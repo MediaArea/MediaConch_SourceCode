@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{16615b4b-f6f6-4711-b84e-0c274ffe74bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{905b9726-45c0-4a7d-96c8-4a9ef9fe1873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\_Automated">
+      <UniqueIdentifier>{4bbb3fb2-9002-40fd-8895-7484f292962a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\_Automated">
+      <UniqueIdentifier>{0346e935-23a9-493f-b58e-e8cbeee949d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{38264c64-6e1e-4f5a-9906-a6c27769b269}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{ca9be640-a193-4ba5-a1ea-2bbea3b077f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MediaConch_GUI.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_mainwindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\qrc_Resources.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Core.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_mainwindow.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
