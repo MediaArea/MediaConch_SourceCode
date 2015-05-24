@@ -45,19 +45,12 @@ ZenLib::Ztring LogFile_FileName;
 int Parse(Core &MI, MediaInfoNameSpace::String &Argument)
 {
     if (0);
-    OPTION("--full",                                        Full)
-    OPTION("-f",                                            Full)
     OPTION("--help",                                        Help)
     OPTION("-h",                                            Help)
-    OPTION("--tool",                                        Tool)
-    OPTION("--language",                                    Language)
-    OPTION("--output=",                                     Output)
-    OPTION("--format=",                                     Format)
-    OPTION("--logfile",                                     LogFile)
-    OPTION("--bom",                                         Bom)
     OPTION("--version",                                     Version)
-    //Obsolete
-    OPTION("-lang=raw",                                     Language)
+    OPTION("--tool",                                        Tool)
+    OPTION("--format",                                      Format)
+    OPTION("--output",                                      Output)
     //Default
     OPTION("--",                                            Default)
     else
@@ -67,44 +60,16 @@ int Parse(Core &MI, MediaInfoNameSpace::String &Argument)
 }
 
 //---------------------------------------------------------------------------
-CL_OPTION(Full)
-{
-    MI.Menu_Debug_Complete(1);
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
 CL_OPTION(Help)
 {
-    MI.Menu_Help_Version();
-
-    TEXTOUT("MediaConch Command line, ");
-    STRINGOUT(MI.Text_Get());
+    Version();
     return Help();
 }
 
 //---------------------------------------------------------------------------
-CL_OPTION(Info_Parameters)
+CL_OPTION(Version)
 {
-    MI.Menu_Help_Info_Parameters();
-
-    STRINGOUT(MI.Text_Get());
-
-    return -1;
-}
-
-//---------------------------------------------------------------------------
-CL_OPTION(Inform)
-{
-    //Form : --Inform=Text
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos==String::npos)
-        return Help_Output();
-
-    MI.Menu_Option_Preferences_Inform(Argument.substr(Egal_Pos+1));
-
-    return 0;
+    return Version();
 }
 
 //---------------------------------------------------------------------------
@@ -117,27 +82,26 @@ CL_OPTION(Tool)
 
     String Tool=Argument.substr(Egal_Pos+1);
     if (Tool==__T("MediaInfo") || Tool==__T("mediainfo"))
-    {
         MI.Tool=Core::tool_MediaInfo;
-        MI.Menu_Option_Preferences_Option(__T("Complete"), __T("1"));
-        //MI.Menu_Option_Preferences_Option(__T("ReadByHuman"), __T("0"));
-        MI.Menu_Option_Preferences_Option(__T("Language"), __T("raw"));
-    }
     if (Tool==__T("MediaTrace") || Tool==__T("mediatrace"))
-    {
-        MI.Menu_Option_Preferences_Option(__T("Details"), __T("1"));
         MI.Tool=Core::tool_MediaTrace;
-    }
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-CL_OPTION(Language)
+CL_OPTION(Format)
 {
+    //Form : --Inform=Text
     size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos!=String::npos)
-        MI.Menu_Language(Argument.substr(Egal_Pos+1));
+    if (Egal_Pos==String::npos)
+        return Help_Output();
+
+    String Format=Argument.substr(Egal_Pos+1);
+    if (Format==__T("XML") || Format==__T("xml"))
+        MI.Format=Core::format_Xml;
+    if (Format==__T("XML") || Format==__T("xml"))
+        MI.Format=Core::format_Xml;
 
     return 0;
 }
@@ -151,54 +115,6 @@ CL_OPTION(Output)
         return Help_Output();
 
     MI.Menu_Option_Preferences_Inform(Argument.substr(Egal_Pos+1));
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-CL_OPTION(Format)
-{
-    //Form : --Inform=Text
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos==String::npos)
-        return Help_Output();
-
-    MI.Menu_Option_Preferences_Inform(Argument.substr(Egal_Pos+1));
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-#if defined(_MSC_VER) && defined(UNICODE)
-    bool CLI_Option_Bom;
-#endif //defined(_MSC_VER) && defined(UNICODE)
-CL_OPTION(Bom)
-{
-    #if defined(_MSC_VER) && defined(UNICODE)
-        fwprintf(stdout, L"\uFEFF");
-        fwprintf(stderr, L"\uFEFF");
-        CLI_Option_Bom=true;
-    #endif //defined(_MSC_VER) && defined(UNICODE)
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-CL_OPTION(Version)
-{
-    MI.Menu_Help_Version();
-
-    TEXTOUT("MediaConch Command line, ");
-    STRINGOUT(MI.Text_Get());
-
-    return -1;
-}
-
-//---------------------------------------------------------------------------
-CL_OPTION(LogFile)
-{
-    //Form : --LogFile=Text
-    LogFile_FileName.assign(Argument, 10, std::string::npos);
 
     return 0;
 }
@@ -222,19 +138,7 @@ CL_OPTION(Default)
     return 0;
 }
 
-void LogFile_Action(ZenLib::Ztring Inform)
-{
-    if (LogFile_FileName.empty())
-        return;
-
-    std::string Inform_Ansi=Inform.To_UTF8();
-    std::fstream File(LogFile_FileName.To_Local().c_str(), std::ios_base::out|std::ios_base::trunc);
-    #if defined(_MSC_VER) && defined(UNICODE)
-        if (CLI_Option_Bom)
-            File.write("\xEF\xBB\xBF", 3);
-    #endif //defined(_MSC_VER) && defined(UNICODE)
-    File.write(Inform_Ansi.c_str(), Inform_Ansi.size());
-}
+//---------------------------------------------------------------------------
 void CallBack_Set(Core &MI, void* Event_CallBackFunction)
 {
     //CallBack configuration

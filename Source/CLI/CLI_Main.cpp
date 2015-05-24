@@ -25,12 +25,6 @@ using namespace MediaInfoNameSpace;
 #include "MediaInfo/MediaInfo_Events.h"
 //---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-#if defined(_MSC_VER) && defined(UNICODE)
-    extern bool CLI_Option_Bom;
-#endif //defined(_MSC_VER) && defined(UNICODE)
-//---------------------------------------------------------------------------
-
 //****************************************************************************
 // Event to manage
 //****************************************************************************
@@ -106,19 +100,16 @@ int main(int argc, char* argv_ansi[])
     #if defined(_MSC_VER) && defined(UNICODE)
         _setmode(_fileno(stdout), _O_U8TEXT);
         _setmode(_fileno(stderr), _O_U8TEXT);
-        CLI_Option_Bom=false;
     #endif
     MediaInfo::Option_Static(__T("LineSeparator"), __T("\n")); //Using sdtout
 
     //Configure MediaConch core
     Core MI;
-    MI.Menu_View_Text(); //Default to text with CLI.
 
     //Retrieve command line (mainly for Unicode)
     GETCOMMANDLINE();
 
     //Parse command line
-    vector<String> List;
     for (int Pos=1; Pos<argc; Pos++)
     {
         //First part of argument (before "=") should be case insensitive
@@ -131,28 +122,19 @@ int main(int argc, char* argv_ansi[])
         if (Return<0)
             return Return; //no more tasks to do
         if (Return>0)
-            List.push_back(argv[Pos]); //Append the filename to the list of filenames to parse
+            MI.List.push_back(argv[Pos]); //Append the filename to the list of filenames to parse
     }
 
     //If no filenames (and no options)
-    if (List.empty())
+    if (MI.List.empty())
         return Help_Nothing();
 
     //Callback for error handling
     CallBack_Set(MI, (void*)Event_CallBackFunction);
 
-    //Parse files
-    MI.Menu_File_Open_Files_Begin();
-    size_t Files_Count=0;
-    for (size_t Pos=0; Pos<List.size(); Pos++)
-        Files_Count+=MI.Menu_File_Open_Files_Continue(List[Pos]);
+    STRINGOUT(MI.Run());
 
-    STRINGOUT(MI.Tool_Run());
-
-    //Output, in a file if needed
-    //LogFile_Action(MI.Inform_Get());
-
-    return Files_Count?0:1;
+    return 1;
 }
 //---------------------------------------------------------------------------
 

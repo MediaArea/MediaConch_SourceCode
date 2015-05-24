@@ -130,3 +130,11 @@ int Help_Output()
 
     return -1;
 }
+
+//---------------------------------------------------------------------------
+int Version()
+{
+    TEXTOUT("MediaConch Command Line Interface 15.04");
+
+    return -1;
+}

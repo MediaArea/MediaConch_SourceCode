@@ -56,12 +56,6 @@
     <ClInclude Include="..\..\..\Source\Common\Core.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Common\Preferences.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Common\Utils.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MediaConch_CLI.rc">

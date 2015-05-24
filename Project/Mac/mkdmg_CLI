@@ -11,7 +11,7 @@ FILES="$3"
 
 APPNAME="MediaConch"
 KIND="CLI"
-VERSION="0.7.68"
+VERSION="15.04"
 SIGNATURE="MediaArea.net"
 
 DMG="tmp-${APPNAME}_${KIND}.dmg"
@@ -33,7 +33,7 @@ pkgbuild --root "${FILES}-Root" --identifier net.mediaarea.mediaconch.mac-cli --
 codesign -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}/mediaconch.pkg"
 cp ../../License.html "${FILES}/License.html"
 cp ../../Release/ReadMe_CLI_Mac.txt "${FILES}/ReadMe.txt"
-cp ../../History_CLI.txt "${FILES}/History.txt"
+cp ../../History_${KIND}.txt "${FILES}/History.txt"
 mkdir "${FILES}/.background"
 cp Logo_White.icns "${FILES}/.background/Logo_White.icns"
 
