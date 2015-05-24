@@ -42,8 +42,14 @@ ZenLib::Ztring LogFile_FileName;
 // Main
 //***************************************************************************
 
-int Parse(Core &MI, MediaInfoNameSpace::String &Argument)
+int Parse(Core &MI, MediaInfoNameSpace::String Argument)
 {
+    if (Argument==__T("-ti"))
+        Argument = __T("--tool=Info");
+    if (Argument==__T("-tt"))
+        Argument = __T("--tool=Trace");
+    if (Argument==__T("-fx"))
+        Argument = __T("--format=XML");
     if (0);
     OPTION("--help",                                        Help)
     OPTION("-h",                                            Help)

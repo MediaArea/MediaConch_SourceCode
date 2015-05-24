@@ -18,7 +18,7 @@
 //
 //***************************************************************************
 
-int Parse(Core &I, MediaInfoNameSpace::String &Argument);
+int Parse(Core &I, MediaInfoNameSpace::String Argument);
 
 
 //---------------------------------------------------------------------------

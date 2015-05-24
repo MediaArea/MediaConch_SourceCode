@@ -27,7 +27,7 @@ int Help()
     TEXTOUT("Options:");
     TEXTOUT("--Help, -h");
     TEXTOUT("                    Display this help and exit");
-    TEXTOUT("--Tool=MediaInfo, -tm");
+    TEXTOUT("--Tool=Info, -ti");
     TEXTOUT("                    Output MediaInfo report");
     TEXTOUT("--Tool=Trace, -tt");
     TEXTOUT("                    Output a trace of the file");
