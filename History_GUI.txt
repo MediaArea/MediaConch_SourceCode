@@ -1,0 +1,12 @@
+﻿Notes :
+-------
++ Added
+- Deleted
+x Correction
+#number is the identifier of bug report (B), requested feature (F) or patch (P)
+bug reports and feature request are here :
+https://sourceforge.net/p/mediaconch/_list/tickets
+
+
+Version 15.05
+-------------
