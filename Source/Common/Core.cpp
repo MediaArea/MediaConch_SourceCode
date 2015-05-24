@@ -174,7 +174,7 @@ String Core::MediaConch ()
                 if (MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version")).substr(8) >= __T("3.0"))
                 {
                     Out<<(!MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetection")).empty()?__T("Pass"):__T("Fail"));
-                    Out<<    __T(" | Error detection               : ")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetection")).empty()?__T("No"):MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetection")))<<endl;
+                    Out<<    __T(" | Error detection type          : ")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetectionType")).empty()?__T("No"):MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetection")))<<endl;
                 }
             }
         }
