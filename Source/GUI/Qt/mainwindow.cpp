@@ -16,6 +16,7 @@
 #include <QDropEvent>
 #include <QDragEnterEvent>
 #include <QMimeData>
+#include <QLabel>
 
 //***************************************************************************
 // Constructor / Desructor
@@ -36,13 +37,13 @@ MainWindow::MainWindow(QWidget *parent) :
     FormatGroup->addAction(ui->actionText);
     FormatGroup->addAction(ui->actionXml);
     
-    // Central widget
-    QVBoxLayout* Layout=new QVBoxLayout(this);
-    plainTextEdit=new QPlainTextEdit(this);
-    plainTextEdit->setReadOnly(true);
-    plainTextEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    Layout->addWidget(plainTextEdit);
+    // Visual elements
+    Layout=new QVBoxLayout(this);
     ui->centralWidget->setLayout(Layout);
+    MainText=NULL;
+    DragDrop_Image=NULL;
+    DragDrop_Text=NULL;
+    createDragDrop();
 
     // Drag n drop
     setAcceptDrops(true);
@@ -90,9 +91,14 @@ void MainWindow::dropEvent(QDropEvent *Event)
 //---------------------------------------------------------------------------
 void MainWindow::Run()
 {
-    String Content=C.Run();
-
-    plainTextEdit->setPlainText(QString().fromStdWString(Content.c_str()));
+    if (C.List.empty())
+    {
+        createDragDrop();
+        return;
+    }
+    createMainText();
+        
+    MainText->setPlainText(QString().fromStdWString(C.Run().c_str()));
 }
 
 //***************************************************************************
@@ -155,3 +161,66 @@ void MainWindow::on_actionXml_triggered()
     C.Format=Core::format_Xml;
     Run();
 }
+
+//***************************************************************************
+// Visual elements
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void MainWindow::clearVisualElements()
+{
+    if (MainText)
+    {
+        Layout->removeWidget(MainText);
+        delete MainText; MainText=NULL;
+    }
+
+    if (DragDrop_Image)
+    {
+        Layout->removeWidget(DragDrop_Image);
+        Layout->removeWidget(DragDrop_Text);
+        delete DragDrop_Image; DragDrop_Image=NULL;
+        delete DragDrop_Text; DragDrop_Text=NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createMainText()
+{
+    if (MainText)
+        return;
+
+    clearVisualElements();
+
+    MainText=new QPlainTextEdit(this);
+    MainText->setReadOnly(true);
+    MainText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    Layout->addWidget(MainText);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createDragDrop()
+{
+    if (DragDrop_Image)
+        return;
+
+    clearVisualElements();
+
+    QFont Font;
+    Font.setPointSize(Font.pointSize()*4);
+
+    DragDrop_Image=new QLabel(this);
+    DragDrop_Image->setAlignment(Qt::AlignCenter);
+    DragDrop_Image->setPixmap(QPixmap(":/icon/dropfiles.png").scaled(256, 256));
+    Layout->addWidget(DragDrop_Image);
+
+    DragDrop_Text=new QLabel(this);
+    DragDrop_Text->setAlignment(Qt::AlignCenter);
+    DragDrop_Text->setFont(Font);
+    QPalette Palette(DragDrop_Text->palette());
+    Palette.setColor(QPalette::WindowText, Qt::darkGray);
+    DragDrop_Text->setPalette(Palette);
+    DragDrop_Text->setText("Drop video file(s) here");
+    Layout->addWidget(DragDrop_Text);
+}
+

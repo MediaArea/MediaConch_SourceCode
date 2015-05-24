@@ -15,7 +15,9 @@ namespace Ui {
 class MainWindow;
 }
 
+class QVBoxLayout;
 class QPlainTextEdit;
+class QLabel;
 
 class MainWindow : public QMainWindow
 {
@@ -32,9 +34,6 @@ public:
     // UI
     void                        Ui_Init                     ();
 
-    // Visual elements
-    QPlainTextEdit*             plainTextEdit;
-
     // Helpers
     void                        Run();
 
@@ -43,6 +42,15 @@ private:
 
     // Internal
     Core C;
+
+    // Visual elements
+    QVBoxLayout*                Layout;
+    QPlainTextEdit*             MainText;
+    QLabel*                     DragDrop_Image;
+    QLabel*                     DragDrop_Text;
+    void                        clearVisualElements();
+    void                        createDragDrop();
+    void                        createMainText();
 
 private Q_SLOTS:
 

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/icon">
         <file alias="icon.png">Image/MediaConch.png</file>
+        <file alias="dropfiles.png">dropfiles_gray.png</file>
     </qresource>
 </RCC>
