@@ -74,6 +74,12 @@ String Core::Run ()
                                 MI->Option(__T("ReadByHuman"), __T("1"));
                                 MI->Option(__T("Language"), String());
                                 MI->Option(__T("Details"), __T("0"));
+                                switch (Format)
+                                {
+                                    case format_Xml:
+                                                            return __T("Conch XML output not yet implemented");
+                                    default:                ;
+                                }
                                 break;
         case tool_MediaInfo:
                                 MI->Option(__T("ReadByHuman"), __T("1"));
