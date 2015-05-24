@@ -43,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
     MainText=NULL;
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
-    createDragDrop();
 
     // Drag n drop
     setAcceptDrops(true);
@@ -52,6 +51,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/icon/icon.png"));
     move(QApplication::desktop()->screenGeometry().width()/4, QApplication::desktop()->screenGeometry().height()/4);
     resize(QApplication::desktop()->screenGeometry().width()/2, QApplication::desktop()->screenGeometry().height()/2);
+
+    // Default
+    on_actionConch_triggered();
 }
 
 MainWindow::~MainWindow()
@@ -130,6 +132,10 @@ void MainWindow::on_actionCloseAll_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionConch_triggered()
 {
+    ui->menuFormat->setEnabled(false);
+    ui->actionText->setEnabled(false);
+    ui->actionXml->setEnabled(false);
+
     C.Tool=Core::tool_MediaConch;
     Run();
 }
@@ -137,6 +143,10 @@ void MainWindow::on_actionConch_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionInfo_triggered()
 {
+    ui->menuFormat->setEnabled(true);
+    ui->actionText->setEnabled(true);
+    ui->actionXml->setEnabled(true);
+
     C.Tool=Core::tool_MediaInfo;
     Run();
 }
@@ -144,6 +154,10 @@ void MainWindow::on_actionInfo_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionTrace_triggered()
 {
+    ui->menuFormat->setEnabled(true);
+    ui->actionText->setEnabled(true);
+    ui->actionXml->setEnabled(true);
+
     C.Tool=Core::tool_MediaTrace;
     Run();
 }
