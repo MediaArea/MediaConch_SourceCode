@@ -81,9 +81,9 @@ CL_OPTION(Tool)
         return Help_Output();
 
     String Tool=Argument.substr(Egal_Pos+1);
-    if (Tool==__T("MediaInfo") || Tool==__T("mediainfo"))
+    if (Tool==__T("Info") || Tool==__T("info"))
         MI.Tool=Core::tool_MediaInfo;
-    if (Tool==__T("MediaTrace") || Tool==__T("mediatrace"))
+    if (Tool==__T("Trace") || Tool==__T("trace"))
         MI.Tool=Core::tool_MediaTrace;
 
     return 0;
