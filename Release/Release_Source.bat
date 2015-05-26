@@ -105,25 +105,6 @@ xcopy ..\Contrib\*.doc MediaConch_Source\Contrib\ /S
 rem --- Copying : CVS files ---
 xcopy ..\*.cvsignore MediaConch_Source\
 
-rem --- Copying : MediaInfoLib files ---
-cd ..\..\MediaInfoLib\Release
-call Release_Source.bat SkipCleanUp SkipCompression
-cd ..\..\MediaConch\Release
-move ..\..\MediaInfoLib\Release\MediaConch_Lib_Source .\MediaInfoLib
-
-rem --- Copying : ZenLib files ---
-cd ..\..\ZenLib\Release
-call Release_Source.bat SkipCleanUp SkipCompression
-cd ..\..\MediaConch\Release
-move ..\..\ZenLib\Release\ZenLib_Source .\ZenLib
-
-rem --- Copying : zlib files ---
-xcopy ..\..\Shared\Source\zlib .\zlib\ /S
-xcopy ..\..\Shared\Project\zlib\Template .\zlib\ /S
-
-rem --- Copying : Wx files ---
-xcopy ..\..\Shared\Source\wx .\wx\ /S
-
 
 rem --- Compressing Archive ---
 if "%2"=="SkipCompression" goto SkipCompression
@@ -131,9 +112,6 @@ move MediaConch_Source MediaConch
 ..\..\Shared\Binary\Windows_i386\7-zip\7z a -r -ttar -mx9 MediaConch_Source.tar MediaConch\*
 ..\..\Shared\Binary\Windows_i386\7-zip\7z a -r -tbzip2 -mx9 mediaconch_.tar.bz2 MediaConch_Source.tar
 ..\..\Shared\Binary\Windows_i386\7-zip\7z a -r -tgzip -mx9 mediaconch_-1.tar.gz MediaConch_Source.tar
-del MediaConch_Source.tar
-..\..\Shared\Binary\Windows_i386\7-zip\7z a -r -t7z -mx9 mediaconch__AllInclusive.7z MediaConch\* MediaInfoLib\* ZenLib\* wxMSW\* zlib\*
-move MediaConch MediaConch_Source
 :SkipCompression
 
 rem --- Clean up ---
