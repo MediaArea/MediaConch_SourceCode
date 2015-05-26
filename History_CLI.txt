@@ -5,8 +5,11 @@
 x Correction
 #number is the identifier of bug report (B), requested feature (F) or patch (P)
 bug reports and feature request are here :
-https://sourceforge.net/p/mediaconch/_list/tickets
+https://github.com/MediaArea/MediaConch_SourceCode
 
 
 Version 15.05
 -------------
+Basic hard-coded policy checker (must be Matroska with FFV1 protected by CRC)
+Info tool (Text or XML)
+Trace tool (Text or XML)
