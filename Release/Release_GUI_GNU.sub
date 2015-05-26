@@ -1,0 +1,43 @@
+##  Copyright (c) MediaArea.net SARL. All Rights Reserved.
+ #
+ #  Use of this source code is governed by a BSD-style license that can
+ #  be found in the License.html file in the root of the source tree.
+ ##
+
+#! /bin/sh
+
+#-----------------------------------------------------------------------
+# $1=OS, $2=Platform
+Release_GUI()
+{
+#-----------------------------------------------------------------------
+# Clean up
+test -e MediaConch_GUI_$1_$2.tar     && rm    MediaConch_GUI_$1_$2.tar
+test -e MediaConch_GUI_$1_$2.tar.bz2 && rm    MediaConch_GUI_$1_$2.tar.bz2
+test -d MediaConch_GUI_$1_$2         && rm -r MediaConch_GUI_$1_$2
+mkdir   MediaConch_GUI_$1_$2
+
+#-----------------------------------------------------------------------
+# Copying : Exe
+cp ../Project/GNU/GUI/mediaconch-gui MediaConch_GUI_$1_$2/mediaconch-gui
+cd MediaConch_GUI_$1_$2
+strip mediaconch-gui
+cd ..
+
+#-----------------------------------------------------------------------
+# Copying : Information file
+cp ../License.html MediaConch_GUI_$1_$2/
+cp ../History_GUI.txt MediaConch_GUI_$1_$2/History.txt
+cp ReadMe_GUI_$1.txt MediaConch_GUI_$1_$2/ReadMe.txt
+
+#-----------------------------------------------------------------------
+# Compressing Archive
+tar jchf MediaConch_GUI_$1_$2.tar.bz2 MediaConch_GUI_$1_$2
+
+#-----------------------------------------------------------------------
+# Clean up
+#if "%1"=="SkipCleanUp" goto SkipCleanUp
+#rm -r MediaConch_GUI_$1_$2
+#:SkipCleanUp
+}
+

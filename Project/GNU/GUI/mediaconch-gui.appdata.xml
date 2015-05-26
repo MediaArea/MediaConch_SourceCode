@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2015 MediaArea.net <info@mediaarea.net> -->
+<component type="desktop">
+ <id type="desktop">mediaconch-gui.desktop</id>
+ <metadata_license>CC-BY-3.0</metadata_license>
+ <project_license>MPL-2.0</project_license>
+ <name>MediaConch</name>
+ <summary>Implementation checker, policy checker, reporter, and fixer</summary>
+ <description>
+   <p>MediaConch is an implementation checker, a policy checker, a reporter, and a fixer</p>
+ </description>
+ <url type="homepage">https://mediaarea.net/MediaConch</url>
+ <updatecontact>info@mediaarea.net</updatecontact>
+</component>

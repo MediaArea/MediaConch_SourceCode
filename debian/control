@@ -1,0 +1,35 @@
+Source: mediaconch
+Priority: optional
+Maintainer: MediaArea.net SARL <info@mediaarea.net>
+Build-Depends: debhelper (>= 5), tofrodos, libmediainfo-dev (>= 0.7.74), libzen-dev (>= 0.4.30), libqt4-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool
+Standards-Version: 3.7.3
+Section: libs
+Homepage: http://MediaArea.net/MediaConch
+Vcs-Svn: https://github.com/MediaArea/MediaInfoLib.git
+Vcs-Browser: https://github.com/MediaArea/MediaInfoLib
+
+Package: mediaconch
+Section: utils
+Architecture: any
+Depends: libmediainfo0 (>= 0.7.73), libzen0 (>= 0.4.30), zlib1g
+Description: MediaConch
+ .
+ Implementation checker, policy checker, reporter, and fixer that targets
+ preservation-level audiovisual files (specifically Matroska,
+ Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
+ .
+ This project is maintained by MediaArea and funded by PREFORMA.
+
+Package: mediaconch-gui
+Section: utils
+Architecture: any
+Depends: libqt4-gui, libmediainfo0 (>= 0.7.73), libzen0 (>= 0.4.30), zlib1g
+Description: MediaConch
+ .
+ Implementation checker, policy checker, reporter, and fixer that targets
+ preservation-level audiovisual files (specifically Matroska,
+ Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
+ .
+ This project is maintained by MediaArea and funded by PREFORMA.
+ .
+ This package contains the graphical user interface

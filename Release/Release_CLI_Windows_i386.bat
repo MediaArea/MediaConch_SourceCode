@@ -23,10 +23,6 @@ copy ..\License.* MediaConch_CLI_Windows_i386\
 copy ..\History_CLI.txt MediaConch_CLI_Windows_i386\History.txt
 copy Readme_CLI_Windows.txt MediaConch_CLI_Windows_i386\ReadMe.txt
 
-rem --- Copying : Contrib files ---
-mkdir MediaConch_CLI_Windows_i386\Contrib
-copy ..\Contrib\CLI_Help.doc MediaConch_CLI_Windows_i386\Contrib\
-
 rem --- Compressing Archive ---
 cd MediaConch_CLI_Windows_i386\
 ..\..\..\Shared\Binary\Windows_i386\7-Zip\7z a -r -tzip ..\MediaConch_CLI_Windows_i386.zip *

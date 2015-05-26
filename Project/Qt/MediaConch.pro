@@ -8,7 +8,8 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = MediaConch
+!macx:TARGET = mediaconch-gui
+macx:TARGET = MediaConch
 TEMPLATE = app
 
 CONFIG += qt release
@@ -29,9 +30,11 @@ INCLUDEPATH      += ../../Source \
                     ../../../MediaInfoLib/Source \
                     ../../../ZenLib/Source
 
-LIBS             += ../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a \
-                    ../../../ZenLib/Project/GNU/Library/.libs/libzen.a \
-                    -lz
+!macx:LIBS       += -lmediainfo \
+                    -lzen
+macx:LIBS        += ../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a \
+                    ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
+LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
 
 RESOURCES        += ../../Source/Resource/Resources.qrc

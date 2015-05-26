@@ -1,0 +1,21 @@
+#! /bin/sh
+
+if qmake --version >/dev/null 2>&1
+then
+    qmake
+elif qmake-qt5 --version >/dev/null 2>&1
+then
+    qmake-qt5
+elif qmake5 --version >/dev/null 2>&1
+then
+    qmake5
+elif qmake-qt4 --version >/dev/null 2>&1
+then
+    qmake-qt4
+elif qmake4 --version >/dev/null 2>&1
+then
+    qmake4
+else
+    echo qmake not found
+    exit
+fi

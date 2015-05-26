@@ -17,6 +17,10 @@
 #include <QDragEnterEvent>
 #include <QMimeData>
 #include <QLabel>
+#include <QUrl>
+#if QT_VERSION >= 0x050200
+    #include <QFontDatabase>
+#endif
 
 //***************************************************************************
 // Constructor / Desructor
@@ -210,7 +214,9 @@ void MainWindow::createMainText()
 
     MainText=new QPlainTextEdit(this);
     MainText->setReadOnly(true);
-    MainText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    #if QT_VERSION >= 0x050200
+        MainText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    #endif
     Layout->addWidget(MainText);
 }
 

@@ -12,10 +12,6 @@ del MediaConch_Source.tar
 del mediaconch_-1.tar.gz
 del mediaconch__AllInclusive.7z
 rmdir MediaConch_Source /S /Q
-rmdir MediaInfoLib /S /Q
-rmdir ZenLib /S /Q
-rmdir wxMSW /S /Q
-rmdir zlib /S /Q
 mkdir MediaConch_Source
 
 
@@ -57,6 +53,7 @@ xcopy ..\Project\*.idl MediaConch_Source\Project\ /S
 xcopy ..\Project\*.rgs MediaConch_Source\Project\ /S
 xcopy ..\Project\*.bat MediaConch_Source\Project\ /S
 xcopy ..\Project\*.pro MediaConch_Source\Project\ /S
+xcopy ..\Project\Qt\prepare MediaConch_Source\Project\Qt\ /S
 xcopy ..\Project\BCB\MediaConch*.res MediaConch_Source\Project\BCB /S
 xcopy ..\Project\MSVC2005\*.cpp MediaConch_Source\Project\MSVC2005\ /S
 xcopy ..\Project\MSVC2005\*.c MediaConch_Source\Project\MSVC2005\ /S
@@ -117,8 +114,5 @@ move MediaConch_Source MediaConch
 rem --- Clean up ---
 if "%1"=="SkipCleanUp" goto SkipCleanUp
 rmdir MediaConch_Source /S /Q
+rmdir MediaConch /S /Q
 :SkipCleanUp
-rmdir MediaInfoLib /S /Q
-rmdir ZenLib /S /Q
-rmdir wxMSW /S /Q
-rmdir zlib /S /Q
