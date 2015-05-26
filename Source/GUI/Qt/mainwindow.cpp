@@ -135,8 +135,10 @@ void MainWindow::on_actionConch_triggered()
     ui->menuFormat->setEnabled(false);
     ui->actionText->setEnabled(false);
     ui->actionXml->setEnabled(false);
+    ui->actionText->setChecked(true);
 
     C.Tool=Core::tool_MediaConch;
+    C.Format=Core::format_Text;
     Run();
 }
 
