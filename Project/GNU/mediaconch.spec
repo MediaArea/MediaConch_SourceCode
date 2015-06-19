@@ -25,6 +25,7 @@ BuildRequires:  automake
 BuildRequires:  autoconf
 BuildRequires:  zlib-devel
 BuildRequires:  libqt4-devel
+BuildRequires:  libxml2
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
 %endif

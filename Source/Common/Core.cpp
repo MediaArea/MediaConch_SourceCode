@@ -12,6 +12,7 @@
 
 //---------------------------------------------------------------------------
 #include "Core.h"
+#include "Common/Schematron.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include <sstream>
@@ -116,6 +117,13 @@ String Core::Run ()
                                     default:                ;
                                 }
                                 break;
+        case tool_MediaSchematron:
+                                MI->Option(__T("ReadByHuman"), __T("1"));
+                                MI->Option(__T("Details"), __T("0"));
+                                MI->Option(__T("Complete"), __T("1"));
+                                MI->Option(__T("Language"), __T("raw"));
+                                MI->Option(__T("Inform"), __T("XML"));
+                                break;
         default:                return String();
     }
 
@@ -127,10 +135,11 @@ String Core::Run ()
     // Output
     switch (Tool)
     {
-        case tool_MediaConch:   return MediaConch();
-        case tool_MediaInfo:    return MediaInfo();
-        case tool_MediaTrace:   return MediaTrace();
-        default:                return String();
+        case tool_MediaConch:      return MediaConch();
+        case tool_MediaInfo:       return MediaInfo();
+        case tool_MediaTrace:      return MediaTrace();
+        case tool_MediaSchematron: return MediaSchematron();
+        default:                   return String();
     }
 }
 
@@ -200,4 +209,27 @@ String Core::MediaInfo ()
 String Core::MediaTrace ()
 {
     return MI->Inform();
+}
+
+//---------------------------------------------------------------------------
+String Core::MediaSchematron ()
+{
+    wstringstream Out;
+    Schematron S;
+    std::string file(SchematronFile.begin(), SchematronFile.end());
+
+    S.register_schema_from_file(file.c_str());
+    String tmp = MI->Inform();
+    std::string xml(tmp.begin(), tmp.end());
+
+    if (!S.validate_xml(xml.c_str(), xml.length()))
+    {
+        Out << __T("NOT VALID\n");
+        for (size_t pos = 0; pos < S.errors.size(); pos++) {
+            Out << S.errors[pos].c_str();
+        }
+    } else {
+        Out << __T("VALID");
+    }
+    return Out.str();
 }

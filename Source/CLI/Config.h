@@ -17,6 +17,9 @@
 #endif
 
 //---------------------------------------------------------------------------
+#ifndef ConfigH
+#define ConfigH
+//---------------------------------------------------------------------------
 //Get command line args in main()
 #ifdef UNICODE
     #ifdef _WIN32
@@ -83,3 +86,5 @@ inline void TEXTOUT(const char* Text)
 {
     STRINGOUT(ZenLib::Ztring().From_ISO_8859_1(Text));
 }
+
+#endif

@@ -11,7 +11,7 @@ Vcs-Browser: https://github.com/MediaArea/MediaInfoLib
 Package: mediaconch
 Section: utils
 Architecture: any
-Depends: libmediainfo0 (>= 0.7.73), libzen0 (>= 0.4.30), zlib1g
+Depends: libmediainfo0 (>= 0.7.73), libzen0 (>= 0.4.30), zlib1g, libxml2
 Description: MediaConch
  .
  Implementation checker, policy checker, reporter, and fixer that targets
@@ -23,7 +23,7 @@ Description: MediaConch
 Package: mediaconch-gui
 Section: utils
 Architecture: any
-Depends: libqt4-gui, libmediainfo0 (>= 0.7.73), libzen0 (>= 0.4.30), zlib1g
+Depends: libqt4-gui, libmediainfo0 (>= 0.7.73), libzen0 (>= 0.4.30), zlib1g, libxml2
 Description: MediaConch
  .
  Implementation checker, policy checker, reporter, and fixer that targets

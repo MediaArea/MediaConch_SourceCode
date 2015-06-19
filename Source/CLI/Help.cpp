@@ -33,6 +33,8 @@ int Help()
     TEXTOUT("                    Output a trace of the file");
     TEXTOUT("--Format=XML -fx");
     TEXTOUT("                    Output in XML format (only MediaInfo report for the moment)");
+    TEXTOUT("--schematron=schFileName");
+    TEXTOUT("                    Validate the XML report");
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
     TEXTOUT("--BOM");
@@ -127,6 +129,18 @@ int Help_Output()
     TEXTOUT("and Text.txt contains");
     TEXTOUT("\"Video;%DisplayAspectRatio%\"  for Video Aspect Ratio.");
     TEXTOUT("\"Audio;%Format%\"              for Audio Format.");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_Schematron()
+{
+    TEXTOUT("--Schematron=...  Specify a schema to validate");
+    TEXTOUT("Usage: \"MediaConch --Schematron=FileName\"");
+    TEXTOUT("");
+    TEXTOUT("FileName is the Schematron file used to validate");
+    TEXTOUT("");
 
     return -1;
 }

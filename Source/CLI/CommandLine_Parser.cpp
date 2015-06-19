@@ -57,6 +57,7 @@ int Parse(Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--tool",                                        Tool)
     OPTION("--format",                                      Format)
     OPTION("--output",                                      Output)
+    OPTION("--schematron",                                  SchematronValidation)
     //Default
     OPTION("--",                                            Default)
     else
@@ -109,6 +110,20 @@ CL_OPTION(Format)
     if (Format==__T("XML") || Format==__T("xml"))
         MI.Format=Core::format_Xml;
 
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(SchematronValidation)
+{
+    //Form : --Inform=Text
+    size_t Egal_Pos=Argument.find(__T('='));
+    if (Egal_Pos==String::npos)
+        return Help_Schematron();
+
+    MediaInfoNameSpace::String Sch;
+    MI.SchematronFile.assign(Argument, Egal_Pos+1, std::string::npos);
+    MI.Tool=Core::tool_MediaSchematron;
     return 0;
 }
 

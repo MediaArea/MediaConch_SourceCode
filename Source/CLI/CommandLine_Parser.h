@@ -37,6 +37,7 @@ CL_OPTION(Format);
 CL_OPTION(LogFile);
 CL_OPTION(Bom);
 CL_OPTION(Version);
+CL_OPTION(SchematronValidation);
 CL_OPTION(Default);
 
 //***************************************************************************

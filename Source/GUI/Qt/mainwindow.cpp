@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ToolGroup->addAction(ui->actionConch);
     ToolGroup->addAction(ui->actionInfo);
     ToolGroup->addAction(ui->actionTrace);
+    ToolGroup->addAction(ui->actionSchematron);
     QActionGroup* FormatGroup = new QActionGroup(this);
     FormatGroup->addAction(ui->actionText);
     FormatGroup->addAction(ui->actionXml);
@@ -107,6 +108,13 @@ void MainWindow::Run()
     MainText->setPlainText(QString().fromStdWString(C.Run().c_str()));
 }
 
+//---------------------------------------------------------------------------
+QString MainWindow::ask_for_schematron_file()
+{
+    QString file=QFileDialog::getOpenFileName(this, "Open file", "", "Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    return file;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -169,6 +177,26 @@ void MainWindow::on_actionTrace_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionSchematron_triggered()
+{
+    if (!C.SchematronFile.length())
+    {
+        QString file = ask_for_schematron_file();
+        if (file.length())
+        {
+            C.SchematronFile = file.toStdWString();
+        }
+    }
+    ui->menuFormat->setEnabled(true);
+    ui->actionText->setEnabled(false);
+    ui->actionXml->setEnabled(true);
+    ui->actionXml->setChecked(true);
+
+    C.Tool=Core::tool_MediaSchematron;
+    Run();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionText_triggered()
 {
     C.Format=Core::format_Text;
@@ -179,6 +207,17 @@ void MainWindow::on_actionText_triggered()
 void MainWindow::on_actionXml_triggered()
 {
     C.Format=Core::format_Xml;
+    Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionChooseSchematron_triggered()
+{
+    QString file = ask_for_schematron_file();
+    if (file.length())
+    {
+        C.SchematronFile = file.toStdWString();
+    }
     Run();
 }
 

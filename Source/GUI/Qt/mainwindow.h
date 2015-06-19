@@ -10,6 +10,7 @@
 #include "Common/Core.h"
 
 #include <QMainWindow>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -36,6 +37,7 @@ public:
 
     // Helpers
     void                        Run();
+    QString                     ask_for_schematron_file();
 
 private:
     Ui::MainWindow *ui;
@@ -59,8 +61,10 @@ private Q_SLOTS:
     void on_actionConch_triggered();
     void on_actionInfo_triggered();
     void on_actionTrace_triggered();
+    void on_actionSchematron_triggered();
     void on_actionText_triggered();
     void on_actionXml_triggered();
+    void on_actionChooseSchematron_triggered();
 };
 
 #endif // MAINWINDOW_H

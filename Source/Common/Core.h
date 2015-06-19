@@ -52,6 +52,7 @@ public:
         tool_MediaConch,
         tool_MediaInfo,
         tool_MediaTrace,
+        tool_MediaSchematron,
     };
     tool Tool;
     enum format
@@ -64,6 +65,8 @@ public:
 
     String Run();
 
+    String SchematronFile;
+
 private:
     Core (const Core&);
 
@@ -72,6 +75,7 @@ private:
     String MediaConch();
     String MediaInfo();
     String MediaTrace();
+    String MediaSchematron();
 };
 
 #endif

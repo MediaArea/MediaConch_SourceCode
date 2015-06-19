@@ -36,6 +36,8 @@
     <addaction name="actionOpen"/>
     <addaction name="actionCloseAll"/>
     <addaction name="separator"/>
+    <addaction name="actionChooseSchematron"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuTool">
@@ -45,6 +47,7 @@
     <addaction name="actionConch"/>
     <addaction name="actionInfo"/>
     <addaction name="actionTrace"/>
+    <addaction name="actionSchematron"/>
    </widget>
    <widget class="QMenu" name="menuFormat">
     <property name="title">
@@ -67,6 +70,7 @@
    <addaction name="actionConch"/>
    <addaction name="actionInfo"/>
    <addaction name="actionTrace"/>
+   <addaction name="actionSchematron"/>
    <addaction name="separator"/>
    <addaction name="separator"/>
    <addaction name="actionText"/>
@@ -81,6 +85,11 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionChooseSchematron">
+   <property name="text">
+    <string>Choose Schematron</string>
    </property>
   </action>
   <action name="actionConch">
@@ -110,6 +119,14 @@
     <string>Trace</string>
    </property>
   </action>
+  <action name="actionSchematron">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Schematron</string>
+   </property>
+  </action>
   <action name="actionText">
    <property name="checkable">
     <bool>true</bool>
@@ -132,6 +149,11 @@
   <action name="actionCloseAll">
    <property name="text">
     <string>Close all</string>
+   </property>
+  </action>
+  <action name="actionChooseSch">
+   <property name="text">
+    <string>Choose Schematron file</string>
    </property>
   </action>
  </widget>
