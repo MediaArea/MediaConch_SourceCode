@@ -73,6 +73,9 @@
    <addaction name="actionSchematron"/>
    <addaction name="separator"/>
    <addaction name="separator"/>
+   <addaction name="actionPolicies"/>
+   <addaction name="separator"/>
+   <addaction name="separator"/>
    <addaction name="actionText"/>
    <addaction name="actionXml"/>
   </widget>
@@ -125,6 +128,14 @@
    </property>
    <property name="text">
     <string>Schematron</string>
+   </property>
+  </action>
+  <action name="actionPolicies">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Policies</string>
    </property>
   </action>
   <action name="actionText">

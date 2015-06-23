@@ -21,6 +21,7 @@
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
+#include <sstream>
 
 //***************************************************************************
 // Constructor / Desructor
@@ -38,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ToolGroup->addAction(ui->actionInfo);
     ToolGroup->addAction(ui->actionTrace);
     ToolGroup->addAction(ui->actionSchematron);
+    ToolGroup->addAction(ui->actionPolicies);
     QActionGroup* FormatGroup = new QActionGroup(this);
     FormatGroup->addAction(ui->actionText);
     FormatGroup->addAction(ui->actionXml);
@@ -98,13 +100,20 @@ void MainWindow::dropEvent(QDropEvent *Event)
 //---------------------------------------------------------------------------
 void MainWindow::Run()
 {
+    if (C.Tool == Core::tool_MediaPolicies)
+    {
+        createMainText();
+        createPoliciesPage();
+        return;
+    }
+
     if (C.List.empty())
     {
         createDragDrop();
         return;
     }
     createMainText();
-        
+
     MainText->setPlainText(QString().fromStdWString(C.Run().c_str()));
 }
 
@@ -197,6 +206,18 @@ void MainWindow::on_actionSchematron_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionPolicies_triggered()
+{
+    ui->menuFormat->setEnabled(true);
+    ui->actionText->setEnabled(false);
+    ui->actionXml->setEnabled(true);
+    ui->actionXml->setChecked(true);
+
+    C.Tool=Core::tool_MediaPolicies;
+    Run();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionText_triggered()
 {
     C.Format=Core::format_Text;
@@ -283,5 +304,38 @@ void MainWindow::createDragDrop()
     DragDrop_Text->setPalette(Palette);
     DragDrop_Text->setText("Drop video file(s) here");
     Layout->addWidget(DragDrop_Text);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createPoliciesPage()
+{
+    //TODO: manage the policies here
+
+    String ret = C.Run();
+
+    if (ret.length() > 0) {
+        MainText->setPlainText(QString().fromStdWString(ret));
+    } else if (C.policies.rules.size()) {
+        stringstream out;
+        map<string, vector<Rule *> >::iterator it = C.policies.rules.begin();
+        map<string, vector<Rule *> >::iterator ite = C.policies.rules.end();
+
+        for (; it != ite; ++it) {
+            out << "Name: " << it->first << endl;
+            for (size_t i=0; i < it->second.size(); ++i) {
+                Rule *r = it->second[i];
+
+                out << "Description:" << r->description << endl;
+                if (r->use_free_text) {
+                    out << "Rule:" << r->text << endl;
+                } else {
+                    //TODO
+                }
+                out << "=================================" << endl;
+            }
+            out << "--------------------------------" << endl;
+        }
+        MainText->setPlainText(QString().fromStdString(out.str()));
+    }
 }
 

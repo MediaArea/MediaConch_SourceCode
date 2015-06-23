@@ -53,6 +53,7 @@ private:
     void                        clearVisualElements();
     void                        createDragDrop();
     void                        createMainText();
+    void                        createPoliciesPage();
 
 private Q_SLOTS:
 
@@ -62,6 +63,7 @@ private Q_SLOTS:
     void on_actionInfo_triggered();
     void on_actionTrace_triggered();
     void on_actionSchematron_triggered();
+    void on_actionPolicies_triggered();
     void on_actionText_triggered();
     void on_actionXml_triggered();
     void on_actionChooseSchematron_triggered();

@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Core functions
+// Policies functions
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef CoreH
-#define CoreH
+#ifndef PoliciesH
+#define PoliciesH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -26,60 +26,67 @@
     #include "MediaInfo/MediaInfoList.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
+#include <map>
 #include <vector>
-#include "Policies.h"
+#include <libxml/tree.h>
 using namespace MediaInfoNameSpace;
 using namespace std;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
-// Class Core
+// Rule
 //***************************************************************************
 
-class Core
+struct Rule
+{
+    Rule() {}
+    ~Rule() {}
+    Rule(const Rule&);
+
+    string description;
+
+    bool   use_free_text;
+
+    string type;
+    string field;
+    string validator;
+    string value;
+
+    string text;
+
+private:
+    Rule& operator=(const Rule&);
+};
+
+//***************************************************************************
+// Class Policies
+//***************************************************************************
+
+class Policies
 {
 public:
     //Constructor/Destructor
-    Core();
-    ~Core();
+    Policies();
+    ~Policies();
 
-    //Menu
-    void    Menu_Option_Preferences_Inform  (const MediaInfoNameSpace::String &Inform);
-    String  Menu_Option_Preferences_Option  (const MediaInfoNameSpace::String &Param, const MediaInfoNameSpace::String &Value);
+    String import_schematron(const char* filename);
+    void export_schematron(const char* filename);
+    void add_new_rule(string& name, Rule& r);
 
-    //Config
-    enum tool
-    {
-        tool_MediaConch,
-        tool_MediaInfo,
-        tool_MediaTrace,
-        tool_MediaSchematron,
-        tool_MediaPolicies,
-    };
-    tool Tool;
-    enum format
-    {
-        format_Text,
-        format_Xml,
-    };
-    format Format;
-    vector<String> List;
+    //TODO: parse csv to get the types/fields/validators from file
+    void dump_rules_to_stdout();
 
-    String Run();
-
-    String SchematronFile;
-    Policies policies;
+    map<string, vector<Rule *> > rules;
 
 private:
-    Core (const Core&);
+    Policies (const Policies&);
+    Policies& operator=(const Policies&);
 
-    MediaInfoNameSpace::MediaInfoList* MI;
-
-    String MediaConch();
-    String MediaInfo();
-    String MediaTrace();
-    String MediaSchematron();
-    String MediaPolicies();
+    // HELPER
+    void find_pattern_node(xmlNodePtr node);
+    void find_rule_node(xmlNodePtr node, string pattern_name);
+    void find_assert_node(xmlNodePtr node, string pattern_name);
+    Rule create_rule_from_data(string descr, string data);
 };
 
 #endif

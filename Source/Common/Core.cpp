@@ -124,6 +124,13 @@ String Core::Run ()
                                 MI->Option(__T("Language"), __T("raw"));
                                 MI->Option(__T("Inform"), __T("XML"));
                                 break;
+        case tool_MediaPolicies:
+                                MI->Option(__T("ReadByHuman"), __T("1"));
+                                MI->Option(__T("Details"), __T("0"));
+                                MI->Option(__T("Complete"), __T("1"));
+                                MI->Option(__T("Language"), __T("raw"));
+                                MI->Option(__T("Inform"), __T("XML"));
+                                break;
         default:                return String();
     }
 
@@ -139,6 +146,7 @@ String Core::Run ()
         case tool_MediaInfo:       return MediaInfo();
         case tool_MediaTrace:      return MediaTrace();
         case tool_MediaSchematron: return MediaSchematron();
+        case tool_MediaPolicies:   return MediaPolicies();
         default:                   return String();
     }
 }
@@ -232,4 +240,12 @@ String Core::MediaSchematron ()
         Out << __T("VALID");
     }
     return Out.str();
+}
+
+//---------------------------------------------------------------------------
+String Core::MediaPolicies ()
+{
+    std::string file(SchematronFile.begin(), SchematronFile.end());
+
+    return policies.import_schematron(file.c_str());
 }

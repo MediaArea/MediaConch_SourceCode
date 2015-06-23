@@ -19,6 +19,7 @@ DEFINES          +=  _UNICODE
 
 SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schematron.cpp \
+                    ../../Source/Common/Policies.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp
 
