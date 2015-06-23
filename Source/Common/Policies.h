@@ -87,6 +87,11 @@ private:
     void find_rule_node(xmlNodePtr node, string pattern_name);
     void find_assert_node(xmlNodePtr node, string pattern_name);
     Rule create_rule_from_data(string descr, string data);
+
+    xmlNodePtr write_pattern(string name, vector<Rule *>& r);
+    xmlNodePtr write_rule(Rule *r);
+    xmlNodePtr write_assert(Rule *r);
+    xmlDocPtr  create_doc();
 };
 
 #endif

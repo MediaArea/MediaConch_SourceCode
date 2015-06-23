@@ -151,6 +151,15 @@ void MainWindow::on_actionCloseAll_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionSavePolicies_triggered()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policies"),
+                                                    "", tr("Schematron (*.sch)"));
+
+    C.policies.export_schematron(filename.toStdString().c_str());
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionConch_triggered()
 {
     ui->menuFormat->setEnabled(false);

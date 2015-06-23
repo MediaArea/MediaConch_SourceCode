@@ -100,9 +100,71 @@ String Policies::import_schematron(const char* filename)
     return String();
 }
 
+xmlNodePtr Policies::write_pattern(string name, vector<Rule *>& r)
+{
+    xmlNodePtr pattern = xmlNewNode(NULL, (xmlChar *)"pattern");
+    xmlNewProp(pattern, (const xmlChar *)"name", (const xmlChar *)name.c_str());
+    xmlNsPtr ns = xmlNewNs(pattern, NULL, (const xmlChar *)"sch");
+    pattern->ns = ns;
+
+    for (size_t i = 0; i < r.size(); ++i)
+    {
+        xmlNodePtr node = write_rule(r[i]);
+        xmlAddChild(pattern, node);
+    }
+    return pattern;
+}
+
+xmlNodePtr Policies::write_rule(Rule *r)
+{
+    xmlNodePtr rule = xmlNewNode(NULL, (xmlChar *)"rule");
+    xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/Mediainfo/File");
+    xmlNsPtr ns = xmlNewNs(rule, NULL, (const xmlChar *)"sch");
+    rule->ns = ns;
+
+    xmlNodePtr node = write_assert(r);
+    xmlAddChild(rule, node);
+    return rule;
+}
+
+xmlNodePtr Policies::write_assert(Rule *r)
+{
+    xmlNodePtr assert = xmlNewNode(NULL, (xmlChar *)"assert");
+    xmlNewProp(assert, (xmlChar *)"test", (xmlChar *)r->text.c_str()); //TODO: text in case of real policy
+    xmlNsPtr ns = xmlNewNs(assert, NULL, (const xmlChar *)"sch");
+    assert->ns = ns;
+
+    xmlNodeSetContent(assert, (xmlChar *)r->description.c_str());
+    return assert;
+}
+
+xmlDocPtr Policies::create_doc()
+{
+    xmlDocPtr doc = xmlNewDoc((xmlChar *)"1.0");
+    xmlNodePtr root_node = xmlNewNode(NULL, (xmlChar *)"schema");
+    xmlNsPtr ns = xmlNewNs(root_node, (const xmlChar*)"http://www.ascc.net/xml/schematron",
+                           (const xmlChar *)"sch");
+
+    root_node->ns = ns;
+    xmlDocSetRootElement(doc, root_node);
+
+    map<string, vector<Rule *> >::iterator it = rules.begin();
+    map<string, vector<Rule *> >::iterator ite = rules.end();
+
+    for (; it != ite; ++it)
+    {
+        xmlNodePtr node = write_pattern(it->first, it->second);
+        xmlAddChild(root_node, node);
+    }
+    return doc;
+}
+
 void Policies::export_schematron(const char* filename)
 {
-    //TODO: format schematron from policies
+    xmlDocPtr new_doc = create_doc();
+
+    xmlSaveFormatFile(filename, new_doc, 2);
+    xmlFreeDoc(new_doc);
 }
 
 void Policies::add_new_rule(string& name, Rule& rule)

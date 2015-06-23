@@ -67,6 +67,7 @@ private Q_SLOTS:
     void on_actionText_triggered();
     void on_actionXml_triggered();
     void on_actionChooseSchematron_triggered();
+    void on_actionSavePolicies_triggered();
 };
 
 #endif // MAINWINDOW_H
