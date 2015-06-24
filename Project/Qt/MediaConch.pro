@@ -21,13 +21,16 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Policies.cpp \
                     ../../Source/GUI/Qt/main.cpp \
-                    ../../Source/GUI/Qt/mainwindow.cpp
+                    ../../Source/GUI/Qt/mainwindow.cpp \
+                    ../../Source/GUI/Qt/policiesmenu.cpp
 
 HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schematron.h \
-                    ../../Source/GUI/Qt/mainwindow.h
+                    ../../Source/GUI/Qt/mainwindow.h \
+                    ../../Source/GUI/Qt/policiesmenu.h
 
-FORMS            += ../../Source/GUI/Qt/mainwindow.ui
+FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
+                    ../../Source/GUI/Qt/policiesmenu.ui
 
 INCLUDEPATH      += ../../Source \
                     ../../../MediaInfoLib/Source \

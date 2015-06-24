@@ -81,7 +81,6 @@ String Policies::import_schematron(const char* filename)
 
     xmlDocPtr doc = xmlParseFile(filename);
 
-    rules.clear();
     if (!doc) {
         return String(__T("The schematron file cannot be parsed"));
     }
@@ -91,6 +90,7 @@ String Policies::import_schematron(const char* filename)
         return String(__T("No root node, leaving"));
     }
 
+    rules.clear();
     xmlNodePtr child = root->children;
     while (child) {
         find_pattern_node(child);

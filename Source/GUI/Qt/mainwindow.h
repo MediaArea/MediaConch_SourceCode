@@ -19,6 +19,7 @@ class MainWindow;
 class QVBoxLayout;
 class QPlainTextEdit;
 class QLabel;
+class PoliciesMenu;
 
 class MainWindow : public QMainWindow
 {
@@ -41,6 +42,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    PoliciesMenu   *policiesMenu;
 
     // Internal
     Core C;
@@ -53,7 +55,9 @@ private:
     void                        clearVisualElements();
     void                        createDragDrop();
     void                        createMainText();
-    void                        createPoliciesPage();
+    void                        createPoliciesMenu();
+    void                        displayPoliciesMenu();
+    void                        choose_schematron_file();
 
 private Q_SLOTS:
 
@@ -68,6 +72,7 @@ private Q_SLOTS:
     void on_actionXml_triggered();
     void on_actionChooseSchematron_triggered();
     void on_actionSavePolicies_triggered();
+    void on_importSchematron();
 };
 
 #endif // MAINWINDOW_H

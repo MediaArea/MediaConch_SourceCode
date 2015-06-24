@@ -245,7 +245,5 @@ String Core::MediaSchematron ()
 //---------------------------------------------------------------------------
 String Core::MediaPolicies ()
 {
-    std::string file(SchematronFile.begin(), SchematronFile.end());
-
-    return policies.import_schematron(file.c_str());
+    return String();
 }

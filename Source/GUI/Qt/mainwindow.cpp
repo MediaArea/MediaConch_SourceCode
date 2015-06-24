@@ -6,6 +6,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "policiesmenu.h"
 
 #include <QPlainTextEdit>
 #include <QVBoxLayout>
@@ -18,6 +19,7 @@
 #include <QMimeData>
 #include <QLabel>
 #include <QUrl>
+#include <QPushButton>
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
@@ -50,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     MainText=NULL;
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
+    policiesMenu = NULL;
 
     // Drag n drop
     setAcceptDrops(true);
@@ -102,8 +105,7 @@ void MainWindow::Run()
 {
     if (C.Tool == Core::tool_MediaPolicies)
     {
-        createMainText();
-        createPoliciesPage();
+        displayPoliciesMenu();
         return;
     }
 
@@ -251,6 +253,18 @@ void MainWindow::on_actionChooseSchematron_triggered()
     Run();
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::on_importSchematron()
+{
+    QString file = ask_for_schematron_file();
+    String ret = C.policies.import_schematron(file.toStdString().c_str());
+    if (ret.length() && policiesMenu) {
+        policiesMenu->add_error(ret);
+    }
+
+    Run();
+}
+
 //***************************************************************************
 // Visual elements
 //***************************************************************************
@@ -262,6 +276,12 @@ void MainWindow::clearVisualElements()
     {
         Layout->removeWidget(MainText);
         delete MainText; MainText=NULL;
+    }
+
+    if (policiesMenu)
+    {
+        Layout->removeWidget(policiesMenu);
+        delete policiesMenu; policiesMenu=NULL;
     }
 
     if (DragDrop_Image)
@@ -316,35 +336,30 @@ void MainWindow::createDragDrop()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createPoliciesPage()
+void MainWindow::createPoliciesMenu()
 {
-    //TODO: manage the policies here
-
-    String ret = C.Run();
-
-    if (ret.length() > 0) {
-        MainText->setPlainText(QString().fromStdWString(ret));
-    } else if (C.policies.rules.size()) {
-        stringstream out;
-        map<string, vector<Rule *> >::iterator it = C.policies.rules.begin();
-        map<string, vector<Rule *> >::iterator ite = C.policies.rules.end();
-
-        for (; it != ite; ++it) {
-            out << "Name: " << it->first << endl;
-            for (size_t i=0; i < it->second.size(); ++i) {
-                Rule *r = it->second[i];
-
-                out << "Description:" << r->description << endl;
-                if (r->use_free_text) {
-                    out << "Rule:" << r->text << endl;
-                } else {
-                    //TODO
-                }
-                out << "=================================" << endl;
-            }
-            out << "--------------------------------" << endl;
-        }
-        MainText->setPlainText(QString().fromStdString(out.str()));
+    if (policiesMenu) {
+        policiesMenu->clear();
+        return;
     }
+    clearVisualElements();
+    policiesMenu = new PoliciesMenu(this);
+    QObject::connect(policiesMenu->get_schematron_button(), SIGNAL(clicked()),
+                     this, SLOT(on_importSchematron()));
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::displayPoliciesMenu()
+{
+    createPoliciesMenu();
+
+    Layout->addWidget(policiesMenu);
+    policiesMenu->show_errors();
+
+    map<string, vector<Rule *> >::iterator it = C.policies.rules.begin();
+    map<string, vector<Rule *> >::iterator ite = C.policies.rules.end();
+    for (; it != ite; ++it)
+    {
+        policiesMenu->add_policy(it->first);
+    }
+}
