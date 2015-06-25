@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "policiesmenu.h"
+#include "policiesedit.h"
 
 #include <QPlainTextEdit>
 #include <QVBoxLayout>
@@ -20,6 +21,8 @@
 #include <QLabel>
 #include <QUrl>
 #include <QPushButton>
+#include <QTableWidgetItem>
+#include <QDialogButtonBox>
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
@@ -53,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
     policiesMenu = NULL;
+    policiesEdit = NULL;
 
     // Drag n drop
     setAcceptDrops(true);
@@ -94,6 +98,43 @@ void MainWindow::dropEvent(QDropEvent *Event)
     }
 
     Run();
+}
+
+void MainWindow::rule_to_add(Rule *r)
+{
+    ruleToAdd.push_back(r);
+}
+
+const Rule *MainWindow::get_rule_from_description(string description) const
+{
+    vector<Rule *>::const_iterator it = ruleToAdd.begin();
+    vector<Rule *>::const_iterator ite = ruleToAdd.end();
+
+    for (; it != ite; ++it)
+    {
+        if ((*it)->description == description)
+        {
+            return *it;
+        }
+    }
+
+    string name = policiesEdit->get_old_name();
+    map<string, vector<Rule *> >::const_iterator r = C.policies.rules.find(name);
+    if (r == C.policies.rules.end())
+    {
+        return NULL;
+    }
+    it = r->second.begin();
+    ite = r->second.end();
+
+    for (; it != ite; ++it)
+    {
+        if ((*it)->description == description)
+        {
+            return *it;
+        }
+    }
+    return NULL;
 }
 
 //***************************************************************************
@@ -265,6 +306,63 @@ void MainWindow::on_importSchematron()
     Run();
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::on_addNewPolicy()
+{
+    QString name = getSelectedPolicyName();
+    displayPoliciesEdit(name.toStdString());
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_editPolicy(int row, int column)
+{
+    QTableWidgetItem *item = policiesMenu->get_policies_table()->item(row, column);
+    string name = item->text().toStdString();
+    displayPoliciesEdit(name);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_addNewRuleRejected()
+{
+    ruleToAdd.clear();
+    clearVisualElements();
+    displayPoliciesMenu();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_addNewRuleAccepted()
+{
+    string new_name = policiesEdit->get_new_name();
+    if (!new_name.length())
+    {
+        policiesEdit->add_error(__T("Policy must have a name"));
+        policiesEdit->show_errors();
+        return;
+    }
+    string old_name = policiesEdit->get_old_name();
+
+    if (old_name.length() && old_name != new_name)
+    {
+        map<string, vector<Rule *> >::iterator oldIt = C.policies.rules.find(old_name);
+        if (oldIt != C.policies.rules.end())
+        {
+            C.policies.rules[new_name] = C.policies.rules[old_name];
+            C.policies.rules.erase(oldIt);
+        }
+    }
+
+    vector<Rule *>::iterator it = ruleToAdd.begin();
+    vector<Rule *>::iterator ite = ruleToAdd.end();
+
+    for (; it != ite; ++it)
+    {
+        C.policies.rules[new_name].push_back(*it);
+    }
+    ruleToAdd.clear();
+    clearVisualElements();
+    displayPoliciesMenu();
+}
+
 //***************************************************************************
 // Visual elements
 //***************************************************************************
@@ -284,6 +382,12 @@ void MainWindow::clearVisualElements()
         delete policiesMenu; policiesMenu=NULL;
     }
 
+    if (policiesEdit)
+    {
+        Layout->removeWidget(policiesEdit);
+        delete policiesEdit; policiesEdit=NULL;
+    }
+
     if (DragDrop_Image)
     {
         Layout->removeWidget(DragDrop_Image);
@@ -291,6 +395,8 @@ void MainWindow::clearVisualElements()
         delete DragDrop_Image; DragDrop_Image=NULL;
         delete DragDrop_Text; DragDrop_Text=NULL;
     }
+
+    ruleToAdd.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -346,6 +452,10 @@ void MainWindow::createPoliciesMenu()
     policiesMenu = new PoliciesMenu(this);
     QObject::connect(policiesMenu->get_schematron_button(), SIGNAL(clicked()),
                      this, SLOT(on_importSchematron()));
+    QObject::connect(policiesMenu->get_addNewPolicy_button(), SIGNAL(clicked()),
+                     this, SLOT(on_addNewPolicy()));
+    QObject::connect(policiesMenu->get_policies_table(), SIGNAL(cellDoubleClicked(int, int)),
+                     this, SLOT(on_editPolicy(int, int)));
 }
 
 //---------------------------------------------------------------------------
@@ -362,4 +472,57 @@ void MainWindow::displayPoliciesMenu()
     {
         policiesMenu->add_policy(it->first);
     }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createPoliciesEdit(string name)
+{
+    if (policiesEdit) {
+        policiesEdit->clear();
+        return;
+    }
+
+    policiesMenu->hide();
+    policiesEdit = new PoliciesEdit(this, name);
+    QObject::connect(policiesEdit->get_validation_button(), SIGNAL(accepted()),
+                     this, SLOT(on_addNewRuleAccepted()));
+    QObject::connect(policiesEdit->get_validation_button(), SIGNAL(rejected()),
+                     this, SLOT(on_addNewRuleRejected()));
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::displayPoliciesEdit(string name)
+{
+    createPoliciesEdit(name);
+    Layout->addWidget(policiesEdit);
+    policiesEdit->show_errors();
+
+    if (name.length())
+    {
+        vector<Rule *>::iterator it = C.policies.rules[name.c_str()].begin();
+        vector<Rule *>::iterator ite = C.policies.rules[name.c_str()].end();
+        for (; it != ite; ++it)
+        {
+            policiesEdit->add_rule(*it);
+        }
+    }
+}
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+QString MainWindow::getSelectedPolicyName()
+{
+    QList<QTableWidgetItem *> list = policiesMenu->get_policies_table()->selectedItems();
+
+    if (list.isEmpty())
+    {
+        return QString();
+    }
+
+    QTableWidgetItem *item = list.first();
+
+    return item->text();
 }

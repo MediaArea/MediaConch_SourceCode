@@ -20,6 +20,7 @@ class QVBoxLayout;
 class QPlainTextEdit;
 class QLabel;
 class PoliciesMenu;
+class PoliciesEdit;
 
 class MainWindow : public QMainWindow
 {
@@ -32,6 +33,8 @@ public:
     // Functions
     void dragEnterEvent         (QDragEnterEvent *event);
     void dropEvent              (QDropEvent *event);
+    void rule_to_add(Rule *r);
+    const Rule *get_rule_from_description(string description) const;
 
     // UI
     void                        Ui_Init                     ();
@@ -43,9 +46,14 @@ public:
 private:
     Ui::MainWindow *ui;
     PoliciesMenu   *policiesMenu;
+    PoliciesEdit   *policiesEdit;
 
     // Internal
     Core C;
+
+    //TEMP
+
+    vector<Rule *> ruleToAdd;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -57,7 +65,15 @@ private:
     void                        createMainText();
     void                        createPoliciesMenu();
     void                        displayPoliciesMenu();
+    void                        createPoliciesEdit(string name);
+    void                        displayPoliciesEdit(string name);
     void                        choose_schematron_file();
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
+
+QString getSelectedPolicyName();
 
 private Q_SLOTS:
 
@@ -73,6 +89,10 @@ private Q_SLOTS:
     void on_actionChooseSchematron_triggered();
     void on_actionSavePolicies_triggered();
     void on_importSchematron();
+    void on_addNewPolicy();
+    void on_editPolicy(int row, int column);
+    void on_addNewRuleRejected();
+    void on_addNewRuleAccepted();
 };
 
 #endif // MAINWINDOW_H

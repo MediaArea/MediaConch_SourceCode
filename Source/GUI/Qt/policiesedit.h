@@ -4,8 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#ifndef POLICIESMENU_H
-#define POLICIESMENU_H
+#ifndef POLICIESEDIT_H
+#define POLICIESEDIT_H
 
 //---------------------------------------------------------------------------
 #ifdef MEDIAINFO_DLL_RUNTIME
@@ -25,19 +25,21 @@ using namespace MediaInfoNameSpace;
 using namespace std;
 
 namespace Ui {
-class PoliciesMenu;
+    class PoliciesEdit;
 }
 
 class QPushButton;
-class QTableWidget;
+class Rule;
+class MainWindow;
+class QDialogButtonBox;
 
-class PoliciesMenu : public QFrame
+class PoliciesEdit : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit PoliciesMenu(QWidget *parent = 0);
-    ~PoliciesMenu();
+    explicit PoliciesEdit(QWidget *parent = 0, string policy = string());
+    ~PoliciesEdit();
 
     
 //***************************************************************************
@@ -47,25 +49,36 @@ public:
 void clear();
 void add_error(String error);
 void show_errors();
-void add_policy(string name);
+void add_rule(Rule *r);
+string get_old_name() const;
+string get_new_name() const;
 
 //***************************************************************************
 // Visual element
 //***************************************************************************
 
-const QPushButton *get_schematron_button() const;
-const QPushButton *get_addNewPolicy_button() const;
-const QTableWidget *get_policies_table() const;
+const QPushButton *get_newRule_button() const;
+const QDialogButtonBox *get_validation_button() const;
 
 private:
-    Ui::PoliciesMenu *ui;
+    MainWindow *mainwindow;
+    Ui::PoliciesEdit *ui;
     list<String> errors;
+    string policyName;
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
+
+QString getSelectedRuleName();
 
 //***************************************************************************
 // Slots
 //***************************************************************************
 
 private Q_SLOTS:
+    void on_addNewRule();
+    void cell_double_clicked(int row, int column);
 };
 
-#endif // POLICIESMENU_H
+#endif // POLICIESEDIT_H

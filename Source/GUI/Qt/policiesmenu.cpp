@@ -73,6 +73,7 @@ void PoliciesMenu::add_policy(string name)
     int row = ui->policies->rowCount();
     ui->policies->insertRow(row);
     QTableWidgetItem *item = new QTableWidgetItem(QString().fromStdString(name));
+    item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
     ui->policies->setItem(row, 0, item);
 }
 
@@ -84,6 +85,18 @@ void PoliciesMenu::add_policy(string name)
 const QPushButton *PoliciesMenu::get_schematron_button() const
 {
     return ui->importSchematron;
+}
+
+//---------------------------------------------------------------------------
+const QPushButton *PoliciesMenu::get_addNewPolicy_button() const
+{
+    return ui->addNewPolicy;
+}
+
+//---------------------------------------------------------------------------
+const QTableWidget *PoliciesMenu::get_policies_table() const
+{
+    return ui->policies;
 }
 
 //***************************************************************************
