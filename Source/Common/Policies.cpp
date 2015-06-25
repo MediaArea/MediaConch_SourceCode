@@ -58,6 +58,7 @@ Rule::Rule(const Rule& r)
 //---------------------------------------------------------------------------
 Policies::Policies()
 {
+    create_values_from_csv();
 }
 
 Policies::~Policies()
@@ -225,10 +226,151 @@ Rule Policies::create_rule_from_data(string descr, string data)
     Rule r;
 
     r.description = descr;
-    //TODO try to parse
-    r.use_free_text = true;
-    r.text = data;
+    if (!try_parsing_test(data, &r))
+    {
+        r.use_free_text = true;
+        r.text = data;
+    }
     return r;
+}
+
+bool Policies::check_test_type(const string& type)
+{
+    list<string>::iterator it = existing_type.begin();
+    list<string>::iterator ite = existing_type.end();
+
+    for (; it != ite; ++it)
+    {
+        if (!type.compare(*it))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Policies::check_test_field(const string& field)
+{
+    list<string>::iterator it = existing_field.begin();
+    list<string>::iterator ite = existing_field.end();
+
+    for (; it != ite; ++it)
+    {
+        if (!field.compare(*it))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Policies::check_test_validator(const string& validator)
+{
+    list<validatorType>::iterator it = existing_validator.begin();
+    list<validatorType>::iterator ite = existing_validator.end();
+
+    for (; it != ite; ++it)
+    {
+        if (!validator.compare(it->value))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+string Policies::parse_test_value(string& sub, const string& before, const string& after)
+{
+    if (sub.compare(0, before.length(), before))
+    {
+        return string();
+    }
+    sub = sub.substr(before.length());
+    string::size_type pos = sub.find(after);
+    if (pos == string::npos)
+    {
+        return string();
+    }
+
+    string ret = sub.substr(0, pos);
+    sub = sub.substr(pos + after.length());
+
+    return ret;
+}
+
+string Policies::parse_test_field(string& sub, const string& before)
+{
+    if (sub.compare(0, before.length(), before))
+    {
+        return string();
+    }
+    sub = sub.substr(before.length());
+    if (!sub.length())
+    {
+        return string();
+    }
+    string::size_type pos = sub.find(" ");
+    string ret = sub.substr(0, pos);
+    if (pos == string::npos)
+    {
+        sub = sub.substr(sub.length());
+        return ret;
+    }
+    sub = sub.substr(pos + 1);
+
+    return ret;
+}
+
+bool Policies::try_parsing_test(string data, Rule *r)
+{
+    string sub = data;
+
+    //Type
+    string type = parse_test_value(sub, string("track[@type='"), string("']"));
+    if (!check_test_type(type))
+    {
+        return false;
+    }
+    if (!sub.length())
+    {
+        r->use_free_text = false;
+        r->type = type;
+        return true;
+    }
+
+    //Field
+    string field = parse_test_field(sub, string("/"));
+    if (!check_test_field(field))
+    {
+        return false;
+    }
+    if (!sub.length())
+    {
+        r->use_free_text = false;
+        r->type = type;
+        r->field = field;
+        return true;
+    }
+
+    //Validator
+    string validator = parse_test_value(sub, string(""), string(" "));
+    if (!check_test_validator(validator))
+    {
+        return false;
+    }
+    if (!sub.length())
+    {
+        return false;
+    }
+    r->use_free_text = false;
+    r->type = type;
+    r->field = field;
+    r->validator = validator;
+
+    //Value
+    r->value = sub;
+
+    return true;
 }
 
 void Policies::dump_rules_to_stdout()
@@ -249,8 +391,63 @@ void Policies::dump_rules_to_stdout()
                     cout << endl;
                 } else {
                     //TODO when parsed
+                    cout << "Type:" << r->type;
+                    cout << " ==== Field:" << r->field;
+                    cout << " ==== Validator:" << r->validator;
+                    cout << " ==== Value:" << r->value;
+                    cout << " ==== Desc:" << r->description;
+                    cout << endl;
                 }
-            delete it->second[i];
         }
+    }
+}
+
+void Policies::create_values_from_csv()
+{
+    string types[] = {
+        "General",
+        "Video",
+        "Audio",
+        "Text",
+        "Image",
+        "Other"
+    };
+    for (size_t i=0; i < (sizeof(types) / sizeof(*types)); i++)
+    {
+        existing_type.push_back(types[i]);
+    }
+
+    string fields[] = {
+        "",
+        "Format",
+        "UniqueID",
+        "FileExtension",
+        "Duration",
+        "FrameRate",
+        "DisplayAspectRatio",
+        "coder_type",
+        "Width",
+        "Height",
+        "ColorSpace",
+        "DisplayAspectRatio"
+    };
+    for (size_t i=0; i < (sizeof(fields) / sizeof(*fields)); i++)
+    {
+        existing_field.push_back(fields[i]);
+    }
+
+    validatorType validators[] = {
+        { "", "" },
+        { "=", "Equal" },
+        { "!=", "Not Equal" },
+        { "&gt", "Greater than" },
+        { "&ge", "Greater or equal" },
+        { "&lt", "Less" },
+        { "&le", "Less or equal" }
+    };
+
+    for (size_t i=0; i < (sizeof(validators) / sizeof(*validators)); i++)
+    {
+        existing_validator.push_back(validators[i]);
     }
 }

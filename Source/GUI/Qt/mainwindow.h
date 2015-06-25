@@ -43,6 +43,10 @@ public:
     void                        Run();
     QString                     ask_for_schematron_file();
 
+    const list<string>* providePolicyExistingType() const {return &C.policies.existing_type; }
+    const list<string>* providePolicyExistingField() const {return &C.policies.existing_field; }
+    const list<Policies::validatorType>* providePolicyExistingValidator() const {return &C.policies.existing_validator; }
+
 private:
     Ui::MainWindow *ui;
     PoliciesMenu   *policiesMenu;

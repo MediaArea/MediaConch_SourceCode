@@ -26,6 +26,7 @@
     #include "MediaInfo/MediaInfoList.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
+#include <list>
 #include <map>
 #include <vector>
 #include <libxml/tree.h>
@@ -78,6 +79,23 @@ public:
 
     map<string, vector<Rule *> > rules;
 
+    //***************************************************************************
+    // Type/Field/Validator
+    //***************************************************************************
+
+    //TODO: parse csv file
+    void create_values_from_csv();
+
+    struct validatorType
+    {
+        string value;
+        string pretty_name;
+    };
+
+    list<string> existing_type;
+    list<string> existing_field;
+    list<validatorType> existing_validator;
+
 private:
     Policies (const Policies&);
     Policies& operator=(const Policies&);
@@ -87,6 +105,16 @@ private:
     void find_rule_node(xmlNodePtr node, string pattern_name);
     void find_assert_node(xmlNodePtr node, string pattern_name);
     Rule create_rule_from_data(string descr, string data);
+
+    // HELPER for parsing
+    bool try_parsing_test(string data, Rule *r);
+
+    string parse_test_value(string& sub, const string& start, const string& after);
+    string parse_test_field(string& sub, const string& end);
+
+    bool check_test_type(const string& type);
+    bool check_test_field(const string& field);
+    bool check_test_validator(const string& validator);
 
     xmlNodePtr write_pattern(string name, vector<Rule *>& r);
     xmlNodePtr write_rule(Rule *r);

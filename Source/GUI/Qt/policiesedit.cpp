@@ -29,6 +29,7 @@ PoliciesEdit::PoliciesEdit(QWidget *parent, string name) :
     ui->errors->setReadOnly(true);
     ui->freeText->hide();
     ui->name->setText(QString().fromStdString(policyName));
+    add_values_to_selector();
 
     QObject::connect(ui->newRule, SIGNAL(clicked()), this, SLOT(on_addNewRule()));
     QObject::connect(ui->rules, SIGNAL(cellDoubleClicked(int, int)),
@@ -134,12 +135,16 @@ void PoliciesEdit::on_addNewRule()
     Rule *r = new Rule;
 
     r->description = ui->ruleName->text().toStdString();
-    if (ui->freeTextSelector)
+    if (ui->freeTextSelector->isChecked())
     {
         r->use_free_text = true;
         r->text = ui->freeText->toPlainText().toStdString();
     } else
     {
+        r->type = ui->type->currentText().toStdString();
+        r->field = ui->field->currentText().toStdString();
+        r->validator = ui->validator->currentText().toStdString();
+        r->value = ui->value->text().toStdString();
         r->use_free_text = false;
     }
     add_rule(r);
@@ -177,12 +182,63 @@ void PoliciesEdit::cell_double_clicked(int row, int column)
         return;
     }
 
+    ui->ruleName->setText(item->text());
     if (r->use_free_text)
     {
-        ui->ruleName->setText(item->text());
         ui->freeText->setText(QString().fromStdString(r->text));
         ui->freeTextSelector->setChecked(true);
         Q_EMIT ui->freeTextSelector->clicked();
         return;
+    }
+
+    int pos = ui->type->findText(QString().fromStdString(r->type));
+    if (pos != -1)
+    {
+        ui->type->setCurrentIndex(pos);
+    }
+    pos = ui->field->findText(QString().fromStdString(r->field));
+    if (pos != -1)
+    {
+        ui->field->setCurrentIndex(pos);
+    }
+    pos = ui->validator->findText(QString().fromStdString(r->validator));
+    if (pos != -1)
+    {
+        ui->validator->setCurrentIndex(pos);
+    }
+    ui->value->setText(QString().fromStdString(r->value));
+    ui->editorSelector->setChecked(true);
+    Q_EMIT ui->editorSelector->clicked();
+}
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::add_values_to_selector()
+{
+    const list<string> *existing_type = mainwindow->providePolicyExistingType();
+    list<string>::const_iterator itType = existing_type->begin();
+    list<string>::const_iterator iteType = existing_type->end();
+    for (; itType != iteType; ++itType)
+    {
+        ui->type->addItem(QString().fromStdString(*itType));
+    }
+
+    const list<string> *existing_field = mainwindow->providePolicyExistingField();
+    list<string>::const_iterator itField = existing_field->begin();
+    list<string>::const_iterator iteField = existing_field->end();
+    for (; itField != iteField; ++itField)
+    {
+        ui->field->addItem(QString().fromStdString(*itField));
+    }
+
+    const list<Policies::validatorType> *existing_validator = mainwindow->providePolicyExistingValidator();
+    list<Policies::validatorType>::const_iterator itValidator = existing_validator->begin();
+    list<Policies::validatorType>::const_iterator iteValidator = existing_validator->end();
+    for (; itValidator != iteValidator; ++itValidator)
+    {
+        ui->validator->addItem(QString().fromStdString(itValidator->value));
     }
 }
