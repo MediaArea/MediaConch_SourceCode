@@ -27,6 +27,8 @@ PoliciesMenu::PoliciesMenu(QWidget *parent) :
 
     QObject::connect(ui->deletePolicy, SIGNAL(clicked()),
                      this, SLOT(delete_clicked()));
+    QObject::connect(ui->exportPolicies, SIGNAL(clicked()),
+                     this, SLOT(export_clicked()));
 }
 
 PoliciesMenu::~PoliciesMenu()
@@ -124,4 +126,9 @@ void PoliciesMenu::delete_clicked()
     }
     mainwindow->policy_to_delete(item->text().toStdString());
     ui->policies->removeRow(item->row());
+}
+
+void PoliciesMenu::export_clicked()
+{
+    mainwindow->exporting_to_schematron_file();
 }

@@ -176,6 +176,14 @@ QString MainWindow::ask_for_schematron_file()
     return file;
 }
 
+void MainWindow::exporting_to_schematron_file()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policies"),
+                                                    "", tr("Schematron (*.sch)"));
+
+    C.policies.export_schematron(filename.toStdString().c_str());
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -205,10 +213,7 @@ void MainWindow::on_actionCloseAll_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionSavePolicies_triggered()
 {
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policies"),
-                                                    "", tr("Schematron (*.sch)"));
-
-    C.policies.export_schematron(filename.toStdString().c_str());
+    exporting_to_schematron_file();
 }
 
 //---------------------------------------------------------------------------

@@ -69,6 +69,7 @@ private:
 
 private Q_SLOTS:
     void delete_clicked();
+    void export_clicked();
 };
 
 #endif // POLICIESMENU_H
