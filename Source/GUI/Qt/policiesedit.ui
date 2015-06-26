@@ -17,15 +17,21 @@
    </sizepolicy>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="11" column="0" colspan="2">
-    <widget class="QDialogButtonBox" name="validation">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   <item row="13" column="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
-   </item>
-   <item row="13" column="0" colspan="3">
-    <widget class="QPlainTextEdit" name="errors"/>
+     <property name="sizeType">
+      <enum>QSizePolicy::Maximum</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>150</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="2" column="0">
     <widget class="QRadioButton" name="editorSelector">
@@ -35,30 +41,6 @@
      <property name="checked">
       <bool>true</bool>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="2" rowspan="13">
-    <widget class="QTableWidget" name="rules">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="showGrid">
-      <bool>false</bool>
-     </property>
-     <property name="gridStyle">
-      <enum>Qt::NoPen</enum>
-     </property>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Policy rule</string>
-      </property>
-     </column>
     </widget>
    </item>
    <item row="10" column="0" colspan="2">
@@ -75,6 +57,9 @@ selection-background-color: rgb(255, 170, 0);</string>
      </property>
     </widget>
    </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="ruleName"/>
+   </item>
    <item row="2" column="1">
     <widget class="QRadioButton" name="freeTextSelector">
      <property name="text">
@@ -82,8 +67,8 @@ selection-background-color: rgb(255, 170, 0);</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QLineEdit" name="ruleName"/>
+   <item row="7" column="0" colspan="2">
+    <widget class="QTextEdit" name="freeText"/>
    </item>
    <item row="5" column="0">
     <widget class="QLabel" name="label">
@@ -91,6 +76,9 @@ selection-background-color: rgb(255, 170, 0);</string>
       <string>Rule name:</string>
      </property>
     </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="name"/>
    </item>
    <item row="6" column="0" colspan="2">
     <widget class="QFrame" name="editorFrame">
@@ -151,17 +139,79 @@ selection-background-color: rgb(255, 170, 0);</string>
      </layout>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2">
-    <widget class="QTextEdit" name="freeText"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="name"/>
-   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Policy name:</string>
      </property>
+    </widget>
+   </item>
+   <item row="13" column="4">
+    <widget class="QPushButton" name="deleteRule">
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 0, 0);
+selection-background-color: rgb(255, 0, 0);
+</string>
+     </property>
+     <property name="text">
+      <string>Delete</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="validation">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="5">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Maximum</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>150</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="15" column="0" colspan="6">
+    <widget class="QPlainTextEdit" name="errors"/>
+   </item>
+   <item row="0" column="3" rowspan="13" colspan="3">
+    <widget class="QTableWidget" name="rules">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::NoPen</enum>
+     </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Policy rule</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>

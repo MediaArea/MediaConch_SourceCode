@@ -34,6 +34,7 @@ PoliciesEdit::PoliciesEdit(QWidget *parent, string name) :
     QObject::connect(ui->newRule, SIGNAL(clicked()), this, SLOT(on_addNewRule()));
     QObject::connect(ui->rules, SIGNAL(cellDoubleClicked(int, int)),
                      this, SLOT(cell_double_clicked(int, int)));
+    QObject::connect(ui->deleteRule, SIGNAL(clicked()), this, SLOT(on_deleteRule()));
 }
 
 //---------------------------------------------------------------------------
@@ -167,6 +168,21 @@ void PoliciesEdit::on_addNewRule()
     }
     add_rule(r);
     mainwindow->rule_to_add(r);
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::on_deleteRule()
+{
+    QList<QTableWidgetItem *> list = ui->rules->selectedItems();
+
+    if (list.isEmpty())
+    {
+        return;
+    }
+
+    QTableWidgetItem *item = list.first();
+    mainwindow->rule_to_delete(item->text().toStdString());
+    ui->rules->removeRow(item->row());
 }
 
 //---------------------------------------------------------------------------

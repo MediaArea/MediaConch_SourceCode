@@ -102,7 +102,41 @@ void MainWindow::dropEvent(QDropEvent *Event)
 
 void MainWindow::rule_to_add(Rule *r)
 {
+    // If registered to delete, remove it
+    vector<string>::iterator it = ruleToDelete.begin();
+    vector<string>::iterator ite = ruleToDelete.end();
+
+    for (; it != ite;)
+    {
+        if (*it == r->description)
+        {
+            it = ruleToDelete.erase(it);
+        } else {
+            ++it;
+        }
+    }
     ruleToAdd.push_back(r);
+}
+
+void MainWindow::rule_to_delete(string description)
+{
+    //Remove temporary rules to add for this policy
+    vector<Rule *>::iterator it = ruleToAdd.begin();
+    vector<Rule *>::iterator ite = ruleToAdd.end();
+
+    for (; it != ite;)
+    {
+        if ((*it)->description == description)
+        {
+            delete *it;
+            it = ruleToAdd.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    //Register rule to delete
+    ruleToDelete.push_back(description);
 }
 
 void MainWindow::policy_to_delete(string name)
@@ -358,6 +392,7 @@ void MainWindow::on_editPolicy()
 void MainWindow::on_addNewRuleRejected()
 {
     ruleToAdd.clear();
+    ruleToDelete.clear();
     clearVisualElements();
     displayPoliciesMenu();
 }
@@ -392,6 +427,28 @@ void MainWindow::on_addNewRuleAccepted()
         C.policies.rules[new_name].push_back(*it);
     }
     ruleToAdd.clear();
+
+    vector<string>::iterator itDel = ruleToDelete.begin();
+    vector<string>::iterator iteDel = ruleToDelete.end();
+
+    for (; itDel != iteDel; ++itDel)
+    {
+        vector<Rule *>::iterator itRule = C.policies.rules[new_name].begin();
+        vector<Rule *>::iterator iteRule = C.policies.rules[new_name].end();
+
+        for (; itRule != iteRule;)
+        {
+            if (*itDel == (*itRule)->description)
+            {
+                delete *itRule;
+                itRule = C.policies.rules[new_name].erase(itRule);
+            } else {
+                ++itRule;
+            }
+        }
+    }
+    ruleToDelete.clear();
+
     clearVisualElements();
     displayPoliciesMenu();
 }
