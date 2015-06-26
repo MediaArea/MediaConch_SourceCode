@@ -207,7 +207,7 @@ selection-background-color: rgb(255, 0, 0);
     </widget>
    </item>
    <item row="7" column="2">
-    <widget class="QPushButton" name="edit">
+    <widget class="QPushButton" name="editPolicy">
      <property name="maximumSize">
       <size>
        <width>100</width>

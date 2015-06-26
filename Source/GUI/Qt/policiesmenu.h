@@ -56,6 +56,7 @@ void add_policy(string name);
 
 const QPushButton *get_schematron_button() const;
 const QPushButton *get_addNewPolicy_button() const;
+const QPushButton *get_editPolicy_button() const;
 const QTableWidget *get_policies_table() const;
 
 private:

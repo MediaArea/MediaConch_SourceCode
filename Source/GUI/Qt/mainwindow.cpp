@@ -336,6 +336,25 @@ void MainWindow::on_editPolicy(int row, int column)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_editPolicy()
+{
+    QList<QTableWidgetItem *> list = policiesMenu->get_policies_table()->selectedItems();
+    if (list.isEmpty())
+    {
+        return;
+    }
+
+    QTableWidgetItem *item = list.first();
+
+    if (!item)
+    {
+        return;
+    }
+    string name = item->text().toStdString();
+    displayPoliciesEdit(name);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_addNewRuleRejected()
 {
     ruleToAdd.clear();
@@ -470,6 +489,8 @@ void MainWindow::createPoliciesMenu()
                      this, SLOT(on_addNewPolicy()));
     QObject::connect(policiesMenu->get_policies_table(), SIGNAL(cellDoubleClicked(int, int)),
                      this, SLOT(on_editPolicy(int, int)));
+    QObject::connect(policiesMenu->get_editPolicy_button(), SIGNAL(clicked()),
+                     this, SLOT(on_editPolicy()));
 }
 
 //---------------------------------------------------------------------------

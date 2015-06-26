@@ -96,6 +96,7 @@ private Q_SLOTS:
     void on_importSchematron();
     void on_addNewPolicy();
     void on_editPolicy(int row, int column);
+    void on_editPolicy();
     void on_addNewRuleRejected();
     void on_addNewRuleAccepted();
 };
