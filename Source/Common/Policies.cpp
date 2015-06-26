@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "Policies.h"
 #include <iostream>
+#include <sstream>
 #include <string.h>
 //---------------------------------------------------------------------------
 
@@ -101,6 +102,36 @@ String Policies::import_schematron(const char* filename)
     return String();
 }
 
+string     Policies::serialize_rule_for_test(Rule *r)
+{
+    if (!r)
+    {
+        return string();
+    }
+    if (r->use_free_text)
+    {
+        return r->text;
+    }
+    stringstream ret;
+
+    ret << "track[@type='" << r->type << "']";
+
+    if (!r->field.length())
+    {
+        goto end;
+    }
+    ret << "/" << r->field;
+
+    if (!r->validator.length())
+    {
+        goto end;
+    }
+    ret << " " << r->validator << " " << r->value;
+
+end:
+    return ret.str();
+}
+
 xmlNodePtr Policies::write_pattern(string name, vector<Rule *>& r)
 {
     xmlNodePtr pattern = xmlNewNode(NULL, (xmlChar *)"pattern");
@@ -131,7 +162,7 @@ xmlNodePtr Policies::write_rule(Rule *r)
 xmlNodePtr Policies::write_assert(Rule *r)
 {
     xmlNodePtr assert = xmlNewNode(NULL, (xmlChar *)"assert");
-    xmlNewProp(assert, (xmlChar *)"test", (xmlChar *)r->text.c_str()); //TODO: text in case of real policy
+    xmlNewProp(assert, (xmlChar *)"test", (xmlChar *)serialize_rule_for_test(r).c_str());
     xmlNsPtr ns = xmlNewNs(assert, NULL, (const xmlChar *)"sch");
     assert->ns = ns;
 

@@ -116,6 +116,7 @@ private:
     bool check_test_field(const string& field);
     bool check_test_validator(const string& validator);
 
+    string     serialize_rule_for_test(Rule *r);
     xmlNodePtr write_pattern(string name, vector<Rule *>& r);
     xmlNodePtr write_rule(Rule *r);
     xmlNodePtr write_assert(Rule *r);
