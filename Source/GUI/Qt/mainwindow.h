@@ -34,6 +34,7 @@ public:
     void dragEnterEvent         (QDragEnterEvent *event);
     void dropEvent              (QDropEvent *event);
     void rule_to_add(Rule *r);
+    void policy_to_delete(string name);
     const Rule *get_rule_from_description(string description) const;
 
     // UI
@@ -56,7 +57,6 @@ private:
     Core C;
 
     //TEMP
-
     vector<Rule *> ruleToAdd;
 
     // Visual elements

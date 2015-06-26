@@ -49,6 +49,7 @@ public:
 void clear();
 void add_error(String error);
 void show_errors();
+void clear_errors();
 void add_rule(Rule *r);
 string get_old_name() const;
 string get_new_name() const;

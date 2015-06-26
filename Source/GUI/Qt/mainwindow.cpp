@@ -105,6 +105,15 @@ void MainWindow::rule_to_add(Rule *r)
     ruleToAdd.push_back(r);
 }
 
+void MainWindow::policy_to_delete(string name)
+{
+    //Remove temporary rules to add for this policy
+    ruleToAdd.clear();
+
+    //Delete policy
+    C.policies.rules.erase(name);
+}
+
 const Rule *MainWindow::get_rule_from_description(string description) const
 {
     vector<Rule *>::const_iterator it = ruleToAdd.begin();

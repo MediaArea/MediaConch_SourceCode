@@ -30,6 +30,7 @@ class PoliciesMenu;
 
 class QPushButton;
 class QTableWidget;
+class MainWindow;
 
 class PoliciesMenu : public QFrame
 {
@@ -59,6 +60,7 @@ const QTableWidget *get_policies_table() const;
 
 private:
     Ui::PoliciesMenu *ui;
+    MainWindow *mainwindow;
     list<String> errors;
 
 //***************************************************************************
@@ -66,6 +68,7 @@ private:
 //***************************************************************************
 
 private Q_SLOTS:
+    void delete_clicked();
 };
 
 #endif // POLICIESMENU_H

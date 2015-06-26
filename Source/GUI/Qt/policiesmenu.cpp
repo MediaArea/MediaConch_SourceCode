@@ -6,6 +6,7 @@
 
 #include "policiesmenu.h"
 #include "ui_policiesmenu.h"
+#include "mainwindow.h"
 
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
@@ -17,11 +18,15 @@
 
 PoliciesMenu::PoliciesMenu(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::PoliciesMenu)
+    ui(new Ui::PoliciesMenu),
+    mainwindow((MainWindow *)parent)
 {
     ui->setupUi(this);
     ui->errors->hide();
     ui->errors->setReadOnly(true);
+
+    QObject::connect(ui->deletePolicy, SIGNAL(clicked()),
+                     this, SLOT(delete_clicked()));
 }
 
 PoliciesMenu::~PoliciesMenu()
@@ -103,3 +108,20 @@ const QTableWidget *PoliciesMenu::get_policies_table() const
 // Slots
 //***************************************************************************
 
+void PoliciesMenu::delete_clicked()
+{
+    QList<QTableWidgetItem *> list = ui->policies->selectedItems();
+    if (list.isEmpty())
+    {
+        return;
+    }
+
+    QTableWidgetItem *item = list.first();
+
+    if (!item)
+    {
+        return;
+    }
+    mainwindow->policy_to_delete(item->text().toStdString());
+    ui->policies->removeRow(item->row());
+}

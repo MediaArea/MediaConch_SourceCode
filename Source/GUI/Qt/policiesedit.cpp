@@ -72,10 +72,16 @@ void PoliciesEdit::show_errors()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesEdit::clear()
+void PoliciesEdit::clear_errors()
 {
     ui->errors->hide();
     errors.clear();
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::clear()
+{
+    clear_errors();
     ui->rules->clearContents();
     while (ui->rules->rowCount() > 0)
     {
@@ -135,6 +141,12 @@ void PoliciesEdit::on_addNewRule()
     Rule *r = new Rule;
 
     r->description = ui->ruleName->text().toStdString();
+    if (!r->description.length())
+    {
+        add_error(__T("Name of the rule must be set"));
+        show_errors();
+        return;
+    }
     ui->ruleName->setText(QString());
     if (ui->freeTextSelector->isChecked())
     {
