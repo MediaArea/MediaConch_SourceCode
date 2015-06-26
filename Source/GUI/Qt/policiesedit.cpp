@@ -135,16 +135,22 @@ void PoliciesEdit::on_addNewRule()
     Rule *r = new Rule;
 
     r->description = ui->ruleName->text().toStdString();
+    ui->ruleName->setText(QString());
     if (ui->freeTextSelector->isChecked())
     {
         r->use_free_text = true;
         r->text = ui->freeText->toPlainText().toStdString();
+        ui->freeText->setText(QString());
     } else
     {
         r->type = ui->type->currentText().toStdString();
         r->field = ui->field->currentText().toStdString();
         r->validator = ui->validator->currentText().toStdString();
         r->value = ui->value->text().toStdString();
+        ui->type->setCurrentIndex(0);
+        ui->field->setCurrentIndex(0);
+        ui->validator->setCurrentIndex(0);
+        ui->value->setText(QString());
         r->use_free_text = false;
     }
     add_rule(r);
