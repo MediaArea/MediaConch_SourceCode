@@ -35,18 +35,33 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policiesmenu.ui \
                     ../../Source/GUI/Qt/policiesedit.ui
 
-INCLUDEPATH      += ../../Source \
-                    ../../../MediaInfoLib/Source \
-                    ../../../ZenLib/Source
+INCLUDEPATH      += ../../Source
 
-INCLUDEPATH      += /usr/include/libxml2/
-
-!macx:LIBS       += -lmediainfo \
-                    -lzen
-macx:LIBS        += ../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a \
-                    ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
+exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a) {
+INCLUDEPATH      += ../../../MediaInfoLib/Source
+LIBS             += ../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a
+message("custom libmediainfo: yes")
+}
+else {
+LIBS             += -lmediainfo
+}
+exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
+INCLUDEPATH      += ../../../ZenLib/Source
+LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
+message("custom libzen      : yes")
+}
+else {
+LIBS             += -lzen
+}
+exists(../../../libxml2/.libs/libxml2.a) {
+INCLUDEPATH      += ../../../libxml2/include
+LIBS             += ../../../libxml2/.libs/libxml2.a
+message("custom libxml2      : yes")
+}
+else {
+LIBS             += -lzen
+}
 LIBS             += -lz
-LIBS             += -lxml2
 !macx:LIBS       += -ldl -lrt
 
 RESOURCES        += ../../Source/Resource/Resources.qrc

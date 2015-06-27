@@ -236,7 +236,19 @@ fi
 dnl -------------------------------------------------------------------------
 dnl libxml2
 dnl
-PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.4)
+if test -e ../../../../libxml2/libxml2.la; then
+	CXXFLAGS="$CXXFLAGS  -I../../../../libxml2/include"
+	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libxml2/include"
+	if test "$enable_staticlibs" = "yes"; then
+		with_libxml2="builtin (static)"
+		LIBS="$LIBS  ../../../../libxml2/.libs/libxml2.a"
+	else
+		with_libxml2="builtin"
+		LIBS="$LIBS  -L../../../../libxml2/.libs -lxml2"
+	fi
+else
+	PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.4)
+fi
 
 dnl #########################################################################
 dnl ### Compiler specific
@@ -320,6 +332,7 @@ echo ""
 echo "  Unicode?                                                $enable_unicode"
 echo "  stream missing support?                                 $enable_stream_missing"
 echo ""
+echo "  Using libxml2?                                          $with_libxml2"
 echo "  Using libzen?                                           $with_zenlib"
 echo "  Using libmediainfo?                                     $with_mediainfolib"
 echo ""
