@@ -37,6 +37,7 @@
 //***************************************************************************
 
 ZenLib::Ztring LogFile_FileName;
+String Last_Argument;
 
 //***************************************************************************
 // Main
@@ -44,6 +45,15 @@ ZenLib::Ztring LogFile_FileName;
 
 int Parse(Core &MI, MediaInfoNameSpace::String Argument)
 {
+    if (Last_Argument.length())
+    {
+        Argument = Last_Argument.append(Argument);
+        Last_Argument = __T("");
+    }
+    if (Argument==__T("-p")) {
+        Last_Argument = __T("--policy=");
+        return 0;
+    }
     if (Argument==__T("-ti"))
         Argument = __T("--tool=Info");
     if (Argument==__T("-tt"))
@@ -57,7 +67,7 @@ int Parse(Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--tool",                                        Tool)
     OPTION("--format",                                      Format)
     OPTION("--output",                                      Output)
-    OPTION("--schematron",                                  SchematronValidation)
+    OPTION("--policy",                                      SchematronValidation)
     //Default
     OPTION("--",                                            Default)
     else
@@ -119,7 +129,7 @@ CL_OPTION(SchematronValidation)
     //Form : --Inform=Text
     size_t Egal_Pos=Argument.find(__T('='));
     if (Egal_Pos==String::npos)
-        return Help_Schematron();
+        return Help_Policy();
 
     MediaInfoNameSpace::String Sch;
     MI.SchematronFile.assign(Argument, Egal_Pos+1, std::string::npos);
