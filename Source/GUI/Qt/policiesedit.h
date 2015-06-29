@@ -29,7 +29,7 @@ namespace Ui {
 }
 
 class QPushButton;
-class Rule;
+struct Rule;
 class MainWindow;
 class QDialogButtonBox;
 
