@@ -93,14 +93,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzng.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzng.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,14 +110,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzng.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzng.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +129,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -137,8 +137,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;zlib.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtharfbuzzng.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtharfbuzzng.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,7 +150,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -158,8 +158,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;zlib.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtharfbuzzng.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;qwindows.lib;qminimal.lib;qtharfbuzzng.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,15 +167,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policiesedit.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policiesmenu.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
+    <ClCompile Include="_Automated\moc_policiesedit.cpp" />
+    <ClCompile Include="_Automated\moc_policiesmenu.cpp" />
     <ClCompile Include="_Automated\qrc_Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Common\Core.h" />
+    <ClInclude Include="..\..\..\Source\Common\Policies.h" />
+    <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
+    <ClInclude Include="_Automated\ui_policiesedit.h" />
+    <ClInclude Include="_Automated\ui_policiesmenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

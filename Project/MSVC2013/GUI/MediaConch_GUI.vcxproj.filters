@@ -53,6 +53,24 @@
     <ClCompile Include="..\..\..\Source\Common\Core.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Policies.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Schematron.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policiesedit.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policiesmenu.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_policiesedit.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_policiesmenu.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -63,6 +81,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Core.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Policies.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Schematron.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_policiesedit.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_policiesmenu.h">
+      <Filter>Header Files\_Automated</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
