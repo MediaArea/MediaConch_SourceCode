@@ -130,6 +130,7 @@ void MainWindow::rule_to_delete(string description)
         {
             delete *it;
             it = ruleToAdd.erase(it);
+            ite = ruleToAdd.end();
         } else {
             ++it;
         }
