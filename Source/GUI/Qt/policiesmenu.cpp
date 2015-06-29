@@ -128,14 +128,10 @@ void PoliciesMenu::delete_clicked()
         return;
     }
 
-    QTableWidgetItem *item = list.first();
+    int row = list.first()->row();
 
-    if (!item)
-    {
-        return;
-    }
-    mainwindow->policy_to_delete(item->text().toStdString());
-    ui->policies->removeRow(item->row());
+    mainwindow->policy_to_delete(row);
+    ui->policies->removeRow(row);
 }
 
 void PoliciesMenu::policy_selected_change()

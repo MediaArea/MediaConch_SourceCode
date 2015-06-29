@@ -38,7 +38,7 @@ class PoliciesEdit : public QFrame
     Q_OBJECT
 
 public:
-    explicit PoliciesEdit(QWidget *parent = 0, string policy = string());
+    explicit PoliciesEdit(QWidget *parent = 0);
     ~PoliciesEdit();
 
     
@@ -51,7 +51,7 @@ void add_error(String error);
 void show_errors();
 void clear_errors();
 void add_rule(Rule *r);
-string get_old_name() const;
+void set_name(string& policyName);
 string get_new_name() const;
 
 //***************************************************************************

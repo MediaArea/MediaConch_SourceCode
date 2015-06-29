@@ -27,7 +27,6 @@
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include <list>
-#include <map>
 #include <vector>
 #include <libxml/tree.h>
 using namespace MediaInfoNameSpace;
@@ -73,11 +72,12 @@ public:
     String import_schematron(const char* filename);
     void export_schematron(const char* filename);
     void add_new_rule(string& name, Rule& r);
+    void erase_policy(int index);
 
     //TODO: parse csv to get the types/fields/validators from file
     void dump_rules_to_stdout();
 
-    map<string, vector<Rule *> > rules;
+    vector<pair<string, vector<Rule *> > > rules;
 
     //***************************************************************************
     // Type/Field/Validator

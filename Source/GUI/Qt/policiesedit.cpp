@@ -18,17 +18,15 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-PoliciesEdit::PoliciesEdit(QWidget *parent, string name) :
+PoliciesEdit::PoliciesEdit(QWidget *parent) :
     QFrame(parent),
     mainwindow((MainWindow *)parent),
-    ui(new Ui::PoliciesEdit),
-    policyName(name)
+    ui(new Ui::PoliciesEdit)
 {
     ui->setupUi(this);
     ui->errors->hide();
     ui->errors->setReadOnly(true);
     ui->freeText->hide();
-    ui->name->setText(QString().fromStdString(policyName));
     add_values_to_selector();
 
     ui->deleteRule->setEnabled(false);
@@ -111,6 +109,11 @@ void PoliciesEdit::add_rule(Rule *r)
     ui->rules->setItem(row, 0, item);
 }
 
+void PoliciesEdit::set_name(string& policyName)
+{
+    ui->name->setText(QString().fromStdString(policyName));
+}
+
 const QPushButton *PoliciesEdit::get_newRule_button() const
 {
     return ui->newRule;
@@ -119,11 +122,6 @@ const QPushButton *PoliciesEdit::get_newRule_button() const
 const QDialogButtonBox *PoliciesEdit::get_validation_button() const
 {
     return ui->validation;
-}
-
-string PoliciesEdit::get_old_name() const
-{
-    return policyName;
 }
 
 string PoliciesEdit::get_new_name() const

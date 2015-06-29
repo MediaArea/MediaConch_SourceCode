@@ -64,8 +64,8 @@ Policies::Policies()
 
 Policies::~Policies()
 {
-    map<string, vector<Rule *> >::iterator it = rules.begin();
-    map<string, vector<Rule *> >::iterator ite = rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
 
     for (; it != ite; ++it) {
         for (size_t i = 0; i < it->second.size(); ++i)
@@ -180,8 +180,8 @@ xmlDocPtr Policies::create_doc()
     root_node->ns = ns;
     xmlDocSetRootElement(doc, root_node);
 
-    map<string, vector<Rule *> >::iterator it = rules.begin();
-    map<string, vector<Rule *> >::iterator ite = rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
 
     for (; it != ite; ++it)
     {
@@ -202,7 +202,36 @@ void Policies::export_schematron(const char* filename)
 void Policies::add_new_rule(string& name, Rule& rule)
 {
     Rule *r = new Rule(rule);
-    rules[name].push_back(r);
+
+    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
+
+    for (; it != ite; ++it)
+    {
+        if (it->first == name)
+        {
+            it->second.push_back(r);
+            return;
+        }
+    }
+
+    vector<Rule *> v;
+    v.push_back(r);
+    rules.push_back(make_pair(name, v));
+}
+
+void Policies::erase_policy(int index)
+{
+    if (index < 0 || (unsigned int)index >= rules.size())
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < rules[index].second.size(); ++i)
+    {
+        delete rules[index].second[i];
+    }
+    rules.erase(rules.begin() + index);
 }
 
 void Policies::find_pattern_node(xmlNodePtr node)
@@ -406,8 +435,8 @@ bool Policies::try_parsing_test(string data, Rule *r)
 
 void Policies::dump_rules_to_stdout()
 {
-    map<string, vector<Rule *> >::iterator it = rules.begin();
-    map<string, vector<Rule *> >::iterator ite = rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
 
     for (size_t num = 0; it != ite; ++it, ++num) {
         cout << "#" << num;

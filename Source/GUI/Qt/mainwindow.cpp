@@ -139,13 +139,13 @@ void MainWindow::rule_to_delete(string description)
     ruleToDelete.push_back(description);
 }
 
-void MainWindow::policy_to_delete(string name)
+void MainWindow::policy_to_delete(int index)
 {
     //Remove temporary rules to add for this policy
     ruleToAdd.clear();
 
     //Delete policy
-    C.policies.rules.erase(name);
+    C.policies.erase_policy(index);
 }
 
 const Rule *MainWindow::get_rule_from_description(string description) const
@@ -161,22 +161,28 @@ const Rule *MainWindow::get_rule_from_description(string description) const
         }
     }
 
-    string name = policiesEdit->get_old_name();
-    map<string, vector<Rule *> >::const_iterator r = C.policies.rules.find(name);
-    if (r == C.policies.rules.end())
+    if (policiesMenu)
     {
-        return NULL;
-    }
-    it = r->second.begin();
-    ite = r->second.end();
-
-    for (; it != ite; ++it)
-    {
-        if ((*it)->description == description)
+        QList<QTableWidgetItem *> list = policiesMenu->get_policies_table()->selectedItems();
+        if (list.isEmpty())
         {
-            return *it;
+            return NULL;
+        }
+
+        int row = list.first()->row();
+
+        vector<Rule *>::const_iterator it = C.policies.rules[row].second.begin();
+        vector<Rule *>::const_iterator ite = C.policies.rules[row].second.end();
+
+        for (; it != ite; ++it)
+        {
+            if ((*it)->description == description)
+            {
+                return *it;
+            }
         }
     }
+
     return NULL;
 }
 
@@ -357,16 +363,13 @@ void MainWindow::on_importSchematron()
 //---------------------------------------------------------------------------
 void MainWindow::on_addNewPolicy()
 {
-    QString name = getSelectedPolicyName();
-    displayPoliciesEdit(name.toStdString());
+    displayPoliciesEdit(-1);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_editPolicy(int row, int column)
+void MainWindow::on_editPolicy(int row, int)
 {
-    QTableWidgetItem *item = policiesMenu->get_policies_table()->item(row, column);
-    string name = item->text().toStdString();
-    displayPoliciesEdit(name);
+    displayPoliciesEdit(row);
 }
 
 //---------------------------------------------------------------------------
@@ -385,7 +388,7 @@ void MainWindow::on_editPolicy()
         return;
     }
     string name = item->text().toStdString();
-    displayPoliciesEdit(name);
+    displayPoliciesEdit(item->row());
 }
 
 //---------------------------------------------------------------------------
@@ -407,16 +410,26 @@ void MainWindow::on_addNewRuleAccepted()
         policiesEdit->show_errors();
         return;
     }
-    string old_name = policiesEdit->get_old_name();
 
-    if (old_name.length() && old_name != new_name)
+    int row = -1;
+    if (policiesMenu)
     {
-        map<string, vector<Rule *> >::iterator oldIt = C.policies.rules.find(old_name);
-        if (oldIt != C.policies.rules.end())
+        QList<QTableWidgetItem *> list = policiesMenu->get_policies_table()->selectedItems();
+        if (list.isEmpty())
         {
-            C.policies.rules[new_name] = C.policies.rules[old_name];
-            C.policies.rules.erase(oldIt);
+            goto create_new_policy;
         }
+
+        row = list.first()->row();
+        if (new_name != list.first()->text().toStdString())
+        {
+            C.policies.rules[row].first = new_name;
+        }
+    } else {
+    create_new_policy:
+        vector<Rule *> v;
+        C.policies.rules.push_back(make_pair(new_name, v));
+        row = C.policies.rules.size() - 1;
     }
 
     vector<Rule *>::iterator it = ruleToAdd.begin();
@@ -424,7 +437,7 @@ void MainWindow::on_addNewRuleAccepted()
 
     for (; it != ite; ++it)
     {
-        C.policies.rules[new_name].push_back(*it);
+        C.policies.rules[row].second.push_back(*it);
     }
     ruleToAdd.clear();
 
@@ -433,15 +446,15 @@ void MainWindow::on_addNewRuleAccepted()
 
     for (; itDel != iteDel; ++itDel)
     {
-        vector<Rule *>::iterator itRule = C.policies.rules[new_name].begin();
-        vector<Rule *>::iterator iteRule = C.policies.rules[new_name].end();
+        vector<Rule *>::iterator itRule = C.policies.rules[row].second.begin();
+        vector<Rule *>::iterator iteRule = C.policies.rules[row].second.end();
 
         for (; itRule != iteRule;)
         {
             if (*itDel == (*itRule)->description)
             {
                 delete *itRule;
-                itRule = C.policies.rules[new_name].erase(itRule);
+                itRule = C.policies.rules[row].second.erase(itRule);
             } else {
                 ++itRule;
             }
@@ -558,8 +571,8 @@ void MainWindow::displayPoliciesMenu()
     Layout->addWidget(policiesMenu);
     policiesMenu->show_errors();
 
-    map<string, vector<Rule *> >::iterator it = C.policies.rules.begin();
-    map<string, vector<Rule *> >::iterator ite = C.policies.rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = C.policies.rules.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = C.policies.rules.end();
     for (; it != ite; ++it)
     {
         policiesMenu->add_policy(it->first);
@@ -567,7 +580,7 @@ void MainWindow::displayPoliciesMenu()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createPoliciesEdit(string name)
+void MainWindow::createPoliciesEdit()
 {
     if (policiesEdit) {
         policiesEdit->clear();
@@ -575,7 +588,7 @@ void MainWindow::createPoliciesEdit(string name)
     }
 
     policiesMenu->hide();
-    policiesEdit = new PoliciesEdit(this, name);
+    policiesEdit = new PoliciesEdit(this);
     QObject::connect(policiesEdit->get_validation_button(), SIGNAL(accepted()),
                      this, SLOT(on_addNewRuleAccepted()));
     QObject::connect(policiesEdit->get_validation_button(), SIGNAL(rejected()),
@@ -583,16 +596,17 @@ void MainWindow::createPoliciesEdit(string name)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::displayPoliciesEdit(string name)
+void MainWindow::displayPoliciesEdit(int row)
 {
-    createPoliciesEdit(name);
+    createPoliciesEdit();
     Layout->addWidget(policiesEdit);
     policiesEdit->show_errors();
 
-    if (name.length())
+    if (row != -1)
     {
-        vector<Rule *>::iterator it = C.policies.rules[name.c_str()].begin();
-        vector<Rule *>::iterator ite = C.policies.rules[name.c_str()].end();
+        policiesEdit->set_name(C.policies.rules[row].first);
+        vector<Rule *>::iterator it = C.policies.rules[row].second.begin();
+        vector<Rule *>::iterator ite = C.policies.rules[row].second.end();
         for (; it != ite; ++it)
         {
             policiesEdit->add_rule(*it);
