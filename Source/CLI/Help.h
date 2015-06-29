@@ -17,7 +17,7 @@
 int Help();
 int Help_Nothing();
 int Help_Output();
-int Help_Schematron();
+int Help_Policy();
 int Help_Security();
 
 int Version();
