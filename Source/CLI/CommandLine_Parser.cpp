@@ -37,6 +37,7 @@
 //***************************************************************************
 
 ZenLib::Ztring LogFile_FileName;
+String Last_Argument;
 
 //***************************************************************************
 // Main
@@ -44,6 +45,15 @@ ZenLib::Ztring LogFile_FileName;
 
 int Parse(Core &MI, MediaInfoNameSpace::String Argument)
 {
+    if (Last_Argument.length())
+    {
+        Argument = Last_Argument.append(Argument);
+        Last_Argument = __T("");
+    }
+    if (Argument==__T("-p")) {
+        Last_Argument = __T("--policy=");
+        return 0;
+    }
     if (Argument==__T("-ti"))
         Argument = __T("--tool=Info");
     if (Argument==__T("-tt"))
