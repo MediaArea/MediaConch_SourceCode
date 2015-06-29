@@ -125,14 +125,20 @@ bool Schematron::validate_xml(const char* xml, size_t len, bool silent)
     }
 
     xmlSchematronValidCtxtPtr ctx = NULL;
-    int validation_flags = XML_SCHEMATRON_OUT_TEXT | XML_SCHEMATRON_OUT_ERROR;
+    int validation_flags = XML_SCHEMATRON_OUT_TEXT;
 
     if (silent) {
         validation_flags |= XML_SCHEMATRON_OUT_QUIET;
     }
+
+#if LIBXML_VERSION >= 20632
+    validation_flags |= XML_SCHEMATRON_OUT_ERROR;
+#endif
     ctx = xmlSchematronNewValidCtxt(schematron_ctx, validation_flags);
 
+#if LIBXML_VERSION >= 20632
     xmlSchematronSetValidStructuredErrors(ctx, manage_error, this);
+#endif
 
     int ret = xmlSchematronValidateDoc(ctx, doc);
     xmlSchematronFreeValidCtxt(ctx);
