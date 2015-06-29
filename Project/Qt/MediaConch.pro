@@ -59,7 +59,8 @@ LIBS             += ../../../libxml2/.libs/libxml2.a
 message("custom libxml2      : yes")
 }
 else {
-LIBS             += -lzen
+INCLUDEPATH      += /usr/include/libxml2
+LIBS             += -lxml2
 }
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
