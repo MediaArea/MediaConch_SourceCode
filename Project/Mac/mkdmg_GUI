@@ -11,7 +11,7 @@ FILES="$3"
 
 APPNAME="MediaConch"
 KIND="GUI"
-VERSION="15.05"
+VERSION="15.06"
 SIGNATURE="MediaArea.net"
 
 FINALDMG="${APPNAME}_${KIND}_${VERSION}_Mac.dmg"

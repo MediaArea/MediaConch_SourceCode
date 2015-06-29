@@ -148,7 +148,7 @@ int Help_Schematron()
 //---------------------------------------------------------------------------
 int Version()
 {
-    TEXTOUT("MediaConch Command Line Interface 15.05");
+    TEXTOUT("MediaConch Command Line Interface 15.06");
 
     return -1;
 }
