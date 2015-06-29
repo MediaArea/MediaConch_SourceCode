@@ -136,8 +136,10 @@ xmlNodePtr Policies::write_pattern(string name, vector<Rule *>& r)
 {
     xmlNodePtr pattern = xmlNewNode(NULL, (xmlChar *)"pattern");
     xmlNewProp(pattern, (const xmlChar *)"name", (const xmlChar *)name.c_str());
-    xmlNsPtr ns = xmlNewNs(pattern, NULL, (const xmlChar *)"sch");
-    pattern->ns = ns;
+    xmlNewNs(pattern, NULL, (const xmlChar *)"sch");
+    xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
+                           (const xmlChar *)"sch");
+    pattern->ns = defNs;
 
     for (size_t i = 0; i < r.size(); ++i)
     {
@@ -151,8 +153,10 @@ xmlNodePtr Policies::write_rule(Rule *r)
 {
     xmlNodePtr rule = xmlNewNode(NULL, (xmlChar *)"rule");
     xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/Mediainfo/File");
-    xmlNsPtr ns = xmlNewNs(rule, NULL, (const xmlChar *)"sch");
-    rule->ns = ns;
+    xmlNewNs(rule, NULL, (const xmlChar *)"sch");
+    xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
+                           (const xmlChar *)"sch");
+    rule->ns = defNs;
 
     xmlNodePtr node = write_assert(r);
     xmlAddChild(rule, node);
@@ -163,8 +167,10 @@ xmlNodePtr Policies::write_assert(Rule *r)
 {
     xmlNodePtr assert = xmlNewNode(NULL, (xmlChar *)"assert");
     xmlNewProp(assert, (xmlChar *)"test", (xmlChar *)serialize_rule_for_test(r).c_str());
-    xmlNsPtr ns = xmlNewNs(assert, NULL, (const xmlChar *)"sch");
-    assert->ns = ns;
+    xmlNewNs(assert, NULL, (const xmlChar *)"sch");
+    xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
+                           (const xmlChar *)"sch");
+    assert->ns = defNs;
 
     xmlNodeSetContent(assert, (xmlChar *)r->description.c_str());
     return assert;

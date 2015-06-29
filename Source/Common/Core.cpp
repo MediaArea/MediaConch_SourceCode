@@ -224,9 +224,17 @@ String Core::MediaSchematron ()
 {
     wstringstream Out;
     Schematron S;
-    std::string file(SchematronFile.begin(), SchematronFile.end());
+    xmlDocPtr doc = NULL;
 
-    S.register_schema_from_file(file.c_str());
+    if (policies.rules.size())
+    {
+        doc = policies.create_doc();
+        S.register_schema_from_doc(doc);
+    } else {
+        std::string file(SchematronFile.begin(), SchematronFile.end());
+        S.register_schema_from_file(file.c_str());
+    }
+
     String tmp = MI->Inform();
     std::string xml(tmp.begin(), tmp.end());
 
@@ -238,6 +246,10 @@ String Core::MediaSchematron ()
         }
     } else {
         Out << __T("VALID");
+    }
+    if (doc)
+    {
+        xmlFreeDoc(doc);
     }
     return Out.str();
 }

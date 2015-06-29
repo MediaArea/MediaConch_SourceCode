@@ -33,6 +33,7 @@ public:
     ~Schematron();
     bool             register_schema_from_file(const char* filename);
     bool             register_schema_from_memory();
+    bool             register_schema_from_doc(xmlDocPtr doc);
 
     bool             validate_xml(const char* xml, size_t len, bool silent=true);
     bool             validate_xml_from_file(const char* file, bool silent=true);

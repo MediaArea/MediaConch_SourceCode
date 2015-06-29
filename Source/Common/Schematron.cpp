@@ -42,6 +42,31 @@ Schematron::~Schematron()
 }
 
 //---------------------------------------------------------------------------
+bool Schematron::register_schema_from_doc(xmlDocPtr doc)
+{
+    if (doc == NULL) {
+        return false;
+    }
+    xmlLoadExtDtdDefaultValue |= 1;
+
+    if (schematron_ctx != NULL) {
+        xmlSchematronFree(schematron_ctx);
+        schematron_ctx = NULL;
+    }
+    xmlSchematronParserCtxtPtr parser = xmlSchematronNewDocParserCtxt(doc);
+    if (!parser) {
+        return false;
+    }
+
+    schematron_ctx = xmlSchematronParse(parser); //TODO: Leak?
+    xmlSchematronFreeParserCtxt(parser);
+    if (schematron_ctx == NULL) {
+        return false;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
 bool Schematron::register_schema_from_memory()
 {
     xmlLoadExtDtdDefaultValue |= 1;

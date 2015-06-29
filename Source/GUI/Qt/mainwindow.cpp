@@ -294,7 +294,7 @@ void MainWindow::on_actionTrace_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionSchematron_triggered()
 {
-    if (!C.SchematronFile.length())
+    if (!C.policies.rules.size() && !C.SchematronFile.length())
     {
         QString file = ask_for_schematron_file();
         if (file.length())

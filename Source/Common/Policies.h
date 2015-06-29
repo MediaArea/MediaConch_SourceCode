@@ -73,6 +73,7 @@ public:
     void export_schematron(const char* filename);
     void add_new_rule(string& name, Rule& r);
     void erase_policy(int index);
+    xmlDocPtr  create_doc();
 
     //TODO: parse csv to get the types/fields/validators from file
     void dump_rules_to_stdout();
@@ -120,7 +121,6 @@ private:
     xmlNodePtr write_pattern(string name, vector<Rule *>& r);
     xmlNodePtr write_rule(Rule *r);
     xmlNodePtr write_assert(Rule *r);
-    xmlDocPtr  create_doc();
 };
 
 #endif
