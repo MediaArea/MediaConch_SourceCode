@@ -161,7 +161,7 @@ void PoliciesEdit::on_addNewRule()
     {
         r->type = ui->type->currentText().toStdString();
         r->field = ui->field->currentText().toStdString();
-        r->validator = ui->validator->currentText().toStdString();
+        r->validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
         r->value = ui->value->text().toStdString();
         ui->type->setCurrentIndex(0);
         ui->field->setCurrentIndex(0);
@@ -248,7 +248,7 @@ void PoliciesEdit::cell_clicked(int row, int column)
     {
         ui->field->setCurrentIndex(pos);
     }
-    pos = ui->validator->findText(QString().fromStdString(r->validator));
+    pos = ui->validator->findText(QString().fromStdString(get_validator_pretty_name_from_value(r->validator)));
     if (pos != -1)
     {
         ui->validator->setCurrentIndex(pos);
@@ -286,6 +286,36 @@ void PoliciesEdit::add_values_to_selector()
     list<Policies::validatorType>::const_iterator iteValidator = existing_validator->end();
     for (; itValidator != iteValidator; ++itValidator)
     {
-        ui->validator->addItem(QString().fromStdString(itValidator->value));
+        ui->validator->addItem(QString().fromStdString(itValidator->pretty_name));
     }
+}
+
+string PoliciesEdit::get_validator_value_from_pretty_name(string pretty_name)
+{
+    const list<Policies::validatorType> *existing_validator = mainwindow->providePolicyExistingValidator();
+    list<Policies::validatorType>::const_iterator itValidator = existing_validator->begin();
+    list<Policies::validatorType>::const_iterator iteValidator = existing_validator->end();
+    for (; itValidator != iteValidator; ++itValidator)
+    {
+        if (itValidator->pretty_name == pretty_name)
+        {
+            return itValidator->value;
+        }
+    }
+    return string();
+}
+
+string PoliciesEdit::get_validator_pretty_name_from_value(string value)
+{
+    const list<Policies::validatorType> *existing_validator = mainwindow->providePolicyExistingValidator();
+    list<Policies::validatorType>::const_iterator itValidator = existing_validator->begin();
+    list<Policies::validatorType>::const_iterator iteValidator = existing_validator->end();
+    for (; itValidator != iteValidator; ++itValidator)
+    {
+        if (itValidator->value == value)
+        {
+            return itValidator->pretty_name;
+        }
+    }
+    return string();
 }

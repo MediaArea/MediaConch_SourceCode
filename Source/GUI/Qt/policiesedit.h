@@ -73,6 +73,8 @@ private:
 
 QString getSelectedRuleName();
 void add_values_to_selector();
+string get_validator_value_from_pretty_name(string pretty_name);
+string get_validator_pretty_name_from_value(string value);
 
 //***************************************************************************
 // Slots
