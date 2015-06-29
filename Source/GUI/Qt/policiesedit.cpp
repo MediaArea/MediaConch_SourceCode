@@ -232,7 +232,8 @@ void PoliciesEdit::cell_clicked(int row, int column)
     {
         ui->freeText->setText(QString().fromStdString(r->text));
         ui->freeTextSelector->setChecked(true);
-        Q_EMIT ui->freeTextSelector->clicked();
+        ui->freeText->show();
+        ui->editorFrame->hide();
         return;
     }
 
@@ -253,7 +254,8 @@ void PoliciesEdit::cell_clicked(int row, int column)
     }
     ui->value->setText(QString().fromStdString(r->value));
     ui->editorSelector->setChecked(true);
-    Q_EMIT ui->editorSelector->clicked();
+    ui->editorFrame->show();
+    ui->freeText->hide();
 }
 
 //***************************************************************************
