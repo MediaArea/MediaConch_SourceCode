@@ -35,8 +35,8 @@ PoliciesEdit::PoliciesEdit(QWidget *parent, string name) :
     QObject::connect(ui->newRule, SIGNAL(clicked()), this, SLOT(on_addNewRule()));
     QObject::connect(ui->rules, SIGNAL(itemSelectionChanged()),
                      this, SLOT(rule_selected_changed()));
-    QObject::connect(ui->rules, SIGNAL(cellDoubleClicked(int, int)),
-                     this, SLOT(cell_double_clicked(int, int)));
+    QObject::connect(ui->rules, SIGNAL(cellClicked(int, int)),
+                     this, SLOT(cell_clicked(int, int)));
     QObject::connect(ui->deleteRule, SIGNAL(clicked()), this, SLOT(on_deleteRule()));
 }
 
@@ -214,7 +214,7 @@ QString PoliciesEdit::getSelectedRuleName()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesEdit::cell_double_clicked(int row, int column)
+void PoliciesEdit::cell_clicked(int row, int column)
 {
     QTableWidgetItem *item = ui->rules->item(row, column);
     string ruleName = item->text().toStdString();

@@ -80,7 +80,7 @@ void add_values_to_selector();
 
 private Q_SLOTS:
     void on_addNewRule();
-    void cell_double_clicked(int row, int column);
+    void cell_clicked(int row, int column);
     void on_deleteRule();
     void rule_selected_changed();
 };
