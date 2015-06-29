@@ -54,10 +54,10 @@ void add_policy(string name);
 // Visual element
 //***************************************************************************
 
-const QPushButton *get_schematron_button() const;
-const QPushButton *get_addNewPolicy_button() const;
-const QPushButton *get_editPolicy_button() const;
-const QTableWidget *get_policies_table() const;
+QPushButton *get_schematron_button() const;
+QPushButton *get_addNewPolicy_button() const;
+QPushButton *get_editPolicy_button() const;
+QTableWidget *get_policies_table() const;
 
 private:
     Ui::PoliciesMenu *ui;

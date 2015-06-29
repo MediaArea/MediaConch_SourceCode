@@ -93,25 +93,25 @@ void PoliciesMenu::add_policy(string name)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const QPushButton *PoliciesMenu::get_schematron_button() const
+QPushButton *PoliciesMenu::get_schematron_button() const
 {
     return ui->importSchematron;
 }
 
 //---------------------------------------------------------------------------
-const QPushButton *PoliciesMenu::get_addNewPolicy_button() const
+QPushButton *PoliciesMenu::get_addNewPolicy_button() const
 {
     return ui->addNewPolicy;
 }
 
 //---------------------------------------------------------------------------
-const QPushButton *PoliciesMenu::get_editPolicy_button() const
+QPushButton *PoliciesMenu::get_editPolicy_button() const
 {
     return ui->editPolicy;
 }
 
 //---------------------------------------------------------------------------
-const QTableWidget *PoliciesMenu::get_policies_table() const
+QTableWidget *PoliciesMenu::get_policies_table() const
 {
     return ui->policies;
 }
