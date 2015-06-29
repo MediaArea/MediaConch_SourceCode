@@ -70,6 +70,7 @@ private:
 
 private Q_SLOTS:
     void delete_clicked();
+    void policy_selected_change();
     void export_clicked();
 };
 

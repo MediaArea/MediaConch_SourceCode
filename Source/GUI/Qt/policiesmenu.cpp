@@ -24,9 +24,13 @@ PoliciesMenu::PoliciesMenu(QWidget *parent) :
     ui->setupUi(this);
     ui->errors->hide();
     ui->errors->setReadOnly(true);
+    ui->deletePolicy->setEnabled(false);
+    ui->editPolicy->setEnabled(false);
 
     QObject::connect(ui->deletePolicy, SIGNAL(clicked()),
                      this, SLOT(delete_clicked()));
+    QObject::connect(ui->policies, SIGNAL(itemSelectionChanged()),
+                     this, SLOT(policy_selected_change()));
     QObject::connect(ui->exportPolicies, SIGNAL(clicked()),
                      this, SLOT(export_clicked()));
 }
@@ -132,6 +136,18 @@ void PoliciesMenu::delete_clicked()
     }
     mainwindow->policy_to_delete(item->text().toStdString());
     ui->policies->removeRow(item->row());
+}
+
+void PoliciesMenu::policy_selected_change()
+{
+    if (ui->policies->selectedItems().isEmpty())
+    {
+        ui->deletePolicy->setEnabled(false);
+        ui->editPolicy->setEnabled(false);
+    } else {
+        ui->deletePolicy->setEnabled(true);
+        ui->editPolicy->setEnabled(true);
+    }
 }
 
 void PoliciesMenu::export_clicked()
