@@ -8,7 +8,12 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
-Version 15.05
+Version 15.06, 2015-06-30
+-------------
+Basic Schematron validator
+Basic Schematron file editor
+
+Version 15.05, 2015-05-31
 -------------
 Basic hard-coded policy checker (must be Matroska with FFV1 protected by CRC)
 Info tool (Text or XML)
