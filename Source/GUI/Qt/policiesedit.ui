@@ -175,7 +175,10 @@ selection-background-color: rgb(255, 0, 0);
    <item row="0" column="3" rowspan="13" colspan="3">
     <widget class="QTableWidget" name="rules">
      <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
      </property>
      <property name="showGrid">
       <bool>false</bool>

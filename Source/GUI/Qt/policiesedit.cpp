@@ -26,7 +26,7 @@ PoliciesEdit::PoliciesEdit(QWidget *parent) :
     ui->setupUi(this);
     ui->errors->hide();
     ui->errors->setReadOnly(true);
-    ui->freeText->hide();
+    clear_editor_fields();
     add_values_to_selector();
 
     ui->deleteRule->setEnabled(false);
@@ -89,6 +89,7 @@ void PoliciesEdit::clear()
     {
         ui->rules->removeRow(0);
     }
+    clear_editor_fields();
 }
 
 //---------------------------------------------------------------------------
@@ -149,24 +150,19 @@ void PoliciesEdit::on_addNewRule()
         show_errors();
         return;
     }
-    ui->ruleName->setText(QString());
     if (ui->freeTextSelector->isChecked())
     {
         r->use_free_text = true;
         r->text = ui->freeText->toPlainText().toStdString();
-        ui->freeText->setText(QString());
     } else
     {
         r->type = ui->type->currentText().toStdString();
         r->field = ui->field->currentText().toStdString();
         r->validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
         r->value = ui->value->text().toStdString();
-        ui->type->setCurrentIndex(0);
-        ui->field->setCurrentIndex(0);
-        ui->validator->setCurrentIndex(0);
-        ui->value->setText(QString());
         r->use_free_text = false;
     }
+    clear_editor_fields();
     add_rule(r);
     mainwindow->rule_to_add(r);
 }
@@ -176,14 +172,13 @@ void PoliciesEdit::on_deleteRule()
 {
     QList<QTableWidgetItem *> list = ui->rules->selectedItems();
 
-    if (list.isEmpty())
+    while (!list.isEmpty())
     {
-        return;
+        QTableWidgetItem *item = list.first();
+        mainwindow->rule_to_delete(item->text().toStdString());
+        ui->rules->removeRow(item->row());
+        list.removeFirst();
     }
-
-    QTableWidgetItem *item = list.first();
-    mainwindow->rule_to_delete(item->text().toStdString());
-    ui->rules->removeRow(item->row());
 }
 
 void PoliciesEdit::rule_selected_changed()
@@ -191,6 +186,7 @@ void PoliciesEdit::rule_selected_changed()
     if (ui->rules->selectedItems().isEmpty())
     {
         ui->deleteRule->setEnabled(false);
+        clear_editor_fields();
     } else {
         ui->deleteRule->setEnabled(true);
     }
@@ -318,4 +314,17 @@ string PoliciesEdit::get_validator_pretty_name_from_value(string value)
         }
     }
     return string();
+}
+
+void PoliciesEdit::clear_editor_fields()
+{
+    ui->editorSelector->setChecked(true);
+    ui->freeText->setText(QString());
+    ui->ruleName->setText(QString());
+    ui->type->setCurrentIndex(0);
+    ui->field->setCurrentIndex(0);
+    ui->validator->setCurrentIndex(0);
+    ui->value->setText(QString());
+    ui->editorFrame->show();
+    ui->freeText->hide();
 }
