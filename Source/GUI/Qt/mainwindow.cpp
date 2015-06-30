@@ -111,6 +111,7 @@ void MainWindow::rule_to_add(Rule *r)
         if (*it == r->description)
         {
             it = ruleToDelete.erase(it);
+            ite = ruleToDelete.end();
         } else {
             ++it;
         }
@@ -456,6 +457,7 @@ void MainWindow::on_addNewRuleAccepted()
             {
                 delete *itRule;
                 itRule = C.policies.rules[row].second.erase(itRule);
+                iteRule = C.policies.rules[row].second.end();
             } else {
                 ++itRule;
             }
