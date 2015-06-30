@@ -247,7 +247,29 @@ if test -e ../../../../libxml2/libxml2.la; then
 		LIBS="$LIBS  -L../../../../libxml2/.libs -lxml2"
 	fi
 else
-	PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.4)
+	if pkg-config --exists libxml2; then
+		CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libxml2)"
+		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libxml2)"
+		if test "$enable_staticlibs" = "yes"; then
+			with_libxml2="system (static)"
+			LIBS="$LIBS $(pkg-config --variable=Libs_Static libxml2)"
+		else
+			with_libxml2="system"
+			LIBS="$LIBS $(pkg-config --libs libxml2)"
+		fi
+	elif pkg-config --exists libxml-2.0; then
+		CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libxml-2.0)"
+		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libxml-2.0)"
+		if test "$enable_staticlibs" = "yes"; then
+			with_libxml2="system (static)"
+			LIBS="$LIBS $(pkg-config --variable=Libs_Static libxml-2.0)"
+		else
+			with_libxml2="system"
+			LIBS="$LIBS $(pkg-config --libs libxml-2.0)"
+		fi
+	else
+		AC_MSG_ERROR([libxml2 configuration is not found])
+	fi
 fi
 
 dnl #########################################################################
