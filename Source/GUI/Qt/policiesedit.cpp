@@ -30,18 +30,24 @@ PoliciesEdit::PoliciesEdit(QWidget *parent) :
     add_values_to_selector();
 
     ui->deleteRule->setEnabled(false);
+    ui->editRule->setEnabled(false);
     QObject::connect(ui->newRule, SIGNAL(clicked()), this, SLOT(on_addNewRule()));
     QObject::connect(ui->rules, SIGNAL(itemSelectionChanged()),
                      this, SLOT(rule_selected_changed()));
     QObject::connect(ui->rules, SIGNAL(cellClicked(int, int)),
                      this, SLOT(cell_clicked(int, int)));
     QObject::connect(ui->deleteRule, SIGNAL(clicked()), this, SLOT(on_deleteRule()));
+    QObject::connect(ui->editRule, SIGNAL(clicked()), this, SLOT(on_editRule()));
 }
 
 //---------------------------------------------------------------------------
 PoliciesEdit::~PoliciesEdit()
 {
     delete ui;
+    for (size_t i = 0; i < rules.size(); ++i)
+    {
+        delete rules[i];
+    }
 }
 
 //***************************************************************************
@@ -108,6 +114,8 @@ void PoliciesEdit::add_rule(Rule *r)
     item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 
     ui->rules->setItem(row, 0, item);
+    Rule *new_rule = new Rule(*r);
+    rules.push_back(new_rule);
 }
 
 void PoliciesEdit::set_name(string& policyName)
@@ -130,6 +138,11 @@ string PoliciesEdit::get_new_name() const
     return ui->name->text().toStdString();
 }
 
+const vector<Rule *>& PoliciesEdit::get_rules() const
+{
+    return rules;
+}
+
 //***************************************************************************
 // Visual element
 //***************************************************************************
@@ -137,19 +150,9 @@ string PoliciesEdit::get_new_name() const
 //***************************************************************************
 // Slots
 //***************************************************************************
-
-//---------------------------------------------------------------------------
-void PoliciesEdit::on_addNewRule()
+void PoliciesEdit::copy_visual_to_rule(Rule *r)
 {
-    Rule *r = new Rule;
-
     r->description = ui->ruleName->text().toStdString();
-    if (!r->description.length())
-    {
-        add_error(__T("Name of the rule must be set"));
-        show_errors();
-        return;
-    }
     if (ui->freeTextSelector->isChecked())
     {
         r->use_free_text = true;
@@ -162,9 +165,24 @@ void PoliciesEdit::on_addNewRule()
         r->value = ui->value->text().toStdString();
         r->use_free_text = false;
     }
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::on_addNewRule()
+{
+    Rule *r = new Rule;
+
+    copy_visual_to_rule(r);
+    if (!r->description.length())
+    {
+        add_error(__T("Name of the rule must be set"));
+        show_errors();
+        delete r;
+        return;
+    }
     clear_editor_fields();
     add_rule(r);
-    mainwindow->rule_to_add(r);
+    delete r;
 }
 
 //---------------------------------------------------------------------------
@@ -175,10 +193,31 @@ void PoliciesEdit::on_deleteRule()
     while (!list.isEmpty())
     {
         QTableWidgetItem *item = list.first();
-        mainwindow->rule_to_delete(item->text().toStdString());
+        rules.erase(rules.begin() + item->row());
         ui->rules->removeRow(item->row());
         list.removeFirst();
     }
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::on_editRule()
+{
+    QList<QTableWidgetItem *> list = ui->rules->selectedItems();
+
+    if (list.isEmpty())
+    {
+        return;
+    }
+    QTableWidgetItem *item = list.first();
+    Rule *r = rules[item->row()];
+    copy_visual_to_rule(r);
+    if (!r->description.length())
+    {
+        add_error(__T("Name of the rule must be set"));
+        show_errors();
+        return;
+    }
+    item->setText(QString().fromStdString(r->description));
 }
 
 void PoliciesEdit::rule_selected_changed()
@@ -186,9 +225,11 @@ void PoliciesEdit::rule_selected_changed()
     if (ui->rules->selectedItems().isEmpty())
     {
         ui->deleteRule->setEnabled(false);
+        ui->editRule->setEnabled(false);
         clear_editor_fields();
     } else {
         ui->deleteRule->setEnabled(true);
+        ui->editRule->setEnabled(true);
     }
 }
 
@@ -211,9 +252,15 @@ QString PoliciesEdit::getSelectedRuleName()
 void PoliciesEdit::cell_clicked(int row, int column)
 {
     QTableWidgetItem *item = ui->rules->item(row, column);
-    string ruleName = item->text().toStdString();
+    if (item->row() == -1)
+    {
+        //Should not happened
+        add_error(__T("Rule not found"));
+        show_errors();
+        return;
+    }
 
-    const Rule *r = mainwindow->get_rule_from_description(ruleName);
+    const Rule *r = rules[item->row()];
 
     if (r == NULL)
     {

@@ -33,10 +33,7 @@ public:
     // Functions
     void dragEnterEvent         (QDragEnterEvent *event);
     void dropEvent              (QDropEvent *event);
-    void rule_to_add(Rule *r);
-    void rule_to_delete(string);
     void policy_to_delete(int row);
-    const Rule *get_rule_from_description(string description) const;
     void exporting_to_schematron_file();
 
     // UI
@@ -57,10 +54,6 @@ private:
 
     // Internal
     Core C;
-
-    //TEMP
-    vector<Rule *> ruleToAdd;
-    vector<string> ruleToDelete;
 
     // Visual elements
     QVBoxLayout*                Layout;

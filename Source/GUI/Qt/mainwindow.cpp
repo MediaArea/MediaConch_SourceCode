@@ -100,92 +100,10 @@ void MainWindow::dropEvent(QDropEvent *Event)
     Run();
 }
 
-void MainWindow::rule_to_add(Rule *r)
-{
-    // If registered to delete, remove it
-    vector<string>::iterator it = ruleToDelete.begin();
-    vector<string>::iterator ite = ruleToDelete.end();
-
-    for (; it != ite;)
-    {
-        if (*it == r->description)
-        {
-            it = ruleToDelete.erase(it);
-            ite = ruleToDelete.end();
-        } else {
-            ++it;
-        }
-    }
-    ruleToAdd.push_back(r);
-}
-
-void MainWindow::rule_to_delete(string description)
-{
-    //Remove temporary rules to add for this policy
-    vector<Rule *>::iterator it = ruleToAdd.begin();
-    vector<Rule *>::iterator ite = ruleToAdd.end();
-
-    for (; it != ite;)
-    {
-        if ((*it)->description == description)
-        {
-            delete *it;
-            it = ruleToAdd.erase(it);
-            ite = ruleToAdd.end();
-        } else {
-            ++it;
-        }
-    }
-
-    //Register rule to delete
-    ruleToDelete.push_back(description);
-}
-
 void MainWindow::policy_to_delete(int index)
 {
-    //Remove temporary rules to add for this policy
-    ruleToAdd.clear();
-
     //Delete policy
     C.policies.erase_policy(index);
-}
-
-const Rule *MainWindow::get_rule_from_description(string description) const
-{
-    vector<Rule *>::const_iterator it = ruleToAdd.begin();
-    vector<Rule *>::const_iterator ite = ruleToAdd.end();
-
-    for (; it != ite; ++it)
-    {
-        if ((*it)->description == description)
-        {
-            return *it;
-        }
-    }
-
-    if (policiesMenu)
-    {
-        QList<QTableWidgetItem *> list = policiesMenu->get_policies_table()->selectedItems();
-        if (list.isEmpty())
-        {
-            return NULL;
-        }
-
-        int row = list.first()->row();
-
-        vector<Rule *>::const_iterator it = C.policies.rules[row].second.begin();
-        vector<Rule *>::const_iterator ite = C.policies.rules[row].second.end();
-
-        for (; it != ite; ++it)
-        {
-            if ((*it)->description == description)
-            {
-                return *it;
-            }
-        }
-    }
-
-    return NULL;
 }
 
 //***************************************************************************
@@ -396,8 +314,6 @@ void MainWindow::on_editPolicy()
 //---------------------------------------------------------------------------
 void MainWindow::on_addNewRuleRejected()
 {
-    ruleToAdd.clear();
-    ruleToDelete.clear();
     clearVisualElements();
     displayPoliciesMenu();
 }
@@ -417,53 +333,38 @@ void MainWindow::on_addNewRuleAccepted()
     if (policiesMenu)
     {
         QList<QTableWidgetItem *> list = policiesMenu->get_policies_table()->selectedItems();
-        if (list.isEmpty())
+        if (!list.isEmpty())
         {
-            goto create_new_policy;
+            row = list.first()->row();
+            if (new_name != list.first()->text().toStdString())
+            {
+                C.policies.rules[row].first = new_name;
+            }
         }
-
-        row = list.first()->row();
-        if (new_name != list.first()->text().toStdString())
-        {
-            C.policies.rules[row].first = new_name;
-        }
-    } else {
-    create_new_policy:
+    }
+    if (row == -1)
+    {
         vector<Rule *> v;
         C.policies.rules.push_back(make_pair(new_name, v));
         row = C.policies.rules.size() - 1;
     }
 
-    vector<Rule *>::iterator it = ruleToAdd.begin();
-    vector<Rule *>::iterator ite = ruleToAdd.end();
-
-    for (; it != ite; ++it)
+    for (size_t i = 0; i < C.policies.rules[row].second.size(); ++i)
     {
-        C.policies.rules[row].second.push_back(*it);
+        delete C.policies.rules[row].second[i];
     }
-    ruleToAdd.clear();
+    C.policies.rules[row].second.clear();
 
-    vector<string>::iterator itDel = ruleToDelete.begin();
-    vector<string>::iterator iteDel = ruleToDelete.end();
-
-    for (; itDel != iteDel; ++itDel)
+    const vector<Rule *> vec = policiesEdit->get_rules();
+    for (size_t i = 0; i < vec.size(); ++i)
     {
-        vector<Rule *>::iterator itRule = C.policies.rules[row].second.begin();
-        vector<Rule *>::iterator iteRule = C.policies.rules[row].second.end();
-
-        for (; itRule != iteRule;)
+        if (!vec[i])
         {
-            if (*itDel == (*itRule)->description)
-            {
-                delete *itRule;
-                itRule = C.policies.rules[row].second.erase(itRule);
-                iteRule = C.policies.rules[row].second.end();
-            } else {
-                ++itRule;
-            }
+            continue;
         }
+        Rule *r = new Rule(*vec[i]);
+        C.policies.rules[row].second.push_back(r);
     }
-    ruleToDelete.clear();
 
     clearVisualElements();
     displayPoliciesMenu();
@@ -501,8 +402,6 @@ void MainWindow::clearVisualElements()
         delete DragDrop_Image; DragDrop_Image=NULL;
         delete DragDrop_Text; DragDrop_Text=NULL;
     }
-
-    ruleToAdd.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -608,11 +507,9 @@ void MainWindow::displayPoliciesEdit(int row)
     if (row != -1)
     {
         policiesEdit->set_name(C.policies.rules[row].first);
-        vector<Rule *>::iterator it = C.policies.rules[row].second.begin();
-        vector<Rule *>::iterator ite = C.policies.rules[row].second.end();
-        for (; it != ite; ++it)
+        for (size_t i = 0; i < C.policies.rules[row].second.size(); ++i)
         {
-            policiesEdit->add_rule(*it);
+            policiesEdit->add_rule(C.policies.rules[row].second[i]);
         }
     }
 }

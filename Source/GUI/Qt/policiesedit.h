@@ -53,6 +53,7 @@ void clear_errors();
 void add_rule(Rule *r);
 void set_name(string& policyName);
 string get_new_name() const;
+const vector<Rule *>& get_rules() const;
 
 //***************************************************************************
 // Visual element
@@ -66,6 +67,7 @@ private:
     Ui::PoliciesEdit *ui;
     list<String> errors;
     string policyName;
+    vector<Rule *> rules;
 
 //***************************************************************************
 // HELPER
@@ -76,6 +78,7 @@ void add_values_to_selector();
 void clear_editor_fields();
 string get_validator_value_from_pretty_name(string pretty_name);
 string get_validator_pretty_name_from_value(string value);
+void copy_visual_to_rule(Rule *r);
 
 //***************************************************************************
 // Slots
@@ -85,6 +88,7 @@ private Q_SLOTS:
     void on_addNewRule();
     void cell_clicked(int row, int column);
     void on_deleteRule();
+    void on_editRule();
     void rule_selected_changed();
 };
 
