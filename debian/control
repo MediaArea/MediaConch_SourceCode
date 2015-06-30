@@ -1,7 +1,7 @@
 Source: mediaconch
 Priority: optional
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
-Build-Depends: debhelper (>= 5), tofrodos, libmediainfo-dev (>= 0.7.75), libzen-dev (>= 0.4.31), libqt4-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool
+Build-Depends: debhelper (>= 5), tofrodos, libmediainfo-dev (>= 0.7.75), libzen-dev (>= 0.4.31), libqt4-dev, libxml2-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool
 Standards-Version: 3.7.3
 Section: libs
 Homepage: http://MediaArea.net/MediaConch
