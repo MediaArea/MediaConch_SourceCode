@@ -38,6 +38,8 @@ PoliciesEdit::PoliciesEdit(QWidget *parent) :
                      this, SLOT(cell_clicked(int, int)));
     QObject::connect(ui->deleteRule, SIGNAL(clicked()), this, SLOT(on_deleteRule()));
     QObject::connect(ui->editRule, SIGNAL(clicked()), this, SLOT(on_editRule()));
+    QObject::connect(ui->freeTextSelector, SIGNAL(clicked()), this, SLOT(free_text_selected()));
+    QObject::connect(ui->editorSelector, SIGNAL(clicked()), this, SLOT(editor_selected()));
 }
 
 //---------------------------------------------------------------------------
@@ -114,7 +116,17 @@ void PoliciesEdit::add_rule(Rule *r)
     item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
 
     ui->rules->setItem(row, 0, item);
-    Rule *new_rule = new Rule(*r);
+
+    Rule rule;
+    Policies p;
+    Rule *new_rule = NULL;
+    if (r->use_free_text && p.try_parsing_test(r->text, &rule))
+    {
+        rule.description = r->description;
+        new_rule = new Rule(rule);
+    } else {
+        new_rule = new Rule(*r);
+    }
     rules.push_back(new_rule);
 }
 
@@ -194,8 +206,8 @@ void PoliciesEdit::on_addNewRule()
         delete r;
         return;
     }
-    clear_editor_fields();
     add_rule(r);
+    clear_editor_fields();
     delete r;
 }
 
@@ -293,30 +305,60 @@ void PoliciesEdit::cell_clicked(int row, int column)
         ui->editorFrame->hide();
         return;
     }
+    fill_editor_fields(r);
 
-    int pos = ui->type->findText(QString().fromStdString(r->type));
-    if (pos != -1)
-    {
-        ui->type->setCurrentIndex(pos);
-    }
-    pos = ui->field->findText(QString().fromStdString(r->field));
-    if (pos != -1)
-    {
-        ui->field->setCurrentIndex(pos);
-    }
-    pos = ui->validator->findText(QString().fromStdString(get_validator_pretty_name_from_value(r->validator)));
-    if (pos != -1)
-    {
-        ui->validator->setCurrentIndex(pos);
-    }
-
-    string value = r->value;
-    if (value.length() >= 2 && value[0] == '\'')
-    {
-        value = value.substr(1, value.length() - 2);
-    }
-    ui->value->setText(QString().fromStdString(value));
     ui->editorSelector->setChecked(true);
+    ui->editorFrame->show();
+    ui->freeText->hide();
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::free_text_selected()
+{
+    Rule r;
+
+    r.type = ui->type->currentText().toStdString();
+    r.field = ui->field->currentText().toStdString();
+    r.validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
+    string value = ui->value->text().toStdString();
+    bool isNum = true;
+    for (size_t i = 0; i < value.length(); ++i)
+    {
+        if ((value[i] > '9' || value[i] < '0') && value[i] != '.')
+        {
+            isNum = false;
+            break;
+        }
+    }
+    if (!isNum)
+    {
+        value = string("'") + value + string("'");
+    }
+    r.value = value;
+    r.use_free_text = false;
+
+    Policies p;
+    string ruleStr = p.serialize_rule_for_test(&r);
+    ui->freeText->setText(QString().fromStdString(ruleStr));
+    ui->freeText->show();
+    ui->editorFrame->hide();
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::editor_selected()
+{
+    Rule r;
+    Policies p;
+    if (p.try_parsing_test(ui->freeText->toPlainText().toStdString(), &r))
+    {
+        fill_editor_fields(&r);
+    } else
+    {
+        ui->type->setCurrentIndex(0);
+        ui->field->setCurrentIndex(0);
+        ui->validator->setCurrentIndex(0);
+        ui->value->setText(QString());
+    }
     ui->editorFrame->show();
     ui->freeText->hide();
 }
@@ -394,4 +436,30 @@ void PoliciesEdit::clear_editor_fields()
     ui->value->setText(QString());
     ui->editorFrame->show();
     ui->freeText->hide();
+}
+
+void PoliciesEdit::fill_editor_fields(const Rule *r)
+{
+    int pos = ui->type->findText(QString().fromStdString(r->type));
+    if (pos != -1)
+    {
+        ui->type->setCurrentIndex(pos);
+    }
+    pos = ui->field->findText(QString().fromStdString(r->field));
+    if (pos != -1)
+    {
+        ui->field->setCurrentIndex(pos);
+    }
+    pos = ui->validator->findText(QString().fromStdString(get_validator_pretty_name_from_value(r->validator)));
+    if (pos != -1)
+    {
+        ui->validator->setCurrentIndex(pos);
+    }
+
+    string value = r->value;
+    if (value.length() >= 2 && value[0] == '\'')
+    {
+        value = value.substr(1, value.length() - 2);
+    }
+    ui->value->setText(QString().fromStdString(value));
 }

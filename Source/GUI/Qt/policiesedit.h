@@ -79,6 +79,7 @@ void clear_editor_fields();
 string get_validator_value_from_pretty_name(string pretty_name);
 string get_validator_pretty_name_from_value(string value);
 void copy_visual_to_rule(Rule *r);
+void fill_editor_fields(const Rule *r);
 
 //***************************************************************************
 // Slots
@@ -90,6 +91,8 @@ private Q_SLOTS:
     void on_deleteRule();
     void on_editRule();
     void rule_selected_changed();
+    void free_text_selected();
+    void editor_selected();
 };
 
 #endif // POLICIESEDIT_H

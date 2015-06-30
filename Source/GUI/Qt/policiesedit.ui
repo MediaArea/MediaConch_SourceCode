@@ -248,7 +248,6 @@ selection-background-color: rgb(255, 0, 0);
       </item>
      </layout>
      <zorder>rules</zorder>
-     <zorder>rules</zorder>
      <zorder>editorFrame</zorder>
      <zorder>editorSelector</zorder>
      <zorder>freeTextSelector</zorder>
@@ -270,70 +269,5 @@ selection-background-color: rgb(255, 0, 0);
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>freeTextSelector</sender>
-   <signal>clicked()</signal>
-   <receiver>editorFrame</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>277</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>240</x>
-     <y>200</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>editorSelector</sender>
-   <signal>clicked()</signal>
-   <receiver>editorFrame</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>39</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>240</x>
-     <y>200</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>freeTextSelector</sender>
-   <signal>clicked()</signal>
-   <receiver>freeText</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>277</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>240</x>
-     <y>355</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>editorSelector</sender>
-   <signal>clicked()</signal>
-   <receiver>freeText</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>39</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>240</x>
-     <y>355</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
