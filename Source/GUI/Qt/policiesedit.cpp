@@ -162,7 +162,21 @@ void PoliciesEdit::copy_visual_to_rule(Rule *r)
         r->type = ui->type->currentText().toStdString();
         r->field = ui->field->currentText().toStdString();
         r->validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
-        r->value = ui->value->text().toStdString();
+        string value = ui->value->text().toStdString();
+        bool isNum = true;
+        for (size_t i = 0; i < value.length(); ++i)
+        {
+            if ((value[i] > '9' || value[i] < '0') && value[i] != '.')
+            {
+                isNum = false;
+                break;
+            }
+        }
+        if (!isNum)
+        {
+            value = string("'") + value + string("'");
+        }
+        r->value = value;
         r->use_free_text = false;
     }
 }
@@ -295,7 +309,13 @@ void PoliciesEdit::cell_clicked(int row, int column)
     {
         ui->validator->setCurrentIndex(pos);
     }
-    ui->value->setText(QString().fromStdString(r->value));
+
+    string value = r->value;
+    if (value.length() >= 2 && value[0] == '\'')
+    {
+        value = value.substr(1, value.length() - 2);
+    }
+    ui->value->setText(QString().fromStdString(value));
     ui->editorSelector->setChecked(true);
     ui->editorFrame->show();
     ui->freeText->hide();
