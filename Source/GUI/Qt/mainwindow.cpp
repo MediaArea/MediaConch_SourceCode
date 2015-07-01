@@ -335,6 +335,21 @@ void MainWindow::on_addNewRuleAccepted()
         return;
     }
 
+    const vector<Rule *> vec = policiesEdit->get_rules();
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        if (!vec[i])
+        {
+            continue;
+        }
+        if (!vec[i]->description.length())
+        {
+            policiesEdit->add_error(__T("Rules must have a name"));
+            policiesEdit->show_errors();
+            return;
+        }
+    }
+
     int row = -1;
     if (policiesMenu)
     {
@@ -361,7 +376,6 @@ void MainWindow::on_addNewRuleAccepted()
     }
     C.policies.rules[row].second.clear();
 
-    const vector<Rule *> vec = policiesEdit->get_rules();
     for (size_t i = 0; i < vec.size(); ++i)
     {
         if (!vec[i])

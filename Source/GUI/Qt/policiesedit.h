@@ -100,6 +100,7 @@ private Q_SLOTS:
     void editRule_validator();
     void editRule_value();
     void editRule_freeText();
+    void editRule_ruleName();
 };
 
 #endif // POLICIESEDIT_H
