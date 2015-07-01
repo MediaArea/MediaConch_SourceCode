@@ -242,7 +242,7 @@ String Core::MediaSchematron ()
     {
         Out << __T("NOT VALID\n");
         for (size_t pos = 0; pos < S.errors.size(); pos++) {
-            Out << S.errors[pos].c_str();
+            Out << "\t" << S.errors[pos].c_str();
         }
     } else {
         Out << __T("VALID");
