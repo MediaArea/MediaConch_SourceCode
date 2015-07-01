@@ -1,17 +1,23 @@
 Source: mediaconch
 Priority: optional
+Section: utils
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
-Build-Depends: debhelper (>= 5), tofrodos, libmediainfo-dev (>= 0.7.75), libzen-dev (>= 0.4.31), libqt4-dev, libxml2-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool
-Standards-Version: 3.7.3
-Section: libs
+Build-Depends: debhelper (>= 9),
+               dh-autoreconf,
+               libmediainfo-dev (>= 0.7.74),
+               libzen-dev (>= 0.4.31),
+               libqt4-dev,
+               libxml2-dev,
+               zlib1g-dev,
+               pkg-config,
+Standards-Version: 3.9.6
 Homepage: http://MediaArea.net/MediaConch
-Vcs-Svn: https://github.com/MediaArea/MediaInfoLib.git
-Vcs-Browser: https://github.com/MediaArea/MediaInfoLib
+Vcs-Svn: https://github.com/MediaArea/MediaConch_SourceCode.git
+Vcs-Browser: https://github.com/MediaArea/MediaConch_SourceCode
 
 Package: mediaconch
-Section: utils
 Architecture: any
-Depends: libmediainfo0 (>= 0.7.75), libzen0 (>= 0.4.31), zlib1g, libxml2
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: MediaConch
  .
  Implementation checker, policy checker, reporter, and fixer that targets
@@ -19,11 +25,12 @@ Description: MediaConch
  Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
  .
  This project is maintained by MediaArea and funded by PREFORMA.
+ .
+ This package includes the command line interface.
 
 Package: mediaconch-gui
-Section: utils
 Architecture: any
-Depends: libqt4-gui, libmediainfo0 (>= 0.7.75), libzen0 (>= 0.4.31), zlib1g, libxml2
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: MediaConch
  .
  Implementation checker, policy checker, reporter, and fixer that targets
@@ -32,4 +39,4 @@ Description: MediaConch
  .
  This project is maintained by MediaArea and funded by PREFORMA.
  .
- This package contains the graphical user interface
+ This package contains the graphical user interface.
