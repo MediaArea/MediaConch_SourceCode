@@ -506,10 +506,10 @@ void Policies::create_values_from_csv()
         { "", "" },
         { "=", "Equal" },
         { "!=", "Not Equal" },
-        { "&gt", "Greater than" },
-        { "&ge", "Greater or equal" },
-        { "&lt", "Less" },
-        { "&le", "Less or equal" }
+        { ">", "Greater than" },
+        { ">=", "Greater or equal" },
+        { "<", "Less" },
+        { "<=", "Less or equal" }
     };
 
     for (size_t i=0; i < (sizeof(validators) / sizeof(*validators)); i++)
