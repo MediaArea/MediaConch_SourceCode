@@ -123,15 +123,14 @@ QTableWidget *PoliciesMenu::get_policies_table() const
 void PoliciesMenu::delete_clicked()
 {
     QList<QTableWidgetItem *> list = ui->policies->selectedItems();
-    if (list.isEmpty())
+    while (!list.isEmpty())
     {
-        return;
+        int row = list.first()->row();
+
+        mainwindow->policy_to_delete(row);
+        ui->policies->removeRow(row);
+        list.removeFirst();
     }
-
-    int row = list.first()->row();
-
-    mainwindow->policy_to_delete(row);
-    ui->policies->removeRow(row);
 }
 
 void PoliciesMenu::policy_selected_change()
