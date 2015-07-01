@@ -134,6 +134,10 @@ CL_OPTION(SchematronValidation)
     MediaInfoNameSpace::String Sch;
     MI.SchematronFile.assign(Argument, Egal_Pos+1, std::string::npos);
     MI.Tool=Core::tool_MediaSchematron;
+    String res = MI.Run();
+    wstringstream Out;
+    Out << MI.SchematronFile << ": " << res;
+    STRINGOUT(Out.str());
     return 0;
 }
 
