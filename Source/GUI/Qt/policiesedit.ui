@@ -50,7 +50,7 @@ selection-background-color: rgb(255, 170, 0);</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="5" rowspan="7" colspan="5">
+      <item row="0" column="5" rowspan="7" colspan="3">
        <widget class="QTableWidget" name="rules">
         <property name="selectionMode">
          <enum>QAbstractItemView::ExtendedSelection</enum>
@@ -77,20 +77,6 @@ selection-background-color: rgb(255, 170, 0);</string>
         </column>
        </widget>
       </item>
-      <item row="8" column="6">
-       <widget class="QPushButton" name="editRule">
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(0, 170, 0);
-selection-background-color: rgb(0, 170, 0);</string>
-        </property>
-        <property name="text">
-         <string>Edit</string>
-        </property>
-       </widget>
-      </item>
       <item row="8" column="5">
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -101,7 +87,7 @@ selection-background-color: rgb(0, 170, 0);</string>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>100</width>
+          <width>150</width>
           <height>20</height>
          </size>
         </property>
@@ -123,6 +109,9 @@ selection-background-color: rgb(0, 170, 0);</string>
          <string>Rule name:</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="ruleName"/>
       </item>
       <item row="2" column="0" rowspan="4" colspan="3">
        <widget class="QFrame" name="editorFrame">
@@ -183,7 +172,7 @@ selection-background-color: rgb(0, 170, 0);</string>
         </layout>
        </widget>
       </item>
-      <item row="8" column="8">
+      <item row="8" column="6">
        <widget class="QPushButton" name="deleteRule">
         <property name="maximumSize">
          <size>
@@ -204,9 +193,6 @@ selection-background-color: rgb(255, 0, 0);
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="ruleName"/>
-      </item>
       <item row="1" column="1">
        <widget class="QRadioButton" name="freeTextSelector">
         <property name="text">
@@ -215,22 +201,6 @@ selection-background-color: rgb(255, 0, 0);
        </widget>
       </item>
       <item row="8" column="7">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Maximum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="8" column="9">
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -240,7 +210,7 @@ selection-background-color: rgb(255, 0, 0);
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>100</width>
+          <width>150</width>
           <height>20</height>
          </size>
         </property>
@@ -251,7 +221,6 @@ selection-background-color: rgb(255, 0, 0);
      <zorder>editorFrame</zorder>
      <zorder>editorSelector</zorder>
      <zorder>freeTextSelector</zorder>
-     <zorder>editRule</zorder>
      <zorder>newRule</zorder>
      <zorder>deleteRule</zorder>
      <zorder>ruleName</zorder>

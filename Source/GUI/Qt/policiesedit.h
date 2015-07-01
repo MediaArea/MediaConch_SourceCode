@@ -32,6 +32,7 @@ class QPushButton;
 struct Rule;
 class MainWindow;
 class QDialogButtonBox;
+class QTableWidgetItem;
 
 class PoliciesEdit : public QFrame
 {
@@ -74,12 +75,14 @@ private:
 //***************************************************************************
 
 QString getSelectedRuleName();
+QTableWidgetItem* getSelectedRuleItem();
 void add_values_to_selector();
 void clear_editor_fields();
 string get_validator_value_from_pretty_name(string pretty_name);
 string get_validator_pretty_name_from_value(string value);
 void copy_visual_to_rule(Rule *r);
 void fill_editor_fields(const Rule *r);
+void value_to_quotted_value(string&);
 
 //***************************************************************************
 // Slots
@@ -89,10 +92,14 @@ private Q_SLOTS:
     void on_addNewRule();
     void cell_clicked(int row, int column);
     void on_deleteRule();
-    void on_editRule();
     void rule_selected_changed();
     void free_text_selected();
     void editor_selected();
+    void editRule_type();
+    void editRule_field();
+    void editRule_validator();
+    void editRule_value();
+    void editRule_freeText();
 };
 
 #endif // POLICIESEDIT_H

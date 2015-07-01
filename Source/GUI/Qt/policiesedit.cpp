@@ -30,16 +30,24 @@ PoliciesEdit::PoliciesEdit(QWidget *parent) :
     add_values_to_selector();
 
     ui->deleteRule->setEnabled(false);
-    ui->editRule->setEnabled(false);
     QObject::connect(ui->newRule, SIGNAL(clicked()), this, SLOT(on_addNewRule()));
     QObject::connect(ui->rules, SIGNAL(itemSelectionChanged()),
                      this, SLOT(rule_selected_changed()));
     QObject::connect(ui->rules, SIGNAL(cellClicked(int, int)),
                      this, SLOT(cell_clicked(int, int)));
     QObject::connect(ui->deleteRule, SIGNAL(clicked()), this, SLOT(on_deleteRule()));
-    QObject::connect(ui->editRule, SIGNAL(clicked()), this, SLOT(on_editRule()));
     QObject::connect(ui->freeTextSelector, SIGNAL(clicked()), this, SLOT(free_text_selected()));
     QObject::connect(ui->editorSelector, SIGNAL(clicked()), this, SLOT(editor_selected()));
+    QObject::connect(ui->type, SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(editRule_type()));
+    QObject::connect(ui->field, SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(editRule_field()));
+    QObject::connect(ui->validator, SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(editRule_validator()));
+    QObject::connect(ui->value, SIGNAL(textEdited(QString)),
+                     this, SLOT(editRule_value()));
+    QObject::connect(ui->freeText, SIGNAL(textChanged()),
+                     this, SLOT(editRule_freeText()));
 }
 
 //---------------------------------------------------------------------------
@@ -175,19 +183,7 @@ void PoliciesEdit::copy_visual_to_rule(Rule *r)
         r->field = ui->field->currentText().toStdString();
         r->validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
         string value = ui->value->text().toStdString();
-        bool isNum = true;
-        for (size_t i = 0; i < value.length(); ++i)
-        {
-            if ((value[i] > '9' || value[i] < '0') && value[i] != '.')
-            {
-                isNum = false;
-                break;
-            }
-        }
-        if (!isNum)
-        {
-            value = string("'") + value + string("'");
-        }
+        value_to_quotted_value(value);
         r->value = value;
         r->use_free_text = false;
     }
@@ -226,24 +222,75 @@ void PoliciesEdit::on_deleteRule()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesEdit::on_editRule()
+void PoliciesEdit::editRule_type()
 {
-    QList<QTableWidgetItem *> list = ui->rules->selectedItems();
+    QTableWidgetItem *item = NULL;
 
-    if (list.isEmpty())
+    if ((item = getSelectedRuleItem()) == NULL)
     {
         return;
     }
-    QTableWidgetItem *item = list.first();
     Rule *r = rules[item->row()];
-    copy_visual_to_rule(r);
-    if (!r->description.length())
+    r->type = ui->type->currentText().toStdString();
+    r->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::editRule_field()
+{
+    QTableWidgetItem *item = NULL;
+
+    if ((item = getSelectedRuleItem()) == NULL)
     {
-        add_error(__T("Name of the rule must be set"));
-        show_errors();
         return;
     }
-    item->setText(QString().fromStdString(r->description));
+    Rule *r = rules[item->row()];
+    r->field = ui->field->currentText().toStdString();
+    r->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::editRule_validator()
+{
+    QTableWidgetItem *item = NULL;
+
+    if ((item = getSelectedRuleItem()) == NULL)
+    {
+        return;
+    }
+    Rule *r = rules[item->row()];
+    r->validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
+    r->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::editRule_value()
+{
+    QTableWidgetItem *item = NULL;
+
+    if ((item = getSelectedRuleItem()) == NULL)
+    {
+        return;
+    }
+    Rule *r = rules[item->row()];
+    string value = ui->value->text().toStdString();
+    value_to_quotted_value(value);
+    r->value = value;
+    r->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::editRule_freeText()
+{
+    QTableWidgetItem *item = NULL;
+
+    if ((item = getSelectedRuleItem()) == NULL)
+    {
+        return;
+    }
+    Rule *r = rules[item->row()];
+    r->text = ui->freeText->toPlainText().toStdString();
+    r->use_free_text = true;
 }
 
 void PoliciesEdit::rule_selected_changed()
@@ -251,25 +298,35 @@ void PoliciesEdit::rule_selected_changed()
     if (ui->rules->selectedItems().isEmpty())
     {
         ui->deleteRule->setEnabled(false);
-        ui->editRule->setEnabled(false);
         clear_editor_fields();
     } else {
         ui->deleteRule->setEnabled(true);
-        ui->editRule->setEnabled(true);
     }
 }
 
 //---------------------------------------------------------------------------
-QString PoliciesEdit::getSelectedRuleName()
+QTableWidgetItem* PoliciesEdit::getSelectedRuleItem()
 {
     QList<QTableWidgetItem *> list = ui->rules->selectedItems();
 
     if (list.isEmpty())
     {
-        return QString();
+        return NULL;
     }
 
-    QTableWidgetItem *item = list.first();
+    return list.first();
+}
+
+//---------------------------------------------------------------------------
+QString PoliciesEdit::getSelectedRuleName()
+{
+
+    QTableWidgetItem *item = NULL;
+
+    if ((item = getSelectedRuleItem()) == NULL)
+    {
+        return QString();
+    }
 
     return item->text();
 }
@@ -285,6 +342,7 @@ void PoliciesEdit::cell_clicked(int row, int column)
         show_errors();
         return;
     }
+    item->setSelected(true);
 
     const Rule *r = rules[item->row()];
 
@@ -321,19 +379,7 @@ void PoliciesEdit::free_text_selected()
     r.field = ui->field->currentText().toStdString();
     r.validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
     string value = ui->value->text().toStdString();
-    bool isNum = true;
-    for (size_t i = 0; i < value.length(); ++i)
-    {
-        if ((value[i] > '9' || value[i] < '0') && value[i] != '.')
-        {
-            isNum = false;
-            break;
-        }
-    }
-    if (!isNum)
-    {
-        value = string("'") + value + string("'");
-    }
+    value_to_quotted_value(value);
     r.value = value;
     r.use_free_text = false;
 
@@ -462,4 +508,21 @@ void PoliciesEdit::fill_editor_fields(const Rule *r)
         value = value.substr(1, value.length() - 2);
     }
     ui->value->setText(QString().fromStdString(value));
+}
+
+void PoliciesEdit::value_to_quotted_value(string& value)
+{
+    bool isNum = true;
+    for (size_t i = 0; i < value.length(); ++i)
+    {
+        if ((value[i] > '9' || value[i] < '0') && value[i] != '.')
+        {
+            isNum = false;
+            break;
+        }
+    }
+    if (!isNum)
+    {
+        value = string("'") + value + string("'");
+    }
 }
