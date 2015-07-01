@@ -33,7 +33,7 @@ int Help()
     TEXTOUT("                    Output a trace of the file");
     TEXTOUT("--Format=XML -fx");
     TEXTOUT("                    Output in XML format (only MediaInfo report for the moment)");
-    TEXTOUT("--Policy=SchematronFileName");
+    TEXTOUT("--Policy=SchematronFileName, -p SchematronFileName");
     TEXTOUT("                    Validate the XML report");
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
