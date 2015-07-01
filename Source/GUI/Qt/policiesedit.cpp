@@ -48,6 +48,8 @@ PoliciesEdit::PoliciesEdit(QWidget *parent) :
                      this, SLOT(editRule_value()));
     QObject::connect(ui->freeText, SIGNAL(textChanged()),
                      this, SLOT(editRule_freeText()));
+    QObject::connect(ui->ruleName, SIGNAL(textEdited(QString)),
+                     this, SLOT(editRule_ruleName()));
 }
 
 //---------------------------------------------------------------------------
@@ -291,6 +293,20 @@ void PoliciesEdit::editRule_freeText()
     Rule *r = rules[item->row()];
     r->text = ui->freeText->toPlainText().toStdString();
     r->use_free_text = true;
+}
+
+//---------------------------------------------------------------------------
+void PoliciesEdit::editRule_ruleName()
+{
+    QTableWidgetItem *item = NULL;
+
+    if ((item = getSelectedRuleItem()) == NULL)
+    {
+        return;
+    }
+    Rule *r = rules[item->row()];
+    r->description = ui->ruleName->text().toStdString();
+    item->setText(ui->ruleName->text());
 }
 
 void PoliciesEdit::rule_selected_changed()
