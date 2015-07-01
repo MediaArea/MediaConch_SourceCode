@@ -1,14 +1,5 @@
 #!/bin/sh
 
-#if [ $# != 3 ]; then
-# echo "usage: mkdmg appname version"
-# exit 0
-#fi
-
-APPNAME="$1"
-VERSION="$2"
-FILES="$3"
-
 APPNAME="MediaConch"
 KIND="GUI"
 VERSION="15.06"
@@ -18,12 +9,13 @@ FINALDMG="${APPNAME}_${KIND}_${VERSION}_Mac.dmg"
 DMG="tmp-${APPNAME}_${KIND}.dmg"
 FILES="tmp-${APPNAME}_${KIND}"
 
-# Create the package
+# Clean up
 rm -rf "${FINALDMG}"
 rm -rf "${DMG}"
 rm -rf "${FILES}"
-mkdir "${FILES}"
-mkdir "${FILES}/${APPNAME}.app"
+
+# Create the package
+mkdir -p "${FILES}/${APPNAME}.app"
 cp -R "../Qt/${APPNAME}.app" "${FILES}/"
 sed -i '' -e "s/VERSION/${VERSION}/g" "${FILES}/${APPNAME}.app/Contents/Info.plist"
 macdeployqt "${FILES}/${APPNAME}.app"
@@ -77,7 +69,7 @@ echo $DEVICE
 sleep 2
 pushd /Volumes/"${APPNAME}"
 ln -s /Applications
-rm .DS_Store
+test -e .DS_Store && rm -fr .DS_Store
 popd
 echo '
    tell application "Finder"
@@ -104,5 +96,7 @@ sleep 2
 # convert to compressed image, delete temp image
 hdiutil convert "$DMG" -format UDBZ -o "${FINALDMG}"
 codesign -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FINALDMG}"
+
+# Clean up
 rm -rf "${DMG}"
 rm -rf "${FILES}"

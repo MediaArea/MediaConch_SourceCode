@@ -1,14 +1,5 @@
 #!/bin/sh
 
-#if [ $# != 3 ]; then
-# echo "usage: mkdmg appname version"
-# exit 0
-#fi
-
-APPNAME="$1"
-VERSION="$2"
-FILES="$3"
-
 APPNAME="MediaConch"
 KIND="CLI"
 VERSION="15.06"
@@ -18,20 +9,18 @@ FINALDMG="${APPNAME}_${KIND}_${VERSION}_Mac.dmg"
 DMG="tmp-${APPNAME}_${KIND}.dmg"
 FILES="tmp-${APPNAME}_${KIND}"
 
-# Prepare the CLI
+# Clean up
 rm -f "${FINALDMG}"
 rm -rf "${DMG}"
 rm -rf "${FILES}"
 rm -rf "${FILES}-Root"
-mkdir "${FILES}-Root"
-mkdir "${FILES}-Root/usr"
-mkdir "${FILES}-Root/usr/local"
-mkdir "${FILES}-Root/usr/local/bin"
+
+# Prepare the CLI
+mkdir -p "${FILES}-Root/usr/local/bin"
 cp ../GNU/CLI/mediaconch "${FILES}-Root/usr/local/bin/"
 codesign -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}-Root/usr/local/bin/mediaconch"
 
 # Create the package
-rm -f "{FILES}"
 mkdir "${FILES}"
 pkgbuild --root "${FILES}-Root" --identifier net.mediaarea.mediaconch.mac-cli --sign "Developer ID Installer: ${SIGNATURE}" --version "${VERSION}" "${FILES}/mediaconch.pkg"
 codesign -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FILES}/mediaconch.pkg"
@@ -48,7 +37,7 @@ DEVICE=$(hdiutil attach -readwrite -noverify "${DMG}" | egrep '^/dev/' | sed 1q 
 echo $DEVICE
 sleep 2
 pushd /Volumes/"${APPNAME}"
-rm .DS_Store
+test -e .DS_Store && rm -fr .DS_Store
 popd
 echo '
    tell application "Finder"
@@ -75,6 +64,8 @@ sleep 2
 # convert to compressed image, delete temp image
 hdiutil convert "$DMG" -format UDBZ -o "${FINALDMG}"
 codesign -f -s "Developer ID Application: ${SIGNATURE}" --verbose "${FINALDMG}"
+
+# Clean up
 rm -rf "${DMG}"
 rm -rf "${FILES}"
 rm -rf "${FILES}-Root"
