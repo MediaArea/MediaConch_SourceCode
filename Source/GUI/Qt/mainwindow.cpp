@@ -219,7 +219,10 @@ void MainWindow::on_actionSchematron_triggered()
         QString file = ask_for_schematron_file();
         if (file.length())
         {
-            C.SchematronFile = file.toStdWString();
+            if (C.policies.import_schematron(file.toStdString().c_str()).length())
+            {
+                C.SchematronFile = file.toStdWString();
+            }
         }
     }
     ui->menuFormat->setEnabled(true);
@@ -263,7 +266,10 @@ void MainWindow::on_actionChooseSchematron_triggered()
     QString file = ask_for_schematron_file();
     if (file.length())
     {
-        C.SchematronFile = file.toStdWString();
+        if (C.policies.import_schematron(file.toStdString().c_str()).length())
+        {
+            C.SchematronFile = file.toStdWString();
+        }
     }
     Run();
 }
