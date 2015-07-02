@@ -226,7 +226,7 @@ String Core::MediaSchematron ()
     Schematron S;
     xmlDocPtr doc = NULL;
 
-    if (policies.pattern.size())
+    if (policies.patterns.size())
     {
         doc = policies.create_doc();
         S.register_schema_from_doc(doc);

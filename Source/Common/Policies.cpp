@@ -21,13 +21,8 @@
 using namespace std;
 //---------------------------------------------------------------------------
 
-
 //***************************************************************************
 // Assert
-//***************************************************************************
-
-//***************************************************************************
-// Constructor/Destructor
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -44,6 +39,33 @@ Assert::Assert(const Assert& r)
     this->validator = r.validator;
     this->value = r.value;
     this->text = r.text;
+}
+
+//***************************************************************************
+// Rule
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+Rule::Rule(const Rule& r)
+{
+    if (&r == this) {
+        return;
+    }
+
+    for (size_t i = 0; i < asserts.size(); ++i)
+    {
+        Assert *a = new Assert(*asserts[i]);
+        this->asserts.push_back(a);
+    }
+}
+
+//---------------------------------------------------------------------------
+Rule::~Rule()
+{
+    for (size_t i = 0; i < asserts.size(); ++i)
+    {
+        delete asserts[i];
+    }
 }
 
 //***************************************************************************
@@ -64,8 +86,8 @@ Policies::Policies()
 
 Policies::~Policies()
 {
-    vector<pair<string, vector<Assert *> > >::iterator it = pattern.begin();
-    vector<pair<string, vector<Assert *> > >::iterator ite = pattern.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = patterns.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = patterns.end();
 
     for (; it != ite; ++it) {
         for (size_t i = 0; i < it->second.size(); ++i)
@@ -92,10 +114,10 @@ String Policies::import_schematron(const char* filename)
         return String(__T("No root node, leaving"));
     }
 
-    pattern.clear();
+    patterns.clear();
     xmlNodePtr child = root->children;
     while (child) {
-        find_pattern_node(child);
+        find_patterns_node(child);
         child = child->next;
     }
     xmlFreeDoc(doc);
@@ -132,7 +154,7 @@ end:
     return ret.str();
 }
 
-xmlNodePtr Policies::write_pattern(string name, vector<Assert *>& r)
+xmlNodePtr Policies::write_pattern(string name, vector<Rule *>& rules)
 {
     xmlNodePtr pattern = xmlNewNode(NULL, (xmlChar *)"pattern");
     xmlNewProp(pattern, (const xmlChar *)"name", (const xmlChar *)name.c_str());
@@ -141,15 +163,15 @@ xmlNodePtr Policies::write_pattern(string name, vector<Assert *>& r)
                            (const xmlChar *)"sch");
     pattern->ns = defNs;
 
-    for (size_t i = 0; i < r.size(); ++i)
+    for (size_t i = 0; i < rules.size(); ++i)
     {
-        xmlNodePtr node = write_rule(r[i]);
+        xmlNodePtr node = write_rule(rules[i]);
         xmlAddChild(pattern, node);
     }
     return pattern;
 }
 
-xmlNodePtr Policies::write_rule(Assert *r)
+xmlNodePtr Policies::write_rule(Rule *r)
 {
     xmlNodePtr rule = xmlNewNode(NULL, (xmlChar *)"rule");
     xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/Mediainfo/File");
@@ -158,21 +180,24 @@ xmlNodePtr Policies::write_rule(Assert *r)
                            (const xmlChar *)"sch");
     rule->ns = defNs;
 
-    xmlNodePtr node = write_assert(r);
-    xmlAddChild(rule, node);
+    for (size_t i = 0; i < r->asserts.size(); ++i)
+    {
+        xmlNodePtr node = write_assert(r->asserts[i]);
+        xmlAddChild(rule, node);
+    }
     return rule;
 }
 
-xmlNodePtr Policies::write_assert(Assert *r)
+xmlNodePtr Policies::write_assert(Assert *a)
 {
     xmlNodePtr assert = xmlNewNode(NULL, (xmlChar *)"assert");
-    xmlNewProp(assert, (xmlChar *)"test", (xmlChar *)serialize_assert_for_test(r).c_str());
+    xmlNewProp(assert, (xmlChar *)"test", (xmlChar *)serialize_assert_for_test(a).c_str());
     xmlNewNs(assert, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
     assert->ns = defNs;
 
-    xmlNodeSetContent(assert, (xmlChar *)r->description.c_str());
+    xmlNodeSetContent(assert, (xmlChar *)a->description.c_str());
     return assert;
 }
 
@@ -186,8 +211,8 @@ xmlDocPtr Policies::create_doc()
     root_node->ns = ns;
     xmlDocSetRootElement(doc, root_node);
 
-    vector<pair<string, vector<Assert *> > >::iterator it = pattern.begin();
-    vector<pair<string, vector<Assert *> > >::iterator ite = pattern.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = patterns.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = patterns.end();
 
     for (; it != ite; ++it)
     {
@@ -205,99 +230,84 @@ void Policies::export_schematron(const char* filename)
     xmlFreeDoc(new_doc);
 }
 
-void Policies::add_new_rule(string& name, Assert& rule)
-{
-    Assert *r = new Assert(rule);
-
-    vector<pair<string, vector<Assert *> > >::iterator it = pattern.begin();
-    vector<pair<string, vector<Assert *> > >::iterator ite = pattern.end();
-
-    for (; it != ite; ++it)
-    {
-        if (it->first == name)
-        {
-            it->second.push_back(r);
-            return;
-        }
-    }
-
-    vector<Assert *> v;
-    v.push_back(r);
-    pattern.push_back(make_pair(name, v));
-}
-
 void Policies::erase_policy(int index)
 {
-    if (index < 0 || (unsigned int)index >= pattern.size())
+    if (index < 0 || (unsigned int)index >= patterns.size())
     {
         return;
     }
 
-    for (size_t i = 0; i < pattern[index].second.size(); ++i)
+    for (size_t i = 0; i < patterns[index].second.size(); ++i)
     {
-        delete pattern[index].second[i];
+        delete patterns[index].second[i];
     }
-    pattern.erase(pattern.begin() + index);
+    patterns.erase(patterns.begin() + index);
 }
 
-void Policies::find_pattern_node(xmlNodePtr node)
+void Policies::find_patterns_node(xmlNodePtr node)
 {
     string def("pattern");
     if (!node || node->type != XML_ELEMENT_NODE ||
         !node->name || def.compare((const char*)node->name))
-    {
         return;
-    }
 
+    string name = (const char*)xmlGetNoNsProp(node, (const unsigned char*)"name");
+    vector<Rule *> rules;
     xmlNodePtr next = node->children;
-    while (next) {
-        string name = (const char*)xmlGetNoNsProp(node, (const unsigned char*)"name");
-        find_rule_node(next, name);
+    while (next)
+    {
+        find_rules_node(next, rules);
         next = next->next;
     }
+    patterns.push_back(make_pair(name, rules));
 }
 
-void Policies::find_rule_node(xmlNodePtr node, string pattern_name)
+void Policies::find_rules_node(xmlNodePtr node, vector<Rule *>& rules)
 {
     string def("rule");
     if (!node || node->type != XML_ELEMENT_NODE ||
         !node->name || def.compare((const char*)node->name))
-    {
         return;
+
+    Rule *r = new Rule;
+    xmlNodePtr next = node->children;
+    while (next)
+    {
+        find_asserts_node(next, r->asserts);
+        //find_report_node(next);
+        next = next->next;
     }
+    rules.push_back(r);
+}
+
+void Policies::find_asserts_node(xmlNodePtr node, vector<Assert *>& asserts)
+{
+    string def("assert");
+    if (!node->name || def.compare((const char*)node->name))
+        return;
 
     xmlNodePtr next = node->children;
-    while (next) {
-        find_assert_node(next, pattern_name);
-        //find_report_node(next);
+    while (next)
+    {
+        string description((const char*)xmlNodeGetContent(node));
+        string test((const char*)xmlGetNoNsProp(node, (const unsigned char*)"test"));
+        Assert* a = create_assert_from_data(description, test);
+        asserts.push_back(a);
         next = next->next;
     }
 }
 
-void Policies::find_assert_node(xmlNodePtr node, string pattern_name)
+Assert* Policies::create_assert_from_data(string descr, string data)
 {
-    string def("assert");
-    if (!node->name || def.compare((const char*)node->name))
-    {
-        return;
-    }
-    string description((const char*)xmlNodeGetContent(node));
-    string test((const char*)xmlGetNoNsProp(node, (const unsigned char*)"test"));
-    Assert r = create_rule_from_data(description, test);
-    add_new_rule(pattern_name, r);
-}
+    Assert* a = new Assert;
 
-Assert Policies::create_rule_from_data(string descr, string data)
-{
-    Assert r;
-
-    r.description = descr;
-    if (!try_parsing_test(data, &r))
+    a->description = descr;
+    if (!try_parsing_test(data, a))
     {
-        r.use_free_text = true;
-        r.text = data;
+        a->use_free_text = true;
+        a->text = data;
     }
-    return r;
+    return a;
 }
 
 bool Policies::check_test_type(const string& type)
@@ -441,29 +451,33 @@ bool Policies::try_parsing_test(string data, Assert *r)
 
 void Policies::dump_pattern_to_stdout()
 {
-    vector<pair<string, vector<Assert *> > >::iterator it = pattern.begin();
-    vector<pair<string, vector<Assert *> > >::iterator ite = pattern.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = patterns.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = patterns.end();
 
     for (size_t num = 0; it != ite; ++it, ++num) {
         cout << "#" << num;
         cout << " ==== Name:" << it->first << endl;
         for (size_t i = 0; i < it->second.size(); ++i)
         {
-            Assert *r = it->second[i];
+            Rule *r = it->second[i];
+            for (size_t i = 0; i < r->asserts.size(); ++i)
+            {
+                Assert *a = r->asserts[i];
 
-                if (r->use_free_text) {
-                    cout << "Assert test:" << r->text;
-                    cout << " ==== Desc:" << r->description;
+                if (a->use_free_text) {
+                    cout << "Assert test:" << a->text;
+                    cout << " ==== Desc:" << a->description;
                     cout << endl;
                 } else {
                     //TODO when parsed
-                    cout << "Type:" << r->type;
-                    cout << " ==== Field:" << r->field;
-                    cout << " ==== Validator:" << r->validator;
-                    cout << " ==== Value:" << r->value;
-                    cout << " ==== Desc:" << r->description;
+                    cout << "Type:" << a->type;
+                    cout << " ==== Field:" << a->field;
+                    cout << " ==== Validator:" << a->validator;
+                    cout << " ==== Value:" << a->value;
+                    cout << " ==== Desc:" << a->description;
                     cout << endl;
                 }
+            }
         }
     }
 }

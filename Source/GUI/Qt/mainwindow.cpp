@@ -214,7 +214,7 @@ void MainWindow::on_actionTrace_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionSchematron_triggered()
 {
-    if (!C.policies.pattern.size() && !C.SchematronFile.length())
+    if (!C.policies.patterns.size() && !C.SchematronFile.length())
     {
         QString file = ask_for_schematron_file();
         if (file.length())
@@ -318,14 +318,14 @@ void MainWindow::on_editPolicy()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_addNewRuleRejected()
+void MainWindow::on_RuleEditRejected()
 {
     clearVisualElements();
     displayPoliciesMenu();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_addNewRuleAccepted()
+void MainWindow::on_RuleEditAccepted()
 {
     string new_name = ruleEdit->get_new_name();
     if (!new_name.length())
@@ -344,7 +344,7 @@ void MainWindow::on_addNewRuleAccepted()
         }
         if (!vec[i]->description.length())
         {
-            ruleEdit->add_error(__T("Pattern must have a name"));
+            ruleEdit->add_error(__T("Assert must have a name"));
             ruleEdit->show_errors();
             return;
         }
@@ -359,32 +359,35 @@ void MainWindow::on_addNewRuleAccepted()
             row = list.first()->row();
             if (new_name != list.first()->text().toStdString())
             {
-                C.policies.pattern[row].first = new_name;
+                C.policies.patterns[row].first = new_name;
             }
         }
     }
     if (row == -1)
     {
-        vector<Assert *> v;
-        C.policies.pattern.push_back(make_pair(new_name, v));
-        row = C.policies.pattern.size() - 1;
+        vector<Rule *> v;
+        C.policies.patterns.push_back(make_pair(new_name, v));
+        row = C.policies.patterns.size() - 1;
     }
 
-    for (size_t i = 0; i < C.policies.pattern[row].second.size(); ++i)
+    // TODO: More than one rule by pattern
+    for (size_t i = 0; i < C.policies.patterns[row].second.size(); ++i)
     {
-        delete C.policies.pattern[row].second[i];
+        delete C.policies.patterns[row].second[i];
     }
-    C.policies.pattern[row].second.clear();
+    C.policies.patterns[row].second.clear();
 
+    Rule *r = new Rule;
     for (size_t i = 0; i < vec.size(); ++i)
     {
         if (!vec[i])
         {
             continue;
         }
-        Assert *r = new Assert(*vec[i]);
-        C.policies.pattern[row].second.push_back(r);
+        Assert *a = new Assert(*vec[i]);
+        r->asserts.push_back(a);
     }
+    C.policies.patterns[row].second.push_back(r);
 
     clearVisualElements();
     displayPoliciesMenu();
@@ -494,8 +497,8 @@ void MainWindow::displayPoliciesMenu()
     Layout->addWidget(policiesMenu);
     policiesMenu->show_errors();
 
-    vector<pair<string, vector<Assert *> > >::iterator it = C.policies.pattern.begin();
-    vector<pair<string, vector<Assert *> > >::iterator ite = C.policies.pattern.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = C.policies.patterns.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = C.policies.patterns.end();
     for (; it != ite; ++it)
     {
         policiesMenu->add_policy(it->first);
@@ -513,9 +516,9 @@ void MainWindow::createRuleEdit()
     policiesMenu->hide();
     ruleEdit = new RuleEdit(this);
     QObject::connect(ruleEdit->get_validation_button(), SIGNAL(accepted()),
-                     this, SLOT(on_addNewRuleAccepted()));
+                     this, SLOT(on_RuleEditAccepted()));
     QObject::connect(ruleEdit->get_validation_button(), SIGNAL(rejected()),
-                     this, SLOT(on_addNewRuleRejected()));
+                     this, SLOT(on_RuleEditRejected()));
 }
 
 //---------------------------------------------------------------------------
@@ -527,10 +530,14 @@ void MainWindow::displayRuleEdit(int row)
 
     if (row != -1)
     {
-        ruleEdit->set_name(C.policies.pattern[row].first);
-        for (size_t i = 0; i < C.policies.pattern[row].second.size(); ++i)
+        ruleEdit->set_name(C.policies.patterns[row].first);
+        for (size_t i = 0; i < C.policies.patterns[row].second.size(); ++i)
         {
-            ruleEdit->add_assert(C.policies.pattern[row].second[i]);
+            Rule *r = C.policies.patterns[row].second[i];
+            for (size_t j = 0; j < r->asserts.size(); ++j)
+            {
+                ruleEdit->add_assert(r->asserts[j]);
+            }
         }
     }
 }
