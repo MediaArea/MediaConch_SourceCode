@@ -64,8 +64,8 @@ Policies::Policies()
 
 Policies::~Policies()
 {
-    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = pattern.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = pattern.end();
 
     for (; it != ite; ++it) {
         for (size_t i = 0; i < it->second.size(); ++i)
@@ -92,7 +92,7 @@ String Policies::import_schematron(const char* filename)
         return String(__T("No root node, leaving"));
     }
 
-    rules.clear();
+    pattern.clear();
     xmlNodePtr child = root->children;
     while (child) {
         find_pattern_node(child);
@@ -186,8 +186,8 @@ xmlDocPtr Policies::create_doc()
     root_node->ns = ns;
     xmlDocSetRootElement(doc, root_node);
 
-    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = pattern.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = pattern.end();
 
     for (; it != ite; ++it)
     {
@@ -209,8 +209,8 @@ void Policies::add_new_rule(string& name, Rule& rule)
 {
     Rule *r = new Rule(rule);
 
-    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = pattern.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = pattern.end();
 
     for (; it != ite; ++it)
     {
@@ -223,21 +223,21 @@ void Policies::add_new_rule(string& name, Rule& rule)
 
     vector<Rule *> v;
     v.push_back(r);
-    rules.push_back(make_pair(name, v));
+    pattern.push_back(make_pair(name, v));
 }
 
 void Policies::erase_policy(int index)
 {
-    if (index < 0 || (unsigned int)index >= rules.size())
+    if (index < 0 || (unsigned int)index >= pattern.size())
     {
         return;
     }
 
-    for (size_t i = 0; i < rules[index].second.size(); ++i)
+    for (size_t i = 0; i < pattern[index].second.size(); ++i)
     {
-        delete rules[index].second[i];
+        delete pattern[index].second[i];
     }
-    rules.erase(rules.begin() + index);
+    pattern.erase(pattern.begin() + index);
 }
 
 void Policies::find_pattern_node(xmlNodePtr node)
@@ -439,10 +439,10 @@ bool Policies::try_parsing_test(string data, Rule *r)
     return true;
 }
 
-void Policies::dump_rules_to_stdout()
+void Policies::dump_pattern_to_stdout()
 {
-    vector<pair<string, vector<Rule *> > >::iterator it = rules.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = pattern.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = pattern.end();
 
     for (size_t num = 0; it != ite; ++it, ++num) {
         cout << "#" << num;

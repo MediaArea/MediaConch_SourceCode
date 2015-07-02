@@ -78,9 +78,9 @@ public:
     bool       try_parsing_test(string data, Rule *r);
 
     //TODO: parse csv to get the types/fields/validators from file
-    void dump_rules_to_stdout();
+    void dump_pattern_to_stdout();
 
-    vector<pair<string, vector<Rule *> > > rules;
+    vector<pair<string, vector<Rule *> > > pattern;
 
     //***************************************************************************
     // Type/Field/Validator

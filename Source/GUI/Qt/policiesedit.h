@@ -54,7 +54,7 @@ void clear_errors();
 void add_rule(Rule *r);
 void set_name(string& policyName);
 string get_new_name() const;
-const vector<Rule *>& get_rules() const;
+const vector<Rule *>& get_pattern() const;
 
 //***************************************************************************
 // Visual element

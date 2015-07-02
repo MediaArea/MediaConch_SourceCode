@@ -160,7 +160,7 @@ string PoliciesEdit::get_new_name() const
     return ui->name->text().toStdString();
 }
 
-const vector<Rule *>& PoliciesEdit::get_rules() const
+const vector<Rule *>& PoliciesEdit::get_pattern() const
 {
     return rules;
 }

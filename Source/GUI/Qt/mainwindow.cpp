@@ -214,7 +214,7 @@ void MainWindow::on_actionTrace_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionSchematron_triggered()
 {
-    if (!C.policies.rules.size() && !C.SchematronFile.length())
+    if (!C.policies.pattern.size() && !C.SchematronFile.length())
     {
         QString file = ask_for_schematron_file();
         if (file.length())
@@ -335,7 +335,7 @@ void MainWindow::on_addNewRuleAccepted()
         return;
     }
 
-    const vector<Rule *> vec = policiesEdit->get_rules();
+    const vector<Rule *> vec = policiesEdit->get_pattern();
     for (size_t i = 0; i < vec.size(); ++i)
     {
         if (!vec[i])
@@ -344,7 +344,7 @@ void MainWindow::on_addNewRuleAccepted()
         }
         if (!vec[i]->description.length())
         {
-            policiesEdit->add_error(__T("Rules must have a name"));
+            policiesEdit->add_error(__T("Pattern must have a name"));
             policiesEdit->show_errors();
             return;
         }
@@ -359,22 +359,22 @@ void MainWindow::on_addNewRuleAccepted()
             row = list.first()->row();
             if (new_name != list.first()->text().toStdString())
             {
-                C.policies.rules[row].first = new_name;
+                C.policies.pattern[row].first = new_name;
             }
         }
     }
     if (row == -1)
     {
         vector<Rule *> v;
-        C.policies.rules.push_back(make_pair(new_name, v));
-        row = C.policies.rules.size() - 1;
+        C.policies.pattern.push_back(make_pair(new_name, v));
+        row = C.policies.pattern.size() - 1;
     }
 
-    for (size_t i = 0; i < C.policies.rules[row].second.size(); ++i)
+    for (size_t i = 0; i < C.policies.pattern[row].second.size(); ++i)
     {
-        delete C.policies.rules[row].second[i];
+        delete C.policies.pattern[row].second[i];
     }
-    C.policies.rules[row].second.clear();
+    C.policies.pattern[row].second.clear();
 
     for (size_t i = 0; i < vec.size(); ++i)
     {
@@ -383,7 +383,7 @@ void MainWindow::on_addNewRuleAccepted()
             continue;
         }
         Rule *r = new Rule(*vec[i]);
-        C.policies.rules[row].second.push_back(r);
+        C.policies.pattern[row].second.push_back(r);
     }
 
     clearVisualElements();
@@ -493,8 +493,8 @@ void MainWindow::displayPoliciesMenu()
     Layout->addWidget(policiesMenu);
     policiesMenu->show_errors();
 
-    vector<pair<string, vector<Rule *> > >::iterator it = C.policies.rules.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = C.policies.rules.end();
+    vector<pair<string, vector<Rule *> > >::iterator it = C.policies.pattern.begin();
+    vector<pair<string, vector<Rule *> > >::iterator ite = C.policies.pattern.end();
     for (; it != ite; ++it)
     {
         policiesMenu->add_policy(it->first);
@@ -526,10 +526,10 @@ void MainWindow::displayPoliciesEdit(int row)
 
     if (row != -1)
     {
-        policiesEdit->set_name(C.policies.rules[row].first);
-        for (size_t i = 0; i < C.policies.rules[row].second.size(); ++i)
+        policiesEdit->set_name(C.policies.pattern[row].first);
+        for (size_t i = 0; i < C.policies.pattern[row].second.size(); ++i)
         {
-            policiesEdit->add_rule(C.policies.rules[row].second[i]);
+            policiesEdit->add_rule(C.policies.pattern[row].second[i]);
         }
     }
 }
