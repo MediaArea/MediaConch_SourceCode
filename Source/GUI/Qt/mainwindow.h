@@ -20,7 +20,7 @@ class QVBoxLayout;
 class QPlainTextEdit;
 class QLabel;
 class PoliciesMenu;
-class PoliciesEdit;
+class RuleEdit;
 
 class MainWindow : public QMainWindow
 {
@@ -50,7 +50,7 @@ public:
 private:
     Ui::MainWindow *ui;
     PoliciesMenu   *policiesMenu;
-    PoliciesEdit   *policiesEdit;
+    RuleEdit       *ruleEdit;
 
     // Internal
     Core C;
@@ -65,8 +65,8 @@ private:
     void                        createMainText();
     void                        createPoliciesMenu();
     void                        displayPoliciesMenu();
-    void                        createPoliciesEdit();
-    void                        displayPoliciesEdit(int row);
+    void                        createRuleEdit();
+    void                        displayRuleEdit(int row);
     void                        choose_schematron_file();
 
 //***************************************************************************

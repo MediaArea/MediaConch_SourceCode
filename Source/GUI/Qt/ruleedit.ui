@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PoliciesEdit</class>
- <widget class="QFrame" name="PoliciesEdit">
+ <class>RuleEdit</class>
+ <widget class="QFrame" name="RuleEdit">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>Policy name:</string>
+      <string>Rule name:</string>
      </property>
     </widget>
    </item>
@@ -37,7 +37,7 @@
        <widget class="QTextEdit" name="freeText"/>
       </item>
       <item row="8" column="1">
-       <widget class="QPushButton" name="newRule">
+       <widget class="QPushButton" name="newAssert">
         <property name="focusPolicy">
          <enum>Qt::NoFocus</enum>
         </property>
@@ -46,12 +46,12 @@
 selection-background-color: rgb(255, 170, 0);</string>
         </property>
         <property name="text">
-         <string>Add new policy rule</string>
+         <string>Add a new assert</string>
         </property>
        </widget>
       </item>
       <item row="0" column="5" rowspan="7" colspan="3">
-       <widget class="QTableWidget" name="rules">
+       <widget class="QTableWidget" name="asserts">
         <property name="selectionMode">
          <enum>QAbstractItemView::ExtendedSelection</enum>
         </property>
@@ -72,7 +72,7 @@ selection-background-color: rgb(255, 170, 0);</string>
         </attribute>
         <column>
          <property name="text">
-          <string>Policy rules</string>
+          <string>Asserts</string>
          </property>
         </column>
        </widget>
@@ -106,12 +106,12 @@ selection-background-color: rgb(255, 170, 0);</string>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Rule name:</string>
+         <string>Assert name:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="ruleName"/>
+       <widget class="QLineEdit" name="assertName"/>
       </item>
       <item row="2" column="0" rowspan="4" colspan="3">
        <widget class="QFrame" name="editorFrame">
@@ -165,7 +165,7 @@ selection-background-color: rgb(255, 170, 0);</string>
          <item row="1" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Rule policy:</string>
+            <string>Assert</string>
            </property>
           </widget>
          </item>
@@ -173,7 +173,7 @@ selection-background-color: rgb(255, 170, 0);</string>
        </widget>
       </item>
       <item row="8" column="6">
-       <widget class="QPushButton" name="deleteRule">
+       <widget class="QPushButton" name="deleteAssert">
         <property name="maximumSize">
          <size>
           <width>100</width>
@@ -196,7 +196,7 @@ selection-background-color: rgb(255, 0, 0);
       <item row="1" column="1">
        <widget class="QRadioButton" name="freeTextSelector">
         <property name="text">
-         <string>Free &amp;text</string>
+         <string>Free te&amp;xt</string>
         </property>
        </widget>
       </item>
@@ -217,13 +217,13 @@ selection-background-color: rgb(255, 0, 0);
        </spacer>
       </item>
      </layout>
-     <zorder>rules</zorder>
+     <zorder>newAssert</zorder>
+     <zorder>deleteAssert</zorder>
+     <zorder>asserts</zorder>
      <zorder>editorFrame</zorder>
      <zorder>editorSelector</zorder>
      <zorder>freeTextSelector</zorder>
-     <zorder>newRule</zorder>
-     <zorder>deleteRule</zorder>
-     <zorder>ruleName</zorder>
+     <zorder>assertName</zorder>
      <zorder>label</zorder>
      <zorder>freeText</zorder>
     </widget>

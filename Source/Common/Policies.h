@@ -34,14 +34,14 @@ using namespace std;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
-// Rule
+// Assert
 //***************************************************************************
 
-struct Rule
+struct Assert
 {
-    Rule() {}
-    ~Rule() {}
-    Rule(const Rule&);
+    Assert() {}
+    ~Assert() {}
+    Assert(const Assert&);
 
     string description;
 
@@ -55,7 +55,7 @@ struct Rule
     string text;
 
 private:
-    Rule& operator=(const Rule&);
+    Assert& operator=(const Assert&);
 };
 
 //***************************************************************************
@@ -71,16 +71,16 @@ public:
 
     String import_schematron(const char* filename);
     void export_schematron(const char* filename);
-    void add_new_rule(string& name, Rule& r);
+    void add_new_rule(string& name, Assert& r);
     void erase_policy(int index);
     xmlDocPtr  create_doc();
-    string     serialize_rule_for_test(Rule *r);
-    bool       try_parsing_test(string data, Rule *r);
+    string     serialize_assert_for_test(Assert *r);
+    bool       try_parsing_test(string data, Assert *r);
 
     //TODO: parse csv to get the types/fields/validators from file
     void dump_pattern_to_stdout();
 
-    vector<pair<string, vector<Rule *> > > pattern;
+    vector<pair<string, vector<Assert *> > > pattern;
 
     //***************************************************************************
     // Type/Field/Validator
@@ -107,7 +107,7 @@ private:
     void find_pattern_node(xmlNodePtr node);
     void find_rule_node(xmlNodePtr node, string pattern_name);
     void find_assert_node(xmlNodePtr node, string pattern_name);
-    Rule create_rule_from_data(string descr, string data);
+    Assert create_rule_from_data(string descr, string data);
 
     string parse_test_value(string& sub, const string& start, const string& after);
     string parse_test_field(string& sub, const string& end);
@@ -116,9 +116,9 @@ private:
     bool check_test_field(const string& field);
     bool check_test_validator(const string& validator);
 
-    xmlNodePtr write_pattern(string name, vector<Rule *>& r);
-    xmlNodePtr write_rule(Rule *r);
-    xmlNodePtr write_assert(Rule *r);
+    xmlNodePtr write_pattern(string name, vector<Assert *>& r);
+    xmlNodePtr write_rule(Assert *r);
+    xmlNodePtr write_assert(Assert *r);
 };
 
 #endif

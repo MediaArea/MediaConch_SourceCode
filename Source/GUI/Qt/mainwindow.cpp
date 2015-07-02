@@ -7,7 +7,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "policiesmenu.h"
-#include "policiesedit.h"
+#include "ruleedit.h"
 
 #include <QPlainTextEdit>
 #include <QVBoxLayout>
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
     policiesMenu = NULL;
-    policiesEdit = NULL;
+    ruleEdit = NULL;
 
     // Drag n drop
     setAcceptDrops(true);
@@ -289,13 +289,13 @@ void MainWindow::on_importSchematron()
 //---------------------------------------------------------------------------
 void MainWindow::on_addNewPolicy()
 {
-    displayPoliciesEdit(-1);
+    displayRuleEdit(-1);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::on_editPolicy(int row, int)
 {
-    displayPoliciesEdit(row);
+    displayRuleEdit(row);
 }
 
 //---------------------------------------------------------------------------
@@ -314,7 +314,7 @@ void MainWindow::on_editPolicy()
         return;
     }
     string name = item->text().toStdString();
-    displayPoliciesEdit(item->row());
+    displayRuleEdit(item->row());
 }
 
 //---------------------------------------------------------------------------
@@ -327,15 +327,15 @@ void MainWindow::on_addNewRuleRejected()
 //---------------------------------------------------------------------------
 void MainWindow::on_addNewRuleAccepted()
 {
-    string new_name = policiesEdit->get_new_name();
+    string new_name = ruleEdit->get_new_name();
     if (!new_name.length())
     {
-        policiesEdit->add_error(__T("Policy must have a name"));
-        policiesEdit->show_errors();
+        ruleEdit->add_error(__T("Policy must have a name"));
+        ruleEdit->show_errors();
         return;
     }
 
-    const vector<Rule *> vec = policiesEdit->get_pattern();
+    const vector<Assert *> vec = ruleEdit->get_asserts();
     for (size_t i = 0; i < vec.size(); ++i)
     {
         if (!vec[i])
@@ -344,8 +344,8 @@ void MainWindow::on_addNewRuleAccepted()
         }
         if (!vec[i]->description.length())
         {
-            policiesEdit->add_error(__T("Pattern must have a name"));
-            policiesEdit->show_errors();
+            ruleEdit->add_error(__T("Pattern must have a name"));
+            ruleEdit->show_errors();
             return;
         }
     }
@@ -365,7 +365,7 @@ void MainWindow::on_addNewRuleAccepted()
     }
     if (row == -1)
     {
-        vector<Rule *> v;
+        vector<Assert *> v;
         C.policies.pattern.push_back(make_pair(new_name, v));
         row = C.policies.pattern.size() - 1;
     }
@@ -382,7 +382,7 @@ void MainWindow::on_addNewRuleAccepted()
         {
             continue;
         }
-        Rule *r = new Rule(*vec[i]);
+        Assert *r = new Assert(*vec[i]);
         C.policies.pattern[row].second.push_back(r);
     }
 
@@ -409,10 +409,11 @@ void MainWindow::clearVisualElements()
         delete policiesMenu; policiesMenu=NULL;
     }
 
-    if (policiesEdit)
+    if (ruleEdit)
     {
-        Layout->removeWidget(policiesEdit);
-        delete policiesEdit; policiesEdit=NULL;
+        Layout->removeWidget(ruleEdit);
+        delete ruleEdit;
+        ruleEdit=NULL;
     }
 
     if (DragDrop_Image)
@@ -493,8 +494,8 @@ void MainWindow::displayPoliciesMenu()
     Layout->addWidget(policiesMenu);
     policiesMenu->show_errors();
 
-    vector<pair<string, vector<Rule *> > >::iterator it = C.policies.pattern.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = C.policies.pattern.end();
+    vector<pair<string, vector<Assert *> > >::iterator it = C.policies.pattern.begin();
+    vector<pair<string, vector<Assert *> > >::iterator ite = C.policies.pattern.end();
     for (; it != ite; ++it)
     {
         policiesMenu->add_policy(it->first);
@@ -502,34 +503,34 @@ void MainWindow::displayPoliciesMenu()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createPoliciesEdit()
+void MainWindow::createRuleEdit()
 {
-    if (policiesEdit) {
-        policiesEdit->clear();
+    if (ruleEdit) {
+        ruleEdit->clear();
         return;
     }
 
     policiesMenu->hide();
-    policiesEdit = new PoliciesEdit(this);
-    QObject::connect(policiesEdit->get_validation_button(), SIGNAL(accepted()),
+    ruleEdit = new RuleEdit(this);
+    QObject::connect(ruleEdit->get_validation_button(), SIGNAL(accepted()),
                      this, SLOT(on_addNewRuleAccepted()));
-    QObject::connect(policiesEdit->get_validation_button(), SIGNAL(rejected()),
+    QObject::connect(ruleEdit->get_validation_button(), SIGNAL(rejected()),
                      this, SLOT(on_addNewRuleRejected()));
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::displayPoliciesEdit(int row)
+void MainWindow::displayRuleEdit(int row)
 {
-    createPoliciesEdit();
-    Layout->addWidget(policiesEdit);
-    policiesEdit->show_errors();
+    createRuleEdit();
+    Layout->addWidget(ruleEdit);
+    ruleEdit->show_errors();
 
     if (row != -1)
     {
-        policiesEdit->set_name(C.policies.pattern[row].first);
+        ruleEdit->set_name(C.policies.pattern[row].first);
         for (size_t i = 0; i < C.policies.pattern[row].second.size(); ++i)
         {
-            policiesEdit->add_rule(C.policies.pattern[row].second[i]);
+            ruleEdit->add_assert(C.policies.pattern[row].second[i]);
         }
     }
 }

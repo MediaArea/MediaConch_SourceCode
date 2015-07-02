@@ -23,17 +23,17 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/policiesmenu.cpp \
-                    ../../Source/GUI/Qt/policiesedit.cpp
+                    ../../Source/GUI/Qt/ruleedit.cpp
 
 HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schematron.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/policiesmenu.h \
-                    ../../Source/GUI/Qt/policiesedit.h
+                    ../../Source/GUI/Qt/ruleedit.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policiesmenu.ui \
-                    ../../Source/GUI/Qt/policiesedit.ui
+                    ../../Source/GUI/Qt/ruleedit.ui
 
 INCLUDEPATH      += ../../Source
 

@@ -4,8 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#ifndef POLICIESEDIT_H
-#define POLICIESEDIT_H
+#ifndef RULEEDIT_H
+#define RULEEDIT_H
 
 //---------------------------------------------------------------------------
 #ifdef MEDIAINFO_DLL_RUNTIME
@@ -25,22 +25,22 @@ using namespace MediaInfoNameSpace;
 using namespace std;
 
 namespace Ui {
-    class PoliciesEdit;
+    class RuleEdit;
 }
 
 class QPushButton;
-struct Rule;
+struct Assert;
 class MainWindow;
 class QDialogButtonBox;
 class QTableWidgetItem;
 
-class PoliciesEdit : public QFrame
+class RuleEdit : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit PoliciesEdit(QWidget *parent = 0);
-    ~PoliciesEdit();
+    explicit RuleEdit(QWidget *parent = 0);
+    ~RuleEdit();
 
     
 //***************************************************************************
@@ -51,37 +51,37 @@ void clear();
 void add_error(String error);
 void show_errors();
 void clear_errors();
-void add_rule(Rule *r);
+void add_assert(Assert *a);
 void set_name(string& policyName);
 string get_new_name() const;
-const vector<Rule *>& get_pattern() const;
+const vector<Assert *>& get_asserts() const;
 
 //***************************************************************************
 // Visual element
 //***************************************************************************
 
-const QPushButton *get_newRule_button() const;
+const QPushButton *get_newAssert_button() const;
 const QDialogButtonBox *get_validation_button() const;
 
 private:
     MainWindow *mainwindow;
-    Ui::PoliciesEdit *ui;
+    Ui::RuleEdit *ui;
     list<String> errors;
     string policyName;
-    vector<Rule *> rules;
+    vector<Assert *> asserts;
 
 //***************************************************************************
 // HELPER
 //***************************************************************************
 
-QString getSelectedRuleName();
-QTableWidgetItem* getSelectedRuleItem();
+QString getSelectedAssertName();
+QTableWidgetItem* getSelectedAssertItem();
 void add_values_to_selector();
 void clear_editor_fields();
 string get_validator_value_from_pretty_name(string pretty_name);
 string get_validator_pretty_name_from_value(string value);
-void copy_visual_to_rule(Rule *r);
-void fill_editor_fields(const Rule *r);
+void copy_visual_to_assert(Assert *a);
+void fill_editor_fields(const Assert *a);
 void value_to_quotted_value(string&);
 
 //***************************************************************************
@@ -89,18 +89,18 @@ void value_to_quotted_value(string&);
 //***************************************************************************
 
 private Q_SLOTS:
-    void on_addNewRule();
+    void on_addNewAssert();
     void cell_clicked(int row, int column);
-    void on_deleteRule();
-    void rule_selected_changed();
+    void on_deleteAssert();
+    void assert_selected_changed();
     void free_text_selected();
     void editor_selected();
-    void editRule_type();
-    void editRule_field();
-    void editRule_validator();
-    void editRule_value();
-    void editRule_freeText();
-    void editRule_ruleName();
+    void editAssert_type();
+    void editAssert_field();
+    void editAssert_validator();
+    void editAssert_value();
+    void editAssert_freeText();
+    void editAssert_assertName();
 };
 
-#endif // POLICIESEDIT_H
+#endif // RULEEDIT_H
