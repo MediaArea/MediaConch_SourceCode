@@ -19,6 +19,7 @@ class MainWindow;
 class QVBoxLayout;
 class QPlainTextEdit;
 class QLabel;
+class PoliciesTree;
 class PoliciesMenu;
 class RuleEdit;
 
@@ -49,6 +50,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    PoliciesTree   *policiesTree;
     PoliciesMenu   *policiesMenu;
     RuleEdit       *ruleEdit;
 
@@ -63,6 +65,8 @@ private:
     void                        clearVisualElements();
     void                        createDragDrop();
     void                        createMainText();
+    void                        displayPoliciesTree();
+    void                        createPoliciesTree();
     void                        createPoliciesMenu();
     void                        displayPoliciesMenu();
     void                        createRuleEdit();

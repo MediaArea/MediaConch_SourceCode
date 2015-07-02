@@ -6,6 +6,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "policiestree.h"
 #include "policiesmenu.h"
 #include "ruleedit.h"
 
@@ -55,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     MainText=NULL;
     DragDrop_Image=NULL;
     DragDrop_Text=NULL;
+    policiesTree = NULL;
     policiesMenu = NULL;
     ruleEdit = NULL;
 
@@ -115,7 +117,7 @@ void MainWindow::Run()
 {
     if (C.Tool == Core::tool_MediaPolicies)
     {
-        displayPoliciesMenu();
+        displayPoliciesTree();
         return;
     }
 
@@ -477,6 +479,28 @@ void MainWindow::createDragDrop()
     DragDrop_Text->setPalette(Palette);
     DragDrop_Text->setText("Drop video file(s) here");
     Layout->addWidget(DragDrop_Text);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createPoliciesTree()
+{
+    if (policiesTree) {
+        return;
+    }
+    clearVisualElements();
+    policiesTree = new PoliciesTree(this);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::displayPoliciesTree()
+{
+    createPoliciesTree();
+
+    Layout->addWidget(policiesTree);
+    policiesTree->setColumnCount(1);
+    policiesTree->header()->hide();
+    QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(QString("Policies")));
+    policiesTree->insertTopLevelItem(0, item);
 }
 
 //---------------------------------------------------------------------------
