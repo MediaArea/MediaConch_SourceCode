@@ -52,9 +52,9 @@ Rule::Rule(const Rule& r)
         return;
     }
 
-    for (size_t i = 0; i < asserts.size(); ++i)
+    for (size_t i = 0; i < r.asserts.size(); ++i)
     {
-        Assert *a = new Assert(*asserts[i]);
+        Assert *a = new Assert(*r.asserts[i]);
         this->asserts.push_back(a);
     }
 }
@@ -69,10 +69,64 @@ Rule::~Rule()
 }
 
 //***************************************************************************
-// Policies
+// Pattern
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+Pattern::Pattern(const Pattern& p)
+{
+    if (&p == this) {
+        return;
+    }
+
+    this->name = p.name;
+    for (size_t i = 0; i < p.rules.size(); ++i)
+    {
+        Rule *r = new Rule(*p.rules[i]);
+        this->rules.push_back(r);
+    }
+}
+
+//---------------------------------------------------------------------------
+Pattern::~Pattern()
+{
+    for (size_t i = 0; i < rules.size(); ++i)
+    {
+        delete rules[i];
+    }
+}
+
+//***************************************************************************
+// Policy
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+Policy::Policy(const Policy& p)
+{
+    if (&p == this) {
+        return;
+    }
+
+    this->title = p.title;
+    for (size_t i = 0; i < p.patterns.size(); ++i)
+    {
+        Pattern *pattern = new Pattern(*p.patterns[i]);
+        this->patterns.push_back(pattern);
+    }
+}
+
+//---------------------------------------------------------------------------
+Policy::~Policy()
+{
+    for (size_t i = 0; i < patterns.size(); ++i)
+    {
+        delete patterns[i];
+    }
+}
+
+//***************************************************************************
+// Policies
+//***************************************************************************
 
 //***************************************************************************
 // Constructor/Destructor
@@ -86,15 +140,7 @@ Policies::Policies()
 
 Policies::~Policies()
 {
-    vector<pair<string, vector<Rule *> > >::iterator it = patterns.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = patterns.end();
-
-    for (; it != ite; ++it) {
-        for (size_t i = 0; i < it->second.size(); ++i)
-        {
-            delete it->second[i];
-        }
-    }
+    policies.clear();
 }
 
 String Policies::import_schematron(const char* filename)
@@ -114,12 +160,16 @@ String Policies::import_schematron(const char* filename)
         return String(__T("No root node, leaving"));
     }
 
-    patterns.clear();
+    //TODO: find title in child
+    string title;
+    Policy *p = new Policy;
+    p->title = title;
     xmlNodePtr child = root->children;
     while (child) {
-        find_patterns_node(child);
+        find_patterns_node(child, p->patterns);
         child = child->next;
     }
+    policies.push_back(p);
     xmlFreeDoc(doc);
     return String();
 }
@@ -154,18 +204,18 @@ end:
     return ret.str();
 }
 
-xmlNodePtr Policies::write_pattern(string name, vector<Rule *>& rules)
+xmlNodePtr Policies::write_pattern(Pattern *p)
 {
     xmlNodePtr pattern = xmlNewNode(NULL, (xmlChar *)"pattern");
-    xmlNewProp(pattern, (const xmlChar *)"name", (const xmlChar *)name.c_str());
+    xmlNewProp(pattern, (const xmlChar *)"name", (const xmlChar *)p->name.c_str());
     xmlNewNs(pattern, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
     pattern->ns = defNs;
 
-    for (size_t i = 0; i < rules.size(); ++i)
+    for (size_t i = 0; i < p->rules.size(); ++i)
     {
-        xmlNodePtr node = write_rule(rules[i]);
+        xmlNodePtr node = write_rule(p->rules[i]);
         xmlAddChild(pattern, node);
     }
     return pattern;
@@ -201,7 +251,7 @@ xmlNodePtr Policies::write_assert(Assert *a)
     return assert;
 }
 
-xmlDocPtr Policies::create_doc()
+xmlDocPtr Policies::create_doc(size_t pos)
 {
     xmlDocPtr doc = xmlNewDoc((xmlChar *)"1.0");
     xmlNodePtr root_node = xmlNewNode(NULL, (xmlChar *)"schema");
@@ -211,40 +261,40 @@ xmlDocPtr Policies::create_doc()
     root_node->ns = ns;
     xmlDocSetRootElement(doc, root_node);
 
-    vector<pair<string, vector<Rule *> > >::iterator it = patterns.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = patterns.end();
+    if (pos >= policies.size() || !policies[pos])
+        return NULL;
 
+    vector<Pattern *>::iterator it = policies[pos]->patterns.begin();
+    vector<Pattern *>::iterator ite = policies[pos]->patterns.end();
+
+    //TODO: write title
     for (; it != ite; ++it)
     {
-        xmlNodePtr node = write_pattern(it->first, it->second);
+        xmlNodePtr node = write_pattern(*it);
         xmlAddChild(root_node, node);
     }
     return doc;
 }
 
-void Policies::export_schematron(const char* filename)
+void Policies::export_schematron(const char* filename, size_t pos)
 {
-    xmlDocPtr new_doc = create_doc();
+    xmlDocPtr new_doc = create_doc(pos);
 
     xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);
 }
 
-void Policies::erase_policy(int index)
+void Policies::erase_policy(size_t index)
 {
-    if (index < 0 || (unsigned int)index >= patterns.size())
-    {
+    if (index >= policies.size())
         return;
-    }
 
-    for (size_t i = 0; i < patterns[index].second.size(); ++i)
-    {
-        delete patterns[index].second[i];
-    }
-    patterns.erase(patterns.begin() + index);
+    if (policies[index])
+        delete policies[index];
+    policies.erase(policies.begin() + index);
 }
 
-void Policies::find_patterns_node(xmlNodePtr node)
+void Policies::find_patterns_node(xmlNodePtr node, vector<Pattern *>& patterns)
 {
     string def("pattern");
     if (!node || node->type != XML_ELEMENT_NODE ||
@@ -252,14 +302,15 @@ void Policies::find_patterns_node(xmlNodePtr node)
         return;
 
     string name = (const char*)xmlGetNoNsProp(node, (const unsigned char*)"name");
-    vector<Rule *> rules;
+    Pattern* p = new Pattern;
+    p->name = name;
     xmlNodePtr next = node->children;
     while (next)
     {
-        find_rules_node(next, rules);
+        find_rules_node(next, p->rules);
         next = next->next;
     }
-    patterns.push_back(make_pair(name, rules));
+    patterns.push_back(p);
 }
 
 void Policies::find_rules_node(xmlNodePtr node, vector<Rule *>& rules)
@@ -449,33 +500,38 @@ bool Policies::try_parsing_test(string data, Assert *r)
     return true;
 }
 
-void Policies::dump_pattern_to_stdout()
+void Policies::dump_policies_to_stdout()
 {
-    vector<pair<string, vector<Rule *> > >::iterator it = patterns.begin();
-    vector<pair<string, vector<Rule *> > >::iterator ite = patterns.end();
+    for (size_t i = 0; i < policies.size(); ++i)
+    {
+        Policy *policy = policies[i];
+        cout << "#" << i;
+        cout << " ==== Title:" << policy->title << endl;
 
-    for (size_t num = 0; it != ite; ++it, ++num) {
-        cout << "#" << num;
-        cout << " ==== Name:" << it->first << endl;
-        for (size_t i = 0; i < it->second.size(); ++i)
+        for (size_t j = 0; j < policy->patterns.size(); ++j)
         {
-            Rule *r = it->second[i];
-            for (size_t i = 0; i < r->asserts.size(); ++i)
-            {
-                Assert *a = r->asserts[i];
+            Pattern *pat = policy->patterns[j];
 
-                if (a->use_free_text) {
-                    cout << "Assert test:" << a->text;
-                    cout << " ==== Desc:" << a->description;
-                    cout << endl;
-                } else {
-                    //TODO when parsed
-                    cout << "Type:" << a->type;
-                    cout << " ==== Field:" << a->field;
-                    cout << " ==== Validator:" << a->validator;
-                    cout << " ==== Value:" << a->value;
-                    cout << " ==== Desc:" << a->description;
-                    cout << endl;
+            cout << "\t==== Pattern name:" << pat->name << endl;
+            for (size_t k = 0; k < pat->rules.size(); ++k)
+            {
+                Rule *r = pat->rules[k];
+                for (size_t l = 0; l < r->asserts.size(); ++l)
+                {
+                    Assert *a = r->asserts[l];
+
+                    if (a->use_free_text) {
+                        cout << "\t\tAssert test:" << a->text;
+                        cout << "' ==== Desc:" << a->description;
+                        cout << endl;
+                    } else {
+                        cout << "\t\tAssert: Type:" << a->type;
+                        cout << " ==== Field:" << a->field;
+                        cout << " ==== Validator:" << a->validator;
+                        cout << " ==== Value:" << a->value;
+                        cout << " ==== Desc:" << a->description;
+                        cout << endl;
+                    }
                 }
             }
         }

@@ -222,19 +222,41 @@ String Core::MediaTrace ()
 //---------------------------------------------------------------------------
 String Core::MediaSchematron ()
 {
-    wstringstream Out;
     Schematron S;
     xmlDocPtr doc = NULL;
 
-    if (policies.patterns.size())
+    if (policies.policies.size())
     {
-        doc = policies.create_doc();
-        S.register_schema_from_doc(doc);
-    } else {
-        std::string file(SchematronFile.begin(), SchematronFile.end());
-        S.register_schema_from_file(file.c_str());
+        wstringstream Out;
+        for (size_t i = 0; i < policies.policies.size(); ++i)
+        {
+            doc = policies.create_doc(i);
+            S.register_schema_from_doc(doc);
+            Out << validation(S);
+            if (doc)
+                xmlFreeDoc(doc);
+        }
+        return Out.str();
     }
+    std::string file(SchematronFile.begin(), SchematronFile.end());
+    S.register_schema_from_file(file.c_str());
+    return validation(S);
+}
 
+//---------------------------------------------------------------------------
+String Core::MediaPolicies ()
+{
+    return String();
+}
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+String Core::validation(Schematron& S)
+{
+    wstringstream Out;
     String tmp = MI->Inform();
     std::string xml(tmp.begin(), tmp.end());
 
@@ -247,15 +269,5 @@ String Core::MediaSchematron ()
     } else {
         Out << __T("VALID");
     }
-    if (doc)
-    {
-        xmlFreeDoc(doc);
-    }
     return Out.str();
-}
-
-//---------------------------------------------------------------------------
-String Core::MediaPolicies ()
-{
-    return String();
 }

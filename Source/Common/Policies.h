@@ -74,6 +74,38 @@ private:
 };
 
 //***************************************************************************
+// Pattern
+//***************************************************************************
+
+struct Pattern
+{
+    Pattern() {}
+    ~Pattern();
+    Pattern(const Pattern&);
+
+    string name;
+    vector<Rule *> rules;
+private:
+    Pattern& operator=(const Pattern&);
+};
+
+//***************************************************************************
+// Policy
+//***************************************************************************
+
+struct Policy
+{
+    Policy() {}
+    ~Policy();
+    Policy(const Policy&);
+
+    string title;
+    vector<Pattern *> patterns;
+private:
+    Policy& operator=(const Policy&);
+};
+
+//***************************************************************************
 // Class Policies
 //***************************************************************************
 
@@ -85,17 +117,16 @@ public:
     ~Policies();
 
     String import_schematron(const char* filename);
-    void export_schematron(const char* filename);
-    void erase_policy(int index);
-    xmlDocPtr  create_doc();
+    void export_schematron(const char* filename, size_t pos);
+    void erase_policy(size_t index);
+    xmlDocPtr  create_doc(size_t pos);
     string     serialize_assert_for_test(Assert *r);
     bool       try_parsing_test(string data, Assert *r);
 
     //TODO: parse csv to get the types/fields/validators from file
-    void dump_pattern_to_stdout();
+    void dump_policies_to_stdout();
 
-    vector<pair<string, vector<Rule *> > > patterns;
-
+    vector<Policy *> policies;
     //***************************************************************************
     // Type/Field/Validator
     //***************************************************************************
@@ -118,7 +149,7 @@ private:
     Policies& operator=(const Policies&);
 
     // HELPER
-    void find_patterns_node(xmlNodePtr node);
+    void find_patterns_node(xmlNodePtr node, vector<Pattern *>& patterns);
     void find_rules_node(xmlNodePtr node, vector<Rule *>& rules);
     void find_asserts_node(xmlNodePtr node, vector<Assert *>& asserts);
     Assert* create_assert_from_data(string descr, string data);
@@ -130,7 +161,7 @@ private:
     bool check_test_field(const string& field);
     bool check_test_validator(const string& validator);
 
-    xmlNodePtr write_pattern(string name, vector<Rule *>& rules);
+    xmlNodePtr write_pattern(Pattern *p);
     xmlNodePtr write_rule(Rule *r);
     xmlNodePtr write_assert(Assert *r);
 };
