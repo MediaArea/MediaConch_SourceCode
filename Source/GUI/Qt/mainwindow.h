@@ -22,6 +22,7 @@ class QLabel;
 class PoliciesTree;
 class PoliciesMenu;
 class PolicyMenu;
+class GroupOfRules;
 class RuleEdit;
 class QTreeWidgetItem;
 
@@ -55,6 +56,7 @@ private:
     PoliciesTree   *policiesTree;
     PoliciesMenu   *policiesMenu;
     PolicyMenu     *policyMenu;
+    GroupOfRules   *groupOfRules;
     RuleEdit       *ruleEdit;
 
     // Internal
@@ -79,6 +81,8 @@ private:
     void                        createPoliciesMenu();
     void                        displayPolicyMenu(QString title);
     void                        createPolicyMenu();
+    void                        displayGroupOfRules(QString title);
+    void                        createGroupOfRules();
     void                        displayPoliciesMenu();
     void                        createRuleEdit();
     void                        displayRuleEdit(int row);

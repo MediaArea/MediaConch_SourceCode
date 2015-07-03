@@ -9,6 +9,7 @@
 #include "policiestree.h"
 #include "policiesmenu.h"
 #include "policymenu.h"
+#include "groupofrules.h"
 #include "ruleedit.h"
 
 #include <QPlainTextEdit>
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     policiesTree = NULL;
     policiesMenu = NULL;
     policyMenu = NULL;
+    groupOfRules = NULL;
     ruleEdit = NULL;
 
     // Drag n drop
@@ -425,8 +427,7 @@ void MainWindow::policiesTree_selectionChanged()
             displayPolicyMenu(item->text(0));
             break;
         case 2:
-            //TODO
-            printf("it's the group of rules level\n");
+            displayGroupOfRules(item->text(0));
             break;
         case 3:
             //TODO
@@ -496,6 +497,13 @@ void MainWindow::clearPoliciesElements()
         policiesTree->get_menu_layout()->removeWidget(policyMenu);
         delete policyMenu;
         policyMenu=NULL;
+    }
+
+    if (groupOfRules)
+    {
+        policiesTree->get_menu_layout()->removeWidget(groupOfRules);
+        delete groupOfRules;
+        groupOfRules = NULL;
     }
 
     if (ruleEdit)
@@ -703,6 +711,28 @@ void MainWindow::displayPolicyMenu(QString title)
 {
     createPolicyMenu();
     QLineEdit* name = policyMenu->get_title_line();
+
+    name->setText(title);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createGroupOfRules()
+{
+    if (groupOfRules) {
+        return;
+    }
+    clearPoliciesElements();
+    groupOfRules = new GroupOfRules(policiesTree->get_menu_frame());
+    policiesTree->get_menu_layout()->addWidget(groupOfRules);
+    // QObject::connect(groupOfRules->get_addNewRule_button(), SIGNAL(clicked()),
+    //                  this, SLOT(on_addNewRule()));
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::displayGroupOfRules(QString title)
+{
+    createGroupOfRules();
+    QLineEdit* name = groupOfRules->get_title_line();
 
     name->setText(title);
 }
