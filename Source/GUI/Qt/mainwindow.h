@@ -80,6 +80,7 @@ private:
     void                        updatePoliciesTreeRule(Rule *rule, QTreeWidgetItem *parent);
     void                        displayPoliciesTree();
     void                        createPoliciesTree();
+    void                        displayPoliciesMenu();
     void                        createPoliciesMenu();
     void                        displayPolicyMenu(QString title);
     void                        createPolicyMenu();
@@ -87,9 +88,8 @@ private:
     void                        createGroupOfRules();
     void                        displayRuleMenu();
     void                        createRuleMenu();
-    void                        displayPoliciesMenu();
+    void                        displayRuleEdit(QTreeWidgetItem *);
     void                        createRuleEdit();
-    void                        displayRuleEdit(int row);
     void                        choose_schematron_file();
 
 //***************************************************************************
@@ -98,6 +98,7 @@ private:
 
     int get_index_in_tree();
     QTreeWidgetItem *get_item_in_tree();
+    int get_index_of_item_backXX(QTreeWidgetItem* item, size_t back);
 
 private Q_SLOTS:
 
@@ -115,8 +116,6 @@ private Q_SLOTS:
     void on_importSchematron();
     void on_exportSchematron();
     void on_addNewPolicy();
-    void on_RuleEditRejected();
-    void on_RuleEditAccepted();
     void policiesTree_selectionChanged();
 };
 

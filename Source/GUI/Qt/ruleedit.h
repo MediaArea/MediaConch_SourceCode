@@ -48,38 +48,26 @@ public:
 //***************************************************************************
 
 void clear();
-void add_error(String error);
-void show_errors();
-void clear_errors();
-void add_assert(Assert *a);
-void set_name(string& policyName);
-string get_new_name() const;
-const vector<Assert *>& get_asserts() const;
+void assert_clicked(Assert *a);
 
 //***************************************************************************
 // Visual element
 //***************************************************************************
 
-const QPushButton *get_newAssert_button() const;
-const QDialogButtonBox *get_validation_button() const;
+const QPushButton *get_delAssert_button();
 
 private:
     MainWindow *mainwindow;
     Ui::RuleEdit *ui;
-    list<String> errors;
-    string policyName;
-    vector<Assert *> asserts;
 
 //***************************************************************************
 // HELPER
 //***************************************************************************
 
-QString getSelectedAssertName();
-QTableWidgetItem* getSelectedAssertItem();
 void add_values_to_selector();
-void clear_editor_fields();
 string get_validator_value_from_pretty_name(string pretty_name);
 string get_validator_pretty_name_from_value(string value);
+
 void copy_visual_to_assert(Assert *a);
 void fill_editor_fields(const Assert *a);
 void value_to_quotted_value(string&);
@@ -89,10 +77,7 @@ void value_to_quotted_value(string&);
 //***************************************************************************
 
 private Q_SLOTS:
-    void on_addNewAssert();
-    void cell_clicked(int row, int column);
     void on_deleteAssert();
-    void assert_selected_changed();
     void free_text_selected();
     void editor_selected();
     void editAssert_type();

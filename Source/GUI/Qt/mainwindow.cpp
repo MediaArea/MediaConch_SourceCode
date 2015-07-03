@@ -313,94 +313,7 @@ void MainWindow::on_exportSchematron()
 //---------------------------------------------------------------------------
 void MainWindow::on_addNewPolicy()
 {
-    displayRuleEdit(-1);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_RuleEditRejected()
-{
-    clearVisualElements();
-    displayPoliciesMenu();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_RuleEditAccepted()
-{
-    //To be adapted with the new GUI
-#if 0
-    string new_name = ruleEdit->get_new_name();
-    if (!new_name.length())
-    {
-        ruleEdit->add_error(__T("Policy must have a name"));
-        ruleEdit->show_errors();
-        return;
-    }
-
-    const vector<Assert *> vec = ruleEdit->get_asserts();
-    for (size_t i = 0; i < vec.size(); ++i)
-    {
-        if (!vec[i])
-        {
-            continue;
-        }
-        if (!vec[i]->description.length())
-        {
-            ruleEdit->add_error(__T("Assert must have a name"));
-            ruleEdit->show_errors();
-            return;
-        }
-    }
-
-    //TODO: more than one policy
-    int row = -1;
-    if (policiesMenu)
-    {
-        QList<QTableWidgetItem *> list = policiesMenu->get_policies_table()->selectedItems();
-        if (!list.isEmpty())
-        {
-            row = list.first()->row();
-            if (new_name != list.first()->text().toStdString())
-            {
-                Policy *p = C.policies.policies[0];
-                p->patterns[row]->name = new_name;
-            }
-        }
-    }
-    if (row == -1)
-    {
-        if (C.policies.policies.size() == 0)
-        {
-            Policy *p = new Policy;
-            C.policies.policies.push_back(p);
-        }
-        Pattern *pat = new Pattern;
-        pat->name = new_name;
-        C.policies.policies[0]->patterns.push_back(pat);
-        row = C.policies.policies[0]->patterns.size() - 1;
-    }
-
-    // TODO: More than one rule by pattern
-    for (size_t i = 0; i < C.policies.policies[0]->patterns[row]->rules.size(); ++i)
-    {
-        delete C.policies.policies[0]->patterns[row]->rules[i];
-    }
-    C.policies.policies[0]->patterns[row]->rules.clear();
-
-    Rule *r = new Rule;
-    for (size_t i = 0; i < vec.size(); ++i)
-    {
-        if (!vec[i])
-        {
-            continue;
-        }
-        Assert *a = new Assert(*vec[i]);
-        r->asserts.push_back(a);
-    }
-    C.policies.policies[0]->patterns[row]->rules.push_back(r);
-#endif
-
-    clearVisualElements();
-    displayPoliciesMenu();
+    // displayRuleEdit(-1);
 }
 
 //---------------------------------------------------------------------------
@@ -435,8 +348,7 @@ void MainWindow::policiesTree_selectionChanged()
             displayRuleMenu();
             break;
         case 4:
-            //TODO
-            printf("it's the assert level\n");
+            displayRuleEdit(item);
             break;
         default:
             return;
@@ -773,31 +685,25 @@ void MainWindow::createRuleEdit()
     }
     clearPoliciesElements();
     ruleEdit = new RuleEdit(this);
-    QObject::connect(ruleEdit->get_validation_button(), SIGNAL(accepted()),
-                     this, SLOT(on_RuleEditAccepted()));
-    QObject::connect(ruleEdit->get_validation_button(), SIGNAL(rejected()),
-                     this, SLOT(on_RuleEditRejected()));
+    policiesTree->get_menu_layout()->addWidget(ruleEdit);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::displayRuleEdit(int row)
+void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
 {
     createRuleEdit();
-    Layout->addWidget(ruleEdit);
-    ruleEdit->show_errors();
 
-    if (row != -1)
-    {
-        ruleEdit->set_name(C.policies.policies[0]->patterns[row]->name);
-        for (size_t i = 0; i < C.policies.policies[0]->patterns[row]->rules.size(); ++i)
-        {
-            Rule *r = C.policies.policies[0]->patterns[row]->rules[i];
-            for (size_t j = 0; j < r->asserts.size(); ++j)
-            {
-                ruleEdit->add_assert(r->asserts[j]);
-            }
-        }
-    }
+    if (!item)
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int rowAssert = get_index_of_item_backXX(item, 0);
+
+    if (rowPolicy < 0 || rowPattern < 0 || rowRule < 0 || rowAssert < 0)
+        return;
+    ruleEdit->assert_clicked(C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[rowAssert]);
 }
 
 //***************************************************************************
@@ -812,6 +718,22 @@ int MainWindow::get_index_in_tree()
         return -1;
 
     return item->parent()->indexOfChild(item);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::get_index_of_item_backXX(QTreeWidgetItem* item, size_t back)
+{
+    QTreeWidgetItem* tmp = item;
+    for (size_t i = 0; i < back; ++i)
+    {
+        if (!tmp->parent())
+            return -1;
+        tmp = tmp->parent();
+    }
+
+    if (!tmp || !tmp->parent())
+        return -1;
+    return tmp->parent()->indexOfChild(tmp);
 }
 
 //---------------------------------------------------------------------------
