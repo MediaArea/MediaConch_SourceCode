@@ -8,6 +8,7 @@
 #include "ui_mainwindow.h"
 #include "policiestree.h"
 #include "policiesmenu.h"
+#include "policymenu.h"
 #include "ruleedit.h"
 
 #include <QPlainTextEdit>
@@ -24,6 +25,7 @@
 #include <QPushButton>
 #include <QTableWidgetItem>
 #include <QDialogButtonBox>
+#include <QLineEdit>
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
@@ -58,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     DragDrop_Text=NULL;
     policiesTree = NULL;
     policiesMenu = NULL;
+    policyMenu = NULL;
     ruleEdit = NULL;
 
     // Drag n drop
@@ -138,13 +141,16 @@ QString MainWindow::ask_for_schematron_file()
     return file;
 }
 
-void MainWindow::exporting_to_schematron_file()
+void MainWindow::exporting_to_schematron_file(int pos)
 {
+    //TODO: -1: disable save or save all?
+    if (pos < 0)
+        return;
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
                                                     "", tr("Schematron (*.sch)"));
 
     //TODO: get policy number
-    C.policies.export_schematron(filename.toStdString().c_str(), 0);
+    C.policies.export_schematron(filename.toStdString().c_str(), pos);
 }
 
 //***************************************************************************
@@ -176,7 +182,7 @@ void MainWindow::on_actionCloseAll_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionSavePolicies_triggered()
 {
-    exporting_to_schematron_file();
+    exporting_to_schematron_file(-1);
 }
 
 //---------------------------------------------------------------------------
@@ -286,6 +292,17 @@ void MainWindow::on_importSchematron()
     // TODO: Display the policy imported
 
     displayPoliciesTree();
+    Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_exportSchematron()
+{
+    int  row = get_index_in_tree();
+
+    if (row < 0)
+        return;
+    exporting_to_schematron_file(row);
     Run();
 }
 
@@ -405,8 +422,7 @@ void MainWindow::policiesTree_selectionChanged()
             displayPoliciesMenu();
             break;
         case 1:
-            //TODO
-            printf("it's the policy level\n");
+            displayPolicyMenu(item->text(0));
             break;
         case 2:
             //TODO
@@ -473,6 +489,13 @@ void MainWindow::clearPoliciesElements()
         policiesTree->get_menu_layout()->removeWidget(policiesMenu);
         delete policiesMenu;
         policiesMenu=NULL;
+    }
+
+    if (policyMenu)
+    {
+        policiesTree->get_menu_layout()->removeWidget(policyMenu);
+        delete policyMenu;
+        policyMenu=NULL;
     }
 
     if (ruleEdit)
@@ -550,9 +573,91 @@ void MainWindow::displayPoliciesTree()
         QTreeWidgetItem* item = new QTreeWidgetItem(tree);
         item->setText(0, tr("Policies"));
     }
-
+    updatePoliciesTree();
     QObject::connect(policiesTree->get_policies_tree(), SIGNAL(itemSelectionChanged()),
                      this, SLOT(policiesTree_selectionChanged()));
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::updatePoliciesTreeRule(Rule *rule, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString name = QString("Rule");
+    item->setText(0, name);
+
+    for (size_t i = 0; i < rule->asserts.size(); ++i)
+    {
+        Assert *assert = rule->asserts[i];
+        if (!assert)
+            continue;
+
+        QTreeWidgetItem* a = new QTreeWidgetItem(item);
+        QString descr = QString().fromStdString(assert->description);
+        a->setText(0, descr);
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::updatePoliciesTreePattern(Pattern *pattern, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString name = QString().fromStdString(pattern->name);
+    if (!name.length())
+        name = QString("New group of rules");
+    item->setText(0, name);
+
+    for (size_t i = 0; i < pattern->rules.size(); ++i)
+    {
+        Rule *rule =pattern->rules[i];
+        if (!rule)
+            continue;
+        updatePoliciesTreeRule(rule, item);
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::updatePoliciesTreePolicy(Policy* policy, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString title = QString().fromStdString(policy->title);
+    if (!title.length())
+        title = QString("New policy");
+    item->setText(0, title);
+
+    for (size_t i = 0; i < policy->patterns.size(); ++i)
+    {
+        Pattern *pat = policy->patterns[i];
+        if (!pat)
+            continue;
+        updatePoliciesTreePattern(pat, item);
+    }
+}
+
+void MainWindow::removeTreeChildren(QTreeWidgetItem* item)
+{
+    if (!item)
+        return;
+    QList<QTreeWidgetItem *> list = item->takeChildren();
+    while (!list.isEmpty())
+        removeTreeChildren(list.takeFirst());
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::updatePoliciesTree()
+{
+    if (!policiesTree) {
+        return;
+    }
+    QTreeWidgetItem* policies = policiesTree->get_policies_tree()->topLevelItem(0);
+    removeTreeChildren(policies);
+
+    for (size_t i = 0; i < C.policies.policies.size(); ++i)
+    {
+        Policy *policy = C.policies.policies[i];
+        if (!policy)
+            continue;
+        updatePoliciesTreePolicy(policy, policies);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -561,6 +666,7 @@ void MainWindow::createPoliciesMenu()
     if (policiesMenu) {
         return;
     }
+
     clearPoliciesElements();
     policiesMenu = new PoliciesMenu(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(policiesMenu);
@@ -574,25 +680,31 @@ void MainWindow::createPoliciesMenu()
 void MainWindow::displayPoliciesMenu()
 {
     createPoliciesMenu();
+    updatePoliciesTree();
+}
 
-    QTreeWidget *tree = policiesTree->get_policies_tree();
-    QTreeWidgetItem* policies = tree->topLevelItem(0);
-
-    if (!policies)
+//---------------------------------------------------------------------------
+void MainWindow::createPolicyMenu()
+{
+    if (policyMenu) {
         return;
-
-    QList<QTreeWidgetItem *> list = policies->takeChildren();
-    while (!list.isEmpty())
-        delete list.takeFirst();
-
-    for (size_t i = 0; i < C.policies.policies.size(); ++i)
-    {
-        QTreeWidgetItem* item = new QTreeWidgetItem(policies);
-        QString title = QString().fromStdString(C.policies.policies[i]->title);
-        if (!title.length())
-            title = QString("New policy");
-        item->setText(0, title);
     }
+    clearPoliciesElements();
+    policyMenu = new PolicyMenu(policiesTree->get_menu_frame());
+    policiesTree->get_menu_layout()->addWidget(policyMenu);
+    QObject::connect(policyMenu->get_exportPolicy_button(), SIGNAL(clicked()),
+                     this, SLOT(on_exportSchematron()));
+    // QObject::connect(policyMenu->get_addNewGor_button(), SIGNAL(clicked()),
+    //                  this, SLOT(on_addNewGor()));
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::displayPolicyMenu(QString title)
+{
+    createPolicyMenu();
+    QLineEdit* name = policyMenu->get_title_line();
+
+    name->setText(title);
 }
 
 //---------------------------------------------------------------------------
@@ -634,3 +746,23 @@ void MainWindow::displayRuleEdit(int row)
 //***************************************************************************
 // HELPER
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+int MainWindow::get_index_in_tree()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return -1;
+
+    return item->parent()->indexOfChild(item);
+}
+
+//---------------------------------------------------------------------------
+QTreeWidgetItem *MainWindow::get_item_in_tree()
+{
+    QList<QTreeWidgetItem *> list = policiesTree->get_policies_tree()->selectedItems();
+    if (list.empty())
+        return NULL;
+
+    return list.first();
+}

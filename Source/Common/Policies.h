@@ -149,6 +149,7 @@ private:
     Policies& operator=(const Policies&);
 
     // HELPER
+    bool find_title_node(xmlNodePtr node, string& title);
     void find_patterns_node(xmlNodePtr node, vector<Pattern *>& patterns);
     void find_rules_node(xmlNodePtr node, vector<Rule *>& rules);
     void find_asserts_node(xmlNodePtr node, vector<Assert *>& asserts);
@@ -161,6 +162,7 @@ private:
     bool check_test_field(const string& field);
     bool check_test_validator(const string& validator);
 
+    xmlNodePtr write_title(string& title);
     xmlNodePtr write_pattern(Pattern *p);
     xmlNodePtr write_rule(Rule *r);
     xmlNodePtr write_assert(Assert *r);

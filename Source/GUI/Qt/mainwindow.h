@@ -21,7 +21,9 @@ class QPlainTextEdit;
 class QLabel;
 class PoliciesTree;
 class PoliciesMenu;
+class PolicyMenu;
 class RuleEdit;
+class QTreeWidgetItem;
 
 class MainWindow : public QMainWindow
 {
@@ -35,7 +37,7 @@ public:
     void dragEnterEvent         (QDragEnterEvent *event);
     void dropEvent              (QDropEvent *event);
     void policy_to_delete(int row);
-    void exporting_to_schematron_file();
+    void exporting_to_schematron_file(int pos);
 
     // UI
     void                        Ui_Init                     ();
@@ -52,6 +54,7 @@ private:
     Ui::MainWindow *ui;
     PoliciesTree   *policiesTree;
     PoliciesMenu   *policiesMenu;
+    PolicyMenu     *policyMenu;
     RuleEdit       *ruleEdit;
 
     // Internal
@@ -66,9 +69,16 @@ private:
     void                        clearPoliciesElements();
     void                        createDragDrop();
     void                        createMainText();
+    void                        removeTreeChildren(QTreeWidgetItem* item);
+    void                        updatePoliciesTree();
+    void                        updatePoliciesTreePolicy(Policy* p, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreePattern(Pattern *p, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeRule(Rule *rule, QTreeWidgetItem *parent);
     void                        displayPoliciesTree();
     void                        createPoliciesTree();
     void                        createPoliciesMenu();
+    void                        displayPolicyMenu(QString title);
+    void                        createPolicyMenu();
     void                        displayPoliciesMenu();
     void                        createRuleEdit();
     void                        displayRuleEdit(int row);
@@ -77,6 +87,9 @@ private:
 //***************************************************************************
 // HELPER
 //***************************************************************************
+
+    int get_index_in_tree();
+    QTreeWidgetItem *get_item_in_tree();
 
 private Q_SLOTS:
 
@@ -92,6 +105,7 @@ private Q_SLOTS:
     void on_actionChooseSchematron_triggered();
     void on_actionSavePolicies_triggered();
     void on_importSchematron();
+    void on_exportSchematron();
     void on_addNewPolicy();
     void on_RuleEditRejected();
     void on_RuleEditAccepted();

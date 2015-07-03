@@ -160,11 +160,17 @@ String Policies::import_schematron(const char* filename)
         return String(__T("No root node, leaving"));
     }
 
-    //TODO: find title in child
-    string title;
     Policy *p = new Policy;
-    p->title = title;
     xmlNodePtr child = root->children;
+    if (child)
+    {
+        while (child && !find_title_node(child, p->title))
+        {
+            child = child->next;
+        }
+        if (child == NULL)
+            child = root->children;
+    }
     while (child) {
         find_patterns_node(child, p->patterns);
         child = child->next;
@@ -202,6 +208,18 @@ string     Policies::serialize_assert_for_test(Assert *r)
 
 end:
     return ret.str();
+}
+
+xmlNodePtr Policies::write_title(string& title)
+{
+    xmlNodePtr nodeTitle = xmlNewNode(NULL, (xmlChar *)"title");
+    xmlNewNs(nodeTitle, NULL, (const xmlChar *)"sch");
+    xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
+                           (const xmlChar *)"sch");
+    nodeTitle->ns = defNs;
+
+    xmlNodeSetContent(nodeTitle, (xmlChar *)title.c_str());
+    return nodeTitle;
 }
 
 xmlNodePtr Policies::write_pattern(Pattern *p)
@@ -267,7 +285,8 @@ xmlDocPtr Policies::create_doc(size_t pos)
     vector<Pattern *>::iterator it = policies[pos]->patterns.begin();
     vector<Pattern *>::iterator ite = policies[pos]->patterns.end();
 
-    //TODO: write title
+    xmlNodePtr nodeTitle = write_title(policies[pos]->title);
+    xmlAddChild(root_node, nodeTitle);
     for (; it != ite; ++it)
     {
         xmlNodePtr node = write_pattern(*it);
@@ -292,6 +311,19 @@ void Policies::erase_policy(size_t index)
     if (policies[index])
         delete policies[index];
     policies.erase(policies.begin() + index);
+}
+
+bool Policies::find_title_node(xmlNodePtr node, string& title)
+{
+    string def("title");
+    if (!node || node->type != XML_ELEMENT_NODE ||
+        !node->name || def.compare((const char*)node->name))
+        return false;
+
+    const char* descr = (const char*)xmlNodeGetContent(node);
+    if (descr)
+        title = string(descr);
+    return true;
 }
 
 void Policies::find_patterns_node(xmlNodePtr node, vector<Pattern *>& patterns)
