@@ -27,8 +27,10 @@ namespace Ui {
 }
 
 class QTreeWidget;
+class QFrame;
+class QLayout;
 
-class PoliciesTree : public QTreeWidget
+class PoliciesTree : public QFrame
 {
     Q_OBJECT
 
@@ -40,6 +42,9 @@ public:
 //***************************************************************************
 // Functions
 //***************************************************************************
+    QTreeWidget *get_policies_tree();
+    QFrame      *get_menu_frame();
+    QLayout     *get_menu_layout();
 
 //***************************************************************************
 // Visual element

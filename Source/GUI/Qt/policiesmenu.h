@@ -19,8 +19,6 @@
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include <QFrame>
-#include <QStandardItem>
-#include <list>
 using namespace MediaInfoNameSpace;
 using namespace std;
 
@@ -29,8 +27,6 @@ class PoliciesMenu;
 }
 
 class QPushButton;
-class QTableWidget;
-class MainWindow;
 
 class PoliciesMenu : public QFrame
 {
@@ -45,33 +41,21 @@ public:
 // Functions
 //***************************************************************************
 
-void clear();
-void add_error(String error);
-void show_errors();
-void add_policy(string name);
-
 //***************************************************************************
 // Visual element
 //***************************************************************************
 
-QPushButton *get_schematron_button() const;
 QPushButton *get_addNewPolicy_button() const;
-QPushButton *get_editPolicy_button() const;
-QTableWidget *get_policies_table() const;
+QPushButton *get_importPolicy_button() const;
 
 private:
     Ui::PoliciesMenu *ui;
-    MainWindow *mainwindow;
-    list<String> errors;
 
 //***************************************************************************
 // Slots
 //***************************************************************************
 
 private Q_SLOTS:
-    void delete_clicked();
-    void policy_selected_change();
-    void export_clicked();
 };
 
 #endif // POLICIESMENU_H

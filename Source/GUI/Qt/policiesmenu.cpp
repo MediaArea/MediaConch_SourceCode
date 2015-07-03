@@ -6,7 +6,6 @@
 
 #include "policiesmenu.h"
 #include "ui_policiesmenu.h"
-#include "mainwindow.h"
 
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
@@ -18,21 +17,9 @@
 
 PoliciesMenu::PoliciesMenu(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::PoliciesMenu),
-    mainwindow((MainWindow *)parent)
+    ui(new Ui::PoliciesMenu)
 {
     ui->setupUi(this);
-    ui->errors->hide();
-    ui->errors->setReadOnly(true);
-    ui->deletePolicy->setEnabled(false);
-    ui->editPolicy->setEnabled(false);
-
-    QObject::connect(ui->deletePolicy, SIGNAL(clicked()),
-                     this, SLOT(delete_clicked()));
-    QObject::connect(ui->policies, SIGNAL(itemSelectionChanged()),
-                     this, SLOT(policy_selected_change()));
-    QObject::connect(ui->exportPolicies, SIGNAL(clicked()),
-                     this, SLOT(export_clicked()));
 }
 
 PoliciesMenu::~PoliciesMenu()
@@ -44,58 +31,14 @@ PoliciesMenu::~PoliciesMenu()
 // Functions
 //***************************************************************************
 
-//---------------------------------------------------------------------------
-void PoliciesMenu::add_error(String error)
-{
-    errors.push_back(error);
-}
-
-void PoliciesMenu::show_errors()
-{
-    list<String>::iterator it = errors.begin();
-    list<String>::iterator ite = errors.end();
-    QString out;
-
-    for (; it != ite; ++it)
-    {
-        out.append(QString().fromStdWString(*it));
-        out.append("\n");
-    }
-    ui->errors->setPlainText(out);
-    if (out.length() > 0)
-    {
-        ui->errors->show();
-    }
-}
-
-void PoliciesMenu::clear()
-{
-    ui->errors->hide();
-    errors.clear();
-    ui->policies->clearContents();
-    while (ui->policies->rowCount() > 0)
-    {
-        ui->policies->removeRow(0);
-    }
-}
-
-void PoliciesMenu::add_policy(string name)
-{
-    int row = ui->policies->rowCount();
-    ui->policies->insertRow(row);
-    QTableWidgetItem *item = new QTableWidgetItem(QString().fromStdString(name));
-    item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-    ui->policies->setItem(row, 0, item);
-}
-
 //***************************************************************************
 // Visual element
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_schematron_button() const
+QPushButton *PoliciesMenu::get_importPolicy_button() const
 {
-    return ui->importSchematron;
+    return ui->importPolicy;
 }
 
 //---------------------------------------------------------------------------
@@ -104,48 +47,6 @@ QPushButton *PoliciesMenu::get_addNewPolicy_button() const
     return ui->addNewPolicy;
 }
 
-//---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_editPolicy_button() const
-{
-    return ui->editPolicy;
-}
-
-//---------------------------------------------------------------------------
-QTableWidget *PoliciesMenu::get_policies_table() const
-{
-    return ui->policies;
-}
-
 //***************************************************************************
 // Slots
 //***************************************************************************
-
-void PoliciesMenu::delete_clicked()
-{
-    QList<QTableWidgetItem *> list = ui->policies->selectedItems();
-    while (!list.isEmpty())
-    {
-        int row = list.first()->row();
-
-        mainwindow->policy_to_delete(row);
-        ui->policies->removeRow(row);
-        list.removeFirst();
-    }
-}
-
-void PoliciesMenu::policy_selected_change()
-{
-    if (ui->policies->selectedItems().isEmpty())
-    {
-        ui->deletePolicy->setEnabled(false);
-        ui->editPolicy->setEnabled(false);
-    } else {
-        ui->deletePolicy->setEnabled(true);
-        ui->editPolicy->setEnabled(true);
-    }
-}
-
-void PoliciesMenu::export_clicked()
-{
-    mainwindow->exporting_to_schematron_file();
-}

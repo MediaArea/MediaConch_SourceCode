@@ -63,6 +63,7 @@ private:
     QLabel*                     DragDrop_Image;
     QLabel*                     DragDrop_Text;
     void                        clearVisualElements();
+    void                        clearPoliciesElements();
     void                        createDragDrop();
     void                        createMainText();
     void                        displayPoliciesTree();
@@ -76,8 +77,6 @@ private:
 //***************************************************************************
 // HELPER
 //***************************************************************************
-
-QString getSelectedPolicyName();
 
 private Q_SLOTS:
 
@@ -94,10 +93,9 @@ private Q_SLOTS:
     void on_actionSavePolicies_triggered();
     void on_importSchematron();
     void on_addNewPolicy();
-    void on_editPolicy(int row, int column);
-    void on_editPolicy();
     void on_RuleEditRejected();
     void on_RuleEditAccepted();
+    void policiesTree_selectionChanged();
 };
 
 #endif // MAINWINDOW_H

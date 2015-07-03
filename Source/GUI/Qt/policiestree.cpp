@@ -11,15 +11,23 @@
     #include <QFontDatabase>
 #endif
 
+#include <QTreeWidget>
+#include <QFrame>
+#include <QVBoxLayout>
+
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
 PoliciesTree::PoliciesTree(QWidget *parent) :
-    QTreeWidget(parent),
+    QFrame(parent),
     ui(new Ui::PoliciesTree)
 {
     ui->setupUi(this);
+    QVBoxLayout *Layout = new QVBoxLayout(ui->menu);
+    ui->menu->setLayout(Layout);
+    ui->policies->setColumnCount(1);
+    ui->policies->header()->hide();
 }
 
 PoliciesTree::~PoliciesTree()
@@ -30,6 +38,24 @@ PoliciesTree::~PoliciesTree()
 //***************************************************************************
 // Functions
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+QTreeWidget *PoliciesTree::get_policies_tree()
+{
+    return ui->policies;
+}
+
+//---------------------------------------------------------------------------
+QFrame *PoliciesTree::get_menu_frame()
+{
+    return ui->menu;
+}
+
+//---------------------------------------------------------------------------
+QLayout *PoliciesTree::get_menu_layout()
+{
+    return ui->menu->layout();
+}
 
 //***************************************************************************
 // Visual element
