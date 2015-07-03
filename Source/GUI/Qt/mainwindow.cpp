@@ -10,6 +10,7 @@
 #include "policiesmenu.h"
 #include "policymenu.h"
 #include "groupofrules.h"
+#include "rulemenu.h"
 #include "ruleedit.h"
 
 #include <QPlainTextEdit>
@@ -63,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     policiesMenu = NULL;
     policyMenu = NULL;
     groupOfRules = NULL;
+    ruleMenu = NULL;
     ruleEdit = NULL;
 
     // Drag n drop
@@ -430,8 +432,7 @@ void MainWindow::policiesTree_selectionChanged()
             displayGroupOfRules(item->text(0));
             break;
         case 3:
-            //TODO
-            printf("it's the rule level\n");
+            displayRuleMenu();
             break;
         case 4:
             //TODO
@@ -504,6 +505,13 @@ void MainWindow::clearPoliciesElements()
         policiesTree->get_menu_layout()->removeWidget(groupOfRules);
         delete groupOfRules;
         groupOfRules = NULL;
+    }
+
+    if (ruleMenu)
+    {
+        policiesTree->get_menu_layout()->removeWidget(ruleMenu);
+        delete ruleMenu;
+        ruleMenu = NULL;
     }
 
     if (ruleEdit)
@@ -735,6 +743,25 @@ void MainWindow::displayGroupOfRules(QString title)
     QLineEdit* name = groupOfRules->get_title_line();
 
     name->setText(title);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createRuleMenu()
+{
+    if (ruleMenu) {
+        return;
+    }
+    clearPoliciesElements();
+    ruleMenu = new RuleMenu(policiesTree->get_menu_frame());
+    policiesTree->get_menu_layout()->addWidget(ruleMenu);
+    // QObject::connect(groupOfRules->get_addNewAssert_button(), SIGNAL(clicked()),
+    //                  this, SLOT(on_addNewAssert()));
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::displayRuleMenu()
+{
+    createRuleMenu();
 }
 
 //---------------------------------------------------------------------------
