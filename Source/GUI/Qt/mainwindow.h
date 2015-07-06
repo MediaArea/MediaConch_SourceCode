@@ -119,6 +119,7 @@ private Q_SLOTS:
     void add_new_gor();
     void add_new_rule();
     void add_new_assert();
+    void delete_all_policies();
     void edit_policy_title();
     void edit_gor_title();
     void edit_assert_name(QString new_name);

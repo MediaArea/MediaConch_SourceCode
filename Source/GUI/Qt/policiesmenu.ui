@@ -46,6 +46,21 @@ selection-background-color: rgb(255, 170, 0);</string>
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="deletePolicies">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 0, 0);
+selection-background-color: rgb(255, 0, 0);
+</string>
+     </property>
+     <property name="text">
+      <string>Delete all policies</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

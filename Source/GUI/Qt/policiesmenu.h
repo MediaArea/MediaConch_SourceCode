@@ -45,8 +45,9 @@ public:
 // Visual element
 //***************************************************************************
 
-QPushButton *get_addNewPolicy_button() const;
-QPushButton *get_importPolicy_button() const;
+QPushButton *get_addNewPolicy_button();
+QPushButton *get_deletePolicies_button();
+QPushButton *get_importPolicy_button();
 
 private:
     Ui::PoliciesMenu *ui;

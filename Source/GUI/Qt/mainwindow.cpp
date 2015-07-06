@@ -408,6 +408,19 @@ void MainWindow::add_new_assert()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::delete_all_policies()
+{
+    QTreeWidget *tree = policiesTree->get_policies_tree();
+    QTreeWidgetItem* policies = tree->topLevelItem(0);
+    if (!policies)
+        return;
+    removeTreeChildren(policies);
+    for (size_t i = 0; i < C.policies.policies.size(); ++i)
+        delete C.policies.policies[i];
+    C.policies.policies.clear();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::edit_policy_title()
 {
     QTreeWidgetItem* item = get_item_in_tree();
@@ -751,13 +764,14 @@ void MainWindow::createPoliciesMenu()
                      this, SLOT(on_importSchematron()));
     QObject::connect(policiesMenu->get_addNewPolicy_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_policy()));
+    QObject::connect(policiesMenu->get_deletePolicies_button(), SIGNAL(clicked()),
+                     this, SLOT(delete_all_policies()));
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::displayPoliciesMenu()
 {
     createPoliciesMenu();
-    updatePoliciesTree();
 }
 
 //---------------------------------------------------------------------------

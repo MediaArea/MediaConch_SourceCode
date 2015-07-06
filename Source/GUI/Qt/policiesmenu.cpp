@@ -36,13 +36,19 @@ PoliciesMenu::~PoliciesMenu()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_importPolicy_button() const
+QPushButton *PoliciesMenu::get_importPolicy_button()
 {
     return ui->importPolicy;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_addNewPolicy_button() const
+QPushButton *PoliciesMenu::get_deletePolicies_button()
+{
+    return ui->deletePolicies;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *PoliciesMenu::get_addNewPolicy_button()
 {
     return ui->addNewPolicy;
 }
