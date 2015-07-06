@@ -571,9 +571,9 @@ void MainWindow::createDragDrop()
 //---------------------------------------------------------------------------
 void MainWindow::createPoliciesTree()
 {
-    if (policiesTree) {
+    if (policiesTree)
         return;
-    }
+
     clearVisualElements();
     clearPoliciesElements();
     policiesTree = new PoliciesTree(this);
@@ -665,9 +665,8 @@ void MainWindow::removeTreeChildren(QTreeWidgetItem* item)
 //---------------------------------------------------------------------------
 void MainWindow::updatePoliciesTree()
 {
-    if (!policiesTree) {
+    if (!policiesTree)
         return;
-    }
     QTreeWidgetItem* policies = policiesTree->get_policies_tree()->topLevelItem(0);
     removeTreeChildren(policies);
 
@@ -683,9 +682,8 @@ void MainWindow::updatePoliciesTree()
 //---------------------------------------------------------------------------
 void MainWindow::createPoliciesMenu()
 {
-    if (policiesMenu) {
+    if (policiesMenu)
         return;
-    }
 
     clearPoliciesElements();
     policiesMenu = new PoliciesMenu(policiesTree->get_menu_frame());
@@ -706,9 +704,8 @@ void MainWindow::displayPoliciesMenu()
 //---------------------------------------------------------------------------
 void MainWindow::createPolicyMenu()
 {
-    if (policyMenu) {
+    if (policyMenu)
         return;
-    }
     clearPoliciesElements();
     policyMenu = new PolicyMenu(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(policyMenu);
@@ -730,9 +727,8 @@ void MainWindow::displayPolicyMenu(QString title)
 //---------------------------------------------------------------------------
 void MainWindow::createGroupOfRules()
 {
-    if (groupOfRules) {
+    if (groupOfRules)
         return;
-    }
     clearPoliciesElements();
     groupOfRules = new GroupOfRules(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(groupOfRules);
@@ -770,7 +766,8 @@ void MainWindow::displayRuleMenu()
 //---------------------------------------------------------------------------
 void MainWindow::createRuleEdit()
 {
-    if (ruleEdit) {
+    if (ruleEdit)
+    {
         ruleEdit->clear();
         return;
     }
