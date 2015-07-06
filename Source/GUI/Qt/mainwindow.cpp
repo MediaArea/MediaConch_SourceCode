@@ -382,6 +382,33 @@ void MainWindow::add_new_rule()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::add_new_assert()
+{
+    QTreeWidgetItem* parent = get_item_in_tree();
+    if (!parent)
+        return;
+    int rowPolicy = get_index_of_item_backXX(parent, 2);
+    int rowGor = get_index_of_item_backXX(parent, 1);
+    int rowRule = get_index_of_item_backXX(parent, 0);
+    if (rowPolicy < 0 || rowGor < 0 || rowRule < 0)
+        return;
+
+    Assert *a = new Assert;
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    a->description = string("New Assert");
+    a->use_free_text = false;
+    QString name = QString().fromStdString(a->description);
+    item->setText(0, name);
+
+    C.policies.policies[rowPolicy]->patterns[rowGor]->rules[rowRule]->asserts.push_back(a);
+    parent->setExpanded(true);
+    parent->setSelected(false);
+    item->setSelected(true);
+    displayRuleEdit(item);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -725,14 +752,13 @@ void MainWindow::displayGroupOfRules(QString title)
 //---------------------------------------------------------------------------
 void MainWindow::createRuleMenu()
 {
-    if (ruleMenu) {
+    if (ruleMenu)
         return;
-    }
     clearPoliciesElements();
     ruleMenu = new RuleMenu(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(ruleMenu);
-    // QObject::connect(groupOfRules->get_addNewAssert_button(), SIGNAL(clicked()),
-    //                  this, SLOT(on_addNewAssert()));
+    QObject::connect(ruleMenu->get_addNewAssert_button(), SIGNAL(clicked()),
+                     this, SLOT(add_new_assert()));
 }
 
 //---------------------------------------------------------------------------
