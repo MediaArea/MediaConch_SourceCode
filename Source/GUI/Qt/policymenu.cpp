@@ -37,21 +37,27 @@ PolicyMenu::~PolicyMenu()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QLineEdit *PolicyMenu::get_title_line() const
+QLineEdit *PolicyMenu::get_title_line()
 {
     return ui->title;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PolicyMenu::get_exportPolicy_button() const
+QPushButton *PolicyMenu::get_exportPolicy_button()
 {
     return ui->exportPolicy;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PolicyMenu::get_addNewGor_button() const
+QPushButton *PolicyMenu::get_addNewGor_button()
 {
     return ui->addNewGor;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *PolicyMenu::get_deletePolicy_button()
+{
+    return ui->deletePolicy;
 }
 
 //***************************************************************************

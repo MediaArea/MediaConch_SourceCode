@@ -46,9 +46,10 @@ public:
 // Visual element
 //***************************************************************************
 
-    QLineEdit   *get_title_line() const;
-    QPushButton *get_addNewGor_button() const;
-    QPushButton *get_exportPolicy_button() const;
+    QLineEdit   *get_title_line();
+    QPushButton *get_addNewGor_button();
+    QPushButton *get_deletePolicy_button();
+    QPushButton *get_exportPolicy_button();
 
 private:
     Ui::PolicyMenu *ui;

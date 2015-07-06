@@ -421,6 +421,35 @@ void MainWindow::delete_all_policies()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::delete_policy()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int row = get_index_in_tree();
+    if (row < 0)
+        return;
+
+    // Internal data
+    Policy *p = C.policies.policies[row];
+    for (size_t i = 0; i < p->patterns.size(); ++i)
+        delete p->patterns[i];
+    p->patterns.clear();
+    C.policies.policies.erase(C.policies.policies.begin() + row);
+
+    // Visual
+    removeTreeChildren(item);
+    QTreeWidgetItem* parent = item->parent();
+    delete parent->takeChild(row);
+    item = get_item_in_tree();
+    if (item)
+        item->setSelected(false);
+    parent->setSelected(true);
+    displayPoliciesMenu();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::edit_policy_title()
 {
     QTreeWidgetItem* item = get_item_in_tree();
@@ -786,6 +815,8 @@ void MainWindow::createPolicyMenu()
                      this, SLOT(on_exportSchematron()));
     QObject::connect(policyMenu->get_addNewGor_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_gor()));
+    QObject::connect(policyMenu->get_deletePolicy_button(), SIGNAL(clicked()),
+                     this, SLOT(delete_policy()));
     QObject::connect(policyMenu->get_title_line(), SIGNAL(textChanged(QString)),
                      this, SLOT(edit_policy_title()));
 }
