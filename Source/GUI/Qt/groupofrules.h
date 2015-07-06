@@ -45,8 +45,9 @@ public:
 // Visual element
 //***************************************************************************
 
-    QLineEdit   *get_title_line() const;
-    QPushButton *get_addNewRule_button() const;
+    QLineEdit   *get_title_line();
+    QPushButton *get_addNewRule_button();
+    QPushButton *get_deleteGor_button();
 
 private:
     Ui::GroupOfRules *ui;

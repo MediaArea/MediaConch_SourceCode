@@ -37,15 +37,21 @@ GroupOfRules::~GroupOfRules()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QLineEdit *GroupOfRules::get_title_line() const
+QLineEdit *GroupOfRules::get_title_line()
 {
     return ui->title;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *GroupOfRules::get_addNewRule_button() const
+QPushButton *GroupOfRules::get_addNewRule_button()
 {
     return ui->addNewRule;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *GroupOfRules::get_deleteGor_button()
+{
+    return ui->deleteGor;
 }
 
 //***************************************************************************

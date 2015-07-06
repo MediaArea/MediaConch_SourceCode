@@ -450,6 +450,37 @@ void MainWindow::delete_policy()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::delete_gor()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int row = get_index_in_tree();
+    int rowPolicy = get_index_of_item_backXX(item, 1);
+    if (rowPolicy < 0 || row < 0)
+        return;
+
+    // Internal data
+    Policy *p = C.policies.policies[rowPolicy];
+    Pattern *pat = p->patterns[row];
+    for (size_t i = 0; i < pat->rules.size(); ++i)
+        delete pat->rules[i];
+    pat->rules.clear();
+    p->patterns.erase(p->patterns.begin() + row);
+
+    // Visual
+    removeTreeChildren(item);
+    QTreeWidgetItem* parent = item->parent();
+    delete parent->takeChild(row);
+    item = get_item_in_tree();
+    if (item)
+        item->setSelected(false);
+    parent->setSelected(true);
+    displayPolicyMenu(parent->text(0));
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::edit_policy_title()
 {
     QTreeWidgetItem* item = get_item_in_tree();
@@ -842,6 +873,8 @@ void MainWindow::createGroupOfRules()
                      this, SLOT(add_new_rule()));
     QObject::connect(groupOfRules->get_title_line(), SIGNAL(textChanged(QString)),
                      this, SLOT(edit_gor_title()));
+    QObject::connect(groupOfRules->get_deleteGor_button(), SIGNAL(clicked()),
+                     this, SLOT(delete_gor()));
 }
 
 //---------------------------------------------------------------------------
