@@ -359,6 +359,29 @@ void MainWindow::add_new_gor()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::add_new_rule()
+{
+    QTreeWidgetItem* parent = get_item_in_tree();
+    if (!parent)
+        return;
+    int rowPolicy = get_index_of_item_backXX(parent, 1);
+    int rowGor = get_index_of_item_backXX(parent, 0);
+    if (rowPolicy < 0 || rowGor < 0)
+        return;
+
+    Rule *r = new Rule;
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    item->setText(0, QString("Rule"));
+
+    C.policies.policies[rowPolicy]->patterns[rowGor]->rules.push_back(r);
+    displayRuleMenu();
+    parent->setExpanded(true);
+    parent->setSelected(false);
+    item->setSelected(true);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -686,8 +709,8 @@ void MainWindow::createGroupOfRules()
     clearPoliciesElements();
     groupOfRules = new GroupOfRules(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(groupOfRules);
-    // QObject::connect(groupOfRules->get_addNewRule_button(), SIGNAL(clicked()),
-    //                  this, SLOT(on_addNewRule()));
+    QObject::connect(groupOfRules->get_addNewRule_button(), SIGNAL(clicked()),
+                     this, SLOT(add_new_rule()));
 }
 
 //---------------------------------------------------------------------------
