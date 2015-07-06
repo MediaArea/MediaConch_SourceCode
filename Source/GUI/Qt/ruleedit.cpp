@@ -26,21 +26,6 @@ RuleEdit::RuleEdit(QWidget *parent) :
     ui->setupUi(this);
     add_values_to_selector();
     clear();
-
-    QObject::connect(ui->freeTextSelector, SIGNAL(clicked()), this, SLOT(free_text_selected()));
-    QObject::connect(ui->editorSelector, SIGNAL(clicked()), this, SLOT(editor_selected()));
-    QObject::connect(ui->type, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(editAssert_type()));
-    QObject::connect(ui->field, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(editAssert_field()));
-    QObject::connect(ui->validator, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(editAssert_validator()));
-    QObject::connect(ui->value, SIGNAL(textEdited(QString)),
-                     this, SLOT(editAssert_value()));
-    QObject::connect(ui->freeText, SIGNAL(textChanged()),
-                     this, SLOT(editAssert_freeText()));
-    QObject::connect(ui->assertName, SIGNAL(textEdited(QString)),
-                     this, SLOT(editAssert_assertName()));
 }
 
 //---------------------------------------------------------------------------
@@ -105,6 +90,52 @@ const QLineEdit *RuleEdit::get_assertName_line()
     return ui->assertName;
 }
 
+//---------------------------------------------------------------------------
+QComboBox *RuleEdit::get_type_select()
+{
+    return ui->type;
+}
+
+//---------------------------------------------------------------------------
+QComboBox *RuleEdit::get_field_select()
+{
+    return ui->field;
+}
+
+//---------------------------------------------------------------------------
+QComboBox *RuleEdit::get_validator_select()
+{
+    return ui->validator;
+}
+
+//---------------------------------------------------------------------------
+QLineEdit *RuleEdit::get_value_line()
+{
+    return ui->value;
+}
+
+//---------------------------------------------------------------------------
+QTextEdit *RuleEdit::get_freeText_text()
+{
+    return ui->freeText;
+}
+
+//---------------------------------------------------------------------------
+QFrame *RuleEdit::get_editor_frame()
+{
+    return ui->editorFrame;
+}
+
+QRadioButton *RuleEdit::get_freeTextSelector_radio()
+{
+    return ui->freeTextSelector;
+}
+
+QRadioButton *RuleEdit::get_editorSelector_radio()
+{
+    return ui->editorSelector;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -127,123 +158,6 @@ void RuleEdit::copy_visual_to_assert(Assert *a)
         a->value = value;
         a->use_free_text = false;
     }
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::editAssert_type()
-{
-    // QTableWidgetItem *item = NULL;
-
-    // if ((item = getSelectedAssertItem()) == NULL)
-    //     return;
-    // Assert *r = asserts[item->row()];
-    // r->type = ui->type->currentText().toStdString();
-    // r->use_free_text = false;
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::editAssert_field()
-{
-    // QTableWidgetItem *item = NULL;
-
-    // if ((item = getSelectedAssertItem()) == NULL)
-    //     return;
-    // Assert *r = asserts[item->row()];
-    // r->field = ui->field->currentText().toStdString();
-    // r->use_free_text = false;
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::editAssert_validator()
-{
-    // QTableWidgetItem *item = NULL;
-
-    // if ((item = getSelectedAssertItem()) == NULL)
-    //     return;
-    // Assert *r = asserts[item->row()];
-    // r->validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
-    // r->use_free_text = false;
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::editAssert_value()
-{
-    // QTableWidgetItem *item = NULL;
-
-    // if ((item = getSelectedAssertItem()) == NULL)
-    //     return;
-    // Assert *r = asserts[item->row()];
-    // string value = ui->value->text().toStdString();
-    // value_to_quotted_value(value);
-    // r->value = value;
-    // r->use_free_text = false;
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::editAssert_freeText()
-{
-    // QTableWidgetItem *item = NULL;
-
-    // if ((item = getSelectedAssertItem()) == NULL)
-    // {
-    //     return;
-    // }
-    // Assert *r = asserts[item->row()];
-    // r->text = ui->freeText->toPlainText().toStdString();
-    // r->use_free_text = true;
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::editAssert_assertName()
-{
-    // QTableWidgetItem *item = NULL;
-
-    // if ((item = getSelectedAssertItem()) == NULL)
-    // {
-    //     return;
-    // }
-    // Assert *r = asserts[item->row()];
-    // r->description = ui->assertName->text().toStdString();
-    // item->setText(ui->assertName->text());
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::free_text_selected()
-{
-    // Assert a;
-
-    // a.type = ui->type->currentText().toStdString();
-    // a.field = ui->field->currentText().toStdString();
-    // a.validator = get_validator_value_from_pretty_name(ui->validator->currentText().toStdString());
-    // string value = ui->value->text().toStdString();
-    // value_to_quotted_value(value);
-    // a.value = value;
-    // a.use_free_text = false;
-
-    // Policies p;
-    // string assertStr = p.serialize_assert_for_test(&a);
-    // ui->freeText->setText(QString().fromStdString(assertStr));
-    // ui->freeText->show();
-    // ui->editorFrame->hide();
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::editor_selected()
-{
-    // Assert r;
-    // Policies p;
-    // if (p.try_parsing_test(ui->freeText->toPlainText().toStdString(), &r))
-    // {
-    //     fill_editor_fields(&r);
-    // } else
-    // {
-    //     ui->type->setCurrentIndex(0);
-    //     ui->field->setCurrentIndex(0);
-    //     ui->validator->setCurrentIndex(0);
-    //     ui->value->setText(QString());
-    // }
-    // ui->editorFrame->show();
-    // ui->freeText->hide();
 }
 
 //***************************************************************************

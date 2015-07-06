@@ -30,10 +30,13 @@ namespace Ui {
 
 class QPushButton;
 class QLineEdit;
+class QComboBox;
+class QTextEdit;
 struct Assert;
 class MainWindow;
 class QDialogButtonBox;
 class QTableWidgetItem;
+class QRadioButton;
 
 class RuleEdit : public QFrame
 {
@@ -50,6 +53,10 @@ public:
 
 void clear();
 void assert_clicked(Assert *a);
+void value_to_quotted_value(string&);
+string get_validator_value_from_pretty_name(string pretty_name);
+string get_validator_pretty_name_from_value(string value);
+void fill_editor_fields(const Assert *a);
 
 //***************************************************************************
 // Visual element
@@ -57,6 +64,14 @@ void assert_clicked(Assert *a);
 
 const QPushButton *get_delAssert_button();
 const QLineEdit   *get_assertName_line();
+QComboBox *get_type_select();
+QComboBox *get_field_select();
+QComboBox *get_validator_select();
+QLineEdit *get_value_line();
+QTextEdit *get_freeText_text();
+QFrame *get_editor_frame();
+QRadioButton *get_freeTextSelector_radio();
+QRadioButton *get_editorSelector_radio();
 
 private:
     MainWindow *mainwindow;
@@ -67,26 +82,14 @@ private:
 //***************************************************************************
 
 void add_values_to_selector();
-string get_validator_value_from_pretty_name(string pretty_name);
-string get_validator_pretty_name_from_value(string value);
 
 void copy_visual_to_assert(Assert *a);
-void fill_editor_fields(const Assert *a);
-void value_to_quotted_value(string&);
 
 //***************************************************************************
 // Slots
 //***************************************************************************
 
 private Q_SLOTS:
-    void free_text_selected();
-    void editor_selected();
-    void editAssert_type();
-    void editAssert_field();
-    void editAssert_validator();
-    void editAssert_value();
-    void editAssert_freeText();
-    void editAssert_assertName();
 };
 
 #endif // RULEEDIT_H

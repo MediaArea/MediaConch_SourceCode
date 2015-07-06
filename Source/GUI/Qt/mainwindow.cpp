@@ -28,6 +28,8 @@
 #include <QTableWidgetItem>
 #include <QDialogButtonBox>
 #include <QLineEdit>
+#include <QComboBox>
+#include <QRadioButton>
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
@@ -601,6 +603,149 @@ void MainWindow::edit_assert_name(QString new_name)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::edit_assert_type()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
+        return;
+
+    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+
+    a->type = ruleEdit->get_type_select()->currentText().toStdString();
+    a->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::edit_assert_field()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
+        return;
+
+    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+
+    a->field = ruleEdit->get_field_select()->currentText().toStdString();
+    a->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::edit_assert_validator()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
+        return;
+
+    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+
+    a->validator = ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString());
+    a->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::edit_assert_value()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
+        return;
+
+    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+
+    a->value = ruleEdit->get_value_line()->text().toStdString();
+    ruleEdit->value_to_quotted_value(a->value);
+    a->use_free_text = false;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::edit_assert_freeText()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
+        return;
+
+    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+
+    a->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
+    a->use_free_text = true;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::assert_free_text_selected(bool checked)
+{
+    if (!checked)
+        return;
+
+    Assert a;
+
+    a.type = ruleEdit->get_type_select()->currentText().toStdString();
+    a.field = ruleEdit->get_field_select()->currentText().toStdString();
+    a.validator = ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString());
+    string value = ruleEdit->get_value_line()->text().toStdString();
+    ruleEdit->value_to_quotted_value(value);
+    a.value = value;
+    a.use_free_text = false;
+
+    string assertStr = C.policies.serialize_assert_for_test(&a);
+    ruleEdit->get_freeText_text()->setText(QString().fromStdString(assertStr));
+    ruleEdit->get_freeText_text()->show();
+    ruleEdit->get_editor_frame()->hide();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::assert_editor_selected(bool checked)
+{
+    if (!checked)
+        return;
+
+    Assert a;
+    if (C.policies.try_parsing_test(ruleEdit->get_freeText_text()->toPlainText().toStdString(), &a))
+        ruleEdit->fill_editor_fields(&a);
+    else
+    {
+        ruleEdit->get_type_select()->setCurrentIndex(0);
+        ruleEdit->get_field_select()->setCurrentIndex(0);
+        ruleEdit->get_validator_select()->setCurrentIndex(0);
+        ruleEdit->get_value_line()->setText(QString());
+    }
+    ruleEdit->get_editor_frame()->show();
+    ruleEdit->get_freeText_text()->hide();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -971,18 +1116,9 @@ void MainWindow::displayRuleMenu()
 //---------------------------------------------------------------------------
 void MainWindow::createRuleEdit()
 {
-    if (ruleEdit)
-    {
-        ruleEdit->clear();
-        return;
-    }
     clearPoliciesElements();
     ruleEdit = new RuleEdit(this);
     policiesTree->get_menu_layout()->addWidget(ruleEdit);
-    QObject::connect(ruleEdit->get_assertName_line(), SIGNAL(textEdited(QString)),
-                     this, SLOT(edit_assert_name(QString)));
-    QObject::connect(ruleEdit->get_delAssert_button(), SIGNAL(clicked()),
-                     this, SLOT(delete_assert()));
 }
 
 //---------------------------------------------------------------------------
@@ -1000,6 +1136,24 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
     if (rowPolicy < 0 || rowPattern < 0 || rowRule < 0 || rowAssert < 0)
         return;
     ruleEdit->assert_clicked(C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[rowAssert]);
+    QObject::connect(ruleEdit->get_assertName_line(), SIGNAL(textEdited(QString)),
+                     this, SLOT(edit_assert_name(QString)));
+    QObject::connect(ruleEdit->get_delAssert_button(), SIGNAL(clicked()),
+                     this, SLOT(delete_assert()));
+    QObject::connect(ruleEdit->get_type_select(), SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(edit_assert_type()));
+    QObject::connect(ruleEdit->get_field_select(), SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(edit_assert_field()));
+    QObject::connect(ruleEdit->get_validator_select(), SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(edit_assert_validator()));
+    QObject::connect(ruleEdit->get_value_line(), SIGNAL(textEdited(QString)),
+                     this, SLOT(edit_assert_value()));
+    QObject::connect(ruleEdit->get_freeText_text(), SIGNAL(textChanged()),
+                     this, SLOT(edit_assert_freeText()));
+    QObject::connect(ruleEdit->get_freeTextSelector_radio(), SIGNAL(toggled(bool)),
+                     this, SLOT(assert_free_text_selected(bool)));
+    QObject::connect(ruleEdit->get_editorSelector_radio(), SIGNAL(toggled(bool)),
+                     this, SLOT(assert_editor_selected(bool)));
 }
 
 //***************************************************************************

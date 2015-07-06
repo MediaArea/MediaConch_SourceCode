@@ -127,7 +127,14 @@ private Q_SLOTS:
     void edit_policy_title();
     void edit_gor_title();
     void edit_assert_name(QString new_name);
+    void edit_assert_type();
+    void edit_assert_field();
+    void edit_assert_validator();
+    void edit_assert_value();
+    void edit_assert_freeText();
     void policiesTree_selectionChanged();
+    void assert_free_text_selected(bool);
+    void assert_editor_selected(bool);
 };
 
 #endif // MAINWINDOW_H
