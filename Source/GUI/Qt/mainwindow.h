@@ -116,6 +116,7 @@ private Q_SLOTS:
     void on_importSchematron();
     void on_exportSchematron();
     void add_new_policy();
+    void add_new_gor();
     void policiesTree_selectionChanged();
 };
 

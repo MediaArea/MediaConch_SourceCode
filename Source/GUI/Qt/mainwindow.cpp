@@ -334,6 +334,31 @@ void MainWindow::add_new_policy()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::add_new_gor()
+{
+    QTreeWidgetItem* parent = get_item_in_tree();
+    if (!parent)
+        return;
+    int rowPolicy = get_index_of_item_backXX(parent, 0);
+    if (rowPolicy < 0)
+        return;
+
+    Pattern *p = new Pattern;
+
+    p->name = string("New group of rules");
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString name = QString().fromStdString(p->name);
+    item->setText(0, name);
+
+    C.policies.policies[rowPolicy]->patterns.push_back(p);
+    displayGroupOfRules(name);
+    parent->setExpanded(true);
+    parent->setSelected(false);
+    item->setSelected(true);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -639,8 +664,8 @@ void MainWindow::createPolicyMenu()
     policiesTree->get_menu_layout()->addWidget(policyMenu);
     QObject::connect(policyMenu->get_exportPolicy_button(), SIGNAL(clicked()),
                      this, SLOT(on_exportSchematron()));
-    // QObject::connect(policyMenu->get_addNewGor_button(), SIGNAL(clicked()),
-    //                  this, SLOT(on_addNewGor()));
+    QObject::connect(policyMenu->get_addNewGor_button(), SIGNAL(clicked()),
+                     this, SLOT(add_new_gor()));
 }
 
 //---------------------------------------------------------------------------
