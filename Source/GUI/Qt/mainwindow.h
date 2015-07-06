@@ -123,6 +123,7 @@ private Q_SLOTS:
     void delete_policy();
     void delete_gor();
     void delete_rule();
+    void delete_assert();
     void edit_policy_title();
     void edit_gor_title();
     void edit_assert_name(QString new_name);

@@ -27,7 +27,6 @@ RuleEdit::RuleEdit(QWidget *parent) :
     add_values_to_selector();
     clear();
 
-    QObject::connect(ui->deleteAssert, SIGNAL(clicked()), this, SLOT(on_deleteAssert()));
     QObject::connect(ui->freeTextSelector, SIGNAL(clicked()), this, SLOT(free_text_selected()));
     QObject::connect(ui->editorSelector, SIGNAL(clicked()), this, SLOT(editor_selected()));
     QObject::connect(ui->type, SIGNAL(currentIndexChanged(int)),
@@ -128,12 +127,6 @@ void RuleEdit::copy_visual_to_assert(Assert *a)
         a->value = value;
         a->use_free_text = false;
     }
-}
-
-//---------------------------------------------------------------------------
-void RuleEdit::on_deleteAssert()
-{
-    //TODO
 }
 
 //---------------------------------------------------------------------------

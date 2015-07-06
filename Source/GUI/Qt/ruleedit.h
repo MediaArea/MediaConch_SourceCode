@@ -79,7 +79,6 @@ void value_to_quotted_value(string&);
 //***************************************************************************
 
 private Q_SLOTS:
-    void on_deleteAssert();
     void free_text_selected();
     void editor_selected();
     void editAssert_type();

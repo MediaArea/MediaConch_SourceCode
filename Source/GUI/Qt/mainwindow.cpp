@@ -513,6 +513,36 @@ void MainWindow::delete_rule()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::delete_assert()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowGor = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (rowPolicy < 0 || rowGor < 0 || rowRule < 0 || row < 0)
+        return;
+
+    // Internal data
+    Rule *r = C.policies.policies[rowPolicy]->patterns[rowGor]->rules[rowRule];
+    Assert *a = r->asserts[row];
+    r->asserts.erase(r->asserts.begin() + row);
+    delete a;
+
+    // Visual
+    QTreeWidgetItem* parent = item->parent();
+    delete parent->takeChild(row);
+    item = get_item_in_tree();
+    if (item)
+        item->setSelected(false);
+    parent->setSelected(true);
+    displayRuleMenu();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::edit_policy_title()
 {
     QTreeWidgetItem* item = get_item_in_tree();
@@ -951,6 +981,8 @@ void MainWindow::createRuleEdit()
     policiesTree->get_menu_layout()->addWidget(ruleEdit);
     QObject::connect(ruleEdit->get_assertName_line(), SIGNAL(textEdited(QString)),
                      this, SLOT(edit_assert_name(QString)));
+    QObject::connect(ruleEdit->get_delAssert_button(), SIGNAL(clicked()),
+                     this, SLOT(delete_assert()));
 }
 
 //---------------------------------------------------------------------------
