@@ -121,6 +121,7 @@ private Q_SLOTS:
     void add_new_assert();
     void edit_policy_title();
     void edit_gor_title();
+    void edit_assert_name(QString new_name);
     void policiesTree_selectionChanged();
 };
 

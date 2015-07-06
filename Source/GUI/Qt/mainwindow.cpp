@@ -395,11 +395,10 @@ void MainWindow::add_new_assert()
 
     Assert *a = new Assert;
 
-    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     a->description = string("New Assert");
     a->use_free_text = false;
     QString name = QString().fromStdString(a->description);
-    item->setText(0, name);
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent, QStringList(name));
 
     C.policies.policies[rowPolicy]->patterns[rowGor]->rules[rowRule]->asserts.push_back(a);
     parent->setExpanded(true);
@@ -443,6 +442,27 @@ void MainWindow::edit_gor_title()
 
     QString title = QString().fromStdString(p->name);
     item->setText(0, title);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::edit_assert_name(QString new_name)
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
+        return;
+
+    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+    a->description = new_name.toStdString();
+
+    QString name = QString().fromStdString(a->description);
+    item->setText(0, name);
 }
 
 //---------------------------------------------------------------------------
@@ -817,15 +837,16 @@ void MainWindow::createRuleEdit()
     clearPoliciesElements();
     ruleEdit = new RuleEdit(this);
     policiesTree->get_menu_layout()->addWidget(ruleEdit);
+    QObject::connect(ruleEdit->get_assertName_line(), SIGNAL(textEdited(QString)),
+                     this, SLOT(edit_assert_name(QString)));
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
 {
-    createRuleEdit();
-
     if (!item)
         return;
+    createRuleEdit();
 
     int rowPolicy = get_index_of_item_backXX(item, 3);
     int rowPattern = get_index_of_item_backXX(item, 2);

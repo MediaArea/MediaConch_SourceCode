@@ -100,6 +100,12 @@ const QPushButton *RuleEdit::get_delAssert_button()
     return ui->deleteAssert;
 }
 
+//---------------------------------------------------------------------------
+const QLineEdit *RuleEdit::get_assertName_line()
+{
+    return ui->assertName;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************

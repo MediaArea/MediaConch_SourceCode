@@ -29,6 +29,7 @@ namespace Ui {
 }
 
 class QPushButton;
+class QLineEdit;
 struct Assert;
 class MainWindow;
 class QDialogButtonBox;
@@ -55,6 +56,7 @@ void assert_clicked(Assert *a);
 //***************************************************************************
 
 const QPushButton *get_delAssert_button();
+const QLineEdit   *get_assertName_line();
 
 private:
     MainWindow *mainwindow;
