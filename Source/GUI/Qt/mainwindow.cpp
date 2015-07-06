@@ -592,6 +592,8 @@ void MainWindow::displayPoliciesTree()
     {
         QTreeWidgetItem* item = new QTreeWidgetItem(tree);
         item->setText(0, tr("Policies"));
+        item->setSelected(true);
+        createPoliciesMenu();
     }
     updatePoliciesTree();
     QObject::connect(policiesTree->get_policies_tree(), SIGNAL(itemSelectionChanged()),
