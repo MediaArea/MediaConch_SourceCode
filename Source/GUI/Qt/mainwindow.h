@@ -115,7 +115,7 @@ private Q_SLOTS:
     void on_actionSavePolicies_triggered();
     void on_importSchematron();
     void on_exportSchematron();
-    void on_addNewPolicy();
+    void add_new_policy();
     void policiesTree_selectionChanged();
 };
 

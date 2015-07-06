@@ -311,9 +311,26 @@ void MainWindow::on_exportSchematron()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_addNewPolicy()
+void MainWindow::add_new_policy()
 {
-    // displayRuleEdit(-1);
+    QTreeWidget *tree = policiesTree->get_policies_tree();
+    QTreeWidgetItem* parent = tree->topLevelItem(0);
+    if (!parent)
+        return;
+
+    Policy *p = new Policy;
+
+    p->title = string("New policy");
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString title = QString().fromStdString(p->title);
+    item->setText(0, title);
+
+    C.policies.policies.push_back(p);
+    displayPolicyMenu(title);
+    parent->setExpanded(true);
+    parent->setSelected(false);
+    item->setSelected(true);
 }
 
 //---------------------------------------------------------------------------
@@ -600,8 +617,8 @@ void MainWindow::createPoliciesMenu()
     policiesTree->get_menu_layout()->addWidget(policiesMenu);
     QObject::connect(policiesMenu->get_importPolicy_button(), SIGNAL(clicked()),
                      this, SLOT(on_importSchematron()));
-    // QObject::connect(policiesMenu->get_addNewPolicy_button(), SIGNAL(clicked()),
-    //                  this, SLOT(on_addNewPolicy()));
+    QObject::connect(policiesMenu->get_addNewPolicy_button(), SIGNAL(clicked()),
+                     this, SLOT(add_new_policy()));
 }
 
 //---------------------------------------------------------------------------
