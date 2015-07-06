@@ -119,6 +119,7 @@ private Q_SLOTS:
     void add_new_gor();
     void add_new_rule();
     void add_new_assert();
+    void edit_policy_title();
     void policiesTree_selectionChanged();
 };
 

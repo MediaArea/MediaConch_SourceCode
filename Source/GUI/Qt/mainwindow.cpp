@@ -409,6 +409,24 @@ void MainWindow::add_new_assert()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::edit_policy_title()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item)
+        return;
+
+    int row = get_index_in_tree();;
+    if (row < 0)
+        return;
+
+    Policy *p = C.policies.policies[row];
+    p->title = policyMenu->get_title_line()->text().toStdString();
+
+    QString title = QString().fromStdString(p->title);
+    item->setText(0, title);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -715,6 +733,8 @@ void MainWindow::createPolicyMenu()
                      this, SLOT(on_exportSchematron()));
     QObject::connect(policyMenu->get_addNewGor_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_gor()));
+    QObject::connect(policyMenu->get_title_line(), SIGNAL(textChanged(QString)),
+                     this, SLOT(edit_policy_title()));
 }
 
 //---------------------------------------------------------------------------
