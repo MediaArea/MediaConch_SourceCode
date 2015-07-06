@@ -44,7 +44,8 @@ public:
 // Visual element
 //***************************************************************************
 
-    QPushButton *get_addNewAssert_button() const;
+    QPushButton *get_addNewAssert_button();
+    QPushButton *get_deleteRule_button();
 
 private:
     Ui::RuleMenu *ui;

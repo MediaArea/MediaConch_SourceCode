@@ -37,9 +37,15 @@ RuleMenu::~RuleMenu()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPushButton *RuleMenu::get_addNewAssert_button() const
+QPushButton *RuleMenu::get_addNewAssert_button()
 {
     return ui->addNewAssert;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *RuleMenu::get_deleteRule_button()
+{
+    return ui->deleteRule;
 }
 
 //***************************************************************************
