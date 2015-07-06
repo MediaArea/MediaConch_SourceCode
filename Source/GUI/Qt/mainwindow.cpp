@@ -427,6 +427,25 @@ void MainWindow::edit_policy_title()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::edit_gor_title()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int row = get_index_in_tree();
+    int rowPolicy = get_index_of_item_backXX(item, 1);
+    if (row < 0 || rowPolicy < 0)
+        return;
+
+    Pattern *p = C.policies.policies[rowPolicy]->patterns[row];
+    p->name = groupOfRules->get_title_line()->text().toStdString();
+
+    QString title = QString().fromStdString(p->name);
+    item->setText(0, title);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -756,6 +775,8 @@ void MainWindow::createGroupOfRules()
     policiesTree->get_menu_layout()->addWidget(groupOfRules);
     QObject::connect(groupOfRules->get_addNewRule_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_rule()));
+    QObject::connect(groupOfRules->get_title_line(), SIGNAL(textChanged(QString)),
+                     this, SLOT(edit_gor_title()));
 }
 
 //---------------------------------------------------------------------------
