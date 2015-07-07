@@ -28,6 +28,7 @@ PoliciesTree::PoliciesTree(QWidget *parent) :
     ui->menu->setLayout(Layout);
     ui->policies->setColumnCount(1);
     ui->policies->header()->hide();
+    ui->error->setReadOnly(true);
 }
 
 PoliciesTree::~PoliciesTree()
@@ -55,6 +56,11 @@ QFrame *PoliciesTree::get_menu_frame()
 QLayout *PoliciesTree::get_menu_layout()
 {
     return ui->menu->layout();
+}
+
+QLineEdit *PoliciesTree::get_error_line()
+{
+    return ui->error;
 }
 
 //***************************************************************************

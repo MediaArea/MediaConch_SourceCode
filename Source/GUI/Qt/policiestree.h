@@ -29,6 +29,7 @@ namespace Ui {
 class QTreeWidget;
 class QFrame;
 class QLayout;
+class QLineEdit;
 
 class PoliciesTree : public QFrame
 {
@@ -45,6 +46,7 @@ public:
     QTreeWidget *get_policies_tree();
     QFrame      *get_menu_frame();
     QLayout     *get_menu_layout();
+    QLineEdit   *get_error_line();
 
 //***************************************************************************
 // Visual element

@@ -155,7 +155,6 @@ void MainWindow::exporting_to_schematron_file(int pos)
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
                                                     "", tr("Schematron (*.sch)"));
 
-    //TODO: get policy number
     C.policies.export_schematron(filename.toStdString().c_str(), pos);
 }
 
@@ -294,11 +293,25 @@ void MainWindow::on_importSchematron()
 {
     QString file = ask_for_schematron_file();
     String ret = C.policies.import_schematron(file.toStdString().c_str());
-    // TODO: Add error if ret.length() > 0
-    // TODO: Display the policy imported
 
     displayPoliciesTree();
-    Run();
+    if (ret.length())
+        policiesTree->get_error_line()->setText(QString().fromStdWString(ret));
+    else
+    {
+        int row = C.policies.policies.size() - 1;
+        QTreeWidgetItem* parent = policiesTree->get_policies_tree()->topLevelItem(0);
+        if (row < 0 || !parent)
+            return;
+
+        QTreeWidgetItem *item = parent->child(row);
+        if (!item)
+            return;
+
+        parent->setExpanded(true);
+        parent->setSelected(false);
+        item->setSelected(true);
+    }
 }
 
 //---------------------------------------------------------------------------
