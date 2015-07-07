@@ -63,6 +63,7 @@ void fill_editor_fields(const Assert *a);
 //***************************************************************************
 
 const QPushButton *get_delAssert_button();
+const QPushButton *get_duplicateAssert_button();
 const QLineEdit   *get_assertName_line();
 QComboBox *get_type_select();
 QComboBox *get_field_select();

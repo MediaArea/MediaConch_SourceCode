@@ -527,6 +527,37 @@ void MainWindow::add_new_assert()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::duplicate_assert()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item)
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 3);
+    int rowPattern = get_index_of_item_backXX(item, 2);
+    int rowRule = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (rowPattern < 0 || rowPolicy < 0 || row < 0)
+        return;
+
+    Rule *r = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule];
+    Assert *a = new Assert(*r->asserts[row]);
+    a->description = a->description + string(" (Copy)");
+    r->asserts.push_back(a);
+
+    QTreeWidgetItem* parent = item->parent();
+    if (!parent)
+        return;
+
+    QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
+    new_item->setText(0, QString().fromStdString(a->description));
+    item->setSelected(false);
+    new_item->setSelected(true);
+
+    displayRuleEdit(new_item);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::delete_all_policies()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -1294,6 +1325,8 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
                      this, SLOT(edit_assert_name(QString)));
     QObject::connect(ruleEdit->get_delAssert_button(), SIGNAL(clicked()),
                      this, SLOT(delete_assert()));
+    QObject::connect(ruleEdit->get_duplicateAssert_button(), SIGNAL(clicked()),
+                     this, SLOT(duplicate_assert()));
     QObject::connect(ruleEdit->get_type_select(), SIGNAL(currentIndexChanged(int)),
                      this, SLOT(edit_assert_type()));
     QObject::connect(ruleEdit->get_field_select(), SIGNAL(currentIndexChanged(int)),

@@ -85,6 +85,12 @@ const QPushButton *RuleEdit::get_delAssert_button()
 }
 
 //---------------------------------------------------------------------------
+const QPushButton *RuleEdit::get_duplicateAssert_button()
+{
+    return ui->duplicateAssert;
+}
+
+//---------------------------------------------------------------------------
 const QLineEdit *RuleEdit::get_assertName_line()
 {
     return ui->assertName;

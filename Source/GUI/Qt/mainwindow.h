@@ -122,6 +122,7 @@ private Q_SLOTS:
     void duplicate_policy();
     void duplicate_gor();
     void duplicate_rule();
+    void duplicate_assert();
     void delete_all_policies();
     void delete_policy();
     void delete_gor();
