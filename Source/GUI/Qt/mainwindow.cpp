@@ -349,6 +349,37 @@ void MainWindow::add_new_policy()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::duplicate_policy()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item)
+        return;
+
+    int row = get_index_in_tree();
+    if (row < 0)
+        return;
+
+    Policy *p = new Policy(*C.policies.policies[row]);
+
+    p->title = p->title + string(" (Copy)");
+
+    C.policies.policies.push_back(p);
+    QTreeWidgetItem* parent = item->parent();
+    if (!parent)
+        return;
+
+    QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
+    item->setSelected(false);
+    new_item->setSelected(true);
+    QString title = QString().fromStdString(p->title);
+    new_item->setText(0, title);
+
+    for (size_t i = 0; i < p->patterns.size(); ++i)
+        updatePoliciesTreePattern(p->patterns[i], new_item);
+    displayPolicyMenu(title);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::add_new_gor()
 {
     QTreeWidgetItem* parent = get_item_in_tree();
@@ -1097,6 +1128,8 @@ void MainWindow::createPolicyMenu()
                      this, SLOT(add_new_gor()));
     QObject::connect(policyMenu->get_deletePolicy_button(), SIGNAL(clicked()),
                      this, SLOT(delete_policy()));
+    QObject::connect(policyMenu->get_duplicatePolicy_button(), SIGNAL(clicked()),
+                     this, SLOT(duplicate_policy()));
     QObject::connect(policyMenu->get_title_line(), SIGNAL(textChanged(QString)),
                      this, SLOT(edit_policy_title()));
 }

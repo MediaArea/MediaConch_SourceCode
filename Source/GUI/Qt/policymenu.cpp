@@ -60,6 +60,12 @@ QPushButton *PolicyMenu::get_deletePolicy_button()
     return ui->deletePolicy;
 }
 
+//---------------------------------------------------------------------------
+QPushButton *PolicyMenu::get_duplicatePolicy_button()
+{
+    return ui->duplicatePolicy;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
