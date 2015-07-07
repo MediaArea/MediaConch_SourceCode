@@ -560,6 +560,14 @@ void MainWindow::delete_assert()
 //---------------------------------------------------------------------------
 void MainWindow::edit_policy_title()
 {
+    QString qtitle = policyMenu->get_title_line()->text();
+    if (!qtitle.length())
+    {
+        policiesTree->get_error_line()->setText(QString("Policy must have a title"));
+        return;
+    }
+    policiesTree->get_error_line()->setText(QString());
+
     QTreeWidgetItem* item = get_item_in_tree();
     if (!item)
         return;
@@ -569,7 +577,7 @@ void MainWindow::edit_policy_title()
         return;
 
     Policy *p = C.policies.policies[row];
-    p->title = policyMenu->get_title_line()->text().toStdString();
+    p->title = qtitle.toStdString();
 
     QString title = QString().fromStdString(p->title);
     item->setText(0, title);
@@ -578,6 +586,14 @@ void MainWindow::edit_policy_title()
 //---------------------------------------------------------------------------
 void MainWindow::edit_gor_title()
 {
+    QString qname = groupOfRules->get_title_line()->text();
+    if (!qname.length())
+    {
+        policiesTree->get_error_line()->setText(QString("Group of rules must have a title"));
+        return;
+    }
+    policiesTree->get_error_line()->setText(QString());
+
     QTreeWidgetItem* item = get_item_in_tree();
     if (!item || !item->parent())
         return;
@@ -588,7 +604,7 @@ void MainWindow::edit_gor_title()
         return;
 
     Pattern *p = C.policies.policies[rowPolicy]->patterns[row];
-    p->name = groupOfRules->get_title_line()->text().toStdString();
+    p->name = qname.toStdString();
 
     QString title = QString().fromStdString(p->name);
     item->setText(0, title);
@@ -597,6 +613,13 @@ void MainWindow::edit_gor_title()
 //---------------------------------------------------------------------------
 void MainWindow::edit_assert_name(QString new_name)
 {
+    if (!new_name.length())
+    {
+        policiesTree->get_error_line()->setText(QString("Assert must have a name"));
+        return;
+    }
+    policiesTree->get_error_line()->setText(QString());
+
     QTreeWidgetItem* item = get_item_in_tree();
     if (!item || !item->parent())
         return;
