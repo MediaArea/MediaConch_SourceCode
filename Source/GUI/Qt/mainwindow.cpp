@@ -701,6 +701,12 @@ void MainWindow::edit_assert_freeText()
 
     a->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
     a->use_free_text = true;
+
+    Assert test;
+    if (C.policies.try_parsing_test(a->text, &test))
+        ruleEdit->get_editorSelector_radio()->setEnabled(true);
+    else
+        ruleEdit->get_editorSelector_radio()->setEnabled(false);
 }
 
 //---------------------------------------------------------------------------
