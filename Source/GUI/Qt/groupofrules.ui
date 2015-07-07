@@ -17,9 +17,6 @@
    </sizepolicy>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="title"/>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="labelTitle">
      <property name="text">
@@ -42,7 +39,7 @@ selection-background-color: rgb(255, 170, 0);
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="QPushButton" name="deleteGor">
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
@@ -55,6 +52,24 @@ selection-background-color: rgb(255, 0, 0);
      </property>
      <property name="text">
       <string>Delete this group of rules</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="title"/>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QPushButton" name="duplicateGor">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 170, 0);
+selection-background-color: rgb(255, 170, 0);
+</string>
+     </property>
+     <property name="text">
+      <string>Duplicate</string>
      </property>
     </widget>
    </item>

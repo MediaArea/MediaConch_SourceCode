@@ -47,6 +47,7 @@ public:
 
     QLineEdit   *get_title_line();
     QPushButton *get_addNewRule_button();
+    QPushButton *get_duplicateGor_button();
     QPushButton *get_deleteGor_button();
 
 private:

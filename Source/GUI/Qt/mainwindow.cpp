@@ -405,6 +405,39 @@ void MainWindow::add_new_gor()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::duplicate_gor()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item)
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (rowPolicy < 0 || row < 0)
+        return;
+
+    Policy *p = C.policies.policies[rowPolicy];
+    Pattern *pat = new Pattern(*p->patterns[row]);
+
+    pat->name = pat->name + string(" (Copy)");
+    p->patterns.push_back(pat);
+
+    QTreeWidgetItem* parent = item->parent();
+    if (!parent)
+        return;
+
+    QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
+    item->setSelected(false);
+    new_item->setSelected(true);
+    QString title = QString().fromStdString(pat->name);
+    new_item->setText(0, title);
+
+    for (size_t i = 0; i < pat->rules.size(); ++i)
+        updatePoliciesTreeRule(pat->rules[i], new_item);
+    displayGroupOfRules(title);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::add_new_rule()
 {
     QTreeWidgetItem* parent = get_item_in_tree();
@@ -1157,6 +1190,8 @@ void MainWindow::createGroupOfRules()
                      this, SLOT(edit_gor_title()));
     QObject::connect(groupOfRules->get_deleteGor_button(), SIGNAL(clicked()),
                      this, SLOT(delete_gor()));
+    QObject::connect(groupOfRules->get_duplicateGor_button(), SIGNAL(clicked()),
+                     this, SLOT(duplicate_gor()));
 }
 
 //---------------------------------------------------------------------------

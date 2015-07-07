@@ -54,6 +54,12 @@ QPushButton *GroupOfRules::get_deleteGor_button()
     return ui->deleteGor;
 }
 
+//---------------------------------------------------------------------------
+QPushButton *GroupOfRules::get_duplicateGor_button()
+{
+    return ui->duplicateGor;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
