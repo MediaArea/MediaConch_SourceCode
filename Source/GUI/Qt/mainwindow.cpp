@@ -1141,7 +1141,9 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
 
     if (rowPolicy < 0 || rowPattern < 0 || rowRule < 0 || rowAssert < 0)
         return;
-    ruleEdit->assert_clicked(C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[rowAssert]);
+    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[rowAssert];
+    ruleEdit->assert_clicked(a);
+
     QObject::connect(ruleEdit->get_assertName_line(), SIGNAL(textEdited(QString)),
                      this, SLOT(edit_assert_name(QString)));
     QObject::connect(ruleEdit->get_delAssert_button(), SIGNAL(clicked()),
@@ -1160,6 +1162,12 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
                      this, SLOT(assert_free_text_selected(bool)));
     QObject::connect(ruleEdit->get_editorSelector_radio(), SIGNAL(toggled(bool)),
                      this, SLOT(assert_editor_selected(bool)));
+
+    Assert test;
+    if (!a->use_free_text || C.policies.try_parsing_test(a->text, &test))
+        ruleEdit->get_editorSelector_radio()->setEnabled(true);
+    else
+        ruleEdit->get_editorSelector_radio()->setEnabled(false);
 }
 
 //***************************************************************************
