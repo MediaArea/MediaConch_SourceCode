@@ -1,0 +1,10 @@
+# bin
+mediaconch-gui
+
+# Qmake generated
+Makefile
+
+# Make generated
+_Automated/
+*.o
+qrc_Resources.cpp
