@@ -43,6 +43,12 @@ QPushButton *RuleMenu::get_addNewAssert_button()
 }
 
 //---------------------------------------------------------------------------
+QPushButton *RuleMenu::get_duplicateRule_button()
+{
+    return ui->duplicateRule;
+}
+
+//---------------------------------------------------------------------------
 QPushButton *RuleMenu::get_deleteRule_button()
 {
     return ui->deleteRule;

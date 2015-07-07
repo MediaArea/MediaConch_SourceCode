@@ -45,6 +45,7 @@ public:
 //***************************************************************************
 
     QPushButton *get_addNewAssert_button();
+    QPushButton *get_duplicateRule_button();
     QPushButton *get_deleteRule_button();
 
 private:

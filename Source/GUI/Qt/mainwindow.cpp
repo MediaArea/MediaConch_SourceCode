@@ -461,6 +461,46 @@ void MainWindow::add_new_rule()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::duplicate_rule()
+{
+    QTreeWidgetItem* item = get_item_in_tree();
+    if (!item)
+        return;
+
+    int rowPolicy = get_index_of_item_backXX(item, 2);
+    int rowPattern = get_index_of_item_backXX(item, 1);
+    int row = get_index_in_tree();
+    if (rowPattern < 0 || rowPolicy < 0 || row < 0)
+        return;
+
+    Pattern *p = C.policies.policies[rowPolicy]->patterns[rowPattern];
+    Rule *r = new Rule(*p->rules[row]);
+
+    p->rules.push_back(r);
+
+    QTreeWidgetItem* parent = item->parent();
+    if (!parent)
+        return;
+
+    QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
+    new_item->setText(0, QString("Rule"));
+    item->setSelected(false);
+    new_item->setSelected(true);
+
+    for (size_t i = 0; i < r->asserts.size(); ++i)
+    {
+        Assert *assert = r->asserts[i];
+        if (!assert)
+            continue;
+
+        QTreeWidgetItem* a = new QTreeWidgetItem(new_item);
+        QString descr = QString().fromStdString(assert->description);
+        a->setText(0, descr);
+    }
+    displayRuleMenu();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::add_new_assert()
 {
     QTreeWidgetItem* parent = get_item_in_tree();
@@ -1215,6 +1255,8 @@ void MainWindow::createRuleMenu()
                      this, SLOT(add_new_assert()));
     QObject::connect(ruleMenu->get_deleteRule_button(), SIGNAL(clicked()),
                      this, SLOT(delete_rule()));
+    QObject::connect(ruleMenu->get_duplicateRule_button(), SIGNAL(clicked()),
+                     this, SLOT(duplicate_rule()));
 }
 
 //---------------------------------------------------------------------------
