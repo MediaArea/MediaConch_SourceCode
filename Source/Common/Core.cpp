@@ -222,7 +222,6 @@ String Core::MediaTrace ()
 //---------------------------------------------------------------------------
 String Core::MediaSchematron ()
 {
-    Schematron S;
     xmlDocPtr doc = NULL;
 
     if (policies.policies.size())
@@ -230,11 +229,17 @@ String Core::MediaSchematron ()
         wstringstream Out;
         for (size_t i = 0; i < policies.policies.size(); ++i)
         {
+            Schematron S;
             doc = policies.create_doc(i);
-            S.register_schema_from_doc(doc);
-            Out << validation(S);
-            if (doc)
-                xmlFreeDoc(doc);
+            if (S.register_schema_from_doc(doc))
+                Out << validation(S);
+            else
+            {
+                Out << "internal error for parsing Policies" << endl;
+                for (size_t pos = 0; pos < S.errors.size(); pos++)
+                    Out << "\t" << S.errors[pos].c_str();
+            }
+            xmlFreeDoc(doc);
         }
         return Out.str();
     }
@@ -244,8 +249,16 @@ String Core::MediaSchematron ()
         for (size_t i = 0; i < SchematronFiles.size(); ++i)
         {
             std::string file(SchematronFiles[i].begin(), SchematronFiles[i].end());
-            S.register_schema_from_file(file.c_str());
-            Out << SchematronFiles[i] << String(__T(": ")) << validation(S) << endl;
+            Out << SchematronFiles[i] << ": ";
+            Schematron S;
+            if (S.register_schema_from_file(file.c_str()))
+                Out << validation(S);
+            else
+            {
+                Out << "internal error for parsing file" << endl;
+                for (size_t pos = 0; pos < S.errors.size(); pos++)
+                    Out << "\t" << S.errors[pos].c_str();
+            }
         }
         return Out.str();
     }
@@ -270,14 +283,16 @@ String Core::validation(Schematron& S)
     String tmp = MI->Inform();
     std::string xml(tmp.begin(), tmp.end());
 
-    if (!S.validate_xml(xml.c_str(), xml.length()))
+    int ret = S.validate_xml(xml.c_str(), xml.length());
+    if (ret > 0)
     {
-        Out << __T("NOT VALID\n");
-        for (size_t pos = 0; pos < S.errors.size(); pos++) {
+        Out << __T("NOT VALID\n") << endl;
+        for (size_t pos = 0; pos < S.errors.size(); pos++)
             Out << "\t" << S.errors[pos].c_str();
-        }
-    } else {
-        Out << __T("VALID");
     }
+    else if (ret < 0)
+        Out << __T("Validation generated an internal error");
+    else
+        Out << __T("VALID");
     return Out.str();
 }

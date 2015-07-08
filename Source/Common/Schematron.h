@@ -35,13 +35,14 @@ public:
     bool             register_schema_from_memory();
     bool             register_schema_from_doc(xmlDocPtr doc);
 
-    bool             validate_xml(const char* xml, size_t len, bool silent=true);
-    bool             validate_xml_from_file(const char* file, bool silent=true);
+    int              validate_xml(const char* xml, size_t len, bool silent=true);
+    int              validate_xml_from_file(const char* file, bool silent=true);
 
     string           get_schema() const { return schema; }
 
     // HELPER
     string           read_file(const char* filename);
+    static void      manage_generic_error(void *userData, const char* msg, ...);
     static void      manage_error(void *userData, xmlErrorPtr err);
 
     vector<string>   errors;

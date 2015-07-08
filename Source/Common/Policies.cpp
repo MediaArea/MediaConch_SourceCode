@@ -301,9 +301,11 @@ void Policies::find_patterns_node(xmlNodePtr node, vector<Pattern *>& patterns)
         !node->name || def.compare((const char*)node->name))
         return;
 
-    string name = (const char*)xmlGetNoNsProp(node, (const unsigned char*)"name");
     Pattern* p = new Pattern;
-    p->name = name;
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name != NULL)
+        p->name = string((const  char *)name);
+
     xmlNodePtr next = node->children;
     while (next)
     {
@@ -341,8 +343,11 @@ void Policies::find_asserts_node(xmlNodePtr node, vector<Assert *>& asserts)
     while (next)
     {
         string description((const char*)xmlNodeGetContent(node));
-        string test((const char*)xmlGetNoNsProp(node, (const unsigned char*)"test"));
-        Assert* a = create_assert_from_data(description, test);
+        xmlChar *test = xmlGetNoNsProp(node, (const unsigned char*)"test");
+        string testStr;
+        if (test != NULL)
+            testStr = string((const char*)test);
+        Assert* a = create_assert_from_data(description, testStr.c_str());
         asserts.push_back(a);
         next = next->next;
     }
