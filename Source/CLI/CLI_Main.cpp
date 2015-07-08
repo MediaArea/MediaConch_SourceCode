@@ -114,10 +114,13 @@ int main(int argc, char* argv_ansi[])
     {
         //First part of argument (before "=") should be case insensitive
         String Argument(argv[Pos]);
-        size_t Egal_Pos=Argument.find(__T('='));
-        if (Egal_Pos==string::npos)
-            Egal_Pos=Argument.size();
-        transform(Argument.begin(), Argument.begin()+Egal_Pos, Argument.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+        if (!Argument.compare(0, 1, __T("-")))
+        {
+            size_t Egal_Pos=Argument.find(__T('='));
+            if (Egal_Pos==string::npos)
+                Egal_Pos=Argument.size();
+            transform(Argument.begin(), Argument.begin()+Egal_Pos, Argument.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+        }
         int Return=Parse (MI, Argument);
         if (Return<0)
             return Return; //no more tasks to do
