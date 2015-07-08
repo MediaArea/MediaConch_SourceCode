@@ -215,14 +215,14 @@ void MainWindow::on_actionTrace_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionSchematron_triggered()
 {
-    if (!C.policies.policies.size() && !C.SchematronFile.length())
+    if (!C.policies.policies.size() && !C.SchematronFiles.size())
     {
         QString file = ask_for_schematron_file();
         if (file.length())
         {
             if (C.policies.import_schematron(file.toStdString().c_str()).length())
             {
-                C.SchematronFile = file.toStdWString();
+                C.SchematronFiles.push_back(file.toStdWString());
             }
         }
     }
@@ -269,7 +269,7 @@ void MainWindow::on_actionChooseSchematron_triggered()
     {
         if (C.policies.import_schematron(file.toStdString().c_str()).length())
         {
-            C.SchematronFile = file.toStdWString();
+            C.SchematronFiles.push_back(file.toStdWString());
         }
     }
     Run();

@@ -69,7 +69,7 @@ public:
 
     String Run();
 
-    String SchematronFile;
+    vector<String> SchematronFiles;
     Policies policies;
 
 private:

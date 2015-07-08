@@ -135,10 +135,7 @@ int main(int argc, char* argv_ansi[])
     //Callback for error handling
     CallBack_Set(MI, (void*)Event_CallBackFunction);
 
-    if (MI.Tool != Core::tool_MediaSchematron)
-    {
-        STRINGOUT(MI.Run());
-    }
+    STRINGOUT(MI.Run());
 
     return 0;
 }

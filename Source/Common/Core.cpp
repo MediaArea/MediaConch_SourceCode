@@ -238,9 +238,19 @@ String Core::MediaSchematron ()
         }
         return Out.str();
     }
-    std::string file(SchematronFile.begin(), SchematronFile.end());
-    S.register_schema_from_file(file.c_str());
-    return validation(S);
+    else if (SchematronFiles.size())
+    {
+        wstringstream Out;
+        for (size_t i = 0; i < SchematronFiles.size(); ++i)
+        {
+            std::string file(SchematronFiles[i].begin(), SchematronFiles[i].end());
+            S.register_schema_from_file(file.c_str());
+            Out << SchematronFiles[i] << String(__T(": ")) << validation(S) << endl;
+        }
+        return Out.str();
+    }
+
+    return String(__T("No Schematron or Policy to apply"));
 }
 
 //---------------------------------------------------------------------------
