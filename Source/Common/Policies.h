@@ -33,6 +33,8 @@ using namespace MediaInfoNameSpace;
 using namespace std;
 //---------------------------------------------------------------------------
 
+namespace MediaConch {
+
 //***************************************************************************
 // Assert
 //***************************************************************************
@@ -168,5 +170,7 @@ private:
     xmlNodePtr write_rule(Rule *r);
     xmlNodePtr write_assert(Assert *r);
 };
+
+}
 
 #endif

@@ -104,7 +104,7 @@ int main(int argc, char* argv_ansi[])
     MediaInfo::Option_Static(__T("LineSeparator"), __T("\n")); //Using sdtout
 
     //Configure MediaConch core
-    Core MI;
+    MediaConch::Core MI;
 
     //Retrieve command line (mainly for Unicode)
     GETCOMMANDLINE();
@@ -140,4 +140,3 @@ int main(int argc, char* argv_ansi[])
     return 0;
 }
 //---------------------------------------------------------------------------
-

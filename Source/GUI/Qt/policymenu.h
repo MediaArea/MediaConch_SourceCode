@@ -29,6 +29,8 @@ class PolicyMenu;
 class QPushButton;
 class QLineEdit;
 
+namespace MediaConch {
+
 class PolicyMenu : public QFrame
 {
     Q_OBJECT
@@ -62,5 +64,7 @@ private:
 
 private Q_SLOTS:
 };
+
+}
 
 #endif // POLICYMENU_H

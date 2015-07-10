@@ -43,7 +43,7 @@ String Last_Argument;
 // Main
 //***************************************************************************
 
-int Parse(Core &MI, MediaInfoNameSpace::String Argument)
+int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
 {
     if (Last_Argument.length())
     {
@@ -99,9 +99,9 @@ CL_OPTION(Tool)
 
     String Tool=Argument.substr(Egal_Pos+1);
     if (Tool==__T("Info") || Tool==__T("info"))
-        MI.Tool=Core::tool_MediaInfo;
+        MI.Tool=MediaConch::Core::tool_MediaInfo;
     if (Tool==__T("Trace") || Tool==__T("trace"))
-        MI.Tool=Core::tool_MediaTrace;
+        MI.Tool=MediaConch::Core::tool_MediaTrace;
 
     return 0;
 }
@@ -116,9 +116,9 @@ CL_OPTION(Format)
 
     String Format=Argument.substr(Egal_Pos+1);
     if (Format==__T("XML") || Format==__T("xml"))
-        MI.Format=Core::format_Xml;
+        MI.Format=MediaConch::Core::format_Xml;
     if (Format==__T("XML") || Format==__T("xml"))
-        MI.Format=Core::format_Xml;
+        MI.Format=MediaConch::Core::format_Xml;
 
     return 0;
 }
@@ -135,7 +135,7 @@ CL_OPTION(SchematronValidation)
     String file;
     file.assign(Argument, Egal_Pos+1, std::string::npos);
     MI.SchematronFiles.push_back(file);
-    MI.Tool=Core::tool_MediaSchematron;
+    MI.Tool=MediaConch::Core::tool_MediaSchematron;
     return 0;
 }
 
@@ -172,9 +172,8 @@ CL_OPTION(Default)
 }
 
 //---------------------------------------------------------------------------
-void CallBack_Set(Core &MI, void* Event_CallBackFunction)
+void CallBack_Set(MediaConch::Core &MI, void* Event_CallBackFunction)
 {
     //CallBack configuration
     MI.Menu_Option_Preferences_Option(__T("Event_CallBackFunction"), __T("CallBack=memory://")+ZenLib::Ztring::ToZtring((size_t)Event_CallBackFunction));
 }
-

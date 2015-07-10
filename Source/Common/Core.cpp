@@ -25,6 +25,8 @@ using namespace ZenLib;
 using namespace std;
 //---------------------------------------------------------------------------
 
+namespace MediaConch {
+
 
 //***************************************************************************
 // Constructor/Destructor
@@ -298,4 +300,6 @@ String Core::validation(Schematron& S)
     else
         Out << __T("VALID");
     return Out.str();
+}
+
 }

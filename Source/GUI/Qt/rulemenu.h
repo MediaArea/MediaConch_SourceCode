@@ -28,6 +28,8 @@ namespace Ui {
 
 class QPushButton;
 
+namespace MediaConch {
+
 class RuleMenu : public QFrame
 {
     Q_OBJECT
@@ -57,5 +59,7 @@ private:
 
 private Q_SLOTS:
 };
+
+}
 
 #endif // RULEMENU_H

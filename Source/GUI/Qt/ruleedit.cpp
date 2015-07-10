@@ -13,6 +13,8 @@
     #include <QFontDatabase>
 #endif
 
+namespace MediaConch {
+
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
@@ -263,4 +265,6 @@ void RuleEdit::value_to_quotted_value(string& value)
     {
         value = string("'") + value + string("'");
     }
+}
+
 }

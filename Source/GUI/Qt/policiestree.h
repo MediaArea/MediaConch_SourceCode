@@ -31,6 +31,8 @@ class QFrame;
 class QLayout;
 class QStatusBar;
 
+namespace MediaConch {
+
 class PoliciesTree : public QFrame
 {
     Q_OBJECT
@@ -62,5 +64,7 @@ private:
 
 private Q_SLOTS:
 };
+
+}
 
 #endif // POLICIESTREE_H

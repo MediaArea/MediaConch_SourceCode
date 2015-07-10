@@ -35,6 +35,8 @@
 #endif
 #include <sstream>
 
+namespace MediaConch {
+
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
@@ -1409,4 +1411,6 @@ QTreeWidgetItem *MainWindow::get_item_in_tree()
         return NULL;
 
     return list.first();
+}
+
 }

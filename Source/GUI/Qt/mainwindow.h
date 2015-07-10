@@ -19,13 +19,16 @@ class MainWindow;
 class QVBoxLayout;
 class QPlainTextEdit;
 class QLabel;
+class QTreeWidgetItem;
+
+namespace MediaConch {
+
 class PoliciesTree;
 class PoliciesMenu;
 class PolicyMenu;
 class GroupOfRules;
 class RuleMenu;
 class RuleEdit;
-class QTreeWidgetItem;
 
 class MainWindow : public QMainWindow
 {
@@ -141,5 +144,7 @@ private Q_SLOTS:
     void assert_free_text_selected(bool);
     void assert_editor_selected(bool);
 };
+
+}
 
 #endif // MAINWINDOW_H

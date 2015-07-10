@@ -29,6 +29,8 @@ class GroupOfRules;
 class QPushButton;
 class QLineEdit;
 
+namespace MediaConch {
+
 class GroupOfRules : public QFrame
 {
     Q_OBJECT
@@ -59,5 +61,7 @@ private:
 
 private Q_SLOTS:
 };
+
+}
 
 #endif // GROUPOFRULES_H

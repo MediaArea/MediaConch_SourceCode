@@ -28,11 +28,14 @@
 #endif
 #include <vector>
 #include "Policies.h"
+
 using namespace MediaInfoNameSpace;
 using namespace std;
+//---------------------------------------------------------------------------
+
+namespace MediaConch {
 
 class Schematron;
-//---------------------------------------------------------------------------
 
 //***************************************************************************
 // Class Core
@@ -86,5 +89,7 @@ private:
     //Helper
     String validation(Schematron& S);
 };
+
+}
 
 #endif

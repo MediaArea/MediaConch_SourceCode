@@ -32,11 +32,14 @@ class QPushButton;
 class QLineEdit;
 class QComboBox;
 class QTextEdit;
-struct Assert;
-class MainWindow;
 class QDialogButtonBox;
 class QTableWidgetItem;
 class QRadioButton;
+
+namespace MediaConch {
+
+struct Assert;
+class MainWindow;
 
 class RuleEdit : public QFrame
 {
@@ -92,5 +95,7 @@ void copy_visual_to_assert(Assert *a);
 
 private Q_SLOTS:
 };
+
+}
 
 #endif // RULEEDIT_H

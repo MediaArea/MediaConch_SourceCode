@@ -20,6 +20,7 @@
 using namespace std;
 //---------------------------------------------------------------------------
 
+namespace MediaConch {
 
 //***************************************************************************
 // Constructor/Destructor
@@ -203,4 +204,6 @@ void Schematron::manage_generic_error(void *userData, const char* msg, ...)
     buf[ret] = '\0';
     obj->errors.push_back(buf);
     va_end(args);
+}
+
 }

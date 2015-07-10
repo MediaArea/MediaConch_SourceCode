@@ -21,6 +21,8 @@
 #include <vector>
 using namespace std;
 
+namespace MediaConch {
+
 //***************************************************************************
 // Class Schematron
 //***************************************************************************
@@ -53,5 +55,7 @@ private:
     string           schema;
     xmlSchematronPtr schematron_ctx;
 };
+
+}
 
 #endif

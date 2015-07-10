@@ -28,6 +28,8 @@ class PoliciesMenu;
 
 class QPushButton;
 
+namespace MediaConch {
+
 class PoliciesMenu : public QFrame
 {
     Q_OBJECT
@@ -58,5 +60,7 @@ private:
 
 private Q_SLOTS:
 };
+
+}
 
 #endif // POLICIESMENU_H
