@@ -149,7 +149,6 @@ QString MainWindow::ask_for_schematron_file()
 
 void MainWindow::exporting_to_schematron_file(int pos)
 {
-    //TODO: -1: disable save or save all?
     if (pos < 0)
         return;
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
@@ -182,12 +181,6 @@ void MainWindow::on_actionCloseAll_triggered()
     C.List.clear();
 
     Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionSavePolicies_triggered()
-{
-    exporting_to_schematron_file(-1);
 }
 
 //---------------------------------------------------------------------------
@@ -1105,12 +1098,14 @@ void MainWindow::displayPoliciesTree()
     QTreeWidgetItem* policies = tree->topLevelItem(0);
     if (!policies)
     {
-        QTreeWidgetItem* item = new QTreeWidgetItem(tree);
-        item->setText(0, tr("Policies"));
-        item->setSelected(true);
+        policies = new QTreeWidgetItem(tree);
+        policies->setText(0, tr("Policies"));
+        policies->setSelected(true);
         createPoliciesMenu();
     }
     updatePoliciesTree();
+    if (policies->childCount())
+        policies->setExpanded(true);
     QObject::connect(policiesTree->get_policies_tree(), SIGNAL(itemSelectionChanged()),
                      this, SLOT(policiesTree_selectionChanged()));
 }

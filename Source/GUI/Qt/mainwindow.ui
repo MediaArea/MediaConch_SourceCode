@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>884</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -37,7 +37,6 @@
     <addaction name="actionCloseAll"/>
     <addaction name="separator"/>
     <addaction name="actionChooseSchematron"/>
-    <addaction name="actionSavePolicies"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -49,6 +48,7 @@
     <addaction name="actionInfo"/>
     <addaction name="actionTrace"/>
     <addaction name="actionSchematron"/>
+    <addaction name="actionPolicies"/>
    </widget>
    <widget class="QMenu" name="menuFormat">
     <property name="title">
@@ -66,7 +66,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionConch"/>
    <addaction name="actionInfo"/>
@@ -93,7 +93,7 @@
   </action>
   <action name="actionChooseSchematron">
    <property name="text">
-    <string>Choose Schematron</string>
+    <string>Import Schematron</string>
    </property>
   </action>
   <action name="actionSavePolicies">
@@ -133,7 +133,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Schematron</string>
+    <string>Apply policies</string>
    </property>
   </action>
   <action name="actionPolicies">
@@ -141,7 +141,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Policies</string>
+    <string>Edit policies</string>
    </property>
   </action>
   <action name="actionText">
