@@ -17,6 +17,21 @@
    </sizepolicy>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="4" column="0" colspan="2">
+    <widget class="QPushButton" name="duplicatePolicy">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 170, 0);
+selection-background-color: rgb(255, 170, 0);
+</string>
+     </property>
+     <property name="text">
+      <string>Duplicate</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="labelTitle">
      <property name="text">
@@ -39,8 +54,8 @@ selection-background-color: rgb(255, 170, 0);
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QPushButton" name="exportPolicy">
+   <item row="3" column="0" colspan="2">
+    <widget class="QPushButton" name="savePolicyTo">
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
@@ -53,7 +68,7 @@ selection-background-color: rgb(255, 170, 0);</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
     <widget class="QPushButton" name="deletePolicy">
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
@@ -71,8 +86,8 @@ selection-background-color: rgb(255, 0, 0);
    <item row="0" column="1">
     <widget class="QLineEdit" name="title"/>
    </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QPushButton" name="duplicatePolicy">
+   <item row="2" column="0" colspan="2">
+    <widget class="QPushButton" name="savePolicy">
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
@@ -82,7 +97,7 @@ selection-background-color: rgb(255, 170, 0);
 </string>
      </property>
      <property name="text">
-      <string>Duplicate</string>
+      <string>Save policy set</string>
      </property>
     </widget>
    </item>

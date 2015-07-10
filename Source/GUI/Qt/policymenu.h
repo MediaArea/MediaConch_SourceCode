@@ -50,7 +50,8 @@ public:
     QPushButton *get_addNewGor_button();
     QPushButton *get_deletePolicy_button();
     QPushButton *get_duplicatePolicy_button();
-    QPushButton *get_exportPolicy_button();
+    QPushButton *get_savePolicy_button();
+    QPushButton *get_savePolicyTo_button();
 
 private:
     Ui::PolicyMenu *ui;

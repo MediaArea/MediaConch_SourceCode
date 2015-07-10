@@ -108,6 +108,7 @@ Policy::Policy(const Policy& p)
         return;
     }
 
+    this->filename = p.filename;
     this->title = p.title;
     for (size_t i = 0; i < p.patterns.size(); ++i)
     {
@@ -164,6 +165,7 @@ String Policies::import_schematron(const char* filename)
         return String(__T("No root node, leaving"));
 
     Policy *p = new Policy;
+    p->filename = filename;
     xmlNodePtr child = root->children;
     if (child)
     {
@@ -312,6 +314,14 @@ xmlDocPtr Policies::create_doc(size_t pos)
 void Policies::export_schematron(const char* filename, size_t pos)
 {
     xmlDocPtr new_doc = create_doc(pos);
+
+    if (filename == NULL)
+    {
+        if (pos >= policies.size() || !policies[pos])
+            return;
+
+        filename = policies[pos]->filename.c_str();
+    }
 
     xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);

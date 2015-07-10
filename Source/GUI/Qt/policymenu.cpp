@@ -21,6 +21,7 @@ PolicyMenu::PolicyMenu(QWidget *parent) :
     ui(new Ui::PolicyMenu)
 {
     ui->setupUi(this);
+    ui->savePolicy->setEnabled(false);
 }
 
 PolicyMenu::~PolicyMenu()
@@ -43,9 +44,15 @@ QLineEdit *PolicyMenu::get_title_line()
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PolicyMenu::get_exportPolicy_button()
+QPushButton *PolicyMenu::get_savePolicy_button()
 {
-    return ui->exportPolicy;
+    return ui->savePolicy;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *PolicyMenu::get_savePolicyTo_button()
+{
+    return ui->savePolicyTo;
 }
 
 //---------------------------------------------------------------------------

@@ -99,6 +99,7 @@ struct Policy
     ~Policy();
     Policy(const Policy&);
 
+    string filename;
     string title;
     vector<Pattern *> patterns;
 private:

@@ -40,6 +40,7 @@ public:
     void dropEvent              (QDropEvent *event);
     void policy_to_delete(int row);
     void exporting_to_schematron_file(int pos);
+    void exporting_to_schematron(int pos);
 
     // UI
     void                        Ui_Init                     ();
@@ -113,7 +114,8 @@ private Q_SLOTS:
     void on_actionXml_triggered();
     void on_actionChooseSchematron_triggered();
     void on_importSchematron();
-    void on_exportSchematron();
+    void save_policy();
+    void save_policy_to();
     void add_new_policy();
     void add_new_gor();
     void add_new_rule();

@@ -147,6 +147,7 @@ QString MainWindow::ask_for_schematron_file()
     return file;
 }
 
+//---------------------------------------------------------------------------
 void MainWindow::exporting_to_schematron_file(int pos)
 {
     if (pos < 0)
@@ -155,6 +156,12 @@ void MainWindow::exporting_to_schematron_file(int pos)
                                                     "", tr("Schematron (*.sch)"));
 
     C.policies.export_schematron(filename.toStdString().c_str(), pos);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::exporting_to_schematron(int pos)
+{
+    C.policies.export_schematron(NULL, pos);
 }
 
 //***************************************************************************
@@ -309,14 +316,23 @@ void MainWindow::on_importSchematron()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_exportSchematron()
+void MainWindow::save_policy_to()
 {
     int  row = get_index_in_tree();
 
     if (row < 0)
         return;
     exporting_to_schematron_file(row);
-    Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::save_policy()
+{
+    int  row = get_index_in_tree();
+
+    if (row < 0)
+        return;
+    exporting_to_schematron(row);
 }
 
 //---------------------------------------------------------------------------
@@ -1222,8 +1238,10 @@ void MainWindow::createPolicyMenu()
     clearPoliciesElements();
     policyMenu = new PolicyMenu(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(policyMenu);
-    QObject::connect(policyMenu->get_exportPolicy_button(), SIGNAL(clicked()),
-                     this, SLOT(on_exportSchematron()));
+    QObject::connect(policyMenu->get_savePolicy_button(), SIGNAL(clicked()),
+                     this, SLOT(save_policy()));
+    QObject::connect(policyMenu->get_savePolicyTo_button(), SIGNAL(clicked()),
+                     this, SLOT(save_policy_to()));
     QObject::connect(policyMenu->get_addNewGor_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_gor()));
     QObject::connect(policyMenu->get_deletePolicy_button(), SIGNAL(clicked()),
@@ -1241,6 +1259,14 @@ void MainWindow::displayPolicyMenu(QString title)
     QLineEdit* name = policyMenu->get_title_line();
 
     name->setText(title);
+
+    policyMenu->get_savePolicy_button()->setEnabled(false);
+    int index = get_index_in_tree();
+    if (index >= 0 && index < (int)C.policies.policies.size())
+    {
+        if (C.policies.policies[index] && C.policies.policies[index]->filename.length())
+            policyMenu->get_savePolicy_button()->setEnabled(true);
+    }
 }
 
 //---------------------------------------------------------------------------
