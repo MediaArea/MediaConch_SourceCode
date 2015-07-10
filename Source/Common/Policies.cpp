@@ -173,7 +173,16 @@ String Policies::import_schematron(const char* filename)
             child = root->children;
     }
     if (!p->title.length())
-        p->title = string("New policy");
+    {
+        p->title = string(filename);
+        size_t start_index = p->title.find_last_of("\\/");
+        if (std::string::npos != start_index)
+            p->title = p->title.substr(start_index + 1);
+
+        size_t end_index = p->title.find(".sch", p->title.length() - 5);
+        if (end_index != std::string::npos)
+            p->title = p->title.substr(0, end_index);
+    }
     while (child)
     {
         find_patterns_node(child, p->patterns);
