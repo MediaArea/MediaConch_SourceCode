@@ -4,25 +4,26 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#include "policiesmenu.h"
-#include "ui_policiesmenu.h"
+#include "policymenu.h"
+#include "ui_policymenu.h"
 
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
+#include <QLineEdit>
 
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
-PoliciesMenu::PoliciesMenu(QWidget *parent) :
+PolicyMenu::PolicyMenu(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::PoliciesMenu)
+    ui(new Ui::PolicyMenu)
 {
     ui->setupUi(this);
 }
 
-PoliciesMenu::~PoliciesMenu()
+PolicyMenu::~PolicyMenu()
 {
     delete ui;
 }
@@ -36,21 +37,33 @@ PoliciesMenu::~PoliciesMenu()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_importPolicy_button()
+QLineEdit *PolicyMenu::get_title_line()
 {
-    return ui->importPolicy;
+    return ui->title;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_deletePolicies_button()
+QPushButton *PolicyMenu::get_exportPolicy_button()
 {
-    return ui->deletePolicies;
+    return ui->exportPolicy;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_addNewPolicy_button()
+QPushButton *PolicyMenu::get_addNewGor_button()
 {
-    return ui->addNewPolicy;
+    return ui->addNewGor;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *PolicyMenu::get_deletePolicy_button()
+{
+    return ui->deletePolicy;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *PolicyMenu::get_duplicatePolicy_button()
+{
+    return ui->duplicatePolicy;
 }
 
 //***************************************************************************

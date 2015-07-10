@@ -4,25 +4,26 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#include "policiesmenu.h"
-#include "ui_policiesmenu.h"
+#include "groupofrules.h"
+#include "ui_groupofrules.h"
 
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
+#include <QLineEdit>
 
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
-PoliciesMenu::PoliciesMenu(QWidget *parent) :
+GroupOfRules::GroupOfRules(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::PoliciesMenu)
+    ui(new Ui::GroupOfRules)
 {
     ui->setupUi(this);
 }
 
-PoliciesMenu::~PoliciesMenu()
+GroupOfRules::~GroupOfRules()
 {
     delete ui;
 }
@@ -36,21 +37,27 @@ PoliciesMenu::~PoliciesMenu()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_importPolicy_button()
+QLineEdit *GroupOfRules::get_title_line()
 {
-    return ui->importPolicy;
+    return ui->title;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_deletePolicies_button()
+QPushButton *GroupOfRules::get_addNewRule_button()
 {
-    return ui->deletePolicies;
+    return ui->addNewRule;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_addNewPolicy_button()
+QPushButton *GroupOfRules::get_deleteGor_button()
 {
-    return ui->addNewPolicy;
+    return ui->deleteGor;
+}
+
+//---------------------------------------------------------------------------
+QPushButton *GroupOfRules::get_duplicateGor_button()
+{
+    return ui->duplicateGor;
 }
 
 //***************************************************************************

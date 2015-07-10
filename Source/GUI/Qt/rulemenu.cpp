@@ -4,25 +4,26 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#include "policiesmenu.h"
-#include "ui_policiesmenu.h"
+#include "rulemenu.h"
+#include "ui_rulemenu.h"
 
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
+#include <QLineEdit>
 
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
-PoliciesMenu::PoliciesMenu(QWidget *parent) :
+RuleMenu::RuleMenu(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::PoliciesMenu)
+    ui(new Ui::RuleMenu)
 {
     ui->setupUi(this);
 }
 
-PoliciesMenu::~PoliciesMenu()
+RuleMenu::~RuleMenu()
 {
     delete ui;
 }
@@ -36,21 +37,21 @@ PoliciesMenu::~PoliciesMenu()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_importPolicy_button()
+QPushButton *RuleMenu::get_addNewAssert_button()
 {
-    return ui->importPolicy;
+    return ui->addNewAssert;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_deletePolicies_button()
+QPushButton *RuleMenu::get_duplicateRule_button()
 {
-    return ui->deletePolicies;
+    return ui->duplicateRule;
 }
 
 //---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_addNewPolicy_button()
+QPushButton *RuleMenu::get_deleteRule_button()
 {
-    return ui->addNewPolicy;
+    return ui->deleteRule;
 }
 
 //***************************************************************************

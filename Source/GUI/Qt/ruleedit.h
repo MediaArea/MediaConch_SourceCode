@@ -4,8 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#ifndef POLICIESEDIT_H
-#define POLICIESEDIT_H
+#ifndef RULEEDIT_H
+#define RULEEDIT_H
 
 //---------------------------------------------------------------------------
 #ifdef MEDIAINFO_DLL_RUNTIME
@@ -25,22 +25,26 @@ using namespace MediaInfoNameSpace;
 using namespace std;
 
 namespace Ui {
-    class PoliciesEdit;
+    class RuleEdit;
 }
 
 class QPushButton;
-struct Rule;
+class QLineEdit;
+class QComboBox;
+class QTextEdit;
+struct Assert;
 class MainWindow;
 class QDialogButtonBox;
 class QTableWidgetItem;
+class QRadioButton;
 
-class PoliciesEdit : public QFrame
+class RuleEdit : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit PoliciesEdit(QWidget *parent = 0);
-    ~PoliciesEdit();
+    explicit RuleEdit(QWidget *parent = 0);
+    ~RuleEdit();
 
     
 //***************************************************************************
@@ -48,59 +52,45 @@ public:
 //***************************************************************************
 
 void clear();
-void add_error(String error);
-void show_errors();
-void clear_errors();
-void add_rule(Rule *r);
-void set_name(string& policyName);
-string get_new_name() const;
-const vector<Rule *>& get_rules() const;
+void assert_clicked(Assert *a);
+void value_to_quotted_value(string&);
+string get_validator_value_from_pretty_name(string pretty_name);
+string get_validator_pretty_name_from_value(string value);
+void fill_editor_fields(const Assert *a);
 
 //***************************************************************************
 // Visual element
 //***************************************************************************
 
-const QPushButton *get_newRule_button() const;
-const QDialogButtonBox *get_validation_button() const;
+const QPushButton *get_delAssert_button();
+const QPushButton *get_duplicateAssert_button();
+const QLineEdit   *get_assertName_line();
+QComboBox *get_type_select();
+QComboBox *get_field_select();
+QComboBox *get_validator_select();
+QLineEdit *get_value_line();
+QTextEdit *get_freeText_text();
+QFrame *get_editor_frame();
+QRadioButton *get_freeTextSelector_radio();
+QRadioButton *get_editorSelector_radio();
 
 private:
     MainWindow *mainwindow;
-    Ui::PoliciesEdit *ui;
-    list<String> errors;
-    string policyName;
-    vector<Rule *> rules;
+    Ui::RuleEdit *ui;
 
 //***************************************************************************
 // HELPER
 //***************************************************************************
 
-QString getSelectedRuleName();
-QTableWidgetItem* getSelectedRuleItem();
 void add_values_to_selector();
-void clear_editor_fields();
-string get_validator_value_from_pretty_name(string pretty_name);
-string get_validator_pretty_name_from_value(string value);
-void copy_visual_to_rule(Rule *r);
-void fill_editor_fields(const Rule *r);
-void value_to_quotted_value(string&);
+
+void copy_visual_to_assert(Assert *a);
 
 //***************************************************************************
 // Slots
 //***************************************************************************
 
 private Q_SLOTS:
-    void on_addNewRule();
-    void cell_clicked(int row, int column);
-    void on_deleteRule();
-    void rule_selected_changed();
-    void free_text_selected();
-    void editor_selected();
-    void editRule_type();
-    void editRule_field();
-    void editRule_validator();
-    void editRule_value();
-    void editRule_freeText();
-    void editRule_ruleName();
 };
 
-#endif // POLICIESEDIT_H
+#endif // RULEEDIT_H

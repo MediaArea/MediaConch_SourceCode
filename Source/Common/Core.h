@@ -30,6 +30,8 @@
 #include "Policies.h"
 using namespace MediaInfoNameSpace;
 using namespace std;
+
+class Schematron;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -67,7 +69,7 @@ public:
 
     String Run();
 
-    String SchematronFile;
+    vector<String> SchematronFiles;
     Policies policies;
 
 private:
@@ -80,6 +82,9 @@ private:
     String MediaTrace();
     String MediaSchematron();
     String MediaPolicies();
+
+    //Helper
+    String validation(Schematron& S);
 };
 
 #endif

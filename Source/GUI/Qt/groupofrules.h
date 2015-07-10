@@ -4,8 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#ifndef POLICIESMENU_H
-#define POLICIESMENU_H
+#ifndef GROUPOFRULES_H
+#define GROUPOFRULES_H
 
 //---------------------------------------------------------------------------
 #ifdef MEDIAINFO_DLL_RUNTIME
@@ -23,19 +23,19 @@ using namespace MediaInfoNameSpace;
 using namespace std;
 
 namespace Ui {
-class PoliciesMenu;
+class GroupOfRules;
 }
 
 class QPushButton;
+class QLineEdit;
 
-class PoliciesMenu : public QFrame
+class GroupOfRules : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit PoliciesMenu(QWidget *parent = 0);
-    ~PoliciesMenu();
-
+    explicit GroupOfRules(QWidget *parent = 0);
+    ~GroupOfRules();
     
 //***************************************************************************
 // Functions
@@ -45,12 +45,13 @@ public:
 // Visual element
 //***************************************************************************
 
-QPushButton *get_addNewPolicy_button();
-QPushButton *get_deletePolicies_button();
-QPushButton *get_importPolicy_button();
+    QLineEdit   *get_title_line();
+    QPushButton *get_addNewRule_button();
+    QPushButton *get_duplicateGor_button();
+    QPushButton *get_deleteGor_button();
 
 private:
-    Ui::PoliciesMenu *ui;
+    Ui::GroupOfRules *ui;
 
 //***************************************************************************
 // Slots
@@ -59,4 +60,4 @@ private:
 private Q_SLOTS:
 };
 
-#endif // POLICIESMENU_H
+#endif // GROUPOFRULES_H

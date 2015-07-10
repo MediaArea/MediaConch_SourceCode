@@ -48,6 +48,7 @@ bool Schematron::register_schema_from_doc(xmlDocPtr doc)
         return false;
     }
     xmlLoadExtDtdDefaultValue |= 1;
+    xmlSetGenericErrorFunc(this, &manage_generic_error);
 
     if (schematron_ctx != NULL) {
         xmlSchematronFree(schematron_ctx);
@@ -63,6 +64,7 @@ bool Schematron::register_schema_from_doc(xmlDocPtr doc)
     if (schematron_ctx == NULL) {
         return false;
     }
+    xmlSetGenericErrorFunc(NULL, NULL);
     return true;
 }
 
@@ -70,6 +72,7 @@ bool Schematron::register_schema_from_doc(xmlDocPtr doc)
 bool Schematron::register_schema_from_memory()
 {
     xmlLoadExtDtdDefaultValue |= 1;
+    xmlSetGenericErrorFunc(this, &manage_generic_error);
 
     if (schematron_ctx != NULL) {
         xmlSchematronFree(schematron_ctx);
@@ -86,6 +89,7 @@ bool Schematron::register_schema_from_memory()
     if (schematron_ctx == NULL) {
         return false;
     }
+    xmlSetGenericErrorFunc(NULL, NULL);
     return true;
 }
 
@@ -107,22 +111,21 @@ bool Schematron::register_schema_from_file(const char* filename)
 }
 
 //---------------------------------------------------------------------------
-bool Schematron::validate_xml(const char* xml, size_t len, bool silent)
+int Schematron::validate_xml(const char* xml, size_t len, bool silent)
 {
-    if (schematron_ctx == NULL) {
-        return false;
-    }
+    if (schematron_ctx == NULL)
+        return -1;
 
     int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD;
+    xmlSetGenericErrorFunc(this, &manage_generic_error);
 
 #ifdef XML_PARSE_BIG_LINES
     doc_flags =| XML_PARSE_BIG_LINES;
 #endif //  | XML_PARSE_BIG_LINES
 
     xmlDocPtr doc = xmlReadMemory(xml, len, NULL, NULL, doc_flags);
-    if (doc == NULL) {
-        return false;
-    }
+    if (doc == NULL)
+        return -1;
 
     xmlSchematronValidCtxtPtr ctx = NULL;
     int validation_flags = XML_SCHEMATRON_OUT_TEXT;
@@ -143,25 +146,19 @@ bool Schematron::validate_xml(const char* xml, size_t len, bool silent)
     int ret = xmlSchematronValidateDoc(ctx, doc);
     xmlSchematronFreeValidCtxt(ctx);
     xmlFreeDoc(doc);
-
-    if (ret != 0) {
-        return false;
-    }
-    return true;
+    xmlSetGenericErrorFunc(NULL, NULL);
+    return ret;
 }
 
 //---------------------------------------------------------------------------
-bool Schematron::validate_xml_from_file(const char* filename, bool silent)
+int Schematron::validate_xml_from_file(const char* filename, bool silent)
 {
-    if (schematron_ctx == NULL) {
-        return false;
-    }
+    if (schematron_ctx == NULL)
+        return -1;
 
     string xml = read_file(filename);
     if (!xml.length())
-    {
-        return false;
-    }
+        return -1;
     return validate_xml(xml.c_str(), xml.length(), silent);
 }
 
@@ -191,4 +188,19 @@ void Schematron::manage_error(void *userData, xmlErrorPtr err)
         return;
     }
     obj->errors.push_back(err->message);
+}
+
+void Schematron::manage_generic_error(void *userData, const char* msg, ...)
+{
+    Schematron *obj = (Schematron *)userData;
+    va_list args;
+    char buf[4096] = {0};
+
+    va_start(args, msg);
+    int ret = vsnprintf(buf, sizeof(buf), msg, args);
+    if (ret < 0)
+        ret = 0;
+    buf[ret] = '\0';
+    obj->errors.push_back(buf);
+    va_end(args);
 }

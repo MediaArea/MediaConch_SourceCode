@@ -222,40 +222,76 @@ String Core::MediaTrace ()
 //---------------------------------------------------------------------------
 String Core::MediaSchematron ()
 {
-    wstringstream Out;
-    Schematron S;
-    xmlDocPtr doc = NULL;
-
-    if (policies.rules.size())
+    if (policies.policies.size())
     {
-        doc = policies.create_doc();
-        S.register_schema_from_doc(doc);
-    } else {
-        std::string file(SchematronFile.begin(), SchematronFile.end());
-        S.register_schema_from_file(file.c_str());
-    }
-
-    String tmp = MI->Inform();
-    std::string xml(tmp.begin(), tmp.end());
-
-    if (!S.validate_xml(xml.c_str(), xml.length()))
-    {
-        Out << __T("NOT VALID\n");
-        for (size_t pos = 0; pos < S.errors.size(); pos++) {
-            Out << "\t" << S.errors[pos].c_str();
+        wstringstream Out;
+        for (size_t i = 0; i < policies.policies.size(); ++i)
+        {
+            xmlDocPtr doc = policies.create_doc(i);
+            Schematron S;
+            Out << policies.policies[i]->title.c_str() << ": ";
+            if (S.register_schema_from_doc(doc))
+                Out << validation(S) << endl;
+            else
+            {
+                Out << "internal error for parsing Policies" << endl;
+                for (size_t pos = 0; pos < S.errors.size(); pos++)
+                    Out << "\t" << S.errors[pos].c_str();
+            }
+            xmlFreeDoc(doc);
         }
-    } else {
-        Out << __T("VALID");
+        return Out.str();
     }
-    if (doc)
+    else if (SchematronFiles.size())
     {
-        xmlFreeDoc(doc);
+        wstringstream Out;
+        for (size_t i = 0; i < SchematronFiles.size(); ++i)
+        {
+            std::string file(SchematronFiles[i].begin(), SchematronFiles[i].end());
+            Out << SchematronFiles[i] << ": ";
+            Schematron S;
+            if (S.register_schema_from_file(file.c_str()))
+                Out << validation(S) << endl;
+            else
+            {
+                Out << "internal error for parsing file" << endl;
+                for (size_t pos = 0; pos < S.errors.size(); pos++)
+                    Out << "\t" << S.errors[pos].c_str();
+            }
+        }
+        return Out.str();
     }
-    return Out.str();
+
+    return String(__T("No Schematron or Policy to apply"));
 }
 
 //---------------------------------------------------------------------------
 String Core::MediaPolicies ()
 {
     return String();
+}
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+String Core::validation(Schematron& S)
+{
+    wstringstream Out;
+    String tmp = MI->Inform();
+    std::string xml(tmp.begin(), tmp.end());
+
+    int ret = S.validate_xml(xml.c_str(), xml.length());
+    if (ret > 0)
+    {
+        Out << __T("NOT VALID\n") << endl;
+        for (size_t pos = 0; pos < S.errors.size(); pos++)
+            Out << "\t" << S.errors[pos].c_str();
+    }
+    else if (ret < 0)
+        Out << __T("Validation generated an internal error");
+    else
+        Out << __T("VALID");
+    return Out.str();
 }

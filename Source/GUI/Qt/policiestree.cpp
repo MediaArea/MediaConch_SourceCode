@@ -4,25 +4,38 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#include "policiesmenu.h"
-#include "ui_policiesmenu.h"
+#include "policiestree.h"
+#include "ui_policiestree.h"
 
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
 
+#include <QStatusBar>
+#include <QTreeWidget>
+#include <QFrame>
+#include <QVBoxLayout>
+
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
-PoliciesMenu::PoliciesMenu(QWidget *parent) :
+PoliciesTree::PoliciesTree(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::PoliciesMenu)
+    ui(new Ui::PoliciesTree)
 {
     ui->setupUi(this);
+    QVBoxLayout *Layout = new QVBoxLayout(ui->menu);
+    ui->menu->setLayout(Layout);
+    ui->policies->setColumnCount(1);
+    ui->policies->header()->hide();
+
+    error = new QStatusBar(this);
+    error->setObjectName(QString::fromUtf8("error"));
+    ui->gridLayout->addWidget(error, 1, 0, 1, 1);
 }
 
-PoliciesMenu::~PoliciesMenu()
+PoliciesTree::~PoliciesTree()
 {
     delete ui;
 }
@@ -31,27 +44,32 @@ PoliciesMenu::~PoliciesMenu()
 // Functions
 //***************************************************************************
 
+//---------------------------------------------------------------------------
+QTreeWidget *PoliciesTree::get_policies_tree()
+{
+    return ui->policies;
+}
+
+//---------------------------------------------------------------------------
+QFrame *PoliciesTree::get_menu_frame()
+{
+    return ui->menu;
+}
+
+//---------------------------------------------------------------------------
+QLayout *PoliciesTree::get_menu_layout()
+{
+    return ui->menu->layout();
+}
+
+QStatusBar *PoliciesTree::get_error_bar()
+{
+    return error;
+}
+
 //***************************************************************************
 // Visual element
 //***************************************************************************
-
-//---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_importPolicy_button()
-{
-    return ui->importPolicy;
-}
-
-//---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_deletePolicies_button()
-{
-    return ui->deletePolicies;
-}
-
-//---------------------------------------------------------------------------
-QPushButton *PoliciesMenu::get_addNewPolicy_button()
-{
-    return ui->addNewPolicy;
-}
 
 //***************************************************************************
 // Slots

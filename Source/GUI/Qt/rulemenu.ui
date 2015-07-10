@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PoliciesMenu</class>
- <widget class="QFrame" name="PoliciesMenu">
+ <class>RuleMenu</class>
+ <widget class="QFrame" name="RuleMenu">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,37 +17,8 @@
    </sizepolicy>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QPushButton" name="addNewPolicy">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 170, 0);
-selection-background-color: rgb(255, 170, 0);
-</string>
-     </property>
-     <property name="text">
-      <string>Add new policy set</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="importPolicy">
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 170, 0);
-selection-background-color: rgb(255, 170, 0);</string>
-     </property>
-     <property name="text">
-      <string>Import policy from schematron file</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="deletePolicies">
+   <item row="3" column="0" colspan="2">
+    <widget class="QPushButton" name="deleteRule">
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
@@ -57,7 +28,37 @@ selection-background-color: rgb(255, 0, 0);
 </string>
      </property>
      <property name="text">
-      <string>Delete all policies</string>
+      <string>Delete the rule</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QPushButton" name="addNewAssert">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 170, 0);
+selection-background-color: rgb(255, 170, 0);
+</string>
+     </property>
+     <property name="text">
+      <string>New Assert</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QPushButton" name="duplicateRule">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 170, 0);
+selection-background-color: rgb(255, 170, 0);
+</string>
+     </property>
+     <property name="text">
+      <string>Duplicate</string>
      </property>
     </widget>
    </item>
