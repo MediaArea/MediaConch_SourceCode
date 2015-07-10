@@ -59,16 +59,40 @@
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policiesedit.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\policiesmenu.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_policiesedit.cpp">
+    <ClCompile Include="_Automated\moc_policiesmenu.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_policiesmenu.cpp">
+    <ClCompile Include="..\..\..\Source\GUI\Qt\groupofrules.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policiestree.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_policiestree.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_policymenu.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_ruleedit.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_rulemenu.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_groupofrules.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,6 +116,21 @@
       <Filter>Header Files\_Automated</Filter>
     </ClInclude>
     <ClInclude Include="_Automated\ui_policiesmenu.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_groupofrules.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_policiestree.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_policymenu.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_ruleedit.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_rulemenu.h">
       <Filter>Header Files\_Automated</Filter>
     </ClInclude>
   </ItemGroup>

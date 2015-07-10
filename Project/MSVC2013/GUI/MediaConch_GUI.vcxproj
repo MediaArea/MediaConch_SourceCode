@@ -169,13 +169,21 @@
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\groupofrules.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policiesedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policiesmenu.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policiestree.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
+    <ClCompile Include="_Automated\moc_groupofrules.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
-    <ClCompile Include="_Automated\moc_policiesedit.cpp" />
     <ClCompile Include="_Automated\moc_policiesmenu.cpp" />
+    <ClCompile Include="_Automated\moc_policiestree.cpp" />
+    <ClCompile Include="_Automated\moc_policymenu.cpp" />
+    <ClCompile Include="_Automated\moc_ruleedit.cpp" />
+    <ClCompile Include="_Automated\moc_rulemenu.cpp" />
     <ClCompile Include="_Automated\qrc_Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,9 +191,14 @@
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
+    <ClInclude Include="_Automated\ui_groupofrules.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
     <ClInclude Include="_Automated\ui_policiesedit.h" />
     <ClInclude Include="_Automated\ui_policiesmenu.h" />
+    <ClInclude Include="_Automated\ui_policiestree.h" />
+    <ClInclude Include="_Automated\ui_policymenu.h" />
+    <ClInclude Include="_Automated\ui_ruleedit.h" />
+    <ClInclude Include="_Automated\ui_rulemenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
