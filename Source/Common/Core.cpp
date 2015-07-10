@@ -222,17 +222,16 @@ String Core::MediaTrace ()
 //---------------------------------------------------------------------------
 String Core::MediaSchematron ()
 {
-    xmlDocPtr doc = NULL;
-
     if (policies.policies.size())
     {
         wstringstream Out;
         for (size_t i = 0; i < policies.policies.size(); ++i)
         {
+            xmlDocPtr doc = policies.create_doc(i);
             Schematron S;
-            doc = policies.create_doc(i);
+            Out << policies.policies[i]->title.c_str() << ": ";
             if (S.register_schema_from_doc(doc))
-                Out << validation(S);
+                Out << validation(S) << endl;
             else
             {
                 Out << "internal error for parsing Policies" << endl;
@@ -252,7 +251,7 @@ String Core::MediaSchematron ()
             Out << SchematronFiles[i] << ": ";
             Schematron S;
             if (S.register_schema_from_file(file.c_str()))
-                Out << validation(S);
+                Out << validation(S) << endl;
             else
             {
                 Out << "internal error for parsing file" << endl;

@@ -172,6 +172,8 @@ String Policies::import_schematron(const char* filename)
         if (child == NULL)
             child = root->children;
     }
+    if (!p->title.length())
+        p->title = string("New policy");
     while (child)
     {
         find_patterns_node(child, p->patterns);
