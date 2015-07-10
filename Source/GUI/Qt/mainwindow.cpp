@@ -296,9 +296,10 @@ void MainWindow::on_importSchematron()
 
     displayPoliciesTree();
     if (ret.length())
-        policiesTree->get_error_line()->setText(QString().fromStdWString(ret));
+        policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
     else
     {
+        policiesTree->get_error_bar()->clearMessage();
         int row = C.policies.policies.size() - 1;
         QTreeWidgetItem* parent = policiesTree->get_policies_tree()->topLevelItem(0);
         if (row < 0 || !parent)
@@ -698,10 +699,10 @@ void MainWindow::edit_policy_title()
     QString qtitle = policyMenu->get_title_line()->text();
     if (!qtitle.length())
     {
-        policiesTree->get_error_line()->setText(QString("Policy must have a title"));
+        policiesTree->get_error_bar()->showMessage(QString("Policy must have a title"));
         return;
     }
-    policiesTree->get_error_line()->setText(QString());
+    policiesTree->get_error_bar()->clearMessage();
 
     QTreeWidgetItem* item = get_item_in_tree();
     if (!item)
@@ -724,10 +725,10 @@ void MainWindow::edit_gor_title()
     QString qname = groupOfRules->get_title_line()->text();
     if (!qname.length())
     {
-        policiesTree->get_error_line()->setText(QString("Group of rules must have a title"));
+        policiesTree->get_error_bar()->showMessage(QString("Group of rules must have a title"));
         return;
     }
-    policiesTree->get_error_line()->setText(QString());
+    policiesTree->get_error_bar()->clearMessage();
 
     QTreeWidgetItem* item = get_item_in_tree();
     if (!item || !item->parent())
@@ -750,10 +751,10 @@ void MainWindow::edit_assert_name(QString new_name)
 {
     if (!new_name.length())
     {
-        policiesTree->get_error_line()->setText(QString("Assert must have a name"));
+        policiesTree->get_error_bar()->showMessage(QString("Assert must have a name"));
         return;
     }
-    policiesTree->get_error_line()->setText(QString());
+    policiesTree->get_error_bar()->clearMessage();
 
     QTreeWidgetItem* item = get_item_in_tree();
     if (!item || !item->parent())

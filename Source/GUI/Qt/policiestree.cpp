@@ -11,6 +11,7 @@
     #include <QFontDatabase>
 #endif
 
+#include <QStatusBar>
 #include <QTreeWidget>
 #include <QFrame>
 #include <QVBoxLayout>
@@ -28,7 +29,10 @@ PoliciesTree::PoliciesTree(QWidget *parent) :
     ui->menu->setLayout(Layout);
     ui->policies->setColumnCount(1);
     ui->policies->header()->hide();
-    ui->error->setReadOnly(true);
+
+    error = new QStatusBar(this);
+    error->setObjectName(QString::fromUtf8("error"));
+    ui->gridLayout->addWidget(error, 1, 0, 1, 1);
 }
 
 PoliciesTree::~PoliciesTree()
@@ -58,9 +62,9 @@ QLayout *PoliciesTree::get_menu_layout()
     return ui->menu->layout();
 }
 
-QLineEdit *PoliciesTree::get_error_line()
+QStatusBar *PoliciesTree::get_error_bar()
 {
-    return ui->error;
+    return error;
 }
 
 //***************************************************************************

@@ -29,7 +29,7 @@ namespace Ui {
 class QTreeWidget;
 class QFrame;
 class QLayout;
-class QLineEdit;
+class QStatusBar;
 
 class PoliciesTree : public QFrame
 {
@@ -46,7 +46,7 @@ public:
     QTreeWidget *get_policies_tree();
     QFrame      *get_menu_frame();
     QLayout     *get_menu_layout();
-    QLineEdit   *get_error_line();
+    QStatusBar  *get_error_bar();
 
 //***************************************************************************
 // Visual element
@@ -54,6 +54,7 @@ public:
 
 private:
     Ui::PoliciesTree *ui;
+    QStatusBar       *error;
 
 //***************************************************************************
 // Slots
