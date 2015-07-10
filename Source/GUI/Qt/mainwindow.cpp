@@ -296,7 +296,7 @@ void MainWindow::on_importSchematron()
 
     displayPoliciesTree();
     if (ret.length())
-        policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
+            policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
     else
     {
         policiesTree->get_error_bar()->clearMessage();

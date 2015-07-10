@@ -64,6 +64,7 @@ bool Schematron::register_schema_from_doc(xmlDocPtr doc)
     if (schematron_ctx == NULL) {
         return false;
     }
+    xmlSetGenericErrorFunc(NULL, NULL);
     return true;
 }
 
@@ -88,6 +89,7 @@ bool Schematron::register_schema_from_memory()
     if (schematron_ctx == NULL) {
         return false;
     }
+    xmlSetGenericErrorFunc(NULL, NULL);
     return true;
 }
 
@@ -144,6 +146,7 @@ int Schematron::validate_xml(const char* xml, size_t len, bool silent)
     int ret = xmlSchematronValidateDoc(ctx, doc);
     xmlSchematronFreeValidCtxt(ctx);
     xmlFreeDoc(doc);
+    xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
 

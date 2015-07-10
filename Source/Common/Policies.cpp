@@ -12,6 +12,7 @@
 
 //---------------------------------------------------------------------------
 #include "Policies.h"
+#include "Schematron.h"
 #include <iostream>
 #include <sstream>
 #include <string.h>
@@ -145,38 +146,40 @@ Policies::~Policies()
 
 String Policies::import_schematron(const char* filename)
 {
-    if (!filename || !strlen(filename)) {
+    if (!filename || !strlen(filename))
         return String(__T("The schematron file does not exist"));
-    }
+
+    Schematron s;
+    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
 
     xmlDocPtr doc = xmlParseFile(filename);
-
-    if (!doc) {
+    if (!doc)
+    {
+        // maybe put the errors from s.errors
         return String(__T("The schematron file cannot be parsed"));
     }
 
     xmlNodePtr root = xmlDocGetRootElement(doc);
-    if (!root) {
+    if (!root)
         return String(__T("No root node, leaving"));
-    }
 
     Policy *p = new Policy;
     xmlNodePtr child = root->children;
     if (child)
     {
         while (child && !find_title_node(child, p->title))
-        {
             child = child->next;
-        }
         if (child == NULL)
             child = root->children;
     }
-    while (child) {
+    while (child)
+    {
         find_patterns_node(child, p->patterns);
         child = child->next;
     }
     policies.push_back(p);
     xmlFreeDoc(doc);
+    xmlSetGenericErrorFunc(NULL, NULL);
     return String();
 }
 
