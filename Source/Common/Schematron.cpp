@@ -198,10 +198,14 @@ void Schematron::manage_generic_error(void *userData, const char* msg, ...)
     char buf[4096] = {0};
 
     va_start(args, msg);
+#ifdef _MSC_VER
+    int ret = vsnprintf_s(buf, sizeof(buf), _TRUNCATE, msg, args);
+#else //_MSC_VER
     int ret = vsnprintf(buf, sizeof(buf), msg, args);
     if (ret < 0)
         ret = 0;
     buf[ret] = '\0';
+#endif //_MSC_VER
     obj->errors.push_back(buf);
     va_end(args);
 }
