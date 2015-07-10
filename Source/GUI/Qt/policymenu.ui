@@ -49,7 +49,7 @@ selection-background-color: rgb(255, 170, 0);
 selection-background-color: rgb(255, 170, 0);</string>
      </property>
      <property name="text">
-      <string>Export policy to schematron file</string>
+      <string>Save policy set to...</string>
      </property>
     </widget>
    </item>

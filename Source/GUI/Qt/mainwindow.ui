@@ -93,7 +93,7 @@
   </action>
   <action name="actionChooseSchematron">
    <property name="text">
-    <string>Import Schematron</string>
+    <string>Load policy set...</string>
    </property>
   </action>
   <action name="actionSavePolicies">

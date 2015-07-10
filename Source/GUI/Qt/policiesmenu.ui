@@ -42,7 +42,7 @@ selection-background-color: rgb(255, 170, 0);
 selection-background-color: rgb(255, 170, 0);</string>
      </property>
      <property name="text">
-      <string>Import policy from schematron file</string>
+      <string>Load policy set...</string>
      </property>
     </widget>
    </item>

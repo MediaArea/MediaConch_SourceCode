@@ -227,6 +227,8 @@ String Core::MediaSchematron ()
         wstringstream Out;
         for (size_t i = 0; i < policies.policies.size(); ++i)
         {
+            if (i)
+                Out << endl;
             xmlDocPtr doc = policies.create_doc(i);
             Schematron S;
             Out << policies.policies[i]->title.c_str() << ": ";
@@ -285,9 +287,11 @@ String Core::validation(Schematron& S)
     int ret = S.validate_xml(xml.c_str(), xml.length());
     if (ret > 0)
     {
-        Out << __T("NOT VALID\n") << endl;
+        Out << __T("NOT VALID\n");
         for (size_t pos = 0; pos < S.errors.size(); pos++)
             Out << "\t" << S.errors[pos].c_str();
+        if (!S.errors.size())
+            Out << endl;
     }
     else if (ret < 0)
         Out << __T("Validation generated an internal error");
