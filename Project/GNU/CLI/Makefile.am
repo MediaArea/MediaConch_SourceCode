@@ -14,7 +14,8 @@ mediaconch_SOURCES = \
     ../../../Source/Common/Policy.cpp \
     ../../../Source/Common/SchematronPolicy.cpp \
     ../../../Source/Common/XsltPolicy.cpp \
-    ../../../Source/Common/Database.cpp
+    ../../../Source/Common/Database.cpp \
+    ../../../Source/Common/SQLLite.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)

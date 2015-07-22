@@ -28,6 +28,10 @@ BuildRequires:  libqt4-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  libcurl-devel
+BuildRequires:  libsql3-devel
+%if 0%{?suse_version}
+BuildRequires:  update-desktop-files
+%endif
 %if 0%{?fedora_version}
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
