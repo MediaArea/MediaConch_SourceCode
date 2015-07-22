@@ -28,6 +28,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/XsltPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/Common/Database.cpp \
+                    ../../Source/Common/SQLLite.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -65,6 +66,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/ImplementationReportDisplayTextXsl.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
                     ../../Source/Common/Database.h \
+                    ../../Source/Common/SQLLite.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
@@ -122,7 +124,7 @@ LIBS             += $$system(pkg-config --libs libmediainfo)
 exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
 INCLUDEPATH      += ../../../ZenLib/Source
 LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
-message("custom libzen      : yes")
+message("custom libzen       : yes")
 }
 else {
 LIBS             += -lzen
@@ -144,6 +146,14 @@ message("custom libxslt      : yes")
 else {
 INCLUDEPATH      += /usr/include/libxslt
 LIBS             += -lxslt
+}
+exists(../../../sqlite/.libs/libsqlite3.a) {
+INCLUDEPATH      += ../../../sqlite
+LIBS             += ../../../sqlite/.libs/libsqlite3.a
+message("custom libsqlite3   : yes")
+}
+else {
+LIBS             += -lsqlite3
 }
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt

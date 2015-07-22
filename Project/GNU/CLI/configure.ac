@@ -301,6 +301,35 @@ else
 	fi
 fi
 
+dnl -------------------------------------------------------------------------
+dnl libsqlite3
+dnl
+if test -e ../../../../sqlite/.libs/libsqlite3.la; then
+	CXXFLAGS="$CXXFLAGS  -I../../../../sqlite"
+	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../sqlite"
+	if test "$enable_staticlibs" = "yes"; then
+		with_libsqlite3="builtin (static)"
+		LIBS="$LIBS  ../../../../sqlite/.libs/libsqlite3.a"
+	else
+		with_libsqlite3="builtin"
+		LIBS="$LIBS  -L../../../../sqlite/.libs -lsqlite3"
+	fi
+else
+	if pkg-config --exists sqlite3; then
+		CXXFLAGS="$CXXFLAGS $(pkg-config --cflags sqlite3)"
+		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags sqlite3)"
+		if test "$enable_staticlibs" = "yes"; then
+			with_libsqlite3="system (static)"
+			LIBS="$LIBS $(pkg-config --static --libs sqlite3)"
+		else
+			with_libsqlite3="system"
+			LIBS="$LIBS $(pkg-config --libs sqlite3)"
+		fi
+	else
+		AC_MSG_ERROR([libsqlite3 configuration is not found])
+	fi
+fi
+
 dnl #########################################################################
 dnl ### Compiler specific
 dnl #########################################################################
@@ -383,6 +412,7 @@ echo ""
 echo "  Unicode?                                                $enable_unicode"
 echo "  stream missing support?                                 $enable_stream_missing"
 echo ""
+echo "  Using libsqlite3?                                       $with_libsqlite3"
 echo "  Using libxml2?                                          $with_libxml2"
 echo "  Using libzen?                                           $with_zenlib"
 echo "  Using libmediainfo?                                     $with_mediainfolib"
