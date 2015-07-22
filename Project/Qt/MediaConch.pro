@@ -27,6 +27,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/SchematronPolicy.cpp \
                     ../../Source/Common/XsltPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
+                    ../../Source/Common/Database.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -63,6 +64,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/ImplementationReportDisplayTextUnicodeXsl.h \
                     ../../Source/Common/ImplementationReportDisplayTextXsl.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
+                    ../../Source/Common/Database.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
