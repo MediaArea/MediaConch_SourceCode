@@ -24,7 +24,7 @@ namespace MediaConch {
 // Class Database
 //***************************************************************************
 
-const String databaseName = __T("MediaConch.db");
+const std::string databaseName = "MediaConch.db";
 
 class Database
 {
@@ -33,14 +33,15 @@ public:
     Database();
     virtual ~Database();
 
-    int    create_report_table();
-    int    save_report(Core::format format, Core::report reportKind, String& filename, time_t file_last_modification, String& report);
-    String report_exists(Core::format format, Core::report reportKind, String& filename, time_t file_last_modification);
+    int         create_report_table();
+    int         save_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification, const std::string& report);
+    std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification);
+    bool        file_is_registered(const std::string& file, time_t file_last_modification);
 
 protected:
-    String query;
-    vector<String> errors;
-    vector<String> reports;
+    std::string                        query;
+    std::vector<std::string>           errors;
+    std::map<std::string, std::string> reports;
 
     //Database dependant
     virtual int execute() = 0;

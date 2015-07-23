@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "Core.h"
 #include "Common/Schema.h"
+#include "SQLLite.h"
 #include "Common/Schematron.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
@@ -26,6 +27,7 @@
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include <sstream>
+#include <sys/stat.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -51,10 +53,12 @@ Core::Core() : policies(this)
     Report_IsDefault=true;
     Format=format_Text;
     policies.create_values_from_csv();
+    db = new SQLLite;
 }
 
 Core::~Core()
 {
+    delete db;
     delete MI;
 }
 
@@ -117,46 +121,36 @@ void Core::Run (String file)
     MI->Option(__T("ParseSpeed"), __T("0"));
     
     // Configuration of the parsing
-    if (Report[report_MediaConch] || Report[report_MediaTrace])
-        MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Details"), __T("1"));
 
     // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
-    switch (Format)
-    {
-        case format_Text:
-                                MI->Option(__T("ReadByHuman"), __T("0"));
-                                break;
-        default:
-                                MI->Option(__T("ReadByHuman"), __T("1"));
-    }
-    switch (Format)
-    {
-        case format_Xml:
-        case format_JsTree:
-                                MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Inform"), __T("XML"));
-                                break;
-        case format_MaXml:
-                                MI->Option(__T("Inform"), __T("MAXML"));
-                                break;
-        default:
-                                MI->Option(__T("Language"), String());
-                                MI->Option(__T("Inform"), String());
-    }
-    if (Report[report_MediaConch])
-    {
-                                MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
-    }
+    MI->Option(__T("ReadByHuman"), __T("1"));
+    MI->Option(__T("Language"), __T("raw"));
+    MI->Option(__T("Inform"), __T("XML"));
 
     // Parsing
     if (file.length())
     {
-        MI->Open(file);
+        bool registered = file_is_registered_in_db(file);
+        if (!registered)
+        {
+            MI->Open(file);
+            register_file_to_database(file);
+            MI->Close();
+        }
     }
     else
     {
         for (size_t Pos=0; Pos<List.size(); Pos++)
-            MI->Open(List[Pos]);
+        {
+            bool registered = file_is_registered_in_db(file);
+            if (!registered)
+            {
+                MI->Open(List[Pos]);
+                register_file_to_database(List[Pos]);
+                MI->Close();
+            }
+        }
     }
 }
 
@@ -166,168 +160,89 @@ String Core::GetOutput()
     if (!PoliciesFiles.empty())
         return PoliciesCheck();
 
-    switch (Format)
+    String report;
+    for (size_t i = 0; i < List.size(); ++i)
     {
-        case format_Text:           return GetOutput_Text();
-        case format_Xml:            return GetOutput_Xml();
-        case format_MaXml:          return GetOutput_MaXml();
-        case format_JsTree:         return GetOutput_JStree();
-        case format_Html:           return GetOutput_Html();
-        default:                    return String();
+        switch (Format)
+        {
+            case format_Text:
+            case format_Xml:
+            case format_MaXml:
+                get_Reports_Output(List[i], report);
+                break;
+            case format_JsTree:
+                GetOutput_JStree(List[i], report);
+                break;
+            case format_Html:
+                GetOutput_Html(List[i], report);
+                break;
+            default:
+                break;
+        }
     }
+    return report;
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Text ()
+String Core::GetOutput_Text (const String& file)
 {
-    String ret;
-
-    if (Report[report_MediaInfo])
-    {
-        MI->Option(__T("Details"), __T("0"));
-        MI->Option(__T("Inform"), String());
-
-        ret += MI->Inform();
-
-        ret += __T("\r\n");
-    }
-
-    if (Report[report_MediaTrace])
-    {
-        MI->Option(__T("Details"), __T("1"));
-        MI->Option(__T("Inform"), String());
-
-        ret += MI->Inform();
-
-        ret += __T("\r\n");
-    }
-
-    if (Report[report_MediaConch])
-    {
-        MI->Option(__T("Details"), __T("1"));
-        MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
-
-        ret += GetOutput_Text_Implementation();
-        ret += __T("\r\n");
-    }
-
-    return ret;
+    String report;
+    Format = format_Text;
+    get_Reports_Output(file, report);
+    return report;
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Xml ()
+String Core::GetOutput_Xml (const String& file)
 {
-    String ret;
-
-    if (Report[report_MediaInfo] && !Report[report_MediaTrace])
-    {
-        MI->Option(__T("Details"), __T("0"));
-        MI->Option(__T("Inform"), __T("MIXML"));
-
-        ret += MI->Inform();
-
-        ret += __T("\r\n");
-    }
-
-    if (Report[report_MediaTrace] && !Report[report_MediaInfo])
-    {
-        MI->Option(__T("Details"), __T("1"));
-        MI->Option(__T("Inform"), __T("XML"));
-
-        ret += MI->Inform();
-
-        ret += __T("\r\n");
-    }
-
-    if (Report[report_MediaTrace] && Report[report_MediaInfo])
-    {
-        MI->Option(__T("Details"), __T("1"));
-        MI->Option(__T("Inform"), __T("MAXML"));
-
-        ret += MI->Inform();
-
-        ret += __T("\r\n");
-    }
-
-    if (Report[report_MediaConch])
-    {
-        MI->Option(__T("Details"), __T("1"));
-        MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
-
-        ret += GetOutput_Xml_Implementation();
-        ret += __T("\r\n");
-    }
-
-    return ret;
+    String report;
+    Format = format_Xml;
+    get_Reports_Output(file, report);
+    return report;
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_MaXml ()
-{
-    String ret;
-
-    MI->Option(__T("Details"), (Report[report_MediaConch] || Report[report_MediaTrace])?__T("1"):__T("0"));
-    MI->Option(__T("Inform"), __T("MAXML"));
-
-    ret += MI->Inform();
-
-    return ret;
-}
-
-//---------------------------------------------------------------------------
-String Core::GetOutput_JStree ()
+void Core::GetOutput_JStree (const String& file, String& report)
 {
     JsTree js;
     if (Report[report_MediaInfo])
     {
-        MI->Option(__T("Details"), __T("0"));
-        MI->Option(__T("Inform"), __T("MIXML"));
-
-        const String& ret = MI->Inform();
-        return js.format_from_inform_XML(ret);
+        String ret = get_report_saved(file, report_MediaInfo, format_Xml);
+        report += js.format_from_inform_XML(ret);
+        return;
     }
 
     if (Report[report_MediaTrace])
     {
-        MI->Option(__T("Details"), __T("1"));
-        MI->Option(__T("Inform"), __T("XML"));
-
-        const String& ret = MI->Inform();
-        return js.format_from_trace_XML(ret);
+        String ret = get_report_saved(file, report_MediaTrace, format_Xml);
+        report += js.format_from_trace_XML(ret);
+        return;
     }
-
-    return String();
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Html ()
+void Core::GetOutput_Html (const String& file, String& report)
 {
     if (Report[report_MediaConch])
     {
-        MI->Option(__T("Details"), __T("1"));
-        MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
-
-        String report;
+        String tmp;
         bool valid;
         std::string memory(implementation_report_xsl);
-        validateXsltPolicyFromMemory(memory, valid, report);
+        validateXsltPolicyFromMemory(file, memory, valid, tmp);
 
         // Apply an XSLT to have HTML
         memory = std::string(implementation_report_display_html_xsl);
-        report = transformWithXsltMemory(report, memory);
-        return report;
+        report += transformWithXsltMemory(tmp, memory);
     }
-
-    return String();
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Text_Implementation ()
+String Core::GetOutput_Text_Implementation (const String& file)
 {
     String report;
     bool valid;
     std::string memory(implementation_report_xsl);
-    validateXsltPolicyFromMemory(memory, valid, report);
+    validateXsltPolicyFromMemory(file, memory, valid, report);
 
     // Apply an XSLT to have Text
 #if defined(_WIN32) || defined(WIN32)
@@ -340,12 +255,12 @@ String Core::GetOutput_Text_Implementation ()
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Xml_Implementation ()
+String Core::GetOutput_Xml_Implementation (const String& file)
 {
     String report;
     bool valid;
     std::string memory(implementation_report_xsl);
-    validateXsltPolicyFromMemory(memory, valid, report);
+    validateXsltPolicyFromMemory(file, memory, valid, report);
 
     // Apply an XSLT to have XML
     if (xsltDisplay.length())
@@ -356,11 +271,6 @@ String Core::GetOutput_Xml_Implementation ()
 //---------------------------------------------------------------------------
 String Core::PoliciesCheck()
 {
-    MI->Option(__T("Complete"), __T("0"));
-    MI->Option(__T("Language"), __T("raw"));
-    MI->Option(__T("Details"), __T("1"));
-    MI->Option(__T("Inform"), __T("MAXML"));
-
     if (PoliciesFiles.size())
     {
         std::vector<String>& vec = PoliciesFiles;
@@ -414,7 +324,7 @@ bool Core::PolicySchematron(const String& file, std::wstringstream& Out)
     if (S->register_schema_from_file(f.c_str()))
     {
         String report;
-        valid = validation(S, report);
+        valid = validation(file, S, report);
 
         if (!valid)
         {
@@ -445,7 +355,7 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
     if (S->register_schema_from_file(f.c_str()))
     {
         String report;
-        valid = validation(S, report);
+        valid = validation(file, S, report);
         if (xsltDisplay.length())
             report = Core::transformWithXsltFile(report, xsltDisplay);
         else 
@@ -491,33 +401,28 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool Core::ValidatePolicy(int policy, bool& valid, String& report)
+bool Core::ValidatePolicy(const String& file, int policy, bool& valid, String& report)
 {
-    MI->Option(__T("Complete"), __T("0"));
-    MI->Option(__T("Language"), __T("raw"));
-    MI->Option(__T("Details"), __T("1"));
-    MI->Option(__T("Inform"), __T("MAXML"));
-
     if (policy == -1 && PoliciesFiles.size())
     {
         if (is_schematron_file(PoliciesFiles[0]))
         {
-            validateSchematronPolicy(-1, valid, report);
+            validateSchematronPolicy(file, -1, valid, report);
             if (!valid)
             {
                 String tmp = report;
-                validateXsltPolicy(-1, valid, report);
+                validateXsltPolicy(file, -1, valid, report);
                 if (!valid)
                     report = tmp;
             }
         }
         else
         {
-            validateXsltPolicy(-1, valid, report);
+            validateXsltPolicy(file, -1, valid, report);
             if (!valid)
             {
                 String tmp;
-                validateSchematronPolicy(-1, valid, tmp);
+                validateSchematronPolicy(file, -1, valid, tmp);
                 if (valid)
                     report = tmp;
             }
@@ -532,9 +437,9 @@ bool Core::ValidatePolicy(int policy, bool& valid, String& report)
     }
 
     if (policies.policies[policy]->type == Policies::POLICY_SCHEMATRON)
-        validateSchematronPolicy(policy, valid, report);
+        validateSchematronPolicy(file, policy, valid, report);
     else if (policies.policies[policy]->type == Policies::POLICY_XSLT)
-        validateXsltPolicy(policy, valid, report);
+        validateXsltPolicy(file, policy, valid, report);
     return true;
 }
 
@@ -578,21 +483,21 @@ String Core::transformWithXsltMemory(String& report, std::string& memory)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Core::validateSchematronPolicy(int pos, bool& valid, String& report)
+void Core::validateSchematronPolicy(const String& file, int pos, bool& valid, String& report)
 {
-    std::string file;
+    std::string policyFile;
     xmlDocPtr doc = NULL;
     Schema *S = new Schematron;
 
     if (pos < 0)
-        file=Ztring(PoliciesFiles[0]).To_UTF8();
+        policyFile=Ztring(PoliciesFiles[0]).To_UTF8();
     else
         doc = policies.create_doc(pos);
 
     if (doc && S->register_schema_from_doc(doc))
-        valid = validation(S, report);
-    else if (!doc && S->register_schema_from_file(file.c_str()))
-        valid = validation(S, report);
+        valid = validation(file, S, report);
+    else if (!doc && S->register_schema_from_file(policyFile.c_str()))
+        valid = validation(file, S, report);
     else
     {
         valid = false;
@@ -610,20 +515,20 @@ void Core::validateSchematronPolicy(int pos, bool& valid, String& report)
 }
 
 //---------------------------------------------------------------------------
-void Core::validateXsltPolicy(int pos, bool& valid, String& report)
+void Core::validateXsltPolicy(const String& file, int pos, bool& valid, String& report)
 {
-    std::string file;
+    std::string policyFile;
     xmlDocPtr doc = NULL;
     Schema *S = new Xslt;
 
     if (pos < 0)
-        file=Ztring(PoliciesFiles[0]).To_UTF8();
+        policyFile=Ztring(PoliciesFiles[0]).To_UTF8();
     else
         doc = policies.create_doc(pos);
     if (doc && S->register_schema_from_doc(doc))
-        valid = validation(S, report);
-    else if (!doc && S->register_schema_from_file(file.c_str()))
-        valid = validation(S, report);
+        valid = validation(file, S, report);
+    else if (!doc && S->register_schema_from_file(policyFile.c_str()))
+        valid = validation(file, S, report);
     else
     {
         valid = false;
@@ -640,12 +545,12 @@ void Core::validateXsltPolicy(int pos, bool& valid, String& report)
 }
 
 //---------------------------------------------------------------------------
-void Core::validateXsltPolicyFromMemory(const std::string& memory, bool& valid, String& report)
+void Core::validateXsltPolicyFromMemory(const String& file, const std::string& memory, bool& valid, String& report)
 {
     Schema *S = new Xslt;
 
     if (S->register_schema_from_memory(memory))
-        valid = validation(S, report);
+        valid = validation(file, S, report);
     else
     {
         valid = false;
@@ -662,10 +567,11 @@ void Core::validateXsltPolicyFromMemory(const std::string& memory, bool& valid, 
 }
 
 //---------------------------------------------------------------------------
-bool Core::validation(Schema* S, String& report)
+bool Core::validation(const String& file, Schema* S, String& report)
 {
-    String tmp = MI->Inform();
-    std::string xml=Ztring(tmp).To_UTF8();
+    String tmp;
+    tmp = get_report_saved(file, report_MediaConch, format_MaXml);
+    std::string xml = Ztring(tmp).To_UTF8();
     bool valid = true;
 
     int ret = S->validate_xml(xml);
@@ -689,6 +595,133 @@ bool Core::is_schematron_file(const String& file)
         return false;
 
     return true;
+}
+
+//---------------------------------------------------------------------------
+time_t Core::get_last_modification_file(const std::string& filename)
+{
+    struct stat stat_base;
+    if (lstat(filename.c_str(), &stat_base))
+        return 0;
+    return stat_base.st_mtime;
+}
+
+//---------------------------------------------------------------------------
+void Core::register_report_mediainfo_text_to_database(std::string& file, time_t time)
+{
+    MI->Option(__T("Details"), __T("0"));
+    MI->Option(__T("Inform"), String());
+    std::string report = Ztring(MI->Inform()).To_UTF8();
+    db->save_report(report_MediaInfo, format_Text, file, time, report);
+}
+
+//---------------------------------------------------------------------------
+void Core::register_report_mediainfo_xml_to_database(std::string& file, time_t time)
+{
+    MI->Option(__T("Details"), __T("0"));
+    MI->Option(__T("Inform"), __T("MIXML"));
+    std::string report = Ztring(MI->Inform()).To_UTF8();
+    db->save_report(report_MediaInfo, format_Xml, file, time, report);
+}
+
+//---------------------------------------------------------------------------
+void Core::register_report_mediatrace_text_to_database(std::string& file, time_t time)
+{
+    MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Inform"), String());
+    std::string report = Ztring(MI->Inform()).To_UTF8();
+    //printf("reporttext=%s\n\n\n\n\n", report.c_str());
+    db->save_report(report_MediaTrace, format_Text, file, time, report);
+}
+
+//---------------------------------------------------------------------------
+void Core::register_report_mediatrace_xml_to_database(std::string& file, time_t time)
+{
+    MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Inform"), __T("XML"));
+    std::string report = Ztring(MI->Inform()).To_UTF8();
+    db->save_report(report_MediaTrace, format_Xml, file, time, report);
+}
+
+//---------------------------------------------------------------------------
+void Core::register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time)
+{
+    MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Inform"), __T("MAXML"));
+    std::string report = Ztring(MI->Inform()).To_UTF8();
+    db->save_report(report_MediaConch, format_MaXml, file, time, report);
+}
+
+//---------------------------------------------------------------------------
+void Core::register_file_to_database(String& file)
+{
+    std::string filename = Ztring(file).To_UTF8();
+    time_t time = get_last_modification_file(filename);
+
+    // MediaInfo
+    register_report_mediainfo_text_to_database(filename, time);
+    register_report_mediainfo_xml_to_database(filename, time);
+
+    // MediaTrace
+    register_report_mediatrace_text_to_database(filename, time);
+    register_report_mediatrace_xml_to_database(filename, time);
+
+    // MediaInfo + MediaTrace (MaXML)
+    register_report_mediainfo_and_mediatrace_xml_to_database(filename, time);
+}
+
+//---------------------------------------------------------------------------
+String Core::get_report_saved(const String& file, report reportKind, format f)
+{
+    if (reportKind >= report_Max || f >= format_Max)
+        return String();
+
+    std::string filename = Ztring(file).To_UTF8();
+    time_t time = get_last_modification_file(filename);
+    std::string report = db->get_report(reportKind, f, filename, time);
+
+    return Ztring().From_UTF8(report);
+}
+
+//---------------------------------------------------------------------------
+void Core::get_Reports_Output(const String& file, String& report)
+{
+    if (Report[report_MediaConch])
+    {
+        if (Format == format_Xml)
+            report += GetOutput_Xml_Implementation(file);
+        else
+            report += GetOutput_Text_Implementation(file);
+        report += __T("\r\n");
+    }
+
+    if (Report[report_MediaTrace] && Report[report_MediaInfo] && Format == format_MaXml)
+    {
+        report += get_report_saved(file, report_MediaConch, Format);
+        report += __T("\r\n");
+    }
+    else
+    {
+        if (Report[report_MediaInfo])
+        {
+            report += get_report_saved(file, report_MediaInfo, Format);
+            report += __T("\r\n");
+        }
+        if (Report[report_MediaTrace])
+        {
+            report += get_report_saved(file, report_MediaTrace, Format);
+            report += __T("\r\n");
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+bool Core::file_is_registered_in_db(String& file)
+{
+    std::string filename = Ztring(file).To_UTF8();
+    time_t time = get_last_modification_file(filename);
+
+    return db->file_is_registered(filename, time);
 }
 
 }

@@ -37,7 +37,7 @@ Database::~Database()
 
 int Database::create_report_table()
 {
-    wstringstream create;
+    std::stringstream create;
     create << "CREATE TABLE IF NOT EXISTS " << "Report"; //Table name
     create << "(";
     create << "FILENAME               TEXT NOT NULL,";
@@ -51,10 +51,10 @@ int Database::create_report_table()
     return execute();
 }
 
-int Database::save_report(Core::format format, Core::report reportKind, String& filename, time_t file_last_modification,
-                          String& report)
+int Database::save_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification,
+                          const std::string& report)
 {
-    wstringstream create;
+    std::stringstream create;
 
     reports.clear();
     create << "INSERT INTO " << "Report";
@@ -68,21 +68,41 @@ int Database::save_report(Core::format format, Core::report reportKind, String& 
     return execute();
 }
 
-String Database::report_exists(Core::format format, Core::report reportKind, String& filename, time_t file_last_modification)
+std::string Database::get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification)
 {
-    wstringstream create;
+    std::stringstream create;
+    std::string key("REPORT");
 
     reports.clear();
-    create << "SELECT report FROM " << "Report" << " WHERE ";
+    create << "SELECT " << key << " FROM " << "Report" << " WHERE ";
     create << "FILENAME = '" << filename << "' ";
     create << "AND FILE_LAST_MODIFICATION = " << file_last_modification << " ";
     create << "AND TOOL = " << reportKind << " ";
     create << "AND FORMAT = " << format << ";";
     query = create.str();
 
-    if (execute() || !reports.size())
-        return String();
-    return reports[0];
+    if (execute() || !reports.size() || reports.find(key) == reports.end())
+        return std::string();
+    return reports[key];
+}
+
+bool Database::file_is_registered(const std::string& filename, time_t file_last_modification)
+{
+    std::stringstream create;
+    std::string key("COUNT(REPORT)");
+
+    reports.clear();
+    create << "SELECT " << key << " FROM " << "Report" << " WHERE ";
+    create << "FILENAME = '" << filename << "' ";
+    create << "AND FILE_LAST_MODIFICATION = " << file_last_modification << ";";
+    query = create.str();
+
+    if (execute() || !reports.size() || reports.find(key) == reports.end())
+        return false;
+
+    if (reports[key] == "0")
+        return false;
+    return true;
 }
 
 }

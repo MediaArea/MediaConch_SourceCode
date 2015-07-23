@@ -58,19 +58,19 @@ public:
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     void                        analyze(String& file);
-    QString                     get_implementationreport_xml();
-    QString                     get_mediainfo_and_mediatrace_xml();
-    QString                     get_mediainfo_xml();
-    QString                     get_mediainfo_jstree();
-    QString                     get_mediatrace_xml();
-    QString                     get_mediatrace_jstree();
+    QString                     get_implementationreport_xml(const String& file);
+    QString                     get_mediainfo_and_mediatrace_xml(const String& file);
+    QString                     get_mediainfo_xml(const String& file);
+    QString                     get_mediainfo_jstree(const String& file);
+    QString                     get_mediatrace_xml(const String& file);
+    QString                     get_mediatrace_jstree(const String& file);
     QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();
     void                        display_selected();
     void                        add_default_policy();
     void                        add_default_displays();
-    bool                        ValidatePolicy(int policy, bool& valid, String& report);
+    bool                        ValidatePolicy(const String& file, int policy, bool& valid, String& report);
     bool                        is_all_policies_saved();
 
     void                        addPolicyToList(QString& policy);
