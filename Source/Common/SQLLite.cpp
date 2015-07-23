@@ -68,14 +68,12 @@ int SQLLite::execute()
         return -1;
 
     errors.clear();
-    std::string q(query.begin(), query.end());
     char *error = NULL;
 
-    int ret = sqlite3_exec(db, q.c_str(), callback, this, &error);
+    int ret = sqlite3_exec(db, query.c_str(), callback, this, &error);
     if (ret != SQLITE_OK)
     {
-        string tmp(error);
-        errors.push_back(String(tmp.begin(), tmp.end()));
+        errors.push_back(std::string(error));
         sqlite3_free(error); //copy
     }
 
@@ -88,18 +86,14 @@ int SQLLite::callback(void* data, int columns, char **column_texts, char** colum
     SQLLite *ptr = (SQLLite*)data;
 
     for (int i = 0; i < columns; ++i)
-    {
-        string name(column_name[i]);
-        if (!name.compare("REPORT"))
-            ptr->add_report(column_texts[i]);
-    }
+        ptr->add_report(column_name[i], column_texts[i]);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-void SQLLite::add_report(string report)
+void SQLLite::add_report(std::string key, std::string report)
 {
-    reports.push_back(String(report.begin(), report.end()));
+    reports[key] = report;
 }
 
 }

@@ -577,7 +577,7 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
     reg = QRegExp("\\{\\{ check\\.getInfo\\.jstree\\|raw \\}\\}");
     reg.setMinimal(true);
 
-    QString report = mainwindow->get_mediainfo_jstree();
+    QString report = mainwindow->get_mediainfo_jstree(file);
     pos = 0;
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), report);
@@ -595,7 +595,7 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
         reg = QRegExp("<p class=\"modal-body\">");
         if ((pos = reg.indexIn(html, pos)) != -1)
         {
-            report = mainwindow->get_mediainfo_xml();
+            report = mainwindow->get_mediainfo_xml(file);
 #if QT_VERSION >= 0x050200
             report = report.toHtmlEscaped();
 #else
@@ -611,7 +611,7 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_conformance(QString& html, String& file)
 {
-    QString report = mainwindow->get_implementationreport_xml();
+    QString report = mainwindow->get_implementationreport_xml(file);
     bool is_valid = true;
 
     if (report.indexOf(" outcome=\"fail\"") != -1)
@@ -701,7 +701,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
 
     bool valid;
     String r;
-    if (!mainwindow->ValidatePolicy(policy, valid, r))
+    if (!mainwindow->ValidatePolicy(file, policy, valid, r))
         valid = false;
 
     // Default without display
@@ -809,7 +809,7 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, String& file)
     reg = QRegExp("\\{\\{ check\\.getTrace\\.jstree\\|raw \\}\\}");
     reg.setMinimal(true);
 
-    QString report = mainwindow->get_mediatrace_jstree();
+    QString report = mainwindow->get_mediatrace_jstree(file);
     pos = 0;
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), report);
@@ -827,7 +827,7 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, String& file)
         reg = QRegExp("<p class=\"modal-body\">");
         if ((pos = reg.indexIn(html, pos)) != -1)
         {
-            report = mainwindow->get_mediatrace_xml();
+            report = mainwindow->get_mediatrace_xml(file);
 #if QT_VERSION >= 0x050200
             report = report.toHtmlEscaped();
 #else

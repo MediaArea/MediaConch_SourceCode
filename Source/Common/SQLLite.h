@@ -32,7 +32,7 @@ public:
     SQLLite();
     virtual ~SQLLite();
 
-    void add_report(string report);
+    void add_report(std::string key, std::string report);
 protected:
     virtual int execute();
     virtual int init();

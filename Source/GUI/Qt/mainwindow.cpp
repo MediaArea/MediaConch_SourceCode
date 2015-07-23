@@ -244,9 +244,9 @@ void MainWindow::exporting_policy(int pos)
 }
 
 //---------------------------------------------------------------------------
-bool MainWindow::ValidatePolicy(int policy, bool& valid, String& report)
+bool MainWindow::ValidatePolicy(const String& file, int policy, bool& valid, String& report)
 {
-    return C.ValidatePolicy(policy, valid, report);
+    return C.ValidatePolicy(file, policy, valid, report);
 }
 
 //---------------------------------------------------------------------------
@@ -612,52 +612,56 @@ void MainWindow::analyze(String& file)
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_implementationreport_xml()
+QString MainWindow::get_implementationreport_xml(const String& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaConch);
-    return QString().fromStdWString(C.GetOutput_Xml());
+    return QString().fromStdWString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediainfo_and_mediatrace_xml()
+QString MainWindow::get_mediainfo_and_mediatrace_xml(const String& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaInfo);
     C.Report.set(Core::report_MediaTrace);
-    return QString().fromStdWString(C.GetOutput_Xml());
+    return QString().fromStdWString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediainfo_xml()
+QString MainWindow::get_mediainfo_xml(const String& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaInfo);
-    return QString().fromStdWString(C.GetOutput_Xml());
+    return QString().fromStdWString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediainfo_jstree()
+QString MainWindow::get_mediainfo_jstree(const String& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaInfo);
-    return QString().fromStdWString(C.GetOutput_JStree());
+    String report;
+    C.GetOutput_JStree(file, report);
+    return QString().fromStdWString(report);
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediatrace_xml()
+QString MainWindow::get_mediatrace_xml(const String& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaTrace);
-    return QString().fromStdWString(C.GetOutput_Xml());
+    return QString().fromStdWString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediatrace_jstree()
+QString MainWindow::get_mediatrace_jstree(const String& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaTrace);
-    return QString().fromStdWString(C.GetOutput_JStree());
+    String report;
+    C.GetOutput_JStree(file, report);
+    return QString().fromStdWString(report);
 }
 
 }

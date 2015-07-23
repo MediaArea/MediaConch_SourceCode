@@ -39,6 +39,7 @@ using namespace std;
 namespace MediaConch {
 
 class Schema;
+class Database;
 
 //***************************************************************************
 // Class Core
@@ -72,6 +73,7 @@ public:
         format_MaXml,       // MAXML, can contain one or more of MediaConch, MediaInfo, MediaTrace
         format_JsTree,
         format_Html,
+        format_Max,
     };
     format Format;
     String ReportAndFormatCombination_IsValid();
@@ -80,16 +82,15 @@ public:
     void   Close();
     void   Run(String file = String());
     String GetOutput();
-    String GetOutput_Text();
-    String GetOutput_Text_Implementation();
-    String GetOutput_Xml();
-    String GetOutput_Xml_Implementation();
-    String GetOutput_MaXml();
-    String GetOutput_JStree();
-    String GetOutput_Html();
+    String GetOutput_Text(const String& file);
+    String GetOutput_Text_Implementation(const String& file);
+    String GetOutput_Xml(const String& file);
+    String GetOutput_Xml_Implementation(const String& file);
+    void   GetOutput_JStree(const String& file, String& report);
+    void   GetOutput_Html(const String& file, String& report);
     String PoliciesCheck();
 
-    bool ValidatePolicy(int policy, bool& valid, String& report);
+    bool ValidatePolicy(const String& file, int policy, bool& valid, String& report);
     String transformWithXsltFile(String& report, String& Xslt);
     String transformWithXsltMemory(String& report, std::string& memory);
 
@@ -101,16 +102,29 @@ private:
     Core (const Core&);
 
     MediaInfoNameSpace::MediaInfoList* MI;
+    Database*                          db;
 
     bool PolicySchematron(const String& file, std::wstringstream& Out);
     bool PolicyXslt(const String& file, std::wstringstream& Out);
 
     //Helper
-    bool validation(Schema* S, String& report);
-    void validateSchematronPolicy(int pos, bool& valid, String& report);
-    void validateXsltPolicy(int pos, bool& valid, String& report);
-    void validateXsltPolicyFromMemory(const std::string& memory, bool& valid, String& report);
+    bool validation(const String& file, Schema* S, String& report);
+    void validateSchematronPolicy(const String& file, int pos, bool& valid, String& report);
+    void validateXsltPolicy(const String& file, int pos, bool& valid, String& report);
+    void validateXsltPolicyFromMemory(const String& file, const std::string& memory, bool& valid, String& report);
     bool is_schematron_file(const String& file);
+
+    bool   file_is_registered_in_db(String& file);
+    time_t get_last_modification_file(const std::string& file);
+    String get_report_saved(const String& file, report reportKind, format f);
+    void get_Reports_Output(const String& file, String& report);
+
+    void register_file_to_database(String& file);
+    void register_report_mediainfo_text_to_database(std::string& file, time_t time);
+    void register_report_mediainfo_xml_to_database(std::string& file, time_t time);
+    void register_report_mediatrace_text_to_database(std::string& file, time_t time);
+    void register_report_mediatrace_xml_to_database(std::string& file, time_t time);
+    void register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time);
 };
 
 }
