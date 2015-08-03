@@ -1,7 +1,8 @@
 #!/bin/sh
 
-##########################################################################
-Parallel_Build () {
+##################################################################
+
+Parallel_Make () {
     local numprocs=1
     case $OS in
     'linux')
@@ -12,10 +13,10 @@ Parallel_Build () {
             numprocs=`sysctl -n hw.ncpu`
         fi
         ;;
-    #'freebsd')
-    #    ;;
     #"solaris')
     #    on Solaris you need to use psrinfo -p instead
+    #    ;;
+    #'freebsd')
     #    ;;
     *) ;;
     esac
@@ -25,105 +26,12 @@ Parallel_Build () {
     make -s -j$numprocs
 }
 
-##########################################################################
-ZenLib () {
-    if test -e ZenLib/Project/GNU/Library/configure; then
-        cd ZenLib/Project/GNU/Library/
-        test -e Makefile && rm Makefile
-        chmod u+x configure
-        if [ "$OS" = "mac" ]; then
-            ./configure $MacOptions $ZenLib_Options $*
-        else
-            ./configure $ZenLib_Options $*
-        fi
-        if test -e Makefile; then
-            make clean
-            Parallel_Build
-            if test -e libzen.la; then
-                echo ZenLib compiled
-            else
-                echo Problem while compiling ZenLib
-                exit
-            fi
-        else
-            echo Problem while configuring ZenLib
-            exit
-        fi
-    else
-        echo ZenLib directory is not found
-        exit
-    fi
-    cd $Home
-}
-
-##########################################################################
-MediaInfoLib () {
-    if test -e MediaInfoLib/Project/GNU/Library/configure; then
-        cd MediaInfoLib/Project/GNU/Library/
-        test -e Makefile && rm Makefile
-        chmod u+x configure
-        if [ "$OS" = "mac" ]; then
-            ./configure $MacOptions $*
-        else
-            ./configure $*
-        fi
-        if test -e Makefile; then
-            make clean
-            Parallel_Build
-            if test -e libmediainfo.la; then
-                echo MediaInfoLib compiled
-            else
-                echo Problem while compiling MediaInfoLib
-                exit
-            fi
-        else
-            echo Problem while configuring MediaInfoLib
-            exit
-        fi
-    else
-        echo MediaInfoLib directory is not found
-        exit
-    fi
-    cd $Home
-}
-
-##########################################################################
-MediaConch() {
-    if test -e MediaConch/Project/Qt/prepare; then
-        cd MediaConch/Project/Qt
-        test -e Makefile && rm Makefile
-        chmod u+x prepare
-        if [ "$OS" = "mac" ]; then
-            ./prepare $MacOptions $*
-        else
-            ./prepare $*
-        fi
-        if test -e Makefile; then
-            make clean
-            Parallel_Build
-            # À changer
-            if test -e $BINAIRY; then
-                echo "MediaConch (GUI) compiled"
-            else
-                echo "Problem while compiling MediaConch (GUI)"
-                exit
-            fi
-        else
-            echo "Problem while configuring MediaConch (GUI)"
-            exit
-        fi
-    else
-        echo MediaConch directory is not found
-        exit
-    fi
-    cd $Home
-}
-
-#########################################################################
+##################################################################
+# Init
 
 Home=`pwd`
-ZenLib_Options=" --without-subdirs --enable-gui"
-MacOptions="--with-macosx-version-min=10.5"
+ZenLib_Options=""
+MacOptions=""
 
 OS=$(uname -s)
 # expr isn't available on mac
@@ -134,15 +42,106 @@ if [ "$OS" = "Darwin" ]; then
 elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
     OS="linux"
     BINAIRY="mediaconch-gui"
-#elif [ "$(expr substr $OS 1 7)" = "FreeBSD" ]; then
-#    OS="freebsd"
 #elif [ "$(expr substr $OS 1 5)" = "SunOS" ]; then
 #    OS="solaris"
+#elif [ "$(expr substr $OS 1 7)" = "FreeBSD" ]; then
+#    OS="freebsd"
 fi
 
-ZenLib
-MediaInfoLib
-MediaConch
+##################################################################
+# ZenLib
+
+if test -e ZenLib/Project/GNU/Library/configure; then
+    cd ZenLib/Project/GNU/Library/
+    test -e Makefile && rm Makefile
+    chmod +x configure
+    if [ "$OS" = "mac" ]; then
+        ./configure $MacOptions $ZenLib_Options $*
+    else
+        ./configure $ZenLib_Options $*
+    fi
+    if test -e Makefile; then
+        make clean
+        Parallel_Make
+        if test -e libzen.la; then
+            echo ZenLib compiled
+        else
+            echo Problem while compiling ZenLib
+            exit
+        fi
+    else
+        echo Problem while configuring ZenLib
+        exit
+    fi
+else
+    echo ZenLib directory is not found
+    exit
+fi
+cd $Home
+
+##################################################################
+# MediaInfoLib
+
+if test -e MediaInfoLib/Project/GNU/Library/configure; then
+    cd MediaInfoLib/Project/GNU/Library/
+    test -e Makefile && rm Makefile
+    chmod +x configure
+    if [ "$OS" = "mac" ]; then
+        ./configure $MacOptions $*
+    else
+        ./configure $*
+    fi
+    if test -e Makefile; then
+        make clean
+        Parallel_Make
+        if test -e libmediainfo.la; then
+            echo MediaInfoLib compiled
+        else
+            echo Problem while compiling MediaInfoLib
+            exit
+        fi
+    else
+        echo Problem while configuring MediaInfoLib
+        exit
+    fi
+else
+    echo MediaInfoLib directory is not found
+    exit
+fi
+cd $Home
+
+##################################################################
+# MediaConch
+
+if test -e MediaConch/Project/Qt/prepare; then
+    cd MediaConch/Project/Qt
+    test -e Makefile && rm Makefile
+    chmod +x prepare
+    if [ "$OS" = "mac" ]; then
+        ./prepare $MacOptions $*
+    else
+        ./prepare $*
+    fi
+    if test -e Makefile; then
+        make clean
+        Parallel_Make
+        if test -e $BINAIRY; then
+            echo "MediaConch (GUI) compiled"
+        else
+            echo "Problem while compiling MediaConch (GUI)"
+            exit
+        fi
+    else
+        echo "Problem while configuring MediaConch (GUI)"
+        exit
+    fi
+else
+    echo MediaConch directory is not found
+    exit
+fi
+cd $Home
+
+##################################################################
 
 echo "MediaConch executable is MediaConch/Project/Qt/$BINAIRY"
 
