@@ -31,7 +31,7 @@ Parallel_Make () {
 
 Home=`pwd`
 ZenLib_Options=""
-MacOptions=""
+MacOptions="--with-macosx-version-min=10.5"
 
 OS=$(uname -s)
 # expr isn't available on mac
