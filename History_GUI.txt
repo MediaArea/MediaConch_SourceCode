@@ -8,6 +8,11 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 15.07, 2015-08-06
+-------------
+Improved FFV1 slice analysis (currently activated only for 1st frame)
+Improved Schematron file editor
+
 Version 15.06, 2015-06-30
 -------------
 Basic Schematron validator
