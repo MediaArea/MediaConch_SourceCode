@@ -11,8 +11,8 @@ configure-stamp:
 
 	fromdos      *.txt
 	chmod 644    *.txt
-	cd Project/GNU/CLI && chmod u+x autogen
-	cd Project/GNU/CLI && ./autogen
+	cd Project/GNU/CLI && chmod u+x autogen.sh
+	cd Project/GNU/CLI && ./autogen.sh
 	cd Project/GNU/CLI && ./configure --prefix=/usr
 
 	cd Project/Qt && chmod u+x prepare
