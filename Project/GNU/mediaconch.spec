@@ -1,4 +1,4 @@
-%define mediaconch_version          15.06
+%define mediaconch_version          15.07
 %define libmediainfo_version        0.7.75
 %define libzen_version              0.4.31
 
@@ -163,5 +163,5 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}/%{_datad
 
 
 %changelog
-* Mon May 25 2015 MediaArea.net SARL <info@mediaarea.net> - 15.06
+* Mon May 25 2015 MediaArea.net SARL <info@mediaarea.net> - 15.07
 - See History.txt for more info and real dates
