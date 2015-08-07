@@ -18,10 +18,8 @@ Vcs-Browser: https://github.com/MediaArea/MediaConch_SourceCode
 Package: mediaconch
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: MediaConch
- .
- Implementation checker, policy checker, reporter, and fixer that targets
- preservation-level audiovisual files (specifically Matroska,
+Description: Implementation checker, policy checker, reporter, and fixer
+ that targets preservation-level audiovisual files (specifically Matroska,
  Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
  .
  This project is maintained by MediaArea and funded by PREFORMA.
@@ -31,10 +29,8 @@ Description: MediaConch
 Package: mediaconch-gui
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: MediaConch
- .
- Implementation checker, policy checker, reporter, and fixer that targets
- preservation-level audiovisual files (specifically Matroska,
+Description: Implementation checker, policy checker, reporter, and fixer
+ that targets preservation-level audiovisual files (specifically Matroska,
  Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
  .
  This project is maintained by MediaArea and funded by PREFORMA.
