@@ -45,6 +45,7 @@ AC_ARG_ENABLE(arch-i386,        AC_HELP_STRING([--enable-arch-i386],        [Cre
 AC_ARG_ENABLE(arch-x86_64,      AC_HELP_STRING([--enable-arch-x86_64],      [Create Mac x86_64 architecture]),            , enable_arch_x86_64=no)
 AC_ARG_ENABLE(staticlibs,       AC_HELP_STRING([--enable-staticlibs],       [Use static libmediainfo and libzen]),        , enable_staticlibs=no)
 AC_ARG_ENABLE([stream_missing],    [AS_HELP_STRING(([--enable-stream_missing],    [Disable stream support (old compilers)]))],    , [enable_stream_missing=no])
+AC_ARG_ENABLE(sqlite,           AC_HELP_STRING([--enable-sqlite],           [Enable Sqlite DB]),                          , enable_sqlite=no)
 
 dnl -------------------------------------------------------------------------
 dnl Arguments - With
@@ -304,30 +305,30 @@ fi
 dnl -------------------------------------------------------------------------
 dnl libsqlite3
 dnl
-if test -e ../../../../sqlite/.libs/libsqlite3.la; then
-	CXXFLAGS="$CXXFLAGS  -I../../../../sqlite"
-	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../sqlite"
-	if test "$enable_staticlibs" = "yes"; then
-		with_libsqlite3="builtin (static)"
-		LIBS="$LIBS  ../../../../sqlite/.libs/libsqlite3.a"
-	else
-		with_libsqlite3="builtin"
-		LIBS="$LIBS  -L../../../../sqlite/.libs -lsqlite3"
-	fi
-else
-	if pkg-config --exists sqlite3; then
-		CXXFLAGS="$CXXFLAGS $(pkg-config --cflags sqlite3)"
-		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags sqlite3)"
-		if test "$enable_staticlibs" = "yes"; then
-			with_libsqlite3="system (static)"
-			LIBS="$LIBS $(pkg-config --static --libs sqlite3)"
-		else
-			with_libsqlite3="system"
-			LIBS="$LIBS $(pkg-config --libs sqlite3)"
-		fi
-	else
-		AC_MSG_ERROR([libsqlite3 configuration is not found])
-	fi
+if test "$enable_sqlite" = "yes"; then
+    if test -e ../../../../sqlite/.libs/libsqlite3.la; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_SQLITE  -I../../../../sqlite"
+        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../sqlite"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libsqlite3="builtin (static)"
+            LIBS="$LIBS  ../../../../sqlite/.libs/libsqlite3.a"
+        else
+            with_libsqlite3="builtin"
+            LIBS="$LIBS  -L../../../../sqlite/.libs -lsqlite3"
+        fi
+    elif pkg-config --exists sqlite3; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_SQLITE $(pkg-config --cflags sqlite3)"
+        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags sqlite3)"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libsqlite3="system (static)"
+            LIBS="$LIBS $(pkg-config --static --libs sqlite3)"
+        else
+            with_libsqlite3="system"
+            LIBS="$LIBS $(pkg-config --libs sqlite3)"
+        fi
+    else
+        AC_MSG_ERROR([libsqlite3 configuration is not found])
+    fi
 fi
 
 dnl #########################################################################

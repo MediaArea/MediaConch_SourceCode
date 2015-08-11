@@ -5,6 +5,9 @@
  */
 
 //---------------------------------------------------------------------------
+#ifdef HAVE_SQLITE
+
+//---------------------------------------------------------------------------
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
@@ -97,3 +100,5 @@ void SQLLite::add_report(std::string key, std::string report)
 }
 
 }
+
+#endif
