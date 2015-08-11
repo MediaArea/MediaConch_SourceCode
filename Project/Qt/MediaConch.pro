@@ -151,9 +151,11 @@ exists(../../../sqlite/.libs/libsqlite3.a) {
 INCLUDEPATH      += ../../../sqlite
 LIBS             += ../../../sqlite/.libs/libsqlite3.a
 message("custom libsqlite3   : yes")
+QMAKE_CXXFLAGS   += -DHAVE_SQLITE
 }
 else {
 LIBS             += -lsqlite3
+QMAKE_CXXFLAGS   += -DHAVE_SQLITE
 }
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt

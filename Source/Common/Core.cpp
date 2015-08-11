@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "Core.h"
 #include "Common/Schema.h"
+#include "Database.h"
 #include "SQLLite.h"
 #include "Common/Schematron.h"
 #include "Common/Xslt.h"
@@ -53,7 +54,11 @@ Core::Core() : policies(this)
     Report_IsDefault=true;
     Format=format_Text;
     policies.create_values_from_csv();
+#ifdef HAVE_SQLITE
     db = new SQLLite;
+#else
+    db = NULL;
+#endif
 }
 
 Core::~Core()
@@ -134,9 +139,14 @@ void Core::Run (String file)
         bool registered = file_is_registered_in_db(file);
         if (!registered)
         {
-            MI->Open(file);
-            register_file_to_database(file);
-            MI->Close();
+            if (db)
+            {
+                MI->Open(file);
+                register_file_to_database(file);
+                MI->Close();
+            }
+            else
+                MI->Open(file);
         }
     }
     else
@@ -146,9 +156,14 @@ void Core::Run (String file)
             bool registered = file_is_registered_in_db(file);
             if (!registered)
             {
-                MI->Open(List[Pos]);
-                register_file_to_database(List[Pos]);
-                MI->Close();
+                if (db)
+                {
+                    MI->Open(List[Pos]);
+                    register_file_to_database(List[Pos]);
+                    MI->Close();
+                }
+                else
+                    MI->Open(List[Pos]);
             }
         }
     }
@@ -718,6 +733,8 @@ void Core::get_Reports_Output(const String& file, String& report)
 //---------------------------------------------------------------------------
 bool Core::file_is_registered_in_db(String& file)
 {
+    if (!db)
+        return false;
     std::string filename = Ztring(file).To_UTF8();
     time_t time = get_last_modification_file(filename);
 
