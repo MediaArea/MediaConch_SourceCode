@@ -26,6 +26,12 @@ namespace MediaConch {
 
 const std::string databaseName = "MediaConch.db";
 
+#ifdef WINDOWS
+    const std::string Path_Separator("\\");
+#else
+    const std::string Path_Separator("/");
+#endif
+
 class Database
 {
 public:
@@ -42,6 +48,9 @@ protected:
     std::string                        query;
     std::vector<std::string>           errors;
     std::map<std::string, std::string> reports;
+    std::string                        db_file;
+
+    void set_database_directory(const std::string& dirname);
 
     //Database dependant
     virtual int execute() = 0;

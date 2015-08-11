@@ -56,6 +56,10 @@ Core::Core() : policies(this)
     policies.create_values_from_csv();
 #ifdef HAVE_SQLITE
     db = new SQLLite;
+
+    String dirname(__T(".")); // TODO: Will be given in the config file
+    db->set_database_directory(dirname);
+    db->init();
 #else
     db = NULL;
 #endif
