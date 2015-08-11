@@ -33,12 +33,6 @@ namespace MediaConch {
 SQLLite::SQLLite() : Database()
 {
     db = NULL;
-    if (init())
-    {
-        db = NULL;
-        return;
-    }
-    create_report_table();
 }
 
 //---------------------------------------------------------------------------
@@ -51,16 +45,17 @@ SQLLite::~SQLLite()
 //---------------------------------------------------------------------------
 int SQLLite::init()
 {
-    int ret;
-    std::string database(databaseName.begin(), databaseName.end());
+    std::string database(db_file.begin(), db_file.end());
 
-    ret = sqlite3_open(database.c_str(), &db);
+    int ret = sqlite3_open(database.c_str(), &db);
     if (ret)
     {
         fprintf(stderr, "Error to open the DB: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
+        db = NULL;
         return -1;
     }
+    create_report_table();
     return 0;
 }
 

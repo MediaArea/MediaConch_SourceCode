@@ -29,12 +29,15 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 Database::Database()
 {
+    db_file = databaseName;
 }
 
+//---------------------------------------------------------------------------
 Database::~Database()
 {
 }
 
+//---------------------------------------------------------------------------
 int Database::create_report_table()
 {
     std::stringstream create;
@@ -103,6 +106,12 @@ bool Database::file_is_registered(const std::string& filename, time_t file_last_
     if (reports[key] == "0")
         return false;
     return true;
+}
+
+//---------------------------------------------------------------------------
+void Database::set_database_directory(const std::string& dirname)
+{
+    db_file = dirname + Path_Separator + databaseName;
 }
 
 }
