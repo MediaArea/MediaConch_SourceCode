@@ -29,6 +29,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/Common/Database.cpp \
                     ../../Source/Common/SQLLite.cpp \
+                    ../../Source/Common/Json.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -67,6 +68,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/SQLLite.h \
+                    ../../Source/Common/Json.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
@@ -156,6 +158,14 @@ QMAKE_CXXFLAGS   += -DHAVE_SQLITE
 else {
 LIBS             += -lsqlite3
 QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+}
+exists(../../../jansson/build/lib/libjansson.a) {
+INCLUDEPATH      += ../../../jansson/build/include
+LIBS             += ../../../jansson/build/lib/libjansson.a
+message("custom libjansson  : yes")
+}
+else {
+LIBS             += -ljansson
 }
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
