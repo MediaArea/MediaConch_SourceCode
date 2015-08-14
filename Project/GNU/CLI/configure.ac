@@ -331,6 +331,33 @@ if test "$enable_sqlite" = "yes"; then
     fi
 fi
 
+dnl -------------------------------------------------------------------------
+dnl libjansson
+dnl
+if test -e ../../../../jansson/build/lib/libjansson.a; then
+        CXXFLAGS="$CXXFLAGS -I../../../../jansson/build/include"
+        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../jansson/build/include"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libjansson="builtin (static)"
+            LIBS="$LIBS ../../../../jansson/build/lib/libjansson.a"
+        else
+            with_libjansson="builtin"
+            LIBS="$LIBS  -L../../../../jansson/build/lib -ljansson"
+        fi
+elif pkg-config --exists jansson; then
+        CXXFLAGS="$CXXFLAGS $(pkg-config --cflags jansson)"
+        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags jansson)"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libjansson="system (static)"
+            LIBS="$LIBS $(pkg-config --variable=Libs_Static jansson)"
+        else
+            with_libjansson="system"
+            LIBS="$LIBS $(pkg-config --libs jansson)"
+        fi
+else
+        AC_MSG_ERROR([libjansson configuration is not found])
+fi
+
 dnl #########################################################################
 dnl ### Compiler specific
 dnl #########################################################################
@@ -413,6 +440,7 @@ echo ""
 echo "  Unicode?                                                $enable_unicode"
 echo "  stream missing support?                                 $enable_stream_missing"
 echo ""
+echo "  Using libjansson?                                       $with_libjansson"
 echo "  Using libsqlite3?                                       $with_libsqlite3"
 echo "  Using libxml2?                                          $with_libxml2"
 echo "  Using libzen?                                           $with_zenlib"

@@ -29,6 +29,7 @@ BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libsql3-devel
+BuildRequires:  libjansson-devel
 %if 0%{?suse_version}
 BuildRequires:  update-desktop-files
 %endif
