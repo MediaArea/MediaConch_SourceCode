@@ -15,6 +15,8 @@
 #include "Common/Schema.h"
 #include "Database.h"
 #include "SQLLite.h"
+#include "Configuration.h"
+#include "Json.h"
 #include "Common/Schematron.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
@@ -28,8 +30,15 @@
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include <sstream>
+#include <fstream>
 #include <sys/stat.h>
 //---------------------------------------------------------------------------
+
+#if defined(UNIX)
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#endif
 
 //---------------------------------------------------------------------------
 const MediaInfoNameSpace::Char* MEDIAINFO_TITLE=__T("MediaArea.net/MediaConch");
@@ -54,11 +63,18 @@ Core::Core() : policies(this)
     Report_IsDefault=true;
     Format=format_Text;
     policies.create_values_from_csv();
+    std::string config_path = get_config_path();
+    config.set_path(config_path);
+    config.parse();
 #ifdef HAVE_SQLITE
+    std::string db_path;
+    if (config.get("SQLite_Path", db_path))
+        db_path = std::string(".");
+    db_path += Path_Separator;
+
     db = new SQLLite;
 
-    String dirname(__T(".")); // TODO: Will be given in the config file
-    db->set_database_directory(dirname);
+    db->set_database_directory(db_path);
     db->init();
 #else
     db = NULL;
@@ -743,6 +759,41 @@ bool Core::file_is_registered_in_db(String& file)
     time_t time = get_last_modification_file(filename);
 
     return db->file_is_registered(filename, time);
+}
+
+//---------------------------------------------------------------------------
+std::string Core::get_config_path()
+{
+    std::string config_path(".");
+#if defined(WINDOWS)
+    char username[UNLEN+1];
+    DWORD username_len = UNLEN+1;
+    GetUserName(username, &username_len);
+
+    std::string wuser(username, username_len);
+    std::string user_name(wuser.begin(), wuser.end());
+    std::stringstream path;
+
+    path << "C:/Users/" << user_name << "/AppData/Local/MediaConch/";
+    config_path = path.str();
+#elif defined(UNIX)
+    const char* home = NULL;
+
+    if ((home = getenv("HOME")) == NULL)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw)
+            home = pw->pw_dir;
+    }
+    config_path = std::string(home) + Path_Separator + std::string(".config/");
+#elif defined(MACOS) || defined(MACOSX)
+    config_path = std::string("~/Library/Preferences/");
+#endif
+
+    std::ifstream ifile(config_path.c_str());
+    if (!ifile)
+        config_path = std::string(".") + Path_Separator;
+    return config_path;
 }
 
 }

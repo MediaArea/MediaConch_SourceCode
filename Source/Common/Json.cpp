@@ -75,9 +75,9 @@ std::string Json::serialize(Value &v)
 }
 
 //---------------------------------------------------------------------------
-Json::Value* Json::get_value_by_key(Value& v, std::string key)
+Container::Value* Json::get_value_by_key(Value& v, std::string key)
 {
-    if (v.type != Value::JSON_TYPE_OBJECT)
+    if (v.type != Value::CONTAINER_TYPE_OBJECT)
         return NULL;
     for (size_t i = 0; i < v.obj.size(); ++i)
         if (!key.compare(v.obj[i].first))
@@ -91,27 +91,27 @@ int Json::get_type_node(Value &v)
     switch (json_typeof(current_node))
     {
         case JSON_INTEGER:
-            v.type = Value::JSON_TYPE_INTEGER;
+            v.type = Value::CONTAINER_TYPE_INTEGER;
             v.l = json_integer_value(current_node);
             break;
         case JSON_REAL:
-            v.type = Value::JSON_TYPE_REAL;
+            v.type = Value::CONTAINER_TYPE_REAL;
             v.d = json_real_value(current_node);
             break;
         case JSON_STRING:
-            v.type = Value::JSON_TYPE_STRING;
+            v.type = Value::CONTAINER_TYPE_STRING;
             v.s = json_string_value(current_node);
             break;
         case JSON_TRUE:
-            v.type = Value::JSON_TYPE_BOOL;
+            v.type = Value::CONTAINER_TYPE_BOOL;
             v.b = true;
             break;
         case JSON_FALSE:
-            v.type = Value::JSON_TYPE_BOOL;
+            v.type = Value::CONTAINER_TYPE_BOOL;
             v.b = false;
             break;
         case JSON_NULL:
-            v.type = Value::JSON_TYPE_NULL;
+            v.type = Value::CONTAINER_TYPE_NULL;
             break;
         default:
             return -1;
@@ -130,7 +130,7 @@ int Json::parse_node(Value &v)
 
     if (json_is_object(current_node))
     {
-        v.type = Value::JSON_TYPE_OBJECT;
+        v.type = Value::CONTAINER_TYPE_OBJECT;
 
         const char *key = NULL;
         json_t *value = NULL;
@@ -150,7 +150,7 @@ int Json::parse_node(Value &v)
 
     if (json_is_array(current_node))
     {
-        v.type = Value::JSON_TYPE_ARRAY;
+        v.type = Value::CONTAINER_TYPE_ARRAY;
         for (size_t i = 0; i < json_array_size(current_node); ++i)
         {
             Value new_node;
@@ -173,17 +173,17 @@ json_t *Json::set_basic_node(Value &v)
 {
     switch (v.type)
     {
-        case Value::JSON_TYPE_INTEGER:
+        case Value::CONTAINER_TYPE_INTEGER:
             return json_integer(v.l);
-        case Value::JSON_TYPE_REAL:
+        case Value::CONTAINER_TYPE_REAL:
             return json_real(v.d);
-        case Value::JSON_TYPE_STRING:
+        case Value::CONTAINER_TYPE_STRING:
             return json_string(v.s.c_str());
-        case Value::JSON_TYPE_BOOL:
+        case Value::CONTAINER_TYPE_BOOL:
             if (v.b == true)
                 return json_true();
             return json_false();
-        case Value::JSON_TYPE_NULL:
+        case Value::CONTAINER_TYPE_NULL:
             return json_null();
         default:
             break;
@@ -198,7 +198,7 @@ json_t *Json::serialize_node(Value &v)
     if ((tmp = set_basic_node(v)))
         return tmp;
 
-    if (v.type == Value::JSON_TYPE_OBJECT)
+    if (v.type == Value::CONTAINER_TYPE_OBJECT)
     {
         tmp = json_object();
         for (size_t i = 0; i < v.obj.size(); ++i)
@@ -212,7 +212,7 @@ json_t *Json::serialize_node(Value &v)
         return tmp;
     }
 
-    if (v.type == Value::JSON_TYPE_ARRAY)
+    if (v.type == Value::CONTAINER_TYPE_ARRAY)
     {
         tmp = json_array();
         for (size_t i = 0; i < v.array.size(); ++i)
