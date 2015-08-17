@@ -30,6 +30,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Database.cpp \
                     ../../Source/Common/SQLLite.cpp \
                     ../../Source/Common/Json.cpp \
+                    ../../Source/Common/Configuration.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -69,6 +70,8 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/SQLLite.h \
                     ../../Source/Common/Json.h \
+                    ../../Source/Common/Container.h \
+                    ../../Source/Common/Configuration.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \

@@ -31,6 +31,7 @@
 #include <vector>
 #include "Policies.h"
 #include "Policy.h"
+#include "Configuration.h"
 
 using namespace MediaInfoNameSpace;
 using namespace std;
@@ -103,6 +104,7 @@ private:
 
     MediaInfoNameSpace::MediaInfoList* MI;
     Database*                          db;
+    Configuration                      config;
 
     bool PolicySchematron(const String& file, std::wstringstream& Out);
     bool PolicyXslt(const String& file, std::wstringstream& Out);
@@ -125,6 +127,7 @@ private:
     void register_report_mediatrace_text_to_database(std::string& file, time_t time);
     void register_report_mediatrace_xml_to_database(std::string& file, time_t time);
     void register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time);
+    std::string get_config_path();
 };
 
 }

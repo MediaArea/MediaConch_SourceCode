@@ -26,12 +26,6 @@ namespace MediaConch {
 
 const std::string databaseName = "MediaConch.db";
 
-#ifdef WINDOWS
-    const std::string Path_Separator("\\");
-#else
-    const std::string Path_Separator("/");
-#endif
-
 class Database
 {
 public:
