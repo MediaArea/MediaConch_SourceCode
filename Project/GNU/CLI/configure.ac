@@ -252,7 +252,7 @@ else
 		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libxml2)"
 		if test "$enable_staticlibs" = "yes"; then
 			with_libxml2="system (static)"
-			LIBS="$LIBS $(pkg-config --variable=Libs_Static libxml2)"
+			LIBS="$LIBS $(pkg-config --static --libs libxml2)"
 		else
 			with_libxml2="system"
 			LIBS="$LIBS $(pkg-config --libs libxml2)"
@@ -262,7 +262,7 @@ else
 		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libxml-2.0)"
 		if test "$enable_staticlibs" = "yes"; then
 			with_libxml2="system (static)"
-			LIBS="$LIBS $(pkg-config --variable=Libs_Static libxml-2.0)"
+			LIBS="$LIBS $(pkg-config --static --libs libxml-2.0)"
 		else
 			with_libxml2="system"
 			LIBS="$LIBS $(pkg-config --libs libxml-2.0)"
