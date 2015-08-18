@@ -17,7 +17,8 @@ mediaconch_SOURCES = \
     ../../../Source/Common/Database.cpp \
     ../../../Source/Common/SQLLite.cpp \
     ../../../Source/Common/Json.cpp \
-    ../../../Source/Common/Configuration.cpp
+    ../../../Source/Common/Configuration.cpp \
+    ../../../Source/Common/REST_API.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)
