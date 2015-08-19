@@ -35,6 +35,7 @@ public:
 
     enum Reason
     {
+        NO_REASON,
         FILE_NOT_EXISTING,
         ID_NOT_EXISTING,
         NOT_READY,
@@ -42,6 +43,7 @@ public:
 
     enum Report
     {
+        NO_REPORT,
         POLICY,
         IMPLEMENTATION,
         MI_XML,
@@ -67,6 +69,22 @@ public:
         return std::string();
     }
 
+    Report string_to_Report(std::string str)
+    {
+#define ReportString(report)       \
+        if (!str.compare(#report)) \
+            return report;
+
+        ReportString(POLICY);
+        ReportString(IMPLEMENTATION);
+        ReportString(MI_XML);
+        ReportString(MEDIATRACE);
+
+#undef ReportString
+
+        return NO_REPORT;
+    }
+
     std::string get_Reason_string(Reason r)
     {
 #define ReasonString(reason) \
@@ -83,6 +101,21 @@ public:
         }
 #undef ReasonString
         return std::string();
+    }
+
+    Reason string_to_Reason(std::string str)
+    {
+#define ReasonString(reason)       \
+        if (!str.compare(#reason)) \
+            return reason;
+
+        ReasonString(FILE_NOT_EXISTING);
+        ReasonString(ID_NOT_EXISTING);
+        ReasonString(NOT_READY);
+
+#undef ReasonString
+
+        return NO_REASON;
     }
 
     // Check
@@ -236,6 +269,20 @@ public:
     std::string serialize_retry_res(Retry_Res& res);
     std::string serialize_clear_res(Clear_Res& res);
 
+    // Parse: Request
+    Check_Req *parse_check_req(std::string data);
+    Status_Req *parse_status_req(std::string data);
+    Report_Req *parse_report_req(std::string data);
+    Retry_Req *parse_retry_req(std::string data);
+    Clear_Req *parse_clear_req(std::string data);
+
+    // Parse: Request
+    Check_Res *parse_check_res(std::string data);
+    Status_Res *parse_status_res(std::string data);
+    Report_Res *parse_report_res(std::string data);
+    Retry_Res *parse_retry_res(std::string data);
+    Clear_Res *parse_clear_res(std::string data);
+
 private:
     Container *model;
 
@@ -247,6 +294,13 @@ private:
     Container::Value serialize_check_oks(std::vector<Check_Ok>& array);
     Container::Value serialize_status_oks(std::vector<Status_Ok>& array);
     Container::Value serialize_report_oks(std::vector<Report_Ok>& array);
+
+    int parse_check_arg(Container::Value *v, std::vector<Check_Arg>& args);
+    int parse_report_arg(Container::Value *v, std::vector<Report_Arg>& args);
+    int parse_generic_nok(Container::Value *v, int& id, Reason& error);
+    int parse_check_ok(Container::Value *v, std::vector<Check_Ok>& ok);
+    int parse_status_ok(Container::Value *v, std::vector<Status_Ok>& ok);
+    int parse_report_ok(Container::Value *v, std::vector<Report_Ok>& ok);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

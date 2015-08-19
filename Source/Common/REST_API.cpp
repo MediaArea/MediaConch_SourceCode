@@ -57,7 +57,7 @@ std::string RESTAPI::serialize_check_req(Check_Req& req)
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
     child.obj.push_back(std::make_pair("args", serialize_check_args(req.args)));
-    child.obj.push_back(std::make_pair("Schematron", schematron));
+    child.obj.push_back(std::make_pair("schematron", schematron));
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj.push_back(std::make_pair("CHECK", child));
@@ -242,6 +242,441 @@ std::string RESTAPI::serialize_clear_res(Clear_Res& res)
 }
 
 //***************************************************************************
+// Serialize: Result
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+RESTAPI::Check_Req *RESTAPI::parse_check_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "CHECK");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+    Check_Req *req = new Check_Req;
+
+    Container::Value *args, *schematron;
+    args = model->get_value_by_key(*child, "args");
+    schematron = model->get_value_by_key(*child, "schematron");
+
+    if (!args || !schematron ||
+        schematron->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        delete req;
+        return NULL;
+    }
+    req->schematron = schematron->s;
+    if (parse_check_arg(args, req->args))
+    {
+        delete req;
+        return NULL;
+    }
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Status_Req *RESTAPI::parse_status_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "STATUS");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Status_Req *req = new Status_Req;
+
+    Container::Value *ids;
+    ids = model->get_value_by_key(*child, "ids");
+
+    if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete req;
+        return NULL;
+    }
+    for (size_t i = 0; i < ids->array.size(); ++i)
+    {
+        Container::Value *id = &ids->array[i];
+
+        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            delete req;
+            return NULL;
+        }
+        req->ids.push_back(id->l);
+    }
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "REPORT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ids, *reports;
+    ids = model->get_value_by_key(*child, "ids");
+    reports = model->get_value_by_key(*child, "reports");
+
+    if (!ids || !reports || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return NULL;
+
+    Report_Req *req = new Report_Req;
+    for (size_t i = 0; i < ids->array.size(); ++i)
+    {
+        Container::Value *id = &ids->array[i];
+
+        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            delete req;
+            return NULL;
+        }
+        req->ids.push_back(id->l);
+    }
+    if (parse_report_arg(reports, req->reports))
+    {
+        delete req;
+        return NULL;
+    }
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Retry_Req *RESTAPI::parse_retry_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "RETRY");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ids;
+    ids = model->get_value_by_key(*child, "ids");
+
+    if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return NULL;
+
+    Retry_Req *req = new Retry_Req;
+    for (size_t i = 0; i < ids->array.size(); ++i)
+    {
+        Container::Value *id = &ids->array[i];
+
+        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            delete req;
+            return NULL;
+        }
+        req->ids.push_back(id->l);
+    }
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "CLEAR");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ids;
+    ids = model->get_value_by_key(*child, "ids");
+
+    if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return NULL;
+
+    Clear_Req *req = new Clear_Req;
+    for (size_t i = 0; i < ids->array.size(); ++i)
+    {
+        Container::Value *id = &ids->array[i];
+
+        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            delete req;
+            return NULL;
+        }
+        req->ids.push_back(id->l);
+    }
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Check_Res *RESTAPI::parse_check_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "CHECK_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ok, *nok;
+    ok = model->get_value_by_key(*child, "ok");
+    nok = model->get_value_by_key(*child, "nok");
+
+    Check_Res *res = new Check_Res;
+    if (ok && parse_check_ok(ok, res->ok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    if (!nok)
+        return res;
+
+    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < nok->array.size(); ++i)
+    {
+        Check_Nok tmp;
+
+        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        {
+            delete res;
+            return NULL;
+        }
+        res->nok.push_back(tmp);
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Status_Res *RESTAPI::parse_status_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "STATUS_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ok, *nok;
+    ok = model->get_value_by_key(*child, "ok");
+    nok = model->get_value_by_key(*child, "nok");
+
+    Status_Res *res = new Status_Res;
+    if (ok && parse_status_ok(ok, res->ok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    if (!nok)
+        return res;
+
+    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < nok->array.size(); ++i)
+    {
+        Status_Nok tmp;
+
+        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        {
+            delete res;
+            return NULL;
+        }
+        res->nok.push_back(tmp);
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Report_Res *RESTAPI::parse_report_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "REPORT_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ok, *nok;
+    ok = model->get_value_by_key(*child, "ok");
+    nok = model->get_value_by_key(*child, "nok");
+
+    Report_Res *res = new Report_Res;
+    if (ok && parse_report_ok(ok, res->ok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    if (!nok)
+        return res;
+
+    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < nok->array.size(); ++i)
+    {
+        Report_Nok tmp;
+
+        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        {
+            delete res;
+            return NULL;
+        }
+        res->nok.push_back(tmp);
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Retry_Res *RESTAPI::parse_retry_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "RETRY_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ok, *nok;
+    ok = model->get_value_by_key(*child, "ok");
+    nok = model->get_value_by_key(*child, "nok");
+
+    Retry_Res *res = new Retry_Res;
+    if (ok)
+    {
+        if (ok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            delete res;
+            return NULL;
+        }
+        for (size_t i = 0; i < ok->array.size(); ++i)
+        {
+            Container::Value *tmp = &ok->array[i];
+
+            if (tmp->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            {
+                delete res;
+                return NULL;
+            }
+            res->ok.push_back(tmp->l);
+        }
+    }
+
+    if (!nok)
+        return res;
+
+    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < nok->array.size(); ++i)
+    {
+        Retry_Nok tmp;
+
+        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        {
+            delete res;
+            return NULL;
+        }
+        res->nok.push_back(tmp);
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+        return NULL;
+
+    child = model->get_value_by_key(v, "CLEAR_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ok, *nok;
+    ok = model->get_value_by_key(*child, "ok");
+    nok = model->get_value_by_key(*child, "nok");
+
+    Clear_Res *res = new Clear_Res;
+    if (ok)
+    {
+        if (ok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            delete res;
+            return NULL;
+        }
+        for (size_t i = 0; i < ok->array.size(); ++i)
+        {
+            Container::Value *tmp = &ok->array[i];
+
+            if (tmp->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            {
+                delete res;
+                return NULL;
+            }
+            res->ok.push_back(tmp->l);
+        }
+    }
+
+    if (!nok)
+        return res;
+
+    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < nok->array.size(); ++i)
+    {
+        Clear_Nok tmp;
+
+        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        {
+            delete res;
+            return NULL;
+        }
+        res->nok.push_back(tmp);
+    }
+    return res;
+}
+
+//***************************************************************************
 // HELPER
 //***************************************************************************
 
@@ -250,7 +685,7 @@ Container::Value RESTAPI::serialize_check_args(std::vector<Check_Arg>& args)
 {
     Container::Value args_val;
 
-    args_val.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    args_val.type = Container::Value::CONTAINER_TYPE_ARRAY;
 
     for (size_t i = 0; i < args.size(); ++i)
     {
@@ -443,6 +878,233 @@ Container::Value RESTAPI::serialize_report_oks(std::vector<Report_Ok>& array)
     }
 
     return ok;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_check_arg(Container::Value *v, std::vector<Check_Arg>& args)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < v->array.size(); ++i)
+    {
+        Container::Value *obj = &v->array[i];
+
+        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+            return -1;
+
+        Container::Value *file, *id;
+
+        file = model->get_value_by_key(*obj, "file");
+        id = model->get_value_by_key(*obj, "id");
+
+        if (!file || !id || file->type != Container::Value::CONTAINER_TYPE_STRING ||
+            id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            return -1;
+
+        Check_Arg arg;
+        arg.file = file->s;
+        arg.id = id->l;
+        args.push_back(arg);
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_report_arg(Container::Value *v, std::vector<Report_Arg>& args)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < v->array.size(); ++i)
+    {
+        Container::Value *obj = &v->array[i];
+
+        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+            return -1;
+
+        Container::Value *kind, *offset, *length;
+
+        kind = model->get_value_by_key(*obj, "kind");
+        offset = model->get_value_by_key(*obj, "offset");
+        length = model->get_value_by_key(*obj, "length");
+
+        if (!kind || kind->type != Container::Value::CONTAINER_TYPE_STRING)
+            return -1;
+
+        Report_Arg arg;
+        arg.kind = string_to_Report(kind->s);
+
+        if (offset && offset->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            arg.offset = offset->l;
+            arg.has_offset = true;
+        }
+        if (length && length->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            arg.length = length->l;
+            arg.has_length = true;
+        }
+        args.push_back(arg);
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_generic_nok(Container::Value *v, int& id, Reason& error)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return -1;
+
+    Container::Value *id_v, *error_v;
+
+    id_v = model->get_value_by_key(*v, "id");
+    error_v = model->get_value_by_key(*v, "error");
+
+    if (!id_v || id_v->type != Container::Value::CONTAINER_TYPE_INTEGER ||
+        !error_v || error_v->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+
+    id = id_v->l;
+    error = string_to_Reason(error_v->s);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_check_ok(Container::Value *v, std::vector<Check_Ok>& oks)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < v->array.size(); ++i)
+    {
+        Container::Value *obj = &v->array[i];
+
+        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+            return -1;
+
+        Container::Value *inId, *outId;
+
+        inId = model->get_value_by_key(*obj, "inId");
+        outId = model->get_value_by_key(*obj, "outId");
+
+        if (!inId || inId->type != Container::Value::CONTAINER_TYPE_INTEGER ||
+            !outId || outId->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            return -1;
+
+        Check_Ok ok;
+        ok.inId = inId->l;
+        ok.outId = outId->l;
+
+        oks.push_back(ok);
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok>& oks)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < v->array.size(); ++i)
+    {
+        Container::Value *obj = &v->array[i];
+
+        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+            return -1;
+
+        Container::Value *id, *finished, *validity;
+
+        id = model->get_value_by_key(*obj, "id");
+        finished = model->get_value_by_key(*obj, "finished");
+        validity = model->get_value_by_key(*obj, "validity");
+
+        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER ||
+            !finished || finished->type != Container::Value::CONTAINER_TYPE_BOOL)
+            return -1;
+
+        Status_Ok ok;
+        ok.id = id->l;
+        ok.finished = finished->b;
+
+        if (!validity)
+            ok.has_validity = false;
+        else if (validity->type == Container::Value::CONTAINER_TYPE_BOOL)
+        {
+            if (!ok.finished)
+                return -1;
+            ok.has_validity = true;
+            ok.validity = validity->b;
+        }
+        else
+            return -1;
+
+        oks.push_back(ok);
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_report_ok(Container::Value *v, std::vector<Report_Ok>& oks)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < v->array.size(); ++i)
+    {
+        Container::Value *obj = &v->array[i];
+
+        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+            return -1;
+
+        Container::Value *id, *policy, *implementation, *mi_xml, *mediatrace;
+
+        id = model->get_value_by_key(*obj, "id");
+        policy = model->get_value_by_key(*obj, "policy");
+        implementation = model->get_value_by_key(*obj, "implementation");
+        mi_xml = model->get_value_by_key(*obj, "mi_xml");
+        mediatrace = model->get_value_by_key(*obj, "mediatrace");
+
+        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            return -1;
+
+        Report_Ok ok;
+        ok.id = id->l;
+
+        if (policy)
+        {
+            if (policy->type != Container::Value::CONTAINER_TYPE_STRING)
+                return -1;
+            ok.policy = policy->s;
+        }
+        if (implementation)
+        {
+            if (implementation->type != Container::Value::CONTAINER_TYPE_STRING)
+                return -1;
+            ok.implementation = implementation->s;
+        }
+        if (mi_xml)
+        {
+            if (mi_xml->type != Container::Value::CONTAINER_TYPE_STRING)
+                return -1;
+            ok.mi_xml = mi_xml->s;
+        }
+        if (mediatrace)
+        {
+            if (mediatrace->type != Container::Value::CONTAINER_TYPE_STRING)
+                return -1;
+            ok.mediatrace = mediatrace->s;
+        }
+
+        oks.push_back(ok);
+    }
+
+    return 0;
 }
 
 }
