@@ -27,15 +27,13 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Json::Json() : current_node(NULL), error(NULL)
+Json::Json() : current_node(NULL)
 {
 }
 
 //---------------------------------------------------------------------------
 Json::~Json()
 {
-    if (error)
-        delete error;
 }
 
 //---------------------------------------------------------------------------
@@ -48,7 +46,11 @@ int Json::parse(std::string data, Value &v)
 
     if (!elements)
     {
-        error = new json_error_t(err);
+        std::stringstream ss;
+        if (err.line >= 0)
+            ss << "line " << err.line << ": ";
+        ss << err.text;
+        error = ss.str();
         return -1;
     }
     current_node = elements;
@@ -63,6 +65,11 @@ int Json::parse(std::string data, Value &v)
 std::string Json::serialize(Value &v)
 {
     json_t *j = serialize_node(v);
+    if (!j)
+    {
+        error = std::string("cannot serialize the node");
+        return std::string();
+    }
 
     std::string ret;
     char *json = json_dumps(j, JSON_ENCODE_ANY);

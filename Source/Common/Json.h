@@ -39,10 +39,8 @@ public:
     virtual std::string serialize(Value &v);
     virtual Value* get_value_by_key(Value& v, std::string key);
     
-    json_error_t* get_error() const { return error; }
 private:
     json_t       *current_node;
-    json_error_t *error;
 
     int parse_node(Value &v);
     int get_type_node(Value &v);
