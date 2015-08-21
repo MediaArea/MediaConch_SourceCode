@@ -358,6 +358,33 @@ else
         AC_MSG_ERROR([libjansson configuration is not found])
 fi
 
+dnl -------------------------------------------------------------------------
+dnl libevent2
+dnl
+if test -e ../../../../libevent/build/lib/libevent.a; then
+        CXXFLAGS="$CXXFLAGS -I../../../../libevent/build/include"
+        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libevent/build/include"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libevent="builtin (static)"
+            LIBS="$LIBS ../../../../libevent/build/lib/libevent.a"
+        else
+            with_libevent="builtin"
+            LIBS="$LIBS  -L../../../../libevent/build/lib -levent"
+        fi
+elif pkg-config --exists libevent; then
+        CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libevent)"
+        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libevent)"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libevent="system (static)"
+            LIBS="$LIBS $(pkg-config --variable=Libs_Static libevent)"
+        else
+            with_libevent="system"
+            LIBS="$LIBS $(pkg-config --libs libevent)"
+        fi
+else
+        AC_MSG_ERROR([libevent configuration is not found])
+fi
+
 dnl #########################################################################
 dnl ### Compiler specific
 dnl #########################################################################
@@ -440,6 +467,7 @@ echo ""
 echo "  Unicode?                                                $enable_unicode"
 echo "  stream missing support?                                 $enable_stream_missing"
 echo ""
+echo "  Using libevent?                                         $with_libevent"
 echo "  Using libjansson?                                       $with_libjansson"
 echo "  Using libsqlite3?                                       $with_libsqlite3"
 echo "  Using libxml2?                                          $with_libxml2"
