@@ -63,6 +63,8 @@ std::string RESTAPI::serialize_check_req(Check_Req& req)
     v.obj.push_back(std::make_pair("CHECK", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -78,6 +80,8 @@ std::string RESTAPI::serialize_status_req(Status_Req& req)
     v.obj.push_back(std::make_pair("STATUS", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -94,6 +98,8 @@ std::string RESTAPI::serialize_report_req(Report_Req& req)
     v.obj.push_back(std::make_pair("REPORT", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -109,6 +115,8 @@ std::string RESTAPI::serialize_retry_req(Retry_Req& req)
     v.obj.push_back(std::make_pair("RETRY", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -124,6 +132,8 @@ std::string RESTAPI::serialize_clear_req(Clear_Req& req)
     v.obj.push_back(std::make_pair("CLEAR", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -150,6 +160,8 @@ std::string RESTAPI::serialize_check_res(Check_Res& res)
     v.obj.push_back(std::make_pair("CHECK_RESULT", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -172,6 +184,8 @@ std::string RESTAPI::serialize_status_res(Status_Res& res)
     v.obj.push_back(std::make_pair("STATUS_RESULT", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -194,6 +208,8 @@ std::string RESTAPI::serialize_report_res(Report_Res& res)
     v.obj.push_back(std::make_pair("REPORT_RESULT", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -216,6 +232,8 @@ std::string RESTAPI::serialize_retry_res(Retry_Res& res)
     v.obj.push_back(std::make_pair("RETRY_RESULT", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -238,6 +256,8 @@ std::string RESTAPI::serialize_clear_res(Clear_Res& res)
     v.obj.push_back(std::make_pair("CLEAR_RESULT", child));
 
     std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
     return ret;
 }
 
@@ -251,7 +271,10 @@ RESTAPI::Check_Req *RESTAPI::parse_check_req(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "CHECK");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -283,7 +306,10 @@ RESTAPI::Status_Req *RESTAPI::parse_status_req(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "STATUS");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -319,7 +345,10 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "REPORT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -358,7 +387,10 @@ RESTAPI::Retry_Req *RESTAPI::parse_retry_req(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "RETRY");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -391,7 +423,10 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "CLEAR");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -424,7 +459,10 @@ RESTAPI::Check_Res *RESTAPI::parse_check_res(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "CHECK_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -470,7 +508,10 @@ RESTAPI::Status_Res *RESTAPI::parse_status_res(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "STATUS_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -516,7 +557,10 @@ RESTAPI::Report_Res *RESTAPI::parse_report_res(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "REPORT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -562,7 +606,10 @@ RESTAPI::Retry_Res *RESTAPI::parse_retry_res(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "RETRY_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
@@ -622,7 +669,10 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
     Container::Value v, *child;
 
     if (model->parse(data, v))
+    {
+        error = model->get_error();
         return NULL;
+    }
 
     child = model->get_value_by_key(v, "CLEAR_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)

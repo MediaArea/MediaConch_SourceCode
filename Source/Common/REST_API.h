@@ -283,8 +283,12 @@ public:
     Retry_Res *parse_retry_res(std::string data);
     Clear_Res *parse_clear_res(std::string data);
 
+    std::string get_error() const { return error; }
+
 private:
     Container *model;
+
+    std::string error;
 
     //Helper
     Container::Value serialize_check_args(std::vector<Check_Arg>& args);
