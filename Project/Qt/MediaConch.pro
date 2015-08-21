@@ -32,6 +32,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Json.cpp \
                     ../../Source/Common/Configuration.cpp \
                     ../../Source/Common/REST_API.cpp \
+                    ../../Source/Common/Httpd.cpp \
+                    ../../Source/Common/LibEventHttpd.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -74,6 +76,8 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Container.h \
                     ../../Source/Common/Configuration.h \
                     ../../Source/Common/REST_API.h \
+                    ../../Source/Common/Httpd.h \
+                    ../../Source/Common/LibEventHttpd.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
@@ -171,6 +175,14 @@ message("custom libjansson  : yes")
 }
 else {
 LIBS             += -ljansson
+}
+exists(../../../libevent/build/lib/libevent.a) {
+INCLUDEPATH      += ../../../libevent/build/include
+LIBS             += ../../../libevent/build/lib/libevent.a
+message("custom libevent  : yes")
+}
+else {
+LIBS             += -levent
 }
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
