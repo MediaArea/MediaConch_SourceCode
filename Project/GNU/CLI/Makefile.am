@@ -20,7 +20,9 @@ mediaconch_SOURCES = \
     ../../../Source/Common/Configuration.cpp \
     ../../../Source/Common/REST_API.cpp \
     ../../../Source/Common/Httpd.cpp \
-    ../../../Source/Common/LibEventHttpd.cpp
+    ../../../Source/Common/LibEventHttpd.cpp \
+    ../../../Source/Common/Http.cpp \
+    ../../../Source/Common/LibEventHttp.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)

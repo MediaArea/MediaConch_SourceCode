@@ -34,6 +34,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/REST_API.cpp \
                     ../../Source/Common/Httpd.cpp \
                     ../../Source/Common/LibEventHttpd.cpp \
+                    ../../Source/Common/Http.cpp \
+                    ../../Source/Common/LibEventHttp.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -78,6 +80,8 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/REST_API.h \
                     ../../Source/Common/Httpd.h \
                     ../../Source/Common/LibEventHttpd.h \
+                    ../../Source/Common/Http.h \
+                    ../../Source/Common/LibEventHttp.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
