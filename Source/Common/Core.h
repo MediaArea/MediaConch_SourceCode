@@ -99,12 +99,23 @@ public:
     Policies policies;
     String xsltDisplay;
 
+    //General Configuration
+    void load_configuration();
+    void load_configuration(std::string& config_path);
+    void set_configuration_path(std::string& path);
+    Configuration* get_configuration_path() const;
+
+    //General Database
+    void load_database();
+    bool database_is_enabled() const;
+
 private:
     Core (const Core&);
 
     MediaInfoNameSpace::MediaInfoList* MI;
     Database*                          db;
-    Configuration                      config;
+    Configuration*                     config;
+    std::string                        configuration_path;
 
     bool PolicySchematron(const String& file, std::wstringstream& Out);
     bool PolicyXslt(const String& file, std::wstringstream& Out);
@@ -128,6 +139,7 @@ private:
     void register_report_mediatrace_xml_to_database(std::string& file, time_t time);
     void register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time);
     std::string get_config_path();
+    Database *get_db();
 };
 
 }

@@ -62,29 +62,17 @@ Core::Core() : policies(this)
     Report.set(report_MediaConch);
     Report_IsDefault=true;
     Format=format_Text;
-    policies.create_values_from_csv();
-    std::string config_path = get_config_path();
-    config.set_path(config_path);
-    config.parse();
-#ifdef HAVE_SQLITE
-    std::string db_path;
-    if (config.get("SQLite_Path", db_path))
-        db_path = std::string(".");
-    db_path += Path_Separator;
-
-    db = new SQLLite;
-
-    db->set_database_directory(db_path);
-    db->init();
-#else
+    config = NULL;
     db = NULL;
-#endif
 }
 
 Core::~Core()
 {
-    delete db;
+    if (db)
+        delete db;
     delete MI;
+    if (config)
+        delete config;
 }
 
 //***************************************************************************
@@ -101,6 +89,44 @@ void Core::Menu_Option_Preferences_Inform (const String& Inform)
 String Core::Menu_Option_Preferences_Option (const String& Param, const String& Value)
 {
     return MI->Option(Param, Value);
+}
+
+//***************************************************************************
+// General
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void Core::load_configuration()
+{
+    config = new Configuration;
+    std::string config_path = get_config_path();
+    config->set_path(config_path);
+    config->parse();
+}
+
+//---------------------------------------------------------------------------
+void Core::load_configuration(std::string& config_path)
+{
+    config = new Configuration;
+    config->set_path(config_path);
+    config->parse();
+}
+
+//---------------------------------------------------------------------------
+void Core::load_database()
+{
+#ifdef HAVE_SQLITE
+    std::string db_path;
+    if (!config || config->get("SQLite_Path", db_path))
+        db_path = std::string(".");
+    db_path += Path_Separator;
+
+    db = new SQLLite;
+
+    String dirname(db_path.begin(), db_path.end());
+    db->set_database_directory(dirname);
+    db->init();
+#endif
 }
 
 //***************************************************************************
@@ -159,7 +185,7 @@ void Core::Run (String file)
         bool registered = file_is_registered_in_db(file);
         if (!registered)
         {
-            if (db)
+            if (get_db())
             {
                 MI->Open(file);
                 register_file_to_database(file);
@@ -176,7 +202,7 @@ void Core::Run (String file)
             bool registered = file_is_registered_in_db(file);
             if (!registered)
             {
-                if (db)
+                if (get_db())
                 {
                     MI->Open(List[Pos]);
                     register_file_to_database(List[Pos]);
@@ -753,8 +779,9 @@ void Core::get_Reports_Output(const String& file, String& report)
 //---------------------------------------------------------------------------
 bool Core::file_is_registered_in_db(String& file)
 {
-    if (!db)
+    if (!get_db())
         return false;
+
     std::string filename = Ztring(file).To_UTF8();
     time_t time = get_last_modification_file(filename);
 
@@ -764,6 +791,9 @@ bool Core::file_is_registered_in_db(String& file)
 //---------------------------------------------------------------------------
 std::string Core::get_config_path()
 {
+    if (configuration_path.length())
+        return configuration_path;
+
     std::string config_path(".");
 #if defined(WINDOWS)
     char username[UNLEN+1];
@@ -794,6 +824,37 @@ std::string Core::get_config_path()
     if (!ifile)
         config_path = std::string(".") + Path_Separator;
     return config_path;
+}
+
+//---------------------------------------------------------------------------
+void Core::set_configuration_path(std::string& path)
+{
+    configuration_path = path;
+}
+
+//---------------------------------------------------------------------------
+Configuration* Core::get_configuration_path() const
+{
+    return config;
+}
+
+//---------------------------------------------------------------------------
+bool Core::database_is_enabled() const
+{
+    if (!config)
+        return false;
+    bool enabled = false;
+    if (config->get("SQLite_Path", enabled))
+        return false;
+    return enabled;
+}
+
+//---------------------------------------------------------------------------
+Database *Core::get_db()
+{
+    if (!db)
+        load_database();
+    return db;
 }
 
 }
