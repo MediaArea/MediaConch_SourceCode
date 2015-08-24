@@ -112,6 +112,7 @@ int main(int argc, char* argv_ansi[])
 
     //Configure MediaConch core
     MediaConch::Core MI;
+    MI.load_configuration();
 
     //Retrieve command line (mainly for Unicode)
     GETCOMMANDLINE();
