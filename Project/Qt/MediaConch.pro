@@ -136,58 +136,70 @@ else {
 LIBS             += $$system(pkg-config --libs libmediainfo)
 }
 }
+
 exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
-INCLUDEPATH      += ../../../ZenLib/Source
-LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
-message("custom libzen       : yes")
+    INCLUDEPATH      += ../../../ZenLib/Source
+    LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
+    message("libzen      : custom")
 }
 else {
-LIBS             += -lzen
+    LIBS             += -lzen
+    message("libzen      : system")
 }
+
 exists(../../../libxml2/.libs/libxml2.a) {
-INCLUDEPATH      += ../../../libxml2/include
-LIBS             += ../../../libxml2/.libs/libxml2.a
-message("custom libxml2      : yes")
+    INCLUDEPATH      += ../../../libxml2/include
+    LIBS             += ../../../libxml2/.libs/libxml2.a
+    message("libxml2     : custom")
 }
 else {
-INCLUDEPATH      += /usr/include/libxml2
-LIBS             += -lxml2
+    INCLUDEPATH      += /usr/include/libxml2
+    LIBS             += -lxml2
+    message("libxml2     : system")
 }
 exists(../../../libxslt/libxslt/.libs/libxslt.a) {
-INCLUDEPATH      += ../../../libxslt/libxslt
-LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
-message("custom libxslt      : yes")
+    INCLUDEPATH      += ../../../libxslt/libxslt
+    LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
+    message("libxslt     : custom")
 }
 else {
-INCLUDEPATH      += /usr/include/libxslt
-LIBS             += -lxslt
+    INCLUDEPATH      += /usr/include/libxslt
+    LIBS             += -lxslt
+    message("libxslt     : system")
 }
+
 exists(../../../sqlite/.libs/libsqlite3.a) {
-INCLUDEPATH      += ../../../sqlite
-LIBS             += ../../../sqlite/.libs/libsqlite3.a
-message("custom libsqlite3   : yes")
-QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    INCLUDEPATH      += ../../../sqlite
+    LIBS             += ../../../sqlite/.libs/libsqlite3.a
+    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    message("libsqlite3  : custom")
 }
 else {
-LIBS             += -lsqlite3
-QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    LIBS             += -lsqlite3
+    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    message("libsqlite3  : system")
 }
+
 exists(../../../jansson/build/lib/libjansson.a) {
-INCLUDEPATH      += ../../../jansson/build/include
-LIBS             += ../../../jansson/build/lib/libjansson.a
-message("custom libjansson  : yes")
+    INCLUDEPATH      += ../../../jansson/build/include
+    LIBS             += ../../../jansson/build/lib/libjansson.a
+    message("libjansson  : custom")
 }
 else {
-LIBS             += -ljansson
+    LIBS             += -ljansson
+    message("libjansson  : system")
 }
+
 exists(../../../libevent/build/lib/libevent.a) {
-INCLUDEPATH      += ../../../libevent/build/include
-LIBS             += ../../../libevent/build/lib/libevent.a
-message("custom libevent  : yes")
+    INCLUDEPATH      += ../../../libevent/build/include
+    LIBS             += ../../../libevent/build/lib/libevent.a
+    message("libevent    : custom")
 }
 else {
-LIBS             += -levent
+    LIBS             += -levent
+    message("libevent    : system")
 }
+
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
 
