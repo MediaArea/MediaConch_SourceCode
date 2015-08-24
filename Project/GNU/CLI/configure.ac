@@ -329,6 +329,8 @@ if test "$enable_sqlite" = "yes"; then
     else
         AC_MSG_ERROR([libsqlite3 configuration is not found])
     fi
+else
+    with_libsqlite3="No"
 fi
 
 dnl -------------------------------------------------------------------------
@@ -349,7 +351,7 @@ elif pkg-config --exists jansson; then
         MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags jansson)"
         if test "$enable_staticlibs" = "yes"; then
             with_libjansson="system (static)"
-            LIBS="$LIBS $(pkg-config --variable=Libs_Static jansson)"
+            LIBS="$LIBS $(pkg-config --static --libs jansson)"
         else
             with_libjansson="system"
             LIBS="$LIBS $(pkg-config --libs jansson)"
@@ -376,7 +378,7 @@ elif pkg-config --exists libevent; then
         MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libevent)"
         if test "$enable_staticlibs" = "yes"; then
             with_libevent="system (static)"
-            LIBS="$LIBS $(pkg-config --variable=Libs_Static libevent)"
+            LIBS="$LIBS $(pkg-config --static --libs libevent)"
         else
             with_libevent="system"
             LIBS="$LIBS $(pkg-config --libs libevent)"
