@@ -11,7 +11,7 @@ Group:          Applications/Multimedia
 License:        MPL-2.0+/GPL-3.0+
 URL:            http://MediaArea.net/MediaConch
 Packager:       MediaArea.net SARL <info@mediaarea.net>
-Source0:        %{name}_%{version}-1.tar.gz
+Source0:        %{name}_%{version}.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:  gcc-c++
@@ -163,5 +163,5 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}/%{_datad
 
 
 %changelog
-* Mon May 25 2015 MediaArea.net SARL <info@mediaarea.net> - 15.07
+* Mon May 25 2015 MediaArea.net SARL <info@mediaarea.net> - %{mediaconch_version}
 - See History.txt for more info and real dates
