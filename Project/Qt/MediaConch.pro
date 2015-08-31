@@ -4,9 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui webkit
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += webkitwidgets
 
 !macx:TARGET = mediaconch-gui
 macx:TARGET = MediaConch
@@ -21,6 +22,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Policies.cpp \
                     ../../Source/GUI/Qt/main.cpp \
+                    ../../Source/GUI/Qt/WebPAge.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/policiestree.cpp \
                     ../../Source/GUI/Qt/policiesmenu.cpp \
@@ -31,6 +33,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
 
 HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schematron.h \
+                    ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/policiestree.h \
                     ../../Source/GUI/Qt/policiesmenu.h \
@@ -76,6 +79,18 @@ LIBS             += -lxml2
 }
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
+
+contains(DEFINES, "MEDIAINFO_LIBCURL_YES") {
+exists(../../../curl/libcurl.pc) {
+INCLUDEPATH      += ../../../curl/include
+LIBS             += ../../../curl/libcurl.a
+message("custom curl         : yes")
+}
+else {
+CONFIG           += link_pkgconfig
+PKGCONFIG        += libcurl
+}
+}
 
 RESOURCES        += ../../Source/Resource/Resources.qrc
 

@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>884</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -44,41 +44,11 @@
     <property name="title">
      <string>Tool</string>
     </property>
-    <addaction name="actionConch"/>
-    <addaction name="actionInfo"/>
-    <addaction name="actionTrace"/>
-    <addaction name="actionSchematron"/>
+    <addaction name="actionChecker"/>
     <addaction name="actionPolicies"/>
-   </widget>
-   <widget class="QMenu" name="menuFormat">
-    <property name="title">
-     <string>Format</string>
-    </property>
-    <addaction name="actionText"/>
-    <addaction name="actionXml"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>
-   <addaction name="menuFormat"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionConch"/>
-   <addaction name="actionInfo"/>
-   <addaction name="actionTrace"/>
-   <addaction name="actionSchematron"/>
-   <addaction name="separator"/>
-   <addaction name="separator"/>
-   <addaction name="actionPolicies"/>
-   <addaction name="separator"/>
-   <addaction name="separator"/>
-   <addaction name="actionText"/>
-   <addaction name="actionXml"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
@@ -101,7 +71,7 @@
     <string>Save policies to Schematron file</string>
    </property>
   </action>
-  <action name="actionConch">
+  <action name="actionChecker">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -109,31 +79,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Conch</string>
-   </property>
-  </action>
-  <action name="actionInfo">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Info</string>
-   </property>
-  </action>
-  <action name="actionTrace">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Trace</string>
-   </property>
-  </action>
-  <action name="actionSchematron">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Apply policies</string>
+    <string>Checker</string>
    </property>
   </action>
   <action name="actionPolicies">
@@ -141,26 +87,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Edit policies</string>
-   </property>
-  </action>
-  <action name="actionText">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Text</string>
-   </property>
-  </action>
-  <action name="actionXml">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>XML</string>
+    <string>Policies</string>
    </property>
   </action>
   <action name="actionCloseAll">

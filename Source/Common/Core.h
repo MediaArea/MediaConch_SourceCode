@@ -70,7 +70,9 @@ public:
     format Format;
     vector<String> List;
 
-    String Run();
+    String Run(String file = String());
+
+    bool ValidatePolicy(String& policy, bool& valid, String& report);
 
     vector<String> SchematronFiles;
     Policies policies;
@@ -87,7 +89,8 @@ private:
     String MediaPolicies();
 
     //Helper
-    String validation(Schematron& S);
+    bool validation(Schematron& S, String& report);
+    void validateSchematronPolicy(int pos, bool& valid, String& report);
 };
 
 }

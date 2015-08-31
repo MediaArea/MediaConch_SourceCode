@@ -1,0 +1,153 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: OpenSans;
+}
+
+footer {
+    border-top: 6px solid #3472A1;
+    border-bottom: 2px solid #3472A1;
+}
+
+.navbar {
+    margin-bottom: 0px;
+    border: 0px;
+    padding-right: 40px;
+}
+
+.navbar-collapse {
+    border-top: 6px solid #3472A1;
+    margin-bottom: 0px;
+    border-bottom: 2px solid #3472A1;
+}
+
+.navbar a {
+    color: black;
+}
+
+.navbar li {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    padding: 5px;
+    color: black;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.navbar span {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    line-height: 20px;
+}
+
+.serif {
+    font-family: Merriweather;
+    font-size: 24px;
+    line-height: 48px;
+    color: black;
+}
+
+.headline {
+    font-family: Merriweather;
+    font-weight: 700;
+    line-height: 1;
+    font-size: 60px;
+}
+
+.tagline {
+    font-size: 30px;
+    line-height: 1.4;
+    padding-bottom: 40px;
+}
+
+.button-padding {
+    padding-bottom: 160px;
+}
+
+.content {
+    padding-top: 40px;
+    background-color: #F2F5F8;
+    padding-bottom: 80px;
+}
+
+
+.panel {
+    background-color: #F5F5F5;
+}
+
+.panel-default > .panel-heading {
+    background-color: #64A8DD;
+}
+
+.panel-title {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.panel-collapse {
+    padding: 10px;
+}
+
+.btn {
+    color: black;
+    font-size: 16px;
+}
+
+.checker-results .list-group {
+    margin-bottom: 0;
+}
+
+.report-blue {
+    color: #4383BD;
+}
+
+.checker-results.panel {
+    margin-bottom: 5px;
+}
+
+.checker-results ul li p {
+    float: right;
+}
+
+.results-dld {
+    margin-left: 10px;
+}
+
+.modal-body p {
+    font-family: monospace;
+}
+
+#checkerUpload > div:nth-child(1) {
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+#checkerOnline > div:nth-child(1) {
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+#checkerRepository > div:nth-child(1) {
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+#fos_user_registration_form .required:after, #fos_user_profile_form .required:after {
+    content: " *";
+}
+
+p.registration {
+    margin-top: 12px;
+}
+
+.alert {
+    margin-top: 20px;
+}

@@ -1,0 +1,31 @@
+<form name="checkerRepository" method="post" action="" enctype="multipart/form-data">
+  <div id="checkerRepository">
+    <div class="form-group">
+      <label class="control-label required">
+        Policy
+      </label>
+      <div id="checkerRepository_step1">
+        <div class="form-group">
+          <label class="control-label" for="checkerRepository_step1_policy">
+            Choose a policy
+          </label>
+          <select id="checkerRepository_step1_policy" name="checkerRepository[step1][policy]" class="form-control">
+            <option selected="selected" value="">Choose a policy</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label required" for="checkerRepository_file">
+        Folder
+        </label>
+      <input id="checkerRepository_directory" name="checkerRepository[directory]" required="required" type="file">
+    </div>
+    <div class="form-group">
+      <button type="submit" id="checkerRepository_Check files" name="checkerRepository[Check files]" class="btn-warning btn">
+        Check files
+      </button>
+    </div>
+    <input id="checkerRepository__token" name="checkerRepository[_token]" class="form-control" value="2Yev2h31m0OJgY4MJn8eqZVZ7bQgm9TrOFBuNaBK-RQ" type="hidden">
+  </div>
+</form>

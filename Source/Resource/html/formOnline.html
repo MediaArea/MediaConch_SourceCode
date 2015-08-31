@@ -1,0 +1,31 @@
+<form name="checkerOnline" method="post" action="" enctype="multipart/form-data">
+  <div id="checkerOnline">
+    <div class="form-group">
+      <label class="control-label required">
+        Policy
+      </label>
+      <div id="checkerOnline_step1">
+        <div class="form-group">
+          <label class="control-label" for="checkerOnline_step1_policy">
+            Choose a policy
+          </label>
+          <select id="checkerOnline_step1_policy" name="checkerOnline[step1][policy]" class="form-control">
+            <option selected="selected" value="">Choose a policy</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label required" for="checkerOnline_file">
+        File
+      </label>
+      <input id="checkerOnline_file" name="checkerOnline[file]" required="required"  maxlength="512" class="form-control" type="url">
+    </div>
+    <div class="form-group">
+      <button type="submit" id="checkerOnline_Check file" name="checkerOnline[Check file]" class="btn-warning btn">
+        Check file
+      </button>
+    </div>
+    <input id="checkerOnline__token" name="checkerOnline[_token]" class="form-control" value="S9eZwOSY4f7x_w29AcjlWoFD9LqOKvhfuggIeESe5_o" type="hidden">
+  </div>
+</form>
