@@ -148,7 +148,7 @@ int Help_Policy()
 //---------------------------------------------------------------------------
 int Version()
 {
-    TEXTOUT("MediaConch Command Line Interface 15.07");
+    TEXTOUT("MediaConch Command Line Interface 15.08");
 
     return -1;
 }
