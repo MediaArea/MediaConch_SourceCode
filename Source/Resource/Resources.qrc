@@ -21,4 +21,10 @@
         <file alias="glyphicons-halflings-regular.woff">html/fonts/glyphicons-halflings-regular.woff</file>
         <file alias="glyphicons-halflings-regular.woff2">html/fonts/glyphicons-halflings-regular.woff2</file>
     </qresource>
+    <qresource prefix="/policies">
+        <file alias="Test0.sch">policies/Test0.sch</file>
+        <file alias="Test1_ntsc.sch">policies/Test1_ntsc.sch</file>
+        <file alias="Test1_pal.sch">policies/Test1_pal.sch</file>
+        <file alias="Test2.sch">policies/Test2.sch</file>
+    </qresource>
 </RCC>

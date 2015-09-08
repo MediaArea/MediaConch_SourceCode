@@ -33,6 +33,11 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QRadioButton>
+#if QT_VERSION >= 0x050000
+#include <QStandardPaths>
+#else
+#include <QDesktopServices>
+#endif
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
@@ -74,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(QApplication::desktop()->screenGeometry().width()/2+100, QApplication::desktop()->screenGeometry().height()/2);
 
     // Default
+    add_default_policy();
     on_actionChecker_triggered();
 }
 
@@ -169,6 +175,49 @@ void MainWindow::exporting_to_schematron_file(int pos)
 void MainWindow::exporting_to_schematron(int pos)
 {
     C.policies.export_schematron(NULL, pos);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::add_default_policy()
+{
+    QDir policies_dir(":/policies");
+
+    policies_dir.setFilter(QDir::Files);
+    QFileInfoList list = policies_dir.entryInfoList();
+    for (int i = 0; i < list.count(); ++i)
+    {
+        QFile file(list[i].absoluteFilePath());
+
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            continue;
+        QByteArray schematron = file.readAll();
+        String ret = C.policies.import_schematron_from_memory(list[i].absoluteFilePath().toStdString().c_str(),
+                                                              schematron.constData(), schematron.length());
+        (void)ret;
+    }
+
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+    policies_dir = QDir(path);
+
+    policies_dir.setFilter(QDir::Files);
+    list = policies_dir.entryInfoList();
+    for (int i = 0; i < list.count(); ++i)
+    {
+        QFile file(list[i].absoluteFilePath());
+
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            continue;
+        QByteArray schematron = file.readAll();
+        String ret = C.policies.import_schematron_from_memory(list[i].absoluteFilePath().toStdString().c_str(),
+                                                              schematron.constData(), schematron.length());
+        (void)ret;
+    }
 }
 
 //***************************************************************************

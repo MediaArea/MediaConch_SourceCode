@@ -120,6 +120,7 @@ public:
     ~Policies();
 
     String import_schematron(const char* filename);
+    String import_schematron_from_memory(const char* filename, const char* memory, int len);
     void export_schematron(const char* filename, size_t pos);
     void erase_policy(size_t index);
     xmlDocPtr  create_doc(size_t pos);
@@ -152,6 +153,8 @@ private:
     Policies& operator=(const Policies&);
 
     // HELPER
+    String import_schematron_from_doc(const char* filename, xmlDocPtr doc);
+
     bool find_title_node(xmlNodePtr node, string& title);
     void find_patterns_node(xmlNodePtr node, vector<Pattern *>& patterns);
     void find_rules_node(xmlNodePtr node, vector<Rule *>& rules);

@@ -57,6 +57,7 @@ public:
     QString                     ask_for_schematron_file();
     void                        checker_selected();
     void                        policies_selected();
+    void                        add_default_policy();
 
     const list<string>* providePolicyExistingType() const {return &C.policies.existing_type; }
     const list<string>* providePolicyExistingField() const {return &C.policies.existing_field; }
