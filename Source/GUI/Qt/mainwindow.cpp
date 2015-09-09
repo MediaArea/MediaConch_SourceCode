@@ -33,6 +33,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QRadioButton>
+#include <QStatusBar>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -61,8 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ToolGroup->addAction(ui->actionPolicies);
     
     // Visual elements
-    Layout=new QVBoxLayout(this);
-    ui->centralWidget->setLayout(Layout);
+    Layout=(QVBoxLayout*)ui->centralWidget->layout();
+    Layout->setContentsMargins(0, 0, 0, 0);
     createMenu();
     MainView=NULL;
     progressBar=NULL;
