@@ -157,6 +157,40 @@ void MainWindow::checker_add_files(QFileInfoList& list, QString& policy)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::checker_add_xslt_file(QString& file, QString& xslt)
+{
+    if (C.Tool == Core::tool_MediaPolicies)
+    {
+        displayPoliciesTree();
+        return;
+    }
+
+    addFileToList(file);
+    C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
+    updateWebView(file.toStdWString(), String());
+    C.PoliciesFiles[Core::policyType_Xslt].clear();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
+{
+    if (C.Tool == Core::tool_MediaPolicies)
+    {
+        displayPoliciesTree();
+        return;
+    }
+
+    for (int i = 0; i < list.count(); ++i)
+    {
+        QString file = list[i].absoluteFilePath();
+        addFileToList(file);
+    }
+    C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
+    updateWebView(list, String());
+    C.PoliciesFiles[Core::policyType_Xslt].clear();
+}
+
+//---------------------------------------------------------------------------
 QString MainWindow::ask_for_schematron_file()
 {
     QString file=QFileDialog::getOpenFileName(this, "Open file", "", "Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
@@ -273,7 +307,7 @@ void MainWindow::on_actionChooseSchematron_triggered()
     {
         if (C.policies.import_schematron(file.toStdString().c_str()).length())
         {
-            C.SchematronFiles.push_back(file.toStdWString());
+            C.PoliciesFiles[Core::policyType_Schematron].push_back(file.toStdWString());
         }
     }
     Run();

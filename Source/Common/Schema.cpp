@@ -32,6 +32,7 @@ Schema::Schema()
 Schema::~Schema()
 {
     schema.clear();
+    report.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -68,6 +69,15 @@ std::string Schema::read_file(const char* filename)
                   std::istreambuf_iterator<char>());
     file_handler.close();
     return buffer;
+}
+
+//---------------------------------------------------------------------------
+int Schema::validate_xml_from_file(const char* filename, bool silent)
+{
+    std::string xml = read_file(filename);
+    if (!xml.length())
+        return -1;
+    return validate_xml(xml.c_str(), xml.length(), silent);
 }
 
 }

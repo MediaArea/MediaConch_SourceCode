@@ -8,6 +8,7 @@ Build-Depends: debhelper (>= 9),
                libzen-dev (>= 0.4.29),
                libqt4-dev,
                libxml2-dev,
+               libxslt-dev,
                zlib1g-dev,
                pkg-config,
 Standards-Version: 3.9.6

@@ -150,6 +150,16 @@ namespace MediaConch
 
         if (!file.length())
             return;
+        if (!policy.length())
+        {
+            QString xslt = file_selector.value("checkerUpload[step1][xslt]", QString());
+            if (xslt.length())
+            {
+                mainwindow->checker_add_xslt_file(file, xslt);
+                return;
+            }
+        }
+
         mainwindow->checker_add_file(file, policy);
     }
 
@@ -162,6 +172,15 @@ namespace MediaConch
 
         if (!url.length())
             return;
+        if (!policy.length())
+        {
+            QString xslt = file_selector.value("checkerUpload[step1][xslt]", QString());
+            if (xslt.length())
+            {
+                mainwindow->checker_add_xslt_file(url, xslt);
+                return;
+            }
+        }
         mainwindow->checker_add_file(url, policy);
     }
 
@@ -176,6 +195,15 @@ namespace MediaConch
         QFileInfoList list = dir.entryInfoList(QDir::Files);
         if (!list.count())
             return;
+        if (!policy.length())
+        {
+            QString xslt = file_selector.value("checkerUpload[step1][xslt]", QString());
+            if (xslt.length())
+            {
+                mainwindow->checker_add_xslt_files(list, xslt);
+                return;
+            }
+        }
         mainwindow->checker_add_files(list, policy);
     }
 

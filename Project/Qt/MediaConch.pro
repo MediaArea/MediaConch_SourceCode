@@ -21,6 +21,7 @@ DEFINES          +=  _UNICODE
 SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schema.cpp \
                     ../../Source/Common/Schematron.cpp \
+                    ../../Source/Common/Xslt.cpp \
                     ../../Source/Common/Policies.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
@@ -36,6 +37,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
 HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schema.h \
                     ../../Source/Common/Schematron.h \
+                    ../../Source/Common/Xslt.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/mainwindow.h \
@@ -80,6 +82,15 @@ message("custom libxml2      : yes")
 else {
 INCLUDEPATH      += /usr/include/libxml2
 LIBS             += -lxml2
+}
+exists(../../../libxslt/libxslt/.libs/libxslt.a) {
+INCLUDEPATH      += ../../../libxslt/libxslt
+LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
+message("custom libxslt      : yes")
+}
+else {
+INCLUDEPATH      += /usr/include/libxslt
+LIBS             += -lxslt
 }
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt

@@ -11,7 +11,8 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "Schematron.h"
+#include <libxml/tree.h>
+#include "Xslt.h"
 #include <fstream>
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -24,81 +25,88 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Schematron::Schematron() : Schema()
+Xslt::Xslt() : Schema()
 {
-    schematron_ctx = NULL;
+    xslt_ctx = NULL;
+    doc_ctx = NULL;
 }
 
 //---------------------------------------------------------------------------
-Schematron::~Schematron()
+Xslt::~Xslt()
 {
-    if (schematron_ctx != NULL)
+    if (xslt_ctx)
     {
-        xmlSchematronFree(schematron_ctx);
-        schematron_ctx = NULL;
+        xsltFreeStylesheet(xslt_ctx);
+        xslt_ctx = NULL;
+        doc_ctx = NULL;
+    }
+    if (doc_ctx)
+    {
+        xmlFreeDoc(doc_ctx);
+        doc_ctx = NULL;
     }
 }
 
 //---------------------------------------------------------------------------
-bool Schematron::register_schema_from_doc(void* data)
+bool Xslt::register_schema_from_doc(void* data)
 {
     xmlDocPtr doc = (xmlDocPtr)data;
     if (doc == NULL)
         return false;
 
-    xmlLoadExtDtdDefaultValue |= 1;
-    xmlSetGenericErrorFunc(this, &manage_generic_error);
+    xsltSetGenericErrorFunc(this, &manage_generic_error);
+    xmlLoadExtDtdDefaultValue = 1;
 
-    if (schematron_ctx != NULL)
+    if (xslt_ctx)
     {
-        xmlSchematronFree(schematron_ctx);
-        schematron_ctx = NULL;
+        xsltFreeStylesheet(xslt_ctx);
+        xslt_ctx = NULL;
+        doc_ctx = NULL;
     }
 
-    xmlSchematronParserCtxtPtr parser = xmlSchematronNewDocParserCtxt(doc);
-    if (!parser)
-        return false;
+    if (doc_ctx)
+    {
+        xmlFreeDoc(doc_ctx);
+        doc_ctx = NULL;
+    }
 
-    schematron_ctx = xmlSchematronParse(parser); //TODO: Leak?
-    xmlSchematronFreeParserCtxt(parser);
-    if (schematron_ctx == NULL)
-        return false;
+    doc_ctx = xmlCopyDoc(doc, 1);
+    xslt_ctx = xsltParseStylesheetDoc(doc_ctx);
 
-    xmlSetGenericErrorFunc(NULL, NULL);
-    return true;
+    xsltSetGenericErrorFunc(NULL, NULL);
+    return xslt_ctx != NULL;
 }
 
 //---------------------------------------------------------------------------
-bool Schematron::register_schema_from_memory()
+bool Xslt::register_schema_from_memory()
 {
-    xmlLoadExtDtdDefaultValue |= 1;
+    xmlLoadExtDtdDefaultValue = 1;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
 
-    if (schematron_ctx != NULL)
-    {
-        xmlSchematronFree(schematron_ctx);
-        schematron_ctx = NULL;
-    }
-
-    xmlSchematronParserCtxtPtr parser =
-        xmlSchematronNewMemParserCtxt(schema.c_str(), schema.length());
-    if (!parser)
-        return false;
-
-    schematron_ctx = xmlSchematronParse(parser); //TODO: Leak?
-    xmlSchematronFreeParserCtxt(parser);
-    if (schematron_ctx == NULL)
-        return false;
-
-    xmlSetGenericErrorFunc(NULL, NULL);
-    return true;
-}
-
-//---------------------------------------------------------------------------
-int Schematron::validate_xml(const char* xml, size_t len, bool silent)
-{
-    if (schematron_ctx == NULL)
+    int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD;
+#ifdef XML_PARSE_BIG_LINES
+    doc_flags =| XML_PARSE_BIG_LINES;
+#endif // !XML_PARSE_BIG_LINES
+    xmlDocPtr doc = xmlReadMemory(schema.c_str(), schema.length(), NULL, NULL, doc_flags);
+    if (doc == NULL)
         return -1;
+
+    bool ret = register_schema_from_doc(doc);
+
+    xmlFreeDoc(doc);
+    xmlSetGenericErrorFunc(NULL, NULL);
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int Xslt::validate_xml(const char* xml, size_t len, bool)
+{
+    report.clear();
+    if (!xslt_ctx)
+        return -1;
+
+    xmlSubstituteEntitiesDefault(1);
+    xmlLoadExtDtdDefaultValue = 1;
 
     int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
@@ -108,29 +116,31 @@ int Schematron::validate_xml(const char* xml, size_t len, bool silent)
 #endif // !XML_PARSE_BIG_LINES
 
     xmlDocPtr doc = xmlReadMemory(xml, len, NULL, NULL, doc_flags);
-    if (doc == NULL)
+    if (!doc)
         return -1;
 
-    xmlSchematronValidCtxtPtr ctx = NULL;
-    int validation_flags = XML_SCHEMATRON_OUT_TEXT;
+    xmlDocPtr res = xsltApplyStylesheet(xslt_ctx, doc, NULL);
 
-    if (silent)
-        validation_flags |= XML_SCHEMATRON_OUT_QUIET;
+    if (!res)
+    {
+        xmlFreeDoc(doc);
+        return -1;
+    }
 
-#if LIBXML_VERSION >= 20632
-    validation_flags |= XML_SCHEMATRON_OUT_ERROR;
-#endif
-    ctx = xmlSchematronNewValidCtxt(schematron_ctx, validation_flags);
+    xmlChar *doc_txt_ptr = NULL;
+    int doc_txt_len = 0;
+    if (xsltSaveResultToString(&doc_txt_ptr, &doc_txt_len, res, xslt_ctx) < 0)
+    {
+        xmlFreeDoc(doc);
+        xmlFreeDoc(res);
+        return -1;
+    }
+    report = std::string((const char*)doc_txt_ptr, doc_txt_len);
 
-#if LIBXML_VERSION >= 20632
-    xmlSchematronSetValidStructuredErrors(ctx, manage_error, this);
-#endif
-
-    int ret = xmlSchematronValidateDoc(ctx, doc);
-    xmlSchematronFreeValidCtxt(ctx);
     xmlFreeDoc(doc);
+    xmlFreeDoc(res);
     xmlSetGenericErrorFunc(NULL, NULL);
-    return ret;
+    return 0;
 }
 
 //***************************************************************************
@@ -138,9 +148,9 @@ int Schematron::validate_xml(const char* xml, size_t len, bool silent)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Schematron::manage_error(void *userData, xmlErrorPtr err)
+void Xslt::manage_error(void *userData, xmlErrorPtr err)
 {
-    Schematron *obj = (Schematron *)userData;
+    Xslt *obj = (Xslt *)userData;
     if (!err || err->code == XML_ERR_OK) {
         return;
     }
@@ -148,9 +158,9 @@ void Schematron::manage_error(void *userData, xmlErrorPtr err)
 }
 
 //---------------------------------------------------------------------------
-void Schematron::manage_generic_error(void *userData, const char* msg, ...)
+void Xslt::manage_generic_error(void *userData, const char* msg, ...)
 {
-    Schematron *obj = (Schematron *)userData;
+    Xslt *obj = (Xslt *)userData;
     va_list args;
     char buf[4096] = {0};
 
