@@ -268,9 +268,10 @@ String Core::MediaSchematron ()
             }
             else
             {
+                std::vector<std::string> errors = S.get_errors();
                 Out << "internal error for parsing file" << endl;
-                for (size_t pos = 0; pos < S.errors.size(); pos++)
-                    Out << "\t" << S.errors[pos].c_str();
+                for (size_t pos = 0; pos < errors.size(); pos++)
+                    Out << "\t" << errors[pos].c_str();
             }
         }
         return Out.str();
@@ -330,9 +331,11 @@ void Core::validateSchematronPolicy(int pos, bool& valid, String& report)
         valid = false;
 
         wstringstream Out;
+        std::vector<std::string> errors = S.get_errors();
+
         Out << "internal error for parsing Policies" << endl;
-        for (size_t i = 0; i < S.errors.size(); i++)
-            Out << "\t" << S.errors[i].c_str();
+        for (size_t i = 0; i < errors.size(); i++)
+            Out << "\t" << errors[i].c_str();
         report = Out.str();
     }
     xmlFreeDoc(doc);
@@ -349,10 +352,12 @@ bool Core::validation(Schematron& S, String& report)
     int ret = S.validate_xml(xml.c_str(), xml.length());
     if (ret > 0)
     {
+        std::vector<std::string> errors = S.get_errors();
+
         Out << __T("NOT VALID\n");
-        for (size_t pos = 0; pos < S.errors.size(); pos++)
-            Out << "\t" << S.errors[pos].c_str();
-        if (!S.errors.size())
+        for (size_t pos = 0; pos < errors.size(); pos++)
+            Out << "\t" << errors[pos].c_str();
+        if (!errors.size())
             Out << endl;
         valid = false;
     }

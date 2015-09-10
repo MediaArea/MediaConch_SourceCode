@@ -6,6 +6,7 @@ mediaconch_SOURCES = \
     ../../../Source/CLI/CommandLine_Parser.cpp \
     ../../../Source/CLI/Help.cpp \
     ../../../Source/Common/Core.cpp \
+    ../../../Source/Common/Schema.cpp \
     ../../../Source/Common/Schematron.cpp \
     ../../../Source/Common/Policies.cpp
 

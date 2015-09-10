@@ -6,48 +6,53 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Schematron functions
+// Schema functions
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef SchematronH
-#define SchematronH
+#ifndef SchemaH
+#define SchemaH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include <libxml/schematron.h>
 #include <string>
-#include "Schema.h"
+#include <vector>
 
 namespace MediaConch {
 
 //***************************************************************************
-// Class Schematron
+// Class Schema
 //***************************************************************************
 
-class Schematron : public Schema
+class Schema
 {
 public:
     //Constructor/Destructor
-    Schematron();
-    virtual ~Schematron();
+    Schema();
+    virtual ~Schema();
 
-    virtual bool register_schema_from_memory();
-    virtual bool register_schema_from_doc(void* doc);
+    bool         register_schema_from_file(const char* filename);
+    virtual bool register_schema_from_memory() = 0;
+    virtual bool register_schema_from_doc(void* doc) = 0;
 
-    virtual int  validate_xml(const char* xml, size_t len, bool silent=true);
-    virtual int  validate_xml_from_file(const char* file, bool silent=true);
+    virtual int  validate_xml(const char* xml, size_t len, bool silent=true) = 0;
+    virtual int  validate_xml_from_file(const char* file, bool silent=true) = 0;
 
-    // Callbacks
-    static void  manage_generic_error(void *userData, const char* msg, ...);
-    static void  manage_error(void *userData, xmlErrorPtr err);
+    std::string  get_schema() const { return schema; }
+    std::vector<std::string> get_errors() const { return errors; }
+
+protected:
+    std::string              schema;
+    std::vector<std::string> errors;
+
+    // HELPER
+    std::string  read_file(const char* filename);
 
 private:
-    Schematron(const Schematron&);
-    Schematron&  operator=(const Schematron&);
+    Schema(const Schema&);
+    Schema&     operator=(const Schema&);
 
-    xmlSchematronPtr schematron_ctx;
 };
 
 }

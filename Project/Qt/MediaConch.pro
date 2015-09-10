@@ -19,6 +19,7 @@ CONFIG += no_keywords
 DEFINES          +=  _UNICODE
 
 SOURCES          += ../../Source/Common/Core.cpp \
+                    ../../Source/Common/Schema.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Policies.cpp \
                     ../../Source/GUI/Qt/main.cpp \
@@ -33,6 +34,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/ruleedit.cpp
 
 HEADERS          += ../../Source/Common/Core.h \
+                    ../../Source/Common/Schema.h \
                     ../../Source/Common/Schematron.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
