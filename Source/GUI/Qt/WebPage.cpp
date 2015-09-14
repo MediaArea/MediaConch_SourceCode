@@ -9,6 +9,9 @@
 #include <QWebElement>
 #include <QWebElementCollection>
 #include <QFileDialog>
+#include <QFile>
+#include <QTextDocument>
+#include <QTextStream>
 
 #include "mainwindow.h"
 #include "WebPage.h"
@@ -64,6 +67,36 @@ namespace MediaConch
                 link.setAttribute("onclick", QString("webpage.menu_link_checker(this.text);"));
             }
         }
+
+        //Results
+        QWebElementCollection results = frame->findAllElements(".checker-results");
+        for (int i = 0; i < results.count(); i++)
+        {
+            QWebElement result = results[i];
+
+            QWebElementCollection downloads = frame->findAllElements("a");
+            for (int j = 0; j < downloads.count(); j++)
+            {
+                QString data_toggle = downloads[j].attribute("data-toggle");
+                if (!data_toggle.length() || data_toggle != "results-dld")
+                    continue;
+
+                QWebElement parent = downloads[j].parent();
+                QWebElementCollection links = parent.findAll("a");
+                QString target;
+                for (int k = 0; k < links.count(); k++)
+                {
+                    QString data_toggle = links[k].attribute("data-toggle");
+                    if (data_toggle.length() || data_toggle == "modal")
+                    {
+                        target = links[k].attribute("data-target");
+                        break;
+                    }
+                }
+
+                downloads[j].setAttribute("onclick", QString("webpage.onDownloadReport(\"%1\");").arg(target));
+            }
+        }
     }
 
     void WebPage::menu_link_checker(const QString& name)
@@ -84,6 +117,29 @@ namespace MediaConch
     void WebPage::onButtonClicked(const QString& id)
     {
         button_clicked_id = id;
+    }
+
+    void WebPage::onDownloadReport(const QString& target)
+    {
+        QWebFrame* frame = mainFrame();
+        QWebElement reportDiv = frame->findFirstElement(target);
+
+        QWebElement report = reportDiv.findFirst(".modal-body");
+        if (report.isNull())
+            return;
+
+        QString dl_file = QFileDialog::getSaveFileName(view());
+
+        if (!dl_file.length())
+            return;
+
+        QFile file(dl_file);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+            return;
+
+        QTextStream out(&file);
+        QTextDocument text(report.toPlainText().trimmed());
+        out << text.toPlainText() << "\n";
     }
 
     void WebPage::onFileUploadSelected(QWebElement form)

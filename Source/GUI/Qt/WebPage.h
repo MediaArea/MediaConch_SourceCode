@@ -32,6 +32,7 @@ protected:
 public Q_SLOTS:
     void onInputChanged(const QString& inputName);
     void onButtonClicked(const QString& id);
+    void onDownloadReport(const QString& target);
     void menu_link_checker(const QString& name);
 
 private Q_SLOTS:
