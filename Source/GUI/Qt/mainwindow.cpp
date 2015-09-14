@@ -245,6 +245,7 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::on_actionCloseAll_triggered()
 {
     C.List.clear();
+    clearVisualElements();
 
     Run();
 }
