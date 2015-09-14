@@ -22,7 +22,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Policies.cpp \
                     ../../Source/GUI/Qt/main.cpp \
-                    ../../Source/GUI/Qt/WebPAge.cpp \
+                    ../../Source/GUI/Qt/WebPage.cpp \
+                    ../../Source/GUI/Qt/WebView.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/policiestree.cpp \
                     ../../Source/GUI/Qt/policiesmenu.cpp \
@@ -34,6 +35,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
 HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schematron.h \
                     ../../Source/GUI/Qt/WebPage.h \
+                    ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/policiestree.h \
                     ../../Source/GUI/Qt/policiesmenu.h \

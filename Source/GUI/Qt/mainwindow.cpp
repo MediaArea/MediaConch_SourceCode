@@ -13,6 +13,7 @@
 #include "rulemenu.h"
 #include "ruleedit.h"
 #include "WebPage.h"
+#include "WebView.h"
 
 #include <QTextEdit>
 #include <QWebView>
@@ -78,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/icon/icon.png"));
     move(QApplication::desktop()->screenGeometry().width()/4-50, QApplication::desktop()->screenGeometry().height()/4);
     resize(QApplication::desktop()->screenGeometry().width()/2+100, QApplication::desktop()->screenGeometry().height()/2);
+    setAcceptDrops(false);
 
     // Default
     add_default_policy();
@@ -1055,6 +1057,7 @@ void MainWindow::createMenu()
     QFile menu_file(":/menu.html");
 
     MenuView = new QWebView(this);
+    MenuView->setAcceptDrops(true);
     MenuView->setMaximumHeight(75);
     MenuView->setMinimumHeight(75);
     Layout->addWidget(MenuView);
@@ -1094,7 +1097,7 @@ void MainWindow::createWebViewFinished(bool ok)
 //---------------------------------------------------------------------------
 void MainWindow::setWebViewContent(QString& html)
 {
-    MainView=new QWebView(this);
+    MainView=new WebView(this);
 
     WebPage* page = new WebPage(this, MainView);
     MainView->setPage(page);

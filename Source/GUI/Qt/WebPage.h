@@ -18,6 +18,8 @@ class WebPage : public QWebPage
 public:
     explicit WebPage(MainWindow *m, QWidget *parent = 0);
 
+    void changeLocalFile(QString& file);
+
 protected:
     virtual bool acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request, QWebPage::NavigationType type);
     QString chooseFile(QWebFrame *frame, const QString& suggested);

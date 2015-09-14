@@ -18,11 +18,11 @@ class MainWindow;
 }
 
 class QVBoxLayout;
-class QWebView;
 class QProgressBar;
 class QLabel;
 class QTreeWidgetItem;
 class QFile;
+class QWebView;
 
 namespace MediaConch {
 
@@ -32,6 +32,7 @@ class PolicyMenu;
 class GroupOfRules;
 class RuleMenu;
 class RuleEdit;
+class WebView;
 
 class MainWindow : public QMainWindow
 {
@@ -78,7 +79,7 @@ private:
     // Visual elements
     QVBoxLayout*                Layout;
     QWebView*                   MenuView;
-    QWebView*                   MainView;
+    WebView*                    MainView;
     QProgressBar*               progressBar;
     void                        clearVisualElements();
     void                        clearPoliciesElements();

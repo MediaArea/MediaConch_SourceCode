@@ -178,5 +178,39 @@ namespace MediaConch
         return false;
     }
     
+    void WebPage::changeLocalFile(QString& file)
+    {
+        QWebFrame* frame = mainFrame();
 
+        QWebElement form = frame->findFirstElement("#collapseOnline");
+        if (!form.isNull())
+        {
+            form.setAttribute("class", "panel-collapse collapse");
+            form.setAttribute("aria-expanded", "false");
+            form.setAttribute("style", "\"height: 20px\"");
+        }
+        form = frame->findFirstElement("#collapseRepository");
+        if (!form.isNull())
+        {
+            form.setAttribute("aria-expanded", "false");
+            form.setAttribute("class", "panel-collapse collapse");
+            form.setAttribute("style", "\"height: 20px\"");
+        }
+
+        form = frame->findFirstElement("#collapseUpload");
+        if (form.isNull())
+            return;
+        form.setAttribute("aria-expanded", "true");
+        form.setAttribute("class", "panel-collapse in");
+        form.setAttribute("style", "");
+
+        QWebElement input = form.findFirst("#checkerUpload_file");
+        if (input.isNull())
+            return;
+
+        input.setAttribute("value", file);
+        file_selector.insert("checkerUpload[file]", file);
+
+        onFileUploadSelected(form);
+    }
 }
