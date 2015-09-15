@@ -162,6 +162,36 @@ String Policies::import_schematron(const char* filename)
         return String(__T("The schematron file cannot be parsed"));
     }
 
+    String ret = import_schematron_from_doc(filename, doc);
+    xmlFreeDoc(doc);
+    return ret;
+}
+
+String Policies::import_schematron_from_memory(const char* filename, const char* buffer, int len)
+{
+    if (!buffer || !len)
+        return String(__T("The schematron does not exist"));
+
+    Schematron s;
+    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
+
+    xmlDocPtr doc = xmlParseMemory(buffer, len);
+    if (!doc)
+    {
+        // maybe put the errors from s.errors
+        return String(__T("The schematron given cannot be parsed"));
+    }
+
+    String ret = import_schematron_from_doc(filename, doc);
+    xmlFreeDoc(doc);
+    return ret;
+}
+
+String Policies::import_schematron_from_doc(const char* filename, xmlDocPtr doc)
+{
+    if (!doc)
+        return String(__T("The schematron doc is not valid"));
+
     xmlNodePtr root = xmlDocGetRootElement(doc);
     if (!root)
         return String(__T("No root node, leaving"));
@@ -193,7 +223,6 @@ String Policies::import_schematron(const char* filename)
         child = child->next;
     }
     policies.push_back(p);
-    xmlFreeDoc(doc);
     xmlSetGenericErrorFunc(NULL, NULL);
     return String();
 }

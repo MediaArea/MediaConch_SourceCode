@@ -12,15 +12,19 @@
 #include "groupofrules.h"
 #include "rulemenu.h"
 #include "ruleedit.h"
+#include "WebPage.h"
+#include "WebView.h"
 
-#include <QPlainTextEdit>
+#include <QTextEdit>
+#include <QWebView>
+#include <QWebFrame>
+#include <QWebElement>
+#include <QProgressBar>
 #include <QVBoxLayout>
 #include <QActionGroup>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QFileDialog>
-#include <QDropEvent>
-#include <QDragEnterEvent>
 #include <QMimeData>
 #include <QLabel>
 #include <QUrl>
@@ -30,6 +34,12 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QRadioButton>
+#include <QStatusBar>
+#if QT_VERSION >= 0x050000
+#include <QStandardPaths>
+#else
+#include <QDesktopServices>
+#endif
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
@@ -49,21 +59,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
-    ToolGroup->addAction(ui->actionConch);
-    ToolGroup->addAction(ui->actionInfo);
-    ToolGroup->addAction(ui->actionTrace);
-    ToolGroup->addAction(ui->actionSchematron);
+    ToolGroup->addAction(ui->actionChecker);
     ToolGroup->addAction(ui->actionPolicies);
-    QActionGroup* FormatGroup = new QActionGroup(this);
-    FormatGroup->addAction(ui->actionText);
-    FormatGroup->addAction(ui->actionXml);
     
     // Visual elements
-    Layout=new QVBoxLayout(this);
-    ui->centralWidget->setLayout(Layout);
-    MainText=NULL;
-    DragDrop_Image=NULL;
-    DragDrop_Text=NULL;
+    Layout=(QVBoxLayout*)ui->centralWidget->layout();
+    Layout->setContentsMargins(0, 0, 0, 0);
+    createMenu();
+    MainView=NULL;
+    progressBar=NULL;
     policiesTree = NULL;
     policiesMenu = NULL;
     policyMenu = NULL;
@@ -71,16 +75,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ruleMenu = NULL;
     ruleEdit = NULL;
 
-    // Drag n drop
-    setAcceptDrops(true);
-
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
-    move(QApplication::desktop()->screenGeometry().width()/4, QApplication::desktop()->screenGeometry().height()/4);
-    resize(QApplication::desktop()->screenGeometry().width()/2, QApplication::desktop()->screenGeometry().height()/2);
+    move(QApplication::desktop()->screenGeometry().width()/4-50, QApplication::desktop()->screenGeometry().height()/4);
+    resize(QApplication::desktop()->screenGeometry().width()/2+100, QApplication::desktop()->screenGeometry().height()/2);
+    setAcceptDrops(false);
 
     // Default
-    on_actionConch_triggered();
+    add_default_policy();
+    on_actionChecker_triggered();
 }
 
 MainWindow::~MainWindow()
@@ -93,24 +96,9 @@ MainWindow::~MainWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+void MainWindow::addFileToList(QString& file)
 {
-    event->acceptProposedAction();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::dropEvent(QDropEvent *Event)
-{
-    if (Event->mimeData()->hasUrls())
-    {
-        QList<QUrl> urls=Event->mimeData()->urls();
-
-        C.List.clear();
-        for (int Pos=0; Pos<urls.size(); Pos++)
-            C.List.push_back(urls[Pos].toLocalFile().toStdWString());
-    }
-
-    Run();
+    C.List.push_back(file.toStdWString());
 }
 
 void MainWindow::policy_to_delete(int index)
@@ -132,14 +120,40 @@ void MainWindow::Run()
         return;
     }
 
-    if (C.List.empty())
+    createWebView();
+    //TODO: fill the view if file already here
+    // if (!C.List.empty())
+    //     C.Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::checker_add_file(QString& file, QString& policy)
+{
+    if (C.Tool == Core::tool_MediaPolicies)
     {
-        createDragDrop();
+        displayPoliciesTree();
         return;
     }
-    createMainText();
 
-    MainText->setPlainText(QString().fromStdWString(C.Run().c_str()));
+    addFileToList(file);
+    updateWebView(file.toStdWString(), policy.toStdWString());
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::checker_add_files(QFileInfoList& list, QString& policy)
+{
+    if (C.Tool == Core::tool_MediaPolicies)
+    {
+        displayPoliciesTree();
+        return;
+    }
+
+    for (int i = 0; i < list.count(); ++i)
+    {
+        QString file = list[i].absoluteFilePath();
+        addFileToList(file);
+    }
+    updateWebView(list, policy.toStdWString());
 }
 
 //---------------------------------------------------------------------------
@@ -166,6 +180,49 @@ void MainWindow::exporting_to_schematron(int pos)
     C.policies.export_schematron(NULL, pos);
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::add_default_policy()
+{
+    QDir policies_dir(":/policies");
+
+    policies_dir.setFilter(QDir::Files);
+    QFileInfoList list = policies_dir.entryInfoList();
+    for (int i = 0; i < list.count(); ++i)
+    {
+        QFile file(list[i].absoluteFilePath());
+
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            continue;
+        QByteArray schematron = file.readAll();
+        String ret = C.policies.import_schematron_from_memory(list[i].absoluteFilePath().toStdString().c_str(),
+                                                              schematron.constData(), schematron.length());
+        (void)ret;
+    }
+
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+    policies_dir = QDir(path);
+
+    policies_dir.setFilter(QDir::Files);
+    list = policies_dir.entryInfoList();
+    for (int i = 0; i < list.count(); ++i)
+    {
+        QFile file(list[i].absoluteFilePath());
+
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            continue;
+        QByteArray schematron = file.readAll();
+        String ret = C.policies.import_schematron_from_memory(list[i].absoluteFilePath().toStdString().c_str(),
+                                                              schematron.constData(), schematron.length());
+        (void)ret;
+    }
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -188,91 +245,23 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::on_actionCloseAll_triggered()
 {
     C.List.clear();
+    clearVisualElements();
 
     Run();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionConch_triggered()
+void MainWindow::on_actionChecker_triggered()
 {
-    ui->menuFormat->setEnabled(false);
-    ui->actionText->setEnabled(false);
-    ui->actionXml->setEnabled(false);
-    ui->actionText->setChecked(true);
-
     C.Tool=Core::tool_MediaConch;
     C.Format=Core::format_Text;
     Run();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionInfo_triggered()
-{
-    ui->menuFormat->setEnabled(true);
-    ui->actionText->setEnabled(true);
-    ui->actionXml->setEnabled(true);
-
-    C.Tool=Core::tool_MediaInfo;
-    Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionTrace_triggered()
-{
-    ui->menuFormat->setEnabled(true);
-    ui->actionText->setEnabled(true);
-    ui->actionXml->setEnabled(true);
-
-    C.Tool=Core::tool_MediaTrace;
-    Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionSchematron_triggered()
-{
-    if (!C.policies.policies.size() && !C.SchematronFiles.size())
-    {
-        QString file = ask_for_schematron_file();
-        if (file.length())
-        {
-            if (C.policies.import_schematron(file.toStdString().c_str()).length())
-            {
-                C.SchematronFiles.push_back(file.toStdWString());
-            }
-        }
-    }
-    ui->menuFormat->setEnabled(true);
-    ui->actionText->setEnabled(false);
-    ui->actionXml->setEnabled(true);
-    ui->actionXml->setChecked(true);
-
-    C.Tool=Core::tool_MediaSchematron;
-    Run();
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::on_actionPolicies_triggered()
 {
-    ui->menuFormat->setEnabled(true);
-    ui->actionText->setEnabled(false);
-    ui->actionXml->setEnabled(true);
-    ui->actionXml->setChecked(true);
-
     C.Tool=Core::tool_MediaPolicies;
-    Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionText_triggered()
-{
-    C.Format=Core::format_Text;
-    Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionXml_triggered()
-{
-    C.Format=Core::format_Xml;
     Run();
 }
 
@@ -291,7 +280,7 @@ void MainWindow::on_actionChooseSchematron_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_importSchematron()
+void MainWindow::import_schematron()
 {
     QString file = ask_for_schematron_file();
     String ret = C.policies.import_schematron(file.toStdString().c_str());
@@ -980,10 +969,18 @@ void MainWindow::policiesTree_selectionChanged()
 //---------------------------------------------------------------------------
 void MainWindow::clearVisualElements()
 {
-    if (MainText)
+    if (MainView)
     {
-        Layout->removeWidget(MainText);
-        delete MainText; MainText=NULL;
+        Layout->removeWidget(MainView);
+        delete MainView;
+        MainView=NULL;
+    }
+
+    if (progressBar)
+    {
+        Layout->removeWidget(progressBar);
+        delete progressBar;
+        progressBar=NULL;
     }
 
     if (policiesTree)
@@ -999,14 +996,6 @@ void MainWindow::clearVisualElements()
         Layout->removeWidget(ruleEdit);
         delete ruleEdit;
         ruleEdit=NULL;
-    }
-
-    if (DragDrop_Image)
-    {
-        Layout->removeWidget(DragDrop_Image);
-        Layout->removeWidget(DragDrop_Text);
-        delete DragDrop_Image; DragDrop_Image=NULL;
-        delete DragDrop_Text; DragDrop_Text=NULL;
     }
 }
 
@@ -1053,45 +1042,133 @@ void MainWindow::clearPoliciesElements()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createMainText()
+void MainWindow::createMenuFinished(bool)
 {
-    if (MainText)
+    if (!MenuView)
         return;
 
-    clearVisualElements();
-
-    MainText=new QPlainTextEdit(this);
-    MainText->setReadOnly(true);
-    #if QT_VERSION >= 0x050200
-        MainText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    #endif
-    Layout->addWidget(MainText);
+    QWebFrame *frame = MenuView->page()->currentFrame();
+    frame->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+    frame->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createDragDrop()
+void MainWindow::createMenu()
 {
-    if (DragDrop_Image)
+    QFile menu_file(":/menu.html");
+
+    MenuView = new QWebView(this);
+    MenuView->setAcceptDrops(true);
+    MenuView->setMaximumHeight(75);
+    MenuView->setMinimumHeight(75);
+    Layout->addWidget(MenuView);
+
+    WebPage* page = new WebPage(this, MenuView);
+    MenuView->setPage(page);
+
+    menu_file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = menu_file.readAll();
+    menu_file.close();
+
+    QObject::connect(MenuView, SIGNAL(loadFinished(bool)), this, SLOT(createMenuFinished(bool)));
+
+    QUrl url = QUrl("qrc:/html");
+    if (!url.isValid())
+        return;
+
+    MenuView->setContent(QString(html).toUtf8(), "text/html", url);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createWebViewFinished(bool ok)
+{
+    if (!MainView)
+        return;
+
+    if (progressBar)
+    {
+        delete progressBar;
+        progressBar = NULL;
+    }
+    if (!ok)
+        return; //TODO: Error
+    Layout->addWidget(MainView);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::setWebViewContent(QString& html)
+{
+    MainView=new WebView(this);
+
+    WebPage* page = new WebPage(this, MainView);
+    MainView->setPage(page);
+
+    QObject::connect(MainView, SIGNAL(loadProgress(int)), progressBar, SLOT(setValue(int)));
+    QObject::connect(MainView, SIGNAL(loadFinished(bool)), this, SLOT(createWebViewFinished(bool)));
+
+    QUrl url = QUrl("qrc:/html");
+    if (!url.isValid())
+        return;
+
+    MainView->setContent(html.toUtf8(), "text/html", url);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createWebView()
+{
+    if (MainView)
         return;
 
     clearVisualElements();
 
-    QFont Font;
-    Font.setPointSize(Font.pointSize()*4);
+    progressBar = new QProgressBar();
+    Layout->addWidget(progressBar);
 
-    DragDrop_Image=new QLabel(this);
-    DragDrop_Image->setAlignment(Qt::AlignCenter);
-    DragDrop_Image->setPixmap(QPixmap(":/icon/dropfiles.png").scaled(256, 256));
-    Layout->addWidget(DragDrop_Image);
+    QString html = create_html();
+    setWebViewContent(html);
+}
 
-    DragDrop_Text=new QLabel(this);
-    DragDrop_Text->setAlignment(Qt::AlignCenter);
-    DragDrop_Text->setFont(Font);
-    QPalette Palette(DragDrop_Text->palette());
-    Palette.setColor(QPalette::WindowText, Qt::darkGray);
-    DragDrop_Text->setPalette(Palette);
-    DragDrop_Text->setText("Drop video file(s) here");
-    Layout->addWidget(DragDrop_Text);
+//---------------------------------------------------------------------------
+void MainWindow::updateWebView(String file, String policy)
+{
+    if (!MainView)
+        return;
+
+    QString html = MainView->page()->currentFrame()->toHtml();
+
+    //Load the new page
+    clearVisualElements();
+    progressBar = new QProgressBar();
+    Layout->addWidget(progressBar);
+    show();
+
+    //Add the file detail to the web page
+    add_file_detail_to_html(html, file, policy);
+
+    setWebViewContent(html);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::updateWebView(QList<QFileInfo>& files, String policy)
+{
+    if (!MainView)
+        return;
+
+    QString html = MainView->page()->currentFrame()->toHtml();
+
+    //Load the new page
+    clearVisualElements();
+    progressBar = new QProgressBar();
+    Layout->addWidget(progressBar);
+
+    //Add the files details to the web page
+    for (int i = 0; i < files.count(); ++i)
+    {
+        String file = files[i].absoluteFilePath().toStdWString();
+        add_file_detail_to_html(html, file, policy);
+    }
+
+    setWebViewContent(html);
 }
 
 //---------------------------------------------------------------------------
@@ -1219,7 +1296,7 @@ void MainWindow::createPoliciesMenu()
     policiesMenu = new PoliciesMenu(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(policiesMenu);
     QObject::connect(policiesMenu->get_importPolicy_button(), SIGNAL(clicked()),
-                     this, SLOT(on_importSchematron()));
+                     this, SLOT(import_schematron()));
     QObject::connect(policiesMenu->get_addNewPolicy_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_policy()));
     QObject::connect(policiesMenu->get_deletePolicies_button(), SIGNAL(clicked()),
@@ -1378,6 +1455,29 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void MainWindow::checker_selected()
+{
+    on_actionChecker_triggered();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::policies_selected()
+{
+    on_actionPolicies_triggered();
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::Run(Core::tool tool, Core::format format, String& file)
+{
+    if (C.Tool == Core::tool_MediaPolicies || C.List.empty())
+        return QString();
+
+    C.Tool = tool;
+    C.Format = format;
+    return QString().fromStdWString(C.Run(file));
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::get_index_in_tree()
 {
     QTreeWidgetItem* item = get_item_in_tree();
@@ -1411,6 +1511,384 @@ QTreeWidgetItem *MainWindow::get_item_in_tree()
         return NULL;
 
     return list.first();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::load_include_in_template(QString& html)
+{
+    QRegExp reg("\\{\\{[\\s]+include\\('AppBundle:(\\w+):(\\w+).html.twig'(,[\\s]*\\{ '\\w+':[\\s]*\\w+[\\s]*\\})?\\)[\\s]\\}\\}");
+    int pos = 0;
+
+    while ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        QString app = reg.cap(1);
+        QString module = reg.cap(2);
+        if (app == "Default" && module == "quotaExceeded")
+        {
+            html.replace(pos, reg.matchedLength(), "");
+            continue;
+        }
+        html.replace(pos, reg.matchedLength(), "");
+        pos = 0;
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::remove_element_in_template(QString& html)
+{
+    QRegExp reg("\\{% (.*) %\\}");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        QString value = reg.cap(1);
+        html.replace(pos, reg.matchedLength(), "");
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::change_collapse_form(QString& html)
+{
+    QRegExp reg("class=\"panel-collapse collapse in\"");
+    int pos = 0;
+
+    while ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        html.replace(pos, reg.matchedLength(), "class=\"panel-collapse collapse\"");
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::load_form_in_template(QString& html)
+{
+    QRegExp reg("\\{\\{[\\s]+form\\((\\w+)\\)[\\s]\\}\\}");
+    int pos = 0;
+
+    while ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        QString value = reg.cap(1);
+        if (value == "formUpload")
+            html.replace(pos, reg.matchedLength(), create_form_upload());
+        else if (value == "formOnline")
+#if defined(MEDIAINFO_LIBCURL_YES)
+            html.replace(pos, reg.matchedLength(), create_form_online());
+#else
+        remove_form_online(pos, html);
+#endif
+        else if (value == "formRepository")
+            html.replace(pos, reg.matchedLength(), create_form_repository());
+        else
+            html.replace(pos, reg.matchedLength(), "");
+    }
+
+    change_collapse_form(html);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::create_policy_options(QString& policies)
+{
+    for (size_t i = 0; i < C.policies.policies.size(); ++i)
+    {
+        QString title = QString().fromStdString(C.policies.policies[i]->title);
+        policies += QString("<option value=\"%1\">%1</option>").arg(title);
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::add_policy_to_form_selection(QString& policies, QString& form, const char *selector)
+{
+    QRegExp reg("<option selected=\"selected\" value=\"\">[\\n\\r\\t\\s]*Choose a policy[\\n\\r\\t\\s]*</option>");
+    int pos = form.indexOf(selector);
+
+    reg.setMinimal(true);
+
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(form, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        form.insert(pos, policies);
+    }
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::create_form_upload()
+{
+    QFile template_html(":/formUpload.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = template_html.readAll();
+    template_html.close();
+
+    QString ret(html);
+    QString policies;
+    create_policy_options(policies);
+    add_policy_to_form_selection(policies, ret, "checkerUpload_step1_policy");
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::create_form_online()
+{
+    QFile template_html(":/formOnline.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = template_html.readAll();
+    template_html.close();
+
+    QString ret(html);
+    QString policies;
+    create_policy_options(policies);
+    add_policy_to_form_selection(policies, ret, "checkerOnline_step1_policy");
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::remove_form_online(int pos, QString& html)
+{
+    int start_div_pos = pos;
+    QRegExp reg("<div class=\"panel panel-default\">");
+    reg.setMinimal(true);
+    start_div_pos = reg.lastIndexIn(html, start_div_pos);
+
+    reg = QRegExp("</div>");
+    reg.setMinimal(true);
+    int end_div_pos = pos;
+    int nb_turn = 0;
+    while ((end_div_pos = reg.indexIn(html, end_div_pos)) != -1)
+    {
+        ++nb_turn;
+        end_div_pos += reg.matchedLength();
+        if (nb_turn == 2)
+            break;
+    }
+    if (end_div_pos != -1 && start_div_pos != -1)
+        html.remove(start_div_pos, end_div_pos - start_div_pos);
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::create_form_repository()
+{
+    QFile template_html(":/formRepository.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = template_html.readAll();
+    template_html.close();
+
+    QString ret(html);
+    QString policies;
+    create_policy_options(policies);
+    add_policy_to_form_selection(policies, ret, "checkerRepository_step1_policy");
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::remove_template_tags(QString& data)
+{
+    load_include_in_template(data);
+    remove_element_in_template(data);
+    load_form_in_template(data);
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::create_html_body()
+{
+    QFile template_html(":/checker.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = template_html.readAll();
+    template_html.close();
+
+    QString data(html);
+    remove_template_tags(data);
+    return data;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::change_body_in_template(QString& body, QString& html)
+{
+    QRegExp reg("\\{% block body %\\}\\{% endblock %\\}");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        html.replace(pos, reg.matchedLength(), body);
+    }
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::create_html_base(QString& body)
+{
+    QFile template_html(":/base.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = template_html.readAll();
+    template_html.close();
+
+    QString base(html);
+
+    change_body_in_template(body, base);
+    return base;
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::create_html()
+{
+    QString body = create_html_body();
+    QString base = create_html_base(body);
+    return base;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::change_html_file_detail_inform_xml(QString& html, String& file)
+{
+    QString report = Run(Core::tool_MediaInfo, Core::format_Xml, file);
+#if QT_VERSION >= 0x050200
+    report = report.toHtmlEscaped();
+#else
+    report = Qt::escape(report);
+#endif
+    report.replace('\n', "<br/>\n");
+
+    QRegExp reg("\\{\\{ check\\.getXml\\|nl2br \\}\\}");
+
+    int pos = 0;
+
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), report);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::change_html_file_detail_conformance(QString& html, String& file)
+{
+    QString report = Run(Core::tool_MediaConch, Core::format_Text, file);
+#if QT_VERSION >= 0x050200
+    report = report.toHtmlEscaped();
+#else
+    report = Qt::escape(report);
+#endif
+    report.replace(' ', "&nbsp;");
+    report.replace('\n', "<br/>\n");
+
+    QRegExp reg("\\{\\{ check\\.getConformance\\|replace\\(\\{' ': '\\&nbsp;'\\}\\)\\|raw\\|nl2br \\}\\}");
+
+    int pos = 0;
+
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), report);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::change_html_file_detail_policy_report(QString& html, String&, String& policy)
+{
+    //TODO: second parameter is the file, should do a Run() XML when database created
+    bool valid;
+    String r;
+    if (!C.ValidatePolicy(policy, valid, r))
+        valid = false;
+
+    QString report = QString().fromStdWString(r);
+#if QT_VERSION >= 0x050200
+    report = report.toHtmlEscaped();
+#else
+    report = Qt::escape(report);
+#endif
+    report.replace('\n', "<br/>\n");
+
+    QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        if (!valid)
+            html.replace(pos, reg.matchedLength(), "danger");
+        else
+            html.replace(pos, reg.matchedLength(), "success");
+    }
+
+    reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        if (!valid)
+            html.replace(pos, reg.matchedLength(), "not ");
+        else
+            html.replace(pos, reg.matchedLength(), QString());
+    }
+
+    reg = QRegExp("\\{% if check\\.getPolicy\\|length > 0 %\\}");
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), report);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::change_html_file_detail(QString& html, String& file)
+{
+    static int index = 0;
+    ++index;
+
+    QRegExp reg("\\{\\{ check.getSource \\}\\}");
+
+    QFileInfo f(QString().fromStdWString(file));
+    int pos = 0;
+
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), f.fileName());
+
+    reg = QRegExp("\\{\\{ loop\\.index \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("%1").arg(index));
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::create_html_file_detail(String& file, String& policy)
+{
+    QFile template_html(":/fileDetailChecker.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = template_html.readAll();
+    template_html.close();
+
+    QString base(html);
+    change_html_file_detail(base, file);
+    change_html_file_detail_conformance(base, file);
+    change_html_file_detail_inform_xml(base, file);
+    // /!\: always has to be after inform_xml (need to be runned one time)
+    change_html_file_detail_policy_report(base, file, policy);
+
+    return base;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::add_file_detail_to_html(QString& html, String& file, String& policy)
+{
+    QString new_html = create_html_file_detail(file, policy);
+
+    QRegExp reg("<div class=\"col-md-6\">");
+    reg.setMinimal(true);
+
+    int pos = 0;
+    int nb = 0;
+    while ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        ++nb;
+        pos += reg.matchedLength();
+        if (nb == 2)
+        {
+            html.insert(pos, new_html);
+            break;
+        }
+    }
 }
 
 }

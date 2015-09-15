@@ -3,4 +3,28 @@
         <file alias="icon.png">Image/MediaConch.png</file>
         <file alias="dropfiles.png">dropfiles_gray.png</file>
     </qresource>
+    <qresource>
+        <file alias="base.html">html/base.html</file>
+        <file alias="menu.html">html/menu.html</file>
+        <file alias="checker.html">html/checker.html</file>
+        <file alias="formUpload.html">html/formUpload.html</file>
+        <file alias="formOnline.html">html/formOnline.html</file>
+        <file alias="formRepository.html">html/formRepository.html</file>
+        <file alias="fileDetailChecker.html">html/fileDetailChecker.html</file>
+        <file alias="jquery.js">html/js/jquery-1.11.2.min.js</file>
+        <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
+        <file alias="main.css">html/css/main.css</file>
+        <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
+        <file alias="glyphicons-halflings-regular.ttf">html/fonts/glyphicons-halflings-regular.ttf</file>
+        <file alias="glyphicons-halflings-regular.eot">html/fonts/glyphicons-halflings-regular.eot</file>
+        <file alias="glyphicons-halflings-regular.svg">html/fonts/glyphicons-halflings-regular.svg</file>
+        <file alias="glyphicons-halflings-regular.woff">html/fonts/glyphicons-halflings-regular.woff</file>
+        <file alias="glyphicons-halflings-regular.woff2">html/fonts/glyphicons-halflings-regular.woff2</file>
+    </qresource>
+    <qresource prefix="/policies">
+        <file alias="Test0.sch">policies/Test0.sch</file>
+        <file alias="Test1_ntsc.sch">policies/Test1_ntsc.sch</file>
+        <file alias="Test1_pal.sch">policies/Test1_pal.sch</file>
+        <file alias="Test2.sch">policies/Test2.sch</file>
+    </qresource>
 </RCC>

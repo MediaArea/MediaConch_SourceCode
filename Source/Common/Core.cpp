@@ -67,7 +67,7 @@ String Core::Menu_Option_Preferences_Option (const String& Param, const String& 
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-String Core::Run ()
+String Core::Run (String file)
 {
     // Config
     switch (Tool)
@@ -138,8 +138,15 @@ String Core::Run ()
 
     // Parsing
     MI->Close();
-    for (size_t Pos=0; Pos<List.size(); Pos++)
-        MI->Open(List[Pos]);
+    if (file.length())
+    {
+        MI->Open(file);
+    }
+    else
+    {
+        for (size_t Pos=0; Pos<List.size(); Pos++)
+            MI->Open(List[Pos]);
+    }
 
     // Output
     switch (Tool)
@@ -231,18 +238,14 @@ String Core::MediaSchematron ()
         {
             if (i)
                 Out << endl;
-            xmlDocPtr doc = policies.create_doc(i);
-            Schematron S;
             Out << policies.policies[i]->title.c_str() << ": ";
-            if (S.register_schema_from_doc(doc))
-                Out << validation(S) << endl;
+            String report;
+            bool valid;
+            validateSchematronPolicy(i, valid, report);
+            if (!valid)
+                Out << report;
             else
-            {
-                Out << "internal error for parsing Policies" << endl;
-                for (size_t pos = 0; pos < S.errors.size(); pos++)
-                    Out << "\t" << S.errors[pos].c_str();
-            }
-            xmlFreeDoc(doc);
+                Out << __T("VALID");
         }
         return Out.str();
     }
@@ -255,7 +258,14 @@ String Core::MediaSchematron ()
             Out << SchematronFiles[i] << ": ";
             Schematron S;
             if (S.register_schema_from_file(file.c_str()))
-                Out << validation(S) << endl;
+            {
+                String report;
+                bool valid = validation(S, report);
+                if (!valid)
+                    Out << report;
+                else
+                    Out << __T("VALID");
+            }
             else
             {
                 Out << "internal error for parsing file" << endl;
@@ -276,15 +286,65 @@ String Core::MediaPolicies ()
 }
 
 //***************************************************************************
+// API
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
+{
+    int pos = -1;
+    std::string policyName(policy.begin(), policy.end());
+
+    for (int i = 0; (size_t)i < policies.policies.size(); ++i)
+    {
+        if (!policies.policies[i]->title.compare(policyName))
+        {
+            pos = i;
+            break;
+        }
+    }
+    if (pos == -1)
+    {
+        report = __T("Policy not found");
+        return false;
+    }
+
+    validateSchematronPolicy(pos, valid, report);
+    return true;
+}
+
+//***************************************************************************
 // HELPER
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-String Core::validation(Schematron& S)
+void Core::validateSchematronPolicy(int pos, bool& valid, String& report)
+{
+    xmlDocPtr doc = policies.create_doc(pos);
+    Schematron S;
+
+    if (S.register_schema_from_doc(doc))
+        valid = validation(S, report);
+    else
+    {
+        valid = false;
+
+        wstringstream Out;
+        Out << "internal error for parsing Policies" << endl;
+        for (size_t i = 0; i < S.errors.size(); i++)
+            Out << "\t" << S.errors[i].c_str();
+        report = Out.str();
+    }
+    xmlFreeDoc(doc);
+}
+
+//---------------------------------------------------------------------------
+bool Core::validation(Schematron& S, String& report)
 {
     wstringstream Out;
     String tmp = MI->Inform();
     std::string xml(tmp.begin(), tmp.end());
+    bool valid = true;
 
     int ret = S.validate_xml(xml.c_str(), xml.length());
     if (ret > 0)
@@ -294,12 +354,15 @@ String Core::validation(Schematron& S)
             Out << "\t" << S.errors[pos].c_str();
         if (!S.errors.size())
             Out << endl;
+        valid = false;
     }
     else if (ret < 0)
+    {
         Out << __T("Validation generated an internal error");
-    else
-        Out << __T("VALID");
-    return Out.str();
+        valid = false;
+    }
+    report = Out.str();
+    return valid;
 }
 
 }

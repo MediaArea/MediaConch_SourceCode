@@ -10,6 +10,7 @@
 #include "Common/Core.h"
 
 #include <QMainWindow>
+#include <QFileInfo>
 #include <QString>
 
 namespace Ui {
@@ -17,9 +18,11 @@ class MainWindow;
 }
 
 class QVBoxLayout;
-class QPlainTextEdit;
+class QProgressBar;
 class QLabel;
 class QTreeWidgetItem;
+class QFile;
+class QWebView;
 
 namespace MediaConch {
 
@@ -29,6 +32,7 @@ class PolicyMenu;
 class GroupOfRules;
 class RuleMenu;
 class RuleEdit;
+class WebView;
 
 class MainWindow : public QMainWindow
 {
@@ -39,8 +43,7 @@ public:
     ~MainWindow();
 
     // Functions
-    void dragEnterEvent         (QDragEnterEvent *event);
-    void dropEvent              (QDropEvent *event);
+    void addFileToList(QString& file);
     void policy_to_delete(int row);
     void exporting_to_schematron_file(int pos);
     void exporting_to_schematron(int pos);
@@ -50,7 +53,12 @@ public:
 
     // Helpers
     void                        Run();
+    void                        checker_add_file(QString& file, QString& policy);
+    void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
     QString                     ask_for_schematron_file();
+    void                        checker_selected();
+    void                        policies_selected();
+    void                        add_default_policy();
 
     const list<string>* providePolicyExistingType() const {return &C.policies.existing_type; }
     const list<string>* providePolicyExistingField() const {return &C.policies.existing_field; }
@@ -70,13 +78,16 @@ private:
 
     // Visual elements
     QVBoxLayout*                Layout;
-    QPlainTextEdit*             MainText;
-    QLabel*                     DragDrop_Image;
-    QLabel*                     DragDrop_Text;
+    QWebView*                   MenuView;
+    WebView*                    MainView;
+    QProgressBar*               progressBar;
     void                        clearVisualElements();
     void                        clearPoliciesElements();
-    void                        createDragDrop();
-    void                        createMainText();
+    void                        createMenu();
+    void                        createWebView();
+    void                        updateWebView(String file, String policy);
+    void                        updateWebView(QList<QFileInfo>& files, String policy);
+    void                        setWebViewContent(QString& html);
     void                        removeTreeChildren(QTreeWidgetItem* item);
     void                        updatePoliciesTree();
     void                        updatePoliciesTreePolicy(Policy* p, QTreeWidgetItem *parent);
@@ -100,23 +111,40 @@ private:
 // HELPER
 //***************************************************************************
 
+    QString Run(Core::tool, Core::format, String& file);
     int get_index_in_tree();
     QTreeWidgetItem *get_item_in_tree();
     int get_index_of_item_backXX(QTreeWidgetItem* item, size_t back);
+    void remove_template_tags(QString& data);
+    void load_include_in_template(QString& html);
+    void remove_element_in_template(QString& html);
+    void load_form_in_template(QString& html);
+    QString create_html();
+    QString create_html_base(QString& body);
+    QString create_html_body();
+    QString create_form_upload();
+    QString create_form_online();
+    QString create_form_repository();
+    void remove_form_online(int pos, QString& html);
+    void change_collapse_form(QString& html);
+    void change_body_in_template(QString& body, QString& html);
+    void add_policy_to_form_selection(QString& policies, QString& form, const char *selector);
+    void create_policy_options(QString& policies);
+    void add_file_detail_to_html(QString& html, String& file, String& policy);
+    QString create_html_file_detail(String& file, String& policy);
+    void change_html_file_detail(QString& html, String& file);
+    void change_html_file_detail_inform_xml(QString& html, String& file);
+    void change_html_file_detail_conformance(QString& html, String& file);
+    void change_html_file_detail_policy_report(QString& html, String& file, String& policy);
 
 private Q_SLOTS:
 
     void on_actionOpen_triggered();
     void on_actionCloseAll_triggered();
-    void on_actionConch_triggered();
-    void on_actionInfo_triggered();
-    void on_actionTrace_triggered();
-    void on_actionSchematron_triggered();
+    void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
-    void on_actionText_triggered();
-    void on_actionXml_triggered();
     void on_actionChooseSchematron_triggered();
-    void on_importSchematron();
+    void import_schematron();
     void save_policy();
     void save_policy_to();
     void add_new_policy();
@@ -143,6 +171,9 @@ private Q_SLOTS:
     void policiesTree_selectionChanged();
     void assert_free_text_selected(bool);
     void assert_editor_selected(bool);
+
+    void createMenuFinished(bool ok);
+    void createWebViewFinished(bool ok);
 };
 
 }
