@@ -272,6 +272,35 @@ else
 	fi
 fi
 
+dnl -------------------------------------------------------------------------
+dnl libxslt
+dnl
+if test -e ../../../../libxslt/libxslt/.libs/libxslt.la; then
+	CXXFLAGS="$CXXFLAGS  -I../../../../libxslt/libxslt"
+	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libxslt/libxslt"
+	if test "$enable_staticlibs" = "yes"; then
+		with_libxslt="builtin (static)"
+		LIBS="$LIBS  ../../../../libxslt/libxslt/.libs/libxslt.a"
+	else
+		with_libxslt="builtin"
+		LIBS="$LIBS  -L../../../../libxslt/libxslt/.libs -lxslt"
+	fi
+else
+	if pkg-config --exists libxslt; then
+		CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libxslt)"
+		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libxslt)"
+		if test "$enable_staticlibs" = "yes"; then
+			with_libxslt="system (static)"
+			LIBS="$LIBS $(pkg-config --static --libs libxslt)"
+		else
+			with_libxslt="system"
+			LIBS="$LIBS $(pkg-config --libs libxslt)"
+		fi
+	else
+		AC_MSG_ERROR([libxslt configuration is not found])
+	fi
+fi
+
 dnl #########################################################################
 dnl ### Compiler specific
 dnl #########################################################################

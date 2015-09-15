@@ -6,7 +6,9 @@ mediaconch_SOURCES = \
     ../../../Source/CLI/CommandLine_Parser.cpp \
     ../../../Source/CLI/Help.cpp \
     ../../../Source/Common/Core.cpp \
+    ../../../Source/Common/Schema.cpp \
     ../../../Source/Common/Schematron.cpp \
+    ../../../Source/Common/Xslt.cpp \
     ../../../Source/Common/Policies.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0

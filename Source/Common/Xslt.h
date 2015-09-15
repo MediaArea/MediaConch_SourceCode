@@ -6,32 +6,35 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Schematron functions
+// Xslt functions
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef SchematronH
-#define SchematronH
+#ifndef XsltH
+#define XsltH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include <libxml/schematron.h>
+#include <libxslt/xslt.h>
+#include <libxslt/xsltInternals.h>
+#include <libxslt/transform.h>
+#include <libxslt/xsltutils.h>
 #include <string>
 #include "Schema.h"
 
 namespace MediaConch {
 
 //***************************************************************************
-// Class Schematron
+// Class Xslt
 //***************************************************************************
 
-class Schematron : public Schema
+class Xslt : public Schema
 {
 public:
     //Constructor/Destructor
-    Schematron();
-    virtual ~Schematron();
+    Xslt();
+    virtual ~Xslt();
 
     virtual bool register_schema_from_memory();
     virtual bool register_schema_from_doc(void* doc);
@@ -43,10 +46,11 @@ public:
     static void  manage_error(void *userData, xmlErrorPtr err);
 
 private:
-    Schematron(const Schematron&);
-    Schematron&  operator=(const Schematron&);
+    Xslt(const Xslt&);
+    Xslt&  operator=(const Xslt&);
 
-    xmlSchematronPtr schematron_ctx;
+    xsltStylesheetPtr xslt_ctx;
+    xmlDocPtr         doc_ctx;
 };
 
 }

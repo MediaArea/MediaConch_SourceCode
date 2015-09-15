@@ -18,6 +18,7 @@ int Help();
 int Help_Nothing();
 int Help_Output();
 int Help_Policy();
+int Help_Xslt();
 int Help_Security();
 
 int Version();

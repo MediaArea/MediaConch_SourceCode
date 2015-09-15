@@ -26,6 +26,7 @@
     #include "MediaInfo/MediaInfoList.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
+#include <map>
 #include <vector>
 #include "Policies.h"
 
@@ -35,7 +36,7 @@ using namespace std;
 
 namespace MediaConch {
 
-class Schematron;
+class Schema;
 
 //***************************************************************************
 // Class Core
@@ -59,6 +60,7 @@ public:
         tool_MediaInfo,
         tool_MediaTrace,
         tool_MediaSchematron,
+        tool_MediaXslt,
         tool_MediaPolicies,
     };
     tool Tool;
@@ -74,7 +76,12 @@ public:
 
     bool ValidatePolicy(String& policy, bool& valid, String& report);
 
-    vector<String> SchematronFiles;
+    enum policyType
+    {
+        policyType_Schematron,
+        policyType_Xslt,
+    };
+    std::map<policyType, std::vector<String> > PoliciesFiles;
     Policies policies;
 
 private:
@@ -86,11 +93,13 @@ private:
     String MediaInfo();
     String MediaTrace();
     String MediaSchematron();
+    String MediaXslt();
     String MediaPolicies();
 
     //Helper
-    bool validation(Schematron& S, String& report);
+    bool validation(Schema* S, String& report);
     void validateSchematronPolicy(int pos, bool& valid, String& report);
+    void validateXsltPolicy(int pos, bool& valid, String& report);
 };
 
 }

@@ -35,6 +35,8 @@ int Help()
     TEXTOUT("                    Output in XML format (only MediaInfo report for the moment)");
     TEXTOUT("--Policy=SchematronFileName, -p SchematronFileName");
     TEXTOUT("                    Validate the XML report");
+    TEXTOUT("--Xslt=XsltFileName, -x XsltFileName");
+    TEXTOUT("                    Validate the XML report");
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
     TEXTOUT("--BOM");
@@ -140,6 +142,18 @@ int Help_Policy()
     TEXTOUT("Usage: \"MediaConch --Policy=FileName\"");
     TEXTOUT("");
     TEXTOUT("FileName is the Schematron file used to validate");
+    TEXTOUT("");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_Xslt()
+{
+    TEXTOUT("--Xslt=...  Specify a schema to validate");
+    TEXTOUT("Usage: \"MediaConch --Xslt=FileName\"");
+    TEXTOUT("");
+    TEXTOUT("FileName is the XSLT file used to validate");
     TEXTOUT("");
 
     return -1;
