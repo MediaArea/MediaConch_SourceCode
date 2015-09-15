@@ -33,6 +33,8 @@ int Help()
     TEXTOUT("                    Output a trace of the file");
     TEXTOUT("--Format=XML -fx");
     TEXTOUT("                    Output in XML format (only MediaInfo report for the moment)");
+    TEXTOUT("--Format=JSTREE -fj");
+    TEXTOUT("                    Output in JS-TREE JSON format (only trace report for the moment)");
     TEXTOUT("--Policy=SchematronFileName, -p SchematronFileName");
     TEXTOUT("                    Validate the XML report");
     TEXTOUT("--Xslt=XsltFileName, -x XsltFileName");

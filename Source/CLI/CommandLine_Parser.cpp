@@ -64,6 +64,8 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
         Argument = __T("--tool=Trace");
     if (Argument==__T("-fx"))
         Argument = __T("--format=XML");
+    if (Argument==__T("-fj"))
+        Argument = __T("--format=JSTREE");
     if (0);
     OPTION("--help",                                        Help)
     OPTION("-h",                                            Help)
@@ -122,8 +124,8 @@ CL_OPTION(Format)
     String Format=Argument.substr(Egal_Pos+1);
     if (Format==__T("XML") || Format==__T("xml"))
         MI.Format=MediaConch::Core::format_Xml;
-    if (Format==__T("XML") || Format==__T("xml"))
-        MI.Format=MediaConch::Core::format_Xml;
+    if (Format==__T("JSTREE") || Format==__T("jstree"))
+        MI.Format=MediaConch::Core::format_JsTree;
 
     return 0;
 }

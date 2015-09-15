@@ -15,6 +15,7 @@
 #include "Common/Schema.h"
 #include "Common/Schematron.h"
 #include "Common/Xslt.h"
+#include "Common/JS_Tree.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include <sstream>
@@ -115,6 +116,10 @@ String Core::Run (String file)
                                                             MI->Option(__T("Inform"), String());
                                                             break;
                                     case format_Xml:
+                                                            MI->Option(__T("Language"), __T("raw"));
+                                                            MI->Option(__T("Inform"), __T("XML"));
+                                                            break;
+                                    case format_JsTree:
                                                             MI->Option(__T("Language"), __T("raw"));
                                                             MI->Option(__T("Inform"), __T("XML"));
                                                             break;
@@ -235,7 +240,13 @@ String Core::MediaInfo ()
 //---------------------------------------------------------------------------
 String Core::MediaTrace ()
 {
-    return MI->Inform();
+    String ret = MI->Inform();
+    if (Format == format_JsTree)
+    {
+        JsTree js;
+        return js.format_from_XML(ret);
+    }
+    return ret;
 }
 
 //---------------------------------------------------------------------------
