@@ -18,7 +18,7 @@ class WebPage : public QWebPage
 public:
     explicit WebPage(MainWindow *m, QWidget *parent = 0);
 
-    void changeLocalFile(QString& file);
+    void changeLocalFiles(QStringList& files);
 
 protected:
     virtual bool acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request, QWebPage::NavigationType type);
@@ -39,10 +39,10 @@ private Q_SLOTS:
     void onLoadFinished(bool ok);
 
 protected:
-    MainWindow             *mainwindow;
-    QMap<QString, QString>  file_selector;
-    QString                 select_file_name;
-    QString                 button_clicked_id;
+    MainWindow                 *mainwindow;
+    QMap<QString, QStringList>  file_selector;
+    QString                     select_file_name;
+    QString                     button_clicked_id;
 };
 
 }

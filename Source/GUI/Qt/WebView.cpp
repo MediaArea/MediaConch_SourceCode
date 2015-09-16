@@ -23,12 +23,11 @@ namespace MediaConch
         {
             QList<QUrl> urls=event->mimeData()->urls();
 
-            if (urls.size() > 0)
-            {
-                WebPage* p = (WebPage*)page();
-                QString file = urls[0].toLocalFile();
-                p->changeLocalFile(file);
-            }
+            WebPage* p = (WebPage*)page();
+            QStringList files;
+            for (int i = 0; i < urls.size(); ++i)
+                files << urls[i].toLocalFile();
+            p->changeLocalFiles(files);
         }
     }
 }
