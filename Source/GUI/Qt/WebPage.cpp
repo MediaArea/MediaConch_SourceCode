@@ -261,6 +261,11 @@ namespace MediaConch
             QStringList suggested = ((const ChooseMultipleFilesExtensionOption*)option)->suggestedFileNames;
             QStringList names = QFileDialog::getOpenFileNames(view(), QString::null);
             ((ChooseMultipleFilesExtensionReturn*)output)->fileNames = names;
+            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload[file]");
+            if (it != file_selector.end())
+                file_selector["checkerUpload[file]"] << names;
+            else
+                file_selector.insert("checkerUpload[file]", names);
             return true;
         }
         return false;
