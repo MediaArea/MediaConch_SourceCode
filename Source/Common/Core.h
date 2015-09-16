@@ -68,6 +68,7 @@ public:
     {
         format_Text,
         format_Xml,
+        format_JsTree,
     };
     format Format;
     vector<String> List;
