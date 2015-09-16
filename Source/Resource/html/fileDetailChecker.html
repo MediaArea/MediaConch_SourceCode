@@ -1,6 +1,7 @@
         <div class="panel panel-default checker-results">
             <div class="panel-heading" role="tab">
-                <h4 class="panel-title">Result for {{ check.getSource }}</h4>
+              <h4 class="panel-title">Result for {{ check.getSource }}</h4>
+              <button type="button" class="close">&times;</button>
             </div>
             <div>
                 <ul class="list-group">
@@ -37,7 +38,8 @@
                                 {% if check.getPolicy|length > 0 %}
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalPolicy{{ loop.index }}">Download report</button>
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -53,7 +55,8 @@
                                 <p>{{ check.getConformance|replace({' ': '&nbsp;'})|raw|nl2br }}</p>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}">Download report</button>
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -69,7 +72,8 @@
                                 <p>{{ check.getXml|nl2br }}</p>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalXml{{ loop.index }}">Download XML</button>
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>

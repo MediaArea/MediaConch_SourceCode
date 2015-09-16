@@ -97,6 +97,11 @@ namespace MediaConch
                 downloads[j].setAttribute("onclick", QString("webpage.onDownloadReport(\"%1\");").arg(target));
             }
         }
+
+        //Results
+        QWebElementCollection report_dld = frame->findAllElements(".report-dld");
+        for (int i = 0; i < report_dld.count(); ++i)
+            report_dld[i].setAttribute("onclick", QString("webpage.onDownloadReport($(this).data('target'));"));
     }
 
     void WebPage::menu_link_checker(const QString& name)
