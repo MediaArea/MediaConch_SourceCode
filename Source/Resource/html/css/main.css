@@ -110,6 +110,11 @@ footer {
     margin-bottom: 5px;
 }
 
+.checker-results .panel-heading h4 {
+    display: inline-block;
+    width: 96%
+}
+
 .checker-results ul li p {
     float: right;
 }
@@ -120,6 +125,14 @@ footer {
 
 .modal-body p {
     font-family: monospace;
+}
+
+#checkerResultTitle h1 {
+    display: inline-block;
+}
+
+#checkerResultTitle .close {
+    margin-top: 40px;
 }
 
 #checkerUpload > div:nth-child(1) {

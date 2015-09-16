@@ -34,6 +34,21 @@
                       }
                   );
               });
+
+              // Remove result block
+              $('.checker-results .panel-heading .close').each(function() {
+                  $(this).click(function () {
+                      $(this).parent().parent().remove();
+                  });
+              });
+
+              // Remove all results blocks
+              $('#checkerResultTitle .close').click(function () {
+                  $('div.checker-results').each(function () {
+                      $(this).remove();
+                  });
+              });
+
           });
         </script>
     </body>
