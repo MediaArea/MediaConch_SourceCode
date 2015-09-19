@@ -11,6 +11,7 @@ Build-Depends: debhelper (>= 9),
                libxslt-dev,
                zlib1g-dev,
                pkg-config,
+               libqtwebkit-dev,
 Standards-Version: 3.9.6
 Homepage: http://MediaArea.net/MediaConch
 Vcs-Svn: https://github.com/MediaArea/MediaConch_SourceCode.git
