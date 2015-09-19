@@ -53,6 +53,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Core configuration
+    C.load_configuration();
+
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
@@ -609,6 +612,12 @@ void MainWindow::analyze(String& file)
     C.Report.reset();
     C.Report.set(Core::report_MediaConch);
     C.Run(file);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::wait_analyze_finished()
+{
+    C.WaitRunIsFinished();
 }
 
 //---------------------------------------------------------------------------

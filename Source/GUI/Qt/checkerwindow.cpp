@@ -210,6 +210,12 @@ void CheckerWindow::updateWebView(String file, int policy)
     progressBar->get_progress_bar()->setMaximum(0);
     progressBar->get_progress_bar()->setMaximum(100);
 
+    // Analyze
+    mainwindow->analyze(file);
+
+    // TODO: do not wait until the end of the analyzed
+    mainwindow->wait_analyze_finished();
+
     //Add the file detail to the web page
     add_file_detail_to_html(html, file, policy);
 
@@ -232,7 +238,18 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
     progressBar->show();
     progressBar->get_progress_bar()->setValue(1);
     progressBar->get_progress_bar()->setMaximum(0);
+
+    // Analyze
+    for (int i = 0; i < files.count(); ++i)
+    {
+        String file = files[i].absoluteFilePath().toStdWString();
+        mainwindow->analyze(file);
+    }
+
     progressBar->get_progress_bar()->setMaximum(100);
+    progressBar->get_progress_bar()->setValue(1);
+    // TODO: do not wait until the end of the analyzed
+    mainwindow->wait_analyze_finished();
 
     //Add the files details to the web page
     QString displayXsltRetain = displayXslt;
@@ -241,7 +258,7 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
         displayXslt = displayXsltRetain;
         String file = files[i].absoluteFilePath().toStdWString();
         add_file_detail_to_html(html, file, policy);
-        progressBar->get_progress_bar()->setValue((i * 100) / files.count());
+        progressBar->get_progress_bar()->setValue(((i + 1) * 100) / files.count());
     }
     resetDisplayXslt();
 
@@ -881,9 +898,6 @@ QString CheckerWindow::create_html_file_detail(String& file, int policy)
     template_html.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray html = template_html.readAll();
     template_html.close();
-
-    // Analyze
-    mainwindow->analyze(file);
 
     QString base(html);
     change_html_file_detail(base, file);

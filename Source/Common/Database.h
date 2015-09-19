@@ -38,17 +38,17 @@ public:
     std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification);
     bool        file_is_registered(const std::string& file, time_t file_last_modification);
 
+    void        set_database_directory(const std::string& dirname);
+    virtual int init() = 0;
+
 protected:
     std::string                        query;
     std::vector<std::string>           errors;
     std::map<std::string, std::string> reports;
     std::string                        db_file;
 
-    void set_database_directory(const std::string& dirname);
-
     //Database dependant
     virtual int execute() = 0;
-    virtual int init() = 0;
 
 private:
     Database (const Database&);

@@ -36,6 +36,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/LibEventHttpd.cpp \
                     ../../Source/Common/Http.cpp \
                     ../../Source/Common/LibEventHttp.cpp \
+                    ../../Source/Common/Scheduler.cpp \
+                    ../../Source/Common/Queue.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -82,6 +84,8 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/LibEventHttpd.h \
                     ../../Source/Common/Http.h \
                     ../../Source/Common/LibEventHttp.h \
+                    ../../Source/Common/Scheduler.h \
+                    ../../Source/Common/Queue.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
