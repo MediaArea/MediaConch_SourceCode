@@ -85,7 +85,10 @@ int Configuration::parse()
     file_handler.close();
 
     if (c->parse(buffer.c_str(), values) < 0)
+    {
+        error = c->get_error();
         return -1;
+    }
 
     parse_error = false;
     return 0;
@@ -193,7 +196,7 @@ Container::Value *Configuration::get_value_for_key(std::string key)
 {
     if (parse_error)
         return NULL;
-    return c->get_value_by_key(values, key);
+    return c->get_value_in_array_by_key(values, key);
 }
 
 }

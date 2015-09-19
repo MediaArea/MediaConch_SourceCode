@@ -64,10 +64,13 @@ Core::Core() : policies(this)
     Format=format_Text;
     config = NULL;
     db = NULL;
+    scheduler = new Scheduler(this);
 }
 
 Core::~Core()
 {
+    if (scheduler)
+        delete scheduler;
     if (db)
         delete db;
     delete MI;
@@ -102,14 +105,14 @@ void Core::load_configuration()
     std::string config_path = get_config_path();
     config->set_path(config_path);
     config->parse();
-}
 
-//---------------------------------------------------------------------------
-void Core::load_configuration(std::string& config_path)
-{
-    config = new Configuration;
-    config->set_path(config_path);
-    config->parse();
+    long scheduler_max_threads = 1;
+    if (scheduler && !config->get("Scheduler_Max_Threads", scheduler_max_threads))
+    {
+        if (scheduler_max_threads <= 0)
+            scheduler_max_threads = 1;
+        scheduler->set_max_threads((size_t)scheduler_max_threads);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -123,8 +126,7 @@ void Core::load_database()
 
     db = new SQLLite;
 
-    String dirname(db_path.begin(), db_path.end());
-    db->set_database_directory(dirname);
+    db->set_database_directory(db_path);
     db->init();
 #endif
 }
@@ -168,50 +170,26 @@ void Core::Close ()
 //---------------------------------------------------------------------------
 void Core::Run (String file)
 {
-    // Currently avoiding to have a big trace
-    MI->Option(__T("ParseSpeed"), __T("0"));
-    
-    // Configuration of the parsing
-    MI->Option(__T("Details"), __T("1"));
-
-    // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
-    MI->Option(__T("ReadByHuman"), __T("1"));
-    MI->Option(__T("Language"), __T("raw"));
-    MI->Option(__T("Inform"), __T("XML"));
-
     // Parsing
     if (file.length())
-    {
-        bool registered = file_is_registered_in_db(file);
-        if (!registered)
-        {
-            if (get_db())
-            {
-                MI->Open(file);
-                register_file_to_database(file);
-                MI->Close();
-            }
-            else
-                MI->Open(file);
-        }
-    }
+        open_file(file);
     else
     {
         for (size_t Pos=0; Pos<List.size(); Pos++)
-        {
-            bool registered = file_is_registered_in_db(file);
-            if (!registered)
-            {
-                if (get_db())
-                {
-                    MI->Open(List[Pos]);
-                    register_file_to_database(List[Pos]);
-                    MI->Close();
-                }
-                else
-                    MI->Open(List[Pos]);
-            }
-        }
+            open_file(List[Pos]);
+    }
+}
+
+//---------------------------------------------------------------------------
+void Core::open_file(String& file)
+{
+    bool registered = file_is_registered_in_db(file);
+    if (!registered)
+    {
+        if (get_db())
+            scheduler->add_element_to_queue(file);
+        else
+            MI->Open(file);
     }
 }
 
@@ -668,49 +646,72 @@ time_t Core::get_last_modification_file(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_text_to_database(std::string& file, time_t time)
+void Core::register_report_mediainfo_text_to_database(std::string& file, time_t time,
+                                                      MediaInfoNameSpace::MediaInfoList* curMI)
 {
-    MI->Option(__T("Details"), __T("0"));
-    MI->Option(__T("Inform"), String());
-    std::string report = Ztring(MI->Inform()).To_UTF8();
+    curMI->Option(__T("Details"), __T("0"));
+    curMI->Option(__T("Inform"), String());
+    std::string report = Ztring(curMI->Inform()).To_UTF8();
     db->save_report(report_MediaInfo, format_Text, file, time, report);
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_xml_to_database(std::string& file, time_t time)
+void Core::register_report_mediainfo_xml_to_database(std::string& file, time_t time,
+                                                     MediaInfoNameSpace::MediaInfoList* curMI)
 {
-    MI->Option(__T("Details"), __T("0"));
-    MI->Option(__T("Inform"), __T("MIXML"));
-    std::string report = Ztring(MI->Inform()).To_UTF8();
+    curMI->Option(__T("Details"), __T("0"));
+    curMI->Option(__T("Inform"), __T("MIXML"));
+    std::string report = Ztring(curMI->Inform()).To_UTF8();
     db->save_report(report_MediaInfo, format_Xml, file, time, report);
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediatrace_text_to_database(std::string& file, time_t time)
+void Core::register_report_mediatrace_text_to_database(std::string& file, time_t time,
+                                                       MediaInfoNameSpace::MediaInfoList* curMI)
 {
-    MI->Option(__T("Details"), __T("1"));
-    MI->Option(__T("Inform"), String());
-    std::string report = Ztring(MI->Inform()).To_UTF8();
+    curMI->Option(__T("Details"), __T("1"));
+    curMI->Option(__T("Inform"), String());
+    std::string report = Ztring(curMI->Inform()).To_UTF8();
     //printf("reporttext=%s\n\n\n\n\n", report.c_str());
     db->save_report(report_MediaTrace, format_Text, file, time, report);
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediatrace_xml_to_database(std::string& file, time_t time)
+void Core::register_report_mediatrace_xml_to_database(std::string& file, time_t time,
+                                                      MediaInfoNameSpace::MediaInfoList* curMI)
 {
-    MI->Option(__T("Details"), __T("1"));
-    MI->Option(__T("Inform"), __T("XML"));
-    std::string report = Ztring(MI->Inform()).To_UTF8();
+    curMI->Option(__T("Details"), __T("1"));
+    curMI->Option(__T("Inform"), __T("XML"));
+    std::string report = Ztring(curMI->Inform()).To_UTF8();
     db->save_report(report_MediaTrace, format_Xml, file, time, report);
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time)
+void Core::register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time,
+                                                                    MediaInfoNameSpace::MediaInfoList* curMI)
 {
-    MI->Option(__T("Details"), __T("1"));
-    MI->Option(__T("Inform"), __T("MAXML"));
-    std::string report = Ztring(MI->Inform()).To_UTF8();
+    curMI->Option(__T("Details"), __T("1"));
+    curMI->Option(__T("Inform"), __T("MAXML"));
+    std::string report = Ztring(curMI->Inform()).To_UTF8();
     db->save_report(report_MediaConch, format_MaXml, file, time, report);
+}
+
+//---------------------------------------------------------------------------
+void Core::register_file_to_database(String& file, MediaInfoNameSpace::MediaInfoList* curMI)
+{
+    std::string filename = Ztring(file).To_UTF8();
+    time_t time = get_last_modification_file(filename);
+
+    // MediaInfo
+    register_report_mediainfo_text_to_database(filename, time, curMI);
+    register_report_mediainfo_xml_to_database(filename, time, curMI);
+
+    // MediaTrace
+    register_report_mediatrace_text_to_database(filename, time, curMI);
+    register_report_mediatrace_xml_to_database(filename, time, curMI);
+
+    // MediaInfo + MediaTrace (MaXML)
+    register_report_mediainfo_and_mediatrace_xml_to_database(filename, time, curMI);
 }
 
 //---------------------------------------------------------------------------
@@ -720,15 +721,15 @@ void Core::register_file_to_database(String& file)
     time_t time = get_last_modification_file(filename);
 
     // MediaInfo
-    register_report_mediainfo_text_to_database(filename, time);
-    register_report_mediainfo_xml_to_database(filename, time);
+    register_report_mediainfo_text_to_database(filename, time, MI);
+    register_report_mediainfo_xml_to_database(filename, time, MI);
 
     // MediaTrace
-    register_report_mediatrace_text_to_database(filename, time);
-    register_report_mediatrace_xml_to_database(filename, time);
+    register_report_mediatrace_text_to_database(filename, time, MI);
+    register_report_mediatrace_xml_to_database(filename, time, MI);
 
     // MediaInfo + MediaTrace (MaXML)
-    register_report_mediainfo_and_mediatrace_xml_to_database(filename, time);
+    register_report_mediainfo_and_mediatrace_xml_to_database(filename, time, MI);
 }
 
 //---------------------------------------------------------------------------
@@ -833,9 +834,9 @@ void Core::set_configuration_path(std::string& path)
 }
 
 //---------------------------------------------------------------------------
-Configuration* Core::get_configuration_path() const
+const std::string& Core::get_configuration_path() const
 {
-    return config;
+    return configuration_path;
 }
 
 //---------------------------------------------------------------------------
@@ -855,6 +856,17 @@ Database *Core::get_db()
     if (!db)
         load_database();
     return db;
+}
+
+//---------------------------------------------------------------------------
+void Core::WaitRunIsFinished()
+{
+    while (1)
+    {
+        if (scheduler->is_finished())
+            break;
+        usleep(50000);
+    }
 }
 
 }

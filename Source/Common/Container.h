@@ -58,6 +58,7 @@ public:
     virtual int parse(std::string data, Value &v) = 0;
     virtual std::string serialize(Value &v) = 0;
     virtual Value* get_value_by_key(Value& v, std::string key) = 0;
+    virtual Value* get_value_in_array_by_key(Value& v, std::string key) = 0;
 
     std::string get_error() const { return error; }
 

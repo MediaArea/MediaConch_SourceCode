@@ -32,6 +32,7 @@
 #include "Policies.h"
 #include "Policy.h"
 #include "Configuration.h"
+#include "Scheduler.h"
 
 using namespace MediaInfoNameSpace;
 using namespace std;
@@ -101,13 +102,16 @@ public:
 
     //General Configuration
     void load_configuration();
-    void load_configuration(std::string& config_path);
     void set_configuration_path(std::string& path);
-    Configuration* get_configuration_path() const;
+    const std::string& get_configuration_path() const;
 
     //General Database
     void load_database();
     bool database_is_enabled() const;
+    void register_file_to_database(String& file, MediaInfoNameSpace::MediaInfoList* MI);
+
+    // TODO: removed and manage waiting time otherway
+    void WaitRunIsFinished();
 
 private:
     Core (const Core&);
@@ -116,6 +120,8 @@ private:
     Database*                          db;
     Configuration*                     config;
     std::string                        configuration_path;
+    //TODO: remove with the daemon
+    Scheduler                         *scheduler;
 
     bool PolicySchematron(const String& file, std::wstringstream& Out);
     bool PolicyXslt(const String& file, std::wstringstream& Out);
@@ -133,13 +139,19 @@ private:
     void get_Reports_Output(const String& file, String& report);
 
     void register_file_to_database(String& file);
-    void register_report_mediainfo_text_to_database(std::string& file, time_t time);
-    void register_report_mediainfo_xml_to_database(std::string& file, time_t time);
-    void register_report_mediatrace_text_to_database(std::string& file, time_t time);
-    void register_report_mediatrace_xml_to_database(std::string& file, time_t time);
-    void register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time);
+    void register_report_mediainfo_text_to_database(std::string& file, time_t time,
+                                                    MediaInfoNameSpace::MediaInfoList* MI);
+    void register_report_mediainfo_xml_to_database(std::string& file, time_t time,
+                                                   MediaInfoNameSpace::MediaInfoList* MI);
+    void register_report_mediatrace_text_to_database(std::string& file, time_t time,
+                                                     MediaInfoNameSpace::MediaInfoList* MI);
+    void register_report_mediatrace_xml_to_database(std::string& file, time_t time,
+                                                    MediaInfoNameSpace::MediaInfoList* MI);
+    void register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time,
+                                                                  MediaInfoNameSpace::MediaInfoList* MI);
     std::string get_config_path();
     Database *get_db();
+    void open_file(String& filename);
 };
 
 }

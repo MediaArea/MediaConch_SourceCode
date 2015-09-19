@@ -152,7 +152,10 @@ int main(int argc, char* argv_ansi[])
 
     for (size_t i = 0; i < MI.List.size(); ++i)
         MI.Run(MI.List[i]);
-    
+
+    // In CLI mode, wait it is finished
+    MI.WaitRunIsFinished();
+
     //Output
     STRINGOUT(MI.GetOutput());
 

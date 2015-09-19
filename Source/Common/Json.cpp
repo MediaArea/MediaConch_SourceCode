@@ -87,8 +87,25 @@ Container::Value* Json::get_value_by_key(Value& v, std::string key)
     if (v.type != Value::CONTAINER_TYPE_OBJECT)
         return NULL;
     for (size_t i = 0; i < v.obj.size(); ++i)
+    {
         if (!key.compare(v.obj[i].first))
             return &v.obj[i].second;
+    }
+    return NULL;
+}
+
+//---------------------------------------------------------------------------
+Container::Value* Json::get_value_in_array_by_key(Value& v, std::string key)
+{
+    if (v.type != Value::CONTAINER_TYPE_ARRAY)
+        return NULL;
+
+    for (size_t i = 0; i < v.array.size(); ++i)
+    {
+        Container::Value* val = get_value_by_key(v.array[i], key);
+        if (val)
+            return val;
+    }
     return NULL;
 }
 
