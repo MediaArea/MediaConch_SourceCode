@@ -27,12 +27,14 @@ BuildRequires:  zlib-devel
 BuildRequires:  libqt4-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
-%if 0%{?suse_version}
-BuildRequires:  update-desktop-files
-%endif
 %if 0%{?fedora_version}
 BuildRequires:  qt-devel
+BuildRequires:  qtwebkit-devel
 BuildRequires:  desktop-file-utils
+%endif
+%if 0%{?suse_version}
+BuildRequires:  libQtWebKit-devel
+BuildRequires:  update-desktop-files
 %endif
 
 %description
