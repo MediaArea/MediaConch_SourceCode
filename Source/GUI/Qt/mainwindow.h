@@ -55,8 +55,8 @@ public:
     void                        Run();
     void                        checker_add_file(QString& file, QString& policy);
     void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
-    void                        checker_add_xslt_file(QString& file, QString& xslt);
-    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt);
+    void                        checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt);
+    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt, QString& display_xslt);
     QString                     get_trace_for_file(const QString& filename);
     QString                     ask_for_schematron_file();
     void                        checker_selected();
@@ -78,6 +78,7 @@ private:
 
     // Internal
     Core C;
+    QString displayXslt;
 
     // Visual elements
     QVBoxLayout*                Layout;

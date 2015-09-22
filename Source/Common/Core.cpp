@@ -328,6 +328,8 @@ String Core::MediaXslt ()
             {
                 String report;
                 validation(S, report);
+                if (xsltDisplay.length())
+                    report = Core::transformWithXslt(report, xsltDisplay);
                 Out << report;
             }
             else
@@ -384,6 +386,23 @@ bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
 
     validateSchematronPolicy(pos, valid, report);
     return true;
+}
+
+//---------------------------------------------------------------------------
+String Core::transformWithXslt(String& report, String& xslt)
+{
+    Schema *S = new Xslt;
+
+    std::string x(xslt.begin(), xslt.end());
+    if (!S->register_schema_from_file(x.c_str()))
+        return report;
+    std::string re(report.begin(), report.end());
+    int valid = S->validate_xml(re.c_str(), re.length());
+    if (valid < 0)
+        return report;
+    std::string r = S->get_report();
+    delete S;
+    return String(r.begin(), r.end());
 }
 
 //***************************************************************************

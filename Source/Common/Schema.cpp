@@ -49,7 +49,7 @@ bool Schema::register_schema_from_file(const char* filename)
         return false;
     }
 
-    return register_schema_from_memory();
+    return register_schema_from_memory(schema);
 }
 
 //---------------------------------------------------------------------------

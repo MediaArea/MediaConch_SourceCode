@@ -58,6 +58,10 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
         Last_Argument = __T("--xslt=");
         return 0;
     }
+    if (Argument==__T("-w")) {
+        Last_Argument = __T("--xsltdisplay=");
+        return 0;
+    }
     if (Argument==__T("-ti"))
         Argument = __T("--tool=Info");
     if (Argument==__T("-tt"))
@@ -74,6 +78,7 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--format",                                      Format)
     OPTION("--output",                                      Output)
     OPTION("--policy",                                      SchematronValidation)
+    OPTION("--xsltdisplay",                                 XsltDisplay)
     OPTION("--xslt",                                        XsltValidation)
     //Default
     OPTION("--",                                            Default)
@@ -155,9 +160,22 @@ CL_OPTION(XsltValidation)
 
     String file;
     file.assign(Argument, Egal_Pos+1, std::string::npos);
-    //TODO
     MI.PoliciesFiles[MediaConch::Core::policyType_Xslt].push_back(file);
     MI.Tool=MediaConch::Core::tool_MediaXslt;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(XsltDisplay)
+{
+    //Form : --Inform=Text
+    size_t Egal_Pos=Argument.find(__T('='));
+    if (Egal_Pos==String::npos)
+        return Help();
+
+    String file;
+    file.assign(Argument, Egal_Pos+1, std::string::npos);
+    MI.xsltDisplay = file;
     return 0;
 }
 

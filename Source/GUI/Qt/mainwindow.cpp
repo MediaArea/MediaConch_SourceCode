@@ -158,7 +158,7 @@ void MainWindow::checker_add_files(QFileInfoList& list, QString& policy)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_xslt_file(QString& file, QString& xslt)
+void MainWindow::checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt)
 {
     if (C.Tool == Core::tool_MediaPolicies)
     {
@@ -168,12 +168,14 @@ void MainWindow::checker_add_xslt_file(QString& file, QString& xslt)
 
     addFileToList(file);
     C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
+    displayXslt = display_xslt;
     updateWebView(file.toStdWString(), String());
+    displayXslt = QString();
     C.PoliciesFiles[Core::policyType_Xslt].clear();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
+void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt, QString& display_xslt)
 {
     if (C.Tool == Core::tool_MediaPolicies)
     {
@@ -187,7 +189,9 @@ void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
         addFileToList(file);
     }
     C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
+    displayXslt = display_xslt;
     updateWebView(list, String());
+    displayXslt = QString();
     C.PoliciesFiles[Core::policyType_Xslt].clear();
 }
 
@@ -1913,6 +1917,11 @@ void MainWindow::change_html_file_detail_policy_report(QString& html, String&, S
     if (!C.ValidatePolicy(policy, valid, r))
         valid = false;
 
+    if (displayXslt.length())
+    {
+        String trans = displayXslt.toStdWString();
+        r = C.transformWithXslt(r, trans);
+    }
     QString report = QString().fromStdWString(r);
 #if QT_VERSION >= 0x050200
     report = report.toHtmlEscaped();

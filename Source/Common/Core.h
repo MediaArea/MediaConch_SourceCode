@@ -76,6 +76,7 @@ public:
     String Run(String file = String());
 
     bool ValidatePolicy(String& policy, bool& valid, String& report);
+    String transformWithXslt(String& report, String& Xslt);
 
     enum policyType
     {
@@ -84,6 +85,7 @@ public:
     };
     std::map<policyType, std::vector<String> > PoliciesFiles;
     Policies policies;
+    String xsltDisplay;
 
 private:
     Core (const Core&);
