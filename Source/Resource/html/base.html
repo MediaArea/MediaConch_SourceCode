@@ -48,7 +48,9 @@
                       $(this).remove();
                   });
               });
-
+              if (0 != $('div.checker-results').length) {
+                  $('#checkerResultTitle .close').removeClass('hidden');
+              }
           });
         </script>
     </body>
