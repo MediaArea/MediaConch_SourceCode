@@ -84,6 +84,7 @@ namespace MediaConch
                 QWebElement parent = downloads[j].parent();
                 QWebElementCollection links = parent.findAll("a");
                 QString target;
+                QString save_name;
                 for (int k = 0; k < links.count(); k++)
                 {
                     QString data_toggle = links[k].attribute("data-toggle");
@@ -93,15 +94,16 @@ namespace MediaConch
                         break;
                     }
                 }
+                save_name = downloads[j].attribute("data-save-name");
 
-                downloads[j].setAttribute("onclick", QString("webpage.onDownloadReport(\"%1\");").arg(target));
+                downloads[j].setAttribute("onclick", QString("webpage.onDownloadReport(\"%1\", \"%2\");").arg(target).arg(save_name));
             }
         }
 
         //Results
         QWebElementCollection report_dld = frame->findAllElements(".report-dld");
         for (int i = 0; i < report_dld.count(); ++i)
-            report_dld[i].setAttribute("onclick", QString("webpage.onDownloadReport($(this).data('target'));"));
+            report_dld[i].setAttribute("onclick", QString("webpage.onDownloadReport($(this).data('target'), $(this).data('save-name'));"));
     }
 
     void WebPage::menu_link_checker(const QString& name)
@@ -124,7 +126,7 @@ namespace MediaConch
         button_clicked_id = id;
     }
 
-    void WebPage::onDownloadReport(const QString& target)
+    void WebPage::onDownloadReport(const QString& target, const QString& save_name)
     {
         QWebFrame* frame = mainFrame();
         QWebElement reportDiv = frame->findFirstElement(target);
@@ -133,7 +135,7 @@ namespace MediaConch
         if (report.isNull())
             return;
 
-        QString dl_file = QFileDialog::getSaveFileName(view());
+        QString dl_file = QFileDialog::getSaveFileName(view(), "Save report", save_name);
 
         if (!dl_file.length())
             return;

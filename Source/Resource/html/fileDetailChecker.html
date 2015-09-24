@@ -8,20 +8,20 @@
                         <li class="list-group-item">This file is: <span class="text-uppercase text-{{ check.getStatus ? 'success' : 'danger' }}"><b>{{ check.getStatus ? '' : 'not ' }}valid</b></span></li>
                         <li class="list-group-item report">Policy report
                             <p class="text-right hidden">
-                                <a href="#" data-toggle="modal" data-target="#modalPolicy{{ loop.index }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                                <a href="#" data-toggle="results-dld"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                                <a href="#" data-toggle="modal" data-target="#modalPolicy{{ loop.index }}" title="View report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                                <a href="#" data-toggle="results-dld" data-save-name="PolicyReport.txt"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </p>
                         </li>
                         <li class="list-group-item report">Implementation report
                             <p class="text-right hidden">
-                                <a href="#" data-toggle="modal" data-target="#modalConformance{{ loop.index }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                                <a href="#" data-toggle="results-dld"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                                <a href="#" data-toggle="modal" data-target="#modalConformance{{ loop.index }}" title="View report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                                <a href="#" data-toggle="results-dld" data-save-name="ConformanceReport.txt"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </p>
                         </li>
                         <li class="list-group-item report">MediaInfo XML
                             <p class="text-right hidden">
-                                <a href="#" data-toggle="modal" data-target="#modalXml{{ loop.index }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                                <a href="#" data-toggle="results-dld"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                                <a href="#" data-toggle="modal" data-target="#modalXml{{ loop.index }}" title="View XML"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                                <a href="#" data-toggle="results-dld" data-save-name="MediaInfo.xml"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </p>
                         </li>
                 </ul>
@@ -38,7 +38,7 @@
                                 {% if check.getPolicy|length > 0 %}
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-primary report-dld" data-target="#modalPolicy{{ loop.index }}">Download report</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalPolicy{{ loop.index }}" data-save-name="PolicyReport.txt">Download report</button>
                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -55,7 +55,7 @@
                                 <p>{{ check.getConformance|replace({' ': '&nbsp;'})|raw|nl2br }}</p>
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}">Download report</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="ConformanceReport.txt">Download report</button>
                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -72,7 +72,7 @@
                                 <p>{{ check.getXml|nl2br }}</p>
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-primary report-dld" data-target="#modalXml{{ loop.index }}">Download XML</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalXml{{ loop.index }}" data-save-name="MediaInfo.xml">Download XML</button>
                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
