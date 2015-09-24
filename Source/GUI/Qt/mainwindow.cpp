@@ -1174,7 +1174,8 @@ void MainWindow::updateWebView(String file, String policy)
     clearVisualElements();
     progressBar = new QProgressBar();
     Layout->addWidget(progressBar);
-    show();
+    progressBar->setValue(0);
+    progressBar->show();
 
     //Add the file detail to the web page
     add_file_detail_to_html(html, file, policy);
@@ -1194,12 +1195,14 @@ void MainWindow::updateWebView(QList<QFileInfo>& files, String policy)
     clearVisualElements();
     progressBar = new QProgressBar();
     Layout->addWidget(progressBar);
+    progressBar->show();
 
     //Add the files details to the web page
     for (int i = 0; i < files.count(); ++i)
     {
         String file = files[i].absoluteFilePath().toStdWString();
         add_file_detail_to_html(html, file, policy);
+        progressBar->setValue((i * 100) / files.count());
     }
 
     setWebViewContent(html);
