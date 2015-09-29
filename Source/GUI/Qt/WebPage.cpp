@@ -104,6 +104,12 @@ namespace MediaConch
         QWebElementCollection report_dld = frame->findAllElements(".report-dld");
         for (int i = 0; i < report_dld.count(); ++i)
             report_dld[i].setAttribute("onclick", QString("webpage.onDownloadReport($(this).data('target'), $(this).data('save-name'));"));
+
+
+        // Add download trace ajax button to result list
+        QWebElementCollection download_traces = frame->findAllElements(".results-dld-trace-ajax");
+        for (int i = 0; i < download_traces.count(); ++i)
+            download_traces[i].setAttribute("onclick", QString("webpage.onSaveTrace($(this).data('target'), $(this).data('save-name'), $(this).data('filename'));"));
     }
 
     void WebPage::menu_link_checker(const QString& name)
@@ -147,6 +153,23 @@ namespace MediaConch
         QTextStream out(&file);
         QTextDocument text(report.toPlainText().trimmed());
         out << text.toPlainText() << "\n";
+    }
+
+    void WebPage::onFillTrace(const QString& target, const QString& filename)
+    {
+        QWebElement traceDiv = mainFrame()->findFirstElement(target);
+        QWebElement p = traceDiv.findFirst(".modal-body");
+        if (p.isNull() || p.toPlainText().length())
+            return;
+
+        QString report = mainwindow->get_trace_for_file(filename);
+        p.setPlainText(report);
+    }
+
+    void WebPage::onSaveTrace(const QString& target, const QString& save_name, const QString& filename)
+    {
+        onFillTrace(target, filename);
+        onDownloadReport(target, save_name);
     }
 
     void WebPage::onFileUploadSelected(QWebElement form)

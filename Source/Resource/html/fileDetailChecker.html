@@ -24,6 +24,12 @@
                                 <a href="#" data-toggle="results-dld" data-save-name="MediaInfo.xml"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </p>
                         </li>
+                        <li class="list-group-item report">MediaInfo Trace
+                            <p class="text-right hidden">
+                              <a href="#" data-toggle="modal" class="results-view-trace-ajax" data-target="#modalTrace{{ loop.index }}" data-filename="{{ check.getTrace }}" title="View trace"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                              <a href="#" data-toggle="results-dld" class="results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-filename="{{ check.getTrace }}" data-save-name="MediaTrace.xml" title="Download trace"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                            </p>
+                        </li>
                 </ul>
             </div>
 
@@ -78,5 +84,69 @@
                         </div>
                     </div>
                 </div>
-
+                <div id="modalTrace{{ loop.index }}" class="modal fade">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">MediaTrace</h4>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-6 col-sm-8 col-xs-8">
+                            <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="traceSearch" id="traceSearch{{ loop.index }}" placeholder="Search" />
+                          </div>
+                          <div id="trace{{ loop.index }}" class="col-md-8"></div>
+                          <div id="traceInfo{{ loop.index }}" class="col-md-4"></div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-primary results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-save-name="MediaTrace.xml" data-filename="{{ check.getTrace }}">Download trace</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="traceXml{{ loop.index }}" class="hidden">
+                  <p class="modal-body"></p>
+                </div>
         </div>
+        <script>
+            $('#modalTrace{{ loop.index }}').on('show.bs.modal',
+                function() {
+                    $('#trace{{ loop.index }}').jstree({
+                        'core' : {
+                            'check_callback' : function (operation, node, parent, position, more) {
+                                if (operation === 'copy_node' || operation === 'move_node') {
+                                    return false; // disable copy and move
+                                }
+                                else {
+                                    return true;
+                                }
+                            },
+                            'multiple' : false,
+                            'data' : {{ check.getTrace.jstree|raw }}
+                        },
+                        "plugins" : ['search', 'types'],
+                        'types' : {
+                            'default' : {'icon' : 'glyphicon glyphicon-folder-open'},
+                            'block' : {'icon' : 'glyphicon glyphicon-folder-open'},
+                            'data' : {'icon' : 'glyphicon glyphicon-file'},
+                        },
+                    })
+                });
+
+            $('#trace{{ loop.index }}').on('ready.jstree', function () {
+                $(function () {
+                    var to = false;
+                    $('#traceSearch{{ loop.index }}').keyup(function () {
+                        if(to) { clearTimeout(to); }
+                        to = setTimeout(function () {
+                            var v = $('#traceSearch{{ loop.index }}').val();
+                            $('#trace{{ loop.index }}').jstree(true).search(v);
+                        }, 250);
+                    });
+                });
+            });
+        </script>
+

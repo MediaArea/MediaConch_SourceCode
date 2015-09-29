@@ -96,7 +96,7 @@ MainWindow::~MainWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void MainWindow::addFileToList(QString& file)
+void MainWindow::addFileToList(const QString& file)
 {
     C.List.push_back(file.toStdWString());
 }
@@ -188,6 +188,20 @@ void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
     C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
     updateWebView(list, String());
     C.PoliciesFiles[Core::policyType_Xslt].clear();
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::get_trace_for_file(const QString& filename)
+{
+    if (C.Tool == Core::tool_MediaPolicies)
+    {
+        displayPoliciesTree();
+        return QString();
+    }
+
+    String file = filename.toStdWString();
+    QString report = Run(Core::tool_MediaTrace, Core::format_Xml, file);
+    return report;
 }
 
 //---------------------------------------------------------------------------
@@ -1866,6 +1880,25 @@ void MainWindow::change_html_file_detail_policy_report(QString& html, String&, S
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::change_html_file_detail_trace(QString& html, String& file)
+{
+    QRegExp reg("data-filename=\"\\{\\{ check\\.getTrace \\}\\}\"");
+    reg.setMinimal(true);
+
+    int pos = 0;
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("data-filename=\"%1\"").arg(QString().fromStdWString(file)));
+
+    reg = QRegExp("\\{\\{ check\\.getTrace\\.jstree\\|raw \\}\\}");
+    reg.setMinimal(true);
+
+    QString report = Run(Core::tool_MediaTrace, Core::format_JsTree, file);
+    pos = 0;
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), report);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::change_html_file_detail(QString& html, String& file)
 {
     static int index = 0;
@@ -1902,6 +1935,7 @@ QString MainWindow::create_html_file_detail(String& file, String& policy)
     change_html_file_detail_inform_xml(base, file);
     // /!\: always has to be after inform_xml (need to be runned one time)
     change_html_file_detail_policy_report(base, file, policy);
+    change_html_file_detail_trace(base, file);
 
     return base;
 }

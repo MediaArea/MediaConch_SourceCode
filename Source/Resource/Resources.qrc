@@ -13,8 +13,10 @@
         <file alias="fileDetailChecker.html">html/fileDetailChecker.html</file>
         <file alias="jquery.js">html/js/jquery-1.11.2.min.js</file>
         <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
+        <file alias="jstree.js">html/js/jstree.min.js</file>
         <file alias="main.css">html/css/main.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
+        <file alias="jstree.css">html/css/jstree.min.css</file>
         <file alias="glyphicons-halflings-regular.ttf">html/fonts/glyphicons-halflings-regular.ttf</file>
         <file alias="glyphicons-halflings-regular.eot">html/fonts/glyphicons-halflings-regular.eot</file>
         <file alias="glyphicons-halflings-regular.svg">html/fonts/glyphicons-halflings-regular.svg</file>

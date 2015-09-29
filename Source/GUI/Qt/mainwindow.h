@@ -43,7 +43,7 @@ public:
     ~MainWindow();
 
     // Functions
-    void addFileToList(QString& file);
+    void addFileToList(const QString& file);
     void policy_to_delete(int row);
     void exporting_to_schematron_file(int pos);
     void exporting_to_schematron(int pos);
@@ -57,6 +57,7 @@ public:
     void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
     void                        checker_add_xslt_file(QString& file, QString& xslt);
     void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt);
+    QString                     get_trace_for_file(const QString& filename);
     QString                     ask_for_schematron_file();
     void                        checker_selected();
     void                        policies_selected();
@@ -138,6 +139,7 @@ private:
     void change_html_file_detail_inform_xml(QString& html, String& file);
     void change_html_file_detail_conformance(QString& html, String& file);
     void change_html_file_detail_policy_report(QString& html, String& file, String& policy);
+    void change_html_file_detail_trace(QString& html, String& file);
 
 private Q_SLOTS:
 
