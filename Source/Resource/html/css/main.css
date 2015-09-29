@@ -112,14 +112,14 @@ footer {
 
 .checker-results .panel-heading h4 {
     display: inline-block;
-    width: 96%
+    width: 95%
 }
 
 .checker-results ul li p {
     float: right;
 }
 
-.results-dld {
+.results-dld, .results-dld-trace, .results-dld-trace-ajax {
     margin-left: 10px;
 }
 
@@ -163,4 +163,14 @@ p.registration {
 
 .alert {
     margin-top: 20px;
+}
+
+.traceSearch {
+    box-shadow: inset 0 0 4px #eee;
+    width: 110px;
+    margin: 0 2px;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid silver;
+    font-size: 1.1em;
 }
