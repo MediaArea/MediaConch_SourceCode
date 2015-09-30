@@ -100,7 +100,7 @@ LIBS             += -lz
 contains(DEFINES, "MEDIAINFO_LIBCURL_YES") {
 exists(../../../curl/libcurl.pc) {
 INCLUDEPATH      += ../../../curl/include
-LIBS             += ../../../curl/libcurl.a
+LIBS             += ../../../curl/lib/.libs/libcurl.a
 message("custom curl         : yes")
 }
 else {

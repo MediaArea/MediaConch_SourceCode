@@ -37,11 +37,11 @@ OS=$(uname -s)
 # expr isn't available on mac
 if [ "$OS" = "Darwin" ]; then
     OS="mac"
-    BINAIRY="MediaConch.app"
+    BINARY="MediaConch.app"
 # if the 5 first caracters of $OS equal "Linux"
 elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
     OS="linux"
-    BINAIRY="mediaconch-gui"
+    BINARY="mediaconch-gui"
 #elif [ "$(expr substr $OS 1 5)" = "SunOS" ]; then
 #    OS="solaris"
 #elif [ "$(expr substr $OS 1 7)" = "FreeBSD" ]; then
@@ -87,9 +87,9 @@ if test -e MediaInfoLib/Project/GNU/Library/configure; then
     test -e Makefile && rm Makefile
     chmod +x configure
     if [ "$OS" = "mac" ]; then
-        ./configure $MacOptions $*
+        ./configure $MacOptions --with-libcurl $*
     else
-        ./configure $*
+        ./configure --with-libcurl $*
     fi
     if test -e Makefile; then
         make clean
@@ -117,15 +117,11 @@ if test -e MediaConch/Project/Qt/prepare; then
     cd MediaConch/Project/Qt
     test -e Makefile && rm Makefile
     chmod +x prepare
-    if [ "$OS" = "mac" ]; then
-        ./prepare $MacOptions $*
-    else
-        ./prepare $*
-    fi
+    ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
     if test -e Makefile; then
         make clean
         Parallel_Make
-        if test -e $BINAIRY; then
+        if test -e $BINARY; then
             echo "MediaConch (GUI) compiled"
         else
             echo "Problem while compiling MediaConch (GUI)"
@@ -143,6 +139,6 @@ cd $Home
 
 ##################################################################
 
-echo "MediaConch executable is MediaConch/Project/Qt/$BINAIRY"
+echo "MediaConch executable is MediaConch/Project/Qt/$BINARY"
 
-unset -v Home ZenLib_Options MacOptions OS BINAIRY
+unset -v Home ZenLib_Options MacOptions OS BINARY

@@ -27,6 +27,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  libqt4-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
+BuildRequires:  libcurl-devel
 %if 0%{?fedora_version}
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
@@ -76,7 +77,7 @@ popd
 
 pushd Project/Qt
     chmod u+x prepare
-    ./prepare
+    ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
 popd
 
 %build

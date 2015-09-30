@@ -8,7 +8,7 @@ Homepage: http://MediaArea.net/MediaConch
 Standards-Version: 3.9.6
 Vcs-Git: https://github.com/MediaArea/MediaConch_SourceCode.git
 Vcs-Browser: https://github.com/MediaArea/MediaConch_SourceCode
-Build-Depends: debhelper (>= 9), dh-autoreconf, tofrodos, libmediainfo-dev (>= 0.7.74), libzen-dev (>= 0.4.29), libqt4-dev, libxml2-dev, libxslt-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool, libqtwebkit-dev
+Build-Depends: debhelper (>= 9), dh-autoreconf, tofrodos, libmediainfo-dev (>= 0.7.74), libzen-dev (>= 0.4.29), libqt4-dev, libxml2-dev, libxslt-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool, libqtwebkit-dev, libcurl4-gnutls-dev
 Package-List:
  mediaconch deb utils optional arch=any
  mediaconch-gui deb utils optional arch=any
