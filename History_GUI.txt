@@ -8,6 +8,15 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 15.09, 2015-10-01
+-------------
+Design of the report is changed (similar to MediaConchOnline)
+Examples of policies provided by default
+Support of XSLT policies
+Drag and drop of several files
+MediaTrace UI
+Save of MediaTrace output in XML format
+
 Version 15.08, 2015-08-31
 -------------
 Improved FFV1 slice analysis

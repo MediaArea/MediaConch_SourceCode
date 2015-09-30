@@ -8,6 +8,10 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 15.09, 2015-10-01
+-------------
+Support of XSLT policies
+
 Version 15.08, 2015-08-31
 -------------
 Improved FFV1 slice analysis
