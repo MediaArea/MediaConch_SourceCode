@@ -7,6 +7,8 @@ mkdir _Automated
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policymenu.h -o_Automated\moc_policymenu.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\ruleedit.h -o_Automated\moc_ruleedit.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\rulemenu.h -o_Automated\moc_rulemenu.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\WebPage.h -o_Automated\moc_WebPage.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\WebView.h -o_Automated\moc_WebView.cpp
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\mainwindow.ui -o _Automated\ui_mainwindow.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\policiesedit.ui -o _Automated\ui_policiesedit.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\policiesmenu.ui -o _Automated\ui_policiesmenu.h

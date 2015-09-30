@@ -108,16 +108,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;MEDIAINFO_DLL_RUNTIME;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;../../../../Qt/qtbase/include/QtGui;../../../../Qt/qtbase/include/QtWidgets;../../../../Qt/qtbase/include/QtCore;../../../../Qt/qtbase/include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013_64\include/QtGui;D:\Qt\5.5\msvc2013_64\include/QtWidgets;D:\Qt\5.5\msvc2013_64\include/QtCore;D:\Qt\5.5\msvc2013_64\include;D:\Qt\5.5\msvc2013_64\include/QtWebKit;D:\Qt\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\Qt\qtbase\lib\MSVC2013\$(Platform);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;qwindowsd.lib;qminimald.lib;qtharfbuzzng.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Qt\5.5\msvc2013_64\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -177,6 +177,8 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebPage.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebView.cpp" />
     <ClCompile Include="_Automated\moc_groupofrules.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
     <ClCompile Include="_Automated\moc_policiesmenu.cpp" />
@@ -184,6 +186,8 @@
     <ClCompile Include="_Automated\moc_policymenu.cpp" />
     <ClCompile Include="_Automated\moc_ruleedit.cpp" />
     <ClCompile Include="_Automated\moc_rulemenu.cpp" />
+    <ClCompile Include="_Automated\moc_WebPage.cpp" />
+    <ClCompile Include="_Automated\moc_WebView.cpp" />
     <ClCompile Include="_Automated\qrc_Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +195,8 @@
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h" />
     <ClInclude Include="_Automated\ui_groupofrules.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
     <ClInclude Include="_Automated\ui_policiesedit.h" />

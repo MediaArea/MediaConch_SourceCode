@@ -95,6 +95,18 @@
     <ClCompile Include="_Automated\moc_groupofrules.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebPage.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebPage.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebView.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebView.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -132,6 +144,12 @@
     </ClInclude>
     <ClInclude Include="_Automated\ui_rulemenu.h">
       <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
