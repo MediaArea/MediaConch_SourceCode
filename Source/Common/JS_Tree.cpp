@@ -13,7 +13,9 @@
 //---------------------------------------------------------------------------
 #include <string>
 #include <sstream>
+#include "ZenLib/Ztring.h"
 #include "JS_Tree.h"
+using namespace ZenLib;
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
@@ -26,7 +28,7 @@ namespace MediaConch {
 String JsTree::format_from_XML(String& xml)
 {
     String json(__T("["));
-    std::string xml_not_unicode(xml.begin(), xml.end());
+    std::string xml_not_unicode=Ztring(xml).To_UTF8();
 
     xmlDocPtr doc = xmlParseMemory(xml_not_unicode.c_str(), xml_not_unicode.length());
     if (!doc)

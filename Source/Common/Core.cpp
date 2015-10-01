@@ -276,7 +276,7 @@ String Core::MediaSchematron ()
         wstringstream Out;
         for (size_t i = 0; i < vec.size(); ++i)
         {
-            std::string file(vec[i].begin(), vec[i].end());
+            std::string file=Ztring(vec[i]).To_UTF8();
             Out << vec[i] << ": ";
             Schema* S = new Schematron;
             if (S->register_schema_from_file(file.c_str()))
@@ -317,7 +317,7 @@ String Core::MediaXslt ()
         wstringstream Out;
         for (size_t i = 0; i < vec.size(); ++i)
         {
-            std::string file(vec[i].begin(), vec[i].end());
+            std::string file=Ztring(vec[i]).To_UTF8();
             Schema *S = new Xslt;
             if (S->register_schema_from_file(file.c_str()))
             {
@@ -355,7 +355,7 @@ String Core::MediaPolicies ()
 bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
 {
     int pos = -1;
-    std::string policyName(policy.begin(), policy.end());
+    std::string policyName=Ztring(policy).To_UTF8();
 
     if (!policy.length() && PoliciesFiles[policyType_Xslt].size())
     {
@@ -414,7 +414,7 @@ void Core::validateXsltPolicy(int pos, bool& valid, String& report)
 {
     Schema *S = new Xslt;
 
-    std::string file(PoliciesFiles[policyType_Xslt][pos].begin(), PoliciesFiles[policyType_Xslt][pos].end());
+    std::string file=Ztring(PoliciesFiles[policyType_Xslt][pos]).To_UTF8();
     if (S->register_schema_from_file(file.c_str()))
         valid = validation(S, report);
     else
@@ -437,7 +437,7 @@ bool Core::validation(Schema* S, String& report)
 {
     wstringstream Out;
     String tmp = MI->Inform();
-    std::string xml(tmp.begin(), tmp.end());
+    std::string xml=Ztring(tmp).To_UTF8();
     bool valid = true;
 
     int ret = S->validate_xml(xml.c_str(), xml.length());
@@ -460,7 +460,7 @@ bool Core::validation(Schema* S, String& report)
     else
     {
         std::string r = S->get_report();
-        Out << String(r.begin(), r.end());
+        Out << Ztring().From_UTF8(r);
     }
     report = Out.str();
     return valid;
