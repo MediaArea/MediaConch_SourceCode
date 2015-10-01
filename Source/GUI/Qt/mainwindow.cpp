@@ -216,9 +216,22 @@ void MainWindow::exporting_to_schematron_file(int pos)
 {
     if (pos < 0)
         return;
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    "", tr("Schematron (*.sch)"));
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
 
+    if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
+        path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".sch";
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                              path, tr("Schematron (*.sch)"));
+
+    if (!filename.length())
+        return;
     C.policies.export_schematron(filename.toStdString().c_str(), pos);
 }
 
