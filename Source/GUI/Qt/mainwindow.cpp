@@ -35,6 +35,7 @@
 #include <QComboBox>
 #include <QRadioButton>
 #include <QStatusBar>
+#include <QMessageBox>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -637,6 +638,18 @@ void MainWindow::duplicate_assert()
 //---------------------------------------------------------------------------
 void MainWindow::delete_all_policies()
 {
+    int ret = QMessageBox::warning(this, tr("Delete all policies"),
+                                   tr("Do you want to delete all policies?"),
+                                   QMessageBox::Yes | QMessageBox::No);
+    switch (ret)
+    {
+      case QMessageBox::Yes:
+          break;
+      case QMessageBox::No:
+      default:
+          return;
+    }
+
     QTreeWidget *tree = policiesTree->get_policies_tree();
     QTreeWidgetItem* policies = tree->topLevelItem(0);
     if (!policies)
