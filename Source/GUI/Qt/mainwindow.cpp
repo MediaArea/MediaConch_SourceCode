@@ -398,6 +398,21 @@ void MainWindow::add_new_policy()
     Policy *p = new Policy;
 
     p->title = string("New policy");
+    if (C.policies.policy_exists(p->title))
+    {
+        int i = 1;
+        while (1)
+        {
+            std::stringstream ss;
+            ss << p->title << " " << i;
+            if (!C.policies.policy_exists(ss.str()))
+            {
+                p->title = ss.str();
+                break;
+            }
+            ++i;
+        }
+    }
 
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(p->title);

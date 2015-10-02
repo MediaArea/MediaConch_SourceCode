@@ -680,4 +680,13 @@ void Policies::create_values_from_csv()
     }
 }
 
+bool Policies::policy_exists(std::string policy)
+{
+    for (size_t i =0; i < policies.size(); ++i)
+        if (policies[i]->title == policy)
+            return true;
+
+    return false;
+}
+
 }

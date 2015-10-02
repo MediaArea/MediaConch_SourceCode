@@ -126,6 +126,7 @@ public:
     xmlDocPtr  create_doc(size_t pos);
     string     serialize_assert_for_test(Assert *r);
     bool       try_parsing_test(string data, Assert *r);
+    bool       policy_exists(std::string policy);
 
     //TODO: parse csv to get the types/fields/validators from file
     void dump_policies_to_stdout();
