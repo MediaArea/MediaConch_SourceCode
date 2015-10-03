@@ -121,7 +121,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -134,14 +134,14 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../Source;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -161,9 +161,9 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -174,13 +174,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -197,13 +197,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <SetChecksum>true</SetChecksum>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -225,7 +225,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../Source;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
@@ -233,7 +233,6 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -241,8 +240,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
       <SetChecksum>true</SetChecksum>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -250,8 +249,11 @@
     <ClCompile Include="..\..\..\Source\CLI\CommandLine_Parser.cpp" />
     <ClCompile Include="..\..\..\Source\CLI\Help.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\JS_Tree.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Schema.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\CLI\CLI_Main.h" />

@@ -45,6 +45,15 @@
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Xslt.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Schema.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\JS_Tree.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\CLI\CLI_Main.h">

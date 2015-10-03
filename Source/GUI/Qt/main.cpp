@@ -7,10 +7,10 @@
 #include "mainwindow.h"
 #include <QApplication>
 
-#include <QtCore/QtPlugin>
-#if defined(_WIN32) && QT_VERSION >= 0x00050000 //Qt5
-    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-#endif
+//#include <QtCore/QtPlugin>
+//#if defined(_WIN32) && QT_VERSION >= 0x00050000 //Qt5
+    //Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+//#endif
 
 #ifdef __MACOSX__
     #include <ApplicationServices/ApplicationServices.h>
