@@ -37,7 +37,10 @@ OS=$(uname -s)
 # expr isn't available on mac
 if [ "$OS" = "Darwin" ]; then
     OS="mac"
-    BINARY="MediaConch.app"
+    BINARY="MediaConch.app/Contents/MacOS/MediaConch"
+    if test -d ~/Qt/5.3/clang_64/bin; then
+        export PATH=$PATH:~/Qt/5.3/clang_64/bin
+    fi  
 # if the 5 first caracters of $OS equal "Linux"
 elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
     OS="linux"
