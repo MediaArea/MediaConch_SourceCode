@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# codesign and osascript requires an GUI session
+if test -d ~/Qt/5.3/clang_64/bin; then
+	export PATH=$PATH:~/Qt/5.3/clang_64/bin
+fi
 
 if [ $# != 3 ]; then
     echo
