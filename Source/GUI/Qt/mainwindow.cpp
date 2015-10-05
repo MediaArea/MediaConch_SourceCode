@@ -342,6 +342,28 @@ void MainWindow::on_actionChooseSchematron_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionAbout_triggered()
+{
+    //Menu
+    QString about("About MediaConch");
+    QString descr(tr("MediaConch is an extensible, open source software project "
+                     "consisting of an implementation checker, policy checker, "
+                     "reporter, and fixer that targets preservation-level audiovisual "
+                     "files (specifically Matroska, Linear Pulse Code Modulation (LPCM) "
+                     "and FF Video Codec 1 (FFV1)) for use in memory institutions, "
+                     "providing detailed and batch-level conformance checking "
+                     "via an adaptable and flexible application program interface "
+                     "accessible by the command line, a graphical user interface, "
+                     "or a web-based shell. Conch is currently being developed by the MediaArea team, "
+                     "notable for the creation of open source media checker software, MediaInfo. "
+                     "Furthermore, the MediaArea team is dedicated to the further "
+                     "development of the standardization of the Matroska and "
+                     "FFV1 formats to ensure their longevity as a recommended digital "
+                     "preservation file format."));
+    QMessageBox::about(this, about, descr);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::import_schematron()
 {
     QString file = ask_for_schematron_file();
