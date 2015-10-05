@@ -10,8 +10,8 @@ cd ../../../../MediaConch/Project/GNU/CLI
 cd ../../../..
 
 # Dependencies
-cp -r /Users/mymac/Documents/almin/libxml2 .
-cp -r /Users/mymac/Documents/almin/libxslt .
+cp -r ~/Documents/almin/libxml2 .
+cp -r ~/Documents/almin/libxslt .
 
 # libxml2 and libcurl doesn’t like multiarch
 #./CLI_Compile.sh --enable-arch-x86_64 --enable-arch-i386
