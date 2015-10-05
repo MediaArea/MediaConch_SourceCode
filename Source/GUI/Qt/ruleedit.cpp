@@ -69,6 +69,9 @@ void RuleEdit::assert_clicked(Assert *a)
         ui->editorFrame->hide();
         return;
     }
+    if (a->type == "")
+        a->type = ui->type->currentText().toStdString();
+
     fill_editor_fields(a);
 
     ui->editorSelector->setChecked(true);
@@ -179,25 +182,19 @@ void RuleEdit::add_values_to_selector()
     list<string>::const_iterator itType = existing_type->begin();
     list<string>::const_iterator iteType = existing_type->end();
     for (; itType != iteType; ++itType)
-    {
         ui->type->addItem(QString().fromStdString(*itType));
-    }
 
     const list<string> *existing_field = mainwindow->providePolicyExistingField();
     list<string>::const_iterator itField = existing_field->begin();
     list<string>::const_iterator iteField = existing_field->end();
     for (; itField != iteField; ++itField)
-    {
         ui->field->addItem(QString().fromStdString(*itField));
-    }
 
     const list<Policies::validatorType> *existing_validator = mainwindow->providePolicyExistingValidator();
     list<Policies::validatorType>::const_iterator itValidator = existing_validator->begin();
     list<Policies::validatorType>::const_iterator iteValidator = existing_validator->end();
     for (; itValidator != iteValidator; ++itValidator)
-    {
         ui->validator->addItem(QString().fromStdString(itValidator->pretty_name));
-    }
 }
 
 string RuleEdit::get_validator_value_from_pretty_name(string pretty_name)
@@ -208,9 +205,7 @@ string RuleEdit::get_validator_value_from_pretty_name(string pretty_name)
     for (; itValidator != iteValidator; ++itValidator)
     {
         if (itValidator->pretty_name == pretty_name)
-        {
             return itValidator->value;
-        }
     }
     return string();
 }
@@ -223,9 +218,7 @@ string RuleEdit::get_validator_pretty_name_from_value(string value)
     for (; itValidator != iteValidator; ++itValidator)
     {
         if (itValidator->value == value)
-        {
             return itValidator->pretty_name;
-        }
     }
     return string();
 }
@@ -262,9 +255,7 @@ void RuleEdit::value_to_quotted_value(string& value)
         }
     }
     if (!isNum)
-    {
         value = string("'") + value + string("'");
-    }
 }
 
 }

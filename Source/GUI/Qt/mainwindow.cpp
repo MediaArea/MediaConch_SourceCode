@@ -35,6 +35,7 @@
 #include <QComboBox>
 #include <QRadioButton>
 #include <QStatusBar>
+#include <QMessageBox>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -216,10 +217,26 @@ void MainWindow::exporting_to_schematron_file(int pos)
 {
     if (pos < 0)
         return;
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    "", tr("Schematron (*.sch)"));
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
 
+    if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
+        path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".sch";
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                              path, tr("Schematron (*.sch)"));
+
+    if (!filename.length())
+        return;
     C.policies.export_schematron(filename.toStdString().c_str(), pos);
+
+    C.policies.policies[pos]->filename = filename.toStdString();
+    policyMenu->get_savePolicy_button()->setEnabled(true);
 }
 
 //---------------------------------------------------------------------------
@@ -328,6 +345,28 @@ void MainWindow::on_actionChooseSchematron_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionAbout_triggered()
+{
+    //Menu
+    QString about("About MediaConch");
+    QString descr(tr("MediaConch is an extensible, open source software project "
+                     "consisting of an implementation checker, policy checker, "
+                     "reporter, and fixer that targets preservation-level audiovisual "
+                     "files (specifically Matroska, Linear Pulse Code Modulation (LPCM) "
+                     "and FF Video Codec 1 (FFV1)) for use in memory institutions, "
+                     "providing detailed and batch-level conformance checking "
+                     "via an adaptable and flexible application program interface "
+                     "accessible by the command line, a graphical user interface, "
+                     "or a web-based shell. Conch is currently being developed by the MediaArea team, "
+                     "notable for the creation of open source media checker software, MediaInfo. "
+                     "Furthermore, the MediaArea team is dedicated to the further "
+                     "development of the standardization of the Matroska and "
+                     "FFV1 formats to ensure their longevity as a recommended digital "
+                     "preservation file format."));
+    QMessageBox::about(this, about, descr);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::import_schematron()
 {
     QString file = ask_for_schematron_file();
@@ -385,6 +424,21 @@ void MainWindow::add_new_policy()
     Policy *p = new Policy;
 
     p->title = string("New policy");
+    if (C.policies.policy_exists(p->title))
+    {
+        int i = 1;
+        while (1)
+        {
+            std::stringstream ss;
+            ss << p->title << " " << i;
+            if (!C.policies.policy_exists(ss.str()))
+            {
+                p->title = ss.str();
+                break;
+            }
+            ++i;
+        }
+    }
 
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(p->title);
@@ -609,6 +663,18 @@ void MainWindow::duplicate_assert()
 //---------------------------------------------------------------------------
 void MainWindow::delete_all_policies()
 {
+    int ret = QMessageBox::warning(this, tr("Delete all policies"),
+                                   tr("Do you want to delete all policies?"),
+                                   QMessageBox::Yes | QMessageBox::No);
+    switch (ret)
+    {
+      case QMessageBox::Yes:
+          break;
+      case QMessageBox::No:
+      default:
+          return;
+    }
+
     QTreeWidget *tree = policiesTree->get_policies_tree();
     QTreeWidgetItem* policies = tree->topLevelItem(0);
     if (!policies)
@@ -617,6 +683,7 @@ void MainWindow::delete_all_policies()
     for (size_t i = 0; i < C.policies.policies.size(); ++i)
         delete C.policies.policies[i];
     C.policies.policies.clear();
+    policiesMenu->get_deletePolicies_button()->setEnabled(false);
 }
 
 //---------------------------------------------------------------------------
@@ -1352,6 +1419,9 @@ void MainWindow::createPoliciesMenu()
                      this, SLOT(add_new_policy()));
     QObject::connect(policiesMenu->get_deletePolicies_button(), SIGNAL(clicked()),
                      this, SLOT(delete_all_policies()));
+
+    if (!C.policies.policies.size())
+        policiesMenu->get_deletePolicies_button()->setEnabled(false);
 }
 
 //---------------------------------------------------------------------------

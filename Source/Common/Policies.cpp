@@ -230,27 +230,22 @@ String Policies::import_schematron_from_doc(const char* filename, xmlDocPtr doc)
 string     Policies::serialize_assert_for_test(Assert *r)
 {
     if (!r)
-    {
         return string();
-    }
+
     if (r->use_free_text)
-    {
         return r->text;
-    }
+
     stringstream ret;
 
     ret << "track[@type='" << r->type << "']";
 
     if (!r->field.length())
-    {
         goto end;
-    }
     ret << "/" << r->field;
 
     if (!r->validator.length())
-    {
         goto end;
-    }
+
     ret << " " << r->validator << " " << r->value;
 
 end:
@@ -459,12 +454,9 @@ bool Policies::check_test_type(const string& type)
     list<string>::iterator ite = existing_type.end();
 
     for (; it != ite; ++it)
-    {
         if (!type.compare(*it))
-        {
             return true;
-        }
-    }
+
     return false;
 }
 
@@ -474,12 +466,9 @@ bool Policies::check_test_field(const string& field)
     list<string>::iterator ite = existing_field.end();
 
     for (; it != ite; ++it)
-    {
         if (!field.compare(*it))
-        {
             return true;
-        }
-    }
+
     return false;
 }
 
@@ -489,27 +478,21 @@ bool Policies::check_test_validator(const string& validator)
     list<validatorType>::iterator ite = existing_validator.end();
 
     for (; it != ite; ++it)
-    {
         if (!validator.compare(it->value))
-        {
             return true;
-        }
-    }
+
     return false;
 }
 
 string Policies::parse_test_value(string& sub, const string& before, const string& after)
 {
     if (sub.compare(0, before.length(), before))
-    {
         return string();
-    }
+
     sub = sub.substr(before.length());
     string::size_type pos = sub.find(after);
     if (pos == string::npos)
-    {
         return string();
-    }
 
     string ret = sub.substr(0, pos);
     sub = sub.substr(pos + after.length());
@@ -520,14 +503,12 @@ string Policies::parse_test_value(string& sub, const string& before, const strin
 string Policies::parse_test_field(string& sub, const string& before)
 {
     if (sub.compare(0, before.length(), before))
-    {
         return string();
-    }
+
     sub = sub.substr(before.length());
     if (!sub.length())
-    {
         return string();
-    }
+
     string::size_type pos = sub.find(" ");
     string ret = sub.substr(0, pos);
     if (pos == string::npos)
@@ -547,9 +528,8 @@ bool Policies::try_parsing_test(string data, Assert *r)
     //Type
     string type = parse_test_value(sub, string("track[@type='"), string("']"));
     if (!check_test_type(type))
-    {
         return false;
-    }
+
     if (!sub.length())
     {
         r->use_free_text = false;
@@ -560,9 +540,8 @@ bool Policies::try_parsing_test(string data, Assert *r)
     //Field
     string field = parse_test_field(sub, string("/"));
     if (!check_test_field(field))
-    {
         return false;
-    }
+
     if (!sub.length())
     {
         r->use_free_text = false;
@@ -573,14 +552,9 @@ bool Policies::try_parsing_test(string data, Assert *r)
 
     //Validator
     string validator = parse_test_value(sub, string(""), string(" "));
-    if (!check_test_validator(validator))
-    {
+    if (!check_test_validator(validator) || !sub.length())
         return false;
-    }
-    if (!sub.length())
-    {
-        return false;
-    }
+
     r->use_free_text = false;
     r->type = type;
     r->field = field;
@@ -675,9 +649,16 @@ void Policies::create_values_from_csv()
     };
 
     for (size_t i=0; i < (sizeof(validators) / sizeof(*validators)); i++)
-    {
         existing_validator.push_back(validators[i]);
-    }
+}
+
+bool Policies::policy_exists(std::string policy)
+{
+    for (size_t i =0; i < policies.size(); ++i)
+        if (policies[i]->title == policy)
+            return true;
+
+    return false;
 }
 
 }

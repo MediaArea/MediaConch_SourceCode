@@ -148,6 +148,7 @@ private Q_SLOTS:
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
     void on_actionChooseSchematron_triggered();
+    void on_actionAbout_triggered();
     void import_schematron();
     void save_policy();
     void save_policy_to();
