@@ -683,6 +683,7 @@ void MainWindow::delete_all_policies()
     for (size_t i = 0; i < C.policies.policies.size(); ++i)
         delete C.policies.policies[i];
     C.policies.policies.clear();
+    policiesMenu->get_deletePolicies_button()->setEnabled(false);
 }
 
 //---------------------------------------------------------------------------
@@ -1418,6 +1419,9 @@ void MainWindow::createPoliciesMenu()
                      this, SLOT(add_new_policy()));
     QObject::connect(policiesMenu->get_deletePolicies_button(), SIGNAL(clicked()),
                      this, SLOT(delete_all_policies()));
+
+    if (!C.policies.policies.size())
+        policiesMenu->get_deletePolicies_button()->setEnabled(false);
 }
 
 //---------------------------------------------------------------------------
