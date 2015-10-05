@@ -234,6 +234,9 @@ void MainWindow::exporting_to_schematron_file(int pos)
     if (!filename.length())
         return;
     C.policies.export_schematron(filename.toStdString().c_str(), pos);
+
+    C.policies.policies[pos]->filename = filename.toStdString();
+    policyMenu->get_savePolicy_button()->setEnabled(true);
 }
 
 //---------------------------------------------------------------------------
