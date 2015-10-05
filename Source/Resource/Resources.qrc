@@ -17,6 +17,8 @@
         <file alias="main.css">html/css/main.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
         <file alias="jstree.css">html/css/jstree.min.css</file>
+        <file alias="32px.png">html/css/32px.png</file>
+        <file alias="40px.png">html/css/40px.png</file>
         <file alias="glyphicons-halflings-regular.ttf">html/fonts/glyphicons-halflings-regular.ttf</file>
         <file alias="glyphicons-halflings-regular.eot">html/fonts/glyphicons-halflings-regular.eot</file>
         <file alias="glyphicons-halflings-regular.svg">html/fonts/glyphicons-halflings-regular.svg</file>
