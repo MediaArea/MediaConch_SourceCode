@@ -17,6 +17,7 @@
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
 #include "ZenLib/Ztring.h"
+#include "ZenLib/ZtringList.h"
 #include "ZenLib/File.h"
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -171,6 +172,8 @@ String Core::Run (String file)
         case tool_MediaSchematron: return MediaSchematron();
         case tool_MediaXslt:       return MediaXslt();
         case tool_MediaPolicies:   return MediaPolicies();
+        case tool_MAFields:        return MAXML_Fields();
+        case tool_MAStreamKinds:   return MAXML_StreamKinds();
         default:                   return String();
     }
 }
@@ -345,6 +348,23 @@ String Core::MediaXslt ()
 String Core::MediaPolicies ()
 {
     return String();
+}
+
+//---------------------------------------------------------------------------
+String Core::MAXML_Fields()
+{
+    ZenLib::ZtringList List;
+    List.Separator_Set(0, __T(","));
+
+    for (size_t i = 0; i < Types.size(); ++i)
+        List.Write(MI->Option(__T("MAXML_Fields"), Types[i]));
+    return List.Read();
+}
+
+//---------------------------------------------------------------------------
+String Core::MAXML_StreamKinds()
+{
+    return MI->Option(__T("MAXML_StreamKinds"), Ztring());
 }
 
 //***************************************************************************

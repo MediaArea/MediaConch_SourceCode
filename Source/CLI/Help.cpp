@@ -39,6 +39,10 @@ int Help()
     TEXTOUT("                    Validate the XML report");
     TEXTOUT("--Xslt=XsltFileName, -x XsltFileName");
     TEXTOUT("                    Validate the XML report");
+    TEXTOUT("--MAXML_Fields=Type");
+    TEXTOUT("                    Give the possibe fields for the given type");
+    TEXTOUT("--MAXML_StreamKinds");
+    TEXTOUT("                    Give the stream possible kinds");
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
     TEXTOUT("--BOM");
@@ -156,6 +160,18 @@ int Help_Xslt()
     TEXTOUT("Usage: \"MediaConch --Xslt=FileName\"");
     TEXTOUT("");
     TEXTOUT("FileName is the XSLT file used to validate");
+    TEXTOUT("");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_MAXML_Fields()
+{
+    TEXTOUT("--MAXML_Fields=...  Specify a type to get the possible fields");
+    TEXTOUT("Usage: \"MediaConch --MAXML_Fields=Type\"");
+    TEXTOUT("");
+    TEXTOUT("Type can be: Audio, General, Image, Menu, Other, Text, Video");
     TEXTOUT("");
 
     return -1;
