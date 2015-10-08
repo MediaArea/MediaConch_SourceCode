@@ -29,84 +29,14 @@
 #include <list>
 #include <vector>
 #include <libxml/tree.h>
+#include "Policy.h"
 using namespace MediaInfoNameSpace;
-using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
 
-//***************************************************************************
-// Assert
-//***************************************************************************
-
-struct Assert
-{
-    Assert() {}
-    ~Assert() {}
-    Assert(const Assert&);
-
-    string description;
-
-    bool   use_free_text;
-
-    string type;
-    string field;
-    string validator;
-    string value;
-
-    string text;
-
-private:
-    Assert& operator=(const Assert&);
-};
-
-//***************************************************************************
-// Rule
-//***************************************************************************
-
-struct Rule
-{
-    Rule() {}
-    ~Rule();
-    Rule(const Rule&);
-
-    vector<Assert *> asserts;
-private:
-    Rule& operator=(const Rule&);
-};
-
-//***************************************************************************
-// Pattern
-//***************************************************************************
-
-struct Pattern
-{
-    Pattern() {}
-    ~Pattern();
-    Pattern(const Pattern&);
-
-    string name;
-    vector<Rule *> rules;
-private:
-    Pattern& operator=(const Pattern&);
-};
-
-//***************************************************************************
-// Policy
-//***************************************************************************
-
-struct Policy
-{
-    Policy() {}
-    ~Policy();
-    Policy(const Policy&);
-
-    string filename;
-    string title;
-    vector<Pattern *> patterns;
-private:
-    Policy& operator=(const Policy&);
-};
+/* TODO: remove */
+class SchematronAssert;
 
 //***************************************************************************
 // Class Policies
@@ -115,23 +45,27 @@ private:
 class Policies
 {
 public:
+    enum PolicyType
+    {
+        POLICY_SCHEMATRON,
+        POLICY_XSLT,
+    };
+
     //Constructor/Destructor
     Policies();
     ~Policies();
 
-    String import_schematron(const char* filename);
-    String import_schematron_from_memory(const char* filename, const char* memory, int len);
-    void export_schematron(const char* filename, size_t pos);
-    void erase_policy(size_t index);
+    String     import_schema(PolicyType type, const char* filename);
+    String     import_schema_from_memory(PolicyType type, const char* filename, const char* memory, int len);
+    void       export_schema(PolicyType type, const char* filename, size_t pos);
     xmlDocPtr  create_doc(size_t pos);
-    string     serialize_assert_for_test(Assert *r);
-    bool       try_parsing_test(string data, Assert *r);
+    void       erase_policy(size_t index);
     bool       policy_exists(std::string policy);
 
-    //TODO: parse csv to get the types/fields/validators from file
-    void dump_policies_to_stdout();
+    static bool        try_parsing_test(std::string data, SchematronAssert *r);
+    static std::string serialize_assert_for_test(SchematronAssert *r);
 
-    vector<Policy *> policies;
+    std::vector<Policy *> policies;
     //***************************************************************************
     // Type/Field/Validator
     //***************************************************************************
@@ -141,39 +75,24 @@ public:
 
     struct validatorType
     {
-        string value;
-        string pretty_name;
+        std::string value;
+        std::string pretty_name;
     };
 
-    list<string> existing_type;
-    list<string> existing_field;
-    list<validatorType> existing_validator;
+    static std::list<std::string>        existing_type;
+    static std::list<std::string>        existing_field;
+    static std::list<validatorType>      existing_validator;
+
+    static std::string parse_test_value(std::string& sub, const std::string& start, const std::string& after);
+    static std::string parse_test_field(std::string& sub, const std::string& end);
+
+    static bool check_test_type(const std::string& type);
+    static bool check_test_field(const std::string& field);
+    static bool check_test_validator(const std::string& validator);
 
 private:
     Policies (const Policies&);
     Policies& operator=(const Policies&);
-
-    // HELPER
-    String import_schematron_from_doc(const char* filename, xmlDocPtr doc);
-
-    bool find_title_node(xmlNodePtr node, string& title);
-    void find_patterns_node(xmlNodePtr node, vector<Pattern *>& patterns);
-    void find_rules_node(xmlNodePtr node, vector<Rule *>& rules);
-    void find_asserts_node(xmlNodePtr node, vector<Assert *>& asserts);
-    Assert* create_assert_from_data(string descr, string data);
-
-    string parse_test_value(string& sub, const string& start, const string& after);
-    string parse_test_field(string& sub, const string& end);
-
-    bool check_test_type(const string& type);
-    bool check_test_field(const string& field);
-    bool check_test_validator(const string& validator);
-
-    xmlNodePtr write_ns();
-    xmlNodePtr write_title(string& title);
-    xmlNodePtr write_pattern(Pattern *p);
-    xmlNodePtr write_rule(Rule *r);
-    xmlNodePtr write_assert(Assert *r);
 };
 
 }

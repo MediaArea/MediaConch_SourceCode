@@ -288,6 +288,7 @@ String Core::MediaSchematron ()
             {
                 String report;
                 bool valid = validation(S, report);
+
                 if (!valid)
                     Out << report;
                 else

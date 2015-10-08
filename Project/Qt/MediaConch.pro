@@ -23,6 +23,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Xslt.cpp \
                     ../../Source/Common/Policies.cpp \
+                    ../../Source/Common/Policy.cpp \
+                    ../../Source/Common/SchematronPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
@@ -40,6 +42,9 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schematron.h \
                     ../../Source/Common/Xslt.h \
                     ../../Source/Common/JS_Tree.h \
+                    ../../Source/Common/Policies.h \
+                    ../../Source/Common/Policy.h \
+                    ../../Source/Common/SchematronPolicy.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/mainwindow.h \

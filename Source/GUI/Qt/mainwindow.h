@@ -8,6 +8,7 @@
 #define MAINWINDOW_H
 
 #include "Common/Core.h"
+#include "Common/SchematronPolicy.h"
 
 #include <QMainWindow>
 #include <QFileInfo>
@@ -95,8 +96,8 @@ private:
     void                        removeTreeChildren(QTreeWidgetItem* item);
     void                        updatePoliciesTree();
     void                        updatePoliciesTreePolicy(Policy* p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreePattern(Pattern *p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeRule(Rule *rule, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreePattern(SchematronPattern *p, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeRule(SchematronRule *rule, QTreeWidgetItem *parent);
     void                        displayPoliciesTree();
     void                        createPoliciesTree();
     void                        displayPoliciesMenu();

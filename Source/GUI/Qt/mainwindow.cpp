@@ -237,7 +237,7 @@ void MainWindow::exporting_to_schematron_file(int pos)
 
     if (!filename.length())
         return;
-    C.policies.export_schematron(filename.toStdString().c_str(), pos);
+    C.policies.export_schema(Policies::POLICY_SCHEMATRON, filename.toStdString().c_str(), pos);
 
     C.policies.policies[pos]->filename = filename.toStdString();
     policyMenu->get_savePolicy_button()->setEnabled(true);
@@ -246,7 +246,7 @@ void MainWindow::exporting_to_schematron_file(int pos)
 //---------------------------------------------------------------------------
 void MainWindow::exporting_to_schematron(int pos)
 {
-    C.policies.export_schematron(NULL, pos);
+    C.policies.export_schema(Policies::POLICY_SCHEMATRON, NULL, pos);
 }
 
 //---------------------------------------------------------------------------
@@ -263,7 +263,7 @@ void MainWindow::add_default_policy()
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
         QByteArray schematron = file.readAll();
-        String ret = C.policies.import_schematron_from_memory(list[i].absoluteFilePath().toStdString().c_str(),
+        String ret = C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
                                                               schematron.constData(), schematron.length());
         (void)ret;
     }
@@ -286,7 +286,7 @@ void MainWindow::add_default_policy()
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
         QByteArray schematron = file.readAll();
-        String ret = C.policies.import_schematron_from_memory(list[i].absoluteFilePath().toStdString().c_str(),
+        String ret = C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
                                                               schematron.constData(), schematron.length());
         (void)ret;
     }
@@ -340,7 +340,7 @@ void MainWindow::on_actionChooseSchematron_triggered()
     QString file = ask_for_schematron_file();
     if (file.length())
     {
-        if (C.policies.import_schematron(file.toStdString().c_str()).length())
+        if (C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
         {
             C.PoliciesFiles[Core::policyType_Schematron].push_back(file.toStdWString());
         }
@@ -374,7 +374,7 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::import_schematron()
 {
     QString file = ask_for_schematron_file();
-    String ret = C.policies.import_schematron(file.toStdString().c_str());
+    String ret = C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str());
 
     displayPoliciesTree();
     if (ret.length())
@@ -425,7 +425,7 @@ void MainWindow::add_new_policy()
     if (!parent)
         return;
 
-    Policy *p = new Policy;
+    Policy *p = new SchematronPolicy;
 
     p->title = string("New policy");
     if (C.policies.policy_exists(p->title))
@@ -466,7 +466,7 @@ void MainWindow::duplicate_policy()
     if (row < 0)
         return;
 
-    Policy *p = new Policy(*C.policies.policies[row]);
+    Policy *p = new SchematronPolicy((SchematronPolicy*)C.policies.policies[row]);
 
     p->title = p->title + string(" (Copy)");
 
@@ -481,8 +481,8 @@ void MainWindow::duplicate_policy()
     QString title = QString().fromStdString(p->title);
     new_item->setText(0, title);
 
-    for (size_t i = 0; i < p->patterns.size(); ++i)
-        updatePoliciesTreePattern(p->patterns[i], new_item);
+    for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
+        updatePoliciesTreePattern(((SchematronPolicy*)p)->patterns[i], new_item);
     displayPolicyMenu(title);
 }
 
@@ -496,7 +496,7 @@ void MainWindow::add_new_gor()
     if (rowPolicy < 0)
         return;
 
-    Pattern *p = new Pattern;
+    SchematronPattern *p = new SchematronPattern;
 
     p->name = string("New group of rules");
 
@@ -504,7 +504,7 @@ void MainWindow::add_new_gor()
     QString name = QString().fromStdString(p->name);
     item->setText(0, name);
 
-    C.policies.policies[rowPolicy]->patterns.push_back(p);
+    ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns.push_back(p);
     displayGroupOfRules(name);
     parent->setExpanded(true);
     parent->setSelected(false);
@@ -524,10 +524,10 @@ void MainWindow::duplicate_gor()
         return;
 
     Policy *p = C.policies.policies[rowPolicy];
-    Pattern *pat = new Pattern(*p->patterns[row]);
+    SchematronPattern *pat = new SchematronPattern(*((SchematronPolicy*)p)->patterns[row]);
 
     pat->name = pat->name + string(" (Copy)");
-    p->patterns.push_back(pat);
+    ((SchematronPolicy*)p)->patterns.push_back(pat);
 
     QTreeWidgetItem* parent = item->parent();
     if (!parent)
@@ -555,12 +555,12 @@ void MainWindow::add_new_rule()
     if (rowPolicy < 0 || rowGor < 0)
         return;
 
-    Rule *r = new Rule;
+    SchematronRule *r = new SchematronRule;
 
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     item->setText(0, QString("Rule"));
 
-    C.policies.policies[rowPolicy]->patterns[rowGor]->rules.push_back(r);
+    ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowGor]->rules.push_back(r);
     displayRuleMenu();
     parent->setExpanded(true);
     parent->setSelected(false);
@@ -580,8 +580,8 @@ void MainWindow::duplicate_rule()
     if (rowPattern < 0 || rowPolicy < 0 || row < 0)
         return;
 
-    Pattern *p = C.policies.policies[rowPolicy]->patterns[rowPattern];
-    Rule *r = new Rule(*p->rules[row]);
+    SchematronPattern *p = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern];
+    SchematronRule *r = new SchematronRule(*p->rules[row]);
 
     p->rules.push_back(r);
 
@@ -596,7 +596,7 @@ void MainWindow::duplicate_rule()
 
     for (size_t i = 0; i < r->asserts.size(); ++i)
     {
-        Assert *assert = r->asserts[i];
+        SchematronAssert *assert = r->asserts[i];
         if (!assert)
             continue;
 
@@ -619,14 +619,14 @@ void MainWindow::add_new_assert()
     if (rowPolicy < 0 || rowGor < 0 || rowRule < 0)
         return;
 
-    Assert *a = new Assert;
+    SchematronAssert *a = new SchematronAssert;
 
     a->description = string("New Assert");
     a->use_free_text = false;
     QString name = QString().fromStdString(a->description);
     QTreeWidgetItem* item = new QTreeWidgetItem(parent, QStringList(name));
 
-    C.policies.policies[rowPolicy]->patterns[rowGor]->rules[rowRule]->asserts.push_back(a);
+    ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowGor]->rules[rowRule]->asserts.push_back(a);
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
@@ -647,8 +647,8 @@ void MainWindow::duplicate_assert()
     if (rowPattern < 0 || rowPolicy < 0 || row < 0)
         return;
 
-    Rule *r = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule];
-    Assert *a = new Assert(*r->asserts[row]);
+    SchematronRule *r = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule];
+    SchematronAssert *a = new SchematronAssert(*r->asserts[row]);
     a->description = a->description + string(" (Copy)");
     r->asserts.push_back(a);
 
@@ -703,9 +703,9 @@ void MainWindow::delete_policy()
 
     // Internal data
     Policy *p = C.policies.policies[row];
-    for (size_t i = 0; i < p->patterns.size(); ++i)
-        delete p->patterns[i];
-    p->patterns.clear();
+    for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
+        delete ((SchematronPolicy*)p)->patterns[i];
+    ((SchematronPolicy*)p)->patterns.clear();
     C.policies.policies.erase(C.policies.policies.begin() + row);
 
     // Visual
@@ -733,11 +733,11 @@ void MainWindow::delete_gor()
 
     // Internal data
     Policy *p = C.policies.policies[rowPolicy];
-    Pattern *pat = p->patterns[row];
+    SchematronPattern *pat = ((SchematronPolicy*)p)->patterns[row];
     for (size_t i = 0; i < pat->rules.size(); ++i)
         delete pat->rules[i];
     pat->rules.clear();
-    p->patterns.erase(p->patterns.begin() + row);
+    ((SchematronPolicy*)p)->patterns.erase(((SchematronPolicy*)p)->patterns.begin() + row);
 
     // Visual
     removeTreeChildren(item);
@@ -764,8 +764,8 @@ void MainWindow::delete_rule()
         return;
 
     // Internal data
-    Pattern *p = C.policies.policies[rowPolicy]->patterns[rowGor];
-    Rule *r = p->rules[row];
+    SchematronPattern *p = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowGor];
+    SchematronRule *r = p->rules[row];
     for (size_t i = 0; i < r->asserts.size(); ++i)
         delete r->asserts[i];
     r->asserts.clear();
@@ -797,8 +797,8 @@ void MainWindow::delete_assert()
         return;
 
     // Internal data
-    Rule *r = C.policies.policies[rowPolicy]->patterns[rowGor]->rules[rowRule];
-    Assert *a = r->asserts[row];
+    SchematronRule *r = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowGor]->rules[rowRule];
+    SchematronAssert *a = r->asserts[row];
     r->asserts.erase(r->asserts.begin() + row);
     delete a;
 
@@ -858,7 +858,7 @@ void MainWindow::edit_gor_title()
     if (row < 0 || rowPolicy < 0)
         return;
 
-    Pattern *p = C.policies.policies[rowPolicy]->patterns[row];
+    SchematronPattern *p = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[row];
     p->name = qname.toStdString();
 
     QString title = QString().fromStdString(p->name);
@@ -886,7 +886,7 @@ void MainWindow::edit_assert_name(QString new_name)
     if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
         return;
 
-    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+    SchematronAssert *a = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
     a->description = new_name.toStdString();
 
     QString name = QString().fromStdString(a->description);
@@ -907,7 +907,7 @@ void MainWindow::edit_assert_type()
     if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
         return;
 
-    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+    SchematronAssert *a = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
     a->type = ruleEdit->get_type_select()->currentText().toStdString();
     a->use_free_text = false;
@@ -927,7 +927,7 @@ void MainWindow::edit_assert_field()
     if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
         return;
 
-    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+    SchematronAssert *a = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
     a->field = ruleEdit->get_field_select()->currentText().toStdString();
     a->use_free_text = false;
@@ -947,7 +947,7 @@ void MainWindow::edit_assert_validator()
     if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
         return;
 
-    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+    SchematronAssert *a = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
     a->validator = ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString());
     a->use_free_text = false;
@@ -967,7 +967,7 @@ void MainWindow::edit_assert_value()
     if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
         return;
 
-    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+    SchematronAssert *a = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
     a->value = ruleEdit->get_value_line()->text().toStdString();
     ruleEdit->value_to_quotted_value(a->value);
@@ -988,12 +988,12 @@ void MainWindow::edit_assert_freeText()
     if (row < 0 || rowPolicy < 0 || rowPattern < 0 || rowRule < 0)
         return;
 
-    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[row];
+    SchematronAssert *a = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
     a->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
     a->use_free_text = true;
 
-    Assert test;
+    SchematronAssert test;
     if (C.policies.try_parsing_test(a->text, &test))
         ruleEdit->get_editorSelector_radio()->setEnabled(true);
     else
@@ -1006,7 +1006,7 @@ void MainWindow::assert_free_text_selected(bool checked)
     if (!checked)
         return;
 
-    Assert a;
+    SchematronAssert a;
 
     a.type = ruleEdit->get_type_select()->currentText().toStdString();
     a.field = ruleEdit->get_field_select()->currentText().toStdString();
@@ -1028,7 +1028,7 @@ void MainWindow::assert_editor_selected(bool checked)
     if (!checked)
         return;
 
-    Assert a;
+    SchematronAssert a;
     if (C.policies.try_parsing_test(ruleEdit->get_freeText_text()->toPlainText().toStdString(), &a))
         ruleEdit->fill_editor_fields(&a);
     else
@@ -1328,7 +1328,7 @@ void MainWindow::displayPoliciesTree()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::updatePoliciesTreeRule(Rule *rule, QTreeWidgetItem *parent)
+void MainWindow::updatePoliciesTreeRule(SchematronRule *rule, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString name = QString("Rule");
@@ -1336,7 +1336,7 @@ void MainWindow::updatePoliciesTreeRule(Rule *rule, QTreeWidgetItem *parent)
 
     for (size_t i = 0; i < rule->asserts.size(); ++i)
     {
-        Assert *assert = rule->asserts[i];
+        SchematronAssert *assert = rule->asserts[i];
         if (!assert)
             continue;
 
@@ -1347,7 +1347,7 @@ void MainWindow::updatePoliciesTreeRule(Rule *rule, QTreeWidgetItem *parent)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::updatePoliciesTreePattern(Pattern *pattern, QTreeWidgetItem *parent)
+void MainWindow::updatePoliciesTreePattern(SchematronPattern *pattern, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString name = QString().fromStdString(pattern->name);
@@ -1357,7 +1357,7 @@ void MainWindow::updatePoliciesTreePattern(Pattern *pattern, QTreeWidgetItem *pa
 
     for (size_t i = 0; i < pattern->rules.size(); ++i)
     {
-        Rule *rule =pattern->rules[i];
+        SchematronRule *rule =pattern->rules[i];
         if (!rule)
             continue;
         updatePoliciesTreeRule(rule, item);
@@ -1373,9 +1373,9 @@ void MainWindow::updatePoliciesTreePolicy(Policy* policy, QTreeWidgetItem *paren
         title = QString("New policy");
     item->setText(0, title);
 
-    for (size_t i = 0; i < policy->patterns.size(); ++i)
+    for (size_t i = 0; i < ((SchematronPolicy*)policy)->patterns.size(); ++i)
     {
-        Pattern *pat = policy->patterns[i];
+        SchematronPattern *pat = ((SchematronPolicy*)policy)->patterns[i];
         if (!pat)
             continue;
         updatePoliciesTreePattern(pat, item);
@@ -1396,6 +1396,7 @@ void MainWindow::updatePoliciesTree()
 {
     if (!policiesTree)
         return;
+
     QTreeWidgetItem* policies = policiesTree->get_policies_tree()->topLevelItem(0);
     removeTreeChildren(policies);
 
@@ -1544,7 +1545,7 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
 
     if (rowPolicy < 0 || rowPattern < 0 || rowRule < 0 || rowAssert < 0)
         return;
-    Assert *a = C.policies.policies[rowPolicy]->patterns[rowPattern]->rules[rowRule]->asserts[rowAssert];
+    SchematronAssert *a = ((SchematronPolicy*)C.policies.policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[rowAssert];
     ruleEdit->assert_clicked(a);
 
     QObject::connect(ruleEdit->get_assertName_line(), SIGNAL(textEdited(QString)),
@@ -1568,7 +1569,7 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
     QObject::connect(ruleEdit->get_editorSelector_radio(), SIGNAL(toggled(bool)),
                      this, SLOT(assert_editor_selected(bool)));
 
-    Assert test;
+    SchematronAssert test;
     if (!a->use_free_text || C.policies.try_parsing_test(a->text, &test))
         ruleEdit->get_editorSelector_radio()->setEnabled(true);
     else

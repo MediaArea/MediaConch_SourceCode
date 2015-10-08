@@ -7,6 +7,7 @@
 #include "ruleedit.h"
 #include "ui_ruleedit.h"
 #include "Common/Policies.h"
+#include "Common/SchematronPolicy.h"
 #include "mainwindow.h"
 
 #if QT_VERSION >= 0x050200
@@ -55,7 +56,7 @@ void RuleEdit::clear()
 }
 
 //---------------------------------------------------------------------------
-void RuleEdit::assert_clicked(Assert *a)
+void RuleEdit::assert_clicked(SchematronAssert *a)
 {
     if (!a)
         return;
@@ -152,7 +153,7 @@ QRadioButton *RuleEdit::get_editorSelector_radio()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void RuleEdit::copy_visual_to_assert(Assert *a)
+void RuleEdit::copy_visual_to_assert(SchematronAssert *a)
 {
     a->description = ui->assertName->text().toStdString();
     if (ui->freeTextSelector->isChecked())
@@ -223,7 +224,7 @@ string RuleEdit::get_validator_pretty_name_from_value(string value)
     return string();
 }
 
-void RuleEdit::fill_editor_fields(const Assert *r)
+void RuleEdit::fill_editor_fields(const SchematronAssert *r)
 {
     int pos = ui->type->findText(QString().fromStdString(r->type));
     if (pos != -1)
