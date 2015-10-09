@@ -5,6 +5,7 @@
  */
 
 #include "mainwindow.h"
+#include "menumainwindow.h"
 #include "ui_mainwindow.h"
 #include "policiestree.h"
 #include "policiesmenu.h"
@@ -66,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Visual elements
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
     Layout->setContentsMargins(0, 0, 0, 0);
-    createMenu();
+    MenuView = new MenuMainWindow(this);
     MainView=NULL;
     progressBar=NULL;
     policiesTree = NULL;
@@ -1161,44 +1162,6 @@ void MainWindow::clearPoliciesElements()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createMenuFinished(bool)
-{
-    if (!MenuView)
-        return;
-
-    QWebFrame *frame = MenuView->page()->currentFrame();
-    frame->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
-    frame->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::createMenu()
-{
-    QFile menu_file(":/menu.html");
-
-    MenuView = new QWebView(this);
-    MenuView->setAcceptDrops(true);
-    MenuView->setMaximumHeight(75);
-    MenuView->setMinimumHeight(75);
-    Layout->addWidget(MenuView);
-
-    WebPage* page = new WebPage(this, MenuView);
-    MenuView->setPage(page);
-
-    menu_file.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = menu_file.readAll();
-    menu_file.close();
-
-    QObject::connect(MenuView, SIGNAL(loadFinished(bool)), this, SLOT(createMenuFinished(bool)));
-
-    QUrl url = QUrl("qrc:/html");
-    if (!url.isValid())
-        return;
-
-    MenuView->setContent(QString(html).toUtf8(), "text/html", url);
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::createWebViewFinished(bool ok)
 {
     if (!MainView)
@@ -1579,6 +1542,12 @@ void MainWindow::displayRuleEdit(QTreeWidgetItem *item)
 //***************************************************************************
 // HELPER
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+void MainWindow::set_widget_to_layout(QWidget* w)
+{
+    Layout->addWidget(w);
+}
 
 //---------------------------------------------------------------------------
 void MainWindow::checker_selected()

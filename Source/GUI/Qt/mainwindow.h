@@ -27,6 +27,7 @@ class QWebView;
 
 namespace MediaConch {
 
+class MenuMainWindow;
 class PoliciesTree;
 class PoliciesMenu;
 class PolicyMenu;
@@ -54,6 +55,7 @@ public:
 
     // Helpers
     void                        Run();
+    void                        set_widget_to_layout(QWidget* w);
     void                        checker_add_file(QString& file, QString& policy);
     void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
     void                        checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt);
@@ -83,12 +85,11 @@ private:
 
     // Visual elements
     QVBoxLayout*                Layout;
-    QWebView*                   MenuView;
     WebView*                    MainView;
+    MenuMainWindow*             MenuView;
     QProgressBar*               progressBar;
     void                        clearVisualElements();
     void                        clearPoliciesElements();
-    void                        createMenu();
     void                        createWebView();
     void                        updateWebView(String file, String policy);
     void                        updateWebView(QList<QFileInfo>& files, String policy);
@@ -179,7 +180,6 @@ private Q_SLOTS:
     void assert_free_text_selected(bool);
     void assert_editor_selected(bool);
 
-    void createMenuFinished(bool ok);
     void createWebViewFinished(bool ok);
 };
 
