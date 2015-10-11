@@ -122,69 +122,25 @@ String MainWindow::transformWithXslt(String report, String trans)
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_file(QString& file, QString& policy)
 {
-    if (C.Tool == Core::tool_MediaPolicies)
-    {
-        createPoliciesView();
-        return;
-    }
-
-    addFileToList(file);
-    updateWebView(file.toStdWString(), policy.toStdWString());
+    MainView->checker_add_file(file, policy);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_files(QFileInfoList& list, QString& policy)
 {
-    if (C.Tool == Core::tool_MediaPolicies)
-    {
-        createPoliciesView();
-        return;
-    }
-
-    for (int i = 0; i < list.count(); ++i)
-    {
-        QString file = list[i].absoluteFilePath();
-        addFileToList(file);
-    }
-    updateWebView(list, policy.toStdWString());
+    MainView->checker_add_files(list, policy);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt)
 {
-    if (C.Tool == Core::tool_MediaPolicies)
-    {
-        createPoliciesView();
-        return;
-    }
-
-    addFileToList(file);
-    C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
-    MainView->setDisplayXslt(display_xslt);
-    updateWebView(file.toStdWString(), String());
-    MainView->resetDisplayXslt();
-    C.PoliciesFiles[Core::policyType_Xslt].clear();
+        MainView->checker_add_xslt_file(file, xslt, display_xslt);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt, QString& display_xslt)
 {
-    if (C.Tool == Core::tool_MediaPolicies)
-    {
-        createPoliciesView();
-        return;
-    }
-
-    for (int i = 0; i < list.count(); ++i)
-    {
-        QString file = list[i].absoluteFilePath();
-        addFileToList(file);
-    }
-    C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
-    MainView->setDisplayXslt(display_xslt);
-    updateWebView(list, String());
-    MainView->resetDisplayXslt();
-    C.PoliciesFiles[Core::policyType_Xslt].clear();
+    MainView->checker_add_xslt_files(list, xslt, display_xslt);
 }
 
 //---------------------------------------------------------------------------

@@ -8,7 +8,6 @@
 #define MAINWINDOW_H
 
 #include "Common/Core.h"
-#include "Common/SchematronPolicy.h"
 
 #include <QMainWindow>
 #include <QFileInfo>
