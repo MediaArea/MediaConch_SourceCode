@@ -12,7 +12,8 @@ mediaconch_SOURCES = \
     ../../../Source/Common/JS_Tree.cpp \
     ../../../Source/Common/Policies.cpp \
     ../../../Source/Common/Policy.cpp \
-    ../../../Source/Common/SchematronPolicy.cpp
+    ../../../Source/Common/SchematronPolicy.cpp \
+    ../../../Source/Common/XsltPolicy.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)

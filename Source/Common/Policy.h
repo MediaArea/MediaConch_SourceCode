@@ -28,6 +28,7 @@
 #endif
 #include <vector>
 #include <libxml/tree.h>
+#include "Policies.h"
 using namespace MediaInfoNameSpace;
 //---------------------------------------------------------------------------
 
@@ -40,7 +41,7 @@ namespace MediaConch {
 class Policy
 {
 public:
-    Policy() {}
+    Policy(Policies::PolicyType t) : type(t) {}
     virtual ~Policy();
     Policy(const Policy*);
 
@@ -49,8 +50,9 @@ public:
     void       export_schema(const char* filename);
     virtual xmlDocPtr  create_doc() = 0;
 
-    std::string filename;
-    std::string title;
+    std::string          filename;
+    std::string          title;
+    Policies::PolicyType type;
 
 protected:
     // HELPER

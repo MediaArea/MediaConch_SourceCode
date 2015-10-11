@@ -11,8 +11,8 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef SchematronPolicyH
-#define SchematronPolicyH
+#ifndef XsltPolicyH
+#define XsltPolicyH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -36,15 +36,14 @@ using namespace MediaInfoNameSpace;
 namespace MediaConch {
 
 //***************************************************************************
-// SchematronAssert
+// XsltRule
 //***************************************************************************
 
-class SchematronAssert
+struct XsltRule
 {
-public:
-    SchematronAssert() {}
-    ~SchematronAssert() {}
-    SchematronAssert(const SchematronAssert&);
+    XsltRule() {}
+    ~XsltRule() {}
+    XsltRule(const XsltRule&);
 
     std::string description;
 
@@ -58,51 +57,22 @@ public:
     std::string text;
 
 private:
-    SchematronAssert& operator=(const SchematronAssert&);
-};
-
-//***************************************************************************
-// SchematronRule
-//***************************************************************************
-
-struct SchematronRule
-{
-    SchematronRule() {}
-    ~SchematronRule();
-    SchematronRule(const SchematronRule&);
-
-    std::vector<SchematronAssert *> asserts;
-private:
-    SchematronRule& operator=(const SchematronRule&);
-};
-
-//***************************************************************************
-// SchematronPattern
-//***************************************************************************
-
-struct SchematronPattern
-{
-    SchematronPattern() {}
-    ~SchematronPattern();
-    SchematronPattern(const SchematronPattern&);
-
-    std::string name;
-    std::vector<SchematronRule *> rules;
-private:
-    SchematronPattern& operator=(const SchematronPattern&);
+    XsltRule& operator=(const XsltRule&);
 };
 
 //***************************************************************************
 // Policy
 //***************************************************************************
 
-class SchematronPolicy : public Policy
+class XsltPolicy : public Policy
 {
 public:
-    SchematronPolicy() : Policy(Policies::POLICY_SCHEMATRON) {}
-    SchematronPolicy(const SchematronPolicy*);
-    virtual ~SchematronPolicy();
-    std::vector<SchematronPattern *> patterns;
+    XsltPolicy() : Policy(Policies::POLICY_XSLT) {}
+    XsltPolicy(const XsltPolicy*);
+    virtual ~XsltPolicy();
+    std::vector<XsltRule *> rules;
+    // TODO
+    /* std::vector<XsltOp *> operations; */
     xmlDocPtr  create_doc();
 
 private:
@@ -110,16 +80,10 @@ private:
     String import_schema_from_doc(const char* filename, xmlDocPtr doc);
 
     bool find_title_node(xmlNodePtr node, std::string& title);
-    void find_patterns_node(xmlNodePtr node, std::vector<SchematronPattern *>& patterns);
-    void find_rules_node(xmlNodePtr node, std::vector<SchematronRule *>& rules);
-    void find_asserts_node(xmlNodePtr node, std::vector<SchematronAssert *>& asserts);
-    SchematronAssert* create_assert_from_data(std::string descr, std::string data);
+    void find_rules_node(xmlNodePtr node, std::vector<XsltRule *>& rules);
 
-    xmlNodePtr write_ns();
     xmlNodePtr write_title(std::string& title);
-    xmlNodePtr write_pattern(SchematronPattern *p);
-    xmlNodePtr write_rule(SchematronRule *r);
-    xmlNodePtr write_assert(SchematronAssert *r);
+    xmlNodePtr write_rule(XsltRule *r);
 };
 
 }

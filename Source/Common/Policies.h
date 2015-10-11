@@ -29,7 +29,6 @@
 #include <list>
 #include <vector>
 #include <libxml/tree.h>
-#include "Policy.h"
 using namespace MediaInfoNameSpace;
 //---------------------------------------------------------------------------
 
@@ -37,6 +36,7 @@ namespace MediaConch {
 
 /* TODO: remove */
 class SchematronAssert;
+class Policy;
 
 //***************************************************************************
 // Class Policies

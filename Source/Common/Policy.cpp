@@ -12,6 +12,7 @@
 
 //---------------------------------------------------------------------------
 #include "Policies.h"
+#include "Policy.h"
 #include "Schematron.h"
 #include <iostream>
 #include <sstream>
@@ -50,7 +51,7 @@ String Policy::import_schema(const char* filename)
     if (!doc)
     {
         // maybe put the errors from s.errors
-        return String(__T("The schematron file cannot be parsed"));
+        return String(__T("The schema cannot be parsed"));
     }
 
     String ret = import_schema_from_doc(filename, doc);
@@ -71,7 +72,7 @@ String Policy::import_schema_from_memory(const char* filename, const char* buffe
     if (!doc)
     {
         // maybe put the errors from s.errors
-        return String(__T("The schematron given cannot be parsed"));
+        return String(__T("The schema given cannot be parsed"));
     }
 
     String ret = import_schema_from_doc(filename, doc);

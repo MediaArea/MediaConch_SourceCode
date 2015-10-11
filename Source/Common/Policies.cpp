@@ -12,6 +12,7 @@
 
 //---------------------------------------------------------------------------
 #include "Policies.h"
+#include "Policy.h"
 #include <iostream>
 #include <sstream>
 #include <string.h>

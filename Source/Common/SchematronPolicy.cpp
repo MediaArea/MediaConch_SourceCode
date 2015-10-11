@@ -100,6 +100,7 @@ SchematronPattern::~SchematronPattern()
 //---------------------------------------------------------------------------
 SchematronPolicy::SchematronPolicy(const SchematronPolicy* s) : Policy(s)
 {
+    type = Policies::POLICY_SCHEMATRON;
     for (size_t i = 0; i < s->patterns.size(); ++i)
     {
         SchematronPattern *pattern = new SchematronPattern(*s->patterns[i]);

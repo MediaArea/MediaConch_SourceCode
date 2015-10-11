@@ -312,9 +312,7 @@ void MainWindow::on_actionChooseSchematron_triggered()
     if (file.length())
     {
         if (C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
-        {
             C.PoliciesFiles[Core::policyType_Schematron].push_back(file.toStdWString());
-        }
     }
     Run();
 }
