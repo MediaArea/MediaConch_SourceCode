@@ -75,28 +75,31 @@ PoliciesWindow::~PoliciesWindow()
 //---------------------------------------------------------------------------
 void PoliciesWindow::import_schematron()
 {
-    // QString file = mainwindow->ask_for_schematron_file();
-    // String ret = mainwindow->get_policies().import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str());
+    QString file = mainwindow->ask_for_schematron_file();
+    if (!file.length())
+        return;
 
-    // displayPoliciesTree();
-    // if (ret.length())
-    //         policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
-    // else
-    // {
-    //     policiesTree->get_error_bar()->clearMessage();
-    //     int row = mainwindow->get_policies().policies.size() - 1;
-    //     QTreeWidgetItem* parent = policiesTree->get_policies_tree()->topLevelItem(0);
-    //     if (row < 0 || !parent)
-    //         return;
+    String ret = mainwindow->get_policies().import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str());
 
-    //     QTreeWidgetItem *item = parent->child(row);
-    //     if (!item)
-    //         return;
+    displayPoliciesTree();
+    if (ret.length())
+            policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
+    else
+    {
+        policiesTree->get_error_bar()->clearMessage();
+        int row = mainwindow->get_policies().policies.size() - 1;
+        QTreeWidgetItem* parent = policiesTree->get_policies_tree()->topLevelItem(0);
+        if (row < 0 || !parent)
+            return;
 
-    //     parent->setExpanded(true);
-    //     parent->setSelected(false);
-    //     item->setSelected(true);
-    // }
+        QTreeWidgetItem *item = parent->child(row);
+        if (!item)
+            return;
+
+        parent->setExpanded(true);
+        parent->setSelected(false);
+        item->setSelected(true);
+    }
 }
 
 //---------------------------------------------------------------------------

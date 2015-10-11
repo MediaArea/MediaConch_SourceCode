@@ -51,7 +51,7 @@ String Policies::import_schema(PolicyType type, const char* filename)
     Policy *p = new SchematronPolicy;
     String ret = p->import_schema(filename);
 
-    if (ret.length())
+    if (!ret.length())
         policies.push_back(p);
     return ret;
 }
