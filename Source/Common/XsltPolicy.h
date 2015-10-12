@@ -41,17 +41,18 @@ namespace MediaConch {
 
 struct XsltRule
 {
-    XsltRule() {}
+    XsltRule() : occurence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
 
-    std::string description;
+    std::string title;
 
     bool   use_free_text;
 
     std::string type;
     std::string field;
-    std::string validator;
+    int         occurence;
+    std::string ope;
     std::string value;
 
     std::string text;

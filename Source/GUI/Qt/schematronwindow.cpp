@@ -90,13 +90,14 @@ void SchematronWindow::display_selection(int level, QTreeWidgetItem *item)
 //---------------------------------------------------------------------------
 void SchematronWindow::save_policy()
 {
-    policieswindow->save_policy();
+    policieswindow->save_policy(Policies::POLICY_SCHEMATRON);
 }
 
 //---------------------------------------------------------------------------
 void SchematronWindow::save_policy_to()
 {
-    policieswindow->save_policy_to();
+    if (policieswindow->save_policy_to(Policies::POLICY_SCHEMATRON) < 0)
+        return;
     policyMenu->get_savePolicy_button()->setEnabled(true);
 }
 
@@ -104,7 +105,24 @@ void SchematronWindow::save_policy_to()
 void SchematronWindow::delete_policy()
 {
     clearPolicyElements();
-    policieswindow->delete_policy();
+
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int row = policieswindow->get_index_in_tree();
+    if (row < 0)
+        return;
+
+    // Internal data
+    Policy *p = mainwindow->get_policies().policies[row];
+    for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
+        delete ((SchematronPolicy*)p)->patterns[i];
+    ((SchematronPolicy*)p)->patterns.clear();
+    mainwindow->get_policies().policies.erase(mainwindow->get_policies().policies.begin() + row);
+
+    // Visual
+    policieswindow->policy_deleted(item, row);
 }
 
 //---------------------------------------------------------------------------
@@ -134,7 +152,7 @@ void SchematronWindow::duplicate_policy()
     new_item->setText(0, title);
 
     for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
-        policieswindow->updatePoliciesTreePattern(((SchematronPolicy*)p)->patterns[i], new_item);
+        policieswindow->updatePoliciesTreeSchematronPattern(((SchematronPolicy*)p)->patterns[i], new_item);
     displayPolicyMenu(title);
 }
 
@@ -192,7 +210,7 @@ void SchematronWindow::duplicate_gor()
     new_item->setText(0, title);
 
     for (size_t i = 0; i < pat->rules.size(); ++i)
-        policieswindow->updatePoliciesTreeRule(pat->rules[i], new_item);
+        policieswindow->updatePoliciesTreeSchematronRule(pat->rules[i], new_item);
     displayGroupOfRules(title);
 }
 

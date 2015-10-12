@@ -44,16 +44,17 @@ public:
     int                         get_index_of_item_backXX(QTreeWidgetItem* item, size_t back);
 
     // Visual elements
-    void                        updatePoliciesTreePattern(SchematronPattern *p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeRule(SchematronRule *rule, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeSchematronPattern(SchematronPattern *p, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeSchematronRule(SchematronRule *rule, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeXsltRule(XsltRule* p, QTreeWidgetItem *parent);
     void                        removeTreeChildren(QTreeWidgetItem* item);
     QStatusBar*                 get_error_bar();
     void                        set_widget_to_tree_layout(QWidget* w);
     void                        remove_widget_from_tree_layout(QWidget* w);
     QFrame*                     policyFrame();
-    void                        delete_policy();
-    void                        save_policy();
-    void                        save_policy_to();
+    void                        policy_deleted(QTreeWidgetItem* item, int row);
+    void                        save_policy(Policies::PolicyType type);
+    int                         save_policy_to(Policies::PolicyType type);
 
 private:
     MainWindow     *mainwindow;
@@ -67,7 +68,8 @@ private:
     void                        displayPoliciesMenu();
     void                        createPoliciesMenu();
     void                        updatePoliciesTree();
-    void                        updatePoliciesTreePolicy(Policy* p, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeSchematronPolicy(SchematronPolicy* p, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeXsltPolicy(XsltPolicy* p, QTreeWidgetItem *parent);
 
 //***************************************************************************
 // HELPER
@@ -78,7 +80,6 @@ private:
 private Q_SLOTS:
     void import_schematron();
     void add_new_policy();
-    void duplicate_policy();
     void delete_all_policies();
     void policiesTree_selectionChanged();
 };

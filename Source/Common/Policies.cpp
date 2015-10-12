@@ -32,6 +32,7 @@ namespace MediaConch {
     std::list<std::string> Policies::existing_type      = std::list<std::string>();
     std::list<std::string> Policies::existing_field     = std::list<std::string>();
     std::list<Policies::validatorType> Policies::existing_validator = std::list<Policies::validatorType>();
+    std::list<std::string> Policies::existing_xsltOperator = std::list<std::string>();
 
 //---------------------------------------------------------------------------
 Policies::Policies()
@@ -142,6 +143,23 @@ void Policies::create_values_from_csv()
 
     for (size_t i=0; i < (sizeof(validators) / sizeof(*validators)); i++)
         existing_validator.push_back(validators[i]);
+
+    std::string xsltOperators[] =
+    {
+        "is_true",
+        "is_equal",
+        "is_greater_than",
+        "is_less_than",
+        "is_greater_or_equal_than",
+        "is_less_or_equal_than",
+        "is_not_equal",
+        "exists",
+        "does_not_exist",
+        "matches_regex",
+    };
+
+    for (size_t i=0; i < (sizeof(xsltOperators) / sizeof(*xsltOperators)); i++)
+        existing_xsltOperator.push_back(xsltOperators[i]);
 }
 
 xmlDocPtr Policies::create_doc(size_t pos)

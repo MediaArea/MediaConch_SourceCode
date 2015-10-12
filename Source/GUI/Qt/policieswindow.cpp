@@ -7,6 +7,7 @@
 #include "policieswindow.h"
 #include "policywindow.h"
 #include "schematronwindow.h"
+#include "xsltwindow.h"
 #include "mainwindow.h"
 #include "policiestree.h"
 #include "policiesmenu.h"
@@ -102,24 +103,29 @@ void PoliciesWindow::import_schematron()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::save_policy_to()
+int PoliciesWindow::save_policy_to(Policies::PolicyType type)
 {
     int  row = get_index_in_tree();
-
     if (row < 0)
-        return;
+        return -1;
 
-    mainwindow->exporting_to_schematron_file(row);
+    if (type == Policies::POLICY_SCHEMATRON)
+        return mainwindow->exporting_to_schematron_file(row);
+    else
+        return mainwindow->exporting_to_xslt_file(row);
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::save_policy()
+void PoliciesWindow::save_policy(Policies::PolicyType type)
 {
     int  row = get_index_in_tree();
-
     if (row < 0)
         return;
-    mainwindow->exporting_to_schematron(row);
+
+    if (type == Policies::POLICY_SCHEMATRON)
+        mainwindow->exporting_to_schematron(row);
+    else
+        mainwindow->exporting_to_xslt(row);
 }
 
 //---------------------------------------------------------------------------
@@ -184,8 +190,8 @@ void PoliciesWindow::add_new_xslt_policy(QTreeWidgetItem* parent)
     item->setText(0, title);
 
     mainwindow->get_policies().policies.push_back(p);
-    // xsltwindow = new XsltWindow(this, mainwindow);
-    // xsltwindow->displayPolicyMenu(title);
+    policywindow = new XsltWindow(this, mainwindow);
+    policywindow->displayPolicyMenu(title);
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
@@ -210,38 +216,6 @@ void PoliciesWindow::add_new_policy()
         add_new_schematron_policy(parent);
     else if (msgBox.clickedButton() == xsltButton)
         add_new_xslt_policy(parent);
-}
-
-//---------------------------------------------------------------------------
-void PoliciesWindow::duplicate_policy()
-{
-    QTreeWidgetItem* item = get_item_in_tree();
-    if (!item)
-        return;
-
-    int row = get_index_in_tree();
-    if (row < 0)
-        return;
-
-    Policy *p = new SchematronPolicy((SchematronPolicy*)mainwindow->get_policies().policies[row]);
-
-    p->title = p->title + string(" (Copy)");
-
-    mainwindow->get_policies().policies.push_back(p);
-    QTreeWidgetItem* parent = item->parent();
-    if (!parent)
-        return;
-
-    QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
-    item->setSelected(false);
-    new_item->setSelected(true);
-    QString title = QString().fromStdString(p->title);
-    new_item->setText(0, title);
-
-    for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
-        updatePoliciesTreePattern(((SchematronPolicy*)p)->patterns[i], new_item);
-    policywindow = new SchematronWindow(this, mainwindow);
-    policywindow->displayPolicyMenu(title);
 }
 
 //---------------------------------------------------------------------------
@@ -271,30 +245,16 @@ void PoliciesWindow::delete_all_policies()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::delete_policy()
+void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
 {
-    QTreeWidgetItem* item = get_item_in_tree();
-    if (!item || !item->parent())
-        return;
-
-    int row = get_index_in_tree();
-    if (row < 0)
-        return;
-
-    // Internal data
-    Policy *p = mainwindow->get_policies().policies[row];
-    for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
-        delete ((SchematronPolicy*)p)->patterns[i];
-    ((SchematronPolicy*)p)->patterns.clear();
-    mainwindow->get_policies().policies.erase(mainwindow->get_policies().policies.begin() + row);
-
-    // Visual
     removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
     delete parent->takeChild(row);
+
     item = get_item_in_tree();
     if (item)
         item->setSelected(false);
+
     parent->setSelected(true);
     displayPoliciesMenu();
 }
@@ -316,19 +276,34 @@ void PoliciesWindow::policiesTree_selectionChanged()
         tmp = tmp->parent();
         ++level;
     }
+
+    int row = -1;
     switch (level)
     {
         case 0:
             displayPoliciesMenu();
+            return;
+        case 4:
+            row = get_index_of_item_backXX(item, 3);
+            break;
+        case 3:
+            row = get_index_of_item_backXX(item, 2);
+            break;
+        case 2:
+            row = get_index_of_item_backXX(item, 1);
+            break;
+        case 1:
+            row = get_index_of_item_backXX(item, 0);
             break;
         default:
-            clearPoliciesElements();
-            if (1)
-                policywindow = new SchematronWindow(this, mainwindow);
-            //TODO XSLT
-            policywindow->display_selection(level, item);
-            break;
+            return;
     }
+    clearPoliciesElements();
+    if (row < 0 || mainwindow->get_policies().policies[row]->type == Policies::POLICY_SCHEMATRON)
+        policywindow = new SchematronWindow(this, mainwindow);
+    else
+        policywindow = new XsltWindow(this, mainwindow);
+    policywindow->display_selection(level, item);
 }
 
 //***************************************************************************
@@ -409,7 +384,7 @@ void PoliciesWindow::displayPoliciesTree()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreeRule(SchematronRule *rule, QTreeWidgetItem *parent)
+void PoliciesWindow::updatePoliciesTreeSchematronRule(SchematronRule *rule, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString name = QString("Rule");
@@ -428,7 +403,7 @@ void PoliciesWindow::updatePoliciesTreeRule(SchematronRule *rule, QTreeWidgetIte
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreePattern(SchematronPattern *pattern, QTreeWidgetItem *parent)
+void PoliciesWindow::updatePoliciesTreeSchematronPattern(SchematronPattern *pattern, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString name = QString().fromStdString(pattern->name);
@@ -441,12 +416,12 @@ void PoliciesWindow::updatePoliciesTreePattern(SchematronPattern *pattern, QTree
         SchematronRule *rule =pattern->rules[i];
         if (!rule)
             continue;
-        updatePoliciesTreeRule(rule, item);
+        updatePoliciesTreeSchematronRule(rule, item);
     }
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreePolicy(Policy* policy, QTreeWidgetItem *parent)
+void PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(policy->title);
@@ -454,12 +429,40 @@ void PoliciesWindow::updatePoliciesTreePolicy(Policy* policy, QTreeWidgetItem *p
         title = QString("New policy");
     item->setText(0, title);
 
-    for (size_t i = 0; i < ((SchematronPolicy*)policy)->patterns.size(); ++i)
+    for (size_t i = 0; i < policy->patterns.size(); ++i)
     {
-        SchematronPattern *pat = ((SchematronPolicy*)policy)->patterns[i];
+        SchematronPattern *pat = policy->patterns[i];
         if (!pat)
             continue;
-        updatePoliciesTreePattern(pat, item);
+        updatePoliciesTreeSchematronPattern(pat, item);
+    }
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::updatePoliciesTreeXsltRule(XsltRule* rule, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString title = QString().fromStdString(rule->title);
+    if (!title.length())
+        title = QString("New Rule");
+    item->setText(0, title);
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::updatePoliciesTreeXsltPolicy(XsltPolicy* policy, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString title = QString().fromStdString(policy->title);
+    if (!title.length())
+        title = QString("New policy");
+    item->setText(0, title);
+
+    for (size_t i = 0; i < policy->rules.size(); ++i)
+    {
+        XsltRule *r = policy->rules[i];
+        if (!r)
+            continue;
+        updatePoliciesTreeXsltRule(r, item);
     }
 }
 
@@ -486,7 +489,10 @@ void PoliciesWindow::updatePoliciesTree()
         Policy *policy = mainwindow->get_policies().policies[i];
         if (!policy)
             continue;
-        updatePoliciesTreePolicy(policy, policies);
+        if (policy->type == Policies::POLICY_SCHEMATRON)
+            updatePoliciesTreeSchematronPolicy((SchematronPolicy*)policy, policies);
+        else if (policy->type == Policies::POLICY_XSLT)
+            updatePoliciesTreeXsltPolicy((XsltPolicy*)policy, policies);
     }
 }
 

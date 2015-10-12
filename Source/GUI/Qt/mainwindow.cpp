@@ -165,7 +165,7 @@ QString MainWindow::ask_for_schematron_file()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::exporting_to_schematron_file(int pos)
+int MainWindow::exporting_to_schematron_file(int pos)
 {
 #if QT_VERSION >= 0x050400
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -182,15 +182,46 @@ void MainWindow::exporting_to_schematron_file(int pos)
                                               path, tr("Schematron (*.sch)"));
 
     if (!filename.length())
-        return;
+        return -1;
     C.policies.export_schema(Policies::POLICY_SCHEMATRON, filename.toStdString().c_str(), pos);
     C.policies.policies[pos]->filename = filename.toStdString();
+    return 0;
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::exporting_to_schematron(int pos)
 {
     C.policies.export_schema(Policies::POLICY_SCHEMATRON, NULL, pos);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::exporting_to_xslt_file(int pos)
+{
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+
+    if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
+        path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".xsl";
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                              path, tr("XSLT (*.xsl)"));
+
+    if (!filename.length())
+        return -1;
+    C.policies.export_schema(Policies::POLICY_XSLT, filename.toStdString().c_str(), pos);
+    C.policies.policies[pos]->filename = filename.toStdString();
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::exporting_to_xslt(int pos)
+{
+    C.policies.export_schema(Policies::POLICY_XSLT, NULL, pos);
 }
 
 //---------------------------------------------------------------------------

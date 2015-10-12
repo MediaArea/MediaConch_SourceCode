@@ -81,6 +81,7 @@ public:
 
     static std::list<std::string>        existing_type;
     static std::list<std::string>        existing_field;
+    static std::list<std::string>        existing_xsltOperator;
     static std::list<validatorType>      existing_validator;
 
     static std::string parse_test_value(std::string& sub, const std::string& start, const std::string& after);

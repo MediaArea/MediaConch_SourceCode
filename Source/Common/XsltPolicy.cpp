@@ -29,15 +29,15 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 XsltRule::XsltRule(const XsltRule& r)
 {
-    if (&r == this) {
+    if (&r == this)
         return;
-    }
 
-    this->description = r.description;
+    this->title = r.title;
     this->use_free_text = r.use_free_text;
     this->type = r.type;
     this->field = r.field;
-    this->validator = r.validator;
+    this->occurence = r.occurence;
+    this->ope = r.ope;
     this->value = r.value;
     this->text = r.text;
 }

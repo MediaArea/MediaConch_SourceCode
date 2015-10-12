@@ -39,8 +39,10 @@ public:
     // Functions
     void addFileToList(const QString& file);
     void policy_to_delete(int row);
-    void exporting_to_schematron_file(int pos);
+    int  exporting_to_schematron_file(int pos);
     void exporting_to_schematron(int pos);
+    int  exporting_to_xslt_file(int pos);
+    void exporting_to_xslt(int pos);
 
     // UI
     void                        Ui_Init                     ();
@@ -72,6 +74,7 @@ public:
     const list<string>* providePolicyExistingType() const {return &C.policies.existing_type; }
     const list<string>* providePolicyExistingField() const {return &C.policies.existing_field; }
     const list<Policies::validatorType>* providePolicyExistingValidator() const {return &C.policies.existing_validator; }
+    const list<string>* providePolicyExistingXsltOperator() const {return &C.policies.existing_xsltOperator; }
 
 private:
     Ui::MainWindow *ui;
