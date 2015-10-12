@@ -34,6 +34,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
                     ../../Source/GUI/Qt/policieswindow.cpp \
+                    ../../Source/GUI/Qt/policywindow.cpp \
+                    ../../Source/GUI/Qt/schematronwindow.cpp \
                     ../../Source/GUI/Qt/policiestree.cpp \
                     ../../Source/GUI/Qt/policiesmenu.cpp \
                     ../../Source/GUI/Qt/policymenu.cpp \
@@ -56,6 +58,8 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \
                     ../../Source/GUI/Qt/policieswindow.h \
+                    ../../Source/GUI/Qt/policywindow.h \
+                    ../../Source/GUI/Qt/schematronwindow.h \
                     ../../Source/GUI/Qt/policiestree.h \
                     ../../Source/GUI/Qt/policiesmenu.h \
                     ../../Source/GUI/Qt/policymenu.h \
