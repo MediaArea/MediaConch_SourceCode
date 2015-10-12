@@ -62,6 +62,8 @@ public:
         tool_MediaSchematron,
         tool_MediaXslt,
         tool_MediaPolicies,
+        tool_MAFields,
+        tool_MAStreamKinds,
     };
     tool Tool;
     enum format
@@ -84,6 +86,7 @@ public:
     };
     std::map<policyType, std::vector<String> > PoliciesFiles;
     Policies policies;
+    vector<String> Types;
 
 private:
     Core (const Core&);
@@ -96,6 +99,8 @@ private:
     String MediaSchematron();
     String MediaXslt();
     String MediaPolicies();
+    String MAXML_Fields();
+    String MAXML_StreamKinds();
 
     //Helper
     bool validation(Schema* S, String& report);

@@ -109,6 +109,7 @@ int main(int argc, char* argv_ansi[])
     //Retrieve command line (mainly for Unicode)
     GETCOMMANDLINE();
 
+    bool Nothing_needed = false;
     //Parse command line
     for (int Pos=1; Pos<argc; Pos++)
     {
@@ -124,12 +125,14 @@ int main(int argc, char* argv_ansi[])
         int Return=Parse (MI, Argument);
         if (Return<0)
             return Return; //no more tasks to do
-        if (Return>0)
+        if (Return==1)
             MI.List.push_back(argv[Pos]); //Append the filename to the list of filenames to parse
+        else if (Return==2)
+            Nothing_needed = true;
     }
 
     //If no filenames (and no options)
-    if (MI.List.empty())
+    if (MI.List.empty() && !Nothing_needed)
         return Help_Nothing();
 
     //Callback for error handling

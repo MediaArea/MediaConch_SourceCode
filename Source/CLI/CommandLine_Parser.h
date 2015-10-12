@@ -39,6 +39,8 @@ CL_OPTION(Bom);
 CL_OPTION(Version);
 CL_OPTION(SchematronValidation);
 CL_OPTION(XsltValidation);
+CL_OPTION(Fields);
+CL_OPTION(StreamKinds);
 CL_OPTION(Default);
 
 //***************************************************************************

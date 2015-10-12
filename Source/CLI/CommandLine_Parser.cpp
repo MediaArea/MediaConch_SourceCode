@@ -31,6 +31,13 @@
 #define OPTION2(_TEXT, _TOLAUNCH) \
     else if (Argument.find(__T(_TEXT))==0)        _TOLAUNCH(); \
 
+#define RETURN_OPTION(_TEXT, _TOLAUNCH)     \
+    else if (Argument.find(__T(_TEXT))==0)  \
+    {                                       \
+        int Return=_TOLAUNCH(MI, Argument); \
+        return Return;                      \
+    }
+
 
 //***************************************************************************
 // Defaults
@@ -75,6 +82,8 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--output",                                      Output)
     OPTION("--policy",                                      SchematronValidation)
     OPTION("--xslt",                                        XsltValidation)
+    OPTION("--maxml_streamkinds",                           StreamKinds)
+    RETURN_OPTION("--maxml_fields",                         Fields)
     //Default
     OPTION("--",                                            Default)
     else
@@ -158,6 +167,29 @@ CL_OPTION(XsltValidation)
     //TODO
     MI.PoliciesFiles[MediaConch::Core::policyType_Xslt].push_back(file);
     MI.Tool=MediaConch::Core::tool_MediaXslt;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(Fields)
+{
+    //Form : --Inform=Text
+    size_t Egal_Pos=Argument.find(__T('='));
+    if (Egal_Pos==String::npos)
+        return Help_MAXML_Fields();
+
+    String type;
+    type.assign(Argument, Egal_Pos+1, std::string::npos);
+
+    MI.Types.push_back(type);
+    MI.Tool=MediaConch::Core::tool_MAFields;
+    return 2;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(StreamKinds)
+{
+    MI.Tool=MediaConch::Core::tool_MAStreamKinds;
     return 0;
 }
 
