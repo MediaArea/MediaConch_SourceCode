@@ -169,6 +169,7 @@ private:
     bool check_test_field(const string& field);
     bool check_test_validator(const string& validator);
 
+    xmlNodePtr write_ns();
     xmlNodePtr write_title(string& title);
     xmlNodePtr write_pattern(Pattern *p);
     xmlNodePtr write_rule(Rule *r);

@@ -83,7 +83,9 @@ String Core::Run (String file)
                                 switch (Format)
                                 {
                                     case format_Xml:
-                                                            return __T("Conch XML output not yet implemented");
+                                                            MI->Option(__T("Language"), __T("raw"));
+                                                            MI->Option(__T("Details"), __T("1"));
+                                                            MI->Option(__T("Inform"), __T("MAXML"));
                                     default:                ;
                                 }
                                 break;
@@ -131,21 +133,21 @@ String Core::Run (String file)
                                 MI->Option(__T("Details"), __T("0"));
                                 MI->Option(__T("Complete"), __T("1"));
                                 MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Inform"), __T("XML"));
+                                MI->Option(__T("Inform"), __T("MAXML"));
                                 break;
         case tool_MediaXslt:
                                 MI->Option(__T("ReadByHuman"), __T("1"));
                                 MI->Option(__T("Details"), __T("0"));
                                 MI->Option(__T("Complete"), __T("1"));
                                 MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Inform"), __T("XML"));
+                                MI->Option(__T("Inform"), __T("MAXML"));
                                 break;
         case tool_MediaPolicies:
                                 MI->Option(__T("ReadByHuman"), __T("1"));
                                 MI->Option(__T("Details"), __T("0"));
                                 MI->Option(__T("Complete"), __T("1"));
                                 MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Inform"), __T("XML"));
+                                MI->Option(__T("Inform"), __T("MAXML"));
                                 break;
         default:                return String();
     }
@@ -178,6 +180,9 @@ String Core::Run (String file)
 //---------------------------------------------------------------------------
 String Core::MediaConch ()
 {
+    if (Format==format_Xml)
+        return MI->Inform();
+    
     //Output
     wstringstream Out;
     for (size_t FilePos=0; FilePos<MI->Count_Get(); FilePos++)

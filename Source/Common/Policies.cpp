@@ -252,6 +252,19 @@ end:
     return ret.str();
 }
 
+xmlNodePtr Policies::write_ns()
+{
+    xmlNodePtr nodeNs = xmlNewNode(NULL, (xmlChar *)"ns");
+    xmlNewProp(nodeNs, (const xmlChar *)"prefix", (const xmlChar *)"ma");
+    xmlNewProp(nodeNs, (const xmlChar *)"uri", (const xmlChar *)"https://mediaarea.net/mediaarea");
+    xmlNewNs(nodeNs, NULL, (const xmlChar *)"sch");
+    xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
+                           (const xmlChar *)"sch");
+    nodeNs->ns = defNs;
+
+    return nodeNs;
+}
+
 xmlNodePtr Policies::write_title(string& title)
 {
     xmlNodePtr nodeTitle = xmlNewNode(NULL, (xmlChar *)"title");
@@ -284,7 +297,7 @@ xmlNodePtr Policies::write_pattern(Pattern *p)
 xmlNodePtr Policies::write_rule(Rule *r)
 {
     xmlNodePtr rule = xmlNewNode(NULL, (xmlChar *)"rule");
-    xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/Mediainfo/File");
+    xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/ma:MediaArea/ma:media/ma:MediaInfo");
     xmlNewNs(rule, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
@@ -329,6 +342,8 @@ xmlDocPtr Policies::create_doc(size_t pos)
 
     xmlNodePtr nodeTitle = write_title(policies[pos]->title);
     xmlAddChild(root_node, nodeTitle);
+    xmlNodePtr nodeNs = write_ns();
+    xmlAddChild(root_node, nodeNs);
     for (; it != ite; ++it)
     {
         xmlNodePtr node = write_pattern(*it);

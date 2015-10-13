@@ -1866,7 +1866,7 @@ QString MainWindow::create_html()
 //---------------------------------------------------------------------------
 void MainWindow::change_html_file_detail_inform_xml(QString& html, String& file)
 {
-    QString report = Run(Core::tool_MediaInfo, Core::format_Xml, file);
+    QString report = Run(Core::tool_MediaConch, Core::format_Xml, file);
 #if QT_VERSION >= 0x050200
     report = report.toHtmlEscaped();
 #else
