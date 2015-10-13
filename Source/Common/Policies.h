@@ -57,7 +57,7 @@ public:
 
     String     import_schema(PolicyType type, const char* filename);
     String     import_schema_from_memory(PolicyType type, const char* filename, const char* memory, int len);
-    void       export_schema(PolicyType type, const char* filename, size_t pos);
+    void       export_schema(const char* filename, size_t pos);
     xmlDocPtr  create_doc(size_t pos);
     void       erase_policy(size_t index);
     bool       policy_exists(std::string policy);

@@ -84,7 +84,7 @@ String Policies::import_schema_from_memory(PolicyType type, const char* filename
     return ret;
 }
 
-void Policies::export_schema(PolicyType type, const char* filename, size_t pos)
+void Policies::export_schema(const char* filename, size_t pos)
 {
     if (pos >= policies.size() || !policies[pos])
         return;

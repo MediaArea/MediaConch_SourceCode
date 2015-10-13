@@ -120,6 +120,19 @@ private:
     xmlNsPtr   create_namespace_xsl(xmlNodePtr node);
     xmlNsPtr   create_namespace_mc(xmlNodePtr node);
     xmlNsPtr   create_namespace_xsi(xmlNodePtr node);
+    void       write_operators(xmlNodePtr node);
+    void       write_operator_is_true(xmlNodePtr node);
+    void       write_operator_is_equal(xmlNodePtr node);
+    void       write_operator_is_greater_than(xmlNodePtr node);
+    void       write_operator_is_less_than(xmlNodePtr node);
+    void       write_operator_is_greater_or_equal_than(xmlNodePtr node);
+    void       write_operator_is_less_or_equal_than(xmlNodePtr node);
+    void       write_operator_exists(xmlNodePtr node);
+    void       write_operator_does_not_exist(xmlNodePtr node);
+    void       write_operator_matches_regex(xmlNodePtr node);
+    xmlNodePtr write_operator_new_node(xmlNodePtr node, const xmlChar* title,
+                                       std::vector<std::pair<const xmlChar*, const xmlChar*> >& prop,
+                                       const xmlChar* content = NULL, bool parentNs=true);
 };
 
 }

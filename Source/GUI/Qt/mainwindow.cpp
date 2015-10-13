@@ -183,7 +183,7 @@ int MainWindow::exporting_to_schematron_file(int pos)
 
     if (!filename.length())
         return -1;
-    C.policies.export_schema(Policies::POLICY_SCHEMATRON, filename.toStdString().c_str(), pos);
+    C.policies.export_schema(filename.toStdString().c_str(), pos);
     C.policies.policies[pos]->filename = filename.toStdString();
     return 0;
 }
@@ -191,7 +191,7 @@ int MainWindow::exporting_to_schematron_file(int pos)
 //---------------------------------------------------------------------------
 void MainWindow::exporting_to_schematron(int pos)
 {
-    C.policies.export_schema(Policies::POLICY_SCHEMATRON, NULL, pos);
+    C.policies.export_schema(NULL, pos);
 }
 
 //---------------------------------------------------------------------------
@@ -213,7 +213,7 @@ int MainWindow::exporting_to_xslt_file(int pos)
 
     if (!filename.length())
         return -1;
-    C.policies.export_schema(Policies::POLICY_XSLT, filename.toStdString().c_str(), pos);
+    C.policies.export_schema(filename.toStdString().c_str(), pos);
     C.policies.policies[pos]->filename = filename.toStdString();
     return 0;
 }
@@ -221,7 +221,7 @@ int MainWindow::exporting_to_xslt_file(int pos)
 //---------------------------------------------------------------------------
 void MainWindow::exporting_to_xslt(int pos)
 {
-    C.policies.export_schema(Policies::POLICY_XSLT, NULL, pos);
+    C.policies.export_schema(NULL, pos);
 }
 
 //---------------------------------------------------------------------------
