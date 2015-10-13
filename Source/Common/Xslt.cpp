@@ -78,7 +78,7 @@ bool Xslt::register_schema_from_doc(void* data)
 }
 
 //---------------------------------------------------------------------------
-bool Xslt::register_schema_from_memory()
+bool Xslt::register_schema_from_memory(const std::string& schem)
 {
     xmlLoadExtDtdDefaultValue = 1;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
@@ -87,7 +87,7 @@ bool Xslt::register_schema_from_memory()
 #ifdef XML_PARSE_BIG_LINES
     doc_flags =| XML_PARSE_BIG_LINES;
 #endif // !XML_PARSE_BIG_LINES
-    xmlDocPtr doc = xmlReadMemory(schema.c_str(), schema.length(), NULL, NULL, doc_flags);
+    xmlDocPtr doc = xmlReadMemory(schem.c_str(), schem.length(), NULL, NULL, doc_flags);
     if (doc == NULL)
         return -1;
 

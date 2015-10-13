@@ -39,6 +39,8 @@ int Help()
     TEXTOUT("                    Validate the XML report");
     TEXTOUT("--Xslt=XsltFileName, -x XsltFileName");
     TEXTOUT("                    Validate the XML report");
+    TEXTOUT("--Xsltdisplay=XsltFileName, -w XsltFileName");
+    TEXTOUT("                    Display XSLT (XML) report");
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
     TEXTOUT("--BOM");

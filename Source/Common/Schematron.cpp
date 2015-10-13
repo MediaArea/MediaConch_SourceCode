@@ -69,7 +69,7 @@ bool Schematron::register_schema_from_doc(void* data)
 }
 
 //---------------------------------------------------------------------------
-bool Schematron::register_schema_from_memory()
+bool Schematron::register_schema_from_memory(const std::string& schem)
 {
     xmlLoadExtDtdDefaultValue |= 1;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
@@ -81,7 +81,7 @@ bool Schematron::register_schema_from_memory()
     }
 
     xmlSchematronParserCtxtPtr parser =
-        xmlSchematronNewMemParserCtxt(schema.c_str(), schema.length());
+        xmlSchematronNewMemParserCtxt(schem.c_str(), schem.length());
     if (!parser)
         return false;
 
