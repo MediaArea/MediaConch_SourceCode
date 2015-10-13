@@ -207,6 +207,7 @@ void PoliciesWindow::add_new_policy()
 
     QMessageBox msgBox;
     msgBox.setText("Which kind of policy do you want to use?");
+    msgBox.setStandardButtons(QMessageBox::Cancel);
     QPushButton *schematronButton = msgBox.addButton(tr("Schematron"), QMessageBox::ActionRole);
     QPushButton *xsltButton = msgBox.addButton(tr("XSL"), QMessageBox::ActionRole);
 
