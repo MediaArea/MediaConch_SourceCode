@@ -41,7 +41,7 @@ namespace MediaConch {
 
 struct XsltRule
 {
-    XsltRule() : occurence(1) {}
+    XsltRule() : occurrence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
 
@@ -51,7 +51,7 @@ struct XsltRule
 
     std::string type;
     std::string field;
-    int         occurence;
+    int         occurrence;
     std::string ope;
     std::string value;
 
@@ -78,10 +78,24 @@ public:
 
 private:
     // HELPER
-    String import_schema_from_doc(const char* filename, xmlDocPtr doc);
+    String     import_schema_from_doc(const char* filename, xmlDocPtr doc);
 
-    bool find_title_node(xmlNodePtr node, std::string& title);
-    void find_rules_node(xmlNodePtr node, std::vector<XsltRule *>& rules);
+    bool       find_title_node(xmlNodePtr node, std::string& title);
+    bool       find_template_node(xmlNodePtr node);
+    bool       find_template_match_node(xmlNodePtr node);
+    bool       find_template_name_node(xmlNodePtr node);
+    bool       find_mediaconch_node(xmlNodePtr node);
+    bool       find_policychecks_node(xmlNodePtr node);
+    bool       find_for_each_node(xmlNodePtr node);
+    bool       find_media_node(xmlNodePtr node);
+    bool       find_policy_node(xmlNodePtr node);
+
+    bool       find_call_template_node(xmlNodePtr node);
+    bool       find_rule_title_node(xmlNodePtr node, std::string& title);
+    bool       find_rule_type_node(xmlNodePtr node, std::string& type);
+    bool       find_rule_occurrence_node(xmlNodePtr node, int& occurrence);
+    bool       find_rule_field_node(xmlNodePtr node, std::string& field);
+    bool       find_rule_value_node(xmlNodePtr node, std::string& value);
 
     void       write_root_default_childs(xmlNodePtr node);
     void       write_root_template_childs(xmlNodePtr node);
@@ -100,7 +114,7 @@ private:
     void       write_rule_type_child(xmlNodePtr node, XsltRule *rule);
     void       write_rule_xpath_child(xmlNodePtr node, XsltRule *rule);
     void       write_rule_value_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_occurence_child(xmlNodePtr node, XsltRule *rule);
+    void       write_rule_occurrence_child(xmlNodePtr node, XsltRule *rule);
     void       write_rule_field_child(xmlNodePtr node, XsltRule *rule);
     void       create_xpath_from_rule(XsltRule *rule, std::string& xpath);
     xmlNsPtr   create_namespace_xsl(xmlNodePtr node);

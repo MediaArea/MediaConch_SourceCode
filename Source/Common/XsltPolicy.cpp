@@ -36,7 +36,7 @@ XsltRule::XsltRule(const XsltRule& r)
     this->use_free_text = r.use_free_text;
     this->type = r.type;
     this->field = r.field;
-    this->occurence = r.occurence;
+    this->occurrence = r.occurrence;
     this->ope = r.ope;
     this->value = r.value;
     this->text = r.text;
@@ -67,9 +67,14 @@ XsltPolicy::~XsltPolicy()
 //---------------------------------------------------------------------------
 bool XsltPolicy::find_title_node(xmlNodePtr node, std::string& title)
 {
-    std::string def("title");
+    std::string def("attribute");
     if (!node || node->type != XML_ELEMENT_NODE ||
         !node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("title");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
         return false;
 
     const char* descr = (const char*)xmlNodeGetContent(node);
@@ -79,26 +84,246 @@ bool XsltPolicy::find_title_node(xmlNodePtr node, std::string& title)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::find_rules_node(xmlNodePtr node, std::vector<XsltRule *>& rules)
+bool XsltPolicy::find_rule_value_node(xmlNodePtr node, std::string& value)
+{
+    std::string def("with-param");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("value");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    const char* descr = (const char*)xmlNodeGetContent(node);
+    if (descr)
+        value = std::string(descr);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_rule_field_node(xmlNodePtr node, std::string& field)
+{
+    std::string def("with-param");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("field");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    const char* descr = (const char*)xmlNodeGetContent(node);
+    if (descr)
+        field = std::string(descr);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_rule_occurrence_node(xmlNodePtr node, int& occurrence)
+{
+    std::string def("with-param");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("occurrence");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    const char* descr = (const char*)xmlNodeGetContent(node);
+    if (descr)
+    {
+        std::string tmp = std::string(descr);
+        occurrence = atoi(tmp.c_str());
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_rule_type_node(xmlNodePtr node, std::string& type)
+{
+    std::string def("with-param");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("tracktype");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    const char* descr = (const char*)xmlNodeGetContent(node);
+    if (descr)
+        type = std::string(descr);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& title)
+{
+    std::string def("with-param");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("title");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    const char* descr = (const char*)xmlNodeGetContent(node);
+    if (descr)
+        title = std::string(descr);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_call_template_node(xmlNodePtr node)
+{
+    std::string def("call-template");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL)
+        return false;
+
+    XsltRule *r = new XsltRule;
+
+    r->ope = std::string((const char*)name);
+
+    for (xmlNodePtr child = node->children; child; child = child->next)
+    {
+        if (find_rule_title_node(child, r->title))
+            continue;
+        if (find_rule_type_node(child, r->type))
+            continue;
+        if (find_rule_occurrence_node(child, r->occurrence))
+            continue;
+        if (find_rule_field_node(child, r->field))
+            continue;
+        if (find_rule_value_node(child, r->value))
+            continue;
+    }
+    rules.push_back(r);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_policy_node(xmlNodePtr node)
 {
     std::string def("policy");
     if (!node->name || def.compare((const char*)node->name))
-        return;
+        return false;
 
-    /* TODO */
-    (void)rules;
-    // xmlNodePtr next = node->children;
-    // while (next)
-    // {
-    //     std::string description((const char*)xmlNodeGetContent(node));
-    //     xmlChar *test = xmlGetNoNsProp(node, (const unsigned char*)"test");
-    //     std::string testStr;
-    //     if (test != NULL)
-    //         testStr = std::string((const char*)test);
-    //     XsltAssert* a = create_assert_from_data(description, testStr.c_str());
-    //     asserts.push_back(a);
-    //     next = next->next;
-    // }
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_call_template_node(child);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_media_node(xmlNodePtr node)
+{
+    std::string def("media");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_policy_node(child);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_for_each_node(xmlNodePtr node)
+{
+    std::string def("for-each");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_media_node(child);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_policychecks_node(xmlNodePtr node)
+{
+    std::string def("policyChecks");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_for_each_node(child);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_mediaconch_node(xmlNodePtr node)
+{
+    std::string def("MediaConch");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_policychecks_node(child);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_template_match_node(xmlNodePtr node)
+{
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"match");
+    if (name == NULL)
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_mediaconch_node(child);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_template_name_node(xmlNodePtr node)
+{
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL)
+        return false;
+    //TODO: operation
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_template_node(xmlNodePtr node)
+{
+    std::string def("template");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    if (find_template_match_node(node))
+        return true;
+    return find_template_name_node(node);
 }
 
 //---------------------------------------------------------------------------
@@ -120,20 +345,21 @@ String XsltPolicy::import_schema_from_doc(const char* filename, xmlDocPtr doc)
         if (child == NULL)
             child = root->children;
     }
-    // if (!title.length())
-    // {
-    //     title = std::string(filename);
-    //     size_t start_index = title.find_last_of("\\/");
-    //     if (std::string::npos != start_index)
-    //         title = title.substr(start_index + 1);
+    if (!title.length())
+    {
+        title = std::string(filename);
+        size_t start_index = title.find_last_of("\\/");
+        if (std::string::npos != start_index)
+            title = title.substr(start_index + 1);
 
-    //     size_t end_index = title.find(".sch", title.length() - 5);
-    //     if (end_index != std::string::npos)
-    //         title = title.substr(0, end_index);
-    // }
+        size_t end_index = title.find(".xsl", title.length() - 5);
+        if (end_index != std::string::npos)
+            title = title.substr(0, end_index);
+    }
+    
     while (child)
     {
-        find_rules_node(child, rules);
+        find_template_node(child);
         child = child->next;
     }
     xmlSetGenericErrorFunc(NULL, NULL);
@@ -243,13 +469,13 @@ void XsltPolicy::write_rule_type_child(xmlNodePtr node, XsltRule *rule)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_rule_occurence_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_rule_occurrence_child(xmlNodePtr node, XsltRule *rule)
 {
     std::stringstream ss;
-    ss << rule->occurence;
+    ss << rule->occurrence;
     xmlNodePtr child = xmlNewNode(NULL, (xmlChar *)"with-param");
     child->ns = node->ns;
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"occurence");
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"occurrence");
     xmlNodeSetContent(child, (xmlChar *)ss.str().c_str());
 
     xmlAddChild(node, child);
@@ -281,7 +507,7 @@ void XsltPolicy::write_rule_child(xmlNodePtr node, XsltRule *rule)
     write_rule_xpath_child(child, rule);
     write_rule_value_child(child, rule);
     write_rule_type_child(child, rule);
-    write_rule_occurence_child(child, rule);
+    write_rule_occurrence_child(child, rule);
     write_rule_field_child(child, rule);
 }
 

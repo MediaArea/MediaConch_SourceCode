@@ -17,6 +17,7 @@
 #include <sstream>
 #include <string.h>
 #include "SchematronPolicy.h"
+#include "XsltPolicy.h"
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
@@ -48,11 +49,17 @@ Policies::~Policies()
 String Policies::import_schema(PolicyType type, const char* filename)
 {
     if (!filename || !strlen(filename))
-        return __T("The schematron file does not exist");
+        return __T("The policy file does not exist");
 
-    Policy *p = new SchematronPolicy;
+    Policy *p = NULL;
+    if (type == POLICY_SCHEMATRON)
+        p = new SchematronPolicy;
+    else if (type == POLICY_XSLT)
+        p = new XsltPolicy;
+    else
+        return __T("The policy type is not correct");
+
     String ret = p->import_schema(filename);
-
     if (!ret.length())
         policies.push_back(p);
     return ret;
@@ -61,9 +68,15 @@ String Policies::import_schema(PolicyType type, const char* filename)
 String Policies::import_schema_from_memory(PolicyType type, const char* filename, const char* buffer, int len)
 {
     if (!buffer || !len)
-        return __T("The schematron does not exist");
+        return __T("The policy does not exist");
 
-    Policy *p = new SchematronPolicy;
+    Policy *p = NULL;
+    if (type == POLICY_SCHEMATRON)
+        p = new SchematronPolicy;
+    else if (type == POLICY_XSLT)
+        p = new XsltPolicy;
+    else
+        return __T("The policy type is not correct");
     String ret = p->import_schema_from_memory(filename, buffer, len);
 
     if (!ret.length())

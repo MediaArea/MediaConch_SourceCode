@@ -79,7 +79,21 @@ void PoliciesWindow::import_schematron()
     if (!file.length())
         return;
 
-    String ret = mainwindow->get_policies().import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str());
+    String ret;
+    if (file.endsWith(".xsl"))
+    {
+        ret = mainwindow->get_policies().import_schema(Policies::POLICY_XSLT, file.toStdString().c_str());
+        if (ret.length())
+            if (!mainwindow->get_policies().import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
+                ret = String();
+    }
+    else
+    {
+        ret = mainwindow->get_policies().import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str());
+        if (ret.length())
+            if (!mainwindow->get_policies().import_schema(Policies::POLICY_XSLT, file.toStdString().c_str()).length())
+                ret = String();
+    }
 
     displayPoliciesTree();
     if (ret.length())

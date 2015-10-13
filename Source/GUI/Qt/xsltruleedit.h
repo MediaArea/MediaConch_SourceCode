@@ -61,7 +61,7 @@ public:
     QComboBox         *get_field_select();
     QComboBox         *get_operator_select();
     QLineEdit         *get_value_line();
-    QSpinBox          *get_occurence_box();
+    QSpinBox          *get_occurrence_box();
     QFrame            *get_editor_frame();
 
 private:

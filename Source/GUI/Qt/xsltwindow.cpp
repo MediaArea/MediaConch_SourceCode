@@ -415,7 +415,7 @@ void XsltWindow::edit_rule_value()
 }
 
 //---------------------------------------------------------------------------
-void XsltWindow::edit_rule_occurence()
+void XsltWindow::edit_rule_occurrence()
 {
     QTreeWidgetItem* item = policieswindow->get_item_in_tree();
     if (!item || !item->parent())
@@ -428,7 +428,7 @@ void XsltWindow::edit_rule_occurence()
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
 
-    r->occurence = ruleEdit->get_occurence_box()->value();
+    r->occurrence = ruleEdit->get_occurrence_box()->value();
 }
 
 //---------------------------------------------------------------------------
@@ -453,8 +453,8 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
                      this, SLOT(edit_rule_operator()));
     QObject::connect(ruleEdit->get_value_line(), SIGNAL(textEdited(QString)),
                      this, SLOT(edit_rule_value()));
-    QObject::connect(ruleEdit->get_occurence_box(), SIGNAL(valueChanged(int)),
-                     this, SLOT(edit_rule_occurence()));
+    QObject::connect(ruleEdit->get_occurrence_box(), SIGNAL(valueChanged(int)),
+                     this, SLOT(edit_rule_occurrence()));
 
     //TODO
     // QObject::connect(ruleEdit->get_editorSelector_radio(), SIGNAL(toggled(bool)),

@@ -160,7 +160,7 @@ QString MainWindow::get_trace_for_file(const QString& filename)
 //---------------------------------------------------------------------------
 QString MainWindow::ask_for_schematron_file()
 {
-    QString file=QFileDialog::getOpenFileName(this, "Open file", "", "Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QString file=QFileDialog::getOpenFileName(this, "Open file", "", "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     return file;
 }
 
@@ -340,11 +340,24 @@ void MainWindow::on_actionPolicies_triggered()
 void MainWindow::on_actionChooseSchematron_triggered()
 {
     QString file = ask_for_schematron_file();
-    if (file.length())
+    if (!file.length())
+        return;
+
+    if (file.endsWith(".xsl"))
     {
-        if (C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
+        if (!C.policies.import_schema(Policies::POLICY_XSLT, file.toStdString().c_str()).length())
+            C.PoliciesFiles[Core::policyType_Xslt].push_back(file.toStdWString());
+        else if (!C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
             C.PoliciesFiles[Core::policyType_Schematron].push_back(file.toStdWString());
     }
+    else if (file.endsWith(".sch"))
+    {
+        if (!C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
+            C.PoliciesFiles[Core::policyType_Schematron].push_back(file.toStdWString());
+        else if (!C.policies.import_schema(Policies::POLICY_XSLT, file.toStdString().c_str()).length())
+            C.PoliciesFiles[Core::policyType_Xslt].push_back(file.toStdWString());
+    }
+    //TODO error
     Run();
 }
 
@@ -423,6 +436,7 @@ void MainWindow::updateWebView(QList<QFileInfo>& files, String policy)
 //---------------------------------------------------------------------------
 void MainWindow::createPoliciesView()
 {
+    clearVisualElements();
     policiesView = new PoliciesWindow(this);
     policiesView->displayPoliciesTree();
 }

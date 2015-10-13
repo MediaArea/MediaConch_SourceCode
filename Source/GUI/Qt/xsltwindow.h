@@ -59,7 +59,7 @@ private Q_SLOTS:
     void edit_rule_field();
     void edit_rule_operator();
     void edit_rule_value();
-    void edit_rule_occurence();
+    void edit_rule_occurrence();
 };
 
 }

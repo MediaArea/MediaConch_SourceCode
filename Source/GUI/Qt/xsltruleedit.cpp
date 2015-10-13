@@ -75,7 +75,7 @@ void XsltRuleEdit::fill_editor_fields(const XsltRule *r)
     if (pos != -1)
         ui->field->setCurrentIndex(pos);
 
-    ui->occurence->setValue(r->occurence);
+    ui->occurrence->setValue(r->occurrence);
     pos = ui->ope->findText(QString().fromStdString(r->ope));
     if (pos != -1)
         ui->ope->setCurrentIndex(pos);
@@ -129,9 +129,9 @@ QLineEdit *XsltRuleEdit::get_value_line()
 }
 
 //---------------------------------------------------------------------------
-QSpinBox *XsltRuleEdit::get_occurence_box()
+QSpinBox *XsltRuleEdit::get_occurrence_box()
 {
-    return ui->occurence;
+    return ui->occurrence;
 }
 
 //---------------------------------------------------------------------------
