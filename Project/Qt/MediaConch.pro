@@ -23,32 +23,55 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Xslt.cpp \
                     ../../Source/Common/Policies.cpp \
+                    ../../Source/Common/Policy.cpp \
+                    ../../Source/Common/SchematronPolicy.cpp \
+                    ../../Source/Common/XsltPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
+                    ../../Source/GUI/Qt/menumainwindow.cpp \
+                    ../../Source/GUI/Qt/checkerwindow.cpp \
+                    ../../Source/GUI/Qt/policieswindow.cpp \
+                    ../../Source/GUI/Qt/policywindow.cpp \
+                    ../../Source/GUI/Qt/schematronwindow.cpp \
+                    ../../Source/GUI/Qt/xsltwindow.cpp \
                     ../../Source/GUI/Qt/policiestree.cpp \
                     ../../Source/GUI/Qt/policiesmenu.cpp \
                     ../../Source/GUI/Qt/policymenu.cpp \
                     ../../Source/GUI/Qt/groupofrules.cpp \
                     ../../Source/GUI/Qt/rulemenu.cpp \
-                    ../../Source/GUI/Qt/ruleedit.cpp
+                    ../../Source/GUI/Qt/ruleedit.cpp \
+                    ../../Source/GUI/Qt/xsltpolicymenu.cpp \
+                    ../../Source/GUI/Qt/xsltruleedit.cpp
 
 HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schema.h \
                     ../../Source/Common/Schematron.h \
                     ../../Source/Common/Xslt.h \
                     ../../Source/Common/JS_Tree.h \
+                    ../../Source/Common/Policies.h \
+                    ../../Source/Common/Policy.h \
+                    ../../Source/Common/SchematronPolicy.h \
+                    ../../Source/Common/XsltPolicy.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/mainwindow.h \
+                    ../../Source/GUI/Qt/menumainwindow.h \
+                    ../../Source/GUI/Qt/checkerwindow.h \
+                    ../../Source/GUI/Qt/policieswindow.h \
+                    ../../Source/GUI/Qt/policywindow.h \
+                    ../../Source/GUI/Qt/schematronwindow.h \
+                    ../../Source/GUI/Qt/xsltwindow.h \
                     ../../Source/GUI/Qt/policiestree.h \
                     ../../Source/GUI/Qt/policiesmenu.h \
                     ../../Source/GUI/Qt/policymenu.h \
                     ../../Source/GUI/Qt/groupofrules.h \
                     ../../Source/GUI/Qt/rulemenu.h \
-                    ../../Source/GUI/Qt/ruleedit.h
+                    ../../Source/GUI/Qt/ruleedit.h \
+                    ../../Source/GUI/Qt/xsltpolicymenu.h \
+                    ../../Source/GUI/Qt/xsltruleedit.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policiestree.ui \
@@ -56,7 +79,9 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policymenu.ui \
                     ../../Source/GUI/Qt/groupofrules.ui \
                     ../../Source/GUI/Qt/rulemenu.ui \
-                    ../../Source/GUI/Qt/ruleedit.ui
+                    ../../Source/GUI/Qt/ruleedit.ui \
+                    ../../Source/GUI/Qt/xsltpolicymenu.ui \
+                    ../../Source/GUI/Qt/xsltruleedit.ui
 
 INCLUDEPATH      += ../../Source
 

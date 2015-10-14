@@ -38,7 +38,7 @@ class QRadioButton;
 
 namespace MediaConch {
 
-struct Assert;
+class SchematronAssert;
 class MainWindow;
 
 class RuleEdit : public QFrame
@@ -55,11 +55,11 @@ public:
 //***************************************************************************
 
 void clear();
-void assert_clicked(Assert *a);
+void assert_clicked(SchematronAssert *a);
 void value_to_quotted_value(string&);
 string get_validator_value_from_pretty_name(string pretty_name);
 string get_validator_pretty_name_from_value(string value);
-void fill_editor_fields(const Assert *a);
+void fill_editor_fields(const SchematronAssert *a);
 
 //***************************************************************************
 // Visual element
@@ -76,6 +76,7 @@ QTextEdit *get_freeText_text();
 QFrame *get_editor_frame();
 QRadioButton *get_freeTextSelector_radio();
 QRadioButton *get_editorSelector_radio();
+void change_values_of_field_selector();
 
 private:
     MainWindow *mainwindow;
@@ -87,7 +88,7 @@ private:
 
 void add_values_to_selector();
 
-void copy_visual_to_assert(Assert *a);
+void copy_visual_to_assert(SchematronAssert *a);
 
 //***************************************************************************
 // Slots

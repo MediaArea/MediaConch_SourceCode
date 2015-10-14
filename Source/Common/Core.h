@@ -29,6 +29,7 @@
 #include <map>
 #include <vector>
 #include "Policies.h"
+#include "Policy.h"
 
 using namespace MediaInfoNameSpace;
 using namespace std;
