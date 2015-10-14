@@ -708,7 +708,7 @@ void XsltPolicy::write_operator_does_not_exist(xmlNodePtr node)
 {
     std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"exists"));
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"does_not_exist"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
@@ -935,7 +935,7 @@ void XsltPolicy::write_for_each_childs(xmlNodePtr node)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"for-each");
     child->ns = create_namespace_xsl(NULL);
 
-    xmlNewNsProp(child, create_namespace_mc(NULL), (const xmlChar *)"select", (const xmlChar *)"media");
+    xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)"mc:media");
     xmlAddChild(node, child);
     write_media_childs(child);
 }
