@@ -147,6 +147,7 @@ void Policies::create_values_from_csv()
     {
         "is_true",
         "is_equal",
+        "is_not_equal",
         "is_greater_than",
         "is_less_than",
         "is_greater_or_equal_than",
@@ -154,7 +155,7 @@ void Policies::create_values_from_csv()
         "is_not_equal",
         "exists",
         "does_not_exist",
-        "matches_regex",
+        "contains_string",
     };
 
     for (size_t i=0; i < (sizeof(xsltOperators) / sizeof(*xsltOperators)); i++)
