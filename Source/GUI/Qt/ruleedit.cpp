@@ -179,23 +179,40 @@ void RuleEdit::copy_visual_to_assert(SchematronAssert *a)
 //---------------------------------------------------------------------------
 void RuleEdit::add_values_to_selector()
 {
-    const list<string> *existing_type = mainwindow->providePolicyExistingType();
-    list<string>::const_iterator itType = existing_type->begin();
-    list<string>::const_iterator iteType = existing_type->end();
+    const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
+    map<string, list<string> >::const_iterator itType = existing_type->begin();
+    map<string, list<string> >::const_iterator iteType = existing_type->end();
     for (; itType != iteType; ++itType)
-        ui->type->addItem(QString().fromStdString(*itType));
+        ui->type->addItem(QString().fromStdString(itType->first));
 
-    const list<string> *existing_field = mainwindow->providePolicyExistingField();
-    list<string>::const_iterator itField = existing_field->begin();
-    list<string>::const_iterator iteField = existing_field->end();
-    for (; itField != iteField; ++itField)
-        ui->field->addItem(QString().fromStdString(*itField));
+    change_values_of_field_selector();
 
     const list<Policies::validatorType> *existing_validator = mainwindow->providePolicyExistingValidator();
     list<Policies::validatorType>::const_iterator itValidator = existing_validator->begin();
     list<Policies::validatorType>::const_iterator iteValidator = existing_validator->end();
     for (; itValidator != iteValidator; ++itValidator)
         ui->validator->addItem(QString().fromStdString(itValidator->pretty_name));
+}
+
+//---------------------------------------------------------------------------
+void RuleEdit::change_values_of_field_selector()
+{
+    std::string type = ui->type->currentText().toStdString();
+    ui->field->clear();
+
+    const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
+    map<string, list<string> >::const_iterator itType = existing_type->begin();
+    map<string, list<string> >::const_iterator iteType = existing_type->end();
+    for (; itType != iteType; ++itType)
+    {
+        if (itType->first.compare(type))
+            continue;
+
+        list<string>::const_iterator it = itType->second.begin();
+        list<string>::const_iterator ite = itType->second.end();
+        for (; it != ite; ++it)
+            ui->field->addItem(QString().fromStdString(*it));
+    }
 }
 
 string RuleEdit::get_validator_value_from_pretty_name(string pretty_name)

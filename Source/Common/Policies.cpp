@@ -12,12 +12,15 @@
 
 //---------------------------------------------------------------------------
 #include "Policies.h"
+#include "Core.h"
 #include "Policy.h"
 #include <iostream>
 #include <sstream>
 #include <string.h>
 #include "SchematronPolicy.h"
 #include "XsltPolicy.h"
+#include "ZenLib/Ztring.h"
+#include "ZenLib/ZtringList.h"
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
@@ -30,15 +33,13 @@ namespace MediaConch {
 // Constructor/Destructor
 //***************************************************************************
 
-    std::list<std::string> Policies::existing_type      = std::list<std::string>();
-    std::list<std::string> Policies::existing_field     = std::list<std::string>();
+    std::map<std::string, std::list<std::string> > Policies::existing_type = std::map<std::string, std::list<std::string> >();
     std::list<Policies::validatorType> Policies::existing_validator = std::list<Policies::validatorType>();
     std::list<std::string> Policies::existing_xsltOperator = std::list<std::string>();
 
 //---------------------------------------------------------------------------
-Policies::Policies()
+Policies::Policies(Core *c) : core(c)
 {
-    create_values_from_csv();
 }
 
 Policies::~Policies()
@@ -112,36 +113,21 @@ void Policies::erase_policy(size_t index)
 
 void Policies::create_values_from_csv()
 {
-    std::string types[] = {
-        "General",
-        "Video",
-        "Audio",
-        "Text",
-        "Image",
-        "Other"
-    };
-    for (size_t i=0; i < (sizeof(types) / sizeof(*types)); i++)
+    ZenLib::ZtringList list;
+    list.Separator_Set(0, __T(","));
+    list.Write(core->Menu_Option_Preferences_Option(__T("MAXML_StreamKinds"), ZenLib::Ztring()));
+    for (size_t i = 0; i < list.size(); ++i)
     {
-        existing_type.push_back(types[i]);
-    }
+        std::list<std::string> fields;
+        fields.push_back("");
 
-    std::string fields[] = {
-        "",
-        "Format",
-        "UniqueID",
-        "FileExtension",
-        "Duration",
-        "FrameRate",
-        "DisplayAspectRatio",
-        "coder_type",
-        "Width",
-        "Height",
-        "ColorSpace",
-        "DisplayAspectRatio"
-    };
-    for (size_t i=0; i < (sizeof(fields) / sizeof(*fields)); i++)
-    {
-        existing_field.push_back(fields[i]);
+        ZenLib::ZtringList listField;
+        listField.Separator_Set(0, __T(","));
+        listField.Write(core->Menu_Option_Preferences_Option(__T("MAXML_Fields"), list[i]));
+        for (size_t j = 0; j < listField.size(); ++j)
+            fields.push_back(listField[j].To_UTF8());
+
+        existing_type[list[i].To_UTF8()] = fields;
     }
 
     validatorType validators[] = {
@@ -194,11 +180,11 @@ bool Policies::policy_exists(std::string policy)
 
 bool Policies::check_test_type(const std::string& type)
 {
-    std::list<std::string>::iterator it = existing_type.begin();
-    std::list<std::string>::iterator ite = existing_type.end();
+    std::map<std::string, std::list<std::string> >::iterator it = existing_type.begin();
+    std::map<std::string, std::list<std::string> >::iterator ite = existing_type.end();
 
     for (; it != ite; ++it)
-        if (!type.compare(*it))
+        if (!type.compare(it->first))
             return true;
 
     return false;
@@ -206,12 +192,18 @@ bool Policies::check_test_type(const std::string& type)
 
 bool Policies::check_test_field(const std::string& field)
 {
-    std::list<std::string>::iterator it = existing_field.begin();
-    std::list<std::string>::iterator ite = existing_field.end();
+    std::map<std::string, std::list<std::string> >::iterator itType = existing_type.begin();
+    std::map<std::string, std::list<std::string> >::iterator iteType = existing_type.end();
 
-    for (; it != ite; ++it)
-        if (!field.compare(*it))
-            return true;
+    for (; itType != iteType; ++itType)
+    {
+        std::list<std::string>::iterator it = itType->second.begin();
+        std::list<std::string>::iterator ite = itType->second.end();
+
+        for (; it != ite; ++it)
+            if (!field.compare(*it))
+                return true;
+    }
 
     return false;
 }

@@ -36,12 +36,13 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Core::Core()
+Core::Core() : policies(this)
 {
     MI=new MediaInfoNameSpace::MediaInfoList;
 
     Format=format_Text;
     Tool=tool_MediaConch;
+    policies.create_values_from_csv();
 }
 
 Core::~Core()

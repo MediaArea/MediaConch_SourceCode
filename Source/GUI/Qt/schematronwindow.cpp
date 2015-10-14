@@ -526,6 +526,7 @@ void SchematronWindow::edit_assert_type()
 
     a->type = ruleEdit->get_type_select()->currentText().toStdString();
     a->use_free_text = false;
+    ruleEdit->change_values_of_field_selector();
 }
 
 //---------------------------------------------------------------------------

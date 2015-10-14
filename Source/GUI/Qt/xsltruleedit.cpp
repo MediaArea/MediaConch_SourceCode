@@ -147,23 +147,39 @@ QFrame *XsltRuleEdit::get_editor_frame()
 //---------------------------------------------------------------------------
 void XsltRuleEdit::add_values_to_selector()
 {
-    const list<string> *existing_type = mainwindow->providePolicyExistingType();
-    list<string>::const_iterator itType = existing_type->begin();
-    list<string>::const_iterator iteType = existing_type->end();
+    const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
+    map<string, list<string> >::const_iterator itType = existing_type->begin();
+    map<string, list<string> >::const_iterator iteType = existing_type->end();
     for (; itType != iteType; ++itType)
-        ui->type->addItem(QString().fromStdString(*itType));
-
-    const list<string> *existing_field = mainwindow->providePolicyExistingField();
-    list<string>::const_iterator itField = existing_field->begin();
-    list<string>::const_iterator iteField = existing_field->end();
-    for (; itField != iteField; ++itField)
-        ui->field->addItem(QString().fromStdString(*itField));
+        ui->type->addItem(QString().fromStdString(itType->first));
+    change_values_of_field_selector();
 
     const list<string> *existing_operator = mainwindow->providePolicyExistingXsltOperator();
     list<string>::const_iterator itOperator = existing_operator->begin();
     list<string>::const_iterator iteOperator = existing_operator->end();
     for (; itOperator != iteOperator; ++itOperator)
         ui->ope->addItem(QString().fromStdString(*itOperator));
+}
+
+//---------------------------------------------------------------------------
+void XsltRuleEdit::change_values_of_field_selector()
+{
+    std::string type = ui->type->currentText().toStdString();
+    ui->field->clear();
+
+    const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
+    map<string, list<string> >::const_iterator itType = existing_type->begin();
+    map<string, list<string> >::const_iterator iteType = existing_type->end();
+    for (; itType != iteType; ++itType)
+    {
+        if (itType->first.compare(type))
+            continue;
+
+        list<string>::const_iterator it = itType->second.begin();
+        list<string>::const_iterator ite = itType->second.end();
+        for (; it != ite; ++it)
+            ui->field->addItem(QString().fromStdString(*it));
+    }
 }
 
 }

@@ -71,8 +71,8 @@ public:
 
     Policies&                   get_policies() { return C.policies; }
 
-    const list<string>* providePolicyExistingType() const {return &C.policies.existing_type; }
-    const list<string>* providePolicyExistingField() const {return &C.policies.existing_field; }
+    const map<string, list<string> >* providePolicyExistingType() const {return &C.policies.existing_type; }
+
     const list<Policies::validatorType>* providePolicyExistingValidator() const {return &C.policies.existing_validator; }
     const list<string>* providePolicyExistingXsltOperator() const {return &C.policies.existing_xsltOperator; }
 

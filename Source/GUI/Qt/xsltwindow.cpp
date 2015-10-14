@@ -361,6 +361,7 @@ void XsltWindow::edit_rule_type()
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
 
     r->type = ruleEdit->get_type_select()->currentText().toStdString();
+    ruleEdit->change_values_of_field_selector();
 }
 
 //---------------------------------------------------------------------------

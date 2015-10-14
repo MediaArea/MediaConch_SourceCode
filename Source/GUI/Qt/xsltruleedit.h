@@ -63,6 +63,7 @@ public:
     QLineEdit         *get_value_line();
     QSpinBox          *get_occurrence_box();
     QFrame            *get_editor_frame();
+    void               change_values_of_field_selector();
 
 private:
     MainWindow *mainwindow;

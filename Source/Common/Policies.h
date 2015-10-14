@@ -27,6 +27,7 @@
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include <list>
+#include <map>
 #include <vector>
 #include <libxml/tree.h>
 using namespace MediaInfoNameSpace;
@@ -37,6 +38,7 @@ namespace MediaConch {
 /* TODO: remove */
 class SchematronAssert;
 class Policy;
+class Core;
 
 //***************************************************************************
 // Class Policies
@@ -52,7 +54,7 @@ public:
     };
 
     //Constructor/Destructor
-    Policies();
+    Policies(Core*);
     ~Policies();
 
     String     import_schema(PolicyType type, const char* filename);
@@ -70,7 +72,6 @@ public:
     // Type/Field/Validator
     //***************************************************************************
 
-    //TODO: parse csv file
     void create_values_from_csv();
 
     struct validatorType
@@ -79,10 +80,9 @@ public:
         std::string pretty_name;
     };
 
-    static std::list<std::string>        existing_type;
-    static std::list<std::string>        existing_field;
-    static std::list<std::string>        existing_xsltOperator;
-    static std::list<validatorType>      existing_validator;
+    static std::map<std::string, std::list<std::string> > existing_type;
+    static std::list<validatorType>                       existing_validator;
+    static std::list<std::string>                         existing_xsltOperator;
 
     static std::string parse_test_value(std::string& sub, const std::string& start, const std::string& after);
     static std::string parse_test_field(std::string& sub, const std::string& end);
@@ -92,6 +92,8 @@ public:
     static bool check_test_validator(const std::string& validator);
 
 private:
+    Core *core;
+
     Policies (const Policies&);
     Policies& operator=(const Policies&);
 };
