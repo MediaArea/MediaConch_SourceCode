@@ -132,15 +132,15 @@ void MainWindow::checker_add_files(QFileInfoList& list, QString& policy)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt)
+void MainWindow::checker_add_xslt_file(QString& file, QString& xslt)
 {
-        MainView->checker_add_xslt_file(file, xslt, display_xslt);
+        MainView->checker_add_xslt_file(file, xslt);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt, QString& display_xslt)
+void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
 {
-    MainView->checker_add_xslt_files(list, xslt, display_xslt);
+    MainView->checker_add_xslt_files(list, xslt);
 }
 
 //---------------------------------------------------------------------------
@@ -274,9 +274,20 @@ void MainWindow::add_default_policy()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addXsltToList(QString& xslt, QString& display_xslt)
+void MainWindow::addXsltDisplay(QString& display_xslt)
 {
     MainView->setDisplayXslt(display_xslt);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::removeXsltDisplay()
+{
+    MainView->resetDisplayXslt();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::addXsltToList(QString& xslt)
+{
     C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
 }
 
@@ -284,7 +295,6 @@ void MainWindow::addXsltToList(QString& xslt, QString& display_xslt)
 void MainWindow::clearXsltList()
 {
     C.PoliciesFiles[Core::policyType_Xslt].clear();
-    MainView->resetDisplayXslt();
 }
 
 //---------------------------------------------------------------------------

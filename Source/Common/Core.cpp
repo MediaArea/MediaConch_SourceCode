@@ -368,7 +368,7 @@ bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
 
     if (!policy.length() && PoliciesFiles[policyType_Xslt].size())
     {
-        validateXsltPolicy(0, valid, report);
+        validateXsltPolicy(-1, valid, report);
         return true;
     }
 
@@ -386,7 +386,10 @@ bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
         return false;
     }
 
-    validateSchematronPolicy(pos, valid, report);
+    if (policies.policies[pos]->type == Policies::POLICY_SCHEMATRON)
+        validateSchematronPolicy(pos, valid, report);
+    else if (policies.policies[pos]->type == Policies::POLICY_XSLT)
+        validateXsltPolicy(pos, valid, report);
     return true;
 }
 
@@ -438,10 +441,17 @@ void Core::validateSchematronPolicy(int pos, bool& valid, String& report)
 //---------------------------------------------------------------------------
 void Core::validateXsltPolicy(int pos, bool& valid, String& report)
 {
+    std::string file;
+    xmlDocPtr doc = NULL;
     Schema *S = new Xslt;
 
-    std::string file=Ztring(PoliciesFiles[policyType_Xslt][pos]).To_UTF8();
-    if (S->register_schema_from_file(file.c_str()))
+    if (pos < 0)
+        file=Ztring(PoliciesFiles[policyType_Xslt][0]).To_UTF8();
+    else
+        doc = policies.create_doc(pos);
+    if (doc && S->register_schema_from_doc(doc))
+        valid = validation(S, report);
+    else if (!doc && S->register_schema_from_file(file.c_str()))
         valid = validation(S, report);
     else
     {

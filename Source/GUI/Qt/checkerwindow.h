@@ -39,8 +39,8 @@ public:
     // Helpers
     void                        checker_add_file(QString& file, QString& policy);
     void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
-    void                        checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt);
-    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt, QString& display_xslt);
+    void                        checker_add_xslt_file(QString& file, QString& xslt);
+    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt);
 
 private:
     // Visual elements

@@ -74,24 +74,24 @@ void CheckerWindow::checker_add_files(QFileInfoList& list, QString& policy)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt)
+void CheckerWindow::checker_add_xslt_file(QString& file, QString& xslt)
 {
     mainwindow->addFileToList(file);
 
-    mainwindow->addXsltToList(xslt, display_xslt);
+    mainwindow->addXsltToList(xslt);
     updateWebView(file.toStdWString(), String());
     mainwindow->clearXsltList();
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt, QString& display_xslt)
+void CheckerWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
 {
     for (int i = 0; i < list.count(); ++i)
     {
         QString file = list[i].absoluteFilePath();
         mainwindow->addFileToList(file);
     }
-    mainwindow->addXsltToList(xslt, display_xslt);
+    mainwindow->addXsltToList(xslt);
     updateWebView(list, String());
     mainwindow->clearXsltList();
 }

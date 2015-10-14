@@ -55,8 +55,8 @@ public:
     String                      transformWithXslt(String report, String trans);
     void                        checker_add_file(QString& file, QString& policy);
     void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
-    void                        checker_add_xslt_file(QString& file, QString& xslt, QString& display_xslt);
-    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt, QString& display_xslt);
+    void                        checker_add_xslt_file(QString& file, QString& xslt);
+    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt);
     QString                     get_trace_for_file(const QString& filename);
     QString                     ask_for_schematron_file();
     void                        checker_selected();
@@ -64,9 +64,11 @@ public:
     void                        add_default_policy();
     bool                        ValidatePolicy(String& policy, bool& valid, String& report);
 
-    void                        addXsltToList(QString& xslt, QString& display_xslt);
+    void                        addXsltToList(QString& xslt);
     void                        clearXsltList();
     void                        clearFileList();
+    void                        addXsltDisplay(QString& display_xslt);
+    void                        removeXsltDisplay();
     QStringList                 get_policy_titles();
 
     Policies&                   get_policies() { return C.policies; }
