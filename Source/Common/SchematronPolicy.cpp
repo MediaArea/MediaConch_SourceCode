@@ -118,7 +118,7 @@ SchematronPolicy::~SchematronPolicy()
 //---------------------------------------------------------------------------
 xmlNodePtr SchematronPolicy::write_ns()
 {
-    xmlNodePtr nodeNs = xmlNewNode(NULL, (xmlChar *)"ns");
+    xmlNodePtr nodeNs = xmlNewNode(NULL, (const xmlChar *)"ns");
     xmlNewProp(nodeNs, (const xmlChar *)"prefix", (const xmlChar *)"ma");
     xmlNewProp(nodeNs, (const xmlChar *)"uri", (const xmlChar *)"https://mediaarea.net/mediaarea");
     xmlNewNs(nodeNs, NULL, (const xmlChar *)"sch");
@@ -132,20 +132,20 @@ xmlNodePtr SchematronPolicy::write_ns()
 //---------------------------------------------------------------------------
 xmlNodePtr SchematronPolicy::write_title(std::string& title)
 {
-    xmlNodePtr nodeTitle = xmlNewNode(NULL, (xmlChar *)"title");
+    xmlNodePtr nodeTitle = xmlNewNode(NULL, (const xmlChar *)"title");
     xmlNewNs(nodeTitle, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
     nodeTitle->ns = defNs;
 
-    xmlNodeSetContent(nodeTitle, (xmlChar *)title.c_str());
+    xmlNodeSetContent(nodeTitle, (const xmlChar *)title.c_str());
     return nodeTitle;
 }
 
 //---------------------------------------------------------------------------
 xmlNodePtr SchematronPolicy::write_pattern(SchematronPattern *p)
 {
-    xmlNodePtr pattern = xmlNewNode(NULL, (xmlChar *)"pattern");
+    xmlNodePtr pattern = xmlNewNode(NULL, (const xmlChar *)"pattern");
     xmlNewProp(pattern, (const xmlChar *)"name", (const xmlChar *)p->name.c_str());
     xmlNewNs(pattern, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
@@ -163,7 +163,7 @@ xmlNodePtr SchematronPolicy::write_pattern(SchematronPattern *p)
 //---------------------------------------------------------------------------
 xmlNodePtr SchematronPolicy::write_rule(SchematronRule *r)
 {
-    xmlNodePtr rule = xmlNewNode(NULL, (xmlChar *)"rule");
+    xmlNodePtr rule = xmlNewNode(NULL, (const xmlChar *)"rule");
     xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/ma:MediaArea/ma:media/ma:MediaInfo");
     xmlNewNs(rule, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
@@ -181,14 +181,14 @@ xmlNodePtr SchematronPolicy::write_rule(SchematronRule *r)
 //---------------------------------------------------------------------------
 xmlNodePtr SchematronPolicy::write_assert(SchematronAssert *a)
 {
-    xmlNodePtr assert = xmlNewNode(NULL, (xmlChar *)"assert");
-    xmlNewProp(assert, (xmlChar *)"test", (xmlChar *)Policies::serialize_assert_for_test(a).c_str());
+    xmlNodePtr assert = xmlNewNode(NULL, (const xmlChar *)"assert");
+    xmlNewProp(assert, (const xmlChar *)"test", (const xmlChar *)Policies::serialize_assert_for_test(a).c_str());
     xmlNewNs(assert, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
     assert->ns = defNs;
 
-    xmlNodeSetContent(assert, (xmlChar *)a->description.c_str());
+    xmlNodeSetContent(assert, (const xmlChar *)a->description.c_str());
     return assert;
 }
 
@@ -324,8 +324,8 @@ String SchematronPolicy::import_schema_from_doc(const char* filename, xmlDocPtr 
 //---------------------------------------------------------------------------
 xmlDocPtr SchematronPolicy::create_doc()
 {
-    xmlDocPtr doc = xmlNewDoc((xmlChar *)"1.0");
-    xmlNodePtr root_node = xmlNewNode(NULL, (xmlChar *)"schema");
+    xmlDocPtr doc = xmlNewDoc((const xmlChar *)"1.0");
+    xmlNodePtr root_node = xmlNewNode(NULL, (const xmlChar *)"schema");
     xmlNsPtr ns = xmlNewNs(root_node, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
 
