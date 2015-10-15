@@ -41,14 +41,26 @@ Help::Help(QWidget *parent) : QDialog(parent)
     QTextBrowser* Text1=new QTextBrowser(this);
     Text1->setReadOnly(true);
     Text1->setOpenExternalLinks(true);
-    Text1->setSource(QUrl("qrc:/Help/About/About.html"));
-    Central->addTab(Text1, tr("About"));
+    Text1->setSource(QUrl("qrc:/Help/Getting Started/Getting Started.html"));
+    Central->addTab(Text1, tr("Getting Started"));
 
     QTextBrowser* Text2=new QTextBrowser(this);
     Text2->setReadOnly(true);
     Text2->setOpenExternalLinks(true);
-    Text2->setSource(QUrl("qrc:/Help/Getting Started/Getting Started.html"));
-    Central->addTab(Text2, tr("Getting Started"));
+    Text2->setSource(QUrl("qrc:/Help/How To Use/How To Use.html"));
+    Central->addTab(Text2, tr("How To Use"));
+
+    QTextBrowser* Text3=new QTextBrowser(this);
+    Text3->setReadOnly(true);
+    Text3->setOpenExternalLinks(true);
+    Text3->setSource(QUrl("qrc:/Help/Data Format/Data Format.html"));
+    Central->addTab(Text3, tr("Data Format"));
+
+    QTextBrowser* Text4=new QTextBrowser(this);
+    Text4->setReadOnly(true);
+    Text4->setOpenExternalLinks(true);
+    Text4->setSource(QUrl("qrc:/Help/About/About.html"));
+    Central->addTab(Text4, tr("About"));
 
     L->addWidget(Central);
     L->addWidget(Close);
@@ -67,14 +79,28 @@ Help::~Help()
 //---------------------------------------------------------------------------
 void Help::GettingStarted()
 {
+    Central->setCurrentIndex(0);
+    show();
+}
+
+//---------------------------------------------------------------------------
+void Help::HowToUse()
+{
     Central->setCurrentIndex(1);
+    show();
+}
+
+//---------------------------------------------------------------------------
+void Help::DataFormat()
+{
+    Central->setCurrentIndex(2);
     show();
 }
 
 //---------------------------------------------------------------------------
 void Help::About()
 {
-    Central->setCurrentIndex(0);
+    Central->setCurrentIndex(3);
     show();
 }
 

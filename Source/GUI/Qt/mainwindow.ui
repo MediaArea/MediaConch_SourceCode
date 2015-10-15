@@ -76,8 +76,11 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout"/>
     <addaction name="actionGettingStarted"/>
+    <addaction name="actionHowToUse"/>
+    <addaction name="actionDataFormat"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>
@@ -127,14 +130,24 @@
     <string>Close all</string>
    </property>
   </action>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
   <action name="actionGettingStarted">
    <property name="text">
     <string>Getting started</string>
+   </property>
+  </action>
+  <action name="actionHowToUse">
+   <property name="text">
+    <string>How To Use</string>
+   </property>
+  </action>
+  <action name="actionDataFormat">
+   <property name="text">
+    <string>Data Format</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

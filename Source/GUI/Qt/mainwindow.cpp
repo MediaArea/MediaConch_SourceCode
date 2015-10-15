@@ -412,6 +412,20 @@ void MainWindow::on_actionGettingStarted_triggered()
     Frame->GettingStarted();
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::on_actionHowToUse_triggered()
+{
+    Help* Frame=new Help(this);
+    Frame->HowToUse();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDataFormat_triggered()
+{
+    Help* Frame=new Help(this);
+    Frame->DataFormat();
+}
+
 //***************************************************************************
 // Visual elements
 //***************************************************************************

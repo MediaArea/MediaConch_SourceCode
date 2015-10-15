@@ -29,6 +29,8 @@ public:
 
     void About();
     void GettingStarted();
+    void HowToUse();
+    void DataFormat();
 
 private:
     QTabWidget*  Central;
