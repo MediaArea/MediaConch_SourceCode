@@ -31,4 +31,8 @@
         <file alias="Test1_pal.sch">policies/Test1_pal.sch</file>
         <file alias="Test2.sch">policies/Test2.sch</file>
     </qresource>
+    <qresource prefix="/Help">
+        <file alias="/About/About.html">../../License.html</file>
+        <file alias="/Getting Started/Getting Started.html">html/Help/Getting Started/Getting Started.html</file>
+    </qresource>
 </RCC>
