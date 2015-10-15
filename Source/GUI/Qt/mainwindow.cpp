@@ -65,8 +65,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
-    move(QApplication::desktop()->screenGeometry().width()/4-50, QApplication::desktop()->screenGeometry().height()/4);
-    resize(QApplication::desktop()->screenGeometry().width()/2+100, QApplication::desktop()->screenGeometry().height()/2);
+    int left=70;
+    int width=QApplication::desktop()->screenGeometry().width();
+    if (width>1150)
+    {
+        left+=(width-1150)/2;
+        width=1150;
+    }
+    move(left, 70);
+    resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
     setAcceptDrops(false);
 
     // Default
