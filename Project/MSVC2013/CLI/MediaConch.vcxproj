@@ -124,7 +124,7 @@
       <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
       <DisableSpecificWarnings>4100;4996;4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -182,7 +182,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
@@ -251,9 +251,12 @@
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Common\JS_Tree.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Policy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schema.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\CLI\CLI_Main.h" />
@@ -262,7 +265,10 @@
     <ClInclude Include="..\..\..\Source\CLI\Help.h" />
     <ClInclude Include="..\..\..\Source\Common\Core.h" />
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
+    <ClInclude Include="..\..\..\Source\Common\Policy.h" />
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
+    <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h" />
+    <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MediaConch_CLI.rc" />

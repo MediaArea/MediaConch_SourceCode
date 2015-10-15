@@ -39,9 +39,6 @@
     <ClCompile Include="..\..\..\Source\Common\Core.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\Policies.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -52,6 +49,18 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\JS_Tree.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Policy.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Policies.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -75,6 +84,15 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Schematron.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Policy.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>

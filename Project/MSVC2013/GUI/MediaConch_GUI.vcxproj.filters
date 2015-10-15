@@ -116,6 +116,69 @@
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Policy.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policieswindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policywindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\xsltwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\menumainwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\xsltruleedit.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_schematronwindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_xsltwindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_checkerwindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_menumainwindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_policieswindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_policywindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_xsltruleedit.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_xsltpolicymenu.cpp">
+      <Filter>Header Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_helpwindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -132,9 +195,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Schematron.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="_Automated\ui_policiesedit.h">
-      <Filter>Header Files\_Automated</Filter>
     </ClInclude>
     <ClInclude Include="_Automated\ui_policiesmenu.h">
       <Filter>Header Files\_Automated</Filter>
@@ -158,6 +218,63 @@
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Policy.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\xsltruleedit.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\menumainwindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\policiesmenu.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\policiestree.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\policymenu.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_xsltpolicymenu.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_xsltruleedit.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
