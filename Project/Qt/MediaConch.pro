@@ -30,6 +30,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
+                    ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
@@ -57,6 +58,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/XsltPolicy.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
+                    ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \

@@ -51,7 +51,7 @@
      <x>0</x>
      <y>0</y>
      <width>884</width>
-     <height>29</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -60,7 +60,6 @@
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionCloseAll"/>
-    <addaction name="actionAbout"/>
     <addaction name="separator"/>
     <addaction name="actionChooseSchematron"/>
     <addaction name="separator"/>
@@ -73,8 +72,16 @@
     <addaction name="actionChecker"/>
     <addaction name="actionPolicies"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionGettingStarted"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
@@ -123,6 +130,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionGettingStarted">
+   <property name="text">
+    <string>Getting started</string>
    </property>
   </action>
  </widget>

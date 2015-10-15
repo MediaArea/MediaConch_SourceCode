@@ -103,7 +103,11 @@ private Q_SLOTS:
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
     void on_actionChooseSchematron_triggered();
+
+    //Help
     void on_actionAbout_triggered();
+    void on_actionGettingStarted_triggered();
+
 };
 
 }
