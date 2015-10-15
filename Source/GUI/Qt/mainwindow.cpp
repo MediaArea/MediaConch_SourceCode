@@ -266,10 +266,25 @@ void MainWindow::add_default_policy()
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
-        QByteArray schematron = file.readAll();
-        String ret = C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
-                                                              schematron.constData(), schematron.length());
-        (void)ret;
+        QByteArray data = file.readAll();
+        String ret;
+
+        if (list[i].absoluteFilePath().endsWith(".xsl"))
+        {
+            ret = C.policies.import_schema_from_memory(Policies::POLICY_XSLT, list[i].absoluteFilePath().toStdString().c_str(),
+                                                       data.constData(), data.length());
+            if (ret.length())
+                C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
+                                                     data.constData(), data.length());
+        }
+        else
+        {
+            ret = C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
+                                                       data.constData(), data.length());
+            if (ret.length())
+                C.policies.import_schema_from_memory(Policies::POLICY_XSLT, list[i].absoluteFilePath().toStdString().c_str(),
+                                                     data.constData(), data.length());
+        }
     }
 }
 
