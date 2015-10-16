@@ -151,8 +151,13 @@ namespace MediaConch
             return;
 
         QTextStream out(&file);
-        QTextDocument text(report.toPlainText().trimmed());
-        out << text.toPlainText() << "\n";
+        if (dl_file.endsWith(".html"))
+            out << report.toOuterXml();
+        else
+        {
+            QTextDocument text(report.toPlainText().trimmed());
+            out << text.toPlainText() << "\n";
+        }
     }
 
     void WebPage::onFillTrace(const QString& target, const QString& filename)

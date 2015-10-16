@@ -78,7 +78,10 @@ private:
     void change_html_file_detail_conformance(QString& html, String& file);
     void change_html_file_detail_policy_report(QString& html, String& file, String& policy);
     void change_html_file_detail_trace(QString& html, String& file);
+    void remove_html_file_detail_policy_report(QString& html);
     bool report_is_html(QString &report);
+    bool is_policy_html_valid(QString &report);
+    void change_report_policy_save_name(QString& html);
 
 public Q_SLOTS:
     void actionCloseAllTriggered();

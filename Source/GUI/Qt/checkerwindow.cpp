@@ -503,6 +503,11 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&, String& policy)
 {
+    if (!policy.length())
+    {
+        remove_html_file_detail_policy_report(html);
+        return;
+    }
     //TODO: second parameter is the file, should do a Run() XML when database created
     bool valid;
     String r;
@@ -513,6 +518,24 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     {
         String trans = displayXslt.toStdWString();
         r = mainwindow->transformWithXslt(r, trans);
+    }
+
+    QString report = QString().fromStdWString(r);
+
+    bool is_html = report_is_html(report);
+    if (!is_html)
+    {
+#if QT_VERSION >= 0x050200
+        report = report.toHtmlEscaped();
+#else
+        report = Qt::escape(report);
+#endif
+        report.replace('\n', "<br/>\n");
+    }
+    else
+    {
+        valid = is_policy_html_valid(report);
+        change_report_policy_save_name(html);
     }
 
     QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
@@ -535,19 +558,6 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
             html.replace(pos, reg.matchedLength(), "not ");
         else
             html.replace(pos, reg.matchedLength(), QString());
-    }
-
-    QString report = QString().fromStdWString(r);
-
-    bool is_html = report_is_html(report);
-    if (!is_html)
-    {
-#if QT_VERSION >= 0x050200
-        report = report.toHtmlEscaped();
-#else
-        report = Qt::escape(report);
-#endif
-        report.replace('\n', "<br/>\n");
     }
 
     reg = QRegExp("\\{% if check\\.getPolicy\\|length > 0 %\\}");
@@ -595,6 +605,24 @@ void CheckerWindow::change_html_file_detail(QString& html, String& file)
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), QString("%1").arg(index));
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::remove_html_file_detail_policy_report(QString& html)
+{
+    QRegExp reg("<li class=\"list-group-item\">This file is");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) == -1)
+        return;
+    html.insert(pos + 26, " hidden");
+
+    reg = QRegExp("<li class=\"list-group-item report\">Policy report");
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) == -1)
+        return;
+    html.insert(pos + 26, " hidden");
 }
 
 //---------------------------------------------------------------------------
@@ -648,6 +676,27 @@ bool CheckerWindow::report_is_html(QString& report)
         return true;
 
     return false;
+}
+
+//---------------------------------------------------------------------------
+bool CheckerWindow::is_policy_html_valid(QString& report)
+{
+    QRegExp reg("<td>fail</td>");
+
+    if (reg.indexIn(report, 0) == -1)
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::change_report_policy_save_name(QString& html)
+{
+    QRegExp reg("data-save-name=\"PolicyReport.txt\"");
+
+    int pos = 0;
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), "data-save-name=\"PolicyReport.html\"");
 }
 
 }
