@@ -130,6 +130,16 @@ int Schematron::validate_xml(const char* xml, size_t len, bool silent)
     xmlSchematronFreeValidCtxt(ctx);
     xmlFreeDoc(doc);
     xmlSetGenericErrorFunc(NULL, NULL);
+
+    std::stringstream Out;
+    if (ret > 0)
+    {
+        for (size_t pos = 0; pos < errors.size(); pos++)
+            Out << "\t" << errors[pos].c_str();
+        if (!errors.size())
+            Out << std::endl;
+        report = Out.str();
+    }
     return ret;
 }
 

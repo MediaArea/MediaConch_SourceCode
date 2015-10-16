@@ -140,7 +140,28 @@ int Xslt::validate_xml(const char* xml, size_t len, bool)
     xmlFreeDoc(doc);
     xmlFreeDoc(res);
     xmlSetGenericErrorFunc(NULL, NULL);
+
+    std::stringstream Out;
+    if (errors.size())
+    {
+        for (size_t pos = 0; pos < errors.size(); pos++)
+            Out << "\t" << errors[pos].c_str();
+        if (!errors.size())
+            Out << std::endl;
+        report = Out.str();
+        return 1;
+    }
+    else if (outcome_has_fail(report))
+        return 1;
     return 0;
+}
+
+//---------------------------------------------------------------------------
+bool Xslt::outcome_has_fail(std::string& report)
+{
+    if (report.find("<results outcome=\"fail\"") != std::string::npos)
+        return true;
+    return false;
 }
 
 //***************************************************************************

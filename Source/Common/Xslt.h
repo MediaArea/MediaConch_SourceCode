@@ -49,6 +49,8 @@ private:
     Xslt(const Xslt&);
     Xslt&  operator=(const Xslt&);
 
+    bool outcome_has_fail(std::string& report);
+
     xsltStylesheetPtr xslt_ctx;
     xmlDocPtr         doc_ctx;
 };

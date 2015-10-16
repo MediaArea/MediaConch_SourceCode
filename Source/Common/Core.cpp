@@ -291,7 +291,10 @@ String Core::MediaSchematron ()
                 bool valid = validation(S, report);
 
                 if (!valid)
+                {
+                    Out << __T("NOT VALID\n");
                     Out << report;
+                }
                 else
                     Out << __T("VALID");
             }
@@ -471,7 +474,6 @@ void Core::validateXsltPolicy(int pos, bool& valid, String& report)
 //---------------------------------------------------------------------------
 bool Core::validation(Schema* S, String& report)
 {
-    wstringstream Out;
     String tmp = MI->Inform();
     std::string xml=Ztring(tmp).To_UTF8();
     bool valid = true;
@@ -486,28 +488,17 @@ bool Core::validation(Schema* S, String& report)
     }
 
     int ret = S->validate_xml(xml.c_str(), xml.length());
-    if (ret > 0)
+    if (ret < 0)
     {
-        std::vector<std::string> errors = S->get_errors();
-
-        Out << __T("NOT VALID\n");
-        for (size_t pos = 0; pos < errors.size(); pos++)
-            Out << "\t" << errors[pos].c_str();
-        if (!errors.size())
-            Out << endl;
-        valid = false;
-    }
-    else if (ret < 0)
-    {
-        Out << __T("Validation generated an internal error");
+        report = __T("Validation generated an internal error");
         valid = false;
     }
     else
     {
         std::string r = S->get_report();
-        Out << Ztring().From_UTF8(r);
+        report = Ztring().From_UTF8(r);
+        valid = ret == 0 ? true : false;
     }
-    report = Out.str();
     return valid;
 }
 

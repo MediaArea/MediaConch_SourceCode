@@ -533,10 +533,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
         report.replace('\n', "<br/>\n");
     }
     else
-    {
-        valid = is_policy_html_valid(report);
         change_report_policy_save_name(html);
-    }
 
     QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
     int pos = 0;
@@ -673,17 +670,6 @@ bool CheckerWindow::report_is_html(QString& report)
     QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
 
     if (reg.indexIn(report, 0) != -1)
-        return true;
-
-    return false;
-}
-
-//---------------------------------------------------------------------------
-bool CheckerWindow::is_policy_html_valid(QString& report)
-{
-    QRegExp reg("<td>fail</td>");
-
-    if (reg.indexIn(report, 0) == -1)
         return true;
 
     return false;
