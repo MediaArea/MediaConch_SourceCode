@@ -515,6 +515,23 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
         r = mainwindow->transformWithXslt(r, trans);
     }
 
+    QString report = QString().fromStdWString(r);
+
+    bool is_html = report_is_html(report);
+    if (!is_html)
+    {
+#if QT_VERSION >= 0x050200
+        report = report.toHtmlEscaped();
+#else
+        report = Qt::escape(report);
+#endif
+        report.replace('\n', "<br/>\n");
+    }
+    else
+    {
+        valid = is_policy_html_valid(report);
+    }
+
     QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
     int pos = 0;
 
@@ -535,19 +552,6 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
             html.replace(pos, reg.matchedLength(), "not ");
         else
             html.replace(pos, reg.matchedLength(), QString());
-    }
-
-    QString report = QString().fromStdWString(r);
-
-    bool is_html = report_is_html(report);
-    if (!is_html)
-    {
-#if QT_VERSION >= 0x050200
-        report = report.toHtmlEscaped();
-#else
-        report = Qt::escape(report);
-#endif
-        report.replace('\n', "<br/>\n");
     }
 
     reg = QRegExp("\\{% if check\\.getPolicy\\|length > 0 %\\}");
@@ -645,6 +649,17 @@ bool CheckerWindow::report_is_html(QString& report)
     QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
 
     if (reg.indexIn(report, 0) != -1)
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool CheckerWindow::is_policy_html_valid(QString& report)
+{
+    QRegExp reg("<td>fail</td>");
+
+    if (reg.indexIn(report, 0) == -1)
         return true;
 
     return false;
