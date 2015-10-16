@@ -503,6 +503,11 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&, String& policy)
 {
+    if (!policy.length())
+    {
+        remove_html_file_detail_policy_report(html);
+        return;
+    }
     //TODO: second parameter is the file, should do a Run() XML when database created
     bool valid;
     String r;
@@ -599,6 +604,24 @@ void CheckerWindow::change_html_file_detail(QString& html, String& file)
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), QString("%1").arg(index));
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::remove_html_file_detail_policy_report(QString& html)
+{
+    QRegExp reg("<li class=\"list-group-item\">This file is");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) == -1)
+        return;
+    html.insert(pos + 26, " hidden");
+
+    reg = QRegExp("<li class=\"list-group-item report\">Policy report");
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) == -1)
+        return;
+    html.insert(pos + 26, " hidden");
 }
 
 //---------------------------------------------------------------------------
