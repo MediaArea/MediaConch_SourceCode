@@ -535,6 +535,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     else
     {
         valid = is_policy_html_valid(report);
+        change_report_policy_save_name(html);
     }
 
     QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
@@ -686,6 +687,16 @@ bool CheckerWindow::is_policy_html_valid(QString& report)
         return true;
 
     return false;
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::change_report_policy_save_name(QString& html)
+{
+    QRegExp reg("data-save-name=\"PolicyReport.txt\"");
+
+    int pos = 0;
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), "data-save-name=\"PolicyReport.html\"");
 }
 
 }
