@@ -140,21 +140,21 @@ void MainWindow::checker_add_files(QFileInfoList& list, QString& policy)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_xslt_file(QString& file, QString& xslt)
+void MainWindow::checker_add_policy_file(QString& file, QString& policy)
 {
-        MainView->checker_add_xslt_file(file, xslt);
+    MainView->checker_add_policy_file(file, policy);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
+void MainWindow::checker_add_policy_files(QFileInfoList& list, QString& policy)
 {
-    MainView->checker_add_xslt_files(list, xslt);
+    MainView->checker_add_policy_files(list, policy);
 }
 
 //---------------------------------------------------------------------------
-const std::vector<String>& MainWindow::xslt_file_registered()
+const std::vector<String>& MainWindow::policy_file_registered()
 {
-    return C.PoliciesFiles[Core::policyType_Xslt];
+    return C.PoliciesFiles;
 }
 
 //---------------------------------------------------------------------------
@@ -172,7 +172,7 @@ QString MainWindow::get_trace_for_file(const QString& filename)
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::ask_for_schematron_file()
+QString MainWindow::ask_for_schema_file()
 {
     QString file=QFileDialog::getOpenFileName(this, "Open file", "", "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     return file;
@@ -258,9 +258,8 @@ void MainWindow::add_default_policy()
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
         QByteArray schematron = file.readAll();
-        String ret = C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
-                                                              schematron.constData(), schematron.length());
-        (void)ret;
+        const std::string& file_str = list[i].absoluteFilePath().toStdString();
+        C.policies.import_schema_from_memory(file_str, schematron.constData(), schematron.length());
     }
 
 #if QT_VERSION >= 0x050400
@@ -281,24 +280,8 @@ void MainWindow::add_default_policy()
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
         QByteArray data = file.readAll();
-        String ret;
-
-        if (list[i].absoluteFilePath().endsWith(".xsl"))
-        {
-            ret = C.policies.import_schema_from_memory(Policies::POLICY_XSLT, list[i].absoluteFilePath().toStdString().c_str(),
-                                                       data.constData(), data.length());
-            if (ret.length())
-                C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
-                                                     data.constData(), data.length());
-        }
-        else
-        {
-            ret = C.policies.import_schema_from_memory(Policies::POLICY_SCHEMATRON, list[i].absoluteFilePath().toStdString().c_str(),
-                                                       data.constData(), data.length());
-            if (ret.length())
-                C.policies.import_schema_from_memory(Policies::POLICY_XSLT, list[i].absoluteFilePath().toStdString().c_str(),
-                                                     data.constData(), data.length());
-        }
+        C.policies.import_schema_from_memory(list[i].absoluteFilePath().toStdString(),
+                                             data.constData(), data.length());
     }
 }
 
@@ -315,15 +298,15 @@ void MainWindow::removeXsltDisplay()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addXsltToList(QString& xslt)
+void MainWindow::addPolicyToList(QString& policy)
 {
-    C.PoliciesFiles[Core::policyType_Xslt].push_back(xslt.toStdWString());
+    C.PoliciesFiles.push_back(policy.toStdWString());
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::clearXsltList()
+void MainWindow::clearPolicyList()
 {
-    C.PoliciesFiles[Core::policyType_Xslt].clear();
+    C.PoliciesFiles.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -376,27 +359,17 @@ void MainWindow::on_actionPolicies_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionChooseSchematron_triggered()
+void MainWindow::on_actionChooseSchema_triggered()
 {
-    QString file = ask_for_schematron_file();
+    QString file = ask_for_schema_file();
     if (!file.length())
         return;
 
-    if (file.endsWith(".xsl"))
+    if (!C.policies.import_schema(file.toStdString()).length())
     {
-        if (!C.policies.import_schema(Policies::POLICY_XSLT, file.toStdString().c_str()).length())
-            C.PoliciesFiles[Core::policyType_Xslt].push_back(file.toStdWString());
-        else if (!C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
-            C.PoliciesFiles[Core::policyType_Schematron].push_back(file.toStdWString());
+        //TODO error
     }
-    else if (file.endsWith(".sch"))
-    {
-        if (!C.policies.import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
-            C.PoliciesFiles[Core::policyType_Schematron].push_back(file.toStdWString());
-        else if (!C.policies.import_schema(Policies::POLICY_XSLT, file.toStdString().c_str()).length())
-            C.PoliciesFiles[Core::policyType_Xslt].push_back(file.toStdWString());
-    }
-    //TODO error
+    C.Tool=Core::tool_MediaPolicies;
     Run();
 }
 

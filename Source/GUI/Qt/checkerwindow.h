@@ -34,13 +34,13 @@ public:
     void                        updateWebView(String file, String policy);
     void                        updateWebView(QList<QFileInfo>& files, String policy);
     void                        setDisplayXslt(QString& d) { displayXslt = d; }
-    void                        resetDisplayXslt() { displayXslt = QString(); }
+    void                        resetDisplayXslt() { displayXslt.clear(); }
 
     // Helpers
     void                        checker_add_file(QString& file, QString& policy);
     void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
-    void                        checker_add_xslt_file(QString& file, QString& xslt);
-    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt);
+    void                        checker_add_policy_file(QString& file, QString& policy);
+    void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
 
 private:
     // Visual elements

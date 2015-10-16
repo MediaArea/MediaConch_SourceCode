@@ -61,7 +61,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionCloseAll"/>
     <addaction name="separator"/>
-    <addaction name="actionChooseSchematron"/>
+    <addaction name="actionChooseSchema"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -96,7 +96,7 @@
     <string>Quit</string>
    </property>
   </action>
-  <action name="actionChooseSchematron">
+  <action name="actionChooseSchema">
    <property name="text">
     <string>Load policy set...</string>
    </property>

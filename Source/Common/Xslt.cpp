@@ -99,7 +99,7 @@ bool Xslt::register_schema_from_memory(const std::string& schem)
 }
 
 //---------------------------------------------------------------------------
-int Xslt::validate_xml(const char* xml, size_t len, bool)
+int Xslt::validate_xml(std::string& xml, bool)
 {
     report.clear();
     if (!xslt_ctx)
@@ -115,7 +115,7 @@ int Xslt::validate_xml(const char* xml, size_t len, bool)
     doc_flags =| XML_PARSE_BIG_LINES;
 #endif // !XML_PARSE_BIG_LINES
 
-    xmlDocPtr doc = xmlReadMemory(xml, len, NULL, NULL, doc_flags);
+    xmlDocPtr doc = xmlReadMemory(xml.c_str(), xml.length(), NULL, NULL, doc_flags);
     if (!doc)
         return -1;
 

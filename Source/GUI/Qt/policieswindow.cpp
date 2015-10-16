@@ -73,27 +73,13 @@ PoliciesWindow::~PoliciesWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::import_schematron()
+void PoliciesWindow::import_schema()
 {
-    QString file = mainwindow->ask_for_schematron_file();
+    QString file = mainwindow->ask_for_schema_file();
     if (!file.length())
         return;
 
-    String ret;
-    if (file.endsWith(".xsl"))
-    {
-        ret = mainwindow->get_policies().import_schema(Policies::POLICY_XSLT, file.toStdString().c_str());
-        if (ret.length())
-            if (!mainwindow->get_policies().import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str()).length())
-                ret = String();
-    }
-    else
-    {
-        ret = mainwindow->get_policies().import_schema(Policies::POLICY_SCHEMATRON, file.toStdString().c_str());
-        if (ret.length())
-            if (!mainwindow->get_policies().import_schema(Policies::POLICY_XSLT, file.toStdString().c_str()).length())
-                ret = String();
-    }
+    String ret = mainwindow->get_policies().import_schema(file.toStdString());
 
     displayPoliciesTree();
     if (ret.length())
@@ -521,7 +507,7 @@ void PoliciesWindow::createPoliciesMenu()
     policiesMenu = new PoliciesMenu(policiesTree->get_menu_frame());
     policiesTree->get_menu_layout()->addWidget(policiesMenu);
     QObject::connect(policiesMenu->get_importPolicy_button(), SIGNAL(clicked()),
-                     this, SLOT(import_schematron()));
+                     this, SLOT(import_schema()));
     QObject::connect(policiesMenu->get_addNewPolicy_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_policy()));
     QObject::connect(policiesMenu->get_deletePolicies_button(), SIGNAL(clicked()),

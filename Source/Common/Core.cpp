@@ -129,14 +129,7 @@ String Core::Run (String file)
                                     default:                ;
                                 }
                                 break;
-        case tool_MediaSchematron:
-                                MI->Option(__T("ReadByHuman"), __T("1"));
-                                MI->Option(__T("Details"), __T("0"));
-                                MI->Option(__T("Complete"), __T("1"));
-                                MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Inform"), __T("MAXML"));
-                                break;
-        case tool_MediaXslt:
+        case tool_Policies:
                                 MI->Option(__T("ReadByHuman"), __T("1"));
                                 MI->Option(__T("Details"), __T("0"));
                                 MI->Option(__T("Complete"), __T("1"));
@@ -171,9 +164,8 @@ String Core::Run (String file)
         case tool_MediaConch:      return MediaConch();
         case tool_MediaInfo:       return MediaInfo();
         case tool_MediaTrace:      return MediaTrace();
-        case tool_MediaSchematron: return MediaSchematron();
-        case tool_MediaXslt:       return MediaXslt();
         case tool_MediaPolicies:   return MediaPolicies();
+        case tool_Policies:        return PoliciesCheck();
         default:                   return String();
     }
 }
@@ -256,101 +248,107 @@ String Core::MediaTrace ()
 }
 
 //---------------------------------------------------------------------------
-String Core::MediaSchematron ()
+String Core::PoliciesCheck()
 {
-    if (policies.policies.size())
+    if (PoliciesFiles.size())
     {
-        wstringstream Out;
-        for (size_t i = 0; i < policies.policies.size(); ++i)
-        {
-            if (i)
-                Out << endl;
-            Out << policies.policies[i]->title.c_str() << ": ";
-            String report;
-            bool valid;
-            validateSchematronPolicy(i, valid, report);
-            if (!valid)
-                Out << report;
-            else
-                Out << __T("VALID");
-        }
-        return Out.str();
-    }
-    else if (PoliciesFiles[policyType_Schematron].size())
-    {
-        std::vector<String>& vec = PoliciesFiles[policyType_Schematron];
-        wstringstream Out;
+        std::vector<String>& vec = PoliciesFiles;
+        std::wstringstream Out;
         for (size_t i = 0; i < vec.size(); ++i)
         {
-            std::string file=Ztring(vec[i]).To_UTF8();
-            Out << vec[i] << ": ";
-            Schema* S = new Schematron;
-            if (S->register_schema_from_file(file.c_str()))
+            std::wstringstream tmp;
+            if (is_schematron_file(vec[i]))
             {
-                String report;
-                bool valid = validation(S, report);
-
-                if (!valid)
+                if (!PolicySchematron(vec[i], tmp))
                 {
-                    Out << __T("NOT VALID\n");
-                    Out << report;
+                    String retain = tmp.str();
+                    tmp.str(String());
+                    if (!PolicyXslt(vec[i], tmp))
+                        Out << retain;
+                    else
+                        Out << tmp.str();
                 }
                 else
-                    Out << __T("VALID");
+                    Out << tmp.str();
             }
             else
             {
-                std::vector<std::string> errors = S->get_errors();
-                Out << "internal error for parsing file" << endl;
-                for (size_t pos = 0; pos < errors.size(); pos++)
-                    Out << "\t" << errors[pos].c_str();
+                if (!PolicyXslt(vec[i], tmp))
+                {
+                    String retain = tmp.str();
+                    tmp.str(String());
+                    if (!PolicySchematron(vec[i], tmp))
+                        Out << retain;
+                    else
+                        Out << tmp.str();
+                }
+                else
+                    Out << tmp.str();
             }
-            delete S;
         }
         return Out.str();
     }
 
-    return String(__T("No Schematron or Policy to apply"));
+    return __T("No policy to apply");
 }
 
 //---------------------------------------------------------------------------
-String Core::MediaXslt ()
+bool Core::PolicySchematron(const String& file, std::wstringstream& Out)
 {
-    if (policies.policies.size())
-    {
-        //TODO
-        return String(__T("XSLT using policy not implemented yet"));
-    }
-    else if (PoliciesFiles[policyType_Xslt].size())
-    {
-        std::vector<String>& vec = PoliciesFiles[policyType_Xslt];
-        wstringstream Out;
-        for (size_t i = 0; i < vec.size(); ++i)
-        {
-            std::string file=Ztring(vec[i]).To_UTF8();
-            Schema *S = new Xslt;
-            if (S->register_schema_from_file(file.c_str()))
-            {
-                String report;
-                validation(S, report);
-                if (xsltDisplay.length())
-                    report = Core::transformWithXslt(report, xsltDisplay);
-                Out << report;
-            }
-            else
-            {
-                std::vector<std::string> errors = S->get_errors();
-                Out << vec[i] << ": ";
-                Out << "internal error for parsing file" << endl;
-                for (size_t pos = 0; pos < errors.size(); pos++)
-                    Out << "\t" << errors[pos].c_str();
-            }
-            delete S;
-        }
-        return Out.str();
-    }
+    Schema* S = new Schematron;
+    std::string f=Ztring(file).To_UTF8();
+    bool valid = false;
 
-    return String(__T("No Policy to apply"));
+    Out << file << ": ";
+    if (S->register_schema_from_file(f.c_str()))
+    {
+        String report;
+        valid = validation(S, report);
+
+        if (!valid)
+        {
+            Out << __T("NOT VALID\n");
+            Out << report;
+        }
+        else
+            Out << __T("VALID");
+    }
+    else
+    {
+        std::vector<std::string> errors = S->get_errors();
+        Out << "internal error for parsing file" << std::endl;
+        for (size_t pos = 0; pos < errors.size(); pos++)
+            Out << "\t" << errors[pos].c_str();
+    }
+    delete S;
+    return valid;
+}
+
+//---------------------------------------------------------------------------
+bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
+{
+    Schema *S = new Xslt;
+    std::string f=Ztring(file).To_UTF8();
+    bool valid = false;
+
+    if (S->register_schema_from_file(f.c_str()))
+    {
+        String report;
+        valid = validation(S, report);
+        if (xsltDisplay.length())
+            report = Core::transformWithXslt(report, xsltDisplay);
+        Out << report;
+    }
+    else
+    {
+        std::vector<std::string> errors = S->get_errors();
+        Out << file << ": ";
+        Out << "internal error for parsing file" << endl;
+        for (size_t pos = 0; pos < errors.size(); pos++)
+            Out << "\t" << errors[pos].c_str();
+    }
+    delete S;
+    return valid;
 }
 
 //---------------------------------------------------------------------------
@@ -366,15 +364,35 @@ String Core::MediaPolicies ()
 //---------------------------------------------------------------------------
 bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
 {
-    int pos = -1;
-    std::string policyName=Ztring(policy).To_UTF8();
-
-    if (!policy.length() && PoliciesFiles[policyType_Xslt].size())
+    if (!policy.length() && PoliciesFiles.size())
     {
-        validateXsltPolicy(-1, valid, report);
+        if (is_schematron_file(PoliciesFiles[0]))
+        {
+            validateSchematronPolicy(-1, valid, report);
+            if (!valid)
+            {
+                String tmp = report;
+                validateXsltPolicy(-1, valid, report);
+                if (!valid)
+                    report = tmp;
+            }
+        }
+        else
+        {
+            validateXsltPolicy(-1, valid, report);
+            if (!valid)
+            {
+                String tmp;
+                validateSchematronPolicy(-1, valid, tmp);
+                if (valid)
+                    report = tmp;
+            }
+        }
         return true;
     }
 
+    int pos = -1;
+    std::string policyName=Ztring(policy).To_UTF8();
     for (int i = 0; (size_t)i < policies.policies.size(); ++i)
     {
         if (!policies.policies[i]->title.compare(policyName))
@@ -404,8 +422,9 @@ String Core::transformWithXslt(String& report, String& xslt)
     std::string x(xslt.begin(), xslt.end());
     if (!S->register_schema_from_file(x.c_str()))
         return report;
-    std::string re(report.begin(), report.end());
-    int valid = S->validate_xml(re.c_str(), re.length());
+
+    std::string re = Ztring(report).To_UTF8();
+    int valid = S->validate_xml(re);
     if (valid < 0)
         return report;
     std::string r = S->get_report();
@@ -420,10 +439,18 @@ String Core::transformWithXslt(String& report, String& xslt)
 //---------------------------------------------------------------------------
 void Core::validateSchematronPolicy(int pos, bool& valid, String& report)
 {
-    xmlDocPtr doc = policies.create_doc(pos);
+    std::string file;
+    xmlDocPtr doc = NULL;
     Schema *S = new Schematron;
 
-    if (S->register_schema_from_doc(doc))
+    if (pos < 0)
+        file=Ztring(PoliciesFiles[0]).To_UTF8();
+    else
+        doc = policies.create_doc(pos);
+
+    if (doc && S->register_schema_from_doc(doc))
+        valid = validation(S, report);
+    else if (!doc && S->register_schema_from_file(file.c_str()))
         valid = validation(S, report);
     else
     {
@@ -449,7 +476,7 @@ void Core::validateXsltPolicy(int pos, bool& valid, String& report)
     Schema *S = new Xslt;
 
     if (pos < 0)
-        file=Ztring(PoliciesFiles[policyType_Xslt][0]).To_UTF8();
+        file=Ztring(PoliciesFiles[0]).To_UTF8();
     else
         doc = policies.create_doc(pos);
     if (doc && S->register_schema_from_doc(doc))
@@ -478,16 +505,7 @@ bool Core::validation(Schema* S, String& report)
     std::string xml=Ztring(tmp).To_UTF8();
     bool valid = true;
 
-    //Hack for removing namespace so we use .sch without namespace. TODO: find a way to keep namespace with .sch policy input
-    if (Tool==tool_MediaSchematron)
-    {
-        std::string xmlns("xmlns=\"https://mediaarea.net/mediaarea\"");
-        size_t xmlns_pos=xml.rfind(xmlns, 1000);
-        if (xmlns_pos!=string::npos)
-            xml.erase(xmlns_pos, xmlns.size());
-    }
-
-    int ret = S->validate_xml(xml.c_str(), xml.length());
+    int ret = S->validate_xml(xml);
     if (ret < 0)
     {
         report = __T("Validation generated an internal error");
@@ -500,6 +518,14 @@ bool Core::validation(Schema* S, String& report)
         valid = ret == 0 ? true : false;
     }
     return valid;
+}
+
+bool Core::is_schematron_file(const String& file)
+{
+    if (file.compare(file.length() - 4, 4, __T(".sch")))
+        return false;
+
+    return true;
 }
 
 }

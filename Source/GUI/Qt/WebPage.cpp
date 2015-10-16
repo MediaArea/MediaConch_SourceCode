@@ -193,14 +193,14 @@ namespace MediaConch
         QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
         QString display_xslt;
         if (display_xslt_list.length())
-            mainwindow->addXsltDisplay(display_xslt_list[0]);
+            mainwindow->addXsltDisplay(display_xslt_list.last());
 
         if (!policy.length())
         {
-            QStringList xslt = file_selector.value("checkerUpload[step1][xslt]", QStringList());
-            if (xslt.length() && xslt[0].length())
+            QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
+            if (upload_list.length() && upload_list.last().length())
             {
-                mainwindow->checker_add_xslt_files(list, xslt[0]);
+                mainwindow->checker_add_policy_files(list, upload_list.last());
                 return;
             }
         }
@@ -221,14 +221,14 @@ namespace MediaConch
         QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
         QString display_xslt;
         if (display_xslt_list.length())
-            mainwindow->addXsltDisplay(display_xslt_list[0]);
+            mainwindow->addXsltDisplay(display_xslt_list.last());
 
         if (!policy.length())
         {
-            QStringList xslt = file_selector.value("checkerUpload[step1][xslt]", QStringList());
-            if (xslt.length() && xslt[0].length())
+            QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
+            if (upload_list.length() && upload_list.last().length())
             {
-                mainwindow->checker_add_xslt_file(url, xslt[0]);
+                mainwindow->checker_add_policy_file(url, upload_list.last());
                 return;
             }
         }
@@ -241,7 +241,7 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QStringList dirname = file_selector.value("checkerRepository[directory]", QStringList());
 
-        QDir dir(dirname[0]);
+        QDir dir(dirname.last());
 
         QFileInfoList list = dir.entryInfoList(QDir::Files);
         if (!list.count())
@@ -250,15 +250,14 @@ namespace MediaConch
         QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
         QString display_xslt;
         if (display_xslt_list.length())
-            mainwindow->addXsltDisplay(display_xslt_list[0]);
+            mainwindow->addXsltDisplay(display_xslt_list.last());
 
         if (!policy.length())
         {
-            QStringList xslt = file_selector.value("checkerUpload[step1][xslt]", QStringList());
-            if (xslt.length())
+            QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
+            if (upload_list.length() && upload_list.last().length())
             {
-                mainwindow->checker_add_xslt_files(list, xslt[0]);
-                mainwindow->removeXsltDisplay();
+                mainwindow->checker_add_policy_files(list, upload_list.last());
                 return;
             }
         }

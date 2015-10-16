@@ -60,9 +60,8 @@ public:
         tool_MediaConch,
         tool_MediaInfo,
         tool_MediaTrace,
-        tool_MediaSchematron,
-        tool_MediaXslt,
         tool_MediaPolicies,
+        tool_Policies,
     };
     tool Tool;
     enum format
@@ -79,12 +78,7 @@ public:
     bool ValidatePolicy(String& policy, bool& valid, String& report);
     String transformWithXslt(String& report, String& Xslt);
 
-    enum policyType
-    {
-        policyType_Schematron,
-        policyType_Xslt,
-    };
-    std::map<policyType, std::vector<String> > PoliciesFiles;
+    std::vector<String> PoliciesFiles;
     Policies policies;
     String xsltDisplay;
 
@@ -96,14 +90,17 @@ private:
     String MediaConch();
     String MediaInfo();
     String MediaTrace();
-    String MediaSchematron();
-    String MediaXslt();
     String MediaPolicies();
+    String PoliciesCheck();
+
+    bool PolicySchematron(const String& file, std::wstringstream& Out);
+    bool PolicyXslt(const String& file, std::wstringstream& Out);
 
     //Helper
     bool validation(Schema* S, String& report);
     void validateSchematronPolicy(int pos, bool& valid, String& report);
     void validateXsltPolicy(int pos, bool& valid, String& report);
+    bool is_schematron_file(const String& file);
 };
 
 }

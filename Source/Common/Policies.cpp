@@ -47,38 +47,67 @@ Policies::~Policies()
     policies.clear();
 }
 
-String Policies::import_schema(PolicyType type, const char* filename)
+String Policies::import_schema(const std::string& filename)
 {
-    if (!filename || !strlen(filename))
+    if (!filename.length())
         return __T("The policy file does not exist");
 
     Policy *p = NULL;
-    if (type == POLICY_SCHEMATRON)
-        p = new SchematronPolicy;
-    else if (type == POLICY_XSLT)
+    String ret;
+    if (!filename.compare(filename.length() - 4, 4, ".xsl"))
+    {
         p = new XsltPolicy;
+        ret = p->import_schema(filename);
+        if (ret.length())
+        {
+            p = new SchematronPolicy;
+            ret = p->import_schema(filename);
+        }
+    }
     else
-        return __T("The policy type is not correct");
+    {
+        p = new SchematronPolicy;
+        String ret = p->import_schema(filename);
+        if (ret.length())
+        {
+            p = new XsltPolicy;
+            ret = p->import_schema(filename);
+        }
+    }
 
-    String ret = p->import_schema(filename);
     if (!ret.length())
         policies.push_back(p);
     return ret;
 }
 
-String Policies::import_schema_from_memory(PolicyType type, const char* filename, const char* buffer, int len)
+String Policies::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
 {
     if (!buffer || !len)
         return __T("The policy does not exist");
 
     Policy *p = NULL;
-    if (type == POLICY_SCHEMATRON)
-        p = new SchematronPolicy;
-    else if (type == POLICY_XSLT)
+    String ret;
+
+    if (!filename.compare(filename.length() - 4, 4, ".xsl"))
+    {
         p = new XsltPolicy;
+        ret = p->import_schema_from_memory(filename, buffer, len);
+        if (ret.length())
+        {
+            p = new SchematronPolicy;
+            ret = p->import_schema_from_memory(filename, buffer, len);
+        }
+    }
     else
-        return __T("The policy type is not correct");
-    String ret = p->import_schema_from_memory(filename, buffer, len);
+    {
+        p = new SchematronPolicy;
+        String ret = p->import_schema_from_memory(filename, buffer, len);
+        if (ret.length())
+        {
+            p = new XsltPolicy;
+            ret = p->import_schema_from_memory(filename, buffer, len);
+        }
+    }
 
     if (!ret.length())
         policies.push_back(p);
