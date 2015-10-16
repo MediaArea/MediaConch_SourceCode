@@ -476,6 +476,15 @@ bool Core::validation(Schema* S, String& report)
     std::string xml=Ztring(tmp).To_UTF8();
     bool valid = true;
 
+    //Hack for removing namespace so we use .sch without namespace. TODO: find a way to keep namespace with .sch policy input
+    if (Tool==tool_MediaSchematron)
+    {
+        std::string xmlns("xmlns=\"https://mediaarea.net/mediaarea\"");
+        size_t xmlns_pos=xml.rfind(xmlns, 1000);
+        if (xmlns_pos!=string::npos)
+            xml.erase(xmlns_pos, xmlns.size());
+    }
+
     int ret = S->validate_xml(xml.c_str(), xml.length());
     if (ret > 0)
     {
