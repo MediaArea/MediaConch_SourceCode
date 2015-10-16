@@ -122,7 +122,7 @@ void MainWindow::Run()
 }
 
 //---------------------------------------------------------------------------
-String MainWindow::transformWithXslt(String report, String trans)
+String MainWindow::transformWithXslt(String& report, String trans)
 {
     return C.transformWithXslt(report, trans);
 }
