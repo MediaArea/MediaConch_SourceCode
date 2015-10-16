@@ -503,7 +503,7 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&, String& policy)
 {
-    if (!policy.length())
+    if (!policy.length() && !mainwindow->xslt_file_registered().size())
     {
         remove_html_file_detail_policy_report(html);
         return;

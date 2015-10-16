@@ -70,6 +70,7 @@ public:
     void                        addXsltDisplay(QString& display_xslt);
     void                        removeXsltDisplay();
     QStringList                 get_policy_titles();
+    const std::vector<String>&  xslt_file_registered();
 
     Policies&                   get_policies() { return C.policies; }
 

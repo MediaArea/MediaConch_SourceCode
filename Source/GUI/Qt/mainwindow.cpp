@@ -152,6 +152,12 @@ void MainWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
 }
 
 //---------------------------------------------------------------------------
+const std::vector<String>& MainWindow::xslt_file_registered()
+{
+    return C.PoliciesFiles[Core::policyType_Xslt];
+}
+
+//---------------------------------------------------------------------------
 QString MainWindow::get_trace_for_file(const QString& filename)
 {
     if (C.Tool == Core::tool_MediaPolicies)
