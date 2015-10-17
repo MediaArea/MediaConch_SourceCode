@@ -193,6 +193,24 @@ xmlNodePtr SchematronPolicy::write_assert(SchematronAssert *a)
 }
 
 //---------------------------------------------------------------------------
+bool SchematronPolicy::find_schematron_header(xmlNodePtr node)
+{
+    if (!node || node->type != XML_ELEMENT_NODE || !node->ns)
+        return false;
+
+    std::string schPrefix("sch");
+    if (schPrefix.compare((const char*)node->ns->prefix))
+        return false;
+
+    std::string schOldUrl("http://www.ascc.net/xml/schematron");
+    std::string schNewUrl("http://purl.oclc.org/dsdl/schematron");
+    if (schOldUrl.compare((const char*)node->ns->href) && schNewUrl.compare((const char*)node->ns->href))
+        return false;
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
 bool SchematronPolicy::find_title_node(xmlNodePtr node, std::string& title)
 {
     std::string def("title");
@@ -283,14 +301,17 @@ SchematronAssert* SchematronPolicy::create_assert_from_data(std::string descr, s
 }
 
 //---------------------------------------------------------------------------
-String SchematronPolicy::import_schema_from_doc(const char* filename, xmlDocPtr doc)
+String SchematronPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
 {
     if (!doc)
-        return String(__T("The schematron doc is not valid"));
+        return __T("The schematron doc is not valid");
 
     xmlNodePtr root = xmlDocGetRootElement(doc);
     if (!root)
-        return String(__T("No root node, leaving"));
+        return __T("No root node, leaving");
+
+    if (!find_schematron_header(root))
+        return __T("Format not detected");
 
     this->filename = filename;
     xmlNodePtr child = root->children;
@@ -303,7 +324,7 @@ String SchematronPolicy::import_schema_from_doc(const char* filename, xmlDocPtr 
     }
     if (!title.length())
     {
-        title = std::string(filename);
+        title = filename;
         size_t start_index = title.find_last_of("\\/");
         if (std::string::npos != start_index)
             title = title.substr(start_index + 1);
@@ -337,8 +358,8 @@ xmlDocPtr SchematronPolicy::create_doc()
 
     xmlNodePtr nodeTitle = write_title(title);
     xmlAddChild(root_node, nodeTitle);
-    xmlNodePtr nodeNs = write_ns();
-    xmlAddChild(root_node, nodeNs);
+    xmlNodePtr nodeNs = write_ns();
+    xmlAddChild(root_node, nodeNs);
     for (; it != ite; ++it)
     {
         xmlNodePtr node = write_pattern(*it);

@@ -52,24 +52,25 @@ public:
     QString                     Run(Core::tool, Core::format, String& file);
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
-    String                      transformWithXslt(String report, String trans);
+    String                      transformWithXslt(String& report, String trans);
     void                        checker_add_file(QString& file, QString& policy);
     void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
-    void                        checker_add_xslt_file(QString& file, QString& xslt);
-    void                        checker_add_xslt_files(QList<QFileInfo>& file, QString& xslt);
+    void                        checker_add_policy_file(QString& file, QString& policy);
+    void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     QString                     get_trace_for_file(const QString& filename);
-    QString                     ask_for_schematron_file();
+    QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();
     void                        add_default_policy();
     bool                        ValidatePolicy(String& policy, bool& valid, String& report);
 
-    void                        addXsltToList(QString& xslt);
-    void                        clearXsltList();
+    void                        addPolicyToList(QString& policy);
+    void                        clearPolicyList();
     void                        clearFileList();
     void                        addXsltDisplay(QString& display_xslt);
     void                        removeXsltDisplay();
     QStringList                 get_policy_titles();
+    const std::vector<String>&  policy_file_registered();
 
     Policies&                   get_policies() { return C.policies; }
 
@@ -102,7 +103,7 @@ private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
-    void on_actionChooseSchematron_triggered();
+    void on_actionChooseSchema_triggered();
 
     //Help
     void on_actionAbout_triggered();

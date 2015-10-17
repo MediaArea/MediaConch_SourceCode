@@ -31,6 +31,7 @@ using namespace MediaInfoNameSpace;
 
 void Log_0 (struct MediaInfo_Event_Log_0* Event, struct UserHandle_struct* UserHandler)
 {
+    (void)UserHandler;
     String MessageString;
 
     if (Event->Type>=0xC0)

@@ -74,26 +74,26 @@ void CheckerWindow::checker_add_files(QFileInfoList& list, QString& policy)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::checker_add_xslt_file(QString& file, QString& xslt)
+void CheckerWindow::checker_add_policy_file(QString& file, QString& policy)
 {
     mainwindow->addFileToList(file);
 
-    mainwindow->addXsltToList(xslt);
+    mainwindow->addPolicyToList(policy);
     updateWebView(file.toStdWString(), String());
-    mainwindow->clearXsltList();
+    mainwindow->clearPolicyList();
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::checker_add_xslt_files(QFileInfoList& list, QString& xslt)
+void CheckerWindow::checker_add_policy_files(QFileInfoList& list, QString& policy)
 {
     for (int i = 0; i < list.count(); ++i)
     {
         QString file = list[i].absoluteFilePath();
         mainwindow->addFileToList(file);
     }
-    mainwindow->addXsltToList(xslt);
+    mainwindow->addPolicyToList(policy);
     updateWebView(list, String());
-    mainwindow->clearXsltList();
+    mainwindow->clearPolicyList();
 }
 
 //***************************************************************************
@@ -503,7 +503,7 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&, String& policy)
 {
-    if (!policy.length())
+    if (!policy.length() && !mainwindow->policy_file_registered().size())
     {
         remove_html_file_detail_policy_report(html);
         return;
@@ -518,6 +518,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     {
         String trans = displayXslt.toStdWString();
         r = mainwindow->transformWithXslt(r, trans);
+        resetDisplayXslt();
     }
 
     QString report = QString().fromStdWString(r);
@@ -533,10 +534,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
         report.replace('\n', "<br/>\n");
     }
     else
-    {
-        valid = is_policy_html_valid(report);
         change_report_policy_save_name(html);
-    }
 
     QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
     int pos = 0;
@@ -673,17 +671,6 @@ bool CheckerWindow::report_is_html(QString& report)
     QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
 
     if (reg.indexIn(report, 0) != -1)
-        return true;
-
-    return false;
-}
-
-//---------------------------------------------------------------------------
-bool CheckerWindow::is_policy_html_valid(QString& report)
-{
-    QRegExp reg("<td>fail</td>");
-
-    if (reg.indexIn(report, 0) == -1)
         return true;
 
     return false;

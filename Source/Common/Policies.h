@@ -57,8 +57,8 @@ public:
     Policies(Core*);
     ~Policies();
 
-    String     import_schema(PolicyType type, const char* filename);
-    String     import_schema_from_memory(PolicyType type, const char* filename, const char* memory, int len);
+    String     import_schema(const std::string& filename);
+    String     import_schema_from_memory(const std::string& filename, const char* memory, int len);
     void       export_schema(const char* filename, size_t pos);
     xmlDocPtr  create_doc(size_t pos);
     void       erase_policy(size_t index);

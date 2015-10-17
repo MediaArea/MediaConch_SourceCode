@@ -95,10 +95,16 @@ bool Schematron::register_schema_from_memory(const std::string& schem)
 }
 
 //---------------------------------------------------------------------------
-int Schematron::validate_xml(const char* xml, size_t len, bool silent)
+int Schematron::validate_xml(std::string& xml, bool silent)
 {
     if (schematron_ctx == NULL)
         return -1;
+
+    //Hack for removing namespace so we use .sch without namespace. TODO: find a way to keep namespace with .sch policy input
+    std::string xmlns("xmlns=\"https://mediaarea.net/mediaarea\"");
+    size_t xmlns_pos=xml.rfind(xmlns, 1000);
+    if (xmlns_pos!=std::string::npos)
+        xml.erase(xmlns_pos, xmlns.size());
 
     int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
@@ -107,7 +113,7 @@ int Schematron::validate_xml(const char* xml, size_t len, bool silent)
     doc_flags =| XML_PARSE_BIG_LINES;
 #endif // !XML_PARSE_BIG_LINES
 
-    xmlDocPtr doc = xmlReadMemory(xml, len, NULL, NULL, doc_flags);
+    xmlDocPtr doc = xmlReadMemory(xml.c_str(), xml.length(), NULL, NULL, doc_flags);
     if (doc == NULL)
         return -1;
 
@@ -130,6 +136,16 @@ int Schematron::validate_xml(const char* xml, size_t len, bool silent)
     xmlSchematronFreeValidCtxt(ctx);
     xmlFreeDoc(doc);
     xmlSetGenericErrorFunc(NULL, NULL);
+
+    std::stringstream Out;
+    if (ret > 0)
+    {
+        for (size_t pos = 0; pos < errors.size(); pos++)
+            Out << "\t" << errors[pos].c_str();
+        if (!errors.size())
+            Out << std::endl;
+        report = Out.str();
+    }
     return ret;
 }
 

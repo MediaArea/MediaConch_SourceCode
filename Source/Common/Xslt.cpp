@@ -99,7 +99,7 @@ bool Xslt::register_schema_from_memory(const std::string& schem)
 }
 
 //---------------------------------------------------------------------------
-int Xslt::validate_xml(const char* xml, size_t len, bool)
+int Xslt::validate_xml(std::string& xml, bool)
 {
     report.clear();
     if (!xslt_ctx)
@@ -115,7 +115,7 @@ int Xslt::validate_xml(const char* xml, size_t len, bool)
     doc_flags =| XML_PARSE_BIG_LINES;
 #endif // !XML_PARSE_BIG_LINES
 
-    xmlDocPtr doc = xmlReadMemory(xml, len, NULL, NULL, doc_flags);
+    xmlDocPtr doc = xmlReadMemory(xml.c_str(), xml.length(), NULL, NULL, doc_flags);
     if (!doc)
         return -1;
 
@@ -140,7 +140,28 @@ int Xslt::validate_xml(const char* xml, size_t len, bool)
     xmlFreeDoc(doc);
     xmlFreeDoc(res);
     xmlSetGenericErrorFunc(NULL, NULL);
+
+    std::stringstream Out;
+    if (errors.size())
+    {
+        for (size_t pos = 0; pos < errors.size(); pos++)
+            Out << "\t" << errors[pos].c_str();
+        if (!errors.size())
+            Out << std::endl;
+        report = Out.str();
+        return 1;
+    }
+    else if (outcome_has_fail(report))
+        return 1;
     return 0;
+}
+
+//---------------------------------------------------------------------------
+bool Xslt::outcome_has_fail(std::string& report)
+{
+    if (report.find("<results outcome=\"fail\"") != std::string::npos)
+        return true;
+    return false;
 }
 
 //***************************************************************************

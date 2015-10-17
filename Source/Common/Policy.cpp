@@ -42,12 +42,12 @@ Policy::~Policy()
 }
 
 //---------------------------------------------------------------------------
-String Policy::import_schema(const char* filename)
+String Policy::import_schema(const std::string& filename)
 {
     Schematron s;
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
 
-    xmlDocPtr doc = xmlParseFile(filename);
+    xmlDocPtr doc = xmlParseFile(filename.c_str());
     if (!doc)
     {
         // maybe put the errors from s.errors
@@ -60,7 +60,7 @@ String Policy::import_schema(const char* filename)
 }
 
 //---------------------------------------------------------------------------
-String Policy::import_schema_from_memory(const char* filename, const char* buffer, int len)
+String Policy::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
 {
     if (!buffer || !len)
         return String(__T("The schematron does not exist"));

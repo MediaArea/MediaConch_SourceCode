@@ -78,7 +78,7 @@ private:
     void             add_new_xslt_policy(QTreeWidgetItem* parent);
 
 private Q_SLOTS:
-    void import_schematron();
+    void import_schema();
     void add_new_policy();
     void delete_all_policies();
     void policiesTree_selectionChanged();

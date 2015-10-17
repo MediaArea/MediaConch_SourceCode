@@ -65,6 +65,22 @@ XsltPolicy::~XsltPolicy()
 }
 
 //---------------------------------------------------------------------------
+bool XsltPolicy::find_xslt_header(xmlNodePtr node)
+{
+    if (!node || node->type != XML_ELEMENT_NODE || !node->ns)
+        return false;
+
+    std::string ns("xsl");
+    if (ns.compare((const char*)node->ns->prefix))
+        return false;
+
+    std::string ref("http://www.w3.org/1999/XSL/Transform");
+    if (ref.compare((const char*)node->ns->href))
+        return false;
+    return true;
+}
+
+//---------------------------------------------------------------------------
 bool XsltPolicy::find_title_node(xmlNodePtr node, std::string& title)
 {
     std::string def("attribute");
@@ -327,14 +343,17 @@ bool XsltPolicy::find_template_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-String XsltPolicy::import_schema_from_doc(const char* filename, xmlDocPtr doc)
+String XsltPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
 {
     if (!doc)
-        return String(__T("The XSL doc is not valid"));
+        return __T("The XSL doc is not valid");
 
     xmlNodePtr root = xmlDocGetRootElement(doc);
     if (!root)
-        return String(__T("No root node, leaving"));
+        return __T("No root node, leaving");
+
+    if (!find_xslt_header(root))
+        return __T("Format not detected");
 
     this->filename = filename;
     xmlNodePtr child = root->children;
@@ -347,7 +366,7 @@ String XsltPolicy::import_schema_from_doc(const char* filename, xmlDocPtr doc)
     }
     if (!title.length())
     {
-        title = std::string(filename);
+        title = filename;
         size_t start_index = title.find_last_of("\\/");
         if (std::string::npos != start_index)
             title = title.substr(start_index + 1);
