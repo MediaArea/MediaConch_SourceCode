@@ -164,7 +164,7 @@ xmlNodePtr SchematronPolicy::write_pattern(SchematronPattern *p)
 xmlNodePtr SchematronPolicy::write_rule(SchematronRule *r)
 {
     xmlNodePtr rule = xmlNewNode(NULL, (const xmlChar *)"rule");
-    xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/ma:MediaArea/ma:media/ma:MediaInfo");
+    xmlNewProp(rule, (const xmlChar *)"context", (const xmlChar *)"/MediaArea/media/MediaInfo");
     xmlNewNs(rule, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
