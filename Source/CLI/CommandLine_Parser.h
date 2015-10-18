@@ -38,7 +38,7 @@ CL_OPTION(LogFile);
 CL_OPTION(Bom);
 CL_OPTION(Version);
 CL_OPTION(Policies);
-CL_OPTION(XsltDisplay);
+CL_OPTION(Display);
 CL_OPTION(Default);
 
 //***************************************************************************

@@ -35,12 +35,10 @@ int Help()
     TEXTOUT("                    Output in XML format (only MediaInfo report for the moment)");
     TEXTOUT("--Format=JSTREE -fj");
     TEXTOUT("                    Output in JS-TREE JSON format (only trace report for the moment)");
-    TEXTOUT("--Policy=SchematronFileName, -p SchematronFileName");
-    TEXTOUT("                    Validate the XML report");
-    TEXTOUT("--Xslt=XsltFileName, -x XsltFileName");
-    TEXTOUT("                    Validate the XML report");
-    TEXTOUT("--Xsltdisplay=XsltFileName, -w XsltFileName");
-    TEXTOUT("                    Display XSLT (XML) report");
+    TEXTOUT("--Policy=PolicyFileName, -p PolicyFileName");
+    TEXTOUT("                    Apply the policy (XSL or Schematron) ");
+    TEXTOUT("--Display=DisplayFileName, -w DisplayFileName");
+    TEXTOUT("                    Apply the display transformation (XSL)");
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
     TEXTOUT("--BOM");

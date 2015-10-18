@@ -54,8 +54,8 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
         Last_Argument = __T("--policy=");
         return 0;
     }
-    if (Argument==__T("-w")) {
-        Last_Argument = __T("--xsltdisplay=");
+    if (Argument==__T("-d")) {
+        Last_Argument = __T("--display=");
         return 0;
     }
     if (Argument==__T("-ti"))
@@ -74,7 +74,7 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--format",                                      Format)
     OPTION("--output",                                      Output)
     OPTION("--policy",                                      Policies)
-    OPTION("--xsltdisplay",                                 XsltDisplay)
+    OPTION("--display",                                     Display)
     //Default
     OPTION("--",                                            Default)
     else
@@ -150,7 +150,7 @@ CL_OPTION(Policies)
 }
 
 //---------------------------------------------------------------------------
-CL_OPTION(XsltDisplay)
+CL_OPTION(Display)
 {
     //Form : --Inform=Text
     size_t Egal_Pos=Argument.find(__T('='));
