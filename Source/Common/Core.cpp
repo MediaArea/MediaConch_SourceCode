@@ -362,9 +362,9 @@ String Core::MediaPolicies ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
+bool Core::ValidatePolicy(int policy, bool& valid, String& report)
 {
-    if (!policy.length() && PoliciesFiles.size())
+    if (policy == -1 && PoliciesFiles.size())
     {
         if (is_schematron_file(PoliciesFiles[0]))
         {
@@ -391,26 +391,16 @@ bool Core::ValidatePolicy(String& policy, bool& valid, String& report)
         return true;
     }
 
-    int pos = -1;
-    std::string policyName=Ztring(policy).To_UTF8();
-    for (int i = 0; (size_t)i < policies.policies.size(); ++i)
-    {
-        if (!policies.policies[i]->title.compare(policyName))
-        {
-            pos = i;
-            break;
-        }
-    }
-    if (pos == -1)
+    if (policy == -1)
     {
         report = __T("Policy not found");
         return false;
     }
 
-    if (policies.policies[pos]->type == Policies::POLICY_SCHEMATRON)
-        validateSchematronPolicy(pos, valid, report);
-    else if (policies.policies[pos]->type == Policies::POLICY_XSLT)
-        validateXsltPolicy(pos, valid, report);
+    if (policies.policies[policy]->type == Policies::POLICY_SCHEMATRON)
+        validateSchematronPolicy(policy, valid, report);
+    else if (policies.policies[policy]->type == Policies::POLICY_XSLT)
+        validateXsltPolicy(policy, valid, report);
     return true;
 }
 

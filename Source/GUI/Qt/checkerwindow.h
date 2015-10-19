@@ -31,16 +31,17 @@ public:
 
     // Functions
     void                        createWebView();
-    void                        updateWebView(String file, String policy);
-    void                        updateWebView(QList<QFileInfo>& files, String policy);
+    void                        updateWebView(String file, int policy);
+    void                        updateWebView(QList<QFileInfo>& files, int policy);
     void                        setDisplayXslt(QString& d) { displayXslt = d; }
     void                        resetDisplayXslt() { displayXslt.clear(); }
 
     // Helpers
-    void                        checker_add_file(QString& file, QString& policy);
-    void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
+    void                        checker_add_file(QString& file, int policy);
+    void                        checker_add_files(QList<QFileInfo>& file, int policy);
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
+    bool                        is_analyzes_done();
 
 private:
     // Visual elements
@@ -48,6 +49,7 @@ private:
     WebView*                    MainView;
     QProgressBar*               progressBar;
     QString                     displayXslt;
+    bool                        analyse;
 
     void                        clearVisualElements();
     void                        setWebViewContent(QString& html);
@@ -71,17 +73,18 @@ private:
     void change_body_in_template(QString& body, QString& html);
     void add_policy_to_form_selection(QString& policies, QString& form, const char *selector);
     void create_policy_options(QString& policies);
-    void add_file_detail_to_html(QString& html, String& file, String& policy);
-    QString create_html_file_detail(String& file, String& policy);
+    void add_file_detail_to_html(QString& html, String& file, int policy);
+    QString create_html_file_detail(String& file, int policy);
     void change_html_file_detail(QString& html, String& file);
     void change_html_file_detail_inform_xml(QString& html, String& file);
     void change_html_file_detail_conformance(QString& html, String& file);
-    void change_html_file_detail_policy_report(QString& html, String& file, String& policy);
+    void change_html_file_detail_policy_report(QString& html, String& file, int policy);
     void change_html_file_detail_trace(QString& html, String& file);
     void remove_html_file_detail_policy_report(QString& html);
     bool report_is_html(QString &report);
     bool is_policy_html_valid(QString &report);
-    void change_report_policy_save_name(QString& html);
+    void change_report_policy_save_name(String& file, QString& policy, bool is_html, QString& html);
+    QString file_remove_ext(String& file);
 
 public Q_SLOTS:
     void actionCloseAllTriggered();

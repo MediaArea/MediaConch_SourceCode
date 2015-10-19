@@ -6,6 +6,7 @@
             <div>
                 <ul class="list-group">
                         <li class="list-group-item">This file is: <span class="text-uppercase text-{{ check.getStatus ? 'success' : 'danger' }}"><b>{{ check.getStatus ? '' : 'not ' }}valid</b></span></li>
+                        <li class="list-group-item">Policy test: <b>{{ check.getPolicy }}</b></li>
                         <li class="list-group-item report">Policy report
                             <p class="text-right hidden">
                                 <a href="#" data-toggle="modal" data-target="#modalPolicy{{ loop.index }}" title="View report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
@@ -24,7 +25,7 @@
                                 <a href="#" data-toggle="results-dld" data-save-name="MediaInfo.xml"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </p>
                         </li>
-                        <li class="list-group-item report">MediaInfo Trace
+                        <li class="list-group-item report">MediaTrace
                             <p class="text-right hidden">
                               <a href="#" data-toggle="modal" class="results-view-trace-ajax" data-target="#modalTrace{{ loop.index }}" data-filename="{{ check.getTrace }}" title="View trace"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
                               <a href="#" data-toggle="results-dld" class="results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-filename="{{ check.getTrace }}" data-save-name="MediaTrace.xml" title="Download trace"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>

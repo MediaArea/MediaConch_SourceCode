@@ -34,6 +34,7 @@ Policy::Policy(const Policy* p)
 
     this->filename = p->filename;
     this->title = p->title;
+    this->saved = false;
 }
 
 //---------------------------------------------------------------------------
@@ -56,6 +57,7 @@ String Policy::import_schema(const std::string& filename)
 
     String ret = import_schema_from_doc(filename, doc);
     xmlFreeDoc(doc);
+    saved = true;
     return ret;
 }
 
@@ -77,6 +79,7 @@ String Policy::import_schema_from_memory(const std::string& filename, const char
 
     String ret = import_schema_from_doc(filename, doc);
     xmlFreeDoc(doc);
+    saved = true;
     return ret;
 }
 
@@ -87,6 +90,7 @@ void Policy::export_schema(const char* filename)
 
     xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);
+    saved = true;
 }
 
 }

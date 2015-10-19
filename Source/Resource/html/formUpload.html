@@ -10,7 +10,7 @@
             Choose a policy
             </label>
           <select id="checkerUpload_step1_policy" name="checkerUpload[step1][policy]" class="form-control">
-            <option selected="selected" value="">Choose a policy</option>
+            <option selected="selected" value="-1">Choose a policy</option>
           </select>
           <label class="control-label" for="checkerUpload_step1_xslt">
             Or a policy file
@@ -25,13 +25,13 @@
     </div>
     <div class="form-group">
       <label class="control-label required" for="checkerUpload_file">
-        File
+        Select files
         </label>
       <input id="checkerUpload_file" name="checkerUpload[file]" required="required" type="file" multiple>
       </div>
     <div class="form-group">
       <button type="submit" id="checkerUpload_Check file" name="checkerUpload[Check file]" class="btn-warning btn">
-        Check file
+        Check files
         </button>
       </div>
     <input id="checkerUpload__token" name="checkerUpload[_token]" class="form-control" value="S9eZwOSY4f7x_w29AcjlWoFD9LqOKvhfuggIeESe5_o" type="hidden">

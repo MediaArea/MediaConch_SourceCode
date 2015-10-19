@@ -75,7 +75,7 @@ public:
 
     String Run(String file = String());
 
-    bool ValidatePolicy(String& policy, bool& valid, String& report);
+    bool ValidatePolicy(int policy, bool& valid, String& report);
     String transformWithXslt(String& report, String& Xslt);
 
     std::vector<String> PoliciesFiles;
