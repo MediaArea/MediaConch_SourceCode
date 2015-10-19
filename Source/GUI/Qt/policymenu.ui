@@ -110,7 +110,7 @@ selection-background-color: rgb(255, 170, 0);
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Schematron policy</string>
+      <string>Policy Schema Language: Schematron</string>
      </property>
     </widget>
    </item>
