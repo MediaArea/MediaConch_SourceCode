@@ -179,6 +179,7 @@ void SchematronWindow::add_new_gor()
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
 }
 
 //---------------------------------------------------------------------------
@@ -198,6 +199,7 @@ void SchematronWindow::duplicate_gor()
 
     pat->name = pat->name + string(" (Copy)");
     ((SchematronPolicy*)p)->patterns.push_back(pat);
+    p->saved = false;
 
     QTreeWidgetItem* parent = item->parent();
     if (!parent)
@@ -231,6 +233,7 @@ void SchematronWindow::add_new_rule()
     item->setText(0, QString("Rule"));
 
     ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowGor]->rules.push_back(r);
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
     displayRuleMenu();
     parent->setExpanded(true);
     parent->setSelected(false);
@@ -259,6 +262,7 @@ void SchematronWindow::duplicate_rule()
     if (!parent)
         return;
 
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
     QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
     new_item->setText(0, QString("Rule"));
     item->setSelected(false);
@@ -289,6 +293,7 @@ void SchematronWindow::add_new_assert()
     if (rowPolicy < 0 || rowGor < 0 || rowRule < 0)
         return;
 
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
     SchematronAssert *a = new SchematronAssert;
 
     a->description = string("New Assert");
@@ -317,6 +322,7 @@ void SchematronWindow::duplicate_assert()
     if (rowPattern < 0 || rowPolicy < 0 || row < 0)
         return;
 
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
     SchematronRule *r = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowPattern]->rules[rowRule];
     SchematronAssert *a = new SchematronAssert(*r->asserts[row]);
     a->description = a->description + string(" (Copy)");
@@ -348,6 +354,7 @@ void SchematronWindow::delete_gor()
 
     // Internal data
     Policy *p = mainwindow->get_policies().policies[rowPolicy];
+    p->saved = false;
     SchematronPattern *pat = ((SchematronPolicy*)p)->patterns[row];
     for (size_t i = 0; i < pat->rules.size(); ++i)
         delete pat->rules[i];
@@ -379,6 +386,7 @@ void SchematronWindow::delete_rule()
         return;
 
     // Internal data
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
     SchematronPattern *p = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowGor];
     SchematronRule *r = p->rules[row];
     for (size_t i = 0; i < r->asserts.size(); ++i)
@@ -412,6 +420,7 @@ void SchematronWindow::delete_assert()
         return;
 
     // Internal data
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
     SchematronRule *r = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowGor]->rules[rowRule];
     SchematronAssert *a = r->asserts[row];
     r->asserts.erase(r->asserts.begin() + row);
@@ -447,10 +456,13 @@ void SchematronWindow::edit_policy_title()
         return;
 
     Policy *p = mainwindow->get_policies().policies[row];
-    p->title = qtitle.toStdString();
-
-    QString title = QString().fromStdString(p->title);
-    item->setText(0, title);
+    if (p->title != qtitle.toStdString())
+    {
+        p->saved = false;
+        p->title = qtitle.toStdString();
+        QString title = QString().fromStdString(p->title);
+        item->setText(0, title);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -474,10 +486,13 @@ void SchematronWindow::edit_gor_title()
         return;
 
     SchematronPattern *p = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[row];
-    p->name = qname.toStdString();
-
-    QString title = QString().fromStdString(p->name);
-    item->setText(0, title);
+    if (p->name != qname.toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        p->name = qname.toStdString();
+        QString title = QString().fromStdString(p->name);
+        item->setText(0, title);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -502,10 +517,14 @@ void SchematronWindow::edit_assert_name(QString new_name)
         return;
 
     SchematronAssert *a = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
-    a->description = new_name.toStdString();
 
-    QString name = QString().fromStdString(a->description);
-    item->setText(0, name);
+    if (a->description != new_name.toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        a->description = new_name.toStdString();
+        QString name = QString().fromStdString(a->description);
+        item->setText(0, name);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -524,9 +543,13 @@ void SchematronWindow::edit_assert_type()
 
     SchematronAssert *a = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
-    a->type = ruleEdit->get_type_select()->currentText().toStdString();
-    a->use_free_text = false;
-    ruleEdit->change_values_of_field_selector();
+    if (a->type != ruleEdit->get_type_select()->currentText().toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        a->type = ruleEdit->get_type_select()->currentText().toStdString();
+        a->use_free_text = false;
+        ruleEdit->change_values_of_field_selector();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -545,8 +568,12 @@ void SchematronWindow::edit_assert_field()
 
     SchematronAssert *a = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
-    a->field = ruleEdit->get_field_select()->currentText().toStdString();
-    a->use_free_text = false;
+    if (a->field != ruleEdit->get_field_select()->currentText().toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        a->field = ruleEdit->get_field_select()->currentText().toStdString();
+        a->use_free_text = false;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -565,8 +592,12 @@ void SchematronWindow::edit_assert_validator()
 
     SchematronAssert *a = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
-    a->validator = ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString());
-    a->use_free_text = false;
+    if (a->validator != ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString()))
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        a->validator = ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString());
+        a->use_free_text = false;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -585,9 +616,13 @@ void SchematronWindow::edit_assert_value()
 
     SchematronAssert *a = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
-    a->value = ruleEdit->get_value_line()->text().toStdString();
-    ruleEdit->value_to_quotted_value(a->value);
-    a->use_free_text = false;
+    if (a->value != ruleEdit->get_value_line()->text().toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        a->value = ruleEdit->get_value_line()->text().toStdString();
+        ruleEdit->value_to_quotted_value(a->value);
+        a->use_free_text = false;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -606,14 +641,18 @@ void SchematronWindow::edit_assert_freeText()
 
     SchematronAssert *a = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowPattern]->rules[rowRule]->asserts[row];
 
-    a->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
-    a->use_free_text = true;
+    if (a->text != ruleEdit->get_freeText_text()->toPlainText().toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        a->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
+        a->use_free_text = true;
 
-    SchematronAssert test;
-    if (mainwindow->get_policies().try_parsing_test(a->text, &test))
-        ruleEdit->get_editorSelector_radio()->setEnabled(true);
-    else
-        ruleEdit->get_editorSelector_radio()->setEnabled(false);
+        SchematronAssert test;
+        if (mainwindow->get_policies().try_parsing_test(a->text, &test))
+            ruleEdit->get_editorSelector_radio()->setEnabled(true);
+        else
+            ruleEdit->get_editorSelector_radio()->setEnabled(false);
+    }
 }
 
 //---------------------------------------------------------------------------

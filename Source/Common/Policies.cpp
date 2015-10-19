@@ -120,12 +120,7 @@ void Policies::export_schema(const char* filename, size_t pos)
         return;
 
     if (filename == NULL)
-    {
-        if (pos >= policies.size() || !policies[pos])
-            return;
-
         filename = policies[pos]->filename.c_str();
-    }
 
     policies[pos]->export_schema(filename);
 }

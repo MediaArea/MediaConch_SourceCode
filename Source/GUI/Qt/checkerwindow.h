@@ -41,6 +41,7 @@ public:
     void                        checker_add_files(QList<QFileInfo>& file, int policy);
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
+    bool                        is_analyzes_done();
 
 private:
     // Visual elements
@@ -48,6 +49,7 @@ private:
     WebView*                    MainView;
     QProgressBar*               progressBar;
     QString                     displayXslt;
+    bool                        analyse;
 
     void                        clearVisualElements();
     void                        setWebViewContent(QString& html);

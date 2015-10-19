@@ -122,10 +122,7 @@ void PoliciesWindow::save_policy(Policies::PolicyType type)
     if (row < 0)
         return;
 
-    if (type == Policies::POLICY_SCHEMATRON)
-        mainwindow->exporting_to_schematron(row);
-    else
-        mainwindow->exporting_to_xslt(row);
+    mainwindow->exporting_policy(row);
 }
 
 //---------------------------------------------------------------------------
@@ -569,6 +566,18 @@ QTreeWidgetItem *PoliciesWindow::get_item_in_tree()
         return NULL;
 
     return list.first();
+}
+
+//---------------------------------------------------------------------------
+bool PoliciesWindow::is_all_policies_saved()
+{
+    Policies& policies = mainwindow->get_policies();
+    for (size_t i = 0; i < policies.policies.size(); ++i)
+    {
+        if (!policies.policies[i]->saved)
+            return false;
+    }
+    return true;
 }
 
 }

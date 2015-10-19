@@ -29,6 +29,7 @@
 #include <QRadioButton>
 #include <QStatusBar>
 #include <QMessageBox>
+#include <QCloseEvent>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -203,12 +204,6 @@ int MainWindow::exporting_to_schematron_file(int pos)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::exporting_to_schematron(int pos)
-{
-    C.policies.export_schema(NULL, pos);
-}
-
-//---------------------------------------------------------------------------
 int MainWindow::exporting_to_xslt_file(int pos)
 {
 #if QT_VERSION >= 0x050400
@@ -233,7 +228,7 @@ int MainWindow::exporting_to_xslt_file(int pos)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::exporting_to_xslt(int pos)
+void MainWindow::exporting_policy(int pos)
 {
     C.policies.export_schema(NULL, pos);
 }
@@ -342,6 +337,8 @@ void MainWindow::on_actionOpen_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionChecker_triggered()
 {
+    if (clearVisualElements() < 0)
+        return;
     C.Tool=Core::tool_MediaConch;
     C.Format=Core::format_Text;
     Run();
@@ -350,6 +347,8 @@ void MainWindow::on_actionChecker_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionPolicies_triggered()
 {
+    if (clearVisualElements() < 0)
+        return;
     C.Tool=Core::tool_MediaPolicies;
     Run();
 }
@@ -367,6 +366,38 @@ void MainWindow::on_actionChooseSchema_triggered()
     }
     C.Tool=Core::tool_MediaPolicies;
     Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (C.Tool == Core::tool_MediaPolicies && policiesView && !policiesView->is_all_policies_saved())
+    {
+        QMessageBox msgBox(QMessageBox::Warning, tr("MediaConch"),
+                           tr("All policy changes not saved will be discarded?"),
+                           QMessageBox::Ok | QMessageBox::Save | QMessageBox::Cancel, this);
+        QString info("Policies not saved:");
+        for (size_t i = 0; i < C.policies.policies.size(); ++i)
+            if (!C.policies.policies[i]->saved)
+            {
+                info += "\r\n\t";
+                info += QString().fromStdString(C.policies.policies[i]->title);
+            }
+
+        msgBox.setInformativeText(info);
+
+        int ret = msgBox.exec();
+        if (ret == QMessageBox::Save)
+            for (size_t i = 0; i < C.policies.policies.size(); ++i)
+                if (!C.policies.policies[i]->saved)
+                    C.policies.export_schema(NULL, i);
+        else if (ret == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
+    }
+    QMainWindow::closeEvent(event);
 }
 
 //***************************************************************************
@@ -406,10 +437,18 @@ void MainWindow::on_actionDataFormat_triggered()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void MainWindow::clearVisualElements()
+int MainWindow::clearVisualElements()
 {
     if (MainView)
     {
+        if (MainView->is_analyzes_done())
+        {
+            int ret = QMessageBox::warning(this, tr("MediaConch"),
+                                           tr("All changes will be discarded?"),
+                                           QMessageBox::Ok | QMessageBox::Cancel);
+            if (ret == QMessageBox::Cancel)
+                return -1;
+        }
         delete MainView;
         MainView=NULL;
     }
@@ -419,6 +458,8 @@ void MainWindow::clearVisualElements()
         delete policiesView;
         policiesView=NULL;
     }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -427,7 +468,8 @@ void MainWindow::createWebView()
     if (MainView)
         return;
 
-    clearVisualElements();
+    if (clearVisualElements())
+        return;
     MainView = new CheckerWindow(this);
     QObject::connect(ui->actionCloseAll, SIGNAL(triggered()),
                      MainView, SLOT(actionCloseAllTriggered()));
@@ -437,7 +479,8 @@ void MainWindow::createWebView()
 //---------------------------------------------------------------------------
 void MainWindow::createPoliciesView()
 {
-    clearVisualElements();
+    if (clearVisualElements() < 0)
+        return;
     policiesView = new PoliciesWindow(this);
     policiesView->displayPoliciesTree();
 }
@@ -461,14 +504,12 @@ void MainWindow::remove_widget_from_layout(QWidget* w)
 //---------------------------------------------------------------------------
 void MainWindow::checker_selected()
 {
-    clearVisualElements();
     on_actionChecker_triggered();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::policies_selected()
 {
-    clearVisualElements();
     on_actionPolicies_triggered();
 }
 

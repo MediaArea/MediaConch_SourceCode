@@ -40,9 +40,8 @@ public:
     void addFileToList(const QString& file);
     void policy_to_delete(int row);
     int  exporting_to_schematron_file(int pos);
-    void exporting_to_schematron(int pos);
     int  exporting_to_xslt_file(int pos);
-    void exporting_to_xslt(int pos);
+    void exporting_policy(int pos);
 
     // UI
     void                        Ui_Init                     ();
@@ -91,11 +90,12 @@ private:
     PoliciesWindow*             policiesView;
     MenuMainWindow*             MenuView;
 
-    void                        clearVisualElements();
+    int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createWebView();
     void                        createPoliciesView();
     void                        choose_schematron_file();
+    void                        closeEvent(QCloseEvent *event);
 
 private Q_SLOTS:
     void on_actionOpen_triggered();

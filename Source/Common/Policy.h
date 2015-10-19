@@ -41,7 +41,7 @@ namespace MediaConch {
 class Policy
 {
 public:
-    Policy(Policies::PolicyType t) : type(t) {}
+    Policy(Policies::PolicyType t) : type(t), saved(false) {}
     virtual ~Policy();
     Policy(const Policy*);
 
@@ -53,6 +53,7 @@ public:
     std::string          filename;
     std::string          title;
     Policies::PolicyType type;
+    bool                 saved;
 
 protected:
     // HELPER

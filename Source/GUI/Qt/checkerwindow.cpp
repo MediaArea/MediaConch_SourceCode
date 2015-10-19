@@ -45,6 +45,7 @@ CheckerWindow::CheckerWindow(MainWindow *parent) : mainwindow(parent)
     // Visual elements
     progressBar=NULL;
     MainView=NULL;
+    analyse=false;
 }
 
 CheckerWindow::~CheckerWindow()
@@ -97,6 +98,12 @@ void CheckerWindow::checker_add_policy_files(QFileInfoList& list, QString& polic
     mainwindow->clearPolicyList();
 }
 
+//---------------------------------------------------------------------------
+bool CheckerWindow::is_analyzes_done()
+{
+    return analyse;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -107,6 +114,7 @@ void CheckerWindow::actionCloseAllTriggered()
     mainwindow->clearFileList();
     clearVisualElements();
     createWebView();
+    analyse = false;
 }
 
 //***************************************************************************
@@ -200,6 +208,7 @@ void CheckerWindow::updateWebView(String file, int policy)
     add_file_detail_to_html(html, file, policy);
 
     setWebViewContent(html);
+    analyse = true;
 }
 
 //---------------------------------------------------------------------------
@@ -226,6 +235,7 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
     }
 
     setWebViewContent(html);
+    analyse = true;
 }
 
 //***************************************************************************
