@@ -537,9 +537,9 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
         change_report_policy_save_name(html);
 
     QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
-    int pos = 0;
-
     reg.setMinimal(true);
+
+    int pos = 0;
     if ((pos = reg.indexIn(html, pos)) != -1)
     {
         if (!valid)
@@ -548,9 +548,14 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
             html.replace(pos, reg.matchedLength(), "success");
     }
 
-    reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
+    reg = QRegExp("\\{\\{ check\\.getPolicy \\}\\}");
     reg.setMinimal(true);
     if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString().fromStdWString(policy));
+
+    reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, 0)) != -1)
     {
         if (!valid)
             html.replace(pos, reg.matchedLength(), "not ");
@@ -611,6 +616,12 @@ void CheckerWindow::remove_html_file_detail_policy_report(QString& html)
     QRegExp reg("<li class=\"list-group-item\">This file is");
     int pos = 0;
 
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) == -1)
+        return;
+    html.insert(pos + 26, " hidden");
+
+    reg = QRegExp("<li class=\"list-group-item\">Policy test");
     reg.setMinimal(true);
     if ((pos = reg.indexIn(html, pos)) == -1)
         return;
