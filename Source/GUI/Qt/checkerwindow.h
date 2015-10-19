@@ -81,7 +81,8 @@ private:
     void remove_html_file_detail_policy_report(QString& html);
     bool report_is_html(QString &report);
     bool is_policy_html_valid(QString &report);
-    void change_report_policy_save_name(QString& html);
+    void change_report_policy_save_name(String& file, QString& policy, bool is_html, QString& html);
+    QString file_remove_ext(String& file);
 
 public Q_SLOTS:
     void actionCloseAllTriggered();

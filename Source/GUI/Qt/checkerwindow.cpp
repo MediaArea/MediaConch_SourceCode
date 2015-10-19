@@ -479,6 +479,13 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
     reg.setMinimal(true);
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), report);
+
+    reg = QRegExp("data-save-name=\"MediaInfo.xml\"");
+    reg.setMinimal(true);
+
+    while ((pos = reg.indexIn(html, 0)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_MediaInfo.xml\"")
+                     .arg(file_remove_ext(file)));
 }
 
 //---------------------------------------------------------------------------
@@ -500,17 +507,24 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
     reg.setMinimal(true);
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), report);
+
+    reg = QRegExp("data-save-name=\"ConformanceReport.txt\"");
+    reg.setMinimal(true);
+
+    while ((pos = reg.indexIn(html, 0)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_ConformanceReport.txt\"")
+                     .arg(file_remove_ext(file)));
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&, int policy)
+void CheckerWindow::change_html_file_detail_policy_report(QString& html, String& file, int policy)
 {
     if (policy == -1 && !mainwindow->policy_file_registered().size())
     {
         remove_html_file_detail_policy_report(html);
         return;
     }
-    //TODO: second parameter is the file, should do a Run() XML when database created
+
     bool valid;
     String r;
     if (!mainwindow->ValidatePolicy(policy, valid, r))
@@ -523,8 +537,17 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
         resetDisplayXslt();
     }
 
-    QString report = QString().fromStdWString(r);
+    QString policy_name;
+    if (policy >= 0)
+        policy_name = QString().fromStdString(mainwindow->get_all_policies()[policy]->title);
+    else
+    {
+        const std::vector<String>& policies_name = mainwindow->policy_file_registered();
+        if (policies_name.size())
+            policy_name = QString().fromStdWString(policies_name.front());
+    }
 
+    QString report = QString().fromStdWString(r);
     bool is_html = report_is_html(report);
     if (!is_html)
     {
@@ -535,8 +558,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
 #endif
         report.replace('\n', "<br/>\n");
     }
-    else
-        change_report_policy_save_name(html);
+    change_report_policy_save_name(file, policy_name, is_html, html);
 
     QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
     reg.setMinimal(true);
@@ -548,16 +570,6 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
             html.replace(pos, reg.matchedLength(), "danger");
         else
             html.replace(pos, reg.matchedLength(), "success");
-    }
-
-    QString policy_name;
-    if (policy >= 0)
-        policy_name = QString().fromStdString(mainwindow->get_all_policies()[policy]->title);
-    else
-    {
-        const std::vector<String>& policies_name = mainwindow->policy_file_registered();
-        if (policies_name.size())
-            policy_name = QString().fromStdWString(policies_name.front());
     }
 
     reg = QRegExp("\\{\\{ check\\.getPolicy \\}\\}");
@@ -598,6 +610,13 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, String& file)
     pos = 0;
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), report);
+
+    reg = QRegExp("data-save-name=\"MediaTrace.xml\"");
+    reg.setMinimal(true);
+
+    while ((pos = reg.indexIn(html, 0)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_MediaTrace.xml\"")
+                     .arg(file_remove_ext(file)));
 }
 
 //---------------------------------------------------------------------------
@@ -700,13 +719,27 @@ bool CheckerWindow::report_is_html(QString& report)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::change_report_policy_save_name(QString& html)
+void CheckerWindow::change_report_policy_save_name(String& file, QString& policy, bool is_html, QString& html)
 {
     QRegExp reg("data-save-name=\"PolicyReport.txt\"");
+    reg.setMinimal(true);
 
     int pos = 0;
     while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), "data-save-name=\"PolicyReport.html\"");
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_%2_PolicyReport.%3\"")
+                     .arg(policy).arg(file_remove_ext(file)).arg(is_html ? "html" : "txt"));
+}
+
+//---------------------------------------------------------------------------
+QString CheckerWindow::file_remove_ext(String& file)
+{
+    QFileInfo f(QString().fromStdWString(file));
+
+    QString ret = f.baseName();
+    int pos;
+    if ((pos = ret.lastIndexOf('.')) != -1)
+        ret.chop(ret.length() - pos);
+    return ret;
 }
 
 }
