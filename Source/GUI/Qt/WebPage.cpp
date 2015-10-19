@@ -195,7 +195,7 @@ namespace MediaConch
         if (display_xslt_list.length())
             mainwindow->addXsltDisplay(display_xslt_list.last());
 
-        if (!policy.length())
+        if (policy == "-1")
         {
             QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
             if (upload_list.length() && upload_list.last().length())
@@ -205,7 +205,7 @@ namespace MediaConch
             }
         }
 
-        mainwindow->checker_add_files(list, policy);
+        mainwindow->checker_add_files(list, policy.toInt());
     }
 
     void WebPage::onFileOnlineSelected(QWebElement form)
@@ -223,7 +223,7 @@ namespace MediaConch
         if (display_xslt_list.length())
             mainwindow->addXsltDisplay(display_xslt_list.last());
 
-        if (!policy.length())
+        if (policy == "-1")
         {
             QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
             if (upload_list.length() && upload_list.last().length())
@@ -232,7 +232,7 @@ namespace MediaConch
                 return;
             }
         }
-        mainwindow->checker_add_file(url, policy);
+        mainwindow->checker_add_file(url, policy.toInt());
     }
 
     void WebPage::onFileRepositorySelected(QWebElement form)
@@ -252,7 +252,7 @@ namespace MediaConch
         if (display_xslt_list.length())
             mainwindow->addXsltDisplay(display_xslt_list.last());
 
-        if (!policy.length())
+        if (policy == "-1")
         {
             QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
             if (upload_list.length() && upload_list.last().length())
@@ -261,7 +261,7 @@ namespace MediaConch
                 return;
             }
         }
-        mainwindow->checker_add_files(list, policy);
+        mainwindow->checker_add_files(list, policy.toInt());
     }
 
     bool WebPage::acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request,

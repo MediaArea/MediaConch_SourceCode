@@ -53,8 +53,8 @@ public:
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
     String                      transformWithXslt(String& report, String trans);
-    void                        checker_add_file(QString& file, QString& policy);
-    void                        checker_add_files(QList<QFileInfo>& file, QString& policy);
+    void                        checker_add_file(QString& file, int policy);
+    void                        checker_add_files(QList<QFileInfo>& file, int policy);
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     QString                     get_trace_for_file(const QString& filename);
@@ -62,14 +62,14 @@ public:
     void                        checker_selected();
     void                        policies_selected();
     void                        add_default_policy();
-    bool                        ValidatePolicy(String& policy, bool& valid, String& report);
+    bool                        ValidatePolicy(int policy, bool& valid, String& report);
 
     void                        addPolicyToList(QString& policy);
     void                        clearPolicyList();
     void                        clearFileList();
     void                        addXsltDisplay(QString& display_xslt);
     void                        removeXsltDisplay();
-    QStringList                 get_policy_titles();
+    const std::vector<Policy *>& get_all_policies() const;
     const std::vector<String>&  policy_file_registered();
 
     Policies&                   get_policies() { return C.policies; }
@@ -94,8 +94,6 @@ private:
     void                        clearVisualElements();
     void                        clearPoliciesElements();
     void                        createWebView();
-    void                        updateWebView(String file, String policy);
-    void                        updateWebView(QList<QFileInfo>& files, String policy);
     void                        createPoliciesView();
     void                        choose_schematron_file();
 

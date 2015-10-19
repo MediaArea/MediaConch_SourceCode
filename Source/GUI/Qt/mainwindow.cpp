@@ -128,13 +128,13 @@ String MainWindow::transformWithXslt(String& report, String trans)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_file(QString& file, QString& policy)
+void MainWindow::checker_add_file(QString& file, int policy)
 {
     MainView->checker_add_file(file, policy);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_files(QFileInfoList& list, QString& policy)
+void MainWindow::checker_add_files(QFileInfoList& list, int policy)
 {
     MainView->checker_add_files(list, policy);
 }
@@ -239,7 +239,7 @@ void MainWindow::exporting_to_xslt(int pos)
 }
 
 //---------------------------------------------------------------------------
-bool MainWindow::ValidatePolicy(String& policy, bool& valid, String& report)
+bool MainWindow::ValidatePolicy(int policy, bool& valid, String& report)
 {
     return C.ValidatePolicy(policy, valid, report);
 }
@@ -316,13 +316,9 @@ void MainWindow::clearFileList()
 }
 
 //---------------------------------------------------------------------------
-QStringList MainWindow::get_policy_titles()
+const std::vector<Policy *>& MainWindow::get_all_policies() const
 {
-    QStringList list;
-
-    for (size_t i = 0; i < C.policies.policies.size(); ++i)
-        list << QString().fromStdString(C.policies.policies[i]->title);
-    return list;
+    return C.policies.policies;
 }
 
 //***************************************************************************
@@ -436,23 +432,6 @@ void MainWindow::createWebView()
     QObject::connect(ui->actionCloseAll, SIGNAL(triggered()),
                      MainView, SLOT(actionCloseAllTriggered()));
     MainView->createWebView();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::updateWebView(String file, String policy)
-{
-    if (!MainView)
-        return;
-    MainView->updateWebView(file, policy);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::updateWebView(QList<QFileInfo>& files, String policy)
-{
-    if (!MainView)
-        return;
-
-    MainView->updateWebView(files, policy);
 }
 
 //---------------------------------------------------------------------------
