@@ -680,12 +680,6 @@ void CheckerWindow::remove_html_file_detail_policy_report(QString& html)
         return;
     html.insert(pos + 26, " hidden");
 
-    reg = QRegExp("<li class=\"list-group-item\">Policy test");
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) == -1)
-        return;
-    html.insert(pos + 26, " hidden");
-
     reg = QRegExp("<li class=\"list-group-item report\">Policy report");
     reg.setMinimal(true);
     if ((pos = reg.indexIn(html, pos)) == -1)

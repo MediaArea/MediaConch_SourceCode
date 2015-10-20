@@ -6,8 +6,7 @@
             <div>
                 <ul class="list-group">
                         <li class="list-group-item">This file is: <span class="text-uppercase text-{{ check.getStatus ? 'success' : 'danger' }}"><b>{{ check.getStatus ? '' : 'not ' }}valid</b></span></li>
-                        <li class="list-group-item">Policy test: <b>{{ check.getPolicy }}</b></li>
-                        <li class="list-group-item report">Policy report
+                        <li class="list-group-item report">Policy report ({{ check.getPolicy }})
                             <p class="text-right">
                                 <a href="#" data-toggle="modal" data-target="#modalPolicy{{ loop.index }}" title="View report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
                                 <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="PolicyReport.txt"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
