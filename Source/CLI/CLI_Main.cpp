@@ -136,7 +136,13 @@ int main(int argc, char* argv_ansi[])
     //Callback for error handling
     CallBack_Set(MI, (void*)Event_CallBackFunction);
 
-    STRINGOUT(MI.Run());
+    for (size_t i = 0; i < MI.List.size(); ++i)
+    {
+        // Analyze
+        MI.Run(MI.List[i]);
+
+        STRINGOUT(MI.Use_Tool());
+    }
 
     return 0;
 }

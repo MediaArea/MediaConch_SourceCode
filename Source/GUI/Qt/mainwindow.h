@@ -56,7 +56,12 @@ public:
     void                        checker_add_files(QList<QFileInfo>& file, int policy);
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
-    QString                     get_trace_for_file(const QString& filename);
+    void                        analyze(String& file);
+    QString                     get_implementationreport_text();
+    QString                     get_mediainfo_and_mediatrace_xml();
+    QString                     get_mediainfo_xml();
+    QString                     get_mediatrace_xml();
+    QString                     get_mediatrace_jstree();
     QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();

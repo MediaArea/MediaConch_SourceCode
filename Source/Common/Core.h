@@ -73,7 +73,13 @@ public:
     format Format;
     vector<String> List;
 
-    String Run(String file = String());
+    void   Run(String file = String());
+    String Use_Tool();
+    String MediaConch();
+    String MediaInfo();
+    String MediaTrace();
+    String MediaPolicies();
+    String PoliciesCheck();
 
     bool ValidatePolicy(int policy, bool& valid, String& report);
     String transformWithXslt(String& report, String& Xslt);
@@ -86,12 +92,6 @@ private:
     Core (const Core&);
 
     MediaInfoNameSpace::MediaInfoList* MI;
-
-    String MediaConch();
-    String MediaInfo();
-    String MediaTrace();
-    String MediaPolicies();
-    String PoliciesCheck();
 
     bool PolicySchematron(const String& file, std::wstringstream& Out);
     bool PolicyXslt(const String& file, std::wstringstream& Out);
