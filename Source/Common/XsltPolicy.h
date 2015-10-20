@@ -55,7 +55,9 @@ struct XsltRule
     std::string ope;
     std::string value;
 
-    std::string text;
+    std::string text; // Free text
+
+    std::string invalid;
 
 private:
     XsltRule& operator=(const XsltRule&);
@@ -102,24 +104,33 @@ private:
     void       write_root_template_childs(xmlNodePtr node);
     void       write_root_output_child(xmlNodePtr node);
     void       write_mediaconch_childs(xmlNodePtr node);
+    void       write_mediaconch_attribute_childs(xmlNodePtr node);
+    void       write_mediaconch_attribute_text_child(xmlNodePtr node);
     void       write_policychecks_childs(xmlNodePtr node);
-    void       write_policychecks_attribute_childs(xmlNodePtr node);
-    void       write_policychecks_attribute_text_child(xmlNodePtr node);
+    void       write_policychecks_title_child(xmlNodePtr node);
+    void       write_policychecks_description_child(xmlNodePtr node);
     void       write_for_each_childs(xmlNodePtr node);
     void       write_media_childs(xmlNodePtr node);
     void       write_media_attribute_childs(xmlNodePtr node);
     void       write_media_attribute_value_child(xmlNodePtr node);
     void       write_policy_childs(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_title_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_type_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_xpath_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_value_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_occurrence_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_field_child(xmlNodePtr node, XsltRule *rule);
-    void       create_xpath_from_rule(XsltRule *rule, std::string& xpath);
+    void       write_policy_title_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_context_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_context_value_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_context_field_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_choose_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_when_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_otherwise_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_for_each_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_xpath_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_value_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_field_child(xmlNodePtr node, XsltRule *rule);
+    void       create_test_from_rule(XsltRule *rule, std::string& xpath);
     xmlNsPtr   create_namespace_xsl(xmlNodePtr node);
     xmlNsPtr   create_namespace_mc(xmlNodePtr node);
+    xmlNsPtr   create_namespace_ma(xmlNodePtr node);
     xmlNsPtr   create_namespace_xsi(xmlNodePtr node);
     void       write_operators(xmlNodePtr node);
     void       write_operator_is_true(xmlNodePtr node);
