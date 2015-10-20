@@ -24,19 +24,6 @@
 
         <script>
           $(document).ready(function() {
-              $('.checker-results li.report').each(function() {
-                  $(this).hover(
-                      function() {
-                          $(this).addClass('report-blue');
-                          $(this).find('p').removeClass('hidden');
-                      },
-                      function() {
-                          $(this).removeClass('report-blue');
-                          $(this).find('p').addClass('hidden');
-                      }
-                  );
-              });
-
               // Remove result block
               $('.checker-results .panel-heading .close').each(function() {
                   $(this).click(function () {
