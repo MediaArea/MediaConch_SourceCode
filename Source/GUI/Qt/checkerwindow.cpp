@@ -554,7 +554,10 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     {
         const std::vector<String>& policies_name = mainwindow->policy_file_registered();
         if (policies_name.size())
-            policy_name = QString().fromStdWString(policies_name.front());
+        {
+            QFileInfo qfile(QString().fromStdWString(policies_name.front()));
+            policy_name = qfile.baseName();
+        }
     }
 
     QString report = QString().fromStdWString(r);
