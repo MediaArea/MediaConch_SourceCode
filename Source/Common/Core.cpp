@@ -71,7 +71,7 @@ String Core::Menu_Option_Preferences_Option (const String& Param, const String& 
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-String Core::Run (String file)
+void Core::Run (String file)
 {
     // Config
     switch (Tool)
@@ -79,16 +79,9 @@ String Core::Run (String file)
         case tool_MediaConch: 
                                 MI->Option(__T("Complete"), __T("0"));
                                 MI->Option(__T("ReadByHuman"), __T("1"));
-                                MI->Option(__T("Language"), String());
-                                MI->Option(__T("Details"), __T("0"));
-                                switch (Format)
-                                {
-                                    case format_Xml:
-                                                            MI->Option(__T("Language"), __T("raw"));
-                                                            MI->Option(__T("Details"), __T("1"));
-                                                            MI->Option(__T("Inform"), __T("MAXML"));
-                                    default:                ;
-                                }
+                                MI->Option(__T("Language"), __T("raw"));
+                                MI->Option(__T("Details"), __T("1"));
+                                MI->Option(__T("Inform"), __T("MAXML"));
                                 break;
         case tool_MediaInfo:
                                 MI->Option(__T("ReadByHuman"), __T("1"));
@@ -143,7 +136,7 @@ String Core::Run (String file)
                                 MI->Option(__T("Language"), __T("raw"));
                                 MI->Option(__T("Inform"), __T("MAXML"));
                                 break;
-        default:                return String();
+        default:                return;
     }
 
     // Parsing
@@ -157,8 +150,11 @@ String Core::Run (String file)
         for (size_t Pos=0; Pos<List.size(); Pos++)
             MI->Open(List[Pos]);
     }
+}
 
-    // Output
+//---------------------------------------------------------------------------
+String Core::Use_Tool()
+{
     switch (Tool)
     {
         case tool_MediaConch:      return MediaConch();
@@ -173,6 +169,11 @@ String Core::Run (String file)
 //---------------------------------------------------------------------------
 String Core::MediaConch ()
 {
+    // Config after Open()
+    MI->Option(__T("Complete"), __T("0"));
+    MI->Option(__T("Language"), __T("raw"));
+    MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Inform"), __T("MAXML"));
     if (Format==format_Xml)
         return MI->Inform();
     
@@ -232,12 +233,45 @@ String Core::MediaConch ()
 //---------------------------------------------------------------------------
 String Core::MediaInfo ()
 {
+    // Config after Open()
+    MI->Option(__T("Details"), __T("0"));
+    switch (Format)
+    {
+        case format_Text:
+                 MI->Option(__T("Complete"), __T("0"));
+                 MI->Option(__T("Language"), String());
+                 MI->Option(__T("Inform"), String());
+                 break;
+        case format_Xml:
+                 MI->Option(__T("Complete"), __T("1"));
+                 MI->Option(__T("Language"), __T("raw"));
+                 MI->Option(__T("Inform"), __T("XML"));
+                 break;
+        default: ;
+    }
     return MI->Inform();
 }
 
 //---------------------------------------------------------------------------
 String Core::MediaTrace ()
 {
+    // Config after Open()
+    MI->Option(__T("Complete"), __T("0"));
+    MI->Option(__T("Details"), __T("1"));
+    switch (Format)
+    {
+        case format_Text:
+                 MI->Option(__T("Language"), String());
+                 MI->Option(__T("Inform"), String());
+                 break;
+        case format_Xml:
+        case format_JsTree:
+                 MI->Option(__T("Language"), __T("raw"));
+                 MI->Option(__T("Inform"), __T("XML"));
+                 break;
+        default: ;
+    }
+
     String ret = MI->Inform();
     if (Format == format_JsTree)
     {
@@ -491,6 +525,10 @@ void Core::validateXsltPolicy(int pos, bool& valid, String& report)
 //---------------------------------------------------------------------------
 bool Core::validation(Schema* S, String& report)
 {
+    MI->Option(__T("Complete"), __T("0"));
+    MI->Option(__T("Language"), __T("raw"));
+    MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Inform"), __T("MAXML"));
     String tmp = MI->Inform();
     std::string xml=Ztring(tmp).To_UTF8();
     bool valid = true;
