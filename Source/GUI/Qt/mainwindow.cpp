@@ -388,9 +388,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
         int ret = msgBox.exec();
         if (ret == QMessageBox::Save)
+        {
             for (size_t i = 0; i < C.policies.policies.size(); ++i)
                 if (!C.policies.policies[i]->saved)
                     C.policies.export_schema(NULL, i);
+        }
         else if (ret == QMessageBox::Cancel)
         {
             event->ignore();
