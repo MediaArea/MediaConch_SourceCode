@@ -54,7 +54,7 @@ public:
     void                        remove_widget_from_tree_layout(QWidget* w);
     QFrame*                     policyFrame();
     void                        policy_deleted(QTreeWidgetItem* item, int row);
-    void                        save_policy(Policies::PolicyType type);
+    void                        save_policy();
     int                         save_policy_to(Policies::PolicyType type);
 
 private:

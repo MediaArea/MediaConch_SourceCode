@@ -474,7 +474,7 @@ QString CheckerWindow::create_html()
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& file)
 {
-    QString report = mainwindow->Run(Core::tool_MediaConch, Core::format_Xml, file);
+    QString report = mainwindow->get_mediainfo_xml();
 #if QT_VERSION >= 0x050200
     report = report.toHtmlEscaped();
 #else
@@ -501,7 +501,7 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_conformance(QString& html, String& file)
 {
-    QString report = mainwindow->Run(Core::tool_MediaConch, Core::format_Text, file);
+    QString report = mainwindow->get_implementationreport_text();
 #if QT_VERSION >= 0x050200
     report = report.toHtmlEscaped();
 #else
@@ -616,7 +616,7 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, String& file)
     reg = QRegExp("\\{\\{ check\\.getTrace\\.jstree\\|raw \\}\\}");
     reg.setMinimal(true);
 
-    QString report = mainwindow->Run(Core::tool_MediaTrace, Core::format_JsTree, file);
+    QString report = mainwindow->get_mediatrace_jstree();
     pos = 0;
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), report);
@@ -627,6 +627,24 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, String& file)
     while ((pos = reg.indexIn(html, 0)) != -1)
         html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_MediaTrace.xml\"")
                      .arg(file_remove_ext(file)));
+
+    reg = QRegExp("<div id=\"traceXml\\d+\" class=\"hidden\">");
+    if ((pos = reg.indexIn(html, 0)) != -1)
+    {
+        reg = QRegExp("<p class=\"modal-body\">");
+        if ((pos = reg.indexIn(html, 0)) != -1)
+        {
+            report = mainwindow->get_mediatrace_xml();
+#if QT_VERSION >= 0x050200
+            report = report.toHtmlEscaped();
+#else
+            report = Qt::escape(report);
+#endif
+            report.replace(' ', "&nbsp;");
+            report.replace('\n', "<br/>");
+            html.insert(pos + reg.matchedLength(), report);
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -683,6 +701,9 @@ QString CheckerWindow::create_html_file_detail(String& file, int policy)
     template_html.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray html = template_html.readAll();
     template_html.close();
+
+    // Analyze
+    mainwindow->analyze(file);
 
     QString base(html);
     change_html_file_detail(base, file);

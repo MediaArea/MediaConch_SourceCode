@@ -116,7 +116,7 @@ int PoliciesWindow::save_policy_to(Policies::PolicyType type)
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::save_policy(Policies::PolicyType type)
+void PoliciesWindow::save_policy()
 {
     int  row = get_index_in_tree();
     if (row < 0)

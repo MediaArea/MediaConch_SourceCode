@@ -159,20 +159,6 @@ const std::vector<String>& MainWindow::policy_file_registered()
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_trace_for_file(const QString& filename)
-{
-    if (C.Tool == Core::tool_MediaPolicies)
-    {
-        createPoliciesView();
-        return QString();
-    }
-
-    String file = filename.toStdWString();
-    QString report = Run(Core::tool_MediaTrace, Core::format_Xml, file);
-    return report;
-}
-
-//---------------------------------------------------------------------------
 QString MainWindow::ask_for_schema_file()
 {
     QString file=QFileDialog::getOpenFileName(this, "Open file", "", "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
@@ -388,9 +374,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
         int ret = msgBox.exec();
         if (ret == QMessageBox::Save)
+        {
             for (size_t i = 0; i < C.policies.policies.size(); ++i)
                 if (!C.policies.policies[i]->saved)
                     C.policies.export_schema(NULL, i);
+        }
         else if (ret == QMessageBox::Cancel)
         {
             event->ignore();
@@ -514,14 +502,45 @@ void MainWindow::policies_selected()
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::Run(Core::tool tool, Core::format format, String& file)
+void MainWindow::analyze(String& file)
 {
-    if (C.Tool == Core::tool_MediaPolicies || C.List.empty())
-        return QString();
+    C.Tool = Core::tool_MediaConch;
+    C.Run(file);
+}
 
-    C.Tool = tool;
-    C.Format = format;
-    return QString().fromStdWString(C.Run(file));
+//---------------------------------------------------------------------------
+QString MainWindow::get_implementationreport_text()
+{
+    C.Format = Core::format_Text;
+    return QString().fromStdWString(C.MediaConch());
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::get_mediainfo_and_mediatrace_xml()
+{
+    C.Format = Core::format_Xml;
+    return QString().fromStdWString(C.MediaConch());
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::get_mediainfo_xml()
+{
+    C.Format = Core::format_Xml;
+    return QString().fromStdWString(C.MediaInfo());
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::get_mediatrace_xml()
+{
+    C.Format = Core::format_Xml;
+    return QString().fromStdWString(C.MediaTrace());
+}
+
+//---------------------------------------------------------------------------
+QString MainWindow::get_mediatrace_jstree()
+{
+    C.Format = Core::format_JsTree;
+    return QString().fromStdWString(C.MediaTrace());
 }
 
 }
