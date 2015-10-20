@@ -432,7 +432,7 @@ int MainWindow::clearVisualElements()
         if (MainView->is_analyzes_done())
         {
             int ret = QMessageBox::warning(this, tr("MediaConch"),
-                                           tr("All changes will be discarded?"),
+                                           tr("All analysis results will be discarded?"),
                                            QMessageBox::Ok | QMessageBox::Cancel);
             if (ret == QMessageBox::Cancel)
                 return -1;
