@@ -83,7 +83,7 @@ void XsltWindow::display_selection(int level, QTreeWidgetItem *item)
 //---------------------------------------------------------------------------
 void XsltWindow::save_policy()
 {
-    policieswindow->save_policy(Policies::POLICY_XSLT);
+    policieswindow->save_policy();
 }
 
 //---------------------------------------------------------------------------

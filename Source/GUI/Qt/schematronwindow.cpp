@@ -90,7 +90,7 @@ void SchematronWindow::display_selection(int level, QTreeWidgetItem *item)
 //---------------------------------------------------------------------------
 void SchematronWindow::save_policy()
 {
-    policieswindow->save_policy(Policies::POLICY_SCHEMATRON);
+    policieswindow->save_policy();
 }
 
 //---------------------------------------------------------------------------
