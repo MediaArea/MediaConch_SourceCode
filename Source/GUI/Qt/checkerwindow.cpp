@@ -510,12 +510,25 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
     report.replace(' ', "&nbsp;");
     report.replace('\n', "<br/>\n");
 
-    QRegExp reg("\\{\\{ check\\.getConformance\\|replace\\(\\{' ': '\\&nbsp;'\\}\\)\\|raw\\|nl2br \\}\\}");
-
+    QRegExp reg("Implementation report");
     int pos = 0;
-
     reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    if ((pos = reg.indexIn(html, 0)) != -1)
+    {
+        bool is_valid = implementationreport_is_valid(report);
+        reg = QRegExp("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
+        reg.setMinimal(true);
+        if ((pos = reg.indexIn(html, pos)) != -1)
+            html.replace(pos, reg.matchedLength(), is_valid ? "success" : "danger");
+        reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
+        reg.setMinimal(true);
+        if ((pos = reg.indexIn(html, pos)) != -1)
+            html.replace(pos, reg.matchedLength(), is_valid ? "" : "not ");
+    }
+
+    reg = QRegExp("\\{\\{ check\\.getConformance\\|replace\\(\\{' ': '\\&nbsp;'\\}\\)\\|raw\\|nl2br \\}\\}");
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, 0)) != -1)
         html.replace(pos, reg.matchedLength(), report);
 
     reg = QRegExp("data-save-name=\"ConformanceReport.txt\"");
@@ -739,6 +752,17 @@ void CheckerWindow::add_file_detail_to_html(QString& html, String& file, int pol
 bool CheckerWindow::report_is_html(QString& report)
 {
     QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
+
+    if (reg.indexIn(report, 0) != -1)
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool CheckerWindow::implementationreport_is_valid(QString& report)
+{
+    QRegExp reg("<\\Fail[ ]+\\|");
 
     if (reg.indexIn(report, 0) != -1)
         return true;
