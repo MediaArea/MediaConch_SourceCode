@@ -96,7 +96,7 @@ void Core::Run (String file)
                                     case format_Xml:
                                                             MI->Option(__T("Complete"), __T("1"));
                                                             MI->Option(__T("Language"), __T("raw"));
-                                                            MI->Option(__T("Inform"), __T("XML"));
+                                                            MI->Option(__T("Inform"), __T("MAXML"));
                                                             break;
                                     default:                ;
                                 }
@@ -245,7 +245,7 @@ String Core::MediaInfo ()
         case format_Xml:
                  MI->Option(__T("Complete"), __T("1"));
                  MI->Option(__T("Language"), __T("raw"));
-                 MI->Option(__T("Inform"), __T("XML"));
+                 MI->Option(__T("Inform"), __T("MAXML"));
                  break;
         default: ;
     }
