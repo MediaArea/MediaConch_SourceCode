@@ -54,13 +54,17 @@ private Q_SLOTS:
     void add_new_rule();
     void duplicate_rule();
     void delete_rule();
+    void rule_free_text_selected(bool checked);
+    void rule_editor_selected(bool checked);
 
     void edit_rule_name(QString new_name);
     void edit_rule_type();
     void edit_rule_field();
     void edit_rule_operator();
     void edit_rule_value();
+    void edit_rule_invalid();
     void edit_rule_occurrence();
+    void edit_rule_freeText();
 };
 
 }

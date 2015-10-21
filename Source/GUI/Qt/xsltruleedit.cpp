@@ -26,6 +26,8 @@ XsltRuleEdit::XsltRuleEdit(QWidget *parent) :
     ui(new Ui::XsltRuleEdit)
 {
     ui->setupUi(this);
+    ui->freeText->setText(QString());
+    ui->freeText->hide();
     add_values_to_selector();
 }
 
@@ -46,21 +48,21 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
         return;
 
     ui->name->setText(QString().fromStdString(r->title));
-    // if (r->use_free_text)
-    // {
-    //     ui->freeText->setText(QString().fromStdString(a->text));
-    //     ui->freeTextSelector->setChecked(true);
-    //     ui->freeText->show();
-    //     ui->editorFrame->hide();
-    //     return;
-    // }
+    if (r->use_free_text)
+    {
+        ui->freeText->setText(QString().fromStdString(r->text));
+        ui->freeTextSelector->setChecked(true);
+        ui->freeText->show();
+        ui->editorFrame->hide();
+        return;
+    }
     if (r->type == "")
         r->type = ui->type->currentText().toStdString();
 
     fill_editor_fields(r);
 
-    // ui->editorSelector->setChecked(true);
-    // ui->freeText->hide();
+    ui->editorSelector->setChecked(true);
+    ui->freeText->hide();
     ui->editorFrame->show();
 }
 
@@ -84,6 +86,7 @@ void XsltRuleEdit::fill_editor_fields(const XsltRule *r)
     if (value.length() >= 2 && value[0] == '\'')
         value = value.substr(1, value.length() - 2);
     ui->value->setText(QString().fromStdString(value));
+    ui->invalid->setText(QString().fromStdString(r->invalid));
 }
 
 //---------------------------------------------------------------------------
@@ -129,15 +132,37 @@ QLineEdit *XsltRuleEdit::get_value_line()
 }
 
 //---------------------------------------------------------------------------
+QLineEdit *XsltRuleEdit::get_invalid_line()
+{
+    return ui->invalid;
+}
+
+//---------------------------------------------------------------------------
 QSpinBox *XsltRuleEdit::get_occurrence_box()
 {
     return ui->occurrence;
 }
 
 //---------------------------------------------------------------------------
+QTextEdit *XsltRuleEdit::get_freeText_text()
+{
+    return ui->freeText;
+}
+
+//---------------------------------------------------------------------------
 QFrame *XsltRuleEdit::get_editor_frame()
 {
     return ui->editorFrame;
+}
+
+QRadioButton *XsltRuleEdit::get_freeTextSelector_radio()
+{
+    return ui->freeTextSelector;
+}
+
+QRadioButton *XsltRuleEdit::get_editorSelector_radio()
+{
+    return ui->editorSelector;
 }
 
 //***************************************************************************
