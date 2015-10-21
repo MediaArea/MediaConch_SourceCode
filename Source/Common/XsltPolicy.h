@@ -132,6 +132,7 @@ private:
     xmlNsPtr   create_namespace_mc(xmlNodePtr node);
     xmlNsPtr   create_namespace_ma(xmlNodePtr node);
     xmlNsPtr   create_namespace_xsi(xmlNodePtr node);
+
     void       write_operators(xmlNodePtr node);
     void       write_operator_is_true(xmlNodePtr node);
     void       write_operator_is_equal(xmlNodePtr node);
@@ -143,6 +144,13 @@ private:
     void       write_operator_exists(xmlNodePtr node);
     void       write_operator_does_not_exist(xmlNodePtr node);
     void       write_operator_contains_string(xmlNodePtr node);
+    void       write_operator_test_type(xmlNodePtr node);
+    void       write_operator_test_streamid(xmlNodePtr node);
+    void       write_operator_actual(xmlNodePtr node);
+    void       write_operator_expected(xmlNodePtr node);
+    void       write_operator_choose(xmlNodePtr node, const xmlChar* test,
+                                     const xmlChar* pass,
+                                     const xmlChar* fail, const xmlChar* reason);
     xmlNodePtr write_operator_new_node(xmlNodePtr node, const xmlChar* title,
                                        std::vector<std::pair<const xmlChar*, const xmlChar*> >& prop,
                                        const xmlChar* content = NULL, bool parentNs=true);
