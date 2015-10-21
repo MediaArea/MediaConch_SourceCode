@@ -39,8 +39,9 @@ namespace MediaConch {
 // XsltRule
 //***************************************************************************
 
-struct XsltRule
+class XsltRule
 {
+public:
     XsltRule() : use_free_text(false), occurrence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
