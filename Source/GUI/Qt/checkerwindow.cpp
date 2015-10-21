@@ -510,12 +510,25 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
     report.replace(' ', "&nbsp;");
     report.replace('\n', "<br/>\n");
 
-    QRegExp reg("\\{\\{ check\\.getConformance\\|replace\\(\\{' ': '\\&nbsp;'\\}\\)\\|raw\\|nl2br \\}\\}");
-
+    QRegExp reg("Implementation report");
     int pos = 0;
-
     reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    if ((pos = reg.indexIn(html, 0)) != -1)
+    {
+        bool is_valid = implementationreport_is_valid(report);
+        reg = QRegExp("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
+        reg.setMinimal(true);
+        if ((pos = reg.indexIn(html, pos)) != -1)
+            html.replace(pos, reg.matchedLength(), is_valid ? "success" : "danger");
+        reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
+        reg.setMinimal(true);
+        if ((pos = reg.indexIn(html, pos)) != -1)
+            html.replace(pos, reg.matchedLength(), is_valid ? "" : "not ");
+    }
+
+    reg = QRegExp("\\{\\{ check\\.getConformance\\|replace\\(\\{' ': '\\&nbsp;'\\}\\)\\|raw\\|nl2br \\}\\}");
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, 0)) != -1)
         html.replace(pos, reg.matchedLength(), report);
 
     reg = QRegExp("data-save-name=\"ConformanceReport.txt\"");
@@ -554,7 +567,10 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     {
         const std::vector<String>& policies_name = mainwindow->policy_file_registered();
         if (policies_name.size())
-            policy_name = QString().fromStdWString(policies_name.front());
+        {
+            QFileInfo qfile(QString().fromStdWString(policies_name.front()));
+            policy_name = qfile.baseName();
+        }
     }
 
     QString report = QString().fromStdWString(r);
@@ -570,10 +586,14 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     }
     change_report_policy_save_name(file, policy_name, is_html, html);
 
-    QRegExp reg("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
+    QRegExp reg("\\{\\{ check\\.getPolicy \\}\\}");
     reg.setMinimal(true);
-
     int pos = 0;
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), policy_name);
+
+    reg = QRegExp("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
+    reg.setMinimal(true);
     if ((pos = reg.indexIn(html, pos)) != -1)
     {
         if (!valid)
@@ -581,11 +601,6 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
         else
             html.replace(pos, reg.matchedLength(), "success");
     }
-
-    reg = QRegExp("\\{\\{ check\\.getPolicy \\}\\}");
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), policy_name);
 
     reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
     reg.setMinimal(true);
@@ -672,22 +687,9 @@ void CheckerWindow::change_html_file_detail(QString& html, String& file)
 //---------------------------------------------------------------------------
 void CheckerWindow::remove_html_file_detail_policy_report(QString& html)
 {
-    QRegExp reg("<li class=\"list-group-item\">This file is");
+    QRegExp reg("<li class=\"list-group-item report\">Policy report");
+    reg.setMinimal(true);
     int pos = 0;
-
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) == -1)
-        return;
-    html.insert(pos + 26, " hidden");
-
-    reg = QRegExp("<li class=\"list-group-item\">Policy test");
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) == -1)
-        return;
-    html.insert(pos + 26, " hidden");
-
-    reg = QRegExp("<li class=\"list-group-item report\">Policy report");
-    reg.setMinimal(true);
     if ((pos = reg.indexIn(html, pos)) == -1)
         return;
     html.insert(pos + 26, " hidden");
@@ -742,6 +744,17 @@ void CheckerWindow::add_file_detail_to_html(QString& html, String& file, int pol
 bool CheckerWindow::report_is_html(QString& report)
 {
     QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
+
+    if (reg.indexIn(report, 0) != -1)
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool CheckerWindow::implementationreport_is_valid(QString& report)
+{
+    QRegExp reg("<\\Fail[ ]+\\|");
 
     if (reg.indexIn(report, 0) != -1)
         return true;

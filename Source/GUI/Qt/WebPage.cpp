@@ -54,7 +54,7 @@ namespace MediaConch
             }
         }
 
-        QWebElementCollection uls = frame->findAllElements("ul");
+        QWebElementCollection uls = frame->findAllElements("ul.navbar");
         for (int i = 0; i < uls.count(); i++)
         {
             QWebElement form = uls[i];
