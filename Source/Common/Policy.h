@@ -52,6 +52,7 @@ public:
 
     std::string          filename;
     std::string          title;
+    std::string          description;
     Policies::PolicyType type;
     bool                 saved;
 

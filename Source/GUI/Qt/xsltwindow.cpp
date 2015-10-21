@@ -259,6 +259,27 @@ void XsltWindow::edit_policy_title()
     }
 }
 
+//---------------------------------------------------------------------------
+void XsltWindow::edit_policy_description()
+{
+    QString qdescription = policyMenu->get_description_line()->text();
+
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    if (!item)
+        return;
+
+    int row = policieswindow->get_index_in_tree();;
+    if (row < 0)
+        return;
+
+    Policy *p = mainwindow->get_policies().policies[row];
+    if (p->description != qdescription.toStdString())
+    {
+        p->description = qdescription.toStdString();
+        p->saved = false;
+    }
+}
+
 //***************************************************************************
 // Visual elements
 //***************************************************************************
@@ -301,6 +322,8 @@ void XsltWindow::createPolicyMenu()
                      this, SLOT(duplicate_policy()));
     QObject::connect(policyMenu->get_title_line(), SIGNAL(textChanged(QString)),
                      this, SLOT(edit_policy_title()));
+    QObject::connect(policyMenu->get_description_line(), SIGNAL(textChanged(QString)),
+                     this, SLOT(edit_policy_description()));
 }
 
 //---------------------------------------------------------------------------
@@ -308,7 +331,6 @@ void XsltWindow::displayPolicyMenu(QString title)
 {
     createPolicyMenu();
     QLineEdit* name = policyMenu->get_title_line();
-
     name->setText(title);
 
     policyMenu->get_savePolicy_button()->setEnabled(false);
@@ -316,7 +338,11 @@ void XsltWindow::displayPolicyMenu(QString title)
     if (index >= 0 && index < (int)mainwindow->get_policies().policies.size())
     {
         if (mainwindow->get_policies().policies[index] && mainwindow->get_policies().policies[index]->filename.length())
+        {
             policyMenu->get_savePolicy_button()->setEnabled(true);
+            QLineEdit* descr = policyMenu->get_description_line();
+            descr->setText(QString().fromStdString(mainwindow->get_policies().policies[index]->description));
+        }
     }
 }
 
@@ -464,6 +490,89 @@ void XsltWindow::edit_rule_occurrence()
 }
 
 //---------------------------------------------------------------------------
+void XsltWindow::edit_rule_invalid()
+{
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = policieswindow->get_index_of_item_backXX(item, 1);
+    int row = policieswindow->get_index_in_tree();
+    if (row < 0 || rowPolicy < 0)
+        return;
+
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+
+    if (r->invalid != ruleEdit->get_invalid_line()->text().toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        r->invalid = ruleEdit->get_invalid_line()->text().toStdString();
+    }
+}
+
+//---------------------------------------------------------------------------
+void XsltWindow::edit_rule_freeText()
+{
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = policieswindow->get_index_of_item_backXX(item, 1);
+    int row = policieswindow->get_index_in_tree();
+    if (row < 0 || rowPolicy < 0)
+        return;
+
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+
+    if (r->text != ruleEdit->get_freeText_text()->toPlainText().toStdString())
+    {
+        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        r->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
+        r->use_free_text = true;
+    }
+}
+
+//---------------------------------------------------------------------------
+void XsltWindow::rule_free_text_selected(bool checked)
+{
+    if (!checked)
+        return;
+
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = policieswindow->get_index_of_item_backXX(item, 1);
+    int row = policieswindow->get_index_in_tree();
+    if (row < 0 || rowPolicy < 0)
+        return;
+
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    r->use_free_text = true;
+    ruleEdit->rule_clicked(r);
+}
+
+//---------------------------------------------------------------------------
+void XsltWindow::rule_editor_selected(bool checked)
+{
+    if (!checked)
+        return;
+
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    if (!item || !item->parent())
+        return;
+
+    int rowPolicy = policieswindow->get_index_of_item_backXX(item, 1);
+    int row = policieswindow->get_index_in_tree();
+    if (row < 0 || rowPolicy < 0)
+        return;
+
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    r->use_free_text = false;
+    ruleEdit->rule_clicked(r);
+}
+
+//---------------------------------------------------------------------------
 void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
 {
     createRuleEdit();
@@ -485,21 +594,17 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
                      this, SLOT(edit_rule_operator()));
     QObject::connect(ruleEdit->get_value_line(), SIGNAL(textEdited(QString)),
                      this, SLOT(edit_rule_value()));
+    QObject::connect(ruleEdit->get_invalid_line(), SIGNAL(textEdited(QString)),
+                     this, SLOT(edit_rule_invalid()));
     QObject::connect(ruleEdit->get_occurrence_box(), SIGNAL(valueChanged(int)),
                      this, SLOT(edit_rule_occurrence()));
-
-    //TODO
-    // QObject::connect(ruleEdit->get_editorSelector_radio(), SIGNAL(toggled(bool)),
-    //                  this, SLOT(assert_editor_selected(bool)));
-    // QObject::connect(ruleEdit->get_freeTextSelector_radio(), SIGNAL(toggled(bool)),
-    //                  this, SLOT(assert_free_text_selected(bool)));
-    // QObject::connect(ruleEdit->get_freeText_text(), SIGNAL(textChanged()),
-    //                  this, SLOT(edit_assert_freeText()));
-    // XsltRule test;
-    // if (!a->use_free_text || mainwindow->get_policies().try_parsing_test(a->text, &test))
-    //     ruleEdit->get_editorSelector_radio()->setEnabled(true);
-    // else
-    //     ruleEdit->get_editorSelector_radio()->setEnabled(false);
+    QObject::connect(ruleEdit->get_editorSelector_radio(), SIGNAL(toggled(bool)),
+                     this, SLOT(rule_editor_selected(bool)));
+    QObject::connect(ruleEdit->get_freeTextSelector_radio(), SIGNAL(toggled(bool)),
+                     this, SLOT(rule_free_text_selected(bool)));
+    QObject::connect(ruleEdit->get_freeText_text(), SIGNAL(textChanged()),
+                     this, SLOT(edit_rule_freeText()));
+    ruleEdit->get_editorSelector_radio()->setEnabled(true);
 }
 
 }

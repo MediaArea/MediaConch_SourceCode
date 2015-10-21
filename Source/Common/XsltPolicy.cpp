@@ -100,13 +100,248 @@ bool XsltPolicy::find_title_node(xmlNodePtr node, std::string& title)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_rule_value_node(xmlNodePtr node, std::string& value)
+bool XsltPolicy::find_call_template_field_node(xmlNodePtr node, std::string& field)
+{
+    std::string def("with-param");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("field");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    const char* select = (const char*)xmlNodeGetContent(node);
+    if (select != NULL)
+        field = std::string((const char*)select);
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_call_template_value_node(xmlNodePtr node, std::string& value)
 {
     std::string def("with-param");
     if (!node->name || def.compare((const char*)node->name))
         return false;
 
     def = std::string("value");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    const char* select = (const char*)xmlNodeGetContent(node);
+    if (select != NULL)
+        value = std::string((const char*)select);
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_call_template_xpath_node(xmlNodePtr node, std::string& xpath)
+{
+    std::string def("with-param");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    def = std::string("xpath");
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL || def.compare((const char*)name))
+        return false;
+
+    xmlChar *select = xmlGetNoNsProp(node, (const unsigned char*)"select");
+    if (select != NULL)
+        xpath = std::string((const char*)select);
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_call_template_free_text_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+{
+    std::string def("call-template");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL)
+        return false;
+    rule->ope = std::string((const char*)name);
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        std::string xpath;
+        if (find_call_template_xpath_node(child, xpath))
+            if (xpath != rule->value)
+                valid = false;
+        child = child->next;
+    }
+
+    if (valid)
+    {
+        rule->text = rule->value;
+        rule->value = std::string();
+        rule->use_free_text = true;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+{
+    std::string def("call-template");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (name == NULL)
+    {
+        valid = false;
+        return true;
+    }
+    rule->ope = std::string((const char*)name);
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        std::string tmp;
+        if (find_call_template_xpath_node(child, tmp))
+        {
+            if (tmp != ".")
+            {
+                valid = false;
+                return true;
+            }
+        }
+        else if (find_call_template_value_node(child, tmp))
+        {
+            if (tmp != rule->value)
+            {
+                valid = false;
+                return true;
+            }
+        }
+        else if (find_call_template_field_node(child, tmp))
+        {
+            if (tmp != rule->field)
+            {
+                valid = false;
+                return true;
+            }
+        }
+        child = child->next;
+    }
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+{
+    std::string def("for-each");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlChar *select_str = xmlGetNoNsProp(node, (const unsigned char*)"select");
+    if (select_str == NULL)
+        return false;
+    std::string select((const char*)select_str);
+
+    valid = parse_test_for_rule(select, rule);
+    if (!valid)
+        return true;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_choose_call_template_node(child, rule, valid);
+        if (!valid)
+            return true;
+        child = child->next;
+    }
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_choose_when_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+{
+    std::string def("when");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlChar *test_str = xmlGetNoNsProp(node, (const unsigned char*)"test");
+    if (test_str == NULL)
+        return false;
+    std::string test((const char*)test_str);
+
+    valid = parse_test_for_rule(test, rule);
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_choose_for_each_node(child, rule, valid);
+        child = child->next;
+    }
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_choose_otherwise_test_node(xmlNodePtr node, XsltRule* rule)
+{
+    std::string def("test");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlChar *out_str = xmlGetNoNsProp(node, (const unsigned char*)"outcome");
+    if (out_str == NULL)
+        return false;
+    rule->invalid = std::string((const char*)out_str);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_choose_otherwise_node(xmlNodePtr node, XsltRule* rule)
+{
+    std::string def("otherwise");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_choose_otherwise_test_node(child, rule);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+{
+    std::string def("choose");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        if (!find_choose_when_node(child, rule, valid))
+            find_choose_otherwise_node(child, rule);;
+        if (!valid)
+            return true;
+        child = child->next;
+    }
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_context_attribute_value_node(xmlNodePtr node, std::string& value)
+{
+    std::string def("value");
     xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
     if (name == NULL || def.compare((const char*)name))
         return false;
@@ -118,13 +353,9 @@ bool XsltPolicy::find_rule_value_node(xmlNodePtr node, std::string& value)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_rule_field_node(xmlNodePtr node, std::string& field)
+bool XsltPolicy::find_context_attribute_field_node(xmlNodePtr node, std::string& field)
 {
-    std::string def("with-param");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    def = std::string("field");
+    std::string def("field");
     xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
     if (name == NULL || def.compare((const char*)name))
         return false;
@@ -136,48 +367,39 @@ bool XsltPolicy::find_rule_field_node(xmlNodePtr node, std::string& field)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_rule_occurrence_node(xmlNodePtr node, int& occurrence)
+bool XsltPolicy::find_context_attribute_node(xmlNodePtr node, XsltRule* rule)
 {
-    std::string def("with-param");
+    std::string def("attribute");
     if (!node->name || def.compare((const char*)node->name))
         return false;
 
-    def = std::string("occurrence");
-    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
-    if (name == NULL || def.compare((const char*)name))
+    if (find_context_attribute_value_node(node, rule->value))
+        return true;
+    if (find_context_attribute_field_node(node, rule->field))
+        return true;
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_context_node(xmlNodePtr node, XsltRule* rule)
+{
+    std::string def("context");
+    if (!node->name || def.compare((const char*)node->name))
         return false;
 
-    const char* descr = (const char*)xmlNodeGetContent(node);
-    if (descr)
+    xmlNodePtr child = node->children;
+    while (child)
     {
-        std::string tmp = std::string(descr);
-        occurrence = atoi(tmp.c_str());
+        find_context_attribute_node(child, rule);
+        child = child->next;
     }
     return true;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_rule_type_node(xmlNodePtr node, std::string& type)
+bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& t)
 {
-    std::string def("with-param");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    def = std::string("tracktype");
-    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
-    if (name == NULL || def.compare((const char*)name))
-        return false;
-
-    const char* descr = (const char*)xmlNodeGetContent(node);
-    if (descr)
-        type = std::string(descr);
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& title)
-{
-    std::string def("with-param");
+    std::string def("attribute");
     if (!node->name || def.compare((const char*)node->name))
         return false;
 
@@ -188,39 +410,7 @@ bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& title)
 
     const char* descr = (const char*)xmlNodeGetContent(node);
     if (descr)
-        title = std::string(descr);
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool XsltPolicy::find_call_template_node(xmlNodePtr node)
-{
-    std::string def("call-template");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
-    if (name == NULL)
-        return false;
-
-    XsltRule *r = new XsltRule;
-
-    r->ope = std::string((const char*)name);
-
-    for (xmlNodePtr child = node->children; child; child = child->next)
-    {
-        if (find_rule_title_node(child, r->title))
-            continue;
-        if (find_rule_type_node(child, r->type))
-            continue;
-        if (find_rule_occurrence_node(child, r->occurrence))
-            continue;
-        if (find_rule_field_node(child, r->field))
-            continue;
-        if (find_rule_value_node(child, r->value))
-            continue;
-    }
-    rules.push_back(r);
+        t = std::string(descr);
     return true;
 }
 
@@ -231,12 +421,23 @@ bool XsltPolicy::find_policy_node(xmlNodePtr node)
     if (!node->name || def.compare((const char*)node->name))
         return false;
 
+    bool valid = true;
+    XsltRule *r = new XsltRule;
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_call_template_node(child);
+        if (!find_rule_title_node(child, r->title))
+            if (!find_context_node(child, r))
+                if (!find_choose_node(child, r, valid))
+                    find_call_template_free_text_node(child, r, valid);
+        if (!valid)
+            break;
         child = child->next;
     }
+    if (valid)
+        rules.push_back(r);
+    else
+        delete r;
     return true;
 }
 
@@ -273,6 +474,32 @@ bool XsltPolicy::find_for_each_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
+bool XsltPolicy::find_policychecks_description_node(xmlNodePtr node)
+{
+    std::string def("description");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    const char* description_str = (const char*)xmlNodeGetContent(node);
+    if (description_str)
+        description = std::string(description_str);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_policychecks_title_node(xmlNodePtr node)
+{
+    std::string def("title");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    const char* title_str = (const char*)xmlNodeGetContent(node);
+    if (title_str)
+        title = std::string(title_str);
+    return true;
+}
+
+//---------------------------------------------------------------------------
 bool XsltPolicy::find_policychecks_node(xmlNodePtr node)
 {
     std::string def("policyChecks");
@@ -282,7 +509,9 @@ bool XsltPolicy::find_policychecks_node(xmlNodePtr node)
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_for_each_node(child);
+        if (!find_policychecks_title_node(child))
+            if (!find_policychecks_description_node(child))
+                find_for_each_node(child);
         child = child->next;
     }
     return true;
@@ -394,8 +623,15 @@ xmlNsPtr XsltPolicy::create_namespace_xsl(xmlNodePtr node)
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_mc(xmlNodePtr node)
 {
-    return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaarea",
+    return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaconch",
                     (const xmlChar *)"mc");
+}
+
+//---------------------------------------------------------------------------
+xmlNsPtr XsltPolicy::create_namespace_ma(xmlNodePtr node)
+{
+    return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaarea",
+                    (const xmlChar *)"ma");
 }
 
 //---------------------------------------------------------------------------
@@ -406,26 +642,93 @@ xmlNsPtr XsltPolicy::create_namespace_xsi(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::create_xpath_from_rule(XsltRule *rule, std::string& xpath)
+void XsltPolicy::create_test_from_rule(XsltRule *rule, std::string& xpath)
 {
     std::stringstream ss;
 
-    ss << "mc:MediaInfo/mc:track[@type='";
+    ss << "ma:MediaInfo/ma:track[@type='";
 
     if (!rule->type.length())
         return;
     ss << rule->type << "']";
 
-    ss << "[" << rule->occurrence << "]";
+    ss << "[";
+    if (rule->occurrence < 0)
+        ss << "*";
+    else
+        ss << rule->occurrence;
+    ss << "]";
 
     if (!rule->field.length())
     {
         xpath = ss.str();
         return;
     }
-    ss << "/mc:" << rule->field;
+    ss << "/ma:" << rule->field;
 
     xpath = ss.str();
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::parse_test_for_rule(const std::string& test, XsltRule *rule)
+{
+    std::string ss(test);
+    std::string find("ma:MediaInfo/ma:track[@type='");
+    size_t pos = 0;
+    size_t end = 0;
+    // type
+    if ((pos = ss.find(find)) != 0)
+        return false;
+
+    pos += find.length();
+    find = "']";
+    if ((end = ss.find(find, pos)) == std::string::npos)
+        return false;
+
+    rule->type = ss.substr(pos, end - pos);
+    if (!rule->type.length())
+        return false;
+
+    end += find.length();
+    if (end == ss.length())
+        return true;
+
+    // occurrence
+    pos = end;
+    find = "[";
+    if ((pos = ss.find(find, end)) != end)
+        return false;
+
+    pos += find.length();
+    find = "]";
+    if ((end = ss.find("]", pos)) == std::string::npos)
+        return false;
+
+    std::string occurrence = ss.substr(pos, end - pos);
+    if (occurrence == "*")
+        rule->occurrence = -1;
+    else
+        rule->occurrence = atoi(occurrence.c_str());
+
+    end += find.length();
+    if (end == ss.length())
+        return true;
+
+    // field
+    pos = end;
+    find = "/ma:";
+    if ((pos = ss.find(find, end)) != end)
+        return false;
+
+    pos += find.length();
+    end = ss.length();
+
+    std::string field = ss.substr(pos, end - pos);
+    if (!field.length())
+        return false;
+    rule->field = field;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
@@ -448,6 +751,81 @@ xmlNodePtr XsltPolicy::write_operator_new_node(xmlNodePtr parent, const xmlChar*
 }
 
 //---------------------------------------------------------------------------
+void XsltPolicy::write_operator_expected(xmlNodePtr node)
+{
+    std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
+
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
+    xmlNodePtr attr = write_operator_new_node(node, (const xmlChar *)"attribute", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
+    write_operator_new_node(attr, (const xmlChar *)"value-of", prop);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_operator_actual(xmlNodePtr node)
+{
+    std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
+
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"actual"));
+    xmlNodePtr attr = write_operator_new_node(node, (const xmlChar *)"attribute", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
+    write_operator_new_node(attr, (const xmlChar *)"value-of", prop);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_operator_choose(xmlNodePtr node, const xmlChar* test,
+                                       const xmlChar* pass,
+                                       const xmlChar* fail, const xmlChar* reason)
+{
+    std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
+
+    xmlNodePtr choose = write_operator_new_node(node, (const xmlChar *)"choose", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"test", test));
+    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
+    write_operator_new_node(when, (const xmlChar *)"attribute", prop, pass);
+
+    xmlNodePtr otherwise = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
+    write_operator_new_node(otherwise, (const xmlChar *)"attribute", prop, fail);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
+    write_operator_new_node(otherwise, (const xmlChar *)"attribute", prop, reason);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_operator_test_streamid(xmlNodePtr node)
+{
+    std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
+
+    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"../@streamid"));
+    xmlNodePtr ifElement = write_operator_new_node(node, (const xmlChar *)"if", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"streamid"));
+    xmlNodePtr attr = write_operator_new_node(ifElement, (const xmlChar *)"attribute", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"../@streamid"));
+    write_operator_new_node(attr, (const xmlChar *)"value-of", prop);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_operator_test_type(xmlNodePtr node)
+{
+    std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
+
+    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"../@type"));
+    xmlNodePtr ifElement = write_operator_new_node(node, (const xmlChar *)"if", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
+    xmlNodePtr attr = write_operator_new_node(ifElement, (const xmlChar *)"attribute", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"../@type"));
+    write_operator_new_node(attr, (const xmlChar *)"value-of", prop);
+}
+
+//---------------------------------------------------------------------------
 void XsltPolicy::write_operator_is_true(xmlNodePtr node)
 {
     std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
@@ -455,71 +833,16 @@ void XsltPolicy::write_operator_is_true(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"is_true"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"$xpath"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"is not true");
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_choose(test, (const xmlChar*)"$xpath", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"is not true");
 }
 
 //---------------------------------------------------------------------------
@@ -530,71 +853,21 @@ void XsltPolicy::write_operator_is_equal(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"is_equal"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"$xpath = $value"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"is not equal");
+    write_operator_choose(test, (const xmlChar*)"$xpath = $value", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"is not equal");
 }
 
 //---------------------------------------------------------------------------
@@ -605,71 +878,22 @@ void XsltPolicy::write_operator_is_not_equal(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"is_not_equal"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_expected(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"$xpath != $value"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"is equal");
+    write_operator_choose(test, (const xmlChar*)"$xpath != $value", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"is equal");
 }
 
 //---------------------------------------------------------------------------
@@ -680,71 +904,22 @@ void XsltPolicy::write_operator_is_greater_than(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"is_greater_than"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_expected(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"$xpath > $value"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"is less or equal than");
+    write_operator_choose(test, (const xmlChar*)"$xpath > $value", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"is less than or equal");
 }
 
 //---------------------------------------------------------------------------
@@ -755,71 +930,22 @@ void XsltPolicy::write_operator_is_less_than(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"is_less_than"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_expected(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"$xpath < $value"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"is greater or equal than");
+    write_operator_choose(test, (const xmlChar*)"$xpath < $value", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"is greater than or equal");
 }
 
 //---------------------------------------------------------------------------
@@ -830,71 +956,22 @@ void XsltPolicy::write_operator_is_greater_or_equal_than(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"is_greater_or_equal_than"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_expected(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"$xpath >= $value"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"is less than");
+    write_operator_choose(test, (const xmlChar*)"$xpath >= $value", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"is less than");
 }
 
 //---------------------------------------------------------------------------
@@ -905,71 +982,22 @@ void XsltPolicy::write_operator_is_less_or_equal_than(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"is_less_or_equal_than"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_expected(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"$xpath <= $value"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"is greater than");
+    write_operator_choose(test, (const xmlChar*)"$xpath <= $value", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"is greater than");
 }
 
 //---------------------------------------------------------------------------
@@ -980,66 +1008,18 @@ void XsltPolicy::write_operator_exists(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"exists"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"string-length($xpath) != 0"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"does not exist");
+    write_operator_choose(test, (const xmlChar*)"string-length($xpath) != 0", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"does not exist");
 }
 
 //---------------------------------------------------------------------------
@@ -1050,63 +1030,18 @@ void XsltPolicy::write_operator_does_not_exist(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"does_not_exist"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"string-length($xpath) = 0"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"exists");
+    write_operator_choose(test, (const xmlChar*)"string-length($xpath) = '0'", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"exists");
 }
 
 //---------------------------------------------------------------------------
@@ -1117,71 +1052,22 @@ void XsltPolicy::write_operator_contains_string(xmlNodePtr node)
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"contains_string"));
     xmlNodePtr child = write_operator_new_node(node, (const xmlChar *)"template", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
-
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"xpath"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
     prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
     write_operator_new_node(child, (const xmlChar *)"param", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"test"));
+    xmlNodePtr test = write_operator_new_node(child, (const xmlChar *)"element", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    write_operator_new_node(child, (const xmlChar *)"param", prop);
+    write_operator_test_type(test);
+    write_operator_test_streamid(test);
+    write_operator_expected(test);
+    write_operator_actual(test);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"title"));
-    xmlNodePtr title = write_operator_new_node(child, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$title"));
-    write_operator_new_node(title, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"context"));
-    xmlNodePtr ctx = write_operator_new_node(child, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktype"));
-    xmlNodePtr ctxEl1 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$tracktype"));
-    write_operator_new_node(ctxEl1, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"field"));
-    xmlNodePtr ctxEl2 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$field"));
-    write_operator_new_node(ctxEl2, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr ctxEl3 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(ctxEl3, (const xmlChar *)"value-of", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"value"));
-    xmlNodePtr ctxEl4 = write_operator_new_node(ctx, (const xmlChar *)"attribute", prop);
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$xpath"));
-    write_operator_new_node(ctxEl4, (const xmlChar *)"value-of", prop);
-
-    xmlNodePtr choose = write_operator_new_node(child, (const xmlChar *)"choose", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"contains($xpath, $value)"));
-    xmlNodePtr when = write_operator_new_node(choose, (const xmlChar *)"when", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res0 = write_operator_new_node(when, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res0, (const xmlChar *)"attribute", prop, (const xmlChar *)"pass");
-
-    xmlNodePtr other = write_operator_new_node(choose, (const xmlChar *)"otherwise", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"results"));
-    xmlNodePtr res = write_operator_new_node(other, (const xmlChar *)"element", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"outcome"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"fail");
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"reason"));
-    write_operator_new_node(res, (const xmlChar *)"attribute", prop, (const xmlChar *)"does not contain");
+    write_operator_choose(test, (const xmlChar*)"contains($xpath, $value)", (const xmlChar*)"pass",
+                          (const xmlChar*)"fail", (const xmlChar*)"does not contain");
 }
 
 //---------------------------------------------------------------------------
@@ -1200,80 +1086,12 @@ void XsltPolicy::write_operators(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_rule_title_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_policy_call_template_field_child(xmlNodePtr node, XsltRule *rule)
 {
-    if (!rule->title.length())
-        return;
-
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
-    child->ns = node->ns;
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"title");
-    xmlNodeSetContent(child, (const xmlChar *)rule->title.c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_rule_xpath_child(xmlNodePtr node, XsltRule *rule)
-{
-    std::string xpath;
-    create_xpath_from_rule(rule, xpath);
-    if (!xpath.length())
-        return;
-
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
-    child->ns = node->ns;
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"xpath");
-    xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)xpath.c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_rule_value_child(xmlNodePtr node, XsltRule *rule)
-{
-    if (!rule->value.length())
-        return;
-
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
-    child->ns = node->ns;
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"value");
-    xmlNodeSetContent(child, (const xmlChar *)rule->value.c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_rule_type_child(xmlNodePtr node, XsltRule *rule)
-{
-    if (!rule->type.length())
-        return;
-
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
-    child->ns = node->ns;
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"tracktype");
-    xmlNodeSetContent(child, (const xmlChar *)rule->type.c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_rule_occurrence_child(xmlNodePtr node, XsltRule *rule)
-{
-    std::stringstream ss;
-    ss << rule->occurrence;
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
-    child->ns = node->ns;
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"occurrence");
-    xmlNodeSetContent(child, (const xmlChar *)ss.str().c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_rule_field_child(xmlNodePtr node, XsltRule *rule)
-{
-    if (!rule->field.length())
+    if (rule->use_free_text || !rule->field.length() ||
+        (rule->ope != "is_greater_than" && rule->ope != "is_less_than" &&
+         rule->ope != "is_greater_or_equal_than" && rule->ope != "is_less_or_equal_than" &&
+         rule->ope != "exists" && rule->ope != "does_not_exist"))
         return;
 
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
@@ -1285,19 +1103,178 @@ void XsltPolicy::write_rule_field_child(xmlNodePtr node, XsltRule *rule)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_rule_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_policy_call_template_value_child(xmlNodePtr node, XsltRule *rule)
+{
+    if (rule->use_free_text || !rule->value.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
+    child->ns = node->ns;
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"value");
+    xmlNodeSetContent(child, (const xmlChar *)rule->value.c_str());
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_call_template_xpath_child(xmlNodePtr node, XsltRule *rule)
+{
+    if (rule->use_free_text && !rule->text.length())
+        return;
+
+    const char *xpath_str = ".";
+    if (rule->use_free_text)
+        xpath_str = rule->text.c_str();
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
+    child->ns = node->ns;
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"xpath");
+    xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)xpath_str);
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_call_template_child(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"call-template");
     child->ns = create_namespace_xsl(NULL);
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)rule->ope.c_str());
+    xmlAddChild(node, child);
+
+    const char *operat = NULL;
+
+    if (!rule->use_free_text)
+        operat = rule->ope.c_str();
+    else
+        operat = "is_true";
+
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)operat);
+    write_policy_call_template_xpath_child(child, rule);
+    write_policy_call_template_value_child(child, rule);
+    write_policy_call_template_field_child(child, rule);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_for_each_child(xmlNodePtr node, XsltRule *rule)
+{
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"for-each");
+    child->ns = node->ns;
+    xmlAddChild(node, child);
+
+    std::string select;
+    create_test_from_rule(rule, select);
+    xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)select.c_str());
+    write_policy_call_template_child(child, rule);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_when_child(xmlNodePtr node, XsltRule *rule)
+{
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"when");
+    child->ns = node->ns;
+    xmlAddChild(node, child);
+
+    std::string test;
+    create_test_from_rule(rule, test);
+    xmlNewProp(child, (const xmlChar *)"test", (const xmlChar *)test.c_str());
+    write_policy_for_each_child(child, rule);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule *rule)
+{
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"test");
+    child->ns = node->ns;
+    xmlAddChild(node, child);
+
+    xmlNewProp(child, (const xmlChar *)"outcome", (const xmlChar *)rule->invalid.c_str());
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_otherwise_child(xmlNodePtr node, XsltRule *rule)
+{
+    if (!rule->invalid.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"otherwise");
+    child->ns = node->ns;
+    xmlAddChild(node, child);
+
+    write_policy_otherwise_outcome_child(child, rule);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_choose_child(xmlNodePtr node, XsltRule *rule)
+{
+    if (rule->use_free_text)
+    {
+        write_policy_call_template_child(node, rule);
+        return;
+    }
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"choose");
+    child->ns = create_namespace_xsl(NULL);
+    xmlAddChild(node, child);
+    write_policy_when_child(child, rule);
+    write_policy_otherwise_child(child, rule);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_context_value_child(xmlNodePtr node, XsltRule *rule)
+{
+    const char *value = NULL;
+    if (!rule->use_free_text && rule->value.length())
+        value = rule->value.c_str();
+    else if (rule->use_free_text && rule->text.length())
+        value = rule->text.c_str();
+    else
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"attribute");
+    child->ns = create_namespace_xsl(NULL);
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"value");
+    xmlNodeSetContent(child, (const xmlChar *)value);
 
     xmlAddChild(node, child);
-    write_rule_title_child(child, rule);
-    write_rule_xpath_child(child, rule);
-    write_rule_value_child(child, rule);
-    write_rule_type_child(child, rule);
-    write_rule_occurrence_child(child, rule);
-    write_rule_field_child(child, rule);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_context_field_child(xmlNodePtr node, XsltRule *rule)
+{
+    if (!rule->field.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"attribute");
+    child->ns = create_namespace_xsl(NULL);
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"field");
+    xmlNodeSetContent(child, (const xmlChar *)rule->field.c_str());
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_context_child(xmlNodePtr node, XsltRule *rule)
+{
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"context");
+    child->ns = node->ns;
+    xmlAddChild(node, child);
+    
+    write_policy_context_field_child(child, rule);
+    write_policy_context_value_child(child, rule);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policy_title_child(xmlNodePtr node, XsltRule *rule)
+{
+    if (!rule->title.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"attribute");
+    child->ns = create_namespace_xsl(NULL);
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"title");
+    xmlNodeSetContent(child, (const xmlChar *)rule->title.c_str());
+
+    xmlAddChild(node, child);
 }
 
 //---------------------------------------------------------------------------
@@ -1306,7 +1283,9 @@ void XsltPolicy::write_policy_childs(xmlNodePtr node, XsltRule *rule)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"policy");
     xmlAddChild(node, child);
 
-    write_rule_child(child, rule);
+    write_policy_title_child(child, rule);
+    write_policy_context_child(child, rule);
+    write_policy_choose_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
@@ -1347,13 +1326,48 @@ void XsltPolicy::write_for_each_childs(xmlNodePtr node)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"for-each");
     child->ns = create_namespace_xsl(NULL);
 
-    xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)"mc:media");
+    xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)"ma:media");
     xmlAddChild(node, child);
     write_media_childs(child);
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policychecks_attribute_text_child(xmlNodePtr node)
+void XsltPolicy::write_policychecks_description_child(xmlNodePtr node)
+{
+    if (!description.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"description");
+    xmlNodeSetContent(child, (const xmlChar *)description.c_str());
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policychecks_title_child(xmlNodePtr node)
+{
+    if (!title.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"title");
+    xmlNodeSetContent(child, (const xmlChar *)title.c_str());
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policychecks_childs(xmlNodePtr node)
+{
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"policyChecks");
+
+    xmlAddChild(node, child);
+    write_policychecks_title_child(child);
+    write_policychecks_description_child(child);
+    write_for_each_childs(child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_mediaconch_attribute_text_child(xmlNodePtr node)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"text");
     child->ns = node->ns;
@@ -1363,24 +1377,14 @@ void XsltPolicy::write_policychecks_attribute_text_child(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policychecks_attribute_childs(xmlNodePtr node)
+void XsltPolicy::write_mediaconch_attribute_childs(xmlNodePtr node)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"attribute");
     child->ns = create_namespace_xsl(NULL);
 
     xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"version");
     xmlAddChild(node, child);
-    write_policychecks_attribute_text_child(child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_policychecks_childs(xmlNodePtr node)
-{
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"policyChecks");
-
-    xmlAddChild(node, child);
-    write_policychecks_attribute_childs(child);
-    write_for_each_childs(child);
+    write_mediaconch_attribute_text_child(child);
 }
 
 //---------------------------------------------------------------------------
@@ -1389,6 +1393,7 @@ void XsltPolicy::write_mediaconch_childs(xmlNodePtr node)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"MediaConch");
 
     xmlAddChild(node, child);
+    write_mediaconch_attribute_childs(child);
     write_policychecks_childs(child);
 }
 
@@ -1398,7 +1403,7 @@ void XsltPolicy::write_root_template_childs(xmlNodePtr node)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"template");
     child->ns = node->ns;
 
-    xmlNewProp(child, (const xmlChar *)"match", (const xmlChar *)"mc:MediaArea");
+    xmlNewProp(child, (const xmlChar *)"match", (const xmlChar *)"ma:MediaArea");
 
     xmlAddChild(node, child);
     write_mediaconch_childs(child);
@@ -1411,6 +1416,7 @@ void XsltPolicy::write_root_output_child(xmlNodePtr node)
     child->ns = node->ns;
 
     xmlNewProp(child, (const xmlChar *)"encoding", (const xmlChar *)"UTF-8");
+    xmlNewProp(child, (const xmlChar *)"method", (const xmlChar *)"xml");
     xmlNewProp(child, (const xmlChar *)"version", (const xmlChar *)"1.0");
     xmlNewProp(child, (const xmlChar *)"indent", (const xmlChar *)"yes");
 
@@ -1435,13 +1441,14 @@ xmlDocPtr XsltPolicy::create_doc()
     //Default Namespaces
     xmlNsPtr nsXsl = create_namespace_xsl(root_node);
     create_namespace_mc(root_node);
+    create_namespace_ma(root_node);
     create_namespace_xsi(root_node);
 
     root_node->ns = nsXsl;
     root_node->nsDef = nsXsl;
 
     xmlNewProp(root_node, (const xmlChar *)"version", (const xmlChar *)"1.0");
-    xmlNewProp(root_node, (const xmlChar *)"extension-element-prefixes", (const xmlChar *)"xsi");
+    xmlNewProp(root_node, (const xmlChar *)"extension-element-prefixes", (const xmlChar *)"xsi ma");
     write_root_default_childs(root_node);
     return doc;
 }

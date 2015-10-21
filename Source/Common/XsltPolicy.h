@@ -41,7 +41,7 @@ namespace MediaConch {
 
 struct XsltRule
 {
-    XsltRule() : occurrence(1) {}
+    XsltRule() : use_free_text(false), occurrence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
 
@@ -55,7 +55,9 @@ struct XsltRule
     std::string ope;
     std::string value;
 
-    std::string text;
+    std::string text; // Free text
+
+    std::string invalid;
 
 private:
     XsltRule& operator=(const XsltRule&);
@@ -87,40 +89,62 @@ private:
     bool       find_template_name_node(xmlNodePtr node);
     bool       find_mediaconch_node(xmlNodePtr node);
     bool       find_policychecks_node(xmlNodePtr node);
+    bool       find_policychecks_title_node(xmlNodePtr node);
+    bool       find_policychecks_description_node(xmlNodePtr node);
     bool       find_for_each_node(xmlNodePtr node);
     bool       find_media_node(xmlNodePtr node);
     bool       find_policy_node(xmlNodePtr node);
 
-    bool       find_call_template_node(xmlNodePtr node);
     bool       find_rule_title_node(xmlNodePtr node, std::string& title);
-    bool       find_rule_type_node(xmlNodePtr node, std::string& type);
-    bool       find_rule_occurrence_node(xmlNodePtr node, int& occurrence);
-    bool       find_rule_field_node(xmlNodePtr node, std::string& field);
-    bool       find_rule_value_node(xmlNodePtr node, std::string& value);
+    bool       find_context_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_context_attribute_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_context_attribute_value_node(xmlNodePtr node, std::string& value);
+    bool       find_context_attribute_field_node(xmlNodePtr node, std::string& value);
+    bool       find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_choose_when_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_choose_otherwise_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_choose_otherwise_test_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_call_template_free_text_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_call_template_xpath_node(xmlNodePtr node, std::string& type);
+    bool       find_call_template_value_node(xmlNodePtr node, std::string& field);
+    bool       find_call_template_field_node(xmlNodePtr node, std::string& field);
+    bool       parse_test_for_rule(const std::string& test, XsltRule *rule);
 
     void       write_root_default_childs(xmlNodePtr node);
     void       write_root_template_childs(xmlNodePtr node);
     void       write_root_output_child(xmlNodePtr node);
     void       write_mediaconch_childs(xmlNodePtr node);
+    void       write_mediaconch_attribute_childs(xmlNodePtr node);
+    void       write_mediaconch_attribute_text_child(xmlNodePtr node);
     void       write_policychecks_childs(xmlNodePtr node);
-    void       write_policychecks_attribute_childs(xmlNodePtr node);
-    void       write_policychecks_attribute_text_child(xmlNodePtr node);
+    void       write_policychecks_title_child(xmlNodePtr node);
+    void       write_policychecks_description_child(xmlNodePtr node);
     void       write_for_each_childs(xmlNodePtr node);
     void       write_media_childs(xmlNodePtr node);
     void       write_media_attribute_childs(xmlNodePtr node);
     void       write_media_attribute_value_child(xmlNodePtr node);
     void       write_policy_childs(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_title_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_type_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_xpath_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_value_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_occurrence_child(xmlNodePtr node, XsltRule *rule);
-    void       write_rule_field_child(xmlNodePtr node, XsltRule *rule);
-    void       create_xpath_from_rule(XsltRule *rule, std::string& xpath);
+    void       write_policy_title_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_context_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_context_value_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_context_field_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_choose_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_when_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_otherwise_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_for_each_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_xpath_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_value_child(xmlNodePtr node, XsltRule *rule);
+    void       write_policy_call_template_field_child(xmlNodePtr node, XsltRule *rule);
+    void       create_test_from_rule(XsltRule *rule, std::string& xpath);
     xmlNsPtr   create_namespace_xsl(xmlNodePtr node);
     xmlNsPtr   create_namespace_mc(xmlNodePtr node);
+    xmlNsPtr   create_namespace_ma(xmlNodePtr node);
     xmlNsPtr   create_namespace_xsi(xmlNodePtr node);
+
     void       write_operators(xmlNodePtr node);
     void       write_operator_is_true(xmlNodePtr node);
     void       write_operator_is_equal(xmlNodePtr node);
@@ -132,6 +156,13 @@ private:
     void       write_operator_exists(xmlNodePtr node);
     void       write_operator_does_not_exist(xmlNodePtr node);
     void       write_operator_contains_string(xmlNodePtr node);
+    void       write_operator_test_type(xmlNodePtr node);
+    void       write_operator_test_streamid(xmlNodePtr node);
+    void       write_operator_actual(xmlNodePtr node);
+    void       write_operator_expected(xmlNodePtr node);
+    void       write_operator_choose(xmlNodePtr node, const xmlChar* test,
+                                     const xmlChar* pass,
+                                     const xmlChar* fail, const xmlChar* reason);
     xmlNodePtr write_operator_new_node(xmlNodePtr node, const xmlChar* title,
                                        std::vector<std::pair<const xmlChar*, const xmlChar*> >& prop,
                                        const xmlChar* content = NULL, bool parentNs=true);

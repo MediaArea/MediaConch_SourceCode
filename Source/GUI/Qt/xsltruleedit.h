@@ -35,6 +35,7 @@ class QSpinBox;
 class QDialogButtonBox;
 class QTableWidgetItem;
 class QRadioButton;
+class QTextEdit;
 
 namespace MediaConch {
 
@@ -63,6 +64,10 @@ public:
     QLineEdit         *get_value_line();
     QSpinBox          *get_occurrence_box();
     QFrame            *get_editor_frame();
+    QLineEdit         *get_invalid_line();
+    QTextEdit         *get_freeText_text();
+    QRadioButton      *get_freeTextSelector_radio();
+    QRadioButton      *get_editorSelector_radio();
     void               change_values_of_field_selector();
 
 private:
