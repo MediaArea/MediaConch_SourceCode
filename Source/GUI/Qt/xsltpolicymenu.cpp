@@ -46,6 +46,12 @@ QLineEdit *XsltPolicyMenu::get_title_line()
 }
 
 //---------------------------------------------------------------------------
+QLineEdit *XsltPolicyMenu::get_description_line()
+{
+    return ui->description;
+}
+
+//---------------------------------------------------------------------------
 QPushButton *XsltPolicyMenu::get_savePolicy_button()
 {
     return ui->savePolicy;

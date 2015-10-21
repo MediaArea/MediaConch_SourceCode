@@ -50,6 +50,7 @@ private Q_SLOTS:
     void duplicate_policy();
     void delete_policy();
     void edit_policy_title();
+    void edit_policy_description();
     void add_new_rule();
     void duplicate_rule();
     void delete_rule();

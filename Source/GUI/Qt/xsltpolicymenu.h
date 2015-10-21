@@ -47,6 +47,7 @@ public:
 // Visual element
 //***************************************************************************
     QLineEdit   *get_title_line();
+    QLineEdit   *get_description_line();
     QPushButton *get_addNewRule_button();
     QPushButton *get_deletePolicy_button();
     QPushButton *get_duplicatePolicy_button();

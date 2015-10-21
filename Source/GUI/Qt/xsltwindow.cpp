@@ -259,6 +259,27 @@ void XsltWindow::edit_policy_title()
     }
 }
 
+//---------------------------------------------------------------------------
+void XsltWindow::edit_policy_description()
+{
+    QString qdescription = policyMenu->get_description_line()->text();
+
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    if (!item)
+        return;
+
+    int row = policieswindow->get_index_in_tree();;
+    if (row < 0)
+        return;
+
+    Policy *p = mainwindow->get_policies().policies[row];
+    if (p->description != qdescription.toStdString())
+    {
+        p->description = qdescription.toStdString();
+        p->saved = false;
+    }
+}
+
 //***************************************************************************
 // Visual elements
 //***************************************************************************
@@ -301,6 +322,8 @@ void XsltWindow::createPolicyMenu()
                      this, SLOT(duplicate_policy()));
     QObject::connect(policyMenu->get_title_line(), SIGNAL(textChanged(QString)),
                      this, SLOT(edit_policy_title()));
+    QObject::connect(policyMenu->get_description_line(), SIGNAL(textChanged(QString)),
+                     this, SLOT(edit_policy_description()));
 }
 
 //---------------------------------------------------------------------------
@@ -308,7 +331,6 @@ void XsltWindow::displayPolicyMenu(QString title)
 {
     createPolicyMenu();
     QLineEdit* name = policyMenu->get_title_line();
-
     name->setText(title);
 
     policyMenu->get_savePolicy_button()->setEnabled(false);
@@ -316,7 +338,11 @@ void XsltWindow::displayPolicyMenu(QString title)
     if (index >= 0 && index < (int)mainwindow->get_policies().policies.size())
     {
         if (mainwindow->get_policies().policies[index] && mainwindow->get_policies().policies[index]->filename.length())
+        {
             policyMenu->get_savePolicy_button()->setEnabled(true);
+            QLineEdit* descr = policyMenu->get_description_line();
+            descr->setText(QString().fromStdString(mainwindow->get_policies().policies[index]->description));
+        }
     }
 }
 
