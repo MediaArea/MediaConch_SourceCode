@@ -124,18 +124,6 @@ LIBS             += -lxslt
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
 
-contains(DEFINES, "MEDIAINFO_LIBCURL_YES") {
-exists(../../../curl/libcurl.pc) {
-INCLUDEPATH      += ../../../curl/include
-LIBS             += ../../../curl/lib/.libs/libcurl.a
-message("custom curl         : yes")
-}
-else {
-CONFIG           += link_pkgconfig
-PKGCONFIG        += libcurl
-}
-}
-
 RESOURCES        += ../../Source/Resource/Resources.qrc
 
 MOC_DIR          =  _Automated
