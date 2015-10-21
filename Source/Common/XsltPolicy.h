@@ -41,7 +41,7 @@ namespace MediaConch {
 
 struct XsltRule
 {
-    XsltRule() : occurrence(1) {}
+    XsltRule() : use_free_text(false), occurrence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
 
@@ -89,16 +89,28 @@ private:
     bool       find_template_name_node(xmlNodePtr node);
     bool       find_mediaconch_node(xmlNodePtr node);
     bool       find_policychecks_node(xmlNodePtr node);
+    bool       find_policychecks_title_node(xmlNodePtr node);
+    bool       find_policychecks_description_node(xmlNodePtr node);
     bool       find_for_each_node(xmlNodePtr node);
     bool       find_media_node(xmlNodePtr node);
     bool       find_policy_node(xmlNodePtr node);
 
-    bool       find_call_template_node(xmlNodePtr node);
     bool       find_rule_title_node(xmlNodePtr node, std::string& title);
-    bool       find_rule_type_node(xmlNodePtr node, std::string& type);
-    bool       find_rule_occurrence_node(xmlNodePtr node, int& occurrence);
-    bool       find_rule_field_node(xmlNodePtr node, std::string& field);
-    bool       find_rule_value_node(xmlNodePtr node, std::string& value);
+    bool       find_context_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_context_attribute_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_context_attribute_value_node(xmlNodePtr node, std::string& value);
+    bool       find_context_attribute_field_node(xmlNodePtr node, std::string& value);
+    bool       find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_choose_when_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_choose_otherwise_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_choose_otherwise_test_node(xmlNodePtr node, XsltRule* rule);
+    bool       find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_call_template_free_text_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       find_call_template_xpath_node(xmlNodePtr node, std::string& type);
+    bool       find_call_template_value_node(xmlNodePtr node, std::string& field);
+    bool       find_call_template_field_node(xmlNodePtr node, std::string& field);
+    bool       parse_test_for_rule(const std::string& test, XsltRule *rule);
 
     void       write_root_default_childs(xmlNodePtr node);
     void       write_root_template_childs(xmlNodePtr node);
