@@ -502,6 +502,7 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
 void CheckerWindow::change_html_file_detail_conformance(QString& html, String& file)
 {
     QString report = mainwindow->get_implementationreport_text();
+    bool is_valid = implementationreport_is_valid(report);
 #if QT_VERSION >= 0x050200
     report = report.toHtmlEscaped();
 #else
@@ -515,7 +516,6 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
     reg.setMinimal(true);
     if ((pos = reg.indexIn(html, 0)) != -1)
     {
-        bool is_valid = implementationreport_is_valid(report);
         reg = QRegExp("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
         reg.setMinimal(true);
         if ((pos = reg.indexIn(html, pos)) != -1)
@@ -754,12 +754,12 @@ bool CheckerWindow::report_is_html(QString& report)
 //---------------------------------------------------------------------------
 bool CheckerWindow::implementationreport_is_valid(QString& report)
 {
-    QRegExp reg("<\\Fail[ ]+\\|");
+    QRegExp reg("Fail \\|", Qt::CaseInsensitive);
 
     if (reg.indexIn(report, 0) != -1)
-        return true;
+        return false;
 
-    return false;
+    return true;
 }
 
 //---------------------------------------------------------------------------
