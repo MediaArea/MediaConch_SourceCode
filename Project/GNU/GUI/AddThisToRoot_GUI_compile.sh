@@ -90,7 +90,7 @@ if test -e MediaInfoLib/Project/GNU/Library/configure; then
     test -e Makefile && rm Makefile
     chmod +x configure
     if [ "$OS" = "mac" ]; then
-        ./configure $MacOptions --with-libcurl $*
+        ./configure $MacOptions --with-libcurl=runtime $*
     else
         ./configure --with-libcurl $*
     fi
