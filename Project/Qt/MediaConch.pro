@@ -33,6 +33,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
+                    ../../Source/GUI/Qt/displaywindow.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
                     ../../Source/GUI/Qt/policieswindow.cpp \
                     ../../Source/GUI/Qt/policywindow.cpp \
@@ -62,6 +63,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \
+                    ../../Source/GUI/Qt/displaywindow.h \
                     ../../Source/GUI/Qt/policieswindow.h \
                     ../../Source/GUI/Qt/policywindow.h \
                     ../../Source/GUI/Qt/schematronwindow.h \

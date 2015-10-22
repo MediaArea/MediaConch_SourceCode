@@ -118,6 +118,8 @@ namespace MediaConch
             mainwindow->checker_selected();
         else if (!name.compare("Policies"))
             mainwindow->policies_selected();
+        else if (!name.compare("Display files"))
+            mainwindow->display_selected();
         else
             mainwindow->checker_selected();
     }

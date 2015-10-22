@@ -9,6 +9,7 @@
 #include "menumainwindow.h"
 #include "checkerwindow.h"
 #include "policieswindow.h"
+#include "displaywindow.h"
 #include "helpwindow.h"
 
 #include <QStringList>
@@ -56,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
     ToolGroup->addAction(ui->actionPolicies);
+    ToolGroup->addAction(ui->actionDisplay);
     
     // Visual elements
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
@@ -63,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     MenuView = new MenuMainWindow(this);
     MainView=NULL;
     policiesView = NULL;
+    displayView = NULL;
 
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
@@ -79,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Default
     add_default_policy();
+    add_default_displays();
     on_actionChecker_triggered();
 }
 
@@ -110,16 +114,27 @@ void MainWindow::policy_to_delete(int index)
 //---------------------------------------------------------------------------
 void MainWindow::Run()
 {
-    if (C.Tool == Core::tool_MediaPolicies)
+    switch (current_view)
     {
-        createPoliciesView();
-        return;
+        case RUN_CHECKER_VIEW:
+            //TODO: fill the view if file already here
+            // if (!C.List.empty())
+            //     C.Run();
+            createWebView();
+            break;
+        case RUN_POLICIES_VIEW:
+            createPoliciesView();
+            break;
+        case RUN_DISPLAY_VIEW:
+            createDisplayView();
+            break;
+        default:
+            //TODO: fill the view if file already here
+            // if (!C.List.empty())
+            //     C.Run();
+            createWebView();
+            break;
     }
-
-    createWebView();
-    //TODO: fill the view if file already here
-    // if (!C.List.empty())
-    //     C.Run();
 }
 
 //---------------------------------------------------------------------------
@@ -267,6 +282,29 @@ void MainWindow::add_default_policy()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::add_default_displays()
+{
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+
+    QDir dir(path);
+    dir.cd("Display");
+
+    if (dir.exists())
+    {
+        dir.setFilter(QDir::Files);
+        QFileInfoList list = dir.entryInfoList();
+        for (int i = 0; i < list.size(); ++i)
+            displaysList.push_back(list[i].absoluteFilePath());
+    }
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::addXsltDisplay(QString& display_xslt)
 {
     MainView->setDisplayXslt(display_xslt);
@@ -302,6 +340,12 @@ const std::vector<Policy *>& MainWindow::get_all_policies() const
     return C.policies.policies;
 }
 
+//---------------------------------------------------------------------------
+const std::vector<QString>& MainWindow::get_displays() const
+{
+    return displaysList;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -323,19 +367,33 @@ void MainWindow::on_actionOpen_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionChecker_triggered()
 {
+    if (!ui->actionChecker->isChecked())
+        ui->actionChecker->setChecked(true);
     if (clearVisualElements() < 0)
         return;
-    C.Tool=Core::tool_MediaConch;
-    C.Format=Core::format_Text;
+    current_view = RUN_CHECKER_VIEW;
     Run();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::on_actionPolicies_triggered()
 {
+    if (!ui->actionPolicies->isChecked())
+        ui->actionPolicies->setChecked(true);
     if (clearVisualElements() < 0)
         return;
-    C.Tool=Core::tool_MediaPolicies;
+    current_view = RUN_POLICIES_VIEW;
+    Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDisplay_triggered()
+{
+    if (!ui->actionDisplay->isChecked())
+        ui->actionDisplay->setChecked(true);
+    if (clearVisualElements() < 0)
+        return;
+    current_view = RUN_DISPLAY_VIEW;
     Run();
 }
 
@@ -350,7 +408,9 @@ void MainWindow::on_actionChooseSchema_triggered()
     {
         //TODO error
     }
-    C.Tool=Core::tool_MediaPolicies;
+    if (!ui->actionPolicies->isChecked())
+        ui->actionPolicies->setChecked(true);
+    current_view = RUN_POLICIES_VIEW;
     Run();
 }
 
@@ -447,6 +507,12 @@ int MainWindow::clearVisualElements()
         policiesView=NULL;
     }
 
+    if (displayView)
+    {
+        delete displayView;
+        displayView=NULL;
+    }
+
     return 0;
 }
 
@@ -471,6 +537,15 @@ void MainWindow::createPoliciesView()
         return;
     policiesView = new PoliciesWindow(this);
     policiesView->displayPoliciesTree();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createDisplayView()
+{
+    if (clearVisualElements() < 0)
+        return;
+    displayView = new DisplayWindow(this);
+    displayView->displayDisplay();
 }
 
 //***************************************************************************
@@ -499,6 +574,12 @@ void MainWindow::checker_selected()
 void MainWindow::policies_selected()
 {
     on_actionPolicies_triggered();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::display_selected()
+{
+    on_actionDisplay_triggered();
 }
 
 //---------------------------------------------------------------------------

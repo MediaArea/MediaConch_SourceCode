@@ -27,6 +27,7 @@ namespace MediaConch {
 class MenuMainWindow;
 class CheckerWindow;
 class PoliciesWindow;
+class DisplayWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -65,7 +66,9 @@ public:
     QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();
+    void                        display_selected();
     void                        add_default_policy();
+    void                        add_default_displays();
     bool                        ValidatePolicy(int policy, bool& valid, String& report);
 
     void                        addPolicyToList(QString& policy);
@@ -74,6 +77,7 @@ public:
     void                        addXsltDisplay(QString& display_xslt);
     void                        removeXsltDisplay();
     const std::vector<Policy *>& get_all_policies() const;
+    const std::vector<QString>& get_displays() const;
     const std::vector<String>&  policy_file_registered();
 
     Policies&                   get_policies() { return C.policies; }
@@ -93,19 +97,32 @@ private:
     QVBoxLayout*                Layout;
     CheckerWindow*              MainView;
     PoliciesWindow*             policiesView;
+    DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
+
+    std::vector<QString>        displaysList;
 
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createWebView();
     void                        createPoliciesView();
+    void                        createDisplayView();
     void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
+
+    enum Run_View
+    {
+        RUN_CHECKER_VIEW,
+        RUN_POLICIES_VIEW,
+        RUN_DISPLAY_VIEW,
+    };
+    Run_View current_view;
 
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
+    void on_actionDisplay_triggered();
     void on_actionChooseSchema_triggered();
 
     //Help
