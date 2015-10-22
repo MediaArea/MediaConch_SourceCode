@@ -77,7 +77,7 @@ public:
     void                        addXsltDisplay(QString& display_xslt);
     void                        removeXsltDisplay();
     const std::vector<Policy *>& get_all_policies() const;
-    const std::vector<QString>& get_displays() const;
+    std::vector<QString>&       get_displays();
     const std::vector<String>&  policy_file_registered();
 
     Policies&                   get_policies() { return C.policies; }

@@ -5,10 +5,13 @@
  */
 
 #include "displaywindow.h"
+#include "displaymenu.h"
 #include "mainwindow.h"
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QDir>
+#include <QFileDialog>
+#include <QPushButton>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -21,10 +24,10 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-DisplayWindow::DisplayWindow(MainWindow* m) : table(NULL), mainwindow(m)
+DisplayWindow::DisplayWindow(MainWindow* m) : displayMenu(NULL), mainwindow(m)
 {
     // Visual elements
-    ;
+    displayMenu = NULL;
 }
 
 DisplayWindow::~DisplayWindow()
@@ -34,44 +37,53 @@ DisplayWindow::~DisplayWindow()
 
 void DisplayWindow::displayDisplay()
 {
-    table = new QTableWidget(0, 2, mainwindow);
+    displayMenu = new DisplayMenu(mainwindow);
     fillTable();
-    mainwindow->set_widget_to_layout(table);
+    mainwindow->set_widget_to_layout(displayMenu);
+
+    QTableWidget *table = displayMenu->get_display_table();
+    if (table)
+    {
+        table->verticalHeader()->hide();
+        table->horizontalHeader()->setStretchLastSection(true);
+        table->resizeColumnsToContents();
+        table->resizeRowsToContents();
+    }
+
+    QObject::connect(displayMenu->get_addFile_button(), SIGNAL(clicked()),
+                     this, SLOT(add_new_file()));
+    QObject::connect(displayMenu->get_delFile_button(), SIGNAL(clicked()),
+                     this, SLOT(delete_file()));
 }
 
 void DisplayWindow::clearDisplay()
 {
-    if (!table)
+    if (!displayMenu)
         return;
 
-    mainwindow->remove_widget_from_layout(table);
-    delete table;
-    table = NULL;
+    mainwindow->remove_widget_from_layout(displayMenu);
+    delete displayMenu;
+    displayMenu = NULL;
 }
 
 void DisplayWindow::fillTable()
 {
+    if (!displayMenu)
+        return;
+
+    QTableWidget *table = displayMenu->get_display_table();
     if (!table)
         return;
 
-    table->horizontalHeader()->setStretchLastSection(true);
-    if (!table->horizontalHeaderItem(0))
-    {
-        QTableWidgetItem* header = new QTableWidgetItem(tr("File"));
-        table->setHorizontalHeaderItem(0, header);
-    }
-    else
-        table->horizontalHeaderItem(0)->setText(tr("File"));
-    if (!table->horizontalHeaderItem(1))
-    {
-        QTableWidgetItem* header = new QTableWidgetItem(tr("Directory"));
-        table->setHorizontalHeaderItem(1, header);
-    }
-    else
-        table->horizontalHeaderItem(1)->setText(tr("Directory"));
-    table->verticalHeader()->hide();
+    table->clear();
+    table->setRowCount(0);
 
-    std::vector<QString> displays = mainwindow->get_displays();
+    QTableWidgetItem *itemFile = new QTableWidgetItem(tr("File"));
+    table->setHorizontalHeaderItem(0, itemFile);
+    QTableWidgetItem *itemDir = new QTableWidgetItem(tr("Path"));
+    table->setHorizontalHeaderItem(1, itemDir);
+
+    std::vector<QString>& displays = mainwindow->get_displays();
     for (size_t i = 0; i < displays.size(); ++i)
     {
         QFileInfo file(displays[i]);
@@ -90,6 +102,81 @@ void DisplayWindow::fillTable()
 
     table->resizeColumnsToContents();
     table->resizeRowsToContents();
+    table->horizontalHeader()->setStretchLastSection(true);
+}
+
+void DisplayWindow::add_new_file()
+{
+    if (!displayMenu)
+        return;
+
+    QStringList List = QFileDialog::getOpenFileNames(mainwindow, "Open file", "", "Display files (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    if (List.empty())
+        return;
+
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+
+    QDir dir(path);
+    dir.cd("Display");
+
+    if (!dir.exists())
+        if (!dir.mkpath(dir.absolutePath()))
+            return;
+
+    std::vector<QString>& displays = mainwindow->get_displays();
+    for (int i = 0; i < List.count(); ++i)
+    {
+        QFileInfo file(List[i]);
+        for (int j = 0; 1; ++j)
+        {
+            QString str;
+            if (!j)
+                str = QString("%1/%2.xsl").arg(dir.absolutePath()).arg(file.baseName());
+            else
+                str = QString("%1/%2_%3.xsl").arg(dir.absolutePath()).arg(file.baseName()).arg(j);
+            QFile info(str);
+            if (info.exists())
+                continue;
+
+            QFile::copy(file.absoluteFilePath(), str);
+            displays.push_back(str);
+            break;
+        }
+    }
+    fillTable();
+}
+
+void DisplayWindow::delete_file()
+{
+    if (!displayMenu)
+        return;
+
+    QTableWidget *table = displayMenu->get_display_table();
+    if (!table)
+        return;
+
+    QItemSelectionModel *select = table->selectionModel();
+
+    if (!select->hasSelection())
+        return;
+
+    QModelIndexList list = select->selectedRows();
+
+    for (int i = 0; i < list.count(); ++i)
+    {
+        QTableWidgetItem* itemDir = table->item(list[i].row(), 1);
+        if (!itemDir)
+            continue;
+        QFile file(itemDir->text());
+        file.remove();
+        table->removeRow(list[i].row());
+    }
 }
 
 }

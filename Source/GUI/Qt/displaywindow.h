@@ -15,6 +15,7 @@ class QTableWidget;
 namespace MediaConch {
 
 class MainWindow;
+class DisplayMenu;
 
 class DisplayWindow : public QObject
 {
@@ -30,8 +31,12 @@ public:
 
 private:
     // Visual elements
-    QTableWidget *table;
+    DisplayMenu  *displayMenu;
     MainWindow   *mainwindow;
+
+private Q_SLOTS:
+    void add_new_file();
+    void delete_file();
 };
 
 }

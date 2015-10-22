@@ -341,7 +341,7 @@ const std::vector<Policy *>& MainWindow::get_all_policies() const
 }
 
 //---------------------------------------------------------------------------
-const std::vector<QString>& MainWindow::get_displays() const
+std::vector<QString>& MainWindow::get_displays()
 {
     return displaysList;
 }
