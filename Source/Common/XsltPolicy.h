@@ -110,7 +110,6 @@ private:
     bool       find_call_template_free_text_node(xmlNodePtr node, XsltRule* rule, bool& valid);
     bool       find_call_template_xpath_node(xmlNodePtr node, std::string& type);
     bool       find_call_template_value_node(xmlNodePtr node, std::string& field);
-    bool       find_call_template_field_node(xmlNodePtr node, std::string& field);
     bool       parse_test_for_rule(const std::string& test, XsltRule *rule);
 
     void       write_root_default_childs(xmlNodePtr node);
@@ -160,7 +159,6 @@ private:
     void       write_operator_test_type(xmlNodePtr node);
     void       write_operator_test_streamid(xmlNodePtr node);
     void       write_operator_actual(xmlNodePtr node);
-    void       write_operator_expected(xmlNodePtr node);
     void       write_operator_choose(xmlNodePtr node, const xmlChar* test,
                                      const xmlChar* pass,
                                      const xmlChar* fail, const xmlChar* reason);
