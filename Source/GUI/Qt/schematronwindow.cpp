@@ -175,11 +175,10 @@ void SchematronWindow::add_new_gor()
     item->setText(0, name);
 
     ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns.push_back(p);
-    displayGroupOfRules(name);
+    mainwindow->get_policies().policies[rowPolicy]->saved = false;
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
-    mainwindow->get_policies().policies[rowPolicy]->saved = false;
 }
 
 //---------------------------------------------------------------------------
@@ -234,7 +233,6 @@ void SchematronWindow::add_new_rule()
 
     ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowGor]->rules.push_back(r);
     mainwindow->get_policies().policies[rowPolicy]->saved = false;
-    displayRuleMenu();
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
@@ -305,7 +303,6 @@ void SchematronWindow::add_new_assert()
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
-    displayRuleEdit(item);
 }
 
 //---------------------------------------------------------------------------

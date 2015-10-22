@@ -171,7 +171,6 @@ void XsltWindow::add_new_rule()
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
-    displayRuleEdit(rowPolicy, ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules.size() - 1);
 }
 
 //---------------------------------------------------------------------------
