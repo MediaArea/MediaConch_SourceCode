@@ -596,8 +596,7 @@ xmlNsPtr XsltPolicy::create_namespace_xsl(xmlNodePtr node)
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_mc(xmlNodePtr node)
 {
-    return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaconch",
-                    (const xmlChar *)"mc");
+    return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaconch", NULL);
 }
 
 //---------------------------------------------------------------------------
