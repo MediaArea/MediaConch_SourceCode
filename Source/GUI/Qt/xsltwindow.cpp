@@ -336,9 +336,10 @@ void XsltWindow::displayPolicyMenu(QString title)
     int index = policieswindow->get_index_in_tree();
     if (index >= 0 && index < (int)mainwindow->get_policies().policies.size())
     {
-        if (mainwindow->get_policies().policies[index] && mainwindow->get_policies().policies[index]->filename.length())
+        if (mainwindow->get_policies().policies[index])
         {
-            policyMenu->get_savePolicy_button()->setEnabled(true);
+            if (mainwindow->get_policies().policies[index]->filename.length())
+                policyMenu->get_savePolicy_button()->setEnabled(true);
             QLineEdit* descr = policyMenu->get_description_line();
             descr->setText(QString().fromStdString(mainwindow->get_policies().policies[index]->description));
         }

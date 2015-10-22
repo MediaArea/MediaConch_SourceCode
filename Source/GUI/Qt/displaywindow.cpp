@@ -122,8 +122,9 @@ void DisplayWindow::add_new_file()
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #endif
 
+    path += ("/displays");
+
     QDir dir(path);
-    dir.cd("Display");
 
     if (!dir.exists())
         if (!dir.mkpath(dir.absolutePath()))

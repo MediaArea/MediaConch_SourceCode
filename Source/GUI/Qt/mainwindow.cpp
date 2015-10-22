@@ -191,6 +191,7 @@ int MainWindow::exporting_to_schematron_file(int pos)
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #endif
 
+    path += "/policies";
     if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
         path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".sch";
 
@@ -215,6 +216,10 @@ int MainWindow::exporting_to_xslt_file(int pos)
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #endif
 
+    path += "/policies";
+    QDir dir(path);
+    if (!dir.exists())
+        dir.mkpath(dir.absolutePath());
     if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
         path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".xsl";
 
@@ -265,6 +270,7 @@ void MainWindow::add_default_policy()
 #else
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #endif
+    path += "/policies";
     policies_dir = QDir(path);
 
     policies_dir.setFilter(QDir::Files);
@@ -292,8 +298,8 @@ void MainWindow::add_default_displays()
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #endif
 
+    path += "/displays";
     QDir dir(path);
-    dir.cd("Display");
 
     if (dir.exists())
     {
