@@ -169,7 +169,6 @@ void Policies::create_values_from_csv()
 
     std::string xsltOperators[] =
     {
-        "is_true",
         "is_equal",
         "is_not_equal",
         "is_greater_than",
