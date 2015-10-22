@@ -73,7 +73,7 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--tool",                                        Tool)
     OPTION("--format",                                      Format)
     OPTION("--output",                                      Output)
-    OPTION("--policy",                                      Policies)
+    OPTION("--policy",                                      PolicyOption)
     OPTION("--display",                                     Display)
     //Default
     OPTION("--",                                            Default)
@@ -135,7 +135,7 @@ CL_OPTION(Format)
 }
 
 //---------------------------------------------------------------------------
-CL_OPTION(Policies)
+CL_OPTION(PolicyOption)
 {
     //Form : --Inform=Text
     size_t Egal_Pos=Argument.find(__T('='));
