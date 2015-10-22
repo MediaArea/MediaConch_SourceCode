@@ -100,25 +100,6 @@ bool XsltPolicy::find_title_node(xmlNodePtr node, std::string& title)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_call_template_field_node(xmlNodePtr node, std::string& field)
-{
-    std::string def("with-param");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    def = std::string("field");
-    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
-    if (name == NULL || def.compare((const char*)name))
-        return false;
-
-    const char* select = (const char*)xmlNodeGetContent(node);
-    if (select != NULL)
-        field = std::string((const char*)select);
-
-    return true;
-}
-
-//---------------------------------------------------------------------------
 bool XsltPolicy::find_call_template_value_node(xmlNodePtr node, std::string& value)
 {
     std::string def("with-param");
@@ -217,14 +198,6 @@ bool XsltPolicy::find_choose_call_template_node(xmlNodePtr node, XsltRule* rule,
         else if (find_call_template_value_node(child, tmp))
         {
             if (tmp != rule->value)
-            {
-                valid = false;
-                return true;
-            }
-        }
-        else if (find_call_template_field_node(child, tmp))
-        {
-            if (tmp != rule->field)
             {
                 valid = false;
                 return true;
@@ -751,18 +724,6 @@ xmlNodePtr XsltPolicy::write_operator_new_node(xmlNodePtr parent, const xmlChar*
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_operator_expected(xmlNodePtr node)
-{
-    std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
-
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"expected"));
-    xmlNodePtr attr = write_operator_new_node(node, (const xmlChar *)"attribute", prop);
-
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"$value"));
-    write_operator_new_node(attr, (const xmlChar *)"value-of", prop);
-}
-
-//---------------------------------------------------------------------------
 void XsltPolicy::write_operator_actual(xmlNodePtr node)
 {
     std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
@@ -889,7 +850,6 @@ void XsltPolicy::write_operator_is_not_equal(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_streamid(test);
-    write_operator_expected(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath != $value", (const xmlChar*)"pass",
@@ -915,7 +875,6 @@ void XsltPolicy::write_operator_is_greater_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_streamid(test);
-    write_operator_expected(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath > $value", (const xmlChar*)"pass",
@@ -941,7 +900,6 @@ void XsltPolicy::write_operator_is_less_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_streamid(test);
-    write_operator_expected(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath < $value", (const xmlChar*)"pass",
@@ -967,7 +925,6 @@ void XsltPolicy::write_operator_is_greater_or_equal_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_streamid(test);
-    write_operator_expected(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath >= $value", (const xmlChar*)"pass",
@@ -993,7 +950,6 @@ void XsltPolicy::write_operator_is_less_or_equal_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_streamid(test);
-    write_operator_expected(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath <= $value", (const xmlChar*)"pass",
@@ -1063,7 +1019,6 @@ void XsltPolicy::write_operator_contains_string(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_streamid(test);
-    write_operator_expected(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"contains($xpath, $value)", (const xmlChar*)"pass",
@@ -1184,7 +1139,6 @@ void XsltPolicy::write_policy_when_child(xmlNodePtr node, XsltRule *rule)
 void XsltPolicy::write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"test");
-    child->ns = node->ns;
     xmlAddChild(node, child);
 
     xmlNewProp(child, (const xmlChar *)"outcome", (const xmlChar *)rule->invalid.c_str());
