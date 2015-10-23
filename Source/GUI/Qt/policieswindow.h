@@ -42,7 +42,7 @@ public:
     int                         get_index_in_tree();
     QTreeWidgetItem*            get_item_in_tree();
     int                         get_index_of_item_backXX(QTreeWidgetItem* item, size_t back);
-    bool                        is_all_policies_saved();
+    void                        new_policy_filename(Policy* policy);
 
     // Visual elements
     void                        updatePoliciesTreeSchematronPattern(SchematronPattern *p, QTreeWidgetItem *parent);

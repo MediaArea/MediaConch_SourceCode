@@ -83,7 +83,7 @@ void PoliciesWindow::import_schema()
 
     displayPoliciesTree();
     if (ret.length())
-            policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
+        policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
     else
     {
         policiesTree->get_error_bar()->clearMessage();
@@ -95,6 +95,7 @@ void PoliciesWindow::import_schema()
         QTreeWidgetItem *item = parent->child(row);
         if (!item)
             return;
+        new_policy_filename(mainwindow->get_policies().policies[row]);
 
         parent->setExpanded(true);
         parent->setSelected(false);
@@ -126,6 +127,38 @@ void PoliciesWindow::save_policy()
 }
 
 //---------------------------------------------------------------------------
+void PoliciesWindow::new_policy_filename(Policy* p)
+{
+    QString path = mainwindow->get_local_folder();
+    path += "/policies";
+
+    QDir dir(path);
+    if (!dir.exists())
+        dir.mkpath(path);
+
+    QString ext;
+    if (p->type == Policies::POLICY_SCHEMATRON)
+        ext = "sch";
+    else
+        ext = "xsl";
+    for (int i = 0; 1; ++i)
+    {
+        QString tmp;
+        if (!i)
+            tmp = QString("%1/%2.%3").arg(path).arg(QString().fromStdString(p->title)).arg(ext);
+        else
+            tmp = QString("%1/%2_%4.%3").arg(path).arg(QString().fromStdString(p->title)).arg(ext).arg(i);
+
+        QFileInfo file(tmp);
+        if (file.exists())
+            continue;
+        p->filename = file.absoluteFilePath().toStdString();
+        p->saved = false;
+        break;
+    }
+}
+
+//---------------------------------------------------------------------------
 void PoliciesWindow::add_new_schematron_policy(QTreeWidgetItem* parent)
 {
     Policy *p = new SchematronPolicy;
@@ -146,6 +179,7 @@ void PoliciesWindow::add_new_schematron_policy(QTreeWidgetItem* parent)
             ++i;
         }
     }
+    new_policy_filename(p);
 
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(p->title);
@@ -181,6 +215,7 @@ void PoliciesWindow::add_new_xslt_policy(QTreeWidgetItem* parent)
             ++i;
         }
     }
+    new_policy_filename(p);
 
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(p->title);
@@ -237,7 +272,11 @@ void PoliciesWindow::delete_all_policies()
         return;
     removeTreeChildren(policies);
     for (size_t i = 0; i < mainwindow->get_policies().policies.size(); ++i)
+    {
+        QFile file(QString().fromStdString(mainwindow->get_policies().policies[i]->filename));
+        file.remove();
         delete mainwindow->get_policies().policies[i];
+    }
     mainwindow->get_policies().policies.clear();
     policiesMenu->get_deletePolicies_button()->setEnabled(false);
 }
@@ -247,14 +286,14 @@ void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
 {
     removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
-    delete parent->takeChild(row);
-
-    item = get_item_in_tree();
-    if (item)
-        item->setSelected(false);
-
+    parent->takeChild(row);
+    for (int i = 0; i < parent->childCount(); ++i)
+    {
+        item = parent->child(i);
+        if (item && item->isSelected())
+            item->setSelected(false);
+    }
     parent->setSelected(true);
-    displayPoliciesMenu();
 }
 
 //---------------------------------------------------------------------------
@@ -566,18 +605,6 @@ QTreeWidgetItem *PoliciesWindow::get_item_in_tree()
         return NULL;
 
     return list.first();
-}
-
-//---------------------------------------------------------------------------
-bool PoliciesWindow::is_all_policies_saved()
-{
-    Policies& policies = mainwindow->get_policies();
-    for (size_t i = 0; i < policies.policies.size(); ++i)
-    {
-        if (!policies.policies[i]->saved)
-            return false;
-    }
-    return true;
 }
 
 }

@@ -174,6 +174,19 @@ const std::vector<String>& MainWindow::policy_file_registered()
 }
 
 //---------------------------------------------------------------------------
+QString MainWindow::get_local_folder() const
+{
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+    return path;
+}
+
+//---------------------------------------------------------------------------
 QString MainWindow::ask_for_schema_file()
 {
     QString file=QFileDialog::getOpenFileName(this, "Open file", "", "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
@@ -183,14 +196,7 @@ QString MainWindow::ask_for_schema_file()
 //---------------------------------------------------------------------------
 int MainWindow::exporting_to_schematron_file(int pos)
 {
-#if QT_VERSION >= 0x050400
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-#elif QT_VERSION >= 0x050000
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-#else
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#endif
-
+    QString path = get_local_folder();
     path += "/policies";
     if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
         path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".sch";
@@ -201,22 +207,15 @@ int MainWindow::exporting_to_schematron_file(int pos)
     if (!filename.length())
         return -1;
     C.policies.export_schema(filename.toStdString().c_str(), pos);
-    C.policies.policies[pos]->filename = filename.toStdString();
     return 0;
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::exporting_to_xslt_file(int pos)
 {
-#if QT_VERSION >= 0x050400
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-#elif QT_VERSION >= 0x050000
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-#else
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#endif
-
+    QString path = get_local_folder();
     path += "/policies";
+
     QDir dir(path);
     if (!dir.exists())
         dir.mkpath(dir.absolutePath());
@@ -229,7 +228,6 @@ int MainWindow::exporting_to_xslt_file(int pos)
     if (!filename.length())
         return -1;
     C.policies.export_schema(filename.toStdString().c_str(), pos);
-    C.policies.policies[pos]->filename = filename.toStdString();
     return 0;
 }
 
@@ -263,13 +261,7 @@ void MainWindow::add_default_policy()
         C.policies.import_schema_from_memory(file_str, schematron.constData(), schematron.length());
     }
 
-#if QT_VERSION >= 0x050400
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-#elif QT_VERSION >= 0x050000
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-#else
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#endif
+    QString path = get_local_folder();
     path += "/policies";
     policies_dir = QDir(path);
 
@@ -290,17 +282,10 @@ void MainWindow::add_default_policy()
 //---------------------------------------------------------------------------
 void MainWindow::add_default_displays()
 {
-#if QT_VERSION >= 0x050400
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-#elif QT_VERSION >= 0x050000
-    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-#else
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#endif
-
+    QString path = get_local_folder();
     path += "/displays";
-    QDir dir(path);
 
+    QDir dir(path);
     if (dir.exists())
     {
         dir.setFilter(QDir::Files);
@@ -423,7 +408,7 @@ void MainWindow::on_actionChooseSchema_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (C.Tool == Core::tool_MediaPolicies && policiesView && !policiesView->is_all_policies_saved())
+    if (!is_all_policies_saved())
     {
         QMessageBox msgBox(QMessageBox::Warning, tr("MediaConch"),
                            tr("All policy changes not saved will be discarded?"),
@@ -452,6 +437,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
     QMainWindow::closeEvent(event);
+}
+
+//---------------------------------------------------------------------------
+bool MainWindow::is_all_policies_saved()
+{
+    for (size_t i = 0; i < C.policies.policies.size(); ++i)
+    {
+        if (!C.policies.policies[i]->saved)
+            return false;
+    }
+    return true;
 }
 
 //***************************************************************************

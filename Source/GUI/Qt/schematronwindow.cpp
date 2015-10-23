@@ -139,6 +139,7 @@ void SchematronWindow::duplicate_policy()
     Policy *p = new SchematronPolicy((SchematronPolicy*)mainwindow->get_policies().policies[row]);
 
     p->title = p->title + string(" (Copy)");
+    policieswindow->new_policy_filename(p);
 
     mainwindow->get_policies().policies.push_back(p);
     QTreeWidgetItem* parent = item->parent();
@@ -146,14 +147,12 @@ void SchematronWindow::duplicate_policy()
         return;
 
     QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
-    item->setSelected(false);
-    new_item->setSelected(true);
     QString title = QString().fromStdString(p->title);
     new_item->setText(0, title);
-
+    item->setSelected(false);
     for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
         policieswindow->updatePoliciesTreeSchematronPattern(((SchematronPolicy*)p)->patterns[i], new_item);
-    displayPolicyMenu(title);
+    new_item->setSelected(true);
 }
 
 //---------------------------------------------------------------------------
@@ -206,13 +205,11 @@ void SchematronWindow::duplicate_gor()
 
     QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
     item->setSelected(false);
-    new_item->setSelected(true);
     QString title = QString().fromStdString(pat->name);
     new_item->setText(0, title);
-
     for (size_t i = 0; i < pat->rules.size(); ++i)
         policieswindow->updatePoliciesTreeSchematronRule(pat->rules[i], new_item);
-    displayGroupOfRules(title);
+    new_item->setSelected(true);
 }
 
 //---------------------------------------------------------------------------
@@ -264,8 +261,6 @@ void SchematronWindow::duplicate_rule()
     QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
     new_item->setText(0, QString("Rule"));
     item->setSelected(false);
-    new_item->setSelected(true);
-
     for (size_t i = 0; i < r->asserts.size(); ++i)
     {
         SchematronAssert *assert = r->asserts[i];
@@ -276,7 +271,7 @@ void SchematronWindow::duplicate_rule()
         QString descr = QString().fromStdString(assert->description);
         a->setText(0, descr);
     }
-    displayRuleMenu();
+    new_item->setSelected(true);
 }
 
 //---------------------------------------------------------------------------
@@ -333,8 +328,6 @@ void SchematronWindow::duplicate_assert()
     new_item->setText(0, QString().fromStdString(a->description));
     item->setSelected(false);
     new_item->setSelected(true);
-
-    displayRuleEdit(new_item);
 }
 
 //---------------------------------------------------------------------------
@@ -361,12 +354,14 @@ void SchematronWindow::delete_gor()
     // Visual
     policieswindow->removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
-    delete parent->takeChild(row);
-    item = policieswindow->get_item_in_tree();
-    if (item)
-        item->setSelected(false);
+    parent->takeChild(row);
+    for (int i = 0; i < parent->childCount(); ++i)
+    {
+        item = parent->child(i);
+        if (item && item->isSelected())
+            item->setSelected(false);
+    }
     parent->setSelected(true);
-    displayPolicyMenu(parent->text(0));
 }
 
 //---------------------------------------------------------------------------
@@ -394,12 +389,14 @@ void SchematronWindow::delete_rule()
     // Visual
     policieswindow->removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
-    delete parent->takeChild(row);
-    item = policieswindow->get_item_in_tree();
-    if (item)
-        item->setSelected(false);
+    parent->takeChild(row);
+    for (int i = 0; i < parent->childCount(); ++i)
+    {
+        item = parent->child(i);
+        if (item && item->isSelected())
+            item->setSelected(false);
+    }
     parent->setSelected(true);
-    displayGroupOfRules(parent->text(0));
 }
 
 //---------------------------------------------------------------------------
@@ -425,12 +422,14 @@ void SchematronWindow::delete_assert()
 
     // Visual
     QTreeWidgetItem* parent = item->parent();
-    delete parent->takeChild(row);
-    item = policieswindow->get_item_in_tree();
-    if (item)
-        item->setSelected(false);
+    parent->takeChild(row);
+    for (int i = 0; i < parent->childCount(); ++i)
+    {
+        item = parent->child(i);
+        if (item && item->isSelected())
+            item->setSelected(false);
+    }
     parent->setSelected(true);
-    displayRuleMenu();
 }
 
 //---------------------------------------------------------------------------

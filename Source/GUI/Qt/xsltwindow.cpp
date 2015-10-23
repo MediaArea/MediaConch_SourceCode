@@ -112,6 +112,9 @@ void XsltWindow::delete_policy()
     for (size_t i = 0; i < ((XsltPolicy*)p)->rules.size(); ++i)
         delete ((XsltPolicy*)p)->rules[i];
     ((XsltPolicy*)p)->rules.clear();
+
+    QFile file(QString().fromStdString(mainwindow->get_policies().policies[row]->filename));
+    file.remove();
     mainwindow->get_policies().policies.erase(mainwindow->get_policies().policies.begin() + row);
 
     // Visual
@@ -134,18 +137,19 @@ void XsltWindow::duplicate_policy()
     p->title = p->title + string(" (Copy)");
 
     mainwindow->get_policies().policies.push_back(p);
+    policieswindow->new_policy_filename(p);
+
     QTreeWidgetItem* parent = item->parent();
     if (!parent)
         return;
 
     QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
-    item->setSelected(false);
-    new_item->setSelected(true);
     QString title = QString().fromStdString(p->title);
     new_item->setText(0, title);
+    item->setSelected(false);
     for (size_t i = 0; i < ((XsltPolicy*)p)->rules.size(); ++i)
         policieswindow->updatePoliciesTreeXsltRule(((XsltPolicy*)p)->rules[i], new_item);
-    displayPolicyMenu(title);
+    new_item->setSelected(true);
 }
 
 //---------------------------------------------------------------------------
@@ -197,7 +201,6 @@ void XsltWindow::duplicate_rule()
     new_item->setText(0, QString().fromStdString(r->title));
     item->setSelected(false);
     new_item->setSelected(true);
-    displayRuleEdit(rowPolicy, p->rules.size() - 1);
 }
 
 //---------------------------------------------------------------------------
@@ -220,12 +223,14 @@ void XsltWindow::delete_rule()
     // Visual
     policieswindow->removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
-    delete parent->takeChild(row);
-    item = policieswindow->get_item_in_tree();
-    if (item)
-        item->setSelected(false);
+    parent->takeChild(row);
+    for (int i = 0; i < parent->childCount(); ++i)
+    {
+        item = parent->child(i);
+        if (item && item->isSelected())
+            item->setSelected(false);
+    }
     parent->setSelected(true);
-    displayPolicyMenu(parent->text(0));
 }
 
 //---------------------------------------------------------------------------
