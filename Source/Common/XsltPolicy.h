@@ -143,6 +143,7 @@ private:
     xmlNsPtr   create_namespace_xsl(xmlNodePtr node);
     xmlNsPtr   create_namespace_mc(xmlNodePtr node);
     xmlNsPtr   create_namespace_ma(xmlNodePtr node);
+    xmlNsPtr   create_namespace_mi(xmlNodePtr node);
     xmlNsPtr   create_namespace_xsi(xmlNodePtr node);
 
     void       write_operators(xmlNodePtr node);

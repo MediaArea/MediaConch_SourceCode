@@ -607,6 +607,13 @@ xmlNsPtr XsltPolicy::create_namespace_ma(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
+xmlNsPtr XsltPolicy::create_namespace_mi(xmlNodePtr node)
+{
+    return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediainfo",
+                    (const xmlChar *)"mi");
+}
+
+//---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_xsi(xmlNodePtr node)
 {
     return xmlNewNs(node, (const xmlChar*)"http://www.w3.org/2001/XMLSchema-instance",
@@ -618,7 +625,7 @@ void XsltPolicy::create_test_from_rule(XsltRule *rule, std::string& xpath)
 {
     std::stringstream ss;
 
-    ss << "ma:MediaInfo/ma:track[@type='";
+    ss << "mi:MediaInfo/mi:track[@type='";
 
     if (!rule->type.length())
         return;
@@ -636,7 +643,7 @@ void XsltPolicy::create_test_from_rule(XsltRule *rule, std::string& xpath)
         xpath = ss.str();
         return;
     }
-    ss << "/ma:" << rule->field;
+    ss << "/mi:" << rule->field;
 
     xpath = ss.str();
 }
@@ -645,7 +652,7 @@ void XsltPolicy::create_test_from_rule(XsltRule *rule, std::string& xpath)
 bool XsltPolicy::parse_test_for_rule(const std::string& test, XsltRule *rule)
 {
     std::string ss(test);
-    std::string find("ma:MediaInfo/ma:track[@type='");
+    std::string find("mi:MediaInfo/mi:track[@type='");
     size_t pos = 0;
     size_t end = 0;
     // type
@@ -688,7 +695,7 @@ bool XsltPolicy::parse_test_for_rule(const std::string& test, XsltRule *rule)
 
     // field
     pos = end;
-    find = "/ma:";
+    find = "/mi:";
     if ((pos = ss.find(find, end)) != end)
         return false;
 
@@ -1395,6 +1402,7 @@ xmlDocPtr XsltPolicy::create_doc()
     xmlNsPtr nsXsl = create_namespace_xsl(root_node);
     create_namespace_mc(root_node);
     create_namespace_ma(root_node);
+    create_namespace_mi(root_node);
     create_namespace_xsi(root_node);
 
     root_node->ns = nsXsl;
