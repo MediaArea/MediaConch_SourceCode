@@ -14,7 +14,7 @@
                         <li class="list-group-item report">Implementation report <span class="text-uppercase text-{{ check.getStatus ? 'success' : 'danger' }}"><b>{{ check.getStatus ? '' : 'not ' }}valid</b></span>
                             <p class="text-right">
                                 <a href="#" data-toggle="modal" data-target="#modalConformance{{ loop.index }}" title="View report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                                <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="ConformanceReport.txt"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                                <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="ImplementationReport.txt"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </p>
                         </li>
                         <li class="list-group-item report">MediaInfo
@@ -60,7 +60,7 @@
                                 <p>{{ check.getConformance|replace({' ': '&nbsp;'})|raw|nl2br }}</p>
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="ConformanceReport.txt">Download report</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="ImplementationReport.txt">Download report</button>
                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
