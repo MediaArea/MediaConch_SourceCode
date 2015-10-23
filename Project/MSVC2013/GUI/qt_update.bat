@@ -3,6 +3,8 @@ mkdir _Automated
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\helpwindow.h -o_Automated\moc_helpwindow.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\menumainwindow.h -o_Automated\moc_menumainwindow.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\checkerwindow.h -o_Automated\moc_checkerwindow.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\displaymenu.h -o_Automated\moc_displaymenu.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\displaywindow.h -o_Automated\moc_displaywindow.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policieswindow.h -o_Automated\moc_policieswindow.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policywindow.h -o_Automated\moc_policywindow.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\schematronwindow.h -o_Automated\moc_schematronwindow.cpp
@@ -19,6 +21,7 @@ mkdir _Automated
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\rulemenu.h -o_Automated\moc_rulemenu.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\WebPage.h -o_Automated\moc_WebPage.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\WebView.h -o_Automated\moc_WebView.cpp
+..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\displaymenu.ui -o _Automated\ui_displaymenu.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\mainwindow.ui -o _Automated\ui_mainwindow.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\policiesedit.ui -o _Automated\ui_policiesedit.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\policiesmenu.ui -o _Automated\ui_policiesmenu.h
