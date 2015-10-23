@@ -139,6 +139,7 @@ void SchematronWindow::duplicate_policy()
     Policy *p = new SchematronPolicy((SchematronPolicy*)mainwindow->get_policies().policies[row]);
 
     p->title = p->title + string(" (Copy)");
+    policieswindow->new_policy_filename(p);
 
     mainwindow->get_policies().policies.push_back(p);
     QTreeWidgetItem* parent = item->parent();

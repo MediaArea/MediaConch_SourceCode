@@ -112,6 +112,9 @@ void XsltWindow::delete_policy()
     for (size_t i = 0; i < ((XsltPolicy*)p)->rules.size(); ++i)
         delete ((XsltPolicy*)p)->rules[i];
     ((XsltPolicy*)p)->rules.clear();
+
+    QFile file(QString().fromStdString(mainwindow->get_policies().policies[row]->filename));
+    file.remove();
     mainwindow->get_policies().policies.erase(mainwindow->get_policies().policies.begin() + row);
 
     // Visual
@@ -134,6 +137,8 @@ void XsltWindow::duplicate_policy()
     p->title = p->title + string(" (Copy)");
 
     mainwindow->get_policies().policies.push_back(p);
+    policieswindow->new_policy_filename(p);
+
     QTreeWidgetItem* parent = item->parent();
     if (!parent)
         return;

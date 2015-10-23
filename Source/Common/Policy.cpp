@@ -32,7 +32,6 @@ Policy::Policy(const Policy* p)
         return;
     }
 
-    this->filename = p->filename;
     this->title = p->title;
     this->description = p->description;
     this->saved = false;

@@ -70,6 +70,7 @@ public:
     void                        add_default_policy();
     void                        add_default_displays();
     bool                        ValidatePolicy(int policy, bool& valid, String& report);
+    bool                        is_all_policies_saved();
 
     void                        addPolicyToList(QString& policy);
     void                        clearPolicyList();
@@ -79,6 +80,7 @@ public:
     const std::vector<Policy *>& get_all_policies() const;
     std::vector<QString>&       get_displays();
     const std::vector<String>&  policy_file_registered();
+    QString                     get_local_folder() const;
 
     Policies&                   get_policies() { return C.policies; }
 
