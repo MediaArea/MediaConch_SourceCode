@@ -242,6 +242,7 @@ String Core::MediaInfo ()
                  MI->Option(__T("Language"), String());
                  MI->Option(__T("Inform"), String());
                  break;
+        case format_JsTree:
         case format_Xml:
                  MI->Option(__T("Complete"), __T("1"));
                  MI->Option(__T("Language"), __T("raw"));
@@ -249,7 +250,14 @@ String Core::MediaInfo ()
                  break;
         default: ;
     }
-    return MI->Inform();
+
+    const String& ret = MI->Inform();
+    if (Format == format_JsTree)
+    {
+        JsTree js;
+        return js.format_from_inform_XML(ret);
+    }
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -276,7 +284,7 @@ String Core::MediaTrace ()
     if (Format == format_JsTree)
     {
         JsTree js;
-        return js.format_from_XML(ret);
+        return js.format_from_trace_XML(ret);
     }
     return ret;
 }
