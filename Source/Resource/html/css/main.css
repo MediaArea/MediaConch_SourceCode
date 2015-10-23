@@ -174,3 +174,7 @@ p.registration {
     border: 1px solid silver;
     font-size: 1.1em;
 }
+
+.jstree-grid-wrapper {
+    margin-top: 10px;
+}

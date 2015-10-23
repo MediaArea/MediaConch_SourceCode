@@ -95,8 +95,9 @@
                           <div class="col-md-6 col-sm-8 col-xs-8">
                             <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="traceSearch" id="traceSearch{{ loop.index }}" placeholder="Search" />
                           </div>
-                          <div id="trace{{ loop.index }}" class="col-md-8"></div>
-                          <div id="traceInfo{{ loop.index }}" class="col-md-4"></div>
+                          <div class="col-md-12">
+                            <div id="trace{{ loop.index }}"></div>
+                          </div>
                         </div>
                       </div>
                       <div class="modal-footer">
@@ -127,20 +128,20 @@
                             'dblclick_toggle' : false,
                             'data' : {{ check.getTrace.jstree|raw }}
                         },
-                        "plugins" : ['search', 'types'],
+                        "plugins" : ['search', 'types', 'grid'],
                         'types' : {
                             'default' : {'icon' : 'glyphicon glyphicon-folder-open'},
                             'block' : {'icon' : 'glyphicon glyphicon-folder-open'},
                             'data' : {'icon' : 'glyphicon glyphicon-file'},
                         },
-                    })
-                    .on('select_node.jstree', function (e, data) {
-                        data.instance.toggle_node(data.node);
-                    })
-                    .on('loaded.jstree', function (e, data) {
-                        data.instance.get_container().find('li').each(function () {
-                            data.instance.open_node($(this));
-                        })
+                        'grid' : {
+                            columns : [
+                                {width: 100, header: "Offset", value: 'offset'},
+                                {width: 500, header: "Key", tree: true},
+                                {width: 250, header: "Value",  value: 'dataValue'},
+                            ],
+                            resizable: true,
+                        },
                     })
                 });
 
@@ -155,6 +156,14 @@
                         }, 250);
                     });
                 });
+            });
+            $('#trace{{ loop.index }}').on('loaded.jstree', function (e, data) {
+                data.instance.get_container().find('li').each(function () {
+                    data.instance.open_node($(this));
+                })
+            });
+            $('#trace{{ loop.index }}').on('select_node.jstree', function (e, data) {
+                data.instance.toggle_node(data.node);
             });
         </script>
 
