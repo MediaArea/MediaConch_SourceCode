@@ -36,6 +36,7 @@ private:
 
 private Q_SLOTS:
     void add_new_file();
+    void export_file();
     void delete_file();
 };
 

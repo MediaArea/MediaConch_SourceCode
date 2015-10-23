@@ -82,22 +82,7 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="3" column="0" colspan="2">
-          <widget class="QPushButton" name="addNewFile">
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(255, 170, 0);
-                  selection-background-color: rgb(255, 170, 0);
-                  </string>
-           </property>
-           <property name="text">
-            <string>Add a Display file</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="2">
+         <item row="5" column="0" colspan="2">
           <widget class="QPushButton" name="deleteFile">
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
@@ -109,6 +94,36 @@
            </property>
            <property name="text">
             <string>Delete selected Display file</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QPushButton" name="addNewFile">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 170, 0);
+                  selection-background-color: rgb(255, 170, 0);
+                  </string>
+           </property>
+           <property name="text">
+            <string>Import display set...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" colspan="2">
+          <widget class="QPushButton" name="exportFile">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 170, 0);
+                  selection-background-color: rgb(255, 170, 0);
+                  </string>
+           </property>
+           <property name="text">
+            <string>Export display set...</string>
            </property>
           </widget>
          </item>
