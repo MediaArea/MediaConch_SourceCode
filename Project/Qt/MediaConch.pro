@@ -33,6 +33,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
+                    ../../Source/GUI/Qt/displaywindow.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
                     ../../Source/GUI/Qt/policieswindow.cpp \
                     ../../Source/GUI/Qt/policywindow.cpp \
@@ -45,7 +46,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/rulemenu.cpp \
                     ../../Source/GUI/Qt/ruleedit.cpp \
                     ../../Source/GUI/Qt/xsltpolicymenu.cpp \
-                    ../../Source/GUI/Qt/xsltruleedit.cpp
+                    ../../Source/GUI/Qt/xsltruleedit.cpp \
+                    ../../Source/GUI/Qt/displaymenu.cpp
 
 HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Schema.h \
@@ -62,6 +64,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \
+                    ../../Source/GUI/Qt/displaywindow.h \
                     ../../Source/GUI/Qt/policieswindow.h \
                     ../../Source/GUI/Qt/policywindow.h \
                     ../../Source/GUI/Qt/schematronwindow.h \
@@ -73,7 +76,8 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/GUI/Qt/rulemenu.h \
                     ../../Source/GUI/Qt/ruleedit.h \
                     ../../Source/GUI/Qt/xsltpolicymenu.h \
-                    ../../Source/GUI/Qt/xsltruleedit.h
+                    ../../Source/GUI/Qt/xsltruleedit.h \
+                    ../../Source/GUI/Qt/displaymenu.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policiestree.ui \
@@ -83,7 +87,8 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/rulemenu.ui \
                     ../../Source/GUI/Qt/ruleedit.ui \
                     ../../Source/GUI/Qt/xsltpolicymenu.ui \
-                    ../../Source/GUI/Qt/xsltruleedit.ui
+                    ../../Source/GUI/Qt/xsltruleedit.ui \
+                    ../../Source/GUI/Qt/displaymenu.ui
 
 INCLUDEPATH      += ../../Source
 

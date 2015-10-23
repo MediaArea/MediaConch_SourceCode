@@ -73,6 +73,8 @@ private:
     void change_body_in_template(QString& body, QString& html);
     void add_policy_to_form_selection(QString& policies, QString& form, const char *selector);
     void create_policy_options(QString& policies);
+    void add_display_to_form_selection(QString& displays, QString& form, const char *selector);
+    void create_displays_options(QString& displays);
     void add_file_detail_to_html(QString& html, String& file, int policy);
     QString create_html_file_detail(String& file, int policy);
     void change_html_file_detail(QString& html, String& file);

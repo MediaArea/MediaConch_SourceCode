@@ -118,6 +118,8 @@ namespace MediaConch
             mainwindow->checker_selected();
         else if (!name.compare("Policies"))
             mainwindow->policies_selected();
+        else if (!name.compare("Display"))
+            mainwindow->display_selected();
         else
             mainwindow->checker_selected();
     }
@@ -152,7 +154,10 @@ namespace MediaConch
 
         QTextStream out(&file);
         if (dl_file.endsWith(".html"))
-            out << report.toOuterXml();
+        {
+            out << "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">";
+            out << report.toInnerXml();
+        }
         else
         {
             QTextDocument text(report.toPlainText().trimmed());
@@ -178,10 +183,21 @@ namespace MediaConch
         for (int i = 0; i < files.size(); ++i)
             list << QFileInfo(files[i]);
 
-        QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
-        QString display_xslt;
-        if (display_xslt_list.length())
-            mainwindow->addXsltDisplay(display_xslt_list.last());
+        QWebElement displayElement = form.findFirst("#checkerUpload_step1_display_selector");
+        QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+
+        if (display_xslt == "-1")
+        {
+            QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
+            if (display_xslt_list.length())
+                mainwindow->addXsltDisplay(display_xslt_list.last());
+        }
+        else
+        {
+            int index = display_xslt.toInt();
+            if (index >= 0 && index < (int)mainwindow->get_displays().size())
+                mainwindow->addXsltDisplay(mainwindow->get_displays()[index]);
+        }
 
         if (policy == "-1")
         {
@@ -206,14 +222,25 @@ namespace MediaConch
         if (!url.length())
             return;
 
-        QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
-        QString display_xslt;
-        if (display_xslt_list.length())
-            mainwindow->addXsltDisplay(display_xslt_list.last());
+        QWebElement displayElement = form.findFirst("#checkerOnline_step1_display_selector");
+        QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+
+        if (display_xslt == "-1")
+        {
+            QStringList display_xslt_list = file_selector.value("checkerOnline[step1][display_xslt]", QStringList());
+            if (display_xslt_list.length())
+                mainwindow->addXsltDisplay(display_xslt_list.last());
+        }
+        else
+        {
+            int index = display_xslt.toInt();
+            if (index >= 0 && index < (int)mainwindow->get_displays().size())
+                mainwindow->addXsltDisplay(mainwindow->get_displays()[index]);
+        }
 
         if (policy == "-1")
         {
-            QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
+            QStringList upload_list = file_selector.value("checkerOnline[step1][xslt]", QStringList());
             if (upload_list.length() && upload_list.last().length())
             {
                 mainwindow->checker_add_policy_file(url, upload_list.last());
@@ -235,14 +262,25 @@ namespace MediaConch
         if (!list.count())
             return;
 
-        QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
-        QString display_xslt;
-        if (display_xslt_list.length())
-            mainwindow->addXsltDisplay(display_xslt_list.last());
+        QWebElement displayElement = form.findFirst("#checkerRepository_step1_display_selector");
+        QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+
+        if (display_xslt == "-1")
+        {
+            QStringList display_xslt_list = file_selector.value("checkerRepository[step1][display_xslt]", QStringList());
+            if (display_xslt_list.length())
+                mainwindow->addXsltDisplay(display_xslt_list.last());
+        }
+        else
+        {
+            int index = display_xslt.toInt();
+            if (index >= 0 && index < (int)mainwindow->get_displays().size())
+                mainwindow->addXsltDisplay(mainwindow->get_displays()[index]);
+        }
 
         if (policy == "-1")
         {
-            QStringList upload_list = file_selector.value("checkerUpload[step1][xslt]", QStringList());
+            QStringList upload_list = file_selector.value("checkerRepository[step1][xslt]", QStringList());
             if (upload_list.length() && upload_list.last().length())
             {
                 mainwindow->checker_add_policy_files(list, upload_list.last());

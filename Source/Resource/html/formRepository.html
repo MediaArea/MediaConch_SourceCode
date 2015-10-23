@@ -12,14 +12,26 @@
           <select id="checkerRepository_step1_policy" name="checkerRepository[step1][policy]" class="form-control">
             <option selected="selected" value="-1">Choose a policy</option>
           </select>
-          <label class="control-label" for="checkerUpload_step1_xslt">
+          <label class="control-label" for="checkerRepository_step1_xslt">
             Or a policy file
           </label>
-          <input id="checkerUpload_step1_xslt" name="checkerUpload[step1][xslt]" required="required" type="file">
-          <label class="control-label" for="checkerUpload_step1_xslt">
-            Display file
+          <input id="checkerRepository_step1_xslt" name="checkerRepository[step1][xslt]" required="required" type="file">
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label required">
+        Display
+      </label>
+      <div id="checkerRepository_display_step1">
+        <div class="form-group">
+          <label class="control-label" for="checkerRepository_step1_display_selector">
+            Choose a display
           </label>
-          <input id="checkerUpload_step1_display_xslt" name="checkerUpload[step1][display_xslt]" required="required" type="file">
+          <select id="checkerRepository_step1_display_selector" name="checkerRepository[step1][display_selector]" class="form-control">
+            <option selected="selected" value="-1">Choose a Display</option>
+          </select>
+          <input id="checkerRepository_step1_display_xslt" name="checkerRepository[step1][display_xslt]" required="required" type="file">
         </div>
       </div>
     </div>
