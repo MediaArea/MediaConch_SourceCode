@@ -99,7 +99,7 @@
   </action>
   <action name="actionChooseSchema">
    <property name="text">
-    <string>Load policy set...</string>
+    <string>Import policy set...</string>
    </property>
   </action>
   <action name="actionSavePolicies">

@@ -42,7 +42,7 @@ selection-background-color: rgb(255, 170, 0);
 selection-background-color: rgb(255, 170, 0);</string>
      </property>
      <property name="text">
-      <string>Load policy set...</string>
+      <string>Import policy set...</string>
      </property>
     </widget>
    </item>

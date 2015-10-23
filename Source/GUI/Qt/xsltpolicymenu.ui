@@ -64,7 +64,7 @@ selection-background-color: rgb(255, 170, 0);
 selection-background-color: rgb(255, 170, 0);</string>
      </property>
      <property name="text">
-      <string>Save policy set to...</string>
+      <string>Export policy set...</string>
      </property>
     </widget>
    </item>
