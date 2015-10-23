@@ -159,7 +159,7 @@ int Xslt::validate_xml(std::string& xml, bool)
 //---------------------------------------------------------------------------
 bool Xslt::outcome_has_fail(std::string& report)
 {
-    if (report.find("<results outcome=\"fail\"") != std::string::npos)
+    if (report.find(" outcome=\"fail\"") != std::string::npos)
         return true;
     return false;
 }
