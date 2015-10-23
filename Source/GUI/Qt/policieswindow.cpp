@@ -286,14 +286,14 @@ void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
 {
     removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
-    delete parent->takeChild(row);
-
-    item = get_item_in_tree();
-    if (item)
-        item->setSelected(false);
-
+    parent->takeChild(row);
+    for (int i = 0; i < parent->childCount(); ++i)
+    {
+        item = parent->child(i);
+        if (item && item->isSelected())
+            item->setSelected(false);
+    }
     parent->setSelected(true);
-    displayPoliciesMenu();
 }
 
 //---------------------------------------------------------------------------
