@@ -445,12 +445,14 @@ void JsTree::interpret_value(std::string& value, bool coma, String& json)
 
     // Not numerical
     std::size_t found = value.find_first_not_of("0123456789.");
-    if (found != std::string::npos)
-        value = "0";
-    json += __T(" (0x");
-    std::string hexa = decimal_to_hexa(value);
-    json += Ztring().From_UTF8(hexa);
-    json += __T(")\"");
+    if (found == std::string::npos)
+    {
+        json += __T(" (0x");
+        std::string hexa = decimal_to_hexa(value);
+        json += Ztring().From_UTF8(hexa);
+        json += __T(")");
+    }
+    json += __T("\"");
 }
 
 //---------------------------------------------------------------------------
