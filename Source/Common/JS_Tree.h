@@ -62,6 +62,8 @@ private:
     String       error;
 
     std::string decimal_to_hexa(std::string val);
+    void interpret_offset(std::string& offset, bool coma, String& json);
+    void interpret_value(std::string& value, bool coma, String& json);
 };
 
 }

@@ -145,7 +145,7 @@ bool JsTree::has_block_data(xmlNodePtr child)
 //---------------------------------------------------------------------------
 void JsTree::interpret_data_in_block(xmlNodePtr block, String& json)
 {
-    //Format: offset_hexa name[ - info] (size bytes)]
+    //Format: "text": "name[ - info] (size bytes)", "data": {"offset": "offset_hexa"}
     std::string offset;
     std::string name;
     std::string info;
@@ -153,7 +153,7 @@ void JsTree::interpret_data_in_block(xmlNodePtr block, String& json)
 
     xmlChar *offset_c = xmlGetNoNsProp(block, (const unsigned char*)"offset");
     if (offset_c != NULL)
-        offset = decimal_to_hexa(std::string((const  char *)offset_c));
+        offset = (const  char *)offset_c;
     xmlChar *name_c = xmlGetNoNsProp(block, (const unsigned char*)"name");
     if (name_c != NULL)
         name = std::string((const  char *)name_c);
@@ -164,32 +164,41 @@ void JsTree::interpret_data_in_block(xmlNodePtr block, String& json)
     if (size_c != NULL)
         size = std::string((const  char *)size_c);
 
+    //Block data
     json += __T(", \"text\":\"");
-    json += String(offset.begin(), offset.end()); //TODO: Transform to hexa
-    json += __T(" ");
-    json += String(name.begin(), name.end());
+    json += Ztring().From_UTF8(name);
     if (info.length())
     {
         json += __T(" - ");
-        json += String(info.begin(), info.end());
+        json += Ztring().From_UTF8(info);
     }
     json += __T(" (");
-    json += String(size.begin(), size.end());
+    json += Ztring().From_UTF8(size);
     json += __T(" bytes)");
     json += __T("\"");
+
+    //Block data
+    json += __T(", \"data\":{");
+    bool coma = false;
+    if (offset_c)
+    {
+        interpret_offset(offset, coma, json);
+        coma = true;
+    }
+    json += __T("}");
 }
 
 //---------------------------------------------------------------------------
 void JsTree::interpret_data_in_data(xmlNodePtr data, String& json)
 {
-    //Format: offset_hexa name: value (value_in_hexa)]
+    //Format: "text": "name", "data": {"offset": "offset_hexa", "dataValue": "value (value_in_hexa)"}
     std::string offset; //Decimal to hexa
     std::string name;
     std::string value; //decimal + hexa if numerical
 
     xmlChar *offset_c = xmlGetNoNsProp(data, (const unsigned char*)"offset");
     if (offset_c != NULL)
-        offset = decimal_to_hexa(std::string((const char *)offset_c));
+        offset = (const char *)offset_c;
     xmlChar *name_c = xmlGetNoNsProp(data, (const unsigned char*)"name");
     if (name_c != NULL)
         name = std::string((const char *)name_c);
@@ -199,24 +208,66 @@ void JsTree::interpret_data_in_data(xmlNodePtr data, String& json)
         value = std::string((const char *)value_c);
 
     json += __T(", \"text\":\"");
-    json += String(offset.begin(), offset.end());
-    json += __T(" ");
-    json += String(name.begin(), name.end());
-    json += __T(": ");
+    json += Ztring().From_UTF8(name);
+
+    //Block data
+    json += __T("\", \"data\":{");
+    bool coma = false;
+    if (offset_c)
+    {
+        interpret_offset(offset, coma, json);
+        coma = true;
+    }
     if (value.length())
     {
-        json += String(value.begin(), value.end());
-
-        // Not numerical
-        std::size_t found = value.find_first_not_of("0123456789.");
-        if (found != std::string::npos)
-            value = "0";
-        json += __T(" (0x");
-        std::string hexa = decimal_to_hexa(value);
-        json += String(hexa.begin(), hexa.end());
-        json += __T(")");
+        interpret_value(value, coma, json);
+        coma = true;
     }
+    json += __T("}");
+}
+
+//---------------------------------------------------------------------------
+void JsTree::interpret_offset(std::string& offset, bool coma, String& json)
+{
+    if (coma)
+        json += __T(", ");
+    json += __T("\"offset\":");
+
+    // Not numerical
+    std::size_t found = offset.find_first_not_of("0123456789.");
+    if (found != std::string::npos)
+        offset = "0";
+    json += __T("\"0x");
+
+    std::string hexa = decimal_to_hexa(offset);
+    int zero = 8 - hexa.length();
+    while (zero > 0)
+    {
+        json += __T("0");
+        --zero;
+    }
+    json += Ztring().From_UTF8(hexa);
+
     json += __T("\"");
+}
+
+//---------------------------------------------------------------------------
+void JsTree::interpret_value(std::string& value, bool coma, String& json)
+{
+    if (coma)
+        json += __T(", ");
+    json += __T("\"dataValue\":\"");
+
+    json += Ztring().From_UTF8(value);
+
+    // Not numerical
+    std::size_t found = value.find_first_not_of("0123456789.");
+    if (found != std::string::npos)
+        value = "0";
+    json += __T(" (0x");
+    std::string hexa = decimal_to_hexa(value);
+    json += Ztring().From_UTF8(hexa);
+    json += __T(")\"");
 }
 
 //---------------------------------------------------------------------------
