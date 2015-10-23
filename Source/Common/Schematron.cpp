@@ -105,6 +105,10 @@ int Schematron::validate_xml(std::string& xml, bool silent)
     size_t xmlns_pos=xml.rfind(xmlns, 1000);
     if (xmlns_pos!=std::string::npos)
         xml.erase(xmlns_pos, xmlns.size());
+    xmlns="xmlns=\"https://mediaarea.net/mediainfo\"";
+    xmlns_pos=xml.rfind(xmlns, 1000);
+    if (xmlns_pos!=std::string::npos)
+        xml.erase(xmlns_pos, xmlns.size());
 
     int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
