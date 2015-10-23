@@ -52,6 +52,8 @@ void DisplayWindow::displayDisplay()
 
     QObject::connect(displayMenu->get_addFile_button(), SIGNAL(clicked()),
                      this, SLOT(add_new_file()));
+    QObject::connect(displayMenu->get_exportFile_button(), SIGNAL(clicked()),
+                     this, SLOT(export_file()));
     QObject::connect(displayMenu->get_delFile_button(), SIGNAL(clicked()),
                      this, SLOT(delete_file()));
 }
@@ -151,6 +153,34 @@ void DisplayWindow::add_new_file()
         }
     }
     fillTable();
+}
+
+void DisplayWindow::export_file()
+{
+    if (!displayMenu)
+        return;
+
+    QTableWidget *table = displayMenu->get_display_table();
+    if (!table)
+        return;
+
+    QItemSelectionModel *select = table->selectionModel();
+
+    if (!select->hasSelection())
+        return;
+
+    QModelIndexList list = select->selectedRows();
+    QTableWidgetItem* itemDir = table->item(list.first().row(), 1);
+
+    if (!itemDir)
+        return;
+
+    QString file = QFileDialog::getSaveFileName(mainwindow, tr("Save display file"), itemDir->text(), tr("Display file (*.xsl)"));
+    if (!file.length())
+        return;
+
+    QFile f(itemDir->text());
+    f.copy(file);
 }
 
 void DisplayWindow::delete_file()

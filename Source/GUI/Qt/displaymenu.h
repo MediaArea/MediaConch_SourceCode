@@ -32,6 +32,7 @@ public:
     QTableWidget *get_display_table();
     QFrame       *get_menu_frame();
     QPushButton  *get_addFile_button();
+    QPushButton  *get_exportFile_button();
     QPushButton  *get_delFile_button();
 
 //***************************************************************************

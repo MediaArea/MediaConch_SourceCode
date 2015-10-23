@@ -51,6 +51,12 @@ QPushButton *DisplayMenu::get_addFile_button()
 }
 
 //---------------------------------------------------------------------------
+QPushButton *DisplayMenu::get_exportFile_button()
+{
+    return ui->exportFile;
+}
+
+//---------------------------------------------------------------------------
 QPushButton *DisplayMenu::get_delFile_button()
 {
     return ui->deleteFile;
