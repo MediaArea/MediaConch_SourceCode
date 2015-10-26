@@ -49,7 +49,6 @@ public:
 
     // Helpers
     void                        Run();
-    QString                     Run(Core::tool, Core::format, String& file);
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
     String                      transformWithXsltFile(String& report, String trans);
