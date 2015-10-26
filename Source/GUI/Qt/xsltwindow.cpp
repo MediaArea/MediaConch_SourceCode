@@ -495,27 +495,6 @@ void XsltWindow::edit_rule_occurrence()
 }
 
 //---------------------------------------------------------------------------
-void XsltWindow::edit_rule_invalid()
-{
-    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
-    if (!item || !item->parent())
-        return;
-
-    int rowPolicy = policieswindow->get_index_of_item_backXX(item, 1);
-    int row = policieswindow->get_index_in_tree();
-    if (row < 0 || rowPolicy < 0)
-        return;
-
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
-
-    if (r->invalid != ruleEdit->get_invalid_line()->text().toStdString())
-    {
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
-        r->invalid = ruleEdit->get_invalid_line()->text().toStdString();
-    }
-}
-
-//---------------------------------------------------------------------------
 void XsltWindow::edit_rule_freeText()
 {
     QTreeWidgetItem* item = policieswindow->get_item_in_tree();
@@ -599,8 +578,6 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
                      this, SLOT(edit_rule_operator()));
     QObject::connect(ruleEdit->get_value_line(), SIGNAL(textEdited(QString)),
                      this, SLOT(edit_rule_value()));
-    QObject::connect(ruleEdit->get_invalid_line(), SIGNAL(textEdited(QString)),
-                     this, SLOT(edit_rule_invalid()));
     QObject::connect(ruleEdit->get_occurrence_box(), SIGNAL(valueChanged(int)),
                      this, SLOT(edit_rule_occurrence()));
     QObject::connect(ruleEdit->get_editorSelector_radio(), SIGNAL(toggled(bool)),
