@@ -352,7 +352,12 @@ void MainWindow::on_actionOpen_triggered()
     for (int Pos=0; Pos<List.size(); Pos++)
         C.List.push_back(List[Pos].toStdWString());
 
+    current_view = RUN_CHECKER_VIEW;
     Run();
+
+    if (!MainView)
+        return;
+    MainView->changeLocalFiles(List);
 }
 
 //---------------------------------------------------------------------------

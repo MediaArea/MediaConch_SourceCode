@@ -132,7 +132,6 @@ private Q_SLOTS:
     void on_actionGettingStarted_triggered();
     void on_actionHowToUse_triggered();
     void on_actionDataFormat_triggered();
-
 };
 
 }

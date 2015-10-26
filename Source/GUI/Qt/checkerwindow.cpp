@@ -241,6 +241,16 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
     analyse = true;
 }
 
+//---------------------------------------------------------------------------
+void CheckerWindow::changeLocalFiles(QStringList& files)
+{
+    if (!MainView || !MainView->page())
+        return;
+
+    WebPage* p = (WebPage*)MainView->page();
+    p->changeLocalFiles(files);
+}
+
 //***************************************************************************
 // HELPER
 //***************************************************************************

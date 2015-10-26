@@ -35,6 +35,7 @@ public:
     void                        updateWebView(QList<QFileInfo>& files, int policy);
     void                        setDisplayXslt(QString& d) { displayXslt = d; }
     void                        resetDisplayXslt() { displayXslt.clear(); }
+    void                        changeLocalFiles(QStringList& files);
 
     // Helpers
     void                        checker_add_file(QString& file, int policy);
