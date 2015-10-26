@@ -133,16 +133,19 @@ int main(int argc, char* argv_ansi[])
     if (MI.List.empty())
         return Help_Nothing();
 
+    String CombinationTest=MI.ReportAndFormatCombination_IsValid();
+    if (!CombinationTest.empty())
+    {
+        STRINGOUT(CombinationTest);
+        return -1;
+    }
+
     //Callback for error handling
     CallBack_Set(MI, (void*)Event_CallBackFunction);
 
     for (size_t i = 0; i < MI.List.size(); ++i)
-    {
-        // Analyze
         MI.Run(MI.List[i]);
-
-        STRINGOUT(MI.Use_Tool());
-    }
+    STRINGOUT(MI.GetOutput());
 
     return 0;
 }

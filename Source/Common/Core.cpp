@@ -40,8 +40,9 @@ Core::Core() : policies(this)
 {
     MI=new MediaInfoNameSpace::MediaInfoList;
 
+    Report.set(report_MediaConch);
+    Report_IsDefault=true;
     Format=format_Text;
-    Tool=tool_MediaConch;
     policies.create_values_from_csv();
 }
 
@@ -71,76 +72,71 @@ String Core::Menu_Option_Preferences_Option (const String& Param, const String& 
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+String Core::ReportAndFormatCombination_IsValid ()
+{
+    // Forcing some formats
+    if (List.size()>1 && Format==format_Xml)
+        Format=format_MaXml;
+    size_t Report_Count=0;
+    for (size_t i=0; i<report_Max; i++)
+        if (Report[i])
+            Report_Count++;
+    if (Report_Count>1 && Format==format_Xml)
+        Format=format_MaXml;
+    
+    // Test of incompatibilities
+    if (Report[report_MediaConch] && Report[report_MediaTrace] && Format==format_Text)
+        return __T("Combination of MediaConch and MediaTrace is currently not possible with Text output");
+    if (Report[report_MediaConch] && Report[report_MediaInfo] && Format==format_MaXml)
+        return __T("Combination of MediaConch and MediaInfo or MediaTrace is currently not possible with XML output");
+    if (Report[report_MediaConch] && Format==format_MaXml)
+        return __T("MediaConch is currently not possible with MAXML output");
+
+    return String();
+}
+
+//---------------------------------------------------------------------------
+void Core::Close ()
+{
+    MI->Close();
+}
+
+//---------------------------------------------------------------------------
 void Core::Run (String file)
 {
-    // Config
-    switch (Tool)
+    // Configuration of the parsing
+    if (Report[report_MediaConch] || Report[report_MediaTrace])
+        MI->Option(__T("Details"), __T("1"));
+
+    // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
+    switch (Format)
     {
-        case tool_MediaConch: 
-                                MI->Option(__T("Complete"), __T("0"));
+        case format_Text:
+                                MI->Option(__T("ReadByHuman"), __T("0"));
+                                break;
+        default:
                                 MI->Option(__T("ReadByHuman"), __T("1"));
+    }
+    switch (Format)
+    {
+        case format_Xml:
+        case format_JsTree:
                                 MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Details"), __T("1"));
+                                MI->Option(__T("Inform"), __T("XML"));
+                                break;
+        case format_MaXml:
                                 MI->Option(__T("Inform"), __T("MAXML"));
                                 break;
-        case tool_MediaInfo:
-                                MI->Option(__T("ReadByHuman"), __T("1"));
-                                MI->Option(__T("Details"), __T("0"));
-                                switch (Format)
-                                {
-                                    case format_Text:
-                                                            MI->Option(__T("Complete"), __T("0"));
-                                                            MI->Option(__T("Language"), String());
-                                                            MI->Option(__T("Inform"), String());
-                                                            break;
-                                    case format_Xml:
-                                                            MI->Option(__T("Complete"), __T("1"));
-                                                            MI->Option(__T("Language"), __T("raw"));
-                                                            MI->Option(__T("Inform"), __T("MAXML"));
-                                                            break;
-                                    default:                ;
-                                }
-                                break;
-        case tool_MediaTrace:
-                                MI->Option(__T("Complete"), __T("0"));
-                                MI->Option(__T("ReadByHuman"), __T("1"));
-                                MI->Option(__T("Details"), __T("1"));
-                                switch (Format)
-                                {
-                                    case format_Text:
-                                                            MI->Option(__T("Language"), String());
-                                                            MI->Option(__T("Inform"), String());
-                                                            break;
-                                    case format_Xml:
-                                                            MI->Option(__T("Language"), __T("raw"));
-                                                            MI->Option(__T("Inform"), __T("XML"));
-                                                            break;
-                                    case format_JsTree:
-                                                            MI->Option(__T("Language"), __T("raw"));
-                                                            MI->Option(__T("Inform"), __T("XML"));
-                                                            break;
-                                    default:                ;
-                                }
-                                break;
-        case tool_Policies:
-                                MI->Option(__T("ReadByHuman"), __T("1"));
-                                MI->Option(__T("Details"), __T("0"));
-                                MI->Option(__T("Complete"), __T("1"));
-                                MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Inform"), __T("MAXML"));
-                                break;
-        case tool_MediaPolicies:
-                                MI->Option(__T("ReadByHuman"), __T("1"));
-                                MI->Option(__T("Details"), __T("0"));
-                                MI->Option(__T("Complete"), __T("1"));
-                                MI->Option(__T("Language"), __T("raw"));
-                                MI->Option(__T("Inform"), __T("MAXML"));
-                                break;
-        default:                return;
+        default:
+                                MI->Option(__T("Language"), String());
+                                MI->Option(__T("Inform"), String());
+    }
+    if (Report[report_MediaConch])
+    {
+                                MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
     }
 
     // Parsing
-    MI->Close();
     if (file.length())
     {
         MI->Open(file);
@@ -153,30 +149,155 @@ void Core::Run (String file)
 }
 
 //---------------------------------------------------------------------------
-String Core::Use_Tool()
+String Core::GetOutput()
 {
-    switch (Tool)
+    if (!PoliciesFiles.empty())
+        return PoliciesCheck();
+
+    switch (Format)
     {
-        case tool_MediaConch:      return MediaConch();
-        case tool_MediaInfo:       return MediaInfo();
-        case tool_MediaTrace:      return MediaTrace();
-        case tool_MediaPolicies:   return MediaPolicies();
-        case tool_Policies:        return PoliciesCheck();
-        default:                   return String();
+        case format_Text:           return GetOutput_Text();
+        case format_Xml:            return GetOutput_Xml();
+        case format_MaXml:          return GetOutput_MaXml();
+        case format_JsTree:         return GetOutput_JStree();
+        default:                    return String();
     }
 }
 
 //---------------------------------------------------------------------------
-String Core::MediaConch ()
+String Core::GetOutput_Text ()
 {
-    // Config after Open()
-    MI->Option(__T("Complete"), __T("0"));
-    MI->Option(__T("Language"), __T("raw"));
-    MI->Option(__T("Details"), __T("1"));
+    String ret;
+
+    if (Report[report_MediaInfo])
+    {
+        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Inform"), String());
+
+        ret += MI->Inform();
+
+        ret += __T("\r\n");
+    }
+
+    if (Report[report_MediaTrace])
+    {
+        MI->Option(__T("Details"), __T("1"));
+        MI->Option(__T("Inform"), String());
+
+        ret += MI->Inform();
+
+        ret += __T("\r\n");
+    }
+
+    if (Report[report_MediaConch])
+    {
+        /*
+        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
+
+        const String& info = MI->Inform();
+        //TODO here: MAXML --> Conformance XML --> Text 
+        
+        ret += __T("(Canvas for Conformance Text)\r\n");
+        ret += info + __T("\r\n");
+        ret += __T("(Canvas for Conformance Text)\r\n");
+        */
+        const String info=GetOutput_Text_Implementation(); //Temporary example
+        ret += info + __T("\r\n");
+
+        ret += __T("\r\n");
+    }
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+String Core::GetOutput_Xml ()
+{
+    String ret;
+
+    if (Report[report_MediaInfo] && !Report[report_MediaTrace])
+    {
+        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Inform"), __T("MAXML")); //TODO: "XML" when new XML output is ready
+
+        ret += MI->Inform();
+
+        ret += __T("\r\n");
+    }
+
+    if (Report[report_MediaTrace] && !Report[report_MediaInfo])
+    {
+        MI->Option(__T("Details"), __T("1"));
+        MI->Option(__T("Inform"), __T("XML"));
+
+        ret += MI->Inform();
+
+        ret += __T("\r\n");
+    }
+
+    if (Report[report_MediaTrace] && Report[report_MediaInfo])
+    {
+        MI->Option(__T("Details"), __T("1"));
+        MI->Option(__T("Inform"), __T("MAXML"));
+
+        ret += MI->Inform();
+
+        ret += __T("\r\n");
+    }
+
+    if (Report[report_MediaConch])
+    {
+        const String info=GetOutput_Xml_Implementation(); //Temporary example
+        ret += info;
+
+        ret += __T("\r\n");
+    }
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+String Core::GetOutput_MaXml ()
+{
+    String ret;
+
+    MI->Option(__T("Details"), Report[report_MediaTrace]?__T("1"):__T("0"));
     MI->Option(__T("Inform"), __T("MAXML"));
-    if (Format==format_Xml)
-        return MI->Inform();
-    
+
+    ret += MI->Inform();
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+String Core::GetOutput_JStree ()
+{
+    JsTree js;
+    if (Report[report_MediaInfo])
+    {
+        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Inform"), __T("MAXML"));
+
+        const String& ret = MI->Inform();
+        return js.format_from_inform_XML(ret);
+    }
+
+    if (Report[report_MediaTrace])
+    {
+        MI->Option(__T("Details"), __T("1"));
+        MI->Option(__T("Inform"), __T("XML"));
+
+        const String& ret = MI->Inform();
+        return js.format_from_trace_XML(ret);
+    }
+
+    return String();
+}
+
+//---------------------------------------------------------------------------
+String Core::GetOutput_Text_Implementation ()
+{
     //Output
     wstringstream Out;
     for (size_t FilePos=0; FilePos<MI->Count_Get(); FilePos++)
@@ -231,62 +352,47 @@ String Core::MediaConch ()
 }
 
 //---------------------------------------------------------------------------
-String Core::MediaInfo ()
+String Core::GetOutput_Xml_Implementation ()
 {
-    // Config after Open()
-    MI->Option(__T("Details"), __T("0"));
-    switch (Format)
+    //Output
+    wstringstream Out;
+    Out<<__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")<<endl;
+    Out<<__T("<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" xmlns:mi=\"https://mediaarea.net/mediainfo\" version=\"0.1\">")<<endl;
+    Out<<__T("<implementationChecks>")<<endl;
+
+    for (size_t FilePos=0; FilePos<MI->Count_Get(); FilePos++)
     {
-        case format_Text:
-                 MI->Option(__T("Complete"), __T("0"));
-                 MI->Option(__T("Language"), String());
-                 MI->Option(__T("Inform"), String());
-                 break;
-        case format_JsTree:
-        case format_Xml:
-                 MI->Option(__T("Complete"), __T("1"));
-                 MI->Option(__T("Language"), __T("raw"));
-                 MI->Option(__T("Inform"), __T("MAXML"));
-                 break;
-        default: ;
+        Out<<__T("    <media ref=\"")<<MI->Get(FilePos, Stream_General, 0, __T("CompleteName"))<<__T("\">")<<endl;
+
+        Out<<__T("        <policy title=\"Is Matroska\">")<<endl;
+        Out<<__T("            <test outcome=\"")<<(MI->Get(FilePos, Stream_General, 0, __T("Format"))==__T("Matroska")?__T("Pass"):__T("Fail"))<<__T("\"/>")<<endl;
+        Out<<__T("        </policy>")<<endl;
+
+        for (size_t StreamPos=0; StreamPos<MI->Count_Get(FilePos, Stream_Video); StreamPos++)
+        {
+            Out<<__T("        <policy title=\"Is FFV1\">")<<endl;
+            Out<<__T("            <test outcome=\"")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("Format"))==__T("FFV1")?__T("pass"):__T("fail"))<<__T("\"/>")<<endl;
+            Out<<__T("        </policy>")<<endl;
+
+            if (MI->Get(FilePos, Stream_Video, StreamPos, __T("Format")) == __T("FFV1"))
+            {
+                Out<<__T("        <policy title=\"Is not version 2\">")<<endl;
+                Out<<__T("            <test outcome=\"")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version"))!=__T("2")?__T("pass"):__T("fail"))<<__T("\"/>")<<endl;
+                Out<<__T("        </policy>")<<endl;
+
+                Out<<__T("        <policy title=\"ErrorDetectionType Present\">")<<endl;
+                Out<<__T("            <test outcome=\"")<<(!MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetectionType")).empty()?__T("pass"):__T("fail"))<<__T("\"/>")<<endl;
+                Out<<__T("        </policy>")<<endl;
+            }
+        }
+
+        Out<<__T("    </media>")<<endl;
     }
 
-    const String& ret = MI->Inform();
-    if (Format == format_JsTree)
-    {
-        JsTree js;
-        return js.format_from_inform_XML(ret);
-    }
-    return ret;
-}
+    Out<<__T("</implementationChecks>")<<endl;
+    Out<<__T("</MediaConch>")<<endl;
 
-//---------------------------------------------------------------------------
-String Core::MediaTrace ()
-{
-    // Config after Open()
-    MI->Option(__T("Complete"), __T("0"));
-    MI->Option(__T("Details"), __T("1"));
-    switch (Format)
-    {
-        case format_Text:
-                 MI->Option(__T("Language"), String());
-                 MI->Option(__T("Inform"), String());
-                 break;
-        case format_Xml:
-        case format_JsTree:
-                 MI->Option(__T("Language"), __T("raw"));
-                 MI->Option(__T("Inform"), __T("XML"));
-                 break;
-        default: ;
-    }
-
-    String ret = MI->Inform();
-    if (Format == format_JsTree)
-    {
-        JsTree js;
-        return js.format_from_trace_XML(ret);
-    }
-    return ret;
+    return Out.str();
 }
 
 //---------------------------------------------------------------------------
@@ -391,12 +497,6 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
     }
     delete S;
     return valid;
-}
-
-//---------------------------------------------------------------------------
-String Core::MediaPolicies ()
-{
-    return String();
 }
 
 //***************************************************************************
