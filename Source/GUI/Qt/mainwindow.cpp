@@ -138,9 +138,15 @@ void MainWindow::Run()
 }
 
 //---------------------------------------------------------------------------
-String MainWindow::transformWithXslt(String& report, String trans)
+String MainWindow::transformWithXsltFile(String& report, String trans)
 {
-    return C.transformWithXslt(report, trans);
+    return C.transformWithXsltFile(report, trans);
+}
+
+//---------------------------------------------------------------------------
+String MainWindow::transformWithXsltMemory(String& report, std::string memory)
+{
+    return C.transformWithXsltMemory(report, memory);
 }
 
 //---------------------------------------------------------------------------
@@ -282,6 +288,13 @@ void MainWindow::add_default_policy()
 //---------------------------------------------------------------------------
 void MainWindow::add_default_displays()
 {
+    QDir displays_dir(":/displays");
+
+    displays_dir.setFilter(QDir::Files);
+    QFileInfoList list = displays_dir.entryInfoList();
+    for (int i = 0; i < list.count(); ++i)
+        displaysList.push_back(list[i].absoluteFilePath());
+
     QString path = get_local_folder();
     path += "/displays";
 
@@ -289,7 +302,7 @@ void MainWindow::add_default_displays()
     if (dir.exists())
     {
         dir.setFilter(QDir::Files);
-        QFileInfoList list = dir.entryInfoList();
+        list = dir.entryInfoList();
         for (int i = 0; i < list.size(); ++i)
             displaysList.push_back(list[i].absoluteFilePath());
     }

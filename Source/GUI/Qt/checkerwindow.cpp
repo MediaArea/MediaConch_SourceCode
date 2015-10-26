@@ -627,8 +627,21 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
 
     if (displayXslt.length())
     {
-        String trans = displayXslt.toStdWString();
-        r = mainwindow->transformWithXslt(r, trans);
+        if (displayXslt.startsWith(":/displays/"))
+        {
+            QFile display_file(displayXslt);
+            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QByteArray data = display_file.readAll();
+                display_file.close();
+                r = mainwindow->transformWithXsltMemory(r, data.data());
+            }
+        }
+        else
+        {
+            String trans = displayXslt.toStdWString();
+            r = mainwindow->transformWithXsltFile(r, trans);
+        }
         resetDisplayXslt();
     }
 

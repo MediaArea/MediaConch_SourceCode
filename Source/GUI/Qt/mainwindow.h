@@ -52,7 +52,8 @@ public:
     QString                     Run(Core::tool, Core::format, String& file);
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
-    String                      transformWithXslt(String& report, String trans);
+    String                      transformWithXsltFile(String& report, String trans);
+    String                      transformWithXsltMemory(String& report, std::string memory);
     void                        checker_add_file(QString& file, int policy);
     void                        checker_add_files(QList<QFileInfo>& file, int policy);
     void                        checker_add_policy_file(QString& file, QString& policy);
