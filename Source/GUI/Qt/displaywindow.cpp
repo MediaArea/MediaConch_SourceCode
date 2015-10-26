@@ -208,8 +208,10 @@ void DisplayWindow::delete_file()
         QTableWidgetItem* itemDir = table->item(list[i].row(), 1);
         if (!itemDir)
             continue;
+
         QFile file(itemDir->text());
         file.remove();
+        mainwindow->get_displays().erase(mainwindow->get_displays().begin() + list[i].row());
         table->removeRow(list[i].row());
     }
 }
