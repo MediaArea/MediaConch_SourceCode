@@ -119,7 +119,7 @@ footer {
     float: right;
 }
 
-.results-dld, .results-dld-trace, .results-dld-trace-ajax {
+.results-dld, .results-dld-trace, .results-dld-trace-ajax, .results-dld-info, .results-dld-info-ajax {
     margin-left: 5px;
 }
 
@@ -165,7 +165,7 @@ p.registration {
     margin-top: 20px;
 }
 
-.traceSearch {
+.jstreeSearch {
     box-shadow: inset 0 0 4px #eee;
     width: 110px;
     margin: 0 2px;

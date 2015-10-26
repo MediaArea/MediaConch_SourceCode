@@ -61,6 +61,7 @@ public:
     QString                     get_implementationreport_text();
     QString                     get_mediainfo_and_mediatrace_xml();
     QString                     get_mediainfo_xml();
+    QString                     get_mediainfo_jstree();
     QString                     get_mediatrace_xml();
     QString                     get_mediatrace_jstree();
     QString                     ask_for_schema_file();

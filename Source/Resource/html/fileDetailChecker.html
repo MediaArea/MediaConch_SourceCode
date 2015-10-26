@@ -19,8 +19,8 @@
                         </li>
                         <li class="list-group-item report">MediaInfo
                             <p class="text-right">
-                                <a href="#" data-toggle="modal" data-target="#modalXml{{ loop.index }}" title="View XML"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                                <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="MediaInfo.xml"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                              <a href="#" data-toggle="modal" class="results-view-info-ajax" data-target="#modalInfo{{ loop.index }}" data-filename="{{ check.getInfo }}" title="View MediaInfo"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                              <a href="#" data-toggle="results-dld" class="results-dld-info-ajax" data-target="#infoXml{{ loop.index }}" data-filename="{{ check.getInfo }}" data-save-name="MediaInfo.xml" title="Download MediaInfo"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </p>
                         </li>
                         <li class="list-group-item report">MediaTrace
@@ -49,6 +49,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="modalConformance{{ loop.index }}" class="modal fade">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
@@ -66,23 +67,35 @@
                         </div>
                     </div>
                 </div>
-                <div id="modalXml{{ loop.index }}" class="modal fade">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">MediaInfo XML</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>{{ check.getXml|nl2br }}</p>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-primary report-dld" data-target="#modalXml{{ loop.index }}" data-save-name="MediaInfo.xml">Download XML</button>
-                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            </div>
+
+                <div id="modalInfo{{ loop.index }}" class="modal fade">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">MediaInfo</h4>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-6 col-sm-8 col-xs-8">
+                            <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="jstreeSearch" id="infoSearch{{ loop.index }}" placeholder="Search" />
+                          </div>
+                          <div class="col-md-12">
+                            <div id="info{{ loop.index }}"></div>
+                          </div>
                         </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-primary results-dld-info-ajax" data-target="#infoXml{{ loop.index }}" data-save-name="MediaInfo.xml" data-filename="{{ check.getInfo }}">Download MediaInfo</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
                     </div>
+                  </div>
                 </div>
+                <div id="infoXml{{ loop.index }}" class="hidden">
+                  <p class="modal-body"></p>
+                </div>
+
                 <div id="modalTrace{{ loop.index }}" class="modal fade">
                   <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -93,7 +106,7 @@
                       <div class="modal-body">
                         <div class="row">
                           <div class="col-md-6 col-sm-8 col-xs-8">
-                            <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="traceSearch" id="traceSearch{{ loop.index }}" placeholder="Search" />
+                            <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="jstreeSearch" id="traceSearch{{ loop.index }}" placeholder="Search" />
                           </div>
                           <div class="col-md-12">
                             <div id="trace{{ loop.index }}"></div>
@@ -101,7 +114,7 @@
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-primary results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-save-name="MediaTrace.xml" data-filename="{{ check.getTrace }}">Download trace</button>
+                        <button type="button" class="btn btn-primary results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-save-name="MediaTrace.xml" data-filename="{{ check.getTrace }}">Download MediaTrace</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       </div>
                     </div>
@@ -163,6 +176,59 @@
                 })
             });
             $('#trace{{ loop.index }}').on('select_node.jstree', function (e, data) {
+                data.instance.toggle_node(data.node);
+            });
+
+            $('#modalInfo{{ loop.index }}').on('show.bs.modal',
+                function() {
+                    $('#info{{ loop.index }}').jstree({
+                        'core' : {
+                            'check_callback' : function (operation, node, parent, position, more) {
+                                if (operation === 'copy_node' || operation === 'move_node') {
+                                    return false; // disable copy and move
+                                }
+                                else {
+                                    return true;
+                                }
+                            },
+                            'multiple' : false,
+                            'dblclick_toggle' : false,
+                            'data' : {{ check.getInfo.jstree|raw }}
+                        },
+                        "plugins" : ['search', 'types', 'grid'],
+                        'types' : {
+                            'default' : {'icon' : 'glyphicon glyphicon-folder-open'},
+                            'block' : {'icon' : 'glyphicon glyphicon-folder-open'},
+                            'data' : {'icon' : 'glyphicon glyphicon-file'},
+                        },
+                        'grid' : {
+                            columns : [
+                                {width: 300, header: "Key", tree: true},
+                                {header: "Value",  value: 'dataValue'},
+                            ],
+                            resizable: true,
+                        },
+                    })
+                });
+
+            $('#info{{ loop.index }}').on('ready.jstree', function () {
+                $(function () {
+                    var to = false;
+                    $('#infoSearch{{ loop.index }}').keyup(function () {
+                        if(to) { clearTimeout(to); }
+                        to = setTimeout(function () {
+                            var v = $('#infoSearch{{ loop.index }}').val();
+                            $('#info{{ loop.index }}').jstree(true).search(v);
+                        }, 250);
+                    });
+                });
+            });
+            $('#info{{ loop.index }}').on('loaded.jstree', function (e, data) {
+                data.instance.get_container().find('li').each(function () {
+                    data.instance.open_node($(this));
+                })
+            });
+            $('#info{{ loop.index }}').on('select_node.jstree', function (e, data) {
                 data.instance.toggle_node(data.node);
             });
         </script>

@@ -105,6 +105,10 @@ namespace MediaConch
         for (int i = 0; i < report_dld.count(); ++i)
             report_dld[i].setAttribute("onclick", QString("webpage.onDownloadReport($(this).data('target'), $(this).data('save-name'));"));
 
+        // Add download info ajax button to result list
+        QWebElementCollection download_infos = frame->findAllElements(".results-dld-info-ajax");
+        for (int i = 0; i < download_infos.count(); ++i)
+            download_infos[i].setAttribute("onclick", QString("webpage.onSaveInfo($(this).data('target'), $(this).data('save-name'));"));
 
         // Add download trace ajax button to result list
         QWebElementCollection download_traces = frame->findAllElements(".results-dld-trace-ajax");
@@ -163,6 +167,11 @@ namespace MediaConch
             QTextDocument text(report.toPlainText().trimmed());
             out << text.toPlainText() << "\n";
         }
+    }
+
+    void WebPage::onSaveInfo(const QString& target, const QString& save_name)
+    {
+        onDownloadReport(target, save_name);
     }
 
     void WebPage::onSaveTrace(const QString& target, const QString& save_name)

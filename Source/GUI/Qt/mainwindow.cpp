@@ -618,6 +618,13 @@ QString MainWindow::get_mediainfo_xml()
 }
 
 //---------------------------------------------------------------------------
+QString MainWindow::get_mediainfo_jstree()
+{
+    C.Format = Core::format_JsTree;
+    return QString().fromStdWString(C.MediaInfo());
+}
+
+//---------------------------------------------------------------------------
 QString MainWindow::get_mediatrace_xml()
 {
     C.Format = Core::format_Xml;
