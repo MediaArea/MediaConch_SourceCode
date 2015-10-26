@@ -60,6 +60,14 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
         return 0;
     }
 
+    // Backward compatibility
+    if (Argument==__T("-tc"))
+        Argument = __T("--report=MediaConch");
+    if (Argument==__T("-ti"))
+        Argument = __T("--report=MediaInfo");
+    if (Argument==__T("-tt"))
+        Argument = __T("--report=MediaTrace");
+
     // Report other options
     if (Argument==__T("--mediaconch"))
         Argument = __T("-mc");
