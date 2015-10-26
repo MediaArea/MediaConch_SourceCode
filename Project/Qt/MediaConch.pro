@@ -94,11 +94,21 @@ INCLUDEPATH      += ../../Source
 
 exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a) {
 INCLUDEPATH      += ../../../MediaInfoLib/Source
-LIBS             += ../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a
-message("custom libmediainfo: yes")
+LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
+message("custom libmediainfo: yes (static)")
 }
 else {
-LIBS             += -lmediainfo
+exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.so) {
+INCLUDEPATH      += ../../../MediaInfoLib/Source
+LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS)
+message("custom libmediainfo: yes (shared)")
+}
+else {
+#CONFIG           += link_pkgconfig
+#PKGCONFIG        += libmediainfo
+#LIBS             += $(pkg-config --libs libmediainfo)
+LIBS             += $$system(pkg-config --libs libmediainfo)
+}
 }
 exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
 INCLUDEPATH      += ../../../ZenLib/Source
