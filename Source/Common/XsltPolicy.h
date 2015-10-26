@@ -58,8 +58,6 @@ public:
 
     std::string text; // Free text
 
-    std::string invalid;
-
 private:
     XsltRule& operator=(const XsltRule&);
 };
@@ -103,8 +101,6 @@ private:
     bool       find_context_attribute_field_node(xmlNodePtr node, std::string& value);
     bool       find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid);
     bool       find_choose_when_node(xmlNodePtr node, XsltRule* rule, bool& valid);
-    bool       find_choose_otherwise_node(xmlNodePtr node, XsltRule* rule);
-    bool       find_choose_otherwise_test_node(xmlNodePtr node, XsltRule* rule);
     bool       find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, bool& valid);
     bool       find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, bool& valid);
     bool       find_call_template_free_text_node(xmlNodePtr node, XsltRule* rule, bool& valid);

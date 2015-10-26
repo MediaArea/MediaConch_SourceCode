@@ -262,36 +262,6 @@ bool XsltPolicy::find_choose_when_node(xmlNodePtr node, XsltRule* rule, bool& va
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_choose_otherwise_test_node(xmlNodePtr node, XsltRule* rule)
-{
-    std::string def("test");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    xmlChar *out_str = xmlGetNoNsProp(node, (const unsigned char*)"outcome");
-    if (out_str == NULL)
-        return false;
-    rule->invalid = std::string((const char*)out_str);
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool XsltPolicy::find_choose_otherwise_node(xmlNodePtr node, XsltRule* rule)
-{
-    std::string def("otherwise");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    xmlNodePtr child = node->children;
-    while (child)
-    {
-        find_choose_otherwise_test_node(child, rule);
-        child = child->next;
-    }
-    return true;
-}
-
-//---------------------------------------------------------------------------
 bool XsltPolicy::find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid)
 {
     std::string def("choose");
@@ -301,8 +271,7 @@ bool XsltPolicy::find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid)
     xmlNodePtr child = node->children;
     while (child)
     {
-        if (!find_choose_when_node(child, rule, valid))
-            find_choose_otherwise_node(child, rule);;
+        find_choose_when_node(child, rule, valid);
         if (!valid)
             return true;
         child = child->next;
@@ -1142,20 +1111,17 @@ void XsltPolicy::write_policy_when_child(xmlNodePtr node, XsltRule *rule)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule *)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"test");
     xmlAddChild(node, child);
 
-    xmlNewProp(child, (const xmlChar *)"outcome", (const xmlChar *)rule->invalid.c_str());
+    xmlNewProp(child, (const xmlChar *)"outcome", (const xmlChar *)"N/A");
 }
 
 //---------------------------------------------------------------------------
 void XsltPolicy::write_policy_otherwise_child(xmlNodePtr node, XsltRule *rule)
 {
-    if (!rule->invalid.length())
-        return;
-
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"otherwise");
     child->ns = node->ns;
     xmlAddChild(node, child);

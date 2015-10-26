@@ -241,6 +241,16 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
     analyse = true;
 }
 
+//---------------------------------------------------------------------------
+void CheckerWindow::changeLocalFiles(QStringList& files)
+{
+    if (!MainView || !MainView->page())
+        return;
+
+    WebPage* p = (WebPage*)MainView->page();
+    p->changeLocalFiles(files);
+}
+
 //***************************************************************************
 // HELPER
 //***************************************************************************
@@ -519,20 +529,19 @@ QString CheckerWindow::create_html()
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& file)
 {
-    QString report = mainwindow->get_mediainfo_xml();
-#if QT_VERSION >= 0x050200
-    report = report.toHtmlEscaped();
-#else
-    report = Qt::escape(report);
-#endif
-    report.replace('\n', "<br/>\n");
-
-    QRegExp reg("\\{\\{ check\\.getXml\\|nl2br \\}\\}");
+    QRegExp reg("data-filename=\"\\{\\{ check\\.getInfo \\}\\}\"");
+    reg.setMinimal(true);
 
     int pos = 0;
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("data-filename=\"%1\"").arg(QString().fromStdWString(file)));
 
+    reg = QRegExp("\\{\\{ check\\.getInfo\\.jstree\\|raw \\}\\}");
     reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) != -1)
+
+    QString report = mainwindow->get_mediainfo_jstree();
+    pos = 0;
+    while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), report);
 
     reg = QRegExp("data-save-name=\"MediaInfo.xml\"");
@@ -541,6 +550,24 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
     while ((pos = reg.indexIn(html, 0)) != -1)
         html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_MediaInfo.xml\"")
                      .arg(file_remove_ext(file)));
+
+    reg = QRegExp("<div id=\"infoXml\\d+\" class=\"hidden\">");
+    if ((pos = reg.indexIn(html, 0)) != -1)
+    {
+        reg = QRegExp("<p class=\"modal-body\">");
+        if ((pos = reg.indexIn(html, pos)) != -1)
+        {
+            report = mainwindow->get_mediainfo_xml();
+#if QT_VERSION >= 0x050200
+            report = report.toHtmlEscaped();
+#else
+            report = Qt::escape(report);
+#endif
+            report.replace(' ', "&nbsp;");
+            report.replace('\n', "<br/>");
+            html.insert(pos + reg.matchedLength(), report);
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -600,8 +627,21 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
 
     if (displayXslt.length())
     {
-        String trans = displayXslt.toStdWString();
-        r = mainwindow->transformWithXslt(r, trans);
+        if (displayXslt.startsWith(":/displays/"))
+        {
+            QFile display_file(displayXslt);
+            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QByteArray data = display_file.readAll();
+                display_file.close();
+                r = mainwindow->transformWithXsltMemory(r, data.data());
+            }
+        }
+        else
+        {
+            String trans = displayXslt.toStdWString();
+            r = mainwindow->transformWithXsltFile(r, trans);
+        }
         resetDisplayXslt();
     }
 
@@ -692,7 +732,7 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, String& file)
     if ((pos = reg.indexIn(html, 0)) != -1)
     {
         reg = QRegExp("<p class=\"modal-body\">");
-        if ((pos = reg.indexIn(html, 0)) != -1)
+        if ((pos = reg.indexIn(html, pos)) != -1)
         {
             report = mainwindow->get_mediatrace_xml();
 #if QT_VERSION >= 0x050200

@@ -86,7 +86,6 @@ void XsltRuleEdit::fill_editor_fields(const XsltRule *r)
     if (value.length() >= 2 && value[0] == '\'')
         value = value.substr(1, value.length() - 2);
     ui->value->setText(QString().fromStdString(value));
-    ui->invalid->setText(QString().fromStdString(r->invalid));
 }
 
 //---------------------------------------------------------------------------
@@ -129,12 +128,6 @@ QComboBox *XsltRuleEdit::get_operator_select()
 QLineEdit *XsltRuleEdit::get_value_line()
 {
     return ui->value;
-}
-
-//---------------------------------------------------------------------------
-QLineEdit *XsltRuleEdit::get_invalid_line()
-{
-    return ui->invalid;
 }
 
 //---------------------------------------------------------------------------

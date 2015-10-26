@@ -175,7 +175,6 @@ void Policies::create_values_from_csv()
         "is_less_than",
         "is_greater_or_equal_than",
         "is_less_or_equal_than",
-        "is_not_equal",
         "exists",
         "does_not_exist",
         "contains_string",

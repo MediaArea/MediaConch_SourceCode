@@ -34,6 +34,7 @@ public Q_SLOTS:
     void onButtonClicked(const QString& id);
     void onDownloadReport(const QString& target, const QString& save_name);
     void menu_link_checker(const QString& name);
+    void onSaveInfo(const QString& target, const QString& save_name);
     void onSaveTrace(const QString& target, const QString& save_name);
 
 private Q_SLOTS:

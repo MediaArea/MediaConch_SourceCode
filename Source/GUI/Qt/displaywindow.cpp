@@ -80,26 +80,30 @@ void DisplayWindow::fillTable()
     table->clear();
     table->setRowCount(0);
 
-    QTableWidgetItem *itemFile = new QTableWidgetItem(tr("File"));
-    table->setHorizontalHeaderItem(0, itemFile);
-    QTableWidgetItem *itemDir = new QTableWidgetItem(tr("Path"));
-    table->setHorizontalHeaderItem(1, itemDir);
+    QTableWidgetItem *itemHeaderFile = new QTableWidgetItem(tr("File"));
+    table->setHorizontalHeaderItem(0, itemHeaderFile);
+    QTableWidgetItem *itemHeaderFullPath = new QTableWidgetItem(tr("Path"));
+    table->setHorizontalHeaderItem(1, itemHeaderFullPath);
 
     std::vector<QString>& displays = mainwindow->get_displays();
     for (size_t i = 0; i < displays.size(); ++i)
     {
         QFileInfo file(displays[i]);
 
+        QString fullPath = file.absoluteFilePath();
+        if (fullPath.startsWith(":/displays"))
+            fullPath = QString("MediaConch example");
+
         QTableWidgetItem *itemFile = new QTableWidgetItem(file.baseName());
-        QTableWidgetItem *itemDir = new QTableWidgetItem(file.absoluteFilePath());
+        QTableWidgetItem *itemFullPath = new QTableWidgetItem(fullPath);
 
         Qt::ItemFlags flag = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsTristate;
-        itemDir->setFlags(flag);
+        itemFullPath->setFlags(flag);
         itemFile->setFlags(flag);
         int row = table->rowCount();
         table->insertRow(row);
         table->setItem(row, 0, itemFile);
-        table->setItem(row, 1, itemDir);
+        table->setItem(row, 1, itemFullPath);
     }
 
     table->resizeColumnsToContents();

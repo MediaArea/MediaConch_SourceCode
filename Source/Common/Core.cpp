@@ -378,7 +378,7 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
         String report;
         valid = validation(S, report);
         if (xsltDisplay.length())
-            report = Core::transformWithXslt(report, xsltDisplay);
+            report = Core::transformWithXsltFile(report, xsltDisplay);
         Out << report;
     }
     else
@@ -447,11 +447,11 @@ bool Core::ValidatePolicy(int policy, bool& valid, String& report)
 }
 
 //---------------------------------------------------------------------------
-String Core::transformWithXslt(String& report, String& xslt)
+String Core::transformWithXsltFile(String& report, String& xslt)
 {
     Schema *S = new Xslt;
 
-    std::string x(xslt.begin(), xslt.end());
+    std::string x = Ztring(xslt).To_UTF8();
     if (!S->register_schema_from_file(x.c_str()))
         return report;
 
@@ -461,7 +461,24 @@ String Core::transformWithXslt(String& report, String& xslt)
         return report;
     std::string r = S->get_report();
     delete S;
-    return String(r.begin(), r.end());
+    return Ztring().From_UTF8(r);
+}
+
+//---------------------------------------------------------------------------
+String Core::transformWithXsltMemory(String& report, std::string& memory)
+{
+    Schema *S = new Xslt;
+
+    if (!S->register_schema_from_memory(memory))
+        return report;
+
+    std::string re = Ztring(report).To_UTF8();
+    int valid = S->validate_xml(re);
+    if (valid < 0)
+        return report;
+    std::string r = S->get_report();
+    delete S;
+    return Ztring().From_UTF8(r);
 }
 
 //***************************************************************************

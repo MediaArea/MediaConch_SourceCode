@@ -82,7 +82,8 @@ public:
     String PoliciesCheck();
 
     bool ValidatePolicy(int policy, bool& valid, String& report);
-    String transformWithXslt(String& report, String& Xslt);
+    String transformWithXsltFile(String& report, String& Xslt);
+    String transformWithXsltMemory(String& report, std::string& memory);
 
     std::vector<String> PoliciesFiles;
     Policies policies;

@@ -32,6 +32,10 @@
         <file alias="Test1_pal.sch">policies/Test1_pal.sch</file>
         <file alias="Test2.sch">policies/Test2.sch</file>
     </qresource>
+    <qresource prefix="/displays">
+        <file alias="HTML.xsl">displays/HTML.xsl</file>
+        <file alias="Text.xsl">displays/Text.xsl</file>
+    </qresource>
     <qresource prefix="/Help">
         <file alias="/About/About.html">../../License.html</file>
         <file alias="/Data Format/Data Format.html">html/Help/Data Format/Data Format.html</file>
