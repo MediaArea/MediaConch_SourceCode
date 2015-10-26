@@ -135,19 +135,19 @@ footer {
     margin-top: 40px;
 }
 
-#checkerUpload > div:nth-child(1) {
+#checkerUpload > div:nth-child(1), #checkerUpload > div:nth-child(2) {
     border: 1px solid #DDD;
     border-radius: 4px;
     padding: 2px;
 }
 
-#checkerOnline > div:nth-child(1) {
+#checkerOnline > div:nth-child(1), #checkerOnline > div:nth-child(2) {
     border: 1px solid #DDD;
     border-radius: 4px;
     padding: 2px;
 }
 
-#checkerRepository > div:nth-child(1) {
+#checkerRepository > div:nth-child(1), #checkerRepository > div:nth-child(2) {
     border: 1px solid #DDD;
     border-radius: 4px;
     padding: 2px;
