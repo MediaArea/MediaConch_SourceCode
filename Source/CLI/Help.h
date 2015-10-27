@@ -15,8 +15,11 @@
 
 //---------------------------------------------------------------------------
 int Help();
+int Help_Usage();
 int Help_Nothing();
-int Help_Output();
+int Help_Advanced();
+int Help_Ssl();
+int Help_Ssh();
 int Help_Policy();
 int Help_Xslt();
 int Help_Security();

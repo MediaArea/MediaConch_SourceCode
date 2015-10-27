@@ -32,7 +32,6 @@ CL_OPTION(Help);
 CL_OPTION(Inform);
 CL_OPTION(Report);
 CL_OPTION(Language);
-CL_OPTION(Output);
 CL_OPTION(Format);
 CL_OPTION(LogFile);
 CL_OPTION(Bom);

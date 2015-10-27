@@ -22,28 +22,86 @@
 //---------------------------------------------------------------------------
 int Help()
 {
-    TEXTOUT("Usage: \"MediaConch [-Options...] FileName1 [Filename2...]\"");
+    Version();
+    Help_Usage();
     TEXTOUT("");
     TEXTOUT("Options:");
+    TEXTOUT("Help:");
     TEXTOUT("--Help, -h");
     TEXTOUT("                    Display this help and exit");
-    TEXTOUT("--Tool=Info, -ti");
+    TEXTOUT("--Help=Advanced, -ha");
+    TEXTOUT("                    Display the advanced help and exit");
+    TEXTOUT("");
+
+    TEXTOUT("Reporting Elements:");
+    TEXTOUT("--Mediaconch, -mc");
+    TEXTOUT("                    Output MediaConch report");
+    TEXTOUT("                    (MediaConch contains default verbosity of implementationChecks plus any provided policy checks.)");
+    TEXTOUT("--Mediainfo, -mi");
     TEXTOUT("                    Output MediaInfo report");
-    TEXTOUT("--Tool=Trace, -tt");
+    TEXTOUT("--Mediatrace, -mt");
     TEXTOUT("                    Output a trace of the file");
-    TEXTOUT("--Format=XML -fx");
-    TEXTOUT("                    Output in XML format (only MediaInfo report for the moment)");
-    TEXTOUT("--Format=JSTREE -fj");
-    TEXTOUT("                    Output in JS-TREE JSON format (only trace report for the moment)");
+    TEXTOUT("");
+
+    // TEXTOUT("Implementation Checker:");
+    // TEXTOUT("--Implementation-verbosity, -iv");
+    // TEXTOUT("                    Select verbosity of the implementation check (not yet implemented)");
+    // TEXTOUT("");
+
+    TEXTOUT("Policy Checker:");
     TEXTOUT("--Policy=PolicyFileName, -p PolicyFileName");
     TEXTOUT("                    Apply the policy (XSL or Schematron) ");
-    TEXTOUT("--Display=DisplayFileName, -w DisplayFileName");
+    TEXTOUT("");
+
+    TEXTOUT("Output Formats:");
+    TEXTOUT("--Format=text -ft");
+    TEXTOUT("                    Output in Text format (default)");
+    TEXTOUT("--Format=xml -fx");
+    TEXTOUT("                    Output in MediaInfo/MediaConch/MediaTrace XML format");
+    TEXTOUT("                    (changed to -fa if there are more than 1 tool or more than 1 file)");
+    TEXTOUT("--Format=maxml -fa");
+    TEXTOUT("                    Output in MediaArea XML format");
+    TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_Usage()
+{
+    TEXTOUT("Usage: \"MediaConch [-Options...] FileName1 [Filename2...]\"");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_Nothing()
+{
+    Help_Usage();
+    TEXTOUT("\"MediaConch --Help\" for displaying more information");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_Advanced()
+{
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
     TEXTOUT("--BOM");
     TEXTOUT("                    Byte order mark for UTF-8 output");
-    TEXTOUT("");
+    TEXTOUT("--Help=Ssl");
+    TEXTOUT("                    More details about SSL specific options (e.g. for HTTPS or FTPS)");
+    TEXTOUT("--Help=Ssh");
+    TEXTOUT("                    More details about SSH specific options (e.g. for SFTP)");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_Ssl()
+{
     TEXTOUT("--Ssl_CertificateFileName=...");
     TEXTOUT("                    File name of the SSL certificate.");
     TEXTOUT("                    The default format is \"PEM\" and can be changed");
@@ -71,6 +129,13 @@ int Help()
     TEXTOUT("--Ssl_IgnoreSecurity=...");
     TEXTOUT("                    Does not verify the authenticity of the peer's certificate");
     TEXTOUT("                    Use it at your own risks");
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int Help_Ssh()
+{
     TEXTOUT("--Ssh_PublicKeyFileName=...");
     TEXTOUT("                    File name of the SSH private key.");
     TEXTOUT("                    Default is $HOME/.ssh/id_rsa.pub or $HOME/.ssh/id_dsa.pub");
@@ -97,42 +162,6 @@ int Help()
     TEXTOUT("                    Does not verify the authenticity of the peer");
     TEXTOUT("                    (you don't need to accept the key with ssh first)");
     TEXTOUT("                    Use it at your own risks");
-
-    return -1;
-}
-
-//---------------------------------------------------------------------------
-int Help_Nothing()
-{
-    TEXTOUT("Usage: \"MediaConch [-Options...] FileName1 [Filename2...]\"");
-    TEXTOUT("\"MediaConch --Help\" for displaying more information");
-
-    return -1;
-}
-
-//---------------------------------------------------------------------------
-int Help_Output()
-{
-    TEXTOUT("--Output=...  Specify a template (BETA)");
-    TEXTOUT("Usage: \"MediaConch --Output=[xxx;]Text FileName\"");
-    TEXTOUT("");
-    TEXTOUT("xxx can be: General, Video, Audio, Text, Chapter, Image, Menu");
-    TEXTOUT("Text can be the template text, or a filename");
-    TEXTOUT("     Filename must be in the form file://filename");
-    TEXTOUT("");
-    TEXTOUT("See --Info-Parameters for available parameters in the text");
-    TEXTOUT("(Parameters must be surrounded by \"%\" sign)");
-    TEXTOUT("");
-    TEXTOUT("Example: \"MediaInfo --Output=Video;%AspectRatio% FileName\"");
-    TEXTOUT("");
-    TEXTOUT("Example: \"MediaInfo --Output=Video;file://Video.txt FileName\"");
-    TEXTOUT("and Video.txt contains ");
-    TEXTOUT("\"%DisplayAspectRatio%\"        for Video Aspect Ratio.");
-    TEXTOUT("");
-    TEXTOUT("Example: \"MediaInfo --Output=file://Text.txt FileName\"");
-    TEXTOUT("and Text.txt contains");
-    TEXTOUT("\"Video;%DisplayAspectRatio%\"  for Video Aspect Ratio.");
-    TEXTOUT("\"Audio;%Format%\"              for Audio Format.");
 
     return -1;
 }
