@@ -25,7 +25,7 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-String JsTree::format_from_trace_XML(String& xml)
+String JsTree::format_from_trace_XML(const String& xml)
 {
     String json(__T("["));
     std::string xml_not_unicode=Ztring(xml).To_UTF8();

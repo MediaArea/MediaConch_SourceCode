@@ -605,50 +605,59 @@ void MainWindow::display_selected()
 //---------------------------------------------------------------------------
 void MainWindow::analyze(String& file)
 {
-    C.Tool = Core::tool_MediaConch;
+    C.Close();
+    C.Report.reset();
+    C.Report.set(Core::report_MediaConch);
     C.Run(file);
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_implementationreport_text()
 {
-    C.Format = Core::format_Text;
-    return QString().fromStdWString(C.MediaConch());
+    C.Report.reset();
+    C.Report.set(Core::report_MediaConch);
+    return QString().fromStdWString(C.GetOutput_Text());
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_and_mediatrace_xml()
 {
-    C.Format = Core::format_Xml;
-    return QString().fromStdWString(C.MediaConch());
+    C.Report.reset();
+    C.Report.set(Core::report_MediaInfo);
+    C.Report.set(Core::report_MediaTrace);
+    return QString().fromStdWString(C.GetOutput_Xml());
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_xml()
 {
-    C.Format = Core::format_Xml;
-    return QString().fromStdWString(C.MediaInfo());
+    C.Report.reset();
+    C.Report.set(Core::report_MediaInfo);
+    return QString().fromStdWString(C.GetOutput_Xml());
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_jstree()
 {
-    C.Format = Core::format_JsTree;
-    return QString().fromStdWString(C.MediaInfo());
+    C.Report.reset();
+    C.Report.set(Core::report_MediaInfo);
+    return QString().fromStdWString(C.GetOutput_JStree());
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediatrace_xml()
 {
-    C.Format = Core::format_Xml;
-    return QString().fromStdWString(C.MediaTrace());
+    C.Report.reset();
+    C.Report.set(Core::report_MediaTrace);
+    return QString().fromStdWString(C.GetOutput_Xml());
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediatrace_jstree()
 {
-    C.Format = Core::format_JsTree;
-    return QString().fromStdWString(C.MediaTrace());
+    C.Report.reset();
+    C.Report.set(Core::report_MediaTrace);
+    return QString().fromStdWString(C.GetOutput_JStree());
 }
 
 }

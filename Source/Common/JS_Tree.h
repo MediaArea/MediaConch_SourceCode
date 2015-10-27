@@ -45,7 +45,7 @@ public:
     JsTree() {}
     ~JsTree() {}
 
-    String       format_from_trace_XML(String& xml);
+    String       format_from_trace_XML(const String& xml);
     String       format_from_inform_XML(const String& xml);
 
     String       get_error() const { return error; }

@@ -27,6 +27,7 @@
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include <map>
+#include <bitset>
 #include <vector>
 #include "Policies.h"
 #include "Policy.h"
@@ -55,30 +56,35 @@ public:
     String  Menu_Option_Preferences_Option  (const MediaInfoNameSpace::String &Param, const MediaInfoNameSpace::String &Value);
 
     //Config
-    enum tool
+    enum report
     {
-        tool_MediaConch,
-        tool_MediaInfo,
-        tool_MediaTrace,
-        tool_MediaPolicies,
-        tool_Policies,
+        report_MediaConch,
+        report_MediaInfo,
+        report_MediaTrace,
+        report_Max
     };
-    tool Tool;
+    bitset<report_Max> Report;
+    bool Report_IsDefault;
     enum format
     {
         format_Text,
-        format_Xml,
+        format_Xml,         // XML corresponding to only one of MediaConch, MediaInfo, MediaTrace
+        format_MaXml,       // MAXML, can contain one or more of MediaConch, MediaInfo, MediaTrace
         format_JsTree,
     };
     format Format;
+    String ReportAndFormatCombination_IsValid();
     vector<String> List;
 
+    void   Close();
     void   Run(String file = String());
-    String Use_Tool();
-    String MediaConch();
-    String MediaInfo();
-    String MediaTrace();
-    String MediaPolicies();
+    String GetOutput();
+    String GetOutput_Text();
+    String GetOutput_Text_Implementation();
+    String GetOutput_Xml();
+    String GetOutput_Xml_Implementation();
+    String GetOutput_MaXml();
+    String GetOutput_JStree();
     String PoliciesCheck();
 
     bool ValidatePolicy(int policy, bool& valid, String& report);

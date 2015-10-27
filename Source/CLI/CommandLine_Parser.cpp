@@ -45,6 +45,7 @@ String Last_Argument;
 
 int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
 {
+    // With 1 other argument
     if (Last_Argument.length())
     {
         Argument = Last_Argument.append(Argument);
@@ -58,19 +59,47 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
         Last_Argument = __T("--display=");
         return 0;
     }
+
+    // Backward compatibility
+    if (Argument==__T("-tc"))
+        Argument = __T("--report=MediaConch");
     if (Argument==__T("-ti"))
-        Argument = __T("--tool=Info");
+        Argument = __T("--report=MediaInfo");
     if (Argument==__T("-tt"))
-        Argument = __T("--tool=Trace");
+        Argument = __T("--report=MediaTrace");
+
+    // Report other options
+    if (Argument==__T("--mediaconch"))
+        Argument = __T("-mc");
+    if (Argument==__T("--mediainfo"))
+        Argument = __T("-mi");
+    if (Argument==__T("--mediatrace"))
+        Argument = __T("-mt");
+    
+    // Report short options
+    if (Argument==__T("-mc"))
+        Argument = __T("--report=MediaConch");
+    if (Argument==__T("-mi"))
+        Argument = __T("--report=MediaInfo");
+    if (Argument==__T("-mt"))
+        Argument = __T("--report=MediaTrace");
+
+    // Format short options
+    if (Argument==__T("-ft"))
+        Argument = __T("--format=Text");
     if (Argument==__T("-fx"))
         Argument = __T("--format=XML");
+    if (Argument==__T("-fa"))
+        Argument = __T("--format=MAXML");
     if (Argument==__T("-fj"))
         Argument = __T("--format=JSTREE");
+    
+    // Listing
     if (0);
     OPTION("--help",                                        Help)
     OPTION("-h",                                            Help)
     OPTION("--version",                                     Version)
-    OPTION("--tool",                                        Tool)
+    OPTION("--report",                                      Report)
     OPTION("--format",                                      Format)
     OPTION("--output",                                      Output)
     OPTION("--policy",                                      PolicyOption)
@@ -101,18 +130,28 @@ CL_OPTION(Version)
 }
 
 //---------------------------------------------------------------------------
-CL_OPTION(Tool)
+CL_OPTION(Report)
 {
     //Form : --Inform=Text
     size_t Egal_Pos=Argument.find(__T('='));
     if (Egal_Pos==String::npos)
         return Help_Output();
 
+    // Removing defaults
+    if (MI.Report_IsDefault)
+    {
+        MI.Report.reset();
+        MI.Report_IsDefault=false;
+    }
+        
+    // New requested reports
     String Tool=Argument.substr(Egal_Pos+1);
-    if (Tool==__T("Info") || Tool==__T("info"))
-        MI.Tool=MediaConch::Core::tool_MediaInfo;
-    if (Tool==__T("Trace") || Tool==__T("trace"))
-        MI.Tool=MediaConch::Core::tool_MediaTrace;
+    if (Tool==__T("MediaConch") || Tool==__T("mediaconch"))
+        MI.Report.set(MediaConch::Core::report_MediaConch);
+    if (Tool==__T("MediaInfo") || Tool==__T("mediainfo"))
+        MI.Report.set(MediaConch::Core::report_MediaInfo);
+    if (Tool==__T("MediaTrace") || Tool==__T("mediatrace"))
+        MI.Report.set(MediaConch::Core::report_MediaTrace);
 
     return 0;
 }
@@ -126,8 +165,12 @@ CL_OPTION(Format)
         return Help_Output();
 
     String Format=Argument.substr(Egal_Pos+1);
+    if (Format==__T("Text") || Format==__T("text"))
+        MI.Format=MediaConch::Core::format_Xml;
     if (Format==__T("XML") || Format==__T("xml"))
         MI.Format=MediaConch::Core::format_Xml;
+    if (Format==__T("MAXML") || Format==__T("maxml"))
+        MI.Format=MediaConch::Core::format_MaXml;
     if (Format==__T("JSTREE") || Format==__T("jstree"))
         MI.Format=MediaConch::Core::format_JsTree;
 
@@ -145,7 +188,7 @@ CL_OPTION(PolicyOption)
     String file;
     file.assign(Argument, Egal_Pos+1, std::string::npos);
     MI.PoliciesFiles.push_back(file);
-    MI.Tool=MediaConch::Core::tool_Policies;
+    Report(MI, __T("--report=MediaConch"));
     return 0;
 }
 
