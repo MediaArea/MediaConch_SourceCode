@@ -548,8 +548,8 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
     reg.setMinimal(true);
 
     while ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_MediaInfo.xml\"")
-                     .arg(file_remove_ext(file)));
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.MediaInfo.xml\"")
+                     .arg(QString().fromStdWString(file)));
 
     reg = QRegExp("<div id=\"infoXml\\d+\" class=\"hidden\">");
     if ((pos = reg.indexIn(html, 0)) != -1)
@@ -603,12 +603,12 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
     if ((pos = reg.indexIn(html, 0)) != -1)
         html.replace(pos, reg.matchedLength(), report);
 
-    reg = QRegExp("data-save-name=\"ConformanceReport.txt\"");
+    reg = QRegExp("data-save-name=\"ImplementationReport.txt\"");
     reg.setMinimal(true);
 
     while ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_ConformanceReport.txt\"")
-                     .arg(file_remove_ext(file)));
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.ImplementationReport.txt\"")
+                     .arg(QString().fromStdWString(file)));
 }
 
 //---------------------------------------------------------------------------
@@ -624,6 +624,10 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     String r;
     if (!mainwindow->ValidatePolicy(policy, valid, r))
         valid = false;
+
+    // Default without display
+    QString save_ext("xml");
+    bool is_html = false;
 
     if (displayXslt.length())
     {
@@ -642,6 +646,10 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
             String trans = displayXslt.toStdWString();
             r = mainwindow->transformWithXsltFile(r, trans);
         }
+
+        QString report = QString().fromStdWString(r);
+        is_html = report_is_html(report);
+        save_ext = is_html ? "html" : "txt";
         resetDisplayXslt();
     }
 
@@ -659,7 +667,6 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     }
 
     QString report = QString().fromStdWString(r);
-    bool is_html = report_is_html(report);
     if (!is_html)
     {
 #if QT_VERSION >= 0x050200
@@ -669,7 +676,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
 #endif
         report.replace('\n', "<br/>\n");
     }
-    change_report_policy_save_name(file, policy_name, is_html, html);
+    change_report_policy_save_name(file, save_ext, html);
 
     QRegExp reg("\\{\\{ check\\.getPolicy \\}\\}");
     reg.setMinimal(true);
@@ -725,8 +732,8 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, String& file)
     reg.setMinimal(true);
 
     while ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_MediaTrace.xml\"")
-                     .arg(file_remove_ext(file)));
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.MediaTrace.xml\"")
+                     .arg(QString().fromStdWString(file)));
 
     reg = QRegExp("<div id=\"traceXml\\d+\" class=\"hidden\">");
     if ((pos = reg.indexIn(html, 0)) != -1)
@@ -848,15 +855,15 @@ bool CheckerWindow::implementationreport_is_valid(QString& report)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::change_report_policy_save_name(String& file, QString& policy, bool is_html, QString& html)
+void CheckerWindow::change_report_policy_save_name(String& file, QString& ext, QString& html)
 {
     QRegExp reg("data-save-name=\"PolicyReport.txt\"");
     reg.setMinimal(true);
 
     int pos = 0;
     while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1_%2_PolicyReport.%3\"")
-                     .arg(policy).arg(file_remove_ext(file)).arg(is_html ? "html" : "txt"));
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.MediaConch.%2\"")
+                     .arg(QString().fromStdWString(file)).arg(ext));
 }
 
 //---------------------------------------------------------------------------
