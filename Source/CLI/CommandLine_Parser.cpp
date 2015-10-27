@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include <string>
 #include <vector>
+#include <algorithm>
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
@@ -59,6 +60,10 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
         Last_Argument = __T("--display=");
         return 0;
     }
+
+    // Help short options
+    if (Argument==__T("-ha"))
+        Argument = __T("--help=Advanced");
 
     // Backward compatibility
     if (Argument==__T("-tc"))
@@ -116,8 +121,20 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
 CL_OPTION(Help)
 {
     (void)MI;
-    (void)Argument;
-    Version();
+    //Form : --Help=Advanced
+    size_t Egal_Pos=Argument.find(__T('='));
+    if (Egal_Pos!=String::npos)
+    {
+        String level=Argument.substr(Egal_Pos+1);
+        transform(level.begin(), level.end(), level.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+
+        if (level == __T("advanced"))
+            return Help_Advanced();
+        else if (level == __T("ssl"))
+            return Help_Ssl();
+        else if (level == __T("ssh"))
+            return Help_Ssh();
+    }
     return Help();
 }
 
@@ -135,7 +152,7 @@ CL_OPTION(Report)
     //Form : --Inform=Text
     size_t Egal_Pos=Argument.find(__T('='));
     if (Egal_Pos==String::npos)
-        return Help_Output();
+        return Help();
 
     // Removing defaults
     if (MI.Report_IsDefault)
@@ -162,7 +179,7 @@ CL_OPTION(Format)
     //Form : --Inform=Text
     size_t Egal_Pos=Argument.find(__T('='));
     if (Egal_Pos==String::npos)
-        return Help_Output();
+        return Help();
 
     String Format=Argument.substr(Egal_Pos+1);
     if (Format==__T("Text") || Format==__T("text"))
