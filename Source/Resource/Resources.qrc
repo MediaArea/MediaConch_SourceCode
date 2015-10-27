@@ -28,6 +28,13 @@
     </qresource>
     <qresource prefix="/policies">
         <file alias="PolicyCheckTemplate.xsl">policies/PolicyCheckTemplate.xsl</file>
+        <file alias="General_Conformance.xsl">policies/General_Conformance.xsl</file>
+        <file alias="NYULibraries_MKVFFV1.xsl">policies/NYULibraries_MKVFFV1.xsl</file>
+        <file alias="NYULibraries_QTv210.xsl">policies/NYULibraries_QTv210.xsl</file>
+        <file alias="QTv210_to_MKVffv1.xsl">policies/QTv210_to_MKVffv1.xsl</file>
+        <file alias="Standards_Mismatch_NTSC.xsl">policies/Standards_Mismatch_NTSC.xsl</file>
+        <file alias="Standards_Mismatch_PAL.xsl">policies/Standards_Mismatch_PAL.xsl</file>
+        <file alias="Testing_Multiple_Files.xsl">policies/Testing_Multiple_Files.xsl</file>
     </qresource>
     <qresource prefix="/displays">
         <file alias="HTML.xsl">displays/HTML.xsl</file>
