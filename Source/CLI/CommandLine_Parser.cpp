@@ -106,7 +106,6 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--version",                                     Version)
     OPTION("--report",                                      Report)
     OPTION("--format",                                      Format)
-    OPTION("--output",                                      Output)
     OPTION("--policy",                                      PolicyOption)
     OPTION("--display",                                     Display)
     //Default
@@ -220,19 +219,6 @@ CL_OPTION(Display)
     String file;
     file.assign(Argument, Egal_Pos+1, std::string::npos);
     MI.xsltDisplay = file;
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-CL_OPTION(Output)
-{
-    //Form : --Inform=Text
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos==String::npos)
-        return Help_Output();
-
-    MI.Menu_Option_Preferences_Inform(Argument.substr(Egal_Pos+1));
-
     return 0;
 }
 
