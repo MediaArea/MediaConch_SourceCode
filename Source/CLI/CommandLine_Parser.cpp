@@ -183,7 +183,7 @@ CL_OPTION(Format)
 
     String Format=Argument.substr(Egal_Pos+1);
     if (Format==__T("Text") || Format==__T("text"))
-        MI.Format=MediaConch::Core::format_Xml;
+        MI.Format=MediaConch::Core::format_Text;
     if (Format==__T("XML") || Format==__T("xml"))
         MI.Format=MediaConch::Core::format_Xml;
     if (Format==__T("MAXML") || Format==__T("maxml"))
