@@ -343,9 +343,6 @@
           <xsl:value-of select="../@streamid"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:attribute name="expected">
-        <xsl:value-of select="$value"/>
-      </xsl:attribute>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -374,9 +371,6 @@
           <xsl:value-of select="../@streamid"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:attribute name="expected">
-        <xsl:value-of select="$value"/>
-      </xsl:attribute>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -405,9 +399,6 @@
           <xsl:value-of select="../@streamid"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:attribute name="expected">
-        <xsl:value-of select="$value"/>
-      </xsl:attribute>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -436,9 +427,6 @@
           <xsl:value-of select="../@streamid"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:attribute name="expected">
-        <xsl:value-of select="$value"/>
-      </xsl:attribute>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -467,9 +455,6 @@
           <xsl:value-of select="../@streamid"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:attribute name="expected">
-        <xsl:value-of select="$value"/>
-      </xsl:attribute>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -552,9 +537,6 @@
           <xsl:value-of select="../@streamid"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:attribute name="expected">
-        <xsl:value-of select="$value"/>
-      </xsl:attribute>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
