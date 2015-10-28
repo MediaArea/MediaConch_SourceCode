@@ -73,6 +73,8 @@ void XsltRuleEdit::fill_editor_fields(const XsltRule *r)
     if (pos != -1)
         ui->type->setCurrentIndex(pos);
 
+    change_values_of_field_selector();
+
     pos = ui->field->findText(QString().fromStdString(r->field));
     if (pos != -1)
         ui->field->setCurrentIndex(pos);
