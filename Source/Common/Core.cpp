@@ -17,6 +17,7 @@
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
 #include "Common/ImplementationReportXsl.h"
+#include "Common/ImplementationReportDisplayXsl.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include <sstream>
@@ -194,7 +195,7 @@ String Core::GetOutput_Text ()
     {
         MI->Option(__T("Details"), __T("0"));
         MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
-        
+
         ret += GetOutput_Text_Implementation();
         ret += __T("\r\n");
     }
@@ -295,10 +296,9 @@ String Core::GetOutput_Text_Implementation ()
     std::string memory(implementation_report_xsl);
     validateXsltPolicyFromMemory(memory, valid, report);
 
-    if (!valid)
-        return report;
-
     // Apply an XSLT to have Text
+    memory = std::string(implementation_report_display_xsl);
+    report = transformWithXsltMemory(report, memory);
     return report;
 }
 
