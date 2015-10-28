@@ -172,6 +172,7 @@ void XsltRuleEdit::add_values_to_selector()
     map<string, list<string> >::const_iterator iteType = existing_type->end();
     for (; itType != iteType; ++itType)
         ui->type->addItem(QString().fromStdString(itType->first));
+    ui->type->model()->sort(0);
     change_values_of_field_selector();
 
     const list<string> *existing_operator = mainwindow->providePolicyExistingXsltOperator();
@@ -200,6 +201,8 @@ void XsltRuleEdit::change_values_of_field_selector()
         for (; it != ite; ++it)
             ui->field->addItem(QString().fromStdString(*it));
     }
+
+    ui->field->model()->sort(0);
 }
 
 }
