@@ -107,6 +107,7 @@ private:
     bool validation(Schema* S, String& report);
     void validateSchematronPolicy(int pos, bool& valid, String& report);
     void validateXsltPolicy(int pos, bool& valid, String& report);
+    void validateXsltPolicyFromMemory(const std::string& memory, bool& valid, String& report);
     bool is_schematron_file(const String& file);
 };
 
