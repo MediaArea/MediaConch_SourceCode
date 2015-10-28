@@ -119,6 +119,15 @@ footer {
     float: right;
 }
 
+.checker-result-text {
+    display: inline-block;
+    width: 90%;
+}
+
+.checker-result-buttons {
+    float: right;
+}
+
 .results-dld, .results-dld-trace, .results-dld-trace-ajax, .results-dld-info, .results-dld-info-ajax {
     margin-left: 5px;
 }
