@@ -779,7 +779,7 @@ void CheckerWindow::change_html_file_detail(QString& html, String& file)
 //---------------------------------------------------------------------------
 void CheckerWindow::remove_html_file_detail_policy_report(QString& html)
 {
-    QRegExp reg("<li class=\"list-group-item report\">Policy report");
+    QRegExp reg("<li class=\"list-group-item report policyResult\">");
     reg.setMinimal(true);
     int pos = 0;
     if ((pos = reg.indexIn(html, pos)) == -1)
