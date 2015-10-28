@@ -144,6 +144,7 @@ RESOURCES        += ../../Source/Resource/Resources.qrc
 MOC_DIR          =  _Automated
 UI_HEADERS_DIR   =  _Automated
 UI_SOURCES_DIR   =  _Automated
+UI_DIR          =  _Automated
 
 macx:ICON = ../../Source/Resource/Image/MediaConch.icns
 macx:QMAKE_LFLAGS += -framework CoreFoundation
