@@ -16,11 +16,13 @@
 #include "ruleedit.h"
 #include "WebPage.h"
 #include "WebView.h"
+#include "progressbar.h"
 
 #include <QTextEdit>
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebElement>
+#include <QFrame>
 #include <QProgressBar>
 #include <QDesktopWidget>
 #include <QFileDialog>
@@ -149,7 +151,7 @@ void CheckerWindow::createWebViewFinished(bool ok)
     {
         mainwindow->remove_widget_from_layout(progressBar);
         delete progressBar;
-        progressBar = NULL;
+        progressBar=NULL;
     }
     if (!ok)
         return; //TODO: Error
@@ -164,7 +166,7 @@ void CheckerWindow::setWebViewContent(QString& html)
     WebPage* page = new WebPage(mainwindow, MainView);
     MainView->setPage(page);
 
-    QObject::connect(MainView, SIGNAL(loadProgress(int)), progressBar, SLOT(setValue(int)));
+    QObject::connect(MainView, SIGNAL(loadProgress(int)), progressBar->get_progress_bar(), SLOT(setValue(int)));
     QObject::connect(MainView, SIGNAL(loadFinished(bool)), this, SLOT(createWebViewFinished(bool)));
 
     QUrl url = QUrl("qrc:/html");
@@ -182,8 +184,10 @@ void CheckerWindow::createWebView()
 
     clearVisualElements();
 
-    progressBar = new QProgressBar();
+    progressBar = new ProgressBar(mainwindow);
     mainwindow->set_widget_to_layout(progressBar);
+    progressBar->get_progress_bar()->setValue(0);
+    progressBar->show();
 
     QString html = create_html();
     setWebViewContent(html);
@@ -199,10 +203,13 @@ void CheckerWindow::updateWebView(String file, int policy)
 
     //Load the new page
     clearVisualElements();
-    progressBar = new QProgressBar();
+
+    progressBar = new ProgressBar(mainwindow);
     mainwindow->set_widget_to_layout(progressBar);
-    progressBar->setValue(0);
     progressBar->show();
+    progressBar->get_progress_bar()->setValue(1);
+    progressBar->get_progress_bar()->setMaximum(0);
+    progressBar->get_progress_bar()->setMaximum(100);
 
     //Add the file detail to the web page
     add_file_detail_to_html(html, file, policy);
@@ -221,10 +228,12 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
 
     //Load the new page
     clearVisualElements();
-    progressBar = new QProgressBar();
+    progressBar = new ProgressBar(mainwindow);
     mainwindow->set_widget_to_layout(progressBar);
-    progressBar->setValue(0);
     progressBar->show();
+    progressBar->get_progress_bar()->setValue(1);
+    progressBar->get_progress_bar()->setMaximum(0);
+    progressBar->get_progress_bar()->setMaximum(100);
 
     //Add the files details to the web page
     QString displayXsltRetain = displayXslt;
@@ -233,7 +242,7 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
         displayXslt = displayXsltRetain;
         String file = files[i].absoluteFilePath().toStdWString();
         add_file_detail_to_html(html, file, policy);
-        progressBar->setValue((i * 100) / files.count());
+        progressBar->get_progress_bar()->setValue((i * 100) / files.count());
     }
     resetDisplayXslt();
 

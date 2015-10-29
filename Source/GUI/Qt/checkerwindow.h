@@ -12,7 +12,7 @@
 #include <QFileInfo>
 #include <QString>
 
-class QProgressBar;
+class QFrame;
 class QFile;
 class QWebView;
 
@@ -20,6 +20,7 @@ namespace MediaConch {
 
 class MainWindow;
 class WebView;
+class ProgressBar;
 
 class CheckerWindow : public QObject
 {
@@ -48,7 +49,7 @@ private:
     // Visual elements
     MainWindow*                 mainwindow;
     WebView*                    MainView;
-    QProgressBar*               progressBar;
+    ProgressBar*                progressBar;
     QString                     displayXslt;
     bool                        analyse;
 
