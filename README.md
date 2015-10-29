@@ -116,7 +116,7 @@ apt-get install libcurl4-gnutls-dev
 
 When you have done all the prerequisite for you configuration, you can build MediaConch. We start with the CLI.
 
-```
+```sh
 cd $BUILD_DIR
 git clone https://github.com/MediaArea/MediaConch_SourceCode.git
 cd MediaConch_SourceCode/Project/GNU/CLI
@@ -125,24 +125,21 @@ cd MediaConch_SourceCode/Project/GNU/CLI
 
 Then, under Mac:
 
-```
+```sh
 ./configure --enable-staticlibs
 make
 ```
 
 Then, under Linux:
 
-```
+```sh
 ./configure --enable-shared
 make
 ```
 
 #### Launch the CLI
 
-The binary is mediaconch.
-
-```
-cd ../path/to/builddir/MediaConch_SourceCode/Project/GNU/CLI
+```sh
 ./mediaconch
 ```
 
@@ -152,7 +149,7 @@ If you have already build the GUI, no need to run git twice. If the directory Me
 
 To compile MediaConch GUI under Mac and Linux:
 
-```
+```sh
 cd $BUILD_DIR
 git clone https://github.com/MediaArea/MediaConch_SourceCode.git
 cd MediaConch_SourceCode/Project/Qt
@@ -162,17 +159,15 @@ make
 
 #### Launch the GUI
 
-Under Mac, the binary is MediaConch.app/Contents/MacOS/MediaConch.
+Under Mac:
 
-```
-cd ../path/to/builddir/MediaConch_SourceCode/Project/Qt
+```sh
 ./MediaConch.app/Contents/MacOS/MediaConch
 ```
 
-Under Linux, the binary is mediaconch-gui.
+Under Linux:
 
-```
-cd ../path/to/builddir/MediaConch_SourceCode/Project/Qt
+```sh
 ./mediaconch-gui
 ```
 
@@ -182,7 +177,7 @@ cd ../path/to/builddir/MediaConch_SourceCode/Project/Qt
 
 To compile ZenLib under Mac and Linux:
 
-```
+```sh
 cd $BUILD_DIR
 git clone https://github.com/MediaArea/ZenLib.git
 cd ZenLib/Project/GNU/Library
@@ -195,7 +190,7 @@ make
 
 To compile MediaInfoLib under Mac and Linux:
 
-```
+```sh
 cd $BUILD_DIR
 git clone https://github.com/MediaArea/MediaInfoLib.git
 cd MediaInfoLib/Project/GNU/Library
@@ -204,14 +199,14 @@ cd MediaInfoLib/Project/GNU/Library
 
 Then, under Mac:
 
-```
+```sh
 ./configure --with-libcurl=runtime
 make
 ```
 
 Then, under Linux:
 
-```
+```sh
 ./configure --with-libcurl
 make
 ```
