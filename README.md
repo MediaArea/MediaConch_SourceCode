@@ -28,36 +28,9 @@ In this document, this directory will be refered as $BUILD_DIR.
 
 ### Dependancies under Linux
 
-#### .deb distributions (Debian, Ubuntu, …)
+#### Listing
 
-*Build dependancies*
-
-* git
-* automake
-* autoconf
-* libtool
-* pkg-config
-* make
-* g++
-
-*CLI and GUI dependancies*
-
-* zlib1g-dev
-* libxml2-dev
-* libxslt1-dev
-
-*GUI only dependancies*
-
-* libqt4-dev
-* libqtwebkit-dev
-
-*Optional dependancy (for online checker)*
-
-* libcurl4-gnutls-dev
-
-#### .rpm based distributions (RHEL, CentOS, SLE, openSUSE, …)
-
-*Build dependancies*
+*Build tools*
 
 * git
 * automake
@@ -65,134 +38,102 @@ In this document, this directory will be refered as $BUILD_DIR.
 * libtool
 * pkgconfig
 * make
-* gcc-c++
+* g++
 
 *CLI and GUI dependancies*
 
-* zlib-devel
-* libxml2-devel
-* libxslt-devel
+* zlib
+* libxml2
+* libxslt
 
 *GUI only dependancies*
 
-yum
-apt
-
-A tester * libqt4-devel
-* qt-devel (fedora)
-* qtwebkit-devel (fedora)
-* desktop-file-utils (fedora)
-* libQtWebKit-devel (suse)
-* update-desktop-files (suse)
+* qt4
+* qtwebkit
 
 *Optional dependancy (for online checker)*
 
-* libcurl-devel
+* libcurl
 
-### MediaArea librairies: ZenLib and MediaInfoLib
+#### Ubuntu
 
-#### ZenLib
+*Build tools and CLI/GUI dependancies*
 
-##### Under Mac
+apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
 
-To compile ZenLib under Mac:
+*GUI only dependancies*
 
-```
-cd $BUILD_DIR
-git clone https://github.com/MediaArea/ZenLib.git
-cd ZenLib/Project/GNU/Library
-./autogen.sh
-./configure --with-macosx-version-min=10.5
-make
-```
+apt-get install libqt4-dev libqtwebkit-dev
 
-##### Under Linux
+*Optional dependancy (for online checker)*
 
-You can use the libzen devel package from your distribution, or compile it yourself.
+apt-get install libcurl4-gnutls-dev
 
-To compile ZenLib under Linux:
+#### Fedora
 
-```
-cd ../path/to/builddir
-git clone https://github.com/MediaArea/ZenLib.git
-cd ZenLib/Project/GNU/Library
-chmod +x autogen.sh configure
-./autogen.sh
-./configure
-make clean
-make
-```
+*Build tools and CLI/GUI dependancies*
 
-#### MediaInfoLib
+yum install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
 
-##### Under Mac
+*GUI only dependancies*
 
-To compile MediaInfoLib under Mac:
+yum install qt-devel qtwebkit-devel desktop-file-utils
 
-```
-cd ../path/to/builddir
-git clone https://github.com/MediaArea/MediaInfoLib.git
-cd MediaInfoLib/Project/GNU/Library
-chmod +x autogen.sh configure
-./autogen.sh
-./configure --with-libcurl=runtime
-make clean
-make
-```
+*Optional dependancy (for online checker)*
 
-Si vous
-./configure --with-libcurl
+yum install libcurl-devel
 
+#### Debian
 
+*Build tools and CLI/GUI dependancies*
 
-##### Under Linux
+apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
 
-You can use the libmediainfo devel package from your distribution, or compile it yourself. However, it is recommended to compile it yourself if you want the online checker.
+*GUI only dependancies*
 
-To compile MediaInfoLib under Linux:
+apt-get install libqt4-dev libqtwebkit-dev
 
-```
-cd ../path/to/builddir
-git clone https://github.com/MediaArea/MediaInfoLib.git
-cd MediaInfoLib/Project/GNU/Library
-chmod +x autogen.sh configure
-./autogen.sh
-make clean
-make
-```
+*Optional dependancy (for online checker)*
+
+apt-get install libcurl4-gnutls-dev
+
+#### OpenSUSE
+
+*Build tools and CLI/GUI dependancies*
+
+??? yast2 install ??? git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
+
+*GUI only dependancies*
+
+??? yast2 install ??? libQtWebKit-devel update-desktop-files
+À tester : libqt4-devel
+
+*Optional dependancy (for online checker)*
+
+??? yast2 install ??? libcurl-devel
 
 ### Build MediaConch CLI
 
 When you have done all the prerequisite for you configuration, you can build MediaConch. We start with the CLI.
 
-##### Under Mac
-
-To compile MediaConch CLI under Mac:
-
 ```
-cd ../path/to/builddir
+cd $BUILD_DIR
 git clone https://github.com/MediaArea/MediaConch_SourceCode.git
 cd MediaConch_SourceCode/Project/GNU/CLI
-chmod +x autogen.sh configure
 ./autogen.sh
-./configure --with-macosx-version-min=10.5 --enable-staticlibs
-make clean
+```
+
+Then, under Mac:
+
+```
+./configure --enable-staticlibs
 make
 ```
 
-##### Under Linux
-
-To compile MediaConch CLI under Linux:
+Then, under Linux:
 
 ```
-cd ../path/to/builddir
-rm -fr MediaConch_SourceCode
-git clone https://github.com/MediaArea/MediaConch_SourceCode.git
-cd MediaConch_SourceCode/Project/GNU/CLI
-chmod +x autogen.sh configure
-./autogen.sh
 ./configure --enable-shared
-make clean
 make
 ```
 
@@ -207,16 +148,15 @@ cd ../path/to/builddir/MediaConch_SourceCode/Project/GNU/CLI
 
 ### Build MediaConch GUI
 
+If you have already build the GUI, no need to run git twice. If the directory MediaConch_SourceCode already exist, git will complain.
+
 To compile MediaConch GUI under Mac and Linux:
 
 ```
-cd ../path/to/builddir
-rm -fr MediaConch_SourceCode
+cd $BUILD_DIR
 git clone https://github.com/MediaArea/MediaConch_SourceCode.git
 cd MediaConch_SourceCode/Project/Qt
-chmod +x prepare
 ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
-make clean
 make
 ```
 
@@ -236,4 +176,46 @@ cd ../path/to/builddir/MediaConch_SourceCode/Project/Qt
 ./mediaconch-gui
 ```
 
+### Optional : build ZenLib and MediaInfoLib
+
+#### ZenLib
+
+To compile ZenLib under Mac and Linux:
+
+```
+cd $BUILD_DIR
+git clone https://github.com/MediaArea/ZenLib.git
+cd ZenLib/Project/GNU/Library
+./autogen.sh
+./configure
+make
+```
+
+#### MediaInfoLib
+
+To compile MediaInfoLib under Mac and Linux:
+
+```
+cd $BUILD_DIR
+git clone https://github.com/MediaArea/MediaInfoLib.git
+cd MediaInfoLib/Project/GNU/Library
+./autogen.sh
+```
+
+Then, under Mac:
+
+```
+./configure --with-libcurl=runtime
+make
+```
+
+Then, under Linux:
+
+```
+./configure --with-libcurl
+make
+```
+
 ## Build under Windows
+
+You need to install Microsoft Visual Studio 2013.
