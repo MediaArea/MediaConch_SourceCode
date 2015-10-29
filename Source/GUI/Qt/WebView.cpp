@@ -17,6 +17,11 @@ namespace MediaConch
         setAcceptDrops(true);
     }
 
+    WebView::~WebView()
+    {
+        stop();
+    }
+
     void WebView::dropEvent(QDropEvent *event)
     {
         if (event->mimeData()->hasUrls())

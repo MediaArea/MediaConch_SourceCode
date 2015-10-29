@@ -144,8 +144,8 @@ void CheckerWindow::clearVisualElements()
 //---------------------------------------------------------------------------
 void CheckerWindow::createWebViewFinished(bool ok)
 {
-    if (!MainView)
-        return;
+    if (!MainView || !ok)
+        return; //TODO: Error
 
     if (progressBar)
     {
@@ -153,8 +153,6 @@ void CheckerWindow::createWebViewFinished(bool ok)
         delete progressBar;
         progressBar=NULL;
     }
-    if (!ok)
-        return; //TODO: Error
     mainwindow->set_widget_to_layout(MainView);
 }
 

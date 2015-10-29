@@ -13,6 +13,7 @@ class WebView : public QWebView
 
 public:
     explicit WebView(QWidget *parent = 0);
+    virtual ~WebView();
 
 protected:
     void dropEvent(QDropEvent *event);
