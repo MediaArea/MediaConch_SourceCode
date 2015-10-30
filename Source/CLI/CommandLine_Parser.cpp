@@ -110,6 +110,7 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
     OPTION("--format",                                      Format)
     OPTION("--policy",                                      PolicyOption)
     OPTION("--display",                                     Display)
+    OPTION("--logfile",                                     LogFile)
     //Default
     OPTION("--",                                            Default)
     else
@@ -227,6 +228,15 @@ CL_OPTION(Display)
 }
 
 //---------------------------------------------------------------------------
+CL_OPTION(LogFile)
+{
+    //Form : --LogFile=Text
+    LogFile_FileName.assign(Argument, 10, std::string::npos);
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 CL_OPTION(Default)
 {
     //Form : --Option=Text
@@ -248,6 +258,17 @@ CL_OPTION(Default)
     }
 
     return 0;
+}
+
+//---------------------------------------------------------------------------
+void LogFile_Action(ZenLib::Ztring Inform)
+{
+    if (LogFile_FileName.empty())
+        return;
+
+    std::string Inform_Ansi=Inform.To_UTF8();
+    std::fstream File(LogFile_FileName.To_Local().c_str(), std::ios_base::out|std::ios_base::trunc);
+    File.write(Inform_Ansi.c_str(), Inform_Ansi.size());
 }
 
 //---------------------------------------------------------------------------

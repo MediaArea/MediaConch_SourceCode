@@ -26,6 +26,12 @@ using namespace MediaInfoNameSpace;
 //---------------------------------------------------------------------------
 
 //****************************************************************************
+// Extern
+//****************************************************************************
+
+extern ZenLib::Ztring LogFile_FileName;
+
+//****************************************************************************
 // Event to manage
 //****************************************************************************
 
@@ -145,7 +151,13 @@ int main(int argc, char* argv_ansi[])
 
     for (size_t i = 0; i < MI.List.size(); ++i)
         MI.Run(MI.List[i]);
+    
+    //Output
     STRINGOUT(MI.GetOutput());
+
+    //Output, in a file if needed
+    if (!LogFile_FileName.empty())
+        LogFile_Action(MI.GetOutput());
 
     return 0;
 }

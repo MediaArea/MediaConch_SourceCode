@@ -38,6 +38,7 @@ CL_OPTION(Bom);
 CL_OPTION(Version);
 CL_OPTION(PolicyOption);
 CL_OPTION(Display);
+CL_OPTION(LogFile);
 CL_OPTION(Default);
 
 //***************************************************************************

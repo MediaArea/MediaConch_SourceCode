@@ -91,8 +91,6 @@ int Help_Advanced()
 {
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
-    TEXTOUT("--BOM");
-    TEXTOUT("                    Byte order mark for UTF-8 output");
     TEXTOUT("--Help=Ssl");
     TEXTOUT("                    More details about SSL specific options (e.g. for HTTPS or FTPS)");
     TEXTOUT("--Help=Ssh");
