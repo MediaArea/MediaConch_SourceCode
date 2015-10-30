@@ -86,6 +86,8 @@ String Core::ReportAndFormatCombination_IsValid ()
             Report_Count++;
     if (Report_Count>1 && Format==format_Xml)
         Format=format_MaXml;
+    if (Format==format_Text && !xsltDisplay.empty())
+        Format=format_Xml; //Forcing XML output in order to apply the Display XSL
     
     // Test of incompatibilities
     if (Report[report_MediaConch] && Report[report_MediaTrace] && Format==format_Text)
@@ -334,10 +336,9 @@ String Core::GetOutput_Xml_Implementation ()
     std::string memory(implementation_report_xsl);
     validateXsltPolicyFromMemory(memory, valid, report);
 
-    if (!valid)
-        return report;
-
     // Apply an XSLT to have XML
+    if (xsltDisplay.length())
+        report = Core::transformWithXsltFile(report, xsltDisplay);
     return report;
 }
 
