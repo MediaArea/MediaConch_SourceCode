@@ -589,11 +589,37 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
 
     // Apply HTML default display
     String r = report.toStdWString();
-    r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
-    report = QString().fromStdWString(r);
+    QString save_ext = "xml";
+    bool is_html = false;
+    if (displayXslt.length())
+    {
+        if (displayXslt.startsWith(":/displays/"))
+        {
+            QFile display_file(displayXslt);
+            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QByteArray data = display_file.readAll();
+                display_file.close();
+                r = mainwindow->transformWithXsltMemory(r, data.data());
+            }
+        }
+        else
+        {
+            String trans = displayXslt.toStdWString();
+            r = mainwindow->transformWithXsltFile(r, trans);
+        }
 
-    bool is_html = report_is_html(report);
-    QString save_ext = is_html ? "html" : "txt";
+        report = QString().fromStdWString(r);
+        is_html = report_is_html(report);
+        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
+    }
+    else
+    {
+        r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
+        report = QString().fromStdWString(r);
+        is_html = report_is_html(report);
+        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
+    }
 
     if (!is_html)
     {
@@ -652,6 +678,7 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
     QString save_ext("xml");
     bool is_html = false;
 
+    QString report = QString().fromStdWString(r);
     if (displayXslt.length())
     {
         if (displayXslt.startsWith(":/displays/"))
@@ -670,10 +697,17 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
             r = mainwindow->transformWithXsltFile(r, trans);
         }
 
-        QString report = QString().fromStdWString(r);
+        report = QString().fromStdWString(r);
         is_html = report_is_html(report);
-        save_ext = is_html ? "html" : "txt";
+        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
         resetDisplayXslt();
+    }
+    else
+    {
+        r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
+        report = QString().fromStdWString(r);
+        is_html = report_is_html(report);
+        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
     }
 
     QString policy_name;
@@ -689,7 +723,6 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, String&
         }
     }
 
-    QString report = QString().fromStdWString(r);
     if (!is_html)
     {
 #if QT_VERSION >= 0x050200
@@ -859,6 +892,17 @@ void CheckerWindow::add_file_detail_to_html(QString& html, String& file, int pol
 bool CheckerWindow::report_is_html(QString& report)
 {
     QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
+
+    if (reg.indexIn(report, 0) != -1)
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool CheckerWindow::report_is_xml(QString& report)
+{
+    QRegExp reg("<\\?xml ", Qt::CaseInsensitive);
 
     if (reg.indexIn(report, 0) != -1)
         return true;
