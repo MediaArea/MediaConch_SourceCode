@@ -5,58 +5,111 @@
         <h1><xsl:value-of select="mc:title"/></h1>
         <p><xsl:value-of select="mc:description"/></p>
         <xsl:for-each select="mc:media">
+			<hr/>
             <b><xsl:value-of select="@ref"/></b><p/>
+			<table style="border: none;border-collapse:separate;border-spacing:0px 1em">
             <xsl:for-each select="mc:policy">
-                <i><xsl:value-of select="@title"/></i>
-                <table border="1">
-                    <p>Context (field): <xsl:value-of select="mc:context/@field"/></p>
-                    <p>Context (value): <xsl:value-of select="mc:context/@value"/></p>
-                    <th>
-                        <td>tracktype</td>
-                        <td>streamid</td>
-                        <td>actual</td>
-                        <td>outcome</td>
-                        <td>reason</td>
-                    </th>
-                    <xsl:for-each select="mc:test">
-                        <tr>
-                            <td/>
-                            <td><xsl:value-of select="@tracktype"/></td>
-                            <xsl:if test="streamid"><td><xsl:value-of select="@streamid"/></td></xsl:if>
-                            <td><xsl:value-of select="@actual"/></td>
-                            <td><xsl:value-of select="@outcome"/></td>
-                            <td><xsl:value-of select="@reason"/></td>
-                        </tr>
-                    </xsl:for-each>
-                </table>
+			    <tr>
+					<td style="border:1px solid black">
+						<p>
+						<xsl:value-of select="@title"/>
+						</p>
+						<xsl:if test="mc:context/@field != ''">
+							<p>
+							<xsl:text>Context (field): </xsl:text>
+							<xsl:value-of select="mc:context/@field"/>
+							</p>
+						</xsl:if>
+						<xsl:if test="mc:context/@value != ''">
+							<p>
+							<xsl:text>Context (value): </xsl:text>
+							<xsl:value-of select="mc:context/@value"/>
+							</p>
+						</xsl:if>
+						<table border="1">
+							<tr>
+								<th>tracktype</th>
+								<th>streamid</th>
+								<th>actual</th>
+								<th>outcome</th>
+								<th>reason</th>
+							</tr>
+							<xsl:for-each select="mc:test">
+								<tr>
+									<td>
+										<xsl:value-of select="@tracktype"/>
+									</td>
+									<td>
+										<xsl:value-of select="@streamid"/>
+									</td>
+									<td>
+										<xsl:value-of select="@actual"/>
+									</td>
+									<td>
+										<xsl:value-of select="@outcome"/>
+									</td>
+									<td>
+										<xsl:value-of select="@reason"/>
+									</td>
+								</tr>
+							</xsl:for-each>
+						</table>
+					</td>
+				</tr>
             </xsl:for-each>
+			</table>
         </xsl:for-each>
     </xsl:template>
     <xsl:template match="/mc:MediaConch/mc:implementationChecks">
         <h1><xsl:value-of select="mc:title"/></h1>
         <p><xsl:value-of select="mc:description"/></p>
         <xsl:for-each select="mc:media">
+			<hr/>
             <b><xsl:value-of select="@ref"/></b><p/>
+			<table style="border: none;border-collapse:separate;border-spacing:0px 1em">
             <xsl:for-each select="mc:check">
-                <i><xsl:value-of select="@icid"/></i>
-                <table border="1">
-                    <p>Context (name): <xsl:value-of select="mc:context/@name"/></p>
-                    <th>
-                        <td>value</td>
-                        <td>outcome</td>
-                        <td>reason</td>
-                    </th>
-                    <xsl:for-each select="mc:test">
-                        <tr>
-                            <td/>
-							<td><xsl:value-of select="mc:value/@name"/></td>
-                            <td><xsl:value-of select="@outcome"/></td>
-                            <td><xsl:value-of select="@reason"/></td>
-                        </tr>
-                    </xsl:for-each>
-                </table>
-				<hr/>
+			    <tr>
+					<td style="border:1px solid black">
+						<p>
+						<xsl:value-of select="@icid"/>
+						</p>
+						<xsl:if test="mc:context/@name != ''">
+							<p>
+							<xsl:text>Context (name): </xsl:text>
+							<xsl:value-of select="mc:context/@name"/>
+							</p>
+						</xsl:if>
+						<table border="1">
+							<tr>
+								<th>value</th>
+								<th>outcome</th>
+								<th>reason</th>
+							</tr>
+							<xsl:for-each select="mc:test">
+								<tr>
+									<td>
+										<xsl:for-each select="mc:value">
+											<xsl:if test="@name != ''">
+												<xsl:value-of select="@name"/>
+												<xsl:text>=</xsl:text>
+											</xsl:if>
+											<xsl:value-of select="."/>
+											<br/>
+										</xsl:for-each>
+									</td>
+									<td>
+										<xsl:value-of select="@outcome"/>
+									</td>
+									<td>
+										<xsl:value-of select="@reason"/>
+									</td>
+								</tr>
+							</xsl:for-each>
+						</table>
+					</td>
+				</tr>
             </xsl:for-each>
+			</table>
         </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>
