@@ -197,7 +197,7 @@ String Core::GetOutput_Text ()
 
     if (Report[report_MediaConch])
     {
-        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Details"), __T("1"));
         MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
 
         ret += GetOutput_Text_Implementation();
@@ -244,7 +244,7 @@ String Core::GetOutput_Xml ()
 
     if (Report[report_MediaConch])
     {
-        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Details"), __T("1"));
         MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
 
         ret += GetOutput_Xml_Implementation();
@@ -297,7 +297,7 @@ String Core::GetOutput_Html ()
 {
     if (Report[report_MediaConch])
     {
-        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Details"), __T("1"));
         MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
 
         String report;
