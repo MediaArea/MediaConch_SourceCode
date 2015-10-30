@@ -58,7 +58,7 @@ public:
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     void                        analyze(String& file);
-    QString                     get_implementationreport_text();
+    QString                     get_implementationreport_xml();
     QString                     get_mediainfo_and_mediatrace_xml();
     QString                     get_mediainfo_xml();
     QString                     get_mediainfo_jstree();
