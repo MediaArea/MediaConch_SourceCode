@@ -35,7 +35,7 @@ int Help()
 
     TEXTOUT("Reporting Elements:");
     TEXTOUT("--Mediaconch, -mc");
-    TEXTOUT("                    Output MediaConch report");
+    TEXTOUT("                    Output MediaConch report (default)");
     TEXTOUT("                    (MediaConch contains default verbosity of implementationChecks plus any provided policy checks.)");
     TEXTOUT("--Mediainfo, -mi");
     TEXTOUT("                    Output MediaInfo report");
