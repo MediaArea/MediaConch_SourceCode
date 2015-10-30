@@ -135,7 +135,10 @@ int Xslt::validate_xml(std::string& xml, bool)
         xmlFreeDoc(res);
         return -1;
     }
-    report = std::string((const char*)doc_txt_ptr, doc_txt_len);
+    size_t Prefix = 0;
+    if (doc_txt_len>3 && doc_txt_ptr[0]=='\n' && doc_txt_ptr[1]==' ' && doc_txt_ptr[2]==' ')
+        Prefix=3; // TODO: we see such prefix in output, we need to understand the reason and remove it fro XSL instead of this hack
+    report = std::string((const char*)doc_txt_ptr+Prefix, doc_txt_len);
 
     xmlFreeDoc(doc);
     xmlFreeDoc(res);
