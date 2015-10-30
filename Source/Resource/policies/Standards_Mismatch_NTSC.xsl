@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>Test 1: Conflicting Tests (NTSC)</title>
+        <title>Standards Mismatch (NTSC)</title>
         <description>This policy checks files for a framesize of 720 x 480 and a framerate of 29.970.</description>
         <xsl:for-each select="ma:media">
           <media>
