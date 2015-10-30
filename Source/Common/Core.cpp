@@ -18,6 +18,7 @@
 #include "Common/JS_Tree.h"
 #include "Common/ImplementationReportXsl.h"
 #include "Common/ImplementationReportDisplayXsl.h"
+#include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include <sstream>
@@ -162,6 +163,7 @@ String Core::GetOutput()
         case format_Xml:            return GetOutput_Xml();
         case format_MaXml:          return GetOutput_MaXml();
         case format_JsTree:         return GetOutput_JStree();
+        case format_Html:           return GetOutput_Html();
         default:                    return String();
     }
 }
@@ -283,6 +285,28 @@ String Core::GetOutput_JStree ()
 
         const String& ret = MI->Inform();
         return js.format_from_trace_XML(ret);
+    }
+
+    return String();
+}
+
+//---------------------------------------------------------------------------
+String Core::GetOutput_Html ()
+{
+    if (Report[report_MediaConch])
+    {
+        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
+
+        String report;
+        bool valid;
+        std::string memory(implementation_report_xsl);
+        validateXsltPolicyFromMemory(memory, valid, report);
+
+        // Apply an XSLT to have HTML
+        memory = std::string(implementation_report_display_html_xsl);
+        report = transformWithXsltMemory(report, memory);
+        return report;
     }
 
     return String();
