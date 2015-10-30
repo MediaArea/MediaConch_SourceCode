@@ -2,7 +2,7 @@ Format: 3.0 (native)
 Source: mediaconch
 Binary: mediaconch, mediaconch-gui
 Architecture: any
-Version: 15.09
+Version: 15.10
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Homepage: http://MediaArea.net/MediaConch
 Standards-Version: 3.9.6
@@ -13,8 +13,8 @@ Package-List:
  mediaconch deb utils optional arch=any
  mediaconch-gui deb utils optional arch=any
 Checksums-Sha1:
- 0000000000000000000000000000000000000000 000000 mediaconch_15.09.tar.xz
+ 0000000000000000000000000000000000000000 000000 mediaconch_15.10.tar.xz
 Checksums-Sha256:
- 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_15.09.tar.xz
+ 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_15.10.tar.xz
 Files:
- 00000000000000000000000000000000 000000 mediaconch_15.09.tar.xz
+ 00000000000000000000000000000000 000000 mediaconch_15.10.tar.xz
