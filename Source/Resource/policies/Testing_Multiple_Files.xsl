@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>Test 2: Testing Multiple Files</title>
+        <title>Testing Multiple Files</title>
         <description>This policy checks all the files for conformance. Test2_2.mkv and Test2_3.mkv fail because they have been manipulated, but they fail in different ways.</description>
         <xsl:for-each select="ma:media">
           <media>
