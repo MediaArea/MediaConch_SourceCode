@@ -163,7 +163,7 @@ Then, under Mac:
 make
 ```
 
-Then, under Linux:
+Under Linux:
 
 ```sh
 ./configure --enable-shared
@@ -178,7 +178,7 @@ make
 
 ### Build MediaConch GUI
 
-If you have already build the GUI, no need to run git twice. If the directory MediaConch_SourceCode already exist, git will complain.
+If you have already build the CLI, no need to run git twice. If the directory MediaConch_SourceCode already exist, git will complain.
 
 To compile MediaConch GUI under Mac and Linux:
 
@@ -237,7 +237,7 @@ Then, under Mac:
 make
 ```
 
-Then, under Linux:
+Under Linux:
 
 ```sh
 ./configure --with-libcurl
