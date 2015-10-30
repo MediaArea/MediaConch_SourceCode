@@ -14,6 +14,7 @@ mkdir _Automated
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policiesedit.h -o_Automated\moc_policiesedit.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policiesmenu.h -o_Automated\moc_policiesmenu.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policymenu.h -o_Automated\moc_policymenu.cpp
+..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\progressbar.h -o_Automated\moc_progressbar.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\groupofrules.h -o_Automated\moc_groupofrules.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policiestree.h -o_Automated\moc_policiestree.cpp
 ..\..\..\..\Qt\qtbase\bin\moc ..\..\..\Source\GUI\Qt\policymenu.h -o_Automated\moc_policymenu.cpp
@@ -28,6 +29,7 @@ mkdir _Automated
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\groupofrules.ui -o _Automated\ui_groupofrules.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\policiestree.ui -o _Automated\ui_policiestree.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\policymenu.ui -o _Automated\ui_policymenu.h
+..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\progressbar.ui -o _Automated\ui_progressbar.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\ruleedit.ui -o _Automated\ui_ruleedit.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\rulemenu.ui -o _Automated\ui_rulemenu.h
 ..\..\..\..\Qt\qtbase\bin\uic ..\..\..\Source\GUI\Qt\xsltpolicymenu.ui -o _Automated\ui_xsltpolicymenu.h

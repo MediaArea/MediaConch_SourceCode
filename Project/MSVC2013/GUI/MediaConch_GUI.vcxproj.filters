@@ -170,9 +170,6 @@
     <ClCompile Include="_Automated\moc_xsltruleedit.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_xsltpolicymenu.cpp">
-      <Filter>Header Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
@@ -190,6 +187,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp">
       <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_progressbar.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_xsltpolicymenu.cpp">
+      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -290,6 +296,12 @@
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="_Automated\ui_displaymenu.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_progressbar.h">
       <Filter>Header Files\_Automated</Filter>
     </ClInclude>
   </ItemGroup>
