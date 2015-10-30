@@ -86,6 +86,7 @@ private:
     void change_html_file_detail_trace(QString& html, String& file);
     void remove_html_file_detail_policy_report(QString& html);
     bool report_is_html(QString &report);
+    bool report_is_xml(QString &report);
     bool is_policy_html_valid(QString &report);
     bool implementationreport_is_valid(QString& report);
     void change_report_policy_save_name(String& file, QString& ext, QString& html);
