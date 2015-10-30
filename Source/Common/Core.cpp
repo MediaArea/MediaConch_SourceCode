@@ -16,6 +16,9 @@
 #include "Common/Schematron.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
+#include "Common/ImplementationReportXsl.h"
+#include "Common/ImplementationReportDisplayXsl.h"
+#include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include <sstream>
@@ -160,6 +163,7 @@ String Core::GetOutput()
         case format_Xml:            return GetOutput_Xml();
         case format_MaXml:          return GetOutput_MaXml();
         case format_JsTree:         return GetOutput_JStree();
+        case format_Html:           return GetOutput_Html();
         default:                    return String();
     }
 }
@@ -191,20 +195,10 @@ String Core::GetOutput_Text ()
 
     if (Report[report_MediaConch])
     {
-        /*
         MI->Option(__T("Details"), __T("0"));
         MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
 
-        const String& info = MI->Inform();
-        //TODO here: MAXML --> Conformance XML --> Text 
-        
-        ret += __T("(Canvas for Conformance Text)\r\n");
-        ret += info + __T("\r\n");
-        ret += __T("(Canvas for Conformance Text)\r\n");
-        */
-        const String info=GetOutput_Text_Implementation(); //Temporary example
-        ret += info + __T("\r\n");
-
+        ret += GetOutput_Text_Implementation();
         ret += __T("\r\n");
     }
 
@@ -248,9 +242,10 @@ String Core::GetOutput_Xml ()
 
     if (Report[report_MediaConch])
     {
-        const String info=GetOutput_Xml_Implementation(); //Temporary example
-        ret += info;
+        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
 
+        ret += GetOutput_Xml_Implementation();
         ret += __T("\r\n");
     }
 
@@ -296,108 +291,64 @@ String Core::GetOutput_JStree ()
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Text_Implementation ()
+String Core::GetOutput_Html ()
 {
-    //Output
-    wstringstream Out;
-    for (size_t FilePos=0; FilePos<MI->Count_Get(); FilePos++)
+    if (Report[report_MediaConch])
     {
-        Out<<__T("************************************************************************")<<endl;
-        Out<<__T("       Container")<<endl;
-        Out<<__T("       ---------")<<endl;
-        Out<<__T("     | File name                     : ")<<MI->Get(FilePos, Stream_General, 0, __T("CompleteName"))<<endl;
-        Out<<(MI->Get(FilePos, Stream_General, 0, __T("Format"))==__T("Matroska")?__T("Pass"):__T("Fail"));
-        Out<<    __T(" | Format                        : ")<<MI->Get(FilePos, Stream_General, 0, __T("Format"))<<endl;
-        for (size_t StreamPos=0; StreamPos<MI->Count_Get(FilePos, Stream_Video); StreamPos++)
-        {
-            Out<<endl;
-            Out<<__T("       Video")<<endl;
-            Out<<__T("       -----")<<endl;
-            Out<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("Format"))==__T("FFV1")?__T("Pass"):__T("Fail"));
-            Out<<    __T(" | Format                        : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("Format"))<<endl;
-            if (MI->Get(FilePos, Stream_Video, StreamPos, __T("Format")) == __T("FFV1"))
-            {
-                Out<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version"))!=__T("Version 2")?__T("Pass"):__T("Fail"));
-                Out<<    __T(" | Version                       : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version")).substr(8)<<endl;
-                Out<<__T("     | Width                         : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("Width"))<<endl;
-                Out<<__T("     | Height                        : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("Height"))<<endl;
-                Out<<__T("     | DAR                           : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("DisplayAspectRatio"))<<endl;
-                Out<<__T("     | Frame rate                    : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("FrameRate"))<<endl;
-                Out<<__T("     | Color space                   : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("ColorSpace"))<<endl;
-                if (!MI->Get(FilePos, Stream_Video, StreamPos, __T("ChromaSubsampling")).empty())
-                    Out<<__T("     | Chroma subsampling            : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("ChromaSubsampling"))<<endl;
-                Out<<__T("     | Bit depth                     : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("BitDepth"))<<endl;
-                Out<<__T("     | Coder type                    : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("coder_type"))<<endl;
-                if (MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version")).substr(8) >= __T("2"))
-                    Out<<__T("     | Max count of slices per frame : ")<<MI->Get(FilePos, Stream_Video, StreamPos, __T("MaxSlicesCount"))<<endl;
-                if (MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version")).substr(8) >= __T("3.1"))
-                    Out<<__T("     | Is intra only                 : ")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_GOP"))==__T("N=1")?__T("Yes"):__T("No"))<<endl;
-                if (MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version")).substr(8) >= __T("3.0"))
-                {
-                    Out<<(!MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetectionType")).empty()?__T("Pass"):__T("Fail"));
-                    Out<<    __T(" | Error detection type          : ")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetectionType")).empty()?__T("No"):MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetectionType")))<<endl;
-                }
-            }
-        }
-        for (size_t StreamPos=0; StreamPos<MI->Count_Get(FilePos, Stream_Audio); StreamPos++)
-        {
-            Out<<endl;
-            Out<<__T("       Audio")<<endl;
-            Out<<__T("       -----")<<endl;
-            Out<<__T("     | Format                        : ")<<MI->Get(FilePos, Stream_Audio, StreamPos, __T("Format"))<<endl;
-        }
+        MI->Option(__T("Details"), __T("0"));
+        MI->Option(__T("Inform"), __T("MAXML")); // MediaConch report is always based on MAXML output
+
+        String report;
+        bool valid;
+        std::string memory(implementation_report_xsl);
+        validateXsltPolicyFromMemory(memory, valid, report);
+
+        // Apply an XSLT to have HTML
+        memory = std::string(implementation_report_display_html_xsl);
+        report = transformWithXsltMemory(report, memory);
+        return report;
     }
 
-    return Out.str();
+    return String();
+}
+
+//---------------------------------------------------------------------------
+String Core::GetOutput_Text_Implementation ()
+{
+    String report;
+    bool valid;
+    std::string memory(implementation_report_xsl);
+    validateXsltPolicyFromMemory(memory, valid, report);
+
+    // Apply an XSLT to have Text
+    memory = std::string(implementation_report_display_xsl);
+    report = transformWithXsltMemory(report, memory);
+    return report;
 }
 
 //---------------------------------------------------------------------------
 String Core::GetOutput_Xml_Implementation ()
 {
-    //Output
-    wstringstream Out;
-    Out<<__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")<<endl;
-    Out<<__T("<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" xmlns:mi=\"https://mediaarea.net/mediainfo\" version=\"0.1\">")<<endl;
-    Out<<__T("<implementationChecks>")<<endl;
+    String report;
+    bool valid;
+    std::string memory(implementation_report_xsl);
+    validateXsltPolicyFromMemory(memory, valid, report);
 
-    for (size_t FilePos=0; FilePos<MI->Count_Get(); FilePos++)
-    {
-        Out<<__T("    <media ref=\"")<<MI->Get(FilePos, Stream_General, 0, __T("CompleteName"))<<__T("\">")<<endl;
+    if (!valid)
+        return report;
 
-        Out<<__T("        <policy title=\"Is Matroska\">")<<endl;
-        Out<<__T("            <test outcome=\"")<<(MI->Get(FilePos, Stream_General, 0, __T("Format"))==__T("Matroska")?__T("Pass"):__T("Fail"))<<__T("\"/>")<<endl;
-        Out<<__T("        </policy>")<<endl;
-
-        for (size_t StreamPos=0; StreamPos<MI->Count_Get(FilePos, Stream_Video); StreamPos++)
-        {
-            Out<<__T("        <policy title=\"Is FFV1\">")<<endl;
-            Out<<__T("            <test outcome=\"")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("Format"))==__T("FFV1")?__T("pass"):__T("fail"))<<__T("\"/>")<<endl;
-            Out<<__T("        </policy>")<<endl;
-
-            if (MI->Get(FilePos, Stream_Video, StreamPos, __T("Format")) == __T("FFV1"))
-            {
-                Out<<__T("        <policy title=\"Is not version 2\">")<<endl;
-                Out<<__T("            <test outcome=\"")<<(MI->Get(FilePos, Stream_Video, StreamPos, __T("Format_Version"))!=__T("2")?__T("pass"):__T("fail"))<<__T("\"/>")<<endl;
-                Out<<__T("        </policy>")<<endl;
-
-                Out<<__T("        <policy title=\"ErrorDetectionType Present\">")<<endl;
-                Out<<__T("            <test outcome=\"")<<(!MI->Get(FilePos, Stream_Video, StreamPos, __T("ErrorDetectionType")).empty()?__T("pass"):__T("fail"))<<__T("\"/>")<<endl;
-                Out<<__T("        </policy>")<<endl;
-            }
-        }
-
-        Out<<__T("    </media>")<<endl;
-    }
-
-    Out<<__T("</implementationChecks>")<<endl;
-    Out<<__T("</MediaConch>")<<endl;
-
-    return Out.str();
+    // Apply an XSLT to have XML
+    return report;
 }
 
 //---------------------------------------------------------------------------
 String Core::PoliciesCheck()
 {
+    MI->Option(__T("Complete"), __T("0"));
+    MI->Option(__T("Language"), __T("raw"));
+    MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Inform"), __T("MAXML"));
+
     if (PoliciesFiles.size())
     {
         std::vector<String>& vec = PoliciesFiles;
@@ -506,6 +457,11 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
 //---------------------------------------------------------------------------
 bool Core::ValidatePolicy(int policy, bool& valid, String& report)
 {
+    MI->Option(__T("Complete"), __T("0"));
+    MI->Option(__T("Language"), __T("raw"));
+    MI->Option(__T("Details"), __T("1"));
+    MI->Option(__T("Inform"), __T("MAXML"));
+
     if (policy == -1 && PoliciesFiles.size())
     {
         if (is_schematron_file(PoliciesFiles[0]))
@@ -648,12 +604,30 @@ void Core::validateXsltPolicy(int pos, bool& valid, String& report)
 }
 
 //---------------------------------------------------------------------------
+void Core::validateXsltPolicyFromMemory(const std::string& memory, bool& valid, String& report)
+{
+    Schema *S = new Xslt;
+
+    if (S->register_schema_from_memory(memory))
+        valid = validation(S, report);
+    else
+    {
+        valid = false;
+
+        wstringstream Out;
+        std::vector<std::string> errors = S->get_errors();
+
+        Out << "internal error for parsing Policies" << endl;
+        for (size_t i = 0; i < errors.size(); i++)
+            Out << "\t" << errors[i].c_str();
+        report = Out.str();
+    }
+    delete S;
+}
+
+//---------------------------------------------------------------------------
 bool Core::validation(Schema* S, String& report)
 {
-    MI->Option(__T("Complete"), __T("0"));
-    MI->Option(__T("Language"), __T("raw"));
-    MI->Option(__T("Details"), __T("1"));
-    MI->Option(__T("Inform"), __T("MAXML"));
     String tmp = MI->Inform();
     std::string xml=Ztring(tmp).To_UTF8();
     bool valid = true;

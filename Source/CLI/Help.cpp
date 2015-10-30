@@ -61,6 +61,8 @@ int Help()
     TEXTOUT("                    (changed to -fa if there are more than 1 tool or more than 1 file)");
     TEXTOUT("--Format=maxml -fa");
     TEXTOUT("                    Output in MediaArea XML format");
+    TEXTOUT("--Format=html -fh");
+    TEXTOUT("                    Output MediaConch report in HTML format");
     TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
 

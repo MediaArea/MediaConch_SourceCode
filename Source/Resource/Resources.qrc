@@ -37,8 +37,8 @@
         <file alias="Testing_Multiple_Files.xsl">policies/Testing_Multiple_Files.xsl</file>
     </qresource>
     <qresource prefix="/displays">
-        <file alias="HTML.xsl">displays/HTML.xsl</file>
-        <file alias="Text.xsl">displays/Text.xsl</file>
+        <file alias="MediaConchHtml.xsl">displays/MediaConchHtml.xsl</file>
+        <file alias="MediaConchText.xsl">displays/MediaConchText.xsl</file>
         <file alias="PolicyReportDisplay.xsl">displays/PolicyReportDisplay.xsl</file>
     </qresource>
     <qresource prefix="/Help">

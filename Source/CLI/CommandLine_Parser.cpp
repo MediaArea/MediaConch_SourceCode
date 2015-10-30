@@ -98,6 +98,8 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
         Argument = __T("--format=MAXML");
     if (Argument==__T("-fj"))
         Argument = __T("--format=JSTREE");
+    if (Argument==__T("-fh"))
+        Argument = __T("--format=HTML");
     
     // Listing
     if (0);
@@ -189,6 +191,8 @@ CL_OPTION(Format)
         MI.Format=MediaConch::Core::format_MaXml;
     if (Format==__T("JSTREE") || Format==__T("jstree"))
         MI.Format=MediaConch::Core::format_JsTree;
+    if (Format==__T("HTML") || Format==__T("html"))
+        MI.Format=MediaConch::Core::format_Html;
 
     return 0;
 }

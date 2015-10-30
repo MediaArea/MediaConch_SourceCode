@@ -59,6 +59,8 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/Policy.h \
                     ../../Source/Common/SchematronPolicy.h \
                     ../../Source/Common/XsltPolicy.h \
+                    ../../Source/Common/ImplementationReportXsl.h \
+                    ../../Source/Common/ImplementationReportDisplayXsl.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
