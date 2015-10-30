@@ -259,7 +259,7 @@ String Core::GetOutput_MaXml ()
 {
     String ret;
 
-    MI->Option(__T("Details"), Report[report_MediaTrace]?__T("1"):__T("0"));
+    MI->Option(__T("Details"), (Report[report_MediaConch] || Report[report_MediaTrace])?__T("1"):__T("0"));
     MI->Option(__T("Inform"), __T("MAXML"));
 
     ret += MI->Inform();
