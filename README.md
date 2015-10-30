@@ -22,9 +22,42 @@ In this document, this directory will be refered as $BUILD_DIR.
 
 #### macport
 
+Some dependancies are availables with macport. To install macport:
+https://guide.macports.org/#installing
+
+```sh
+port install port install autoconf automake libtool pkgconfig zlib
+```
+
 #### libxml2
 
+libxml2 and libxslt must be manually compiled.
+
+Download ftp://xmlsoft.org/libxml2/libxml2-2.9.2.tar.gz, and then:
+
+```sh
+mv libxml2-2.9.2 $BUILD_DIR/libxml2
+cd $BUILD_DIR/libxml2
+./configure --disable-shared --enable-static --disable-ipv6 --without-ftp --without-http --without-c14n --without-catalog --with-xpath --without-xptr --without-xinclude --without-iconv --without-icu --without-iso8859x --without-zlib --without-lzma --without-mem_debug --without-run_debug --without-regexps --without-modules --with-tree --without-writer --with-pattern --with-push --without-valid --with-sax1 --without-legacy --with-output --without-schemas --with-schematron --without-python
+make
+```
+
 #### libxslt
+
+Download ftp://xmlsoft.org/libxml2/libxslt-1.1.28.tar.gz, and then:
+
+```sh
+mv libxslt-1.1.28 $BUILD_DIR/libxslt
+cd $BUILD_DIR/libxslt
+touch libtoolT
+./configure --with-libxml-src=$BUILD_DIR/libxml2 --without-crypto
+make
+```
+
+#### Qt
+
+To install Qt:
+http://download.qt.io/archive/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg.mirrorlist
 
 ### Dependancies under Linux
 
@@ -81,7 +114,7 @@ yum install qt-devel qtwebkit-devel desktop-file-utils
 
 *Optional dependancy (for online checker)*
 
-yum install libcurl-devel
+yum install libcurl-devel libopenssh2-devel libidn-devel openldap-devel
 
 #### Debian
 
