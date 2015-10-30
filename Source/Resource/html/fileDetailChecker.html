@@ -62,7 +62,7 @@
                                 <h4 class="modal-title">Implementation report</h4>
                             </div>
                             <div class="modal-body">
-                                <p>{{ check.getConformance|replace({' ': '&nbsp;'})|raw|nl2br }}</p>
+                                {{ check.getConformance|replace({' ': '&nbsp;'})|raw|nl2br }}
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="ImplementationReport.txt">Download report</button>
