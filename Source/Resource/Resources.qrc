@@ -40,7 +40,6 @@
         <file alias="MediaConchHtml.xsl">displays/MediaConchHtml.xsl</file>
         <file alias="MediaConchXml.xsl">displays/MediaConchXml.xsl</file>
         <file alias="MediaConchText.xsl">displays/MediaConchText.xsl</file>
-        <file alias="PolicyReportDisplay.xsl">displays/PolicyReportDisplay.xsl</file>
     </qresource>
     <qresource prefix="/Help">
         <file alias="/About/About.html">../../License.html</file>
