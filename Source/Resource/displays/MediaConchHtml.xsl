@@ -22,13 +22,40 @@
                         <tr>
                             <td/>
                             <td><xsl:value-of select="@tracktype"/></td>
-                            <td><xsl:value-of select="@streamid"/></td>
+                            <xsl:if test="streamid"><td><xsl:value-of select="@streamid"/></td></xsl:if>
                             <td><xsl:value-of select="@actual"/></td>
                             <td><xsl:value-of select="@outcome"/></td>
                             <td><xsl:value-of select="@reason"/></td>
                         </tr>
                     </xsl:for-each>
                 </table>
+            </xsl:for-each>
+        </xsl:for-each>
+    </xsl:template>
+    <xsl:template match="/mc:MediaConch/mc:implementationChecks">
+        <h1><xsl:value-of select="mc:title"/></h1>
+        <p><xsl:value-of select="mc:description"/></p>
+        <xsl:for-each select="mc:media">
+            <b><xsl:value-of select="@ref"/></b><p/>
+            <xsl:for-each select="mc:check">
+                <i><xsl:value-of select="@icid"/></i>
+                <table border="1">
+                    <p>Context (name): <xsl:value-of select="mc:context/@name"/></p>
+                    <th>
+                        <td>value</td>
+                        <td>outcome</td>
+                        <td>reason</td>
+                    </th>
+                    <xsl:for-each select="mc:test">
+                        <tr>
+                            <td/>
+							<td><xsl:value-of select="mc:value/@name"/></td>
+                            <td><xsl:value-of select="@outcome"/></td>
+                            <td><xsl:value-of select="@reason"/></td>
+                        </tr>
+                    </xsl:for-each>
+                </table>
+				<hr/>
             </xsl:for-each>
         </xsl:for-each>
     </xsl:template>
