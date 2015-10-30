@@ -612,11 +612,11 @@ void MainWindow::analyze(String& file)
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_implementationreport_text()
+QString MainWindow::get_implementationreport_xml()
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaConch);
-    return QString().fromStdWString(C.GetOutput_Text());
+    return QString().fromStdWString(C.GetOutput_Xml());
 }
 
 //---------------------------------------------------------------------------

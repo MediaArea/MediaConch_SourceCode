@@ -5,6 +5,7 @@
  */
 
 #include "Common/Policy.h"
+#include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "mainwindow.h"
 #include "checkerwindow.h"
 #include "ui_mainwindow.h"
@@ -580,15 +581,30 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, String& fi
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_conformance(QString& html, String& file)
 {
-    QString report = mainwindow->get_implementationreport_text();
-    bool is_valid = implementationreport_is_valid(report);
+    QString report = mainwindow->get_implementationreport_xml();
+    bool is_valid = true;
+
+    if (report.indexOf(" outcome=\"fail\"") != -1)
+        is_valid = false;
+
+    // Apply HTML default display
+    String r = report.toStdWString();
+    r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
+    report = QString().fromStdWString(r);
+
+    bool is_html = report_is_html(report);
+    QString save_ext = is_html ? "html" : "txt";
+
+    if (!is_html)
+    {
 #if QT_VERSION >= 0x050200
-    report = report.toHtmlEscaped();
+        report = report.toHtmlEscaped();
 #else
-    report = Qt::escape(report);
+        report = Qt::escape(report);
 #endif
-    report.replace(' ', "&nbsp;");
-    report.replace('\n', "<br/>\n");
+        report.replace(' ', "&nbsp;");
+        report.replace('\n', "<br/>\n");
+    }
 
     QRegExp reg("Implementation report");
     int pos = 0;
@@ -614,8 +630,8 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, String& f
     reg.setMinimal(true);
 
     while ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.ImplementationReport.txt\"")
-                     .arg(QString().fromStdWString(file)));
+        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.ImplementationReport.%2\"")
+                     .arg(QString().fromStdWString(file)).arg(save_ext));
 }
 
 //---------------------------------------------------------------------------
