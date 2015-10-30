@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>Test 0: File Conformance</title>
+        <title>General Conformance</title>
         <description>This policy checks that the file follows general rules of file conformance.</description>
         <xsl:for-each select="ma:media">
           <media>
@@ -51,57 +51,21 @@
               </xsl:choose>
             </policy>
             <policy>
-              <xsl:attribute name="title">General FileExtension must be mkv</xsl:attribute>
-              <context>
-                <xsl:attribute name="value">track[@type='General']/FileExtension = 'mkv'</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="track[@type='General']/FileExtension = 'mkv'"/>
-              </xsl:call-template>
-            </policy>
-            <policy>
-              <xsl:attribute name="title">General Duration must be more than 500ms and less than 5 seconds</xsl:attribute>
-              <context>
-                <xsl:attribute name="value">(track[@type='General']/Duration &gt; 500 and track[@type='General']/Duration &lt; 5000)</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="(track[@type='General']/Duration &gt; 500 and track[@type='General']/Duration &lt; 5000)"/>
-              </xsl:call-template>
-            </policy>
-            <policy>
-              <xsl:attribute name="title">General FrameRate must be 25</xsl:attribute>
+              <xsl:attribute name="title">General FrameRate must be 25 fps</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
-                <xsl:attribute name="value">25</xsl:attribute>
+                <xsl:attribute name="value">25.000</xsl:attribute>
               </context>
               <xsl:choose>
                 <xsl:when test="mi:MediaInfo/mi:track[@type='General'][1]/mi:FrameRate">
                   <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][1]/mi:FrameRate">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
-                      <xsl:with-param name="value">25</xsl:with-param>
+                      <xsl:with-param name="value">25.000</xsl:with-param>
                     </xsl:call-template>
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
-              <xsl:attribute name="title">Video stream must exist</xsl:attribute>
-              <context>
-                <xsl:attribute name="value">track[@type='Video']</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="track[@type='Video']"/>
-              </xsl:call-template>
-            </policy>
-            <policy>
-              <xsl:attribute name="title">Video track Unique ID must exist</xsl:attribute>
-              <context>
-                <xsl:attribute name="value">track[@type='Video']/UniqueID</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="track[@type='Video']/UniqueID"/>
-              </xsl:call-template>
             </policy>
             <policy>
               <xsl:attribute name="title">Video Format must equal FFV1</xsl:attribute>
@@ -136,15 +100,6 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
-              <xsl:attribute name="title">Video coder_type must be Golomb Rice</xsl:attribute>
-              <context>
-                <xsl:attribute name="value">track[@type='Video']/coder_type = 'Golomb Rice'</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="track[@type='Video']/coder_type = 'Golomb Rice'"/>
-              </xsl:call-template>
             </policy>
           </media>
         </xsl:for-each>

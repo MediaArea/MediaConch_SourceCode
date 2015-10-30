@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>Test 1: Conflicting Tests (PAL)</title>
+        <title>Standards Mismatch (PAL)</title>
         <description>This policy checks files for a framesize of 720 x 576 and a framerate of 25.</description>
         <xsl:for-each select="ma:media">
           <media>
