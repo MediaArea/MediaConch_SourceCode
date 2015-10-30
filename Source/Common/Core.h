@@ -71,6 +71,7 @@ public:
         format_Xml,         // XML corresponding to only one of MediaConch, MediaInfo, MediaTrace
         format_MaXml,       // MAXML, can contain one or more of MediaConch, MediaInfo, MediaTrace
         format_JsTree,
+        format_Html,
     };
     format Format;
     String ReportAndFormatCombination_IsValid();
@@ -85,6 +86,7 @@ public:
     String GetOutput_Xml_Implementation();
     String GetOutput_MaXml();
     String GetOutput_JStree();
+    String GetOutput_Html();
     String PoliciesCheck();
 
     bool ValidatePolicy(int policy, bool& valid, String& report);
