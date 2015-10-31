@@ -14,7 +14,7 @@
             <xsl:attribute name="ref">
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
-            <policy>
+            <check>
               <xsl:attribute name="title">Video Width must be 720.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Width</xsl:attribute>
@@ -30,8 +30,8 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">Video Height must be 480.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Height</xsl:attribute>
@@ -47,8 +47,8 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">General FrameRate must be 29.970.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
@@ -64,7 +64,7 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
+            </check>
           </media>
         </xsl:for-each>
       </policyChecks>

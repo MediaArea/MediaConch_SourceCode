@@ -21,7 +21,7 @@
 			<xsl:text>******************************************************************************&#xa;</xsl:text>
             <xsl:value-of select="@ref"/>
 			<xsl:text>&#xa;</xsl:text>
-            <xsl:for-each select="mc:policy">
+            <xsl:for-each select="mc:check">
 				<xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
                 <xsl:value-of select="@title"/>
 				<xsl:text>&#xa;</xsl:text>

@@ -14,7 +14,7 @@
             <xsl:attribute name="ref">
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
-            <policy>
+            <check>
               <xsl:attribute name="title">General UniqueID must exist. </xsl:attribute>
               <context>
                 <xsl:attribute name="field">UniqueID</xsl:attribute>
@@ -28,8 +28,8 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">General Format must be Matroska</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
@@ -45,8 +45,8 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">General FileExtension must be mkv.</xsl:attribute>
               <context>
                 <xsl:attribute name="value">track[@type='General']/FileExtension = 'mkv'</xsl:attribute>
@@ -54,8 +54,8 @@
               <xsl:call-template name="is_true">
                 <xsl:with-param name="xpath" select="track[@type='General']/FileExtension = 'mkv'"/>
               </xsl:call-template>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">General Duration must be 40 ms.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Duration</xsl:attribute>
@@ -71,8 +71,8 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">General FrameRate must be 25</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
@@ -88,8 +88,8 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">Video stream must exist.</xsl:attribute>
               <context>
                 <xsl:attribute name="value">track[@type='Video']</xsl:attribute>
@@ -97,8 +97,8 @@
               <xsl:call-template name="is_true">
                 <xsl:with-param name="xpath" select="track[@type='Video']"/>
               </xsl:call-template>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">Video Unique ID must exist.</xsl:attribute>
               <context>
                 <xsl:attribute name="value">track[@type='Video']/UniqueID</xsl:attribute>
@@ -106,8 +106,8 @@
               <xsl:call-template name="is_true">
                 <xsl:with-param name="xpath" select="track[@type='Video']/UniqueID"/>
               </xsl:call-template>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">Video Format must equal RGB</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
@@ -123,8 +123,8 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
-            <policy>
+            </check>
+            <check>
               <xsl:attribute name="title">Video DisplayAspectRatio must be 1.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">DisplayAspectRatio</xsl:attribute>
@@ -140,7 +140,7 @@
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
-            </policy>
+            </check>
           </media>
         </xsl:for-each>
       </policyChecks>

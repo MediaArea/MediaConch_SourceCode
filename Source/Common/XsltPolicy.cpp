@@ -359,7 +359,7 @@ bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& t)
 //---------------------------------------------------------------------------
 bool XsltPolicy::find_policy_node(xmlNodePtr node)
 {
-    std::string def("policy");
+    std::string def("check");
     if (!node->name || def.compare((const char*)node->name))
         return false;
 
@@ -1206,7 +1206,7 @@ void XsltPolicy::write_policy_title_child(xmlNodePtr node, XsltRule *rule)
 //---------------------------------------------------------------------------
 void XsltPolicy::write_policy_childs(xmlNodePtr node, XsltRule *rule)
 {
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"policy");
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"check");
     xmlAddChild(node, child);
 
     write_policy_title_child(child, rule);

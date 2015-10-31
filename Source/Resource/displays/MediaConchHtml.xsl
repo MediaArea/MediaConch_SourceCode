@@ -8,7 +8,7 @@
 			<hr/>
             <b><xsl:value-of select="@ref"/></b><p/>
 			<table style="border: none;border-collapse:separate;border-spacing:0px 1em">
-            <xsl:for-each select="mc:policy">
+            <xsl:for-each select="mc:check">
 			    <tr>
 					<td style="border:1px solid black">
 						<p>
