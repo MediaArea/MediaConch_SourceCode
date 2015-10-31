@@ -265,6 +265,9 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QStringList dirname = file_selector.value("checkerRepository[directory]", QStringList());
 
+        if (dirname.empty())
+            return;
+
         QDir dir(dirname.last());
 
         QFileInfoList list = dir.entryInfoList(QDir::Files);
