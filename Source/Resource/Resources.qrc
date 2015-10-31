@@ -27,7 +27,6 @@
         <file alias="glyphicons-halflings-regular.woff2">html/fonts/glyphicons-halflings-regular.woff2</file>
     </qresource>
     <qresource prefix="/policies">
-        <file alias="PolicyCheckTemplate.xsl">policies/PolicyCheckTemplate.xsl</file>
         <file alias="General_Conformance.xsl">policies/General_Conformance.xsl</file>
         <file alias="NYULibraries_MKVFFV1.xsl">policies/NYULibraries_MKVFFV1.xsl</file>
         <file alias="NYULibraries_QTv210.xsl">policies/NYULibraries_QTv210.xsl</file>
