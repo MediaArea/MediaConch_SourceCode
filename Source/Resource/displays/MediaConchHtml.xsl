@@ -29,7 +29,7 @@
 						<table border="1">
 							<tr>
 								<th>tracktype</th>
-								<th>tracktypeorder</th>
+								<th>typeorder</th>
 								<th>trackid</th>
 								<th>actual</th>
 								<th>outcome</th>
@@ -41,7 +41,7 @@
 										<xsl:value-of select="@tracktype"/>
 									</td>
 									<td>
-										<xsl:value-of select="@tracktypeorder"/>
+										<xsl:value-of select="@typeorder"/>
 									</td>
 									<td>
 										<xsl:value-of select="@trackid"/>
