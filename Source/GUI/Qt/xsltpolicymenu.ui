@@ -35,7 +35,7 @@ selection-background-color: rgb(255, 170, 0);
    <item row="1" column="0">
     <widget class="QLabel" name="labelTitle">
      <property name="text">
-      <string>Title:</string>
+      <string>Name:</string>
      </property>
     </widget>
    </item>

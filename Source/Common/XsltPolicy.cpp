@@ -88,7 +88,7 @@ bool XsltPolicy::find_title_node(xmlNodePtr node, std::string& title)
         !node->name || def.compare((const char*)node->name))
         return false;
 
-    def = std::string("title");
+    def = std::string("name");
     xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
     if (name == NULL || def.compare((const char*)name))
         return false;
@@ -345,7 +345,7 @@ bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& t)
     if (!node->name || def.compare((const char*)node->name))
         return false;
 
-    def = std::string("title");
+    def = std::string("name");
     xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
     if (name == NULL || def.compare((const char*)name))
         return false;
@@ -431,7 +431,7 @@ bool XsltPolicy::find_policychecks_description_node(xmlNodePtr node)
 //---------------------------------------------------------------------------
 bool XsltPolicy::find_policychecks_title_node(xmlNodePtr node)
 {
-    std::string def("title");
+    std::string def("name");
     if (!node->name || def.compare((const char*)node->name))
         return false;
 
@@ -1197,7 +1197,7 @@ void XsltPolicy::write_policy_title_child(xmlNodePtr node, XsltRule *rule)
 
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"attribute");
     child->ns = create_namespace_xsl(NULL);
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"title");
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"name");
     xmlNodeSetContent(child, (const xmlChar *)rule->title.c_str());
 
     xmlAddChild(node, child);
@@ -1275,7 +1275,7 @@ void XsltPolicy::write_policychecks_title_child(xmlNodePtr node)
     if (!title.length())
         return;
 
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"title");
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"name");
     xmlNodeSetContent(child, (const xmlChar *)title.c_str());
 
     xmlAddChild(node, child);
