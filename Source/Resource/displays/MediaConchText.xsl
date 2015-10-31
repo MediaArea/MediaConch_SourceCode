@@ -5,10 +5,10 @@
         <xsl:text>*********************&#xa;</xsl:text>
         <xsl:text>* MediaConch report *&#xa;</xsl:text>
         <xsl:text>*********************&#xa;</xsl:text>
-		<xsl:if test="mc:title != '' or mc:description != ''">
+		<xsl:if test="mc:name != '' or mc:description != ''">
 			<xsl:text>&#xa;</xsl:text>
-			<xsl:if test="mc:title != ''">
-				<xsl:value-of select="mc:title"/>
+			<xsl:if test="mc:name != ''">
+				<xsl:value-of select="mc:name"/>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
 			<xsl:if test="mc:description != ''">
@@ -23,7 +23,7 @@
 			<xsl:text>&#xa;</xsl:text>
             <xsl:for-each select="mc:check">
 				<xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
-                <xsl:value-of select="@title"/>
+                <xsl:value-of select="@name"/>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:if test="mc:context/@field != ''">
 					<xsl:text>Context (field): </xsl:text>
@@ -41,9 +41,14 @@
 						<xsl:value-of select="@tracktype"/>
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
-					<xsl:if test="@streamid">
-						<xsl:text>Stream ID: </xsl:text>
-						<xsl:value-of select="@streamid"/>
+					<xsl:if test="@tracktypeorder">
+						<xsl:text>Track Type Order: </xsl:text>
+						<xsl:value-of select="@tracktypeorder"/>
+						<xsl:text>&#xa;</xsl:text>
+					</xsl:if>
+					<xsl:if test="@trackid">
+						<xsl:text>Track ID: </xsl:text>
+						<xsl:value-of select="@trackid"/>
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
 					<xsl:if test="@actual != ''">
@@ -67,10 +72,10 @@
         <xsl:text>*********************&#xa;</xsl:text>
         <xsl:text>* MediaConch report *&#xa;</xsl:text>
         <xsl:text>*********************&#xa;</xsl:text>
-		<xsl:if test="mc:title != '' or mc:description != ''">
+		<xsl:if test="mc:name != '' or mc:description != ''">
 			<xsl:text>&#xa;</xsl:text>
-			<xsl:if test="mc:title != ''">
-				<xsl:value-of select="mc:title"/>
+			<xsl:if test="mc:name != ''">
+				<xsl:value-of select="mc:name"/>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
 			<xsl:if test="mc:description != ''">

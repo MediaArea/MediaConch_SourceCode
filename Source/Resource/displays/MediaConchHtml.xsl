@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" extension-element-prefixes="xsi">
     <xsl:output encoding="UTF-8" method="html" version="1.0" indent="yes"/>
     <xsl:template match="/mc:MediaConch/mc:policyChecks">
-        <h1><xsl:value-of select="mc:title"/></h1>
+        <h1><xsl:value-of select="mc:name"/></h1>
         <p><xsl:value-of select="mc:description"/></p>
         <xsl:for-each select="mc:media">
 			<hr/>
@@ -12,7 +12,7 @@
 			    <tr>
 					<td style="border:1px solid black">
 						<p>
-						<xsl:value-of select="@title"/>
+						<xsl:value-of select="@name"/>
 						</p>
 						<xsl:if test="mc:context/@field != ''">
 							<p>
@@ -29,7 +29,8 @@
 						<table border="1">
 							<tr>
 								<th>tracktype</th>
-								<th>streamid</th>
+								<th>tracktypeorder</th>
+								<th>trackid</th>
 								<th>actual</th>
 								<th>outcome</th>
 								<th>reason</th>
@@ -40,7 +41,10 @@
 										<xsl:value-of select="@tracktype"/>
 									</td>
 									<td>
-										<xsl:value-of select="@streamid"/>
+										<xsl:value-of select="@tracktypeorder"/>
+									</td>
+									<td>
+										<xsl:value-of select="@trackid"/>
 									</td>
 									<td>
 										<xsl:value-of select="@actual"/>
@@ -61,7 +65,7 @@
         </xsl:for-each>
     </xsl:template>
     <xsl:template match="/mc:MediaConch/mc:implementationChecks">
-        <h1><xsl:value-of select="mc:title"/></h1>
+        <h1><xsl:value-of select="mc:name"/></h1>
         <p><xsl:value-of select="mc:description"/></p>
         <xsl:for-each select="mc:media">
 			<hr/>
