@@ -6,9 +6,174 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="qrc:/bootstrap.css">
         <link rel="stylesheet" type="text/css" href="qrc:/main.css" media="screen"/>
-    </head>
-    <body id="body">
-      <!-- Text here -->
+ 	</head>
+	<body id="body">
+
+<h1>XML Reporting</h1>
+
+<p>This document describes four XML schemas designed by MediaArea for various types of file reportage. These schemas include the MediaInfo XML, the MediaConch XML, the MediaTrace XML, and the MediaAreaXML (MAXML). Brief descriptions of structure and operation can be found below. </p>
+
+<h4><a href="#mediainfo-xml">MediaInfo XML</a></h4>
+
+<ul>
+<li><a href="#structure-of-a-mediainfo-xml">Structure of a MediaInfo XML</a></li>
+<li><a href="#generating-a-mediainfo-xml">Generating a MediaInfo XML</a></li>
+<li><a href="#mediainfo-xml-schema">MediaInfo XML Schema</a></li>
+</ul>
+
+<h4><a href="#mediaconch-xml">MediaConch XML</a></h4>
+
+<ul>
+<li><a href="#structure-of-a-mediaconch-xml">Structure of a MediaConch XML</a></li>
+<li><a href="#generating-a-mediaconch-xml">Generating a MediaConch XML</a></li>
+<li><a href="#mediaconch-xml-schema">MediaConch XML Schema</a></li>
+</ul>
+
+<h4><a href="#mediatrace-xml">MediaTrace XML</a></h4>
+
+<ul>
+<li><a href="#structure-of-a-mediatrace-xml">Structure of a MediaTrace XML</a></li>
+<li><a href="#generating-a-mediatrace-xml">Generating a MediaTrace XML</a></li>
+<li><a href="#mediatrace-xml-schema">MediaTrace XML Schema</a></li>
+</ul>
+
+<h4><a href="#mediaarea-xml">MediaArea XML</a></h4>
+
+<ul>
+<li><a href="#structure-of-a-mediaarea-xml">Structure of a MediaArea XML</a></li>
+<li><a href="#generating-a-mediaarea-xml">Generating a MediaArea XML</a></li>
+<li><a href="#mediaarea-xml-schema">MediaArea XML Schema</a></li>
+</ul>
+
+<h3>MediaInfo XML</h3>
+
+<p>Using MediaArea’s principal software, MediaInfo, the MediaInfo XML presents a file’s basic metadata elements in the form of easily intelligible sets of track and stream information. These track types may include but are not limited to, “General,” or general container information; “Video” track or stream information; “Audio” track or stream information; and “Timecode” or other ancillary information. Additional information on MediaInfo general reporting is available <a href="https://mediaarea.net/en/MediaInfo">here</a>.</p>
+
+<h4>Structure of A MediaInfo XML</h4>
+
+<p>The root element of the MediaInfo XML exists as <code>&lt;Mediainfo&gt;</code>. A nested <code>&lt;File&gt;</code> sub-element containing a <code>ref</code> attribute specifies the path and filename of the file reported on. A <code>&lt;track type&gt;</code> child element defines MediaInfo's track types, and within <code>&lt;track type&gt;</code> elements are various sub-child elements corresponding to associated field metadata. For example, a "General" track type element will include such sibling elements as <code>&lt;CompleteName&gt;</code>, <code>&lt;Format&gt;</code>, and <code>&lt;FileSize&gt;</code>; a "Video" track type element will include such sibling elements as <code>&lt;Width&gt;</code>, <Height>, and <PixelAspectRatio>; an "Audio" track type element will include such sibling elements as <code>&lt;Channels&gt;</code>, <code>&lt;SamplingRate&gt;</code>, and <code>&lt;SamplingCount&gt;</code>; and so on, and so forth. </p>
+
+<p>The following is an example of a MediaInfo XML General type track element containing the sub-child elements "Format," "Format<em>profile," and "Codec</em>ID": </p>
+
+<pre><code>    &lt;track type="General"&gt;
+    &lt;Complete_name&gt;/Users/mycomputer//files/ffv1.mkv&lt;/Complete_name&gt;
+    &lt;Format&gt;MPEG-4&lt;/Format&gt;
+    &lt;Format_profile&gt;QuickTime&lt;/Format_profile&gt;
+    &lt;Codec_ID&gt;qt&lt;/Codec_ID&gt;
+    &lt;/track&gt;`
+</code></pre>
+
+<h4>Generating a MediaInfo XML</h4>
+
+<p>A MediaInfo XML can be generated using the following tools and associated commands:</p>
+
+<ul>
+<li><p>With MediaInfo: <code>mediainfo --Output=XML file.mov</code></p></li>
+<li><p>With MediaConch (CLI): <code>mediaconch -mi -fx file.mov</code></p></li>
+<li><p>With MediaConch (GUI): Select View Mode in the <code>MediaInfo</code> tab from the resulting file Checker reports</p></li>
+</ul>
+
+<h4>MediaInfo XML Schema</h4>
+
+<p>An XML Schema for MediaAreaXML is available at . </p>
+
+<h3>MediaConch XML</h3>
+
+<p>The MediaConch XML is designed specifically for file conformance checking using MediaArea’s MediaConch software, and contains reportage pertaining to a user-defined policy or policies. Additional information on MediaConch is available <a href="https://mediaarea.net/MediaConch/">here</a>.</p>
+
+<h4>Structure of a MediaConch XML</h4>
+
+<p>The root element of the MediaConch XML exists as <code>&lt;MediaConch&gt;</code>, and initially contains a <code>&lt;policyChecks&gt;</code> element which encapsulates all policy rules. The <code>&lt;title&gt;</code> element denotes the title of the policy, while the <code>&lt;media&gt;</code> element contains the checked filename its associated path:</p>
+
+<pre><code>    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+    &lt;MediaConch xmlns="https://mediaarea.net/mediaconch" xmlns:mi="https://mediaarea.net/mediainfo" version="0.1"&gt;`
+    &lt;policyChecks&gt;
+    &lt;title&gt;Preservation Master File Recommendations - Matroska/FFV1&lt;/title&gt;
+    &lt;media ref="/Users/mycomputer//files/ffv1.mkv"&gt;`
+</code></pre>
+
+<p>Within the <policyChecks> element are individual <policy> rules that contain the name of the policy rule, the associated track type and field, a user-declared value, the reported or “actual” value, and a “pass” or “fail” outcome:</p>
+
+<pre><code>    &lt;policy title="General Format equals Matroska"&gt;
+    &lt;context field="Format" value="Matroska"/&gt;
+    &lt;test tracktype="General" actual="Matroska" outcome="pass"/&gt;
+    &lt;/policy&gt;
+</code></pre>
+
+<h4>Generating a MediaConch XML</h4>
+
+<p>A MediaConch XML can be generated using the following tools and associated commands:</p>
+
+<p>-With MediaConch (CLI): <code>mediaconch -mi -fx file.mov</code></p>
+
+<p>-With MediaConch (GUI): Select View Mode in the <code>Policy Report</code> tab from the resulting file Checker reports</p>
+
+<h4>MediaConch XML Schema</h4>
+
+<p>An XML Schema for MediaAreaXML is available at <a href="url">url</a>. </p>
+
+<h3>MediaTrace XML</h3>
+
+<p>The MediaTrace XML is a technical reporting tool that expresses the binary architecture of a file as interpreted by MediaArea’s principal software, MediaInfo. Additional information on MediaTrace is available <a href="https://mediaarea.net/mediatrace/">here</a>. A data dictionary is provided at the project’s Github repository <a href="https://github.com/MediaArea/MediaAreaXml/blob/master/DataDictionary.md">here</a>. </p>
+
+<h3>Structure of a MediaTrace XML</h3>
+
+<p>The root element of the MediaTrace XML exists as <MediaTrace>. This root element contains a <code>&lt;creatingLibrary&gt;</code> sub-element denoting the version of MediaInfo’s library used in generating the trace report:</p>
+
+<pre><code>    &lt;MediaTrace
+    xmlns="https://mediaarea.net/mediatrace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://mediaarea.net/mediatrace https://mediaarea.net/mediatrace/mediatrace_0_1.xsd"
+    version="0.1"
+    ref="/Users/mycomputer//files/ffv1.mkv"&gt;
+    &lt;creatingLibrary version="0.7.78" url="https://mediaarea.net/MediaInfo"&gt;MediaInfoLib&lt;/creatingLibrary&gt;`
+</code></pre>
+
+<p>Many audiovisual formats are based on chunk-based storage where a block of data will either contain a data payload or other blocks. In QuickTime parlance these blocks are called atoms, in AVI “chunks”, and in Matroska, “elements”. MediaTrace will attempt to parse apart each block into subdivisions and report on their contents. Whether the source format specification calls it element, atom, chunk, or another term, MediaTrace will call it a <code>&lt;block&gt;</code>. In MediaTrace the contents of the block are called <code>&lt;data&gt;</code>:</p>
+
+<pre><code>    &lt;block offset="28" name="DocType" info="matroska" size="11"&gt;
+        &lt;block offset="28" name="Header" size="3"&gt;
+            &lt;data offset="28" name="Name"&gt;642&lt;/data&gt;
+            &lt;data offset="30" name="Size"&gt;8&lt;/data&gt;
+        &lt;/block&gt;
+        &lt;data offset="31" name="Data"&gt;matroska&lt;/data&gt;
+     &lt;/block&gt;`
+</code></pre>
+
+<h4>Generating a MediaTrace XML</h4>
+
+<p>A MediaTrace XML can be generated using the following tools and associated commands:</p>
+
+<p>-With MediaInfo: <code>mediainfo --Details=1 --Output=XML file.mkv</code></p>
+
+<p>-With MediaConch (CLI): <code>mediaconch -mt -fx file.mkv</code></p>
+
+<p>-With MediaConch (GUI): Select Select View Mode in the <code>MediaTrace</code> tab from the resulting file Checker reports</p>
+
+<h4>MediaTrace XML Schema</h4>
+
+<p>An XML Schema for MediaTrace is available at https://mediaarea.net/mediatrace/mediatrace.xsd. </p>
+
+<h3>MediaArea XML</h3>
+
+<p>The MediaArea XML (MAXML) is designed to bundle general reporting information from MediaInfo, binary file architecture reporting from MediaTrace, and conformance checking information from MediaConch into one condensed XML structure. </p>
+
+<h4>Structure of a MediaArea XML</h4>
+
+<p>The root element of the MediaArea XML is <code>&lt;MediaArea&gt;</code>, followed by a <code>&lt;media&gt;</code> sibling element. A <code>&lt;MediaInfo&gt;</code> child element defines a MediaInfo general report. Sibling <code>&lt;track type&gt;</code> elements offer various sub-child elements corresponding to associated field metadata. </p>
+
+<h4>Generating a MediaArea XML</h4>
+
+<p>A MediaTrace XML can be generated using the following tools and associated commands:</p>
+
+<p>-With MediaInfo: <code>mediainfo --Details=1 --Output=MAXML file.mkv</code></p>
+
+<p>-With MediaConch (CLI): <code>mediaconch -mt -fx file.mkv</code></p>
+
+<h4>MediaArea XML Schema</h4>
+
+<p>An XML Schema for MediaAreaXML is available at https://mediaarea.net/mediaarea/mediaarea<em>0</em>1.xsd.</p>
+
       <script src="qrc:/jquery.js"></script>
       <script src="qrc:/bootstrap.js"></script>
     </body>
