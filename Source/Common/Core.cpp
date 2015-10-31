@@ -215,7 +215,7 @@ String Core::GetOutput_Xml ()
     if (Report[report_MediaInfo] && !Report[report_MediaTrace])
     {
         MI->Option(__T("Details"), __T("0"));
-        MI->Option(__T("Inform"), __T("MAXML")); //TODO: "XML" when new XML output is ready
+        MI->Option(__T("Inform"), __T("MIXML"));
 
         ret += MI->Inform();
 
