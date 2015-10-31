@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>Preservation Master File Recommendations - QuickTime/v210 (NYU Libraries)</title>
+        <name>Preservation Master File Recommendations - QuickTime/v210 (NYU Libraries)</name>
         <description/>
         <xsl:for-each select="ma:media">
           <media>
@@ -15,7 +15,7 @@
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
             <check>
-              <xsl:attribute name="title">General Format equals MPEG-4</xsl:attribute>
+              <xsl:attribute name="name">General Format equals MPEG-4</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">MPEG-4</xsl:attribute>
@@ -32,7 +32,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General Format_Profile equals QuickTime</xsl:attribute>
+              <xsl:attribute name="name">General Format_Profile equals QuickTime</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format_Profile</xsl:attribute>
                 <xsl:attribute name="value">QuickTime</xsl:attribute>
@@ -49,7 +49,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General CodecID equals qt</xsl:attribute>
+              <xsl:attribute name="name">General CodecID equals qt</xsl:attribute>
               <context>
                 <xsl:attribute name="field">CodecID</xsl:attribute>
                 <xsl:attribute name="value">qt</xsl:attribute>
@@ -66,7 +66,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Format is YUV</xsl:attribute>
+              <xsl:attribute name="name">Video Format is YUV</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">YUV</xsl:attribute>
@@ -83,7 +83,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video CodecID equals v210</xsl:attribute>
+              <xsl:attribute name="name">Video CodecID equals v210</xsl:attribute>
               <context>
                 <xsl:attribute name="field">CodecID</xsl:attribute>
                 <xsl:attribute name="value">v210</xsl:attribute>
@@ -100,7 +100,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Width equals 720 (pixels)</xsl:attribute>
+              <xsl:attribute name="name">Video Width equals 720 (pixels)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Width</xsl:attribute>
                 <xsl:attribute name="value">720</xsl:attribute>
@@ -117,7 +117,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Height equals 486 (pixels)</xsl:attribute>
+              <xsl:attribute name="name">Video Height equals 486 (pixels)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Height</xsl:attribute>
                 <xsl:attribute name="value">486</xsl:attribute>
@@ -134,7 +134,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video DisplayAspectRatio equals 4:3 (1.333)</xsl:attribute>
+              <xsl:attribute name="name">Video DisplayAspectRatio equals 4:3 (1.333)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">DisplayAspectRatio</xsl:attribute>
                 <xsl:attribute name="value">1.333</xsl:attribute>
@@ -151,7 +151,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video FrameRate equals 29.97 fps (29.970)</xsl:attribute>
+              <xsl:attribute name="name">Video FrameRate equals 29.97 fps (29.970)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
                 <xsl:attribute name="value">29.970</xsl:attribute>
@@ -168,7 +168,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Standard equals NTSC</xsl:attribute>
+              <xsl:attribute name="name">Video Standard equals NTSC</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Standard</xsl:attribute>
                 <xsl:attribute name="value">NTSC</xsl:attribute>
@@ -185,7 +185,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video ColorSpace equals YUV</xsl:attribute>
+              <xsl:attribute name="name">Video ColorSpace equals YUV</xsl:attribute>
               <context>
                 <xsl:attribute name="field">ColorSpace</xsl:attribute>
                 <xsl:attribute name="value">YUV</xsl:attribute>
@@ -202,7 +202,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video ChromaSubsampling equals 4:2:2</xsl:attribute>
+              <xsl:attribute name="name">Video ChromaSubsampling equals 4:2:2</xsl:attribute>
               <context>
                 <xsl:attribute name="field">ChromaSubsampling</xsl:attribute>
                 <xsl:attribute name="value">4:2:2</xsl:attribute>
@@ -219,7 +219,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video BitDepth equals 10 (bits)</xsl:attribute>
+              <xsl:attribute name="name">Video BitDepth equals 10 (bits)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">BitDepth</xsl:attribute>
                 <xsl:attribute name="value">10</xsl:attribute>
@@ -236,7 +236,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio Format equals PCM</xsl:attribute>
+              <xsl:attribute name="name">Audio Format equals PCM</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">PCM</xsl:attribute>
@@ -253,7 +253,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio CodecID equals sowt</xsl:attribute>
+              <xsl:attribute name="name">Audio CodecID equals sowt</xsl:attribute>
               <context>
                 <xsl:attribute name="field">CodecID</xsl:attribute>
                 <xsl:attribute name="value">sowt</xsl:attribute>
@@ -270,7 +270,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio Channels are greater or equal than 1</xsl:attribute>
+              <xsl:attribute name="name">Audio Channels are greater or equal than 1</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Channels</xsl:attribute>
                 <xsl:attribute name="value">1</xsl:attribute>
@@ -288,7 +288,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio SamplingRate is greater or equal than 48 kHz (48000)</xsl:attribute>
+              <xsl:attribute name="name">Audio SamplingRate is greater or equal than 48 kHz (48000)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">SamplingRate</xsl:attribute>
                 <xsl:attribute name="value">48000</xsl:attribute>
@@ -306,7 +306,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio BitDepth is greater or equal than 16-bit</xsl:attribute>
+              <xsl:attribute name="name">Audio BitDepth is greater or equal than 16-bit</xsl:attribute>
               <context>
                 <xsl:attribute name="field">BitDepth</xsl:attribute>
                 <xsl:attribute name="value">16</xsl:attribute>

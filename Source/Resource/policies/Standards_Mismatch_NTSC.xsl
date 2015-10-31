@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>Standards Mismatch (NTSC)</title>
+        <name>Standards Mismatch (NTSC)</name>
         <description>This policy checks files for a framesize of 720 x 480 and a framerate of 29.970.</description>
         <xsl:for-each select="ma:media">
           <media>
@@ -15,7 +15,7 @@
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
             <check>
-              <xsl:attribute name="title">Video Width must be 720.</xsl:attribute>
+              <xsl:attribute name="name">Video Width must be 720.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Width</xsl:attribute>
                 <xsl:attribute name="value">720</xsl:attribute>
@@ -32,7 +32,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Height must be 480.</xsl:attribute>
+              <xsl:attribute name="name">Video Height must be 480.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Height</xsl:attribute>
                 <xsl:attribute name="value">480</xsl:attribute>
@@ -49,7 +49,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General FrameRate must be 29.970.</xsl:attribute>
+              <xsl:attribute name="name">General FrameRate must be 29.970.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
                 <xsl:attribute name="value">29.970</xsl:attribute>

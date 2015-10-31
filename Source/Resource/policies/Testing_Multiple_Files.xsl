@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>Testing Multiple Files</title>
+        <name>Testing Multiple Files</name>
         <description>This policy checks all the files for conformance. Test2_2.mkv and Test2_3.mkv fail because they have been manipulated, but they fail in different ways.</description>
         <xsl:for-each select="ma:media">
           <media>
@@ -15,7 +15,7 @@
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
             <check>
-              <xsl:attribute name="title">General UniqueID must exist. </xsl:attribute>
+              <xsl:attribute name="name">General UniqueID must exist. </xsl:attribute>
               <context>
                 <xsl:attribute name="field">UniqueID</xsl:attribute>
               </context>
@@ -30,7 +30,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General Format must be Matroska</xsl:attribute>
+              <xsl:attribute name="name">General Format must be Matroska</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">Matroska</xsl:attribute>
@@ -47,7 +47,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General FileExtension must be mkv.</xsl:attribute>
+              <xsl:attribute name="name">General FileExtension must be mkv.</xsl:attribute>
               <context>
                 <xsl:attribute name="value">track[@type='General']/FileExtension = 'mkv'</xsl:attribute>
               </context>
@@ -56,7 +56,7 @@
               </xsl:call-template>
             </check>
             <check>
-              <xsl:attribute name="title">General Duration must be 40 ms.</xsl:attribute>
+              <xsl:attribute name="name">General Duration must be 40 ms.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Duration</xsl:attribute>
                 <xsl:attribute name="value">40</xsl:attribute>
@@ -73,7 +73,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General FrameRate must be 25</xsl:attribute>
+              <xsl:attribute name="name">General FrameRate must be 25</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
                 <xsl:attribute name="value">25</xsl:attribute>
@@ -90,7 +90,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video stream must exist.</xsl:attribute>
+              <xsl:attribute name="name">Video stream must exist.</xsl:attribute>
               <context>
                 <xsl:attribute name="value">track[@type='Video']</xsl:attribute>
               </context>
@@ -99,7 +99,7 @@
               </xsl:call-template>
             </check>
             <check>
-              <xsl:attribute name="title">Video Unique ID must exist.</xsl:attribute>
+              <xsl:attribute name="name">Video Unique ID must exist.</xsl:attribute>
               <context>
                 <xsl:attribute name="value">track[@type='Video']/UniqueID</xsl:attribute>
               </context>
@@ -108,7 +108,7 @@
               </xsl:call-template>
             </check>
             <check>
-              <xsl:attribute name="title">Video Format must equal RGB</xsl:attribute>
+              <xsl:attribute name="name">Video Format must equal RGB</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">RGB</xsl:attribute>
@@ -125,7 +125,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video DisplayAspectRatio must be 1.</xsl:attribute>
+              <xsl:attribute name="name">Video DisplayAspectRatio must be 1.</xsl:attribute>
               <context>
                 <xsl:attribute name="field">DisplayAspectRatio</xsl:attribute>
                 <xsl:attribute name="value">1.</xsl:attribute>

@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>MKV/FFV1 (reformatted QT/v210) </title>
+        <name>MKV/FFV1 (reformatted QT/v210) </name>
         <description>Policy check for Matroska-wrapped FFV1 and LPCM file, transcoded from QuickTime-wrapped v210 and LPCM file. </description>
         <xsl:for-each select="ma:media">
           <media>
@@ -15,7 +15,7 @@
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
             <check>
-              <xsl:attribute name="title">General Format equals Matroska</xsl:attribute>
+              <xsl:attribute name="name">General Format equals Matroska</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">Matroska</xsl:attribute>
@@ -32,7 +32,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General Format_Version is Version 4</xsl:attribute>
+              <xsl:attribute name="name">General Format_Version is Version 4</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format_Version</xsl:attribute>
                 <xsl:attribute name="value">4</xsl:attribute>
@@ -49,7 +49,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General Duration is greater or equal than 1 KiB</xsl:attribute>
+              <xsl:attribute name="name">General Duration is greater or equal than 1 KiB</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FileSize</xsl:attribute>
                 <xsl:attribute name="value">1</xsl:attribute>
@@ -67,7 +67,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General Duration is greater or equal than 1 ms</xsl:attribute>
+              <xsl:attribute name="name">General Duration is greater or equal than 1 ms</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Duration</xsl:attribute>
                 <xsl:attribute name="value">1</xsl:attribute>
@@ -85,7 +85,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Format is FFV1</xsl:attribute>
+              <xsl:attribute name="name">Video Format is FFV1</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">FFV1</xsl:attribute>
@@ -102,7 +102,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Format_Version is greater or equal than 1</xsl:attribute>
+              <xsl:attribute name="name">Video Format_Version is greater or equal than 1</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format_Version</xsl:attribute>
                 <xsl:attribute name="value">1</xsl:attribute>
@@ -120,7 +120,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video CodecID is equal to FFV1</xsl:attribute>
+              <xsl:attribute name="name">Video CodecID is equal to FFV1</xsl:attribute>
               <context>
                 <xsl:attribute name="field">CodecID</xsl:attribute>
                 <xsl:attribute name="value">V_MS/VFW/FOURCC / FFV1</xsl:attribute>
@@ -137,7 +137,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Duration is greater or equal than 1 ms</xsl:attribute>
+              <xsl:attribute name="name">Video Duration is greater or equal than 1 ms</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Duration</xsl:attribute>
                 <xsl:attribute name="value">1</xsl:attribute>
@@ -155,7 +155,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Width is equal to 720 (pixels)</xsl:attribute>
+              <xsl:attribute name="name">Video Width is equal to 720 (pixels)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Width</xsl:attribute>
                 <xsl:attribute name="value">720</xsl:attribute>
@@ -172,7 +172,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Height is equal to 486 (pixels)</xsl:attribute>
+              <xsl:attribute name="name">Video Height is equal to 486 (pixels)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Height</xsl:attribute>
                 <xsl:attribute name="value">486</xsl:attribute>
@@ -189,7 +189,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video DisplayAspectRatio is 4:3 (1.333)</xsl:attribute>
+              <xsl:attribute name="name">Video DisplayAspectRatio is 4:3 (1.333)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">DisplayAspectRatio</xsl:attribute>
                 <xsl:attribute name="value">1.333</xsl:attribute>
@@ -206,7 +206,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video FrameRate_Mode is Constant (CFR)</xsl:attribute>
+              <xsl:attribute name="name">Video FrameRate_Mode is Constant (CFR)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate_Mode</xsl:attribute>
                 <xsl:attribute name="value">CFR</xsl:attribute>
@@ -223,7 +223,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video FrameRate equals 29.97 (fps)</xsl:attribute>
+              <xsl:attribute name="name">Video FrameRate equals 29.97 (fps)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
                 <xsl:attribute name="value">29.970</xsl:attribute>
@@ -240,7 +240,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Standard is NTSC</xsl:attribute>
+              <xsl:attribute name="name">Video Standard is NTSC</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Standard</xsl:attribute>
                 <xsl:attribute name="value">NTSC</xsl:attribute>
@@ -257,7 +257,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video ColorSpace is YUV</xsl:attribute>
+              <xsl:attribute name="name">Video ColorSpace is YUV</xsl:attribute>
               <context>
                 <xsl:attribute name="field">ColorSpace</xsl:attribute>
                 <xsl:attribute name="value">YUV</xsl:attribute>
@@ -274,7 +274,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video ChromaSubsampling is 4:2:2</xsl:attribute>
+              <xsl:attribute name="name">Video ChromaSubsampling is 4:2:2</xsl:attribute>
               <context>
                 <xsl:attribute name="field">ChromaSubsampling</xsl:attribute>
                 <xsl:attribute name="value">4:2:2</xsl:attribute>
@@ -291,7 +291,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video BitDepth equals 10-bit</xsl:attribute>
+              <xsl:attribute name="name">Video BitDepth equals 10-bit</xsl:attribute>
               <context>
                 <xsl:attribute name="field">BitDepth</xsl:attribute>
                 <xsl:attribute name="value">10</xsl:attribute>
@@ -308,7 +308,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Compression_Mode equals Lossless</xsl:attribute>
+              <xsl:attribute name="name">Video Compression_Mode equals Lossless</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Compression_Mode</xsl:attribute>
                 <xsl:attribute name="value">Lossless</xsl:attribute>
@@ -325,7 +325,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio Format equals Pulse Code Modulation (PCM)</xsl:attribute>
+              <xsl:attribute name="name">Audio Format equals Pulse Code Modulation (PCM)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">PCM</xsl:attribute>
@@ -342,7 +342,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio CodecID is A_PCM/INT/LIT</xsl:attribute>
+              <xsl:attribute name="name">Audio CodecID is A_PCM/INT/LIT</xsl:attribute>
               <context>
                 <xsl:attribute name="field">CodecID</xsl:attribute>
                 <xsl:attribute name="value">A_PCM/INT/LIT</xsl:attribute>
@@ -359,7 +359,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio Duration is greater or equal than 1 ms</xsl:attribute>
+              <xsl:attribute name="name">Audio Duration is greater or equal than 1 ms</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Duration</xsl:attribute>
                 <xsl:attribute name="value">1</xsl:attribute>
@@ -377,7 +377,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio BitRate_Mode is Constant (CBR)</xsl:attribute>
+              <xsl:attribute name="name">Audio BitRate_Mode is Constant (CBR)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">BitRate_Mode</xsl:attribute>
                 <xsl:attribute name="value">CBR</xsl:attribute>
@@ -394,7 +394,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio Channels equals 4</xsl:attribute>
+              <xsl:attribute name="name">Audio Channels equals 4</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Channels</xsl:attribute>
                 <xsl:attribute name="value">4</xsl:attribute>
@@ -411,7 +411,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio SamplingRate equals 48 (kHz)</xsl:attribute>
+              <xsl:attribute name="name">Audio SamplingRate equals 48 (kHz)</xsl:attribute>
               <context>
                 <xsl:attribute name="field">SamplingRate</xsl:attribute>
                 <xsl:attribute name="value">48000</xsl:attribute>
@@ -428,7 +428,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Audio BitDepth equals 16-bit</xsl:attribute>
+              <xsl:attribute name="name">Audio BitDepth equals 16-bit</xsl:attribute>
               <context>
                 <xsl:attribute name="field">BitDepth</xsl:attribute>
                 <xsl:attribute name="value">16</xsl:attribute>

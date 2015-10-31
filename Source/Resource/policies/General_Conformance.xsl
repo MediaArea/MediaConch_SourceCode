@@ -7,7 +7,7 @@
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
       <policyChecks>
-        <title>General Conformance</title>
+        <name>General Conformance</name>
         <description>This policy checks that the file follows general rules of file conformance.</description>
         <xsl:for-each select="ma:media">
           <media>
@@ -15,7 +15,7 @@
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
             <check>
-              <xsl:attribute name="title">General UniqueID must exist. </xsl:attribute>
+              <xsl:attribute name="name">General UniqueID must exist. </xsl:attribute>
               <context>
                 <xsl:attribute name="field">UniqueID</xsl:attribute>
               </context>
@@ -34,7 +34,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General Format must be Matroska</xsl:attribute>
+              <xsl:attribute name="name">General Format must be Matroska</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">Matroska</xsl:attribute>
@@ -51,7 +51,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">General FrameRate must be 25 fps</xsl:attribute>
+              <xsl:attribute name="name">General FrameRate must be 25 fps</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
                 <xsl:attribute name="value">25.000</xsl:attribute>
@@ -68,7 +68,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video Format must equal FFV1</xsl:attribute>
+              <xsl:attribute name="name">Video Format must equal FFV1</xsl:attribute>
               <context>
                 <xsl:attribute name="field">Format</xsl:attribute>
                 <xsl:attribute name="value">FFV1</xsl:attribute>
@@ -85,7 +85,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="title">Video DisplayAspectRatio must be 1.333</xsl:attribute>
+              <xsl:attribute name="name">Video DisplayAspectRatio must be 1.333</xsl:attribute>
               <context>
                 <xsl:attribute name="field">DisplayAspectRatio</xsl:attribute>
                 <xsl:attribute name="value">1.333</xsl:attribute>
