@@ -8,27 +8,12 @@
       </xsl:attribute>
       <policyChecks>
         <name>Testing Multiple Files</name>
-        <description>This policy checks all the files for conformance. Test2_2.mkv and Test2_3.mkv fail because they have been manipulated, but they fail in different ways.</description>
+        <description>This policy check is provided by MediaConch as an example for testing multiple files, and should be used with the associated test files. In this test, Testing_Multiple_Files_1.mkv and Testing_Multiple_Files_2.mkv will prove to be valid, while Testing_Multiple_Files_3.mkv will prove to be not valid, as it contains a YUV colorspace instead of the required "RGB".</description>
         <xsl:for-each select="ma:media">
           <media>
             <xsl:attribute name="ref">
               <xsl:value-of select="./@ref"/>
             </xsl:attribute>
-            <check>
-              <xsl:attribute name="name">General UniqueID must exist. </xsl:attribute>
-              <context>
-                <xsl:attribute name="field">UniqueID</xsl:attribute>
-              </context>
-              <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][*]/mi:UniqueID">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][*]/mi:UniqueID">
-                    <xsl:call-template name="exists">
-                      <xsl:with-param name="xpath" select="."/>
-                    </xsl:call-template>
-                  </xsl:for-each>
-                </xsl:when>
-              </xsl:choose>
-            </check>
             <check>
               <xsl:attribute name="name">General Format must be Matroska</xsl:attribute>
               <context>
@@ -47,95 +32,34 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="name">General FileExtension must be mkv.</xsl:attribute>
-              <context>
-                <xsl:attribute name="value">track[@type='General']/FileExtension = 'mkv'</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="track[@type='General']/FileExtension = 'mkv'"/>
-              </xsl:call-template>
-            </check>
-            <check>
-              <xsl:attribute name="name">General Duration must be 40 ms.</xsl:attribute>
-              <context>
-                <xsl:attribute name="field">Duration</xsl:attribute>
-                <xsl:attribute name="value">40</xsl:attribute>
-              </context>
-              <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][*]/mi:Duration">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][*]/mi:Duration">
-                    <xsl:call-template name="is_equal">
-                      <xsl:with-param name="xpath" select="."/>
-                      <xsl:with-param name="value">40</xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:for-each>
-                </xsl:when>
-              </xsl:choose>
-            </check>
-            <check>
-              <xsl:attribute name="name">General FrameRate must be 25</xsl:attribute>
+              <xsl:attribute name="name">General FrameRate must be 25.000</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FrameRate</xsl:attribute>
-                <xsl:attribute name="value">25</xsl:attribute>
+                <xsl:attribute name="value">25.000</xsl:attribute>
               </context>
               <xsl:choose>
                 <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:FrameRate">
                   <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:FrameRate">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
-                      <xsl:with-param name="value">25</xsl:with-param>
+                      <xsl:with-param name="value">25.000</xsl:with-param>
                     </xsl:call-template>
                   </xsl:for-each>
                 </xsl:when>
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="name">Video stream must exist.</xsl:attribute>
+              <xsl:attribute name="name">Video ColorSpace equals RGB</xsl:attribute>
               <context>
-                <xsl:attribute name="value">track[@type='Video']</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="track[@type='Video']"/>
-              </xsl:call-template>
-            </check>
-            <check>
-              <xsl:attribute name="name">Video Unique ID must exist.</xsl:attribute>
-              <context>
-                <xsl:attribute name="value">track[@type='Video']/UniqueID</xsl:attribute>
-              </context>
-              <xsl:call-template name="is_true">
-                <xsl:with-param name="xpath" select="track[@type='Video']/UniqueID"/>
-              </xsl:call-template>
-            </check>
-            <check>
-              <xsl:attribute name="name">Video Format must equal RGB</xsl:attribute>
-              <context>
-                <xsl:attribute name="field">Format</xsl:attribute>
+                <xsl:attribute name="field">ColorSpace</xsl:attribute>
                 <xsl:attribute name="value">RGB</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Format">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Format">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:ColorSpace">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:ColorSpace">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">RGB</xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:for-each>
-                </xsl:when>
-              </xsl:choose>
-            </check>
-            <check>
-              <xsl:attribute name="name">Video DisplayAspectRatio must be 1.</xsl:attribute>
-              <context>
-                <xsl:attribute name="field">DisplayAspectRatio</xsl:attribute>
-                <xsl:attribute name="value">1.</xsl:attribute>
-              </context>
-              <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:DisplayAspectRatio">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:DisplayAspectRatio">
-                    <xsl:call-template name="is_equal">
-                      <xsl:with-param name="xpath" select="."/>
-                      <xsl:with-param name="value">1.</xsl:with-param>
                     </xsl:call-template>
                   </xsl:for-each>
                 </xsl:when>
