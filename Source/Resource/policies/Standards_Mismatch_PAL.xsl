@@ -6,14 +6,14 @@
       <xsl:attribute name="version">
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
-      <policyChecks>
-        <name>Standards Mismatch (PAL)</name>
-        <description>This policy checks files for a framesize of 720 x 576 and a framerate of 25.</description>
-        <xsl:for-each select="ma:media">
-          <media>
-            <xsl:attribute name="ref">
-              <xsl:value-of select="./@ref"/>
-            </xsl:attribute>
+      <xsl:for-each select="ma:media">
+        <media>
+          <xsl:attribute name="ref">
+            <xsl:value-of select="./@ref"/>
+          </xsl:attribute>
+          <policyChecks>
+            <name>Standards Mismatch (PAL)</name>
+            <description>This policy checks files for a framesize of 720 x 576 and a framerate of 25.</description>
             <check>
               <xsl:attribute name="name">Video Width must be 720</xsl:attribute>
               <context>
@@ -65,9 +65,9 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-          </media>
-        </xsl:for-each>
-      </policyChecks>
+          </policyChecks>
+        </media>
+      </xsl:for-each>
     </MediaConch>
   </xsl:template>
   <xsl:template name="is_true">

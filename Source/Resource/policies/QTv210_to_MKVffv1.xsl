@@ -6,14 +6,14 @@
       <xsl:attribute name="version">
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
-      <policyChecks>
-        <name>MKV/FFV1 (reformatted QT/v210) </name>
-        <description>Policy check for Matroska-wrapped FFV1 and LPCM file, transcoded from QuickTime-wrapped v210 and LPCM file. </description>
-        <xsl:for-each select="ma:media">
-          <media>
-            <xsl:attribute name="ref">
-              <xsl:value-of select="./@ref"/>
-            </xsl:attribute>
+      <xsl:for-each select="ma:media">
+        <media>
+          <xsl:attribute name="ref">
+            <xsl:value-of select="./@ref"/>
+          </xsl:attribute>
+          <policyChecks>
+            <name>MKV/FFV1 (reformatted QT/v210) </name>
+            <description>Policy check for Matroska-wrapped FFV1 and LPCM file, transcoded from QuickTime-wrapped v210 and LPCM file. </description>
             <check>
               <xsl:attribute name="name">General Format equals Matroska</xsl:attribute>
               <context>
@@ -444,9 +444,9 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-          </media>
-        </xsl:for-each>
-      </policyChecks>
+          </policyChecks>
+        </media>
+      </xsl:for-each>
     </MediaConch>
   </xsl:template>
   <xsl:template name="is_true">

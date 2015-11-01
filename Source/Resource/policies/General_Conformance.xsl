@@ -6,14 +6,14 @@
       <xsl:attribute name="version">
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
-      <policyChecks>
-        <name>General Conformance</name>
-        <description>This policy checks that the file follows general rules of file conformance.</description>
-        <xsl:for-each select="ma:media">
-          <media>
-            <xsl:attribute name="ref">
-              <xsl:value-of select="./@ref"/>
-            </xsl:attribute>
+      <xsl:for-each select="ma:media">
+        <media>
+          <xsl:attribute name="ref">
+            <xsl:value-of select="./@ref"/>
+          </xsl:attribute>
+          <policyChecks>
+            <name>General Conformance</name>
+            <description>This policy checks that the file follows general rules of file conformance.</description>
             <check>
               <xsl:attribute name="name">General UniqueID must exist. </xsl:attribute>
               <context>
@@ -101,9 +101,9 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-          </media>
-        </xsl:for-each>
-      </policyChecks>
+          </policyChecks>
+        </media>
+      </xsl:for-each>
     </MediaConch>
   </xsl:template>
   <xsl:template name="is_true">

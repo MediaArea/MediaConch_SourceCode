@@ -6,14 +6,14 @@
       <xsl:attribute name="version">
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
-      <policyChecks>
-        <name>Testing Multiple Files</name>
-        <description>This policy checks all the files for conformance. Test2_2.mkv and Test2_3.mkv fail because they have been manipulated, but they fail in different ways.</description>
-        <xsl:for-each select="ma:media">
-          <media>
-            <xsl:attribute name="ref">
-              <xsl:value-of select="./@ref"/>
-            </xsl:attribute>
+      <xsl:for-each select="ma:media">
+        <media>
+          <xsl:attribute name="ref">
+            <xsl:value-of select="./@ref"/>
+          </xsl:attribute>
+          <policyChecks>
+            <name>Testing Multiple Files</name>
+            <description>This policy checks all the files for conformance. Test2_2.mkv and Test2_3.mkv fail because they have been manipulated, but they fail in different ways.</description>
             <check>
               <xsl:attribute name="name">General UniqueID must exist. </xsl:attribute>
               <context>
@@ -141,9 +141,9 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-          </media>
-        </xsl:for-each>
-      </policyChecks>
+          </policyChecks>
+        </media>
+      </xsl:for-each>
     </MediaConch>
   </xsl:template>
   <xsl:template name="is_true">

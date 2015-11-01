@@ -6,14 +6,14 @@
       <xsl:attribute name="version">
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
-      <policyChecks>
-        <name>Preservation Master File Recommendations - QuickTime/v210 (NYU Libraries)</name>
-        <description/>
-        <xsl:for-each select="ma:media">
-          <media>
-            <xsl:attribute name="ref">
-              <xsl:value-of select="./@ref"/>
-            </xsl:attribute>
+      <xsl:for-each select="ma:media">
+        <media>
+          <xsl:attribute name="ref">
+            <xsl:value-of select="./@ref"/>
+          </xsl:attribute>
+          <policyChecks>
+            <name>Preservation Master File Recommendations - QuickTime/v210 (NYU Libraries)</name>
+            <description/>
             <check>
               <xsl:attribute name="name">General Format equals MPEG-4</xsl:attribute>
               <context>
@@ -323,9 +323,9 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-          </media>
-        </xsl:for-each>
-      </policyChecks>
+          </policyChecks>
+        </media>
+      </xsl:for-each>
     </MediaConch>
   </xsl:template>
   <xsl:template name="is_true">
