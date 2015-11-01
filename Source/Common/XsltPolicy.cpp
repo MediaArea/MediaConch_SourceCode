@@ -384,6 +384,50 @@ bool XsltPolicy::find_policy_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
+bool XsltPolicy::find_policychecks_description_node(xmlNodePtr node)
+{
+    std::string def("description");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    const char* description_str = (const char*)xmlNodeGetContent(node);
+    if (description_str)
+        description = std::string(description_str);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_policychecks_name_node(xmlNodePtr node)
+{
+    std::string def("name");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    const char* title_str = (const char*)xmlNodeGetContent(node);
+    if (title_str)
+        title = std::string(title_str);
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_policychecks_node(xmlNodePtr node)
+{
+    std::string def("policyChecks");
+    if (!node->name || def.compare((const char*)node->name))
+        return false;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        if (!find_policychecks_name_node(child))
+            if (!find_policychecks_description_node(child))
+                find_policy_node(child);
+        child = child->next;
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
 bool XsltPolicy::find_media_node(xmlNodePtr node)
 {
     std::string def("media");
@@ -393,7 +437,7 @@ bool XsltPolicy::find_media_node(xmlNodePtr node)
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_policy_node(child);
+        find_policychecks_node(child);
         child = child->next;
     }
     return true;
@@ -416,50 +460,6 @@ bool XsltPolicy::find_for_each_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_policychecks_description_node(xmlNodePtr node)
-{
-    std::string def("description");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    const char* description_str = (const char*)xmlNodeGetContent(node);
-    if (description_str)
-        description = std::string(description_str);
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool XsltPolicy::find_policychecks_title_node(xmlNodePtr node)
-{
-    std::string def("name");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    const char* title_str = (const char*)xmlNodeGetContent(node);
-    if (title_str)
-        title = std::string(title_str);
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool XsltPolicy::find_policychecks_node(xmlNodePtr node)
-{
-    std::string def("policyChecks");
-    if (!node->name || def.compare((const char*)node->name))
-        return false;
-
-    xmlNodePtr child = node->children;
-    while (child)
-    {
-        if (!find_policychecks_title_node(child))
-            if (!find_policychecks_description_node(child))
-                find_for_each_node(child);
-        child = child->next;
-    }
-    return true;
-}
-
-//---------------------------------------------------------------------------
 bool XsltPolicy::find_mediaconch_node(xmlNodePtr node)
 {
     std::string def("MediaConch");
@@ -469,7 +469,7 @@ bool XsltPolicy::find_mediaconch_node(xmlNodePtr node)
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_policychecks_node(child);
+        find_for_each_node(child);
         child = child->next;
     }
     return true;
@@ -1242,6 +1242,42 @@ void XsltPolicy::write_policy_childs(xmlNodePtr node, XsltRule *rule)
 }
 
 //---------------------------------------------------------------------------
+void XsltPolicy::write_policychecks_description_child(xmlNodePtr node)
+{
+    if (!description.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"description");
+    xmlNodeSetContent(child, (const xmlChar *)description.c_str());
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policychecks_name_child(xmlNodePtr node)
+{
+    if (!title.length())
+        return;
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"name");
+    xmlNodeSetContent(child, (const xmlChar *)title.c_str());
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
+void XsltPolicy::write_policychecks_childs(xmlNodePtr node)
+{
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"policyChecks");
+
+    xmlAddChild(node, child);
+    write_policychecks_title_child(child);
+    write_policychecks_description_child(child);
+    for (size_t i = 0; i < rules.size(); ++i)
+        write_policy_childs(child, rules[i]);
+}
+
+//---------------------------------------------------------------------------
 void XsltPolicy::write_media_attribute_value_child(xmlNodePtr node)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"value-of");
@@ -1269,8 +1305,7 @@ void XsltPolicy::write_media_childs(xmlNodePtr node)
     xmlAddChild(node, child);
 
     write_media_attribute_childs(child);
-    for (size_t i = 0; i < rules.size(); ++i)
-        write_policy_childs(child, rules[i]);
+    write_policychecks_childs(child);
 }
 
 //---------------------------------------------------------------------------
@@ -1282,41 +1317,6 @@ void XsltPolicy::write_for_each_childs(xmlNodePtr node)
     xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)"ma:media");
     xmlAddChild(node, child);
     write_media_childs(child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_policychecks_description_child(xmlNodePtr node)
-{
-    if (!description.length())
-        return;
-
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"description");
-    xmlNodeSetContent(child, (const xmlChar *)description.c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_policychecks_title_child(xmlNodePtr node)
-{
-    if (!title.length())
-        return;
-
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"name");
-    xmlNodeSetContent(child, (const xmlChar *)title.c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
-void XsltPolicy::write_policychecks_childs(xmlNodePtr node)
-{
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"policyChecks");
-
-    xmlAddChild(node, child);
-    write_policychecks_title_child(child);
-    write_policychecks_description_child(child);
-    write_for_each_childs(child);
 }
 
 //---------------------------------------------------------------------------
@@ -1347,7 +1347,7 @@ void XsltPolicy::write_mediaconch_childs(xmlNodePtr node)
 
     xmlAddChild(node, child);
     write_mediaconch_attribute_childs(child);
-    write_policychecks_childs(child);
+    write_for_each_childs(child);
 }
 
 //---------------------------------------------------------------------------

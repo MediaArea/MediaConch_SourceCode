@@ -88,7 +88,7 @@ private:
     bool       find_template_name_node(xmlNodePtr node);
     bool       find_mediaconch_node(xmlNodePtr node);
     bool       find_policychecks_node(xmlNodePtr node);
-    bool       find_policychecks_title_node(xmlNodePtr node);
+    bool       find_policychecks_name_node(xmlNodePtr node);
     bool       find_policychecks_description_node(xmlNodePtr node);
     bool       find_for_each_node(xmlNodePtr node);
     bool       find_media_node(xmlNodePtr node);
@@ -115,7 +115,7 @@ private:
     void       write_mediaconch_attribute_childs(xmlNodePtr node);
     void       write_mediaconch_attribute_text_child(xmlNodePtr node);
     void       write_policychecks_childs(xmlNodePtr node);
-    void       write_policychecks_title_child(xmlNodePtr node);
+    void       write_policychecks_name_child(xmlNodePtr node);
     void       write_policychecks_description_child(xmlNodePtr node);
     void       write_for_each_childs(xmlNodePtr node);
     void       write_media_childs(xmlNodePtr node);
