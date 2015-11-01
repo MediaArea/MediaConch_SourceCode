@@ -49,7 +49,7 @@
               </xsl:choose>
             </check>
             <check>
-              <xsl:attribute name="name">General Duration is greater or equal than 1 KiB</xsl:attribute>
+              <xsl:attribute name="name">General FileSize is greater or equal than 1 byte</xsl:attribute>
               <context>
                 <xsl:attribute name="field">FileSize</xsl:attribute>
                 <xsl:attribute name="value">1</xsl:attribute>
