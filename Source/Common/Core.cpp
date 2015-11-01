@@ -17,7 +17,11 @@
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
 #include "Common/ImplementationReportXsl.h"
-#include "Common/ImplementationReportDisplayXsl.h"
+#if defined(_WIN32) || defined(WIN32)
+#include "Common/ImplementationReportDisplayTextXsl.h"
+#else //defined(_WIN32) || defined(WIN32)
+#include "Common/ImplementationReportDisplayTextUnicodeXsl.h"
+#endif //defined(_WIN32) || defined(WIN32)
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
@@ -326,7 +330,11 @@ String Core::GetOutput_Text_Implementation ()
     validateXsltPolicyFromMemory(memory, valid, report);
 
     // Apply an XSLT to have Text
-    memory = std::string(implementation_report_display_xsl);
+#if defined(_WIN32) || defined(WIN32)
+    memory = std::string(implementation_report_display_text_xsl);
+#else //defined(_WIN32) || defined(WIN32)
+    memory = std::string(implementation_report_display_textunicode_xsl);
+#endif //defined(_WIN32) || defined(WIN32)
     report = transformWithXsltMemory(report, memory);
     return report;
 }

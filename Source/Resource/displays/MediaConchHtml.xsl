@@ -50,6 +50,10 @@
 										<xsl:value-of select="@actual"/>
 									</td>
 									<td>
+										<xsl:if test="@outcome = 'pass'"><xsl:text>✅  </xsl:text>
+										</xsl:if>
+										<xsl:if test="@outcome = 'fail'"><xsl:text>❌  </xsl:text>
+										</xsl:if>
 										<xsl:value-of select="@outcome"/>
 									</td>
 									<td>
@@ -102,6 +106,10 @@
 										</xsl:for-each>
 									</td>
 									<td>
+										<xsl:if test="@outcome = 'pass'"><xsl:text>✅  </xsl:text>
+										</xsl:if>
+										<xsl:if test="@outcome = 'fail'"><xsl:text>❌  </xsl:text>
+										</xsl:if>
 										<xsl:value-of select="@outcome"/>
 									</td>
 									<td>
