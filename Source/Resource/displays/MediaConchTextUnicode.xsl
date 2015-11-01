@@ -74,54 +74,53 @@
       <xsl:for-each select="mc:policyChecks">
         <xsl:for-each select="mc:check">
           <xsl:text> 🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚 &#xa;</xsl:text>
-            <xsl:value-of select="@name"/>
+          <xsl:value-of select="@name"/>
+          <xsl:text>&#xa;</xsl:text>
+          <xsl:if test="mc:context/@field != ''">
+            <xsl:text>Context (field): </xsl:text>
+            <xsl:value-of select="mc:context/@field"/>
             <xsl:text>&#xa;</xsl:text>
-            <xsl:if test="mc:context/@field != ''">
-              <xsl:text>Context (field): </xsl:text>
-              <xsl:value-of select="mc:context/@field"/>
+          </xsl:if>
+          <xsl:if test="mc:context/@value != ''">
+            <xsl:text>Context (value): </xsl:text>
+            <xsl:value-of select="mc:context/@value"/>
+            <xsl:text>&#xa;</xsl:text>
+          </xsl:if>
+          <xsl:for-each select="mc:test">
+            <xsl:if test="@tracktype != ''">
+              <xsl:text>Track type: </xsl:text>
+              <xsl:value-of select="@tracktype"/>
               <xsl:text>&#xa;</xsl:text>
             </xsl:if>
-            <xsl:if test="mc:context/@value != ''">
-              <xsl:text>Context (value): </xsl:text>
-              <xsl:value-of select="mc:context/@value"/>
+            <xsl:if test="@tracktypeorder">
+              <xsl:text>Track Type Order: </xsl:text>
+              <xsl:value-of select="@tracktypeorder"/>
               <xsl:text>&#xa;</xsl:text>
             </xsl:if>
-            <xsl:for-each select="mc:test">
-              <xsl:if test="@tracktype != ''">
-                <xsl:text>Track type: </xsl:text>
-                <xsl:value-of select="@tracktype"/>
-                <xsl:text>&#xa;</xsl:text>
-              </xsl:if>
-              <xsl:if test="@tracktypeorder">
-                <xsl:text>Track Type Order: </xsl:text>
-                <xsl:value-of select="@tracktypeorder"/>
-                <xsl:text>&#xa;</xsl:text>
-              </xsl:if>
-              <xsl:if test="@trackid">
-                <xsl:text>Track ID: </xsl:text>
-                <xsl:value-of select="@trackid"/>
-                <xsl:text>&#xa;</xsl:text>
-              </xsl:if>
-              <xsl:if test="@actual != ''">
-                <xsl:text>Actual: </xsl:text>
-                <xsl:value-of select="@actual"/>
-                <xsl:text>&#xa;</xsl:text>
-              </xsl:if>
-              <xsl:text>Outcome: </xsl:text>
-              <xsl:if test="@outcome = 'pass'">
-                <xsl:text>✅  </xsl:text>
-              </xsl:if>
-              <xsl:if test="@outcome = 'fail'">
-                <xsl:text>❌  </xsl:text>
-              </xsl:if>
-              <xsl:value-of select="@outcome"/>
+            <xsl:if test="@trackid">
+              <xsl:text>Track ID: </xsl:text>
+              <xsl:value-of select="@trackid"/>
               <xsl:text>&#xa;</xsl:text>
-              <xsl:if test="@reason != ''">
-                <xsl:text>Reason: </xsl:text>
-                <xsl:value-of select="@reason"/>
-                <xsl:text>&#xa;</xsl:text>
-              </xsl:if>
-            </xsl:for-each>
+            </xsl:if>
+            <xsl:if test="@actual != ''">
+              <xsl:text>Actual: </xsl:text>
+              <xsl:value-of select="@actual"/>
+              <xsl:text>&#xa;</xsl:text>
+            </xsl:if>
+            <xsl:text>Outcome: </xsl:text>
+            <xsl:if test="@outcome = 'pass'">
+              <xsl:text>✅  </xsl:text>
+            </xsl:if>
+            <xsl:if test="@outcome = 'fail'">
+              <xsl:text>❌  </xsl:text>
+            </xsl:if>
+            <xsl:value-of select="@outcome"/>
+            <xsl:text>&#xa;</xsl:text>
+            <xsl:if test="@reason != ''">
+              <xsl:text>Reason: </xsl:text>
+              <xsl:value-of select="@reason"/>
+              <xsl:text>&#xa;</xsl:text>
+            </xsl:if>
           </xsl:for-each>
         </xsl:for-each>
       </xsl:for-each>
