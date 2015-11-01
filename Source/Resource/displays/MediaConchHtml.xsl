@@ -3,7 +3,9 @@
   <xsl:output encoding="UTF-8" method="html" version="1.0" indent="yes"/>
   <xsl:template match="/mc:MediaConch">
     <xsl:for-each select="mc:media">
+      <p>
       <xsl:text> &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A; </xsl:text>
+      </p>
       <b>
         <xsl:value-of select="@ref"/>
       </b>
@@ -66,7 +68,6 @@
           </table>
       </xsl:for-each>
       <xsl:for-each select="mc:policyChecks">
-        <xsl:text> &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A; </xsl:text>
         <h1>
           <xsl:value-of select="mc:name"/>
         </h1>
