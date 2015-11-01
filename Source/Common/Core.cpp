@@ -448,6 +448,30 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
         valid = validation(S, report);
         if (xsltDisplay.length())
             report = Core::transformWithXsltFile(report, xsltDisplay);
+        else 
+            switch (Format)
+            {
+                case format_Text:
+                                    {
+                                        // Apply an XSLT to have Text
+                                    #if defined(_WIN32) || defined(WIN32)
+                                        std::string memory(implementation_report_display_text_xsl);
+                                    #else //defined(_WIN32) || defined(WIN32)
+                                        std::string memory(implementation_report_display_textunicode_xsl);
+                                    #endif //defined(_WIN32) || defined(WIN32)
+                                        report = transformWithXsltMemory(report, memory);
+                                    }
+                                    break;
+                case format_Html:
+                                    {
+                                        // Apply an XSLT to have Text
+                                        std::string memory(implementation_report_display_html_xsl);
+                                        report = transformWithXsltMemory(report, memory);
+                                    }
+                                    break;
+                default:            ;
+            }
+
         Out << report;
     }
     else
