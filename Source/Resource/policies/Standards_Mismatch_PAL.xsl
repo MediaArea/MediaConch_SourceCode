@@ -21,8 +21,8 @@
                 <xsl:attribute name="value">720</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Width">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Width">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Width">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Width">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">720</xsl:with-param>
@@ -38,8 +38,8 @@
                 <xsl:attribute name="value">576</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Height">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Height">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Height">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Height">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">576</xsl:with-param>
@@ -55,8 +55,8 @@
                 <xsl:attribute name="value">25</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][1]/mi:FrameRate">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][1]/mi:FrameRate">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][*]/mi:FrameRate">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][*]/mi:FrameRate">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">25</xsl:with-param>
