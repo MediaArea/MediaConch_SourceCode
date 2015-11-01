@@ -29,11 +29,11 @@
 
 <ul>
 <li><a href="#type">Type</a></li>
-<li><a href="#field">Field</a> </li>
+<li><a href="#field">Field</a></li>
 <li><a href="#occurrence">Occurrence</a></li>
 <li><a href="#validator">Validator</a></li>
 <li><a href="#value">Value</a></li>
-<li><a href="#free-text-mode">Free Text Mode</a></li>
+<li><a name="free-text-mode">Free Text Mode</a></li>
 </ul>
 
 <h2>Display</h2>
@@ -50,29 +50,29 @@
 
 <p>In the "Checker" section, files may be checked for conformance using policies defined by the user. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. </p>
 
-<h3>Check local file</h3>
+<h3><a name="check-local-file">Check local file</a></h3>
 
 <p>“Check local file” allows a user to select a file or files from a local computer. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. Policies will be run when selecting the "Check files" button.</p>
 
 <p>Example: /Users/mycomputer/mediafiles/ffv1.mkv</p>
 
-<h3>Check online file</h3>
+<h3><a name="check-online-file">Check online file</a></h3>
 
 <p>“Check online file” allows a user to select a file using a URL path. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. Please note that this feature supports HTTP/HTTPS/FTP/FTPS application protocols. Policies will be run when selecting the "Check files" button.</p>
 
 <p>Example: <em>http://www.mywebsite.com/media/ffv1.mkv</em></p>
 
-<h3>Check local folder</h3>
+<h3><a name="check-local-folder">Check local folder</a></h3>
 
 <p>“Check local folder” allows a user to select a folder of files from a local computer or volume. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. Policies will be run when selecting the "Check files" button.</p>
 
 <p>Example: <em>/Users/mycomputer/mediafiles/</em> </p>
 
-<h3>Reporting</h3>
+<h3><a name="reporting">Reporting</a></h3>
 
 <p>Once a file or files are “checked,” several conformance checking reports are generated. These reports are made viewable by clicking on the “eye” icon next to each report, where, in ”View Mode,” a report is overlaid onto the GUI for review. </p>
 
-<h3>Policy Report</h3>
+<h3><a name="policy-report">Policy Report</a></h3>
 
 <p>A policy report will declare whether a particular file is either wholly VALID or NOT VALID according to the prescribed policy tests. A file will only be considered VALID if all rules and asserts are found to be true. When declared NON VALID, a text-based Policy Report (FileName_PolicyReport.txt) will list all failed rules and asserts. </p>
 
@@ -84,21 +84,21 @@
 
 <p>In this example, the stated policy rule (General FileExtension must be mkv) proved not to be true, causing a failed test outcome (in this case the file extension was .avi). </p>
 
-<h3>Implementation Report</h3>
+<h3><a name="implementation-report">Implementation Report</a></h3>
 
 <p>An implementation report will declare whether a particular file is either VALID or NOT VALID according to specifications of Matroska, FFV1, and LPCM. Currently, a text-based Implementation Report (FileName_ConformanceReport.txt) will list a general readout of container and video streams, including whether a required field has either passed or failed specification.</p>
 
-<h3>MediaInfo Report</h3>
+<h3><a name="mediainfo-report">MediaInfo Report</a></h3>
 
 <p>In View Mode, a user may navigate through an interactive jstree-grid of a file's MediaInfo general report. This report may be exported in a well-formed XML format. </p>
 
-<h3>MediaTrace Report</h3>
+<h3><a name="mediatrace-report">MediaTrace Report</a></h3>
 
 <p>In View Mode, a user may navigate through an interactive jstree-grid of a file's more verbose MediaTrace report. Like MediaInfo's general report, this report may be exported in a well-formed XML format.  </p>
 
 <p>User Note: When opening MediaTrace in View Mode, offsets will be addressed in hexadecimal, or “hex” notation. This differs from the MediaTrace XML output, which addresses offset in decimal notation. </p>
 
-<h3>Exporting Reports</h3>
+<h3><a name="exporting-reports">Exporting Reports</a></h3>
 
 <p>Reports can be downloaded by either clicking on the down arrow (↓) found directly to the right of each report, or by clicking on the “Download” button located at the bottom right of each report in View Mode. </p>
 
@@ -119,25 +119,25 @@
 <li>Value: 29.970</li>
 </ul>
 
-<h3>Type</h3>
+<h3><a name="type">Type</a></h3>
 
 <p>Allows a user to select from a list of available metadata stream types. These streams include General, Video, Audio, Image, Text, Menu, or Other. </p>
 
 <p>Example: <em>General</em></p>
 
-<h3>Field</h3>
+<h3><a name="field">Field</a></h3>
 
 <p>Allows a user to select from a list of associated fields. Fields vary according to what type of metadata stream is selected. </p>
 
 <p>Example: <em>General/UniqueID</em></p>
 
-<h3>Occurrence</h3>
+<h3><a name="occurrence">Occurrence</a></h3>
 
 <p>Allows a user to select whether a rule or assert occurs more than once in reportage. </p>
 
 <p>Example: <em>Occurrence:1</em></p>
 
-<h3>Validator</h3>
+<h3><a name="validator">Validator</a></h3>
 
 <p>Validators for MediaConch include <em>is_equal</em>; <em>is_not_equal</em>; <em>is_greater than</em>; <em>is_less_than</em>; <em>is_greater_or_equal_than</em>; <em>is_less_or_equal_than</em>; <em>exists</em>; <em>does_not_exist</em>; <em>contains_string</em>.</p>
 
@@ -177,13 +177,13 @@ Example: <em>Video/FrameRate is_less_or_equal_than 29.970</em></p>
 
 <p>Example: <em>General/CompleteName contains_string ffv1</em></p>
 
-<h3>Value</h3>
+<h3><a name="value">Value</a></h3>
 
 <p>Allows a user may select a desired value . </p>
 
 <p>User note: When creating a value, do not include any associated strings (e.g., "pixels"). </p>
 
-<h3>Free Text mode</h3>
+<h3><a name="free-text-mode">Free Text mode</a></h3>
 
 <p>In addition to the Editor, policies may also be edited in Free Text mode. Free Text uses the XML Path Language, or XPath. An example of a MediaConch XPath expression in Free Text mode includes the following:</p>
 
@@ -193,15 +193,15 @@ Example: <em>Video/FrameRate is_less_or_equal_than 29.970</em></p>
 
 <p>The display section will allow a user to apply an XSL to any conformance output XMLs for HTML presentation. </p>
 
-<h3>Import display set</h3>
+<h3><a name="import-display-set">Import display set</a></h3>
 
 <p>Allows a user to import a display file to the display set. </p>
 
-<h3>Export display set</h3>
+<h3><a name="export-display-set">Export display set</a></h3>
 
 <p>Allows a user to export a display file to the display set. </p>
 
-<h3>Delete selected display file</h3>
+<h3><a name="delete-selected-display-file">Delete selected display file</a></h3>
 
 <p>Allows a user to delete a display file from the display set. </p>
 
