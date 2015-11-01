@@ -747,6 +747,21 @@ void XsltPolicy::write_operator_test_tracktypeorder(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
+void XsltPolicy::write_operator_test_trackid(xmlNodePtr node)
+{
+    std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
+
+    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"../mi:ID"));
+    xmlNodePtr ifElement = write_operator_new_node(node, (const xmlChar *)"if", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"trackid"));
+    xmlNodePtr attr = write_operator_new_node(ifElement, (const xmlChar *)"attribute", prop);
+
+    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"../mi:ID"));
+    write_operator_new_node(attr, (const xmlChar *)"value-of", prop);
+}
+
+//---------------------------------------------------------------------------
 void XsltPolicy::write_operator_test_type(xmlNodePtr node)
 {
     std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
@@ -777,6 +792,7 @@ void XsltPolicy::write_operator_is_true(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_choose(test, (const xmlChar*)"$xpath", (const xmlChar*)"pass",
                           (const xmlChar*)"fail", (const xmlChar*)"is not true");
 }
@@ -800,6 +816,7 @@ void XsltPolicy::write_operator_is_equal(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath = $value", (const xmlChar*)"pass",
@@ -825,6 +842,7 @@ void XsltPolicy::write_operator_is_not_equal(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath != $value", (const xmlChar*)"pass",
@@ -850,6 +868,7 @@ void XsltPolicy::write_operator_is_greater_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath > $value", (const xmlChar*)"pass",
@@ -875,6 +894,7 @@ void XsltPolicy::write_operator_is_less_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath < $value", (const xmlChar*)"pass",
@@ -900,6 +920,7 @@ void XsltPolicy::write_operator_is_greater_or_equal_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath >= $value", (const xmlChar*)"pass",
@@ -925,6 +946,7 @@ void XsltPolicy::write_operator_is_less_or_equal_than(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"$xpath <= $value", (const xmlChar*)"pass",
@@ -947,6 +969,7 @@ void XsltPolicy::write_operator_exists(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"string-length($xpath) != 0", (const xmlChar*)"pass",
@@ -969,6 +992,7 @@ void XsltPolicy::write_operator_does_not_exist(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"string-length($xpath) = '0'", (const xmlChar*)"pass",
@@ -994,6 +1018,7 @@ void XsltPolicy::write_operator_contains_string(xmlNodePtr node)
 
     write_operator_test_type(test);
     write_operator_test_tracktypeorder(test);
+    write_operator_test_trackid(test);
     write_operator_actual(test);
 
     write_operator_choose(test, (const xmlChar*)"contains($xpath, $value)", (const xmlChar*)"pass",

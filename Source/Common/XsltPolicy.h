@@ -155,6 +155,7 @@ private:
     void       write_operator_contains_string(xmlNodePtr node);
     void       write_operator_test_type(xmlNodePtr node);
     void       write_operator_test_tracktypeorder(xmlNodePtr node);
+    void       write_operator_test_trackid(xmlNodePtr node);
     void       write_operator_actual(xmlNodePtr node);
     void       write_operator_choose(xmlNodePtr node, const xmlChar* test,
                                      const xmlChar* pass,
