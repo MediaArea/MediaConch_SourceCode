@@ -2,9 +2,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" extension-element-prefixes="xsi">
     <xsl:output encoding="UTF-8" method="text" version="1.0" indent="yes"/>
     <xsl:template match="/mc:MediaConch/mc:policyChecks">
-        <xsl:text>*********************&#xa;</xsl:text>
-        <xsl:text>* MediaConch report *&#xa;</xsl:text>
-        <xsl:text>*********************&#xa;</xsl:text>
+        <xsl:text>***********************&#xa;</xsl:text>
+        <xsl:text>* 🐚 MediaConch report *&#xa;</xsl:text>
+        <xsl:text>***********************&#xa;</xsl:text>
 		<xsl:if test="mc:name != '' or mc:description != ''">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:if test="mc:name != ''">
@@ -22,7 +22,7 @@
             <xsl:value-of select="@ref"/>
 			<xsl:text>&#xa;</xsl:text>
             <xsl:for-each select="mc:check">
-				<xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
+				<xsl:text> 🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚 &#xa;</xsl:text>
                 <xsl:value-of select="@name"/>
 				<xsl:text>&#xa;</xsl:text>
 				<xsl:if test="mc:context/@field != ''">
@@ -73,9 +73,9 @@
         </xsl:for-each>
     </xsl:template>
     <xsl:template match="/mc:MediaConch/mc:implementationChecks">
-        <xsl:text>*********************&#xa;</xsl:text>
-        <xsl:text>* MediaConch report *&#xa;</xsl:text>
-        <xsl:text>*********************&#xa;</xsl:text>
+        <xsl:text>***********************&#xa;</xsl:text>
+        <xsl:text>* 🐚 MediaConch report *&#xa;</xsl:text>
+        <xsl:text>***********************&#xa;</xsl:text>
 		<xsl:if test="mc:name != '' or mc:description != ''">
 			<xsl:text>&#xa;</xsl:text>
 			<xsl:if test="mc:name != ''">
@@ -93,7 +93,7 @@
             <xsl:value-of select="@ref"/>
 			<xsl:text>&#xa;</xsl:text>
             <xsl:for-each select="mc:check">
-				<xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
+				<xsl:text> 🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚 &#xa;</xsl:text>
                 <xsl:value-of select="@icid"/><xsl:text>&#xa;</xsl:text>
 				<xsl:if test="mc:context/@name != ''">
 					<xsl:text>Context (name): </xsl:text>
