@@ -8,6 +8,20 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 15.10, 2015-11-02
+-------------
+Implementation checker with some EBML tests
+New set of default Policy reports
+About box and Help documentation added
+More coherent list of options
+MediaTrace UI changed, with a grid (offset on the left, value on the right)
+MediaInfo report UI
+MediaInfo XML export
+Policy XSL editor updated
+Display XSL import / export
+Text/HTML/XSL display examples
+Several bug fixes
+
 Version 15.09, 2015-10-02
 -------------
 Design of the report is changed (similar to MediaConchOnline)

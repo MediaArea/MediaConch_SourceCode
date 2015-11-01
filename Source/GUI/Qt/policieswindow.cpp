@@ -284,6 +284,7 @@ void PoliciesWindow::delete_all_policies()
 //---------------------------------------------------------------------------
 void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
 {
+    disconnectPoliciesTreeSelectionChanged();
     removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
     parent->takeChild(row);
@@ -293,6 +294,8 @@ void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
         if (item && item->isSelected())
             item->setSelected(false);
     }
+    connectPoliciesTreeSelectionChanged();
+    parent->setSelected(false);
     parent->setSelected(true);
 }
 
@@ -416,8 +419,7 @@ void PoliciesWindow::displayPoliciesTree()
     updatePoliciesTree();
     if (policies->childCount())
         policies->setExpanded(true);
-    QObject::connect(policiesTree->get_policies_tree(), SIGNAL(itemSelectionChanged()),
-                     this, SLOT(policiesTree_selectionChanged()));
+    connectPoliciesTreeSelectionChanged();
 }
 
 //---------------------------------------------------------------------------
@@ -605,6 +607,26 @@ QTreeWidgetItem *PoliciesWindow::get_item_in_tree()
         return NULL;
 
     return list.first();
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::connectPoliciesTreeSelectionChanged()
+{
+    if (!policiesTree)
+        return;
+
+    QObject::connect(policiesTree->get_policies_tree(), SIGNAL(itemSelectionChanged()),
+                     this, SLOT(policiesTree_selectionChanged()));
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::disconnectPoliciesTreeSelectionChanged()
+{
+    if (!policiesTree)
+        return;
+
+    QObject::disconnect(policiesTree->get_policies_tree(), SIGNAL(itemSelectionChanged()),
+                     this, SLOT(policiesTree_selectionChanged()));
 }
 
 }

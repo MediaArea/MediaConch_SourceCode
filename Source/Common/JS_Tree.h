@@ -56,14 +56,12 @@ private:
 
     String       error;
 
-    void         find_block_node(xmlNodePtr node, bool& sep, String& json);
-    void         find_data_node(xmlNodePtr node, bool& sep, String& json);
+    void         find_trace_media_node(xmlNodePtr node, bool& sep, String& json);
     void         find_trace_block_node(xmlNodePtr node, bool& sep, String& json);
     void         find_trace_data_node(xmlNodePtr node, bool& sep, String& json);
     bool         has_block_data(xmlNodePtr child);
     void         find_inform_data_node(xmlNodePtr node, bool& sep, String& json);
-    void         find_inform_media(xmlNodePtr node, bool& sep, String& json);
-    void         find_inform_mediainfo(xmlNodePtr node, bool& sep, String& json);
+    void         find_inform_media_node(xmlNodePtr node, bool& sep, String& json);
     void         find_inform_track_type(xmlNodePtr node, bool& sep, String& json);
 
     void         interpret_trace_data_in_block(xmlNodePtr block, String& json);

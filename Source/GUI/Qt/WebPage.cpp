@@ -159,7 +159,8 @@ namespace MediaConch
         QTextStream out(&file);
         if (dl_file.endsWith(".html"))
         {
-            out << "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">";
+            out << "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
+            out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n";
             out << report.toInnerXml();
         }
         else

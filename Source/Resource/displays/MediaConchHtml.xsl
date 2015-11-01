@@ -5,7 +5,7 @@
         <h1><xsl:value-of select="mc:name"/></h1>
         <p><xsl:value-of select="mc:description"/></p>
         <xsl:for-each select="mc:media">
-			<hr/>
+			<xsl:text> 🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚 </xsl:text>
             <b><xsl:value-of select="@ref"/></b><p/>
 			<table style="border: none;border-collapse:separate;border-spacing:0px 1em">
             <xsl:for-each select="mc:check">
@@ -50,6 +50,10 @@
 										<xsl:value-of select="@actual"/>
 									</td>
 									<td>
+										<xsl:if test="@outcome = 'pass'"><xsl:text>✅  </xsl:text>
+										</xsl:if>
+										<xsl:if test="@outcome = 'fail'"><xsl:text>❌  </xsl:text>
+										</xsl:if>
 										<xsl:value-of select="@outcome"/>
 									</td>
 									<td>
@@ -68,7 +72,7 @@
         <h1><xsl:value-of select="mc:name"/></h1>
         <p><xsl:value-of select="mc:description"/></p>
         <xsl:for-each select="mc:media">
-			<hr/>
+			<xsl:text> 🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚  🐚 </xsl:text>
             <b><xsl:value-of select="@ref"/></b><p/>
 			<table style="border: none;border-collapse:separate;border-spacing:0px 1em">
             <xsl:for-each select="mc:check">
@@ -102,6 +106,10 @@
 										</xsl:for-each>
 									</td>
 									<td>
+										<xsl:if test="@outcome = 'pass'"><xsl:text>✅  </xsl:text>
+										</xsl:if>
+										<xsl:if test="@outcome = 'fail'"><xsl:text>❌  </xsl:text>
+										</xsl:if>
 										<xsl:value-of select="@outcome"/>
 									</td>
 									<td>

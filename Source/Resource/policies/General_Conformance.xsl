@@ -20,8 +20,8 @@
                 <xsl:attribute name="field">UniqueID</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][1]/mi:UniqueID">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][1]/mi:UniqueID">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][*]/mi:UniqueID">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][*]/mi:UniqueID">
                     <xsl:call-template name="exists">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="field">UniqueID</xsl:with-param>
@@ -40,8 +40,8 @@
                 <xsl:attribute name="value">Matroska</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][1]/mi:Format">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][1]/mi:Format">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][*]/mi:Format">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][*]/mi:Format">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">Matroska</xsl:with-param>
@@ -57,8 +57,8 @@
                 <xsl:attribute name="value">25.000</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][1]/mi:FrameRate">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][1]/mi:FrameRate">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='General'][*]/mi:FrameRate">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='General'][*]/mi:FrameRate">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">25.000</xsl:with-param>
@@ -74,8 +74,8 @@
                 <xsl:attribute name="value">FFV1</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Format">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Format">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Format">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:Format">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">FFV1</xsl:with-param>
@@ -91,8 +91,8 @@
                 <xsl:attribute name="value">1.333</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][1]/mi:DisplayAspectRatio">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][1]/mi:DisplayAspectRatio">
+                <xsl:when test="mi:MediaInfo/mi:track[@type='Video'][*]/mi:DisplayAspectRatio">
+                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Video'][*]/mi:DisplayAspectRatio">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">1.333</xsl:with-param>
@@ -114,9 +114,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -144,9 +144,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -177,9 +177,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -210,9 +210,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -243,9 +243,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -276,9 +276,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -309,9 +309,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -341,9 +341,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -373,9 +373,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">
@@ -406,9 +406,9 @@
           <xsl:value-of select="../@type"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="../@tracktypeorder">
+      <xsl:if test="../@typeorder">
         <xsl:attribute name="tracktypeorder">
-          <xsl:value-of select="../@tracktypeorder"/>
+          <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="../mi:ID">

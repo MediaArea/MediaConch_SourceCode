@@ -342,6 +342,8 @@ void SchematronWindow::delete_gor()
     if (rowPolicy < 0 || row < 0)
         return;
 
+    policieswindow->disconnectPoliciesTreeSelectionChanged();
+
     // Internal data
     Policy *p = mainwindow->get_policies().policies[rowPolicy];
     p->saved = false;
@@ -361,6 +363,8 @@ void SchematronWindow::delete_gor()
         if (item && item->isSelected())
             item->setSelected(false);
     }
+    policieswindow->connectPoliciesTreeSelectionChanged();
+    parent->setSelected(false);
     parent->setSelected(true);
 }
 
@@ -376,6 +380,8 @@ void SchematronWindow::delete_rule()
     int row = policieswindow->get_index_in_tree();
     if (rowPolicy < 0 || rowGor < 0 || row < 0)
         return;
+
+    policieswindow->disconnectPoliciesTreeSelectionChanged();
 
     // Internal data
     mainwindow->get_policies().policies[rowPolicy]->saved = false;
@@ -396,6 +402,9 @@ void SchematronWindow::delete_rule()
         if (item && item->isSelected())
             item->setSelected(false);
     }
+
+    policieswindow->connectPoliciesTreeSelectionChanged();
+    parent->setSelected(false);
     parent->setSelected(true);
 }
 
@@ -413,6 +422,8 @@ void SchematronWindow::delete_assert()
     if (rowPolicy < 0 || rowGor < 0 || rowRule < 0 || row < 0)
         return;
 
+    policieswindow->disconnectPoliciesTreeSelectionChanged();
+
     // Internal data
     mainwindow->get_policies().policies[rowPolicy]->saved = false;
     SchematronRule *r = ((SchematronPolicy*)mainwindow->get_policies().policies[rowPolicy])->patterns[rowGor]->rules[rowRule];
@@ -429,6 +440,8 @@ void SchematronWindow::delete_assert()
         if (item && item->isSelected())
             item->setSelected(false);
     }
+    policieswindow->connectPoliciesTreeSelectionChanged();
+    parent->setSelected(false);
     parent->setSelected(true);
 }
 

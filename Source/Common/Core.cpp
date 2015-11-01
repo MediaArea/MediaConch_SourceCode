@@ -17,7 +17,11 @@
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
 #include "Common/ImplementationReportXsl.h"
-#include "Common/ImplementationReportDisplayXsl.h"
+#if defined(_WIN32) || defined(WIN32)
+#include "Common/ImplementationReportDisplayTextXsl.h"
+#else //defined(_WIN32) || defined(WIN32)
+#include "Common/ImplementationReportDisplayTextUnicodeXsl.h"
+#endif //defined(_WIN32) || defined(WIN32)
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
@@ -109,6 +113,9 @@ void Core::Close ()
 //---------------------------------------------------------------------------
 void Core::Run (String file)
 {
+    // Currently avoiding to have a big trace
+    MI->Option(__T("ParseSpeed"), __T("0"));
+    
     // Configuration of the parsing
     if (Report[report_MediaConch] || Report[report_MediaTrace])
         MI->Option(__T("Details"), __T("1"));
@@ -274,7 +281,7 @@ String Core::GetOutput_JStree ()
     if (Report[report_MediaInfo])
     {
         MI->Option(__T("Details"), __T("0"));
-        MI->Option(__T("Inform"), __T("MAXML"));
+        MI->Option(__T("Inform"), __T("MIXML"));
 
         const String& ret = MI->Inform();
         return js.format_from_inform_XML(ret);
@@ -323,7 +330,11 @@ String Core::GetOutput_Text_Implementation ()
     validateXsltPolicyFromMemory(memory, valid, report);
 
     // Apply an XSLT to have Text
-    memory = std::string(implementation_report_display_xsl);
+#if defined(_WIN32) || defined(WIN32)
+    memory = std::string(implementation_report_display_text_xsl);
+#else //defined(_WIN32) || defined(WIN32)
+    memory = std::string(implementation_report_display_textunicode_xsl);
+#endif //defined(_WIN32) || defined(WIN32)
     report = transformWithXsltMemory(report, memory);
     return report;
 }
@@ -437,6 +448,30 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
         valid = validation(S, report);
         if (xsltDisplay.length())
             report = Core::transformWithXsltFile(report, xsltDisplay);
+        else 
+            switch (Format)
+            {
+                case format_Text:
+                                    {
+                                        // Apply an XSLT to have Text
+                                    #if defined(_WIN32) || defined(WIN32)
+                                        std::string memory(implementation_report_display_text_xsl);
+                                    #else //defined(_WIN32) || defined(WIN32)
+                                        std::string memory(implementation_report_display_textunicode_xsl);
+                                    #endif //defined(_WIN32) || defined(WIN32)
+                                        report = transformWithXsltMemory(report, memory);
+                                    }
+                                    break;
+                case format_Html:
+                                    {
+                                        // Apply an XSLT to have Text
+                                        std::string memory(implementation_report_display_html_xsl);
+                                        report = transformWithXsltMemory(report, memory);
+                                    }
+                                    break;
+                default:            ;
+            }
+
         Out << report;
     }
     else

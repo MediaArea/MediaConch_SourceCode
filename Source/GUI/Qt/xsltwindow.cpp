@@ -215,6 +215,7 @@ void XsltWindow::delete_rule()
     if (rowPolicy < 0 || row < 0)
         return;
 
+    policieswindow->disconnectPoliciesTreeSelectionChanged();
     // Internal data
     XsltPolicy* p = (XsltPolicy*)mainwindow->get_policies().policies[rowPolicy];
     p->rules.erase(p->rules.begin() + row);
@@ -230,6 +231,8 @@ void XsltWindow::delete_rule()
         if (item && item->isSelected())
             item->setSelected(false);
     }
+    policieswindow->connectPoliciesTreeSelectionChanged();
+    parent->setSelected(false);
     parent->setSelected(true);
 }
 

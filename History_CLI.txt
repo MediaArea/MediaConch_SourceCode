@@ -8,6 +8,15 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 15.10, 2015-11-02
+-------------
+Implementation checker with some EBML tests
+Help updated and split (standard / advanced)
+More output combinations (e.g. implementation checker with Text, HTML, or XML output)
+MediaInfo XML export
+Text/HTML/XSL output support
+Several bug fixes
+
 Version 15.09, 2015-10-02
 -------------
 Support of XSLT policies
