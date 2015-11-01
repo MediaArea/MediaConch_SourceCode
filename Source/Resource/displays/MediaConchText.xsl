@@ -41,9 +41,9 @@
 						<xsl:value-of select="@tracktype"/>
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
-					<xsl:if test="@typeorder">
+					<xsl:if test="@tracktypeorder">
 						<xsl:text>Track Type Order: </xsl:text>
-						<xsl:value-of select="@typeorder"/>
+						<xsl:value-of select="@tracktypeorder"/>
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
 					<xsl:if test="@trackid">

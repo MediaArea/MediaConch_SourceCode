@@ -736,13 +736,13 @@ void XsltPolicy::write_operator_test_streamid(xmlNodePtr node)
 {
     std::vector<std::pair<const xmlChar*, const xmlChar*> > prop;
 
-    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"../@streamid"));
+    prop.push_back(std::make_pair((const xmlChar *)"test", (const xmlChar *)"../@typeorder"));
     xmlNodePtr ifElement = write_operator_new_node(node, (const xmlChar *)"if", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"streamid"));
+    prop.push_back(std::make_pair((const xmlChar *)"name", (const xmlChar *)"tracktypeorder"));
     xmlNodePtr attr = write_operator_new_node(ifElement, (const xmlChar *)"attribute", prop);
 
-    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"../@streamid"));
+    prop.push_back(std::make_pair((const xmlChar *)"select", (const xmlChar *)"../@typeorder"));
     write_operator_new_node(attr, (const xmlChar *)"value-of", prop);
 }
 
