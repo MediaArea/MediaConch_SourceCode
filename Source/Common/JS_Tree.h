@@ -56,8 +56,6 @@ private:
 
     String       error;
 
-    void         find_block_node(xmlNodePtr node, bool& sep, String& json);
-    void         find_data_node(xmlNodePtr node, bool& sep, String& json);
     void         find_trace_media_node(xmlNodePtr node, bool& sep, String& json);
     void         find_trace_block_node(xmlNodePtr node, bool& sep, String& json);
     void         find_trace_data_node(xmlNodePtr node, bool& sep, String& json);
