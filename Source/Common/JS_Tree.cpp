@@ -48,7 +48,7 @@ String JsTree::format_from_trace_XML(const String& xml)
     bool new_sep = false;
     while (child)
     {
-        find_trace_block_node(child, new_sep, json);
+        find_trace_media_node(child, new_sep, json);
         child = child->next;
     }
 
@@ -56,6 +56,23 @@ String JsTree::format_from_trace_XML(const String& xml)
 
     xmlFreeDoc(doc);
     return json;
+}
+
+//---------------------------------------------------------------------------
+void JsTree::find_trace_media_node(xmlNodePtr node, bool& sep, String& json)
+{
+    std::string name("media");
+
+    if (!node || node->type != XML_ELEMENT_NODE || !node->name ||
+        name.compare((const char*)node->name))
+        return;
+
+    xmlNodePtr child = node->children;
+    while (child)
+    {
+        find_trace_block_node(child, sep, json);
+        child = child->next;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -167,7 +184,7 @@ String JsTree::format_from_inform_XML(const String& xml)
     bool new_sep = false;
     while (child)
     {
-        find_inform_media(child, new_sep, json);
+        find_inform_media_node(child, new_sep, json);
         child = child->next;
     }
 
@@ -271,24 +288,7 @@ void JsTree::find_inform_track_type(xmlNodePtr node, bool& sep, String& json)
 }
 
 //---------------------------------------------------------------------------
-void JsTree::find_inform_mediainfo(xmlNodePtr node, bool& sep, String& json)
-{
-    std::string name("MediaInfo");
-
-    if (!node || node->type != XML_ELEMENT_NODE || !node->name ||
-        name.compare((const char*)node->name))
-        return;
-
-    xmlNodePtr child = node->children;
-    while (child)
-    {
-        find_inform_track_type(child, sep, json);
-        child = child->next;
-    }
-}
-
-//---------------------------------------------------------------------------
-void JsTree::find_inform_media(xmlNodePtr node, bool& sep, String& json)
+void JsTree::find_inform_media_node(xmlNodePtr node, bool& sep, String& json)
 {
     std::string name("media");
 
@@ -317,7 +317,7 @@ void JsTree::find_inform_media(xmlNodePtr node, bool& sep, String& json)
         bool new_sep = false;
         while (child)
         {
-            find_inform_mediainfo(child, new_sep, json);
+            find_inform_track_type(child, new_sep, json);
             child = child->next;
         }
         json += __T("]");

@@ -277,7 +277,7 @@ String Core::GetOutput_JStree ()
     if (Report[report_MediaInfo])
     {
         MI->Option(__T("Details"), __T("0"));
-        MI->Option(__T("Inform"), __T("MAXML"));
+        MI->Option(__T("Inform"), __T("MIXML"));
 
         const String& ret = MI->Inform();
         return js.format_from_inform_XML(ret);
