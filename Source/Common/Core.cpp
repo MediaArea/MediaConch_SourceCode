@@ -109,6 +109,9 @@ void Core::Close ()
 //---------------------------------------------------------------------------
 void Core::Run (String file)
 {
+    // Currently avoiding to have a big trace
+    MI->Option(__T("ParseSpeed"), __T("0"));
+    
     // Configuration of the parsing
     if (Report[report_MediaConch] || Report[report_MediaTrace])
         MI->Option(__T("Details"), __T("1"));
