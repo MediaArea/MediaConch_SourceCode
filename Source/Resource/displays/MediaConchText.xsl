@@ -22,9 +22,6 @@
           <xsl:value-of select="@ref"/>
           <xsl:text>&#xa;</xsl:text>
           <xsl:for-each select="mc:implementationChecks">
-            <xsl:text>*********************&#xa;</xsl:text>
-            <xsl:text>* MediaConch report *&#xa;</xsl:text>
-            <xsl:text>*********************&#xa;</xsl:text>
             <xsl:if test="mc:name != '' or mc:description != ''">
               <xsl:text>&#xa;</xsl:text>
               <xsl:if test="mc:name != ''">
