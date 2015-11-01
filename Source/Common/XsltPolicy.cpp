@@ -357,7 +357,7 @@ bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& t)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_policy_node(xmlNodePtr node)
+bool XsltPolicy::find_check_node(xmlNodePtr node)
 {
     std::string def("check");
     if (!node->name || def.compare((const char*)node->name))
@@ -421,7 +421,7 @@ bool XsltPolicy::find_policychecks_node(xmlNodePtr node)
     {
         if (!find_policychecks_name_node(child))
             if (!find_policychecks_description_node(child))
-                find_policy_node(child);
+                find_check_node(child);
         child = child->next;
     }
     return true;
@@ -1043,7 +1043,7 @@ void XsltPolicy::write_operators(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_call_template_field_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_call_template_field_child(xmlNodePtr node, XsltRule *rule)
 {
     if (rule->use_free_text || !rule->field.length() ||
         (rule->ope != "is_greater_than" && rule->ope != "is_less_than" &&
@@ -1060,7 +1060,7 @@ void XsltPolicy::write_policy_call_template_field_child(xmlNodePtr node, XsltRul
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_call_template_value_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_call_template_value_child(xmlNodePtr node, XsltRule *rule)
 {
     if (rule->use_free_text || !rule->value.length())
         return;
@@ -1074,7 +1074,7 @@ void XsltPolicy::write_policy_call_template_value_child(xmlNodePtr node, XsltRul
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_call_template_xpath_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_call_template_xpath_child(xmlNodePtr node, XsltRule *rule)
 {
     if (rule->use_free_text && !rule->text.length())
         return;
@@ -1092,7 +1092,7 @@ void XsltPolicy::write_policy_call_template_xpath_child(xmlNodePtr node, XsltRul
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_call_template_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_call_template_child(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"call-template");
     child->ns = create_namespace_xsl(NULL);
@@ -1106,13 +1106,13 @@ void XsltPolicy::write_policy_call_template_child(xmlNodePtr node, XsltRule *rul
         operat = "is_true";
 
     xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)operat);
-    write_policy_call_template_xpath_child(child, rule);
-    write_policy_call_template_value_child(child, rule);
-    write_policy_call_template_field_child(child, rule);
+    write_check_call_template_xpath_child(child, rule);
+    write_check_call_template_value_child(child, rule);
+    write_check_call_template_field_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_for_each_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_for_each_child(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"for-each");
     child->ns = node->ns;
@@ -1121,11 +1121,11 @@ void XsltPolicy::write_policy_for_each_child(xmlNodePtr node, XsltRule *rule)
     std::string select;
     create_test_from_rule(rule, select);
     xmlNewProp(child, (const xmlChar *)"select", (const xmlChar *)select.c_str());
-    write_policy_call_template_child(child, rule);
+    write_check_call_template_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_when_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_when_child(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"when");
     child->ns = node->ns;
@@ -1134,11 +1134,11 @@ void XsltPolicy::write_policy_when_child(xmlNodePtr node, XsltRule *rule)
     std::string test;
     create_test_from_rule(rule, test);
     xmlNewProp(child, (const xmlChar *)"test", (const xmlChar *)test.c_str());
-    write_policy_for_each_child(child, rule);
+    write_check_for_each_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule *)
+void XsltPolicy::write_check_otherwise_outcome_child(xmlNodePtr node, XsltRule *)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"test");
     xmlAddChild(node, child);
@@ -1147,33 +1147,33 @@ void XsltPolicy::write_policy_otherwise_outcome_child(xmlNodePtr node, XsltRule 
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_otherwise_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_otherwise_child(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"otherwise");
     child->ns = node->ns;
     xmlAddChild(node, child);
 
-    write_policy_otherwise_outcome_child(child, rule);
+    write_check_otherwise_outcome_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_choose_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_choose_child(xmlNodePtr node, XsltRule *rule)
 {
     if (rule->use_free_text)
     {
-        write_policy_call_template_child(node, rule);
+        write_check_call_template_child(node, rule);
         return;
     }
 
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"choose");
     child->ns = create_namespace_xsl(NULL);
     xmlAddChild(node, child);
-    write_policy_when_child(child, rule);
-    write_policy_otherwise_child(child, rule);
+    write_check_when_child(child, rule);
+    write_check_otherwise_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_context_value_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_context_value_child(xmlNodePtr node, XsltRule *rule)
 {
     const char *value = NULL;
     if (!rule->use_free_text && rule->value.length())
@@ -1192,7 +1192,7 @@ void XsltPolicy::write_policy_context_value_child(xmlNodePtr node, XsltRule *rul
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_context_field_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_context_field_child(xmlNodePtr node, XsltRule *rule)
 {
     if (!rule->field.length())
         return;
@@ -1206,18 +1206,18 @@ void XsltPolicy::write_policy_context_field_child(xmlNodePtr node, XsltRule *rul
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_context_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_context_child(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"context");
     child->ns = node->ns;
     xmlAddChild(node, child);
     
-    write_policy_context_field_child(child, rule);
-    write_policy_context_value_child(child, rule);
+    write_check_context_field_child(child, rule);
+    write_check_context_value_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_title_child(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_name_child(xmlNodePtr node, XsltRule *rule)
 {
     if (!rule->title.length())
         return;
@@ -1231,14 +1231,14 @@ void XsltPolicy::write_policy_title_child(xmlNodePtr node, XsltRule *rule)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_policy_childs(xmlNodePtr node, XsltRule *rule)
+void XsltPolicy::write_check_childs(xmlNodePtr node, XsltRule *rule)
 {
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"check");
     xmlAddChild(node, child);
 
-    write_policy_title_child(child, rule);
-    write_policy_context_child(child, rule);
-    write_policy_choose_child(child, rule);
+    write_check_name_child(child, rule);
+    write_check_context_child(child, rule);
+    write_check_choose_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
@@ -1271,10 +1271,10 @@ void XsltPolicy::write_policychecks_childs(xmlNodePtr node)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"policyChecks");
 
     xmlAddChild(node, child);
-    write_policychecks_title_child(child);
+    write_policychecks_name_child(child);
     write_policychecks_description_child(child);
     for (size_t i = 0; i < rules.size(); ++i)
-        write_policy_childs(child, rules[i]);
+        write_check_childs(child, rules[i]);
 }
 
 //---------------------------------------------------------------------------
