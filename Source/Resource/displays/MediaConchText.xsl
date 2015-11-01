@@ -22,6 +22,9 @@
           <xsl:value-of select="@ref"/>
           <xsl:text>&#xa;</xsl:text>
           <xsl:for-each select="mc:implementationChecks">
+            <xsl:text>*********************&#xa;</xsl:text>
+            <xsl:text>* Implementation Checks *&#xa;</xsl:text>
+            <xsl:text>*********************&#xa;</xsl:text>
             <xsl:if test="mc:name != '' or mc:description != ''">
               <xsl:text>&#xa;</xsl:text>
               <xsl:if test="mc:name != ''">
@@ -63,6 +66,9 @@
             </xsl:for-each>
           </xsl:for-each>
           <xsl:for-each select="mc:policyChecks">
+            <xsl:text>*********************&#xa;</xsl:text>
+            <xsl:text>* Policy Checks *&#xa;</xsl:text>
+            <xsl:text>*********************&#xa;</xsl:text>
             <xsl:for-each select="mc:check">
               <xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
               <xsl:value-of select="@name"/>
