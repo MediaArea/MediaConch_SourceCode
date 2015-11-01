@@ -58,6 +58,8 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
     }
     if (r->type == "")
         r->type = ui->type->currentText().toStdString();
+    if (r->ope == "")
+        r->ope = ui->ope->currentText().toStdString();
 
     fill_editor_fields(r);
 
