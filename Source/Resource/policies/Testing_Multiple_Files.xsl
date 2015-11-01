@@ -6,7 +6,6 @@
       <xsl:attribute name="version">
         <xsl:text>0.1</xsl:text>
       </xsl:attribute>
-<<<<<<< HEAD
       <xsl:for-each select="ma:media">
         <media>
           <xsl:attribute name="ref">
@@ -15,15 +14,6 @@
           <policyChecks>
             <name>Testing Multiple Files</name>
             <description>This policy checks all the files for conformance. Test2_2.mkv and Test2_3.mkv fail because they have been manipulated, but they fail in different ways.</description>
-=======
-      <policyChecks>
-        <name>Testing Multiple Files</name>
-        <description>This policy check is provided by MediaConch as an example for testing multiple files, and should be used with the associated test files. In this test, Testing_Multiple_Files_1.mkv and Testing_Multiple_Files_2.mkv will prove to be valid, while Testing_Multiple_Files_3.mkv will prove to be not valid, as it contains a YUV colorspace instead of the required "RGB".</description>
-        <xsl:for-each select="ma:media">
-          <media>
-            <xsl:attribute name="ref">
-              <xsl:value-of select="./@ref"/>
-            </xsl:attribute>
             <check>
               <xsl:attribute name="name">General Format must be Matroska</xsl:attribute>
               <context>
@@ -75,7 +65,6 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-<<<<<<< HEAD
             <check>
               <xsl:attribute name="name">Video DisplayAspectRatio must be 1.</xsl:attribute>
               <context>
@@ -93,10 +82,6 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-          </policyChecks>
-        </media>
-      </xsl:for-each>
-=======
           </media>
         </xsl:for-each>
       </policyChecks>
