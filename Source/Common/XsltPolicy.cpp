@@ -644,21 +644,23 @@ bool XsltPolicy::parse_test_for_rule(const std::string& test, XsltRule *rule)
     // occurrence
     pos = end;
     find = "[";
-    if ((pos = ss.find(find, end)) != end)
-        return false;
+    if ((pos = ss.find(find, end)) == end)
+    {
+        pos += find.length();
+        find = "]";
+        if ((end = ss.find("]", pos)) == std::string::npos)
+            return false;
 
-    pos += find.length();
-    find = "]";
-    if ((end = ss.find("]", pos)) == std::string::npos)
-        return false;
-
-    std::string occurrence = ss.substr(pos, end - pos);
-    if (occurrence == "*")
-        rule->occurrence = -1;
+        std::string occurrence = ss.substr(pos, end - pos);
+        if (occurrence == "*")
+            rule->occurrence = -1;
+        else
+            rule->occurrence = atoi(occurrence.c_str());
+        end += find.length();
+    }
     else
-        rule->occurrence = atoi(occurrence.c_str());
+        rule->occurrence = -1;
 
-    end += find.length();
     if (end == ss.length())
         return true;
 
