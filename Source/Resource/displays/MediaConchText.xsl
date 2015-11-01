@@ -57,10 +57,6 @@
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>
 					<xsl:text>Outcome: </xsl:text>
-					<xsl:if test="@outcome = 'pass'"><xsl:text>✅  </xsl:text>
-					</xsl:if>
-					<xsl:if test="@outcome = 'fail'"><xsl:text>❌  </xsl:text>
-					</xsl:if>
 					<xsl:value-of select="@outcome"/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:if test="@reason != ''">
@@ -110,10 +106,6 @@
 						<xsl:text>, </xsl:text>
 					</xsl:for-each>
 					<xsl:text>Outcome: </xsl:text>
-					<xsl:if test="@outcome = 'pass'"><xsl:text>✅  </xsl:text>
-					</xsl:if>
-					<xsl:if test="@outcome = 'fail'"><xsl:text>❌  </xsl:text>
-					</xsl:if>
 					<xsl:value-of select="@outcome"/>
 					<xsl:text>&#xa;</xsl:text>
 					<xsl:if test="@reason != ''">
