@@ -179,11 +179,27 @@ void DisplayWindow::export_file()
     if (!itemDir)
         return;
 
-    QString file = QFileDialog::getSaveFileName(mainwindow, tr("Save display file"), itemDir->text(), tr("Display file (*.xsl)"));
+    QString save_file = itemDir->text();
+    if (save_file == "MediaConch example")
+    {
+        QTableWidgetItem* itemFile = table->item(list.first().row(), 0);
+        std::vector<QString>& vec = mainwindow->get_displays();
+        for (size_t i = 0; i < vec.size(); ++i)
+        {
+            QFileInfo info(vec[i]);
+            if (info.baseName() == itemFile->text())
+            {
+                save_file = vec[i];
+                break;
+            }
+        }
+    }
+
+    QString file = QFileDialog::getSaveFileName(mainwindow, tr("Save display file"), save_file, tr("Display file (*.xsl)"));
     if (!file.length())
         return;
 
-    QFile f(itemDir->text());
+    QFile f(save_file);
     f.copy(file);
 }
 
