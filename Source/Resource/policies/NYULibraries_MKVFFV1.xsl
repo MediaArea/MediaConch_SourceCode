@@ -290,6 +290,11 @@
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
+      </xsl:if>
       <xsl:choose>
         <xsl:when test="$xpath">
           <xsl:attribute name="outcome">pass</xsl:attribute>
@@ -314,6 +319,11 @@
         <xsl:attribute name="typeorder">
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
       </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
@@ -343,6 +353,11 @@
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
+      </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -370,6 +385,11 @@
         <xsl:attribute name="typeorder">
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
       </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
@@ -399,6 +419,11 @@
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
+      </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -426,6 +451,11 @@
         <xsl:attribute name="typeorder">
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
       </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
@@ -455,6 +485,11 @@
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
+      </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -481,6 +516,11 @@
         <xsl:attribute name="typeorder">
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
       </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
@@ -509,6 +549,11 @@
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
+      </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
       </xsl:attribute>
@@ -536,6 +581,11 @@
         <xsl:attribute name="typeorder">
           <xsl:value-of select="../@typeorder"/>
         </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="../mi:ID">
+          <xsl:attribute name="ID">
+              <xsl:value-of select="../mi:ID"/>
+          </xsl:attribute>
       </xsl:if>
       <xsl:attribute name="actual">
         <xsl:value-of select="$xpath"/>
