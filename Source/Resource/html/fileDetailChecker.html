@@ -228,9 +228,7 @@
                 });
             });
             $('#info{{ loop.index }}').on('loaded.jstree', function (e, data) {
-                data.instance.get_container().find('li').each(function () {
-                    data.instance.open_node($(this));
-                })
+                data.instance.open_all();
             });
             $('#info{{ loop.index }}').on('select_node.jstree', function (e, data) {
                 data.instance.toggle_node(data.node);
