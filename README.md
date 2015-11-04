@@ -26,7 +26,7 @@ Some dependancies are availables with macport. To install macport:
 https://guide.macports.org/#installing
 
 ```sh
-port install port install autoconf automake libtool pkgconfig zlib
+port install autoconf automake libtool pkgconfig zlib
 ```
 
 #### libxml2
@@ -56,7 +56,7 @@ make
 
 #### Qt
 
-To install Qt:
+To install Qt, download and execute:
 http://download.qt.io/archive/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg.mirrorlist
 
 ### Dependancies under Linux
@@ -72,6 +72,11 @@ http://download.qt.io/archive/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg
 * pkgconfig
 * make
 * g++
+
+*MediaArea tools*
+
+* libzen0
+* libmediainfo0
 
 *CLI and GUI dependancies*
 
@@ -92,58 +97,113 @@ http://download.qt.io/archive/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg
 
 *Build tools and CLI/GUI dependancies*
 
+```sh
 apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
+```
+ 
+*MediaArea tools*
+
+Go to https://mediaarea.net/MediaConch/downloads/ubuntu.html and download the libmediainfo0, libmediainfo-dev, libzen0 and libzen-dev packages corresponding to your Ubuntu version (Ubuntu 15.10 is not supported yet). Then install them with :
+
+```sh
+dpkg -i libmediainfo* libzen*
+```
 
 *GUI only dependancies*
 
+```sh
 apt-get install libqt4-dev libqtwebkit-dev
+```
 
 *Optional dependancy (for online checker)*
 
+```sh
 apt-get install libcurl4-gnutls-dev
+```
 
 #### Fedora
 
 *Build tools and CLI/GUI dependancies*
 
+```sh
 yum install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
+```
+
+*MediaArea tools*
+
+Go to https://mediaarea.net/MediaConch/downloads/fedora.html and download the libmediainfo0, libmediainfo-devel, libzen0 and libzen-devel packages corresponding to your Fedora version. Then install them with :
+
+```sh
+rpm -i libmediainfo* libzen*
+```
 
 *GUI only dependancies*
 
+```sh
 yum install qt-devel qtwebkit-devel desktop-file-utils
+```
 
 *Optional dependancy (for online checker)*
 
+```sh
 yum install libcurl-devel libopenssh2-devel libidn-devel openldap-devel
+```
 
 #### Debian
 
 *Build tools and CLI/GUI dependancies*
 
+```sh
 apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
+```
+
+*MediaArea tools*
+
+Go to https://mediaarea.net/MediaConch/downloads/debian.html and download the libmediainfo0, libmediainfo-dev, libzen0 and libzen-dev packages corresponding to your Debian version. Then install them with :
+
+```sh
+dpkg -i libmediainfo* libzen*
+```
 
 *GUI only dependancies*
 
+```sh
 apt-get install libqt4-dev libqtwebkit-dev
+```
 
 *Optional dependancy (for online checker)*
 
+```sh
 apt-get install libcurl4-gnutls-dev
+```
 
 #### OpenSUSE
 
 *Build tools and CLI/GUI dependancies*
 
-??? yast2 install ??? git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
+```sh
+zypper install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
+```
+
+*MediaArea tools*
+
+Go to https://mediaarea.net/MediaConch/downloads/opensuse.html and download the libmediainfo0, libmediainfo-devel, libzen0 and libzen-devel packages corresponding to your OpenSuse version. Then install them with :
+
+```sh
+rpm -i libmediainfo* libzen*
+```
 
 *GUI only dependancies*
 
-??? yast2 install ??? libQtWebKit-devel update-desktop-files
-À tester : libqt4-devel
+```sh
+zypper install libqt4-devel libQtWebKit-devel update-desktop-files
+```
 
 *Optional dependancy (for online checker)*
 
-??? yast2 install ??? libcurl-devel
+```sh
+zypper install libcurl-devel
+```
 
 ### Build MediaConch CLI
 
@@ -178,7 +238,7 @@ make
 
 ### Build MediaConch GUI
 
-If you have already build the CLI, no need to run git twice. If the directory MediaConch_SourceCode already exist, git will complain.
+If you have already build the CLI, no need to run git twice. In fact, if you re-run git with an existing MediaConch_SourceCode directory, git will complain and exit.
 
 To compile MediaConch GUI under Mac and Linux:
 
@@ -186,6 +246,22 @@ To compile MediaConch GUI under Mac and Linux:
 cd $BUILD_DIR
 git clone https://github.com/MediaArea/MediaConch_SourceCode.git
 cd MediaConch_SourceCode/Project/Qt
+```
+
+##### Without online checker
+
+Run:
+
+```sh
+./prepare
+make
+```
+
+##### With online checker
+
+You must install the online checker dependancies. Then run:
+
+```sh
 ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
 make
 ```
@@ -230,7 +306,18 @@ cd MediaInfoLib/Project/GNU/Library
 ./autogen.sh
 ```
 
-Then, under Mac:
+##### Without online checker
+
+Run:
+
+```sh
+./configure --with-libcurl=runtime
+make
+```
+
+##### With online checker
+
+Under Mac:
 
 ```sh
 ./configure --with-libcurl=runtime
@@ -238,6 +325,8 @@ make
 ```
 
 Under Linux:
+
+You must install the online checker dependancies. Then run:
 
 ```sh
 ./configure --with-libcurl
