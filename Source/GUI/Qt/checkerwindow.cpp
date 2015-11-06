@@ -340,9 +340,25 @@ void CheckerWindow::create_policy_options(QString& policies)
 {
     const std::vector<Policy *>& list = mainwindow->get_all_policies();
 
+    QString system_policy;
+    QString user_policy;
     for (size_t i = 0; i < list.size(); ++i)
-        policies += QString("<option value=\"%1\">%2</option>")
-            .arg((int)i).arg(QString().fromStdString(list[i]->title));
+    {
+        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
+            system_policy += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(QString().fromStdString(list[i]->title));
+        else
+            user_policy += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(QString().fromStdString(list[i]->title));
+    }
+
+    // Create default policy opt-group
+    if (system_policy.length())
+        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
+
+    // Create default policy opt-group
+    if (user_policy.length())
+        policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
 }
 
 //---------------------------------------------------------------------------
@@ -350,12 +366,26 @@ void CheckerWindow::create_displays_options(QString& displays)
 {
     std::vector<QString>& list = mainwindow->get_displays();
 
+    QString system_display;
+    QString user_display;
     for (size_t i = 0; i < list.size(); ++i)
     {
         QFileInfo file(list[i]);
-        displays += QString("<option value=\"%1\">%2</option>")
-            .arg((int)i).arg(file.baseName());
+        if (list[i].startsWith(":/"))
+            system_display += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(file.baseName());
+        else
+            user_display += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(file.baseName());
     }
+
+    // Create default display opt-group
+    if (system_display.length())
+        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
+
+    // Create user display opt-group
+    if (user_display.length())
+        displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
 }
 
 //---------------------------------------------------------------------------
