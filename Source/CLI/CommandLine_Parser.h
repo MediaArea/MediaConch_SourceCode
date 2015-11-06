@@ -18,15 +18,15 @@
 //
 //***************************************************************************
 
-int Parse(MediaConch::Core &I, MediaInfoNameSpace::String Argument);
+int Parse(MediaConch::Core& I, std::string& Argument);
 
 
 //---------------------------------------------------------------------------
 #define CL_METHOD(_NAME) \
-    int _NAME(MediaConch::Core &MI, const MediaInfoNameSpace::String &Argument)
+    int _NAME(MediaConch::Core& MI, const std::string& Argument)
 
 #define CL_OPTION(_NAME) \
-    int _NAME(MediaConch::Core &MI, const MediaInfoNameSpace::String &Argument)
+    int _NAME(MediaConch::Core& MI, const std::string& Argument)
 
 CL_OPTION(Help);
 CL_OPTION(Inform);
@@ -46,6 +46,6 @@ CL_OPTION(Default);
 //***************************************************************************
 
 void LogFile_Action(ZenLib::Ztring Inform);
-void CallBack_Set(MediaConch::Core &MI, void* Event_CallBackFunction);
+void CallBack_Set(MediaConch::Core& MI, void* Event_CallBackFunction);
 
 #endif

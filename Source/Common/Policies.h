@@ -57,12 +57,12 @@ public:
     Policies(Core*);
     ~Policies();
 
-    String     import_schema(const std::string& filename);
-    String     import_schema_from_memory(const std::string& filename, const char* memory, int len);
-    void       export_schema(const char* filename, size_t pos);
-    xmlDocPtr  create_doc(size_t pos);
-    void       erase_policy(size_t index);
-    bool       policy_exists(std::string policy);
+    std::string import_schema(const std::string& filename);
+    std::string import_schema_from_memory(const std::string& filename, const char* memory, int len);
+    void        export_schema(const char* filename, size_t pos);
+    xmlDocPtr   create_doc(size_t pos);
+    void        erase_policy(size_t index);
+    bool        policy_exists(std::string policy);
 
     static bool        try_parsing_test(std::string data, SchematronAssert *r);
     static std::string serialize_assert_for_test(SchematronAssert *r);

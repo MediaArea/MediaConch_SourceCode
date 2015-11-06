@@ -79,11 +79,11 @@ void PoliciesWindow::import_schema()
     if (!file.length())
         return;
 
-    String ret = mainwindow->get_policies().import_schema(file.toStdString());
+    std::string ret = mainwindow->get_policies().import_schema(file.toStdString());
 
     displayPoliciesTree();
     if (ret.length())
-        policiesTree->get_error_bar()->showMessage(QString().fromStdWString(ret));
+        policiesTree->get_error_bar()->showMessage(QString().fromStdString(ret));
     else
     {
         policiesTree->get_error_bar()->clearMessage();
