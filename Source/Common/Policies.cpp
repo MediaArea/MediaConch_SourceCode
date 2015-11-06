@@ -47,13 +47,13 @@ Policies::~Policies()
     policies.clear();
 }
 
-String Policies::import_schema(const std::string& filename)
+std::string Policies::import_schema(const std::string& filename)
 {
     if (!filename.length())
-        return __T("The policy file does not exist");
+        return "The policy file does not exist";
 
     Policy *p = NULL;
-    String ret;
+    std::string ret;
     if (!filename.compare(filename.length() - 4, 4, ".xsl"))
     {
         p = new XsltPolicy;
@@ -67,7 +67,7 @@ String Policies::import_schema(const std::string& filename)
     else
     {
         p = new SchematronPolicy;
-        String ret = p->import_schema(filename);
+        std::string ret = p->import_schema(filename);
         if (ret.length())
         {
             p = new XsltPolicy;
@@ -80,13 +80,13 @@ String Policies::import_schema(const std::string& filename)
     return ret;
 }
 
-String Policies::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
+std::string Policies::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
 {
     if (!buffer || !len)
-        return __T("The policy does not exist");
+        return "The policy does not exist";
 
     Policy *p = NULL;
-    String ret;
+    std::string ret;
 
     if (!filename.compare(filename.length() - 4, 4, ".xsl"))
     {
@@ -101,7 +101,7 @@ String Policies::import_schema_from_memory(const std::string& filename, const ch
     else
     {
         p = new SchematronPolicy;
-        String ret = p->import_schema_from_memory(filename, buffer, len);
+        std::string ret = p->import_schema_from_memory(filename, buffer, len);
         if (ret.length())
         {
             p = new XsltPolicy;

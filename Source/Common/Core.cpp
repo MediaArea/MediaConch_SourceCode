@@ -136,7 +136,7 @@ void Core::load_database()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-String Core::ReportAndFormatCombination_IsValid ()
+std::string Core::ReportAndFormatCombination_IsValid ()
 {
     // Forcing some formats
     if (List.size()>1 && Format==format_Xml)
@@ -152,13 +152,13 @@ String Core::ReportAndFormatCombination_IsValid ()
     
     // Test of incompatibilities
     if (Report[report_MediaConch] && Report[report_MediaTrace] && Format==format_Text)
-        return __T("Combination of MediaConch and MediaTrace is currently not possible with Text output");
+        return "Combination of MediaConch and MediaTrace is currently not possible with Text output";
     if (Report[report_MediaConch] && Report[report_MediaInfo] && Format==format_MaXml)
-        return __T("Combination of MediaConch and MediaInfo or MediaTrace is currently not possible with XML output");
+        return "Combination of MediaConch and MediaInfo or MediaTrace is currently not possible with XML output";
     if (Report[report_MediaConch] && Format==format_MaXml)
-        return __T("MediaConch is currently not possible with MAXML output");
+        return "MediaConch is currently not possible with MAXML output";
 
-    return String();
+    return std::string();
 }
 
 //---------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void Core::Close ()
 }
 
 //---------------------------------------------------------------------------
-void Core::Run (String file)
+void Core::Run (std::string file)
 {
     // Parsing
     if (file.length())
@@ -181,7 +181,7 @@ void Core::Run (String file)
 }
 
 //---------------------------------------------------------------------------
-void Core::open_file(String& file)
+void Core::open_file(std::string& file)
 {
     bool registered = file_is_registered_in_db(file);
     if (!registered)
@@ -189,17 +189,17 @@ void Core::open_file(String& file)
         if (get_db())
             scheduler->add_element_to_queue(file);
         else
-            MI->Open(file);
+            MI->Open(Ztring().From_UTF8(file));
     }
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput()
+std::string Core::GetOutput()
 {
     if (!PoliciesFiles.empty())
         return PoliciesCheck();
 
-    String report;
+    std::string report;
     for (size_t i = 0; i < List.size(); ++i)
     {
         switch (Format)
@@ -223,48 +223,48 @@ String Core::GetOutput()
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Text (const String& file)
+std::string Core::GetOutput_Text (const std::string& file)
 {
-    String report;
+    std::string report;
     Format = format_Text;
     get_Reports_Output(file, report);
     return report;
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Xml (const String& file)
+std::string Core::GetOutput_Xml (const std::string& file)
 {
-    String report;
+    std::string report;
     Format = format_Xml;
     get_Reports_Output(file, report);
     return report;
 }
 
 //---------------------------------------------------------------------------
-void Core::GetOutput_JStree (const String& file, String& report)
+void Core::GetOutput_JStree (const std::string& file, std::string& report)
 {
     JsTree js;
     if (Report[report_MediaInfo])
     {
-        String ret = get_report_saved(file, report_MediaInfo, format_Xml);
+        std::string ret = get_report_saved(file, report_MediaInfo, format_Xml);
         report += js.format_from_inform_XML(ret);
         return;
     }
 
     if (Report[report_MediaTrace])
     {
-        String ret = get_report_saved(file, report_MediaTrace, format_Xml);
+        std::string ret = get_report_saved(file, report_MediaTrace, format_Xml);
         report += js.format_from_trace_XML(ret);
         return;
     }
 }
 
 //---------------------------------------------------------------------------
-void Core::GetOutput_Html (const String& file, String& report)
+void Core::GetOutput_Html (const std::string& file, std::string& report)
 {
     if (Report[report_MediaConch])
     {
-        String tmp;
+        std::string tmp;
         bool valid;
         std::string memory(implementation_report_xsl);
         validateXsltPolicyFromMemory(file, memory, valid, tmp);
@@ -276,9 +276,9 @@ void Core::GetOutput_Html (const String& file, String& report)
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Text_Implementation (const String& file)
+std::string Core::GetOutput_Text_Implementation (const std::string& file)
 {
-    String report;
+    std::string report;
     bool valid;
     std::string memory(implementation_report_xsl);
     validateXsltPolicyFromMemory(file, memory, valid, report);
@@ -294,9 +294,9 @@ String Core::GetOutput_Text_Implementation (const String& file)
 }
 
 //---------------------------------------------------------------------------
-String Core::GetOutput_Xml_Implementation (const String& file)
+std::string Core::GetOutput_Xml_Implementation (const std::string& file)
 {
-    String report;
+    std::string report;
     bool valid;
     std::string memory(implementation_report_xsl);
     validateXsltPolicyFromMemory(file, memory, valid, report);
@@ -308,21 +308,21 @@ String Core::GetOutput_Xml_Implementation (const String& file)
 }
 
 //---------------------------------------------------------------------------
-String Core::PoliciesCheck()
+std::string Core::PoliciesCheck()
 {
     if (PoliciesFiles.size())
     {
-        std::vector<String>& vec = PoliciesFiles;
-        std::wstringstream Out;
+        std::vector<std::string>& vec = PoliciesFiles;
+        std::stringstream Out;
         for (size_t i = 0; i < vec.size(); ++i)
         {
-            std::wstringstream tmp;
+            std::stringstream tmp;
             if (is_schematron_file(vec[i]))
             {
                 if (!PolicySchematron(vec[i], tmp))
                 {
-                    String retain = tmp.str();
-                    tmp.str(String());
+                    std::string retain = tmp.str();
+                    tmp.str(std::string());
                     if (!PolicyXslt(vec[i], tmp))
                         Out << retain;
                     else
@@ -335,8 +335,8 @@ String Core::PoliciesCheck()
             {
                 if (!PolicyXslt(vec[i], tmp))
                 {
-                    String retain = tmp.str();
-                    tmp.str(String());
+                    std::string retain = tmp.str();
+                    tmp.str(std::string());
                     if (!PolicySchematron(vec[i], tmp))
                         Out << retain;
                     else
@@ -349,29 +349,28 @@ String Core::PoliciesCheck()
         return Out.str();
     }
 
-    return __T("No policy to apply");
+    return "No policy to apply";
 }
 
 //---------------------------------------------------------------------------
-bool Core::PolicySchematron(const String& file, std::wstringstream& Out)
+bool Core::PolicySchematron(const std::string& file, std::stringstream& Out)
 {
     Schema* S = new Schematron;
-    std::string f=Ztring(file).To_UTF8();
     bool valid = false;
 
     Out << file << ": ";
-    if (S->register_schema_from_file(f.c_str()))
+    if (S->register_schema_from_file(file.c_str()))
     {
-        String report;
+        std::string report;
         valid = validation(file, S, report);
 
         if (!valid)
         {
-            Out << __T("NOT VALID\n");
+            Out << "NOT VALID\n";
             Out << report;
         }
         else
-            Out << __T("VALID");
+            Out << "VALID";
     }
     else
     {
@@ -385,15 +384,14 @@ bool Core::PolicySchematron(const String& file, std::wstringstream& Out)
 }
 
 //---------------------------------------------------------------------------
-bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
+bool Core::PolicyXslt(const std::string& file, std::stringstream& Out)
 {
     Schema *S = new Xslt;
-    std::string f=Ztring(file).To_UTF8();
     bool valid = false;
 
-    if (S->register_schema_from_file(f.c_str()))
+    if (S->register_schema_from_file(file.c_str()))
     {
-        String report;
+        std::string report;
         valid = validation(file, S, report);
         if (xsltDisplay.length())
             report = Core::transformWithXsltFile(report, xsltDisplay);
@@ -440,7 +438,7 @@ bool Core::PolicyXslt(const String& file, std::wstringstream& Out)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool Core::ValidatePolicy(const String& file, int policy, bool& valid, String& report)
+bool Core::ValidatePolicy(const std::string& file, int policy, bool& valid, std::string& report)
 {
     if (policy == -1 && PoliciesFiles.size())
     {
@@ -449,7 +447,7 @@ bool Core::ValidatePolicy(const String& file, int policy, bool& valid, String& r
             validateSchematronPolicy(file, -1, valid, report);
             if (!valid)
             {
-                String tmp = report;
+                std::string tmp = report;
                 validateXsltPolicy(file, -1, valid, report);
                 if (!valid)
                     report = tmp;
@@ -460,7 +458,7 @@ bool Core::ValidatePolicy(const String& file, int policy, bool& valid, String& r
             validateXsltPolicy(file, -1, valid, report);
             if (!valid)
             {
-                String tmp;
+                std::string tmp;
                 validateSchematronPolicy(file, -1, valid, tmp);
                 if (valid)
                     report = tmp;
@@ -471,7 +469,7 @@ bool Core::ValidatePolicy(const String& file, int policy, bool& valid, String& r
 
     if (policy == -1)
     {
-        report = __T("Policy not found");
+        report = "Policy not found";
         return false;
     }
 
@@ -483,38 +481,36 @@ bool Core::ValidatePolicy(const String& file, int policy, bool& valid, String& r
 }
 
 //---------------------------------------------------------------------------
-String Core::transformWithXsltFile(String& report, String& xslt)
+std::string Core::transformWithXsltFile(std::string& report, std::string& xslt)
 {
     Schema *S = new Xslt;
 
-    std::string x = Ztring(xslt).To_UTF8();
-    if (!S->register_schema_from_file(x.c_str()))
+    if (!S->register_schema_from_file(xslt.c_str()))
         return report;
 
-    std::string re = Ztring(report).To_UTF8();
-    int valid = S->validate_xml(re);
+    int valid = S->validate_xml(report);
     if (valid < 0)
         return report;
+
     std::string r = S->get_report();
     delete S;
-    return Ztring().From_UTF8(r);
+    return r;
 }
 
 //---------------------------------------------------------------------------
-String Core::transformWithXsltMemory(String& report, std::string& memory)
+std::string Core::transformWithXsltMemory(std::string& report, std::string& memory)
 {
     Schema *S = new Xslt;
 
     if (!S->register_schema_from_memory(memory))
         return report;
 
-    std::string re = Ztring(report).To_UTF8();
-    int valid = S->validate_xml(re);
+    int valid = S->validate_xml(report);
     if (valid < 0)
         return report;
     std::string r = S->get_report();
     delete S;
-    return Ztring().From_UTF8(r);
+    return r;
 }
 
 //***************************************************************************
@@ -522,26 +518,24 @@ String Core::transformWithXsltMemory(String& report, std::string& memory)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Core::validateSchematronPolicy(const String& file, int pos, bool& valid, String& report)
+void Core::validateSchematronPolicy(const std::string& file, int pos, bool& valid, std::string& report)
 {
     std::string policyFile;
     xmlDocPtr doc = NULL;
     Schema *S = new Schematron;
 
-    if (pos < 0)
-        policyFile=Ztring(PoliciesFiles[0]).To_UTF8();
-    else
+    if (pos >= 0)
         doc = policies.create_doc(pos);
 
     if (doc && S->register_schema_from_doc(doc))
         valid = validation(file, S, report);
-    else if (!doc && S->register_schema_from_file(policyFile.c_str()))
+    else if (!doc && PoliciesFiles.size() > 0 && S->register_schema_from_file(PoliciesFiles[0].c_str()))
         valid = validation(file, S, report);
     else
     {
         valid = false;
 
-        wstringstream Out;
+        std::stringstream Out;
         std::vector<std::string> errors = S->get_errors();
 
         Out << "internal error for parsing Policies" << endl;
@@ -554,25 +548,24 @@ void Core::validateSchematronPolicy(const String& file, int pos, bool& valid, St
 }
 
 //---------------------------------------------------------------------------
-void Core::validateXsltPolicy(const String& file, int pos, bool& valid, String& report)
+void Core::validateXsltPolicy(const std::string& file, int pos, bool& valid, std::string& report)
 {
     std::string policyFile;
     xmlDocPtr doc = NULL;
     Schema *S = new Xslt;
 
-    if (pos < 0)
-        policyFile=Ztring(PoliciesFiles[0]).To_UTF8();
-    else
+    if (pos >= 0)
         doc = policies.create_doc(pos);
+
     if (doc && S->register_schema_from_doc(doc))
         valid = validation(file, S, report);
-    else if (!doc && S->register_schema_from_file(policyFile.c_str()))
+    else if (!doc && PoliciesFiles.size() > 0 && S->register_schema_from_file(PoliciesFiles[0].c_str()))
         valid = validation(file, S, report);
     else
     {
         valid = false;
 
-        wstringstream Out;
+        std::stringstream Out;
         std::vector<std::string> errors = S->get_errors();
 
         Out << "internal error for parsing Policies" << endl;
@@ -584,7 +577,7 @@ void Core::validateXsltPolicy(const String& file, int pos, bool& valid, String& 
 }
 
 //---------------------------------------------------------------------------
-void Core::validateXsltPolicyFromMemory(const String& file, const std::string& memory, bool& valid, String& report)
+void Core::validateXsltPolicyFromMemory(const std::string& file, const std::string& memory, bool& valid, std::string& report)
 {
     Schema *S = new Xslt;
 
@@ -594,7 +587,7 @@ void Core::validateXsltPolicyFromMemory(const String& file, const std::string& m
     {
         valid = false;
 
-        wstringstream Out;
+        std::stringstream Out;
         std::vector<std::string> errors = S->get_errors();
 
         Out << "internal error for parsing Policies" << endl;
@@ -606,31 +599,28 @@ void Core::validateXsltPolicyFromMemory(const String& file, const std::string& m
 }
 
 //---------------------------------------------------------------------------
-bool Core::validation(const String& file, Schema* S, String& report)
+bool Core::validation(const std::string& file, Schema* S, std::string& report)
 {
-    String tmp;
-    tmp = get_report_saved(file, report_MediaConch, format_MaXml);
-    std::string xml = Ztring(tmp).To_UTF8();
+    std::string xml = get_report_saved(file, report_MediaConch, format_MaXml);
     bool valid = true;
 
     int ret = S->validate_xml(xml);
     if (ret < 0)
     {
-        report = __T("Validation generated an internal error");
+        report = "Validation generated an internal error";
         valid = false;
     }
     else
     {
-        std::string r = S->get_report();
-        report = Ztring().From_UTF8(r);
+        report = S->get_report();
         valid = ret == 0 ? true : false;
     }
     return valid;
 }
 
-bool Core::is_schematron_file(const String& file)
+bool Core::is_schematron_file(const std::string& file)
 {
-    if (file.compare(file.length() - 4, 4, __T(".sch")))
+    if (file.compare(file.length() - 4, 4, ".sch"))
         return false;
 
     return true;
@@ -672,7 +662,6 @@ void Core::register_report_mediatrace_text_to_database(std::string& file, time_t
     curMI->Option(__T("Details"), __T("1"));
     curMI->Option(__T("Inform"), String());
     std::string report = Ztring(curMI->Inform()).To_UTF8();
-    //printf("reporttext=%s\n\n\n\n\n", report.c_str());
     db->save_report(report_MediaTrace, format_Text, file, time, report);
 }
 
@@ -697,9 +686,8 @@ void Core::register_report_mediainfo_and_mediatrace_xml_to_database(std::string&
 }
 
 //---------------------------------------------------------------------------
-void Core::register_file_to_database(String& file, MediaInfoNameSpace::MediaInfoList* curMI)
+void Core::register_file_to_database(std::string& filename, MediaInfoNameSpace::MediaInfoList* curMI)
 {
-    std::string filename = Ztring(file).To_UTF8();
     time_t time = get_last_modification_file(filename);
 
     // MediaInfo
@@ -715,9 +703,8 @@ void Core::register_file_to_database(String& file, MediaInfoNameSpace::MediaInfo
 }
 
 //---------------------------------------------------------------------------
-void Core::register_file_to_database(String& file)
+void Core::register_file_to_database(std::string& filename)
 {
-    std::string filename = Ztring(file).To_UTF8();
     time_t time = get_last_modification_file(filename);
 
     // MediaInfo
@@ -733,20 +720,17 @@ void Core::register_file_to_database(String& file)
 }
 
 //---------------------------------------------------------------------------
-String Core::get_report_saved(const String& file, report reportKind, format f)
+std::string Core::get_report_saved(const std::string& filename, report reportKind, format f)
 {
     if (reportKind >= report_Max || f >= format_Max)
-        return String();
+        return std::string();
 
-    std::string filename = Ztring(file).To_UTF8();
     time_t time = get_last_modification_file(filename);
-    std::string report = db->get_report(reportKind, f, filename, time);
-
-    return Ztring().From_UTF8(report);
+    return db->get_report(reportKind, f, filename, time);
 }
 
 //---------------------------------------------------------------------------
-void Core::get_Reports_Output(const String& file, String& report)
+void Core::get_Reports_Output(const std::string& file, std::string& report)
 {
     if (Report[report_MediaConch])
     {
@@ -754,36 +738,35 @@ void Core::get_Reports_Output(const String& file, String& report)
             report += GetOutput_Xml_Implementation(file);
         else
             report += GetOutput_Text_Implementation(file);
-        report += __T("\r\n");
+        report += "\r\n";
     }
 
     if (Report[report_MediaTrace] && Report[report_MediaInfo] && Format == format_MaXml)
     {
         report += get_report_saved(file, report_MediaConch, Format);
-        report += __T("\r\n");
+        report += "\r\n";
     }
     else
     {
         if (Report[report_MediaInfo])
         {
             report += get_report_saved(file, report_MediaInfo, Format);
-            report += __T("\r\n");
+            report += "\r\n";
         }
         if (Report[report_MediaTrace])
         {
             report += get_report_saved(file, report_MediaTrace, Format);
-            report += __T("\r\n");
+            report += "\r\n";
         }
     }
 }
 
 //---------------------------------------------------------------------------
-bool Core::file_is_registered_in_db(String& file)
+bool Core::file_is_registered_in_db(std::string& filename)
 {
     if (!get_db())
         return false;
 
-    std::string filename = Ztring(file).To_UTF8();
     time_t time = get_last_modification_file(filename);
 
     return db->file_is_registered(filename, time);

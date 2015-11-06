@@ -36,7 +36,7 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int Scheduler::add_element_to_queue(String& filename)
+    int Scheduler::add_element_to_queue(std::string& filename)
     {
         static int index = 0;
 

@@ -50,7 +50,7 @@ public:
     Scheduler(Core *c);
     virtual ~Scheduler();
 
-    int add_element_to_queue(String& filename);
+    int add_element_to_queue(std::string& filename);
     void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfoList* MI);
     bool is_finished();
     void set_max_threads(size_t nb) { max_threads = nb; }

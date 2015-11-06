@@ -27,10 +27,10 @@
     } \
 
 #define OPTION(_TEXT, _TOLAUNCH) \
-    else if (Argument.find(__T(_TEXT))==0)        LAUNCH(_TOLAUNCH) \
+    else if (Argument.find(_TEXT)==0)        LAUNCH(_TOLAUNCH) \
 
 #define OPTION2(_TEXT, _TOLAUNCH) \
-    else if (Argument.find(__T(_TEXT))==0)        _TOLAUNCH(); \
+    else if (Argument.find(_TEXT)==0)        _TOLAUNCH(); \
 
 
 //***************************************************************************
@@ -38,70 +38,70 @@
 //***************************************************************************
 
 ZenLib::Ztring LogFile_FileName;
-String Last_Argument;
+std::string Last_Argument;
 
 //***************************************************************************
 // Main
 //***************************************************************************
 
-int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
+int Parse(MediaConch::Core& MI, std::string& Argument)
 {
     // With 1 other argument
     if (Last_Argument.length())
     {
         Argument = Last_Argument.append(Argument);
-        Last_Argument = __T("");
+        Last_Argument = "";
     }
-    if (Argument==__T("-p")) {
-        Last_Argument = __T("--policy=");
+    if (Argument=="-p") {
+        Last_Argument = "--policy=";
         return 0;
     }
-    if (Argument==__T("-d")) {
-        Last_Argument = __T("--display=");
+    if (Argument=="-d") {
+        Last_Argument = "--display=";
         return 0;
     }
 
     // Help short options
-    if (Argument==__T("-ha"))
-        Argument = __T("--help=Advanced");
-    if (Argument==__T("-v"))
-        Argument = __T("--version");
+    if (Argument=="-ha")
+        Argument = "--help=Advanced";
+    if (Argument=="-v")
+        Argument = "--version";
 
     // Backward compatibility
-    if (Argument==__T("-tc"))
-        Argument = __T("--report=MediaConch");
-    if (Argument==__T("-ti"))
-        Argument = __T("--report=MediaInfo");
-    if (Argument==__T("-tt"))
-        Argument = __T("--report=MediaTrace");
+    if (Argument=="-tc")
+        Argument = "--report=MediaConch";
+    if (Argument=="-ti")
+        Argument = "--report=MediaInfo";
+    if (Argument=="-tt")
+        Argument = "--report=MediaTrace";
 
     // Report other options
-    if (Argument==__T("--mediaconch"))
-        Argument = __T("-mc");
-    if (Argument==__T("--mediainfo"))
-        Argument = __T("-mi");
-    if (Argument==__T("--mediatrace"))
-        Argument = __T("-mt");
+    if (Argument=="--mediaconch")
+        Argument = "-mc";
+    if (Argument=="--mediainfo")
+        Argument = "-mi";
+    if (Argument=="--mediatrace")
+        Argument = "-mt";
     
     // Report short options
-    if (Argument==__T("-mc"))
-        Argument = __T("--report=MediaConch");
-    if (Argument==__T("-mi"))
-        Argument = __T("--report=MediaInfo");
-    if (Argument==__T("-mt"))
-        Argument = __T("--report=MediaTrace");
+    if (Argument=="-mc")
+        Argument = "--report=MediaConch";
+    if (Argument=="-mi")
+        Argument = "--report=MediaInfo";
+    if (Argument=="-mt")
+        Argument = "--report=MediaTrace";
 
     // Format short options
-    if (Argument==__T("-ft"))
-        Argument = __T("--format=Text");
-    if (Argument==__T("-fx"))
-        Argument = __T("--format=XML");
-    if (Argument==__T("-fa"))
-        Argument = __T("--format=MAXML");
-    if (Argument==__T("-fj"))
-        Argument = __T("--format=JSTREE");
-    if (Argument==__T("-fh"))
-        Argument = __T("--format=HTML");
+    if (Argument=="-ft")
+        Argument = "--format=Text";
+    if (Argument=="-fx")
+        Argument = "--format=XML";
+    if (Argument=="-fa")
+        Argument = "--format=MAXML";
+    if (Argument=="-fj")
+        Argument = "--format=JSTREE";
+    if (Argument=="-fh")
+        Argument = "--format=HTML";
     
     // Listing
     if (0);
@@ -126,17 +126,17 @@ CL_OPTION(Help)
 {
     (void)MI;
     //Form : --Help=Advanced
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos!=String::npos)
+    size_t Egal_Pos=Argument.find('=');
+    if (Egal_Pos!=std::string::npos)
     {
-        String level=Argument.substr(Egal_Pos+1);
+        std::string level=Argument.substr(Egal_Pos+1);
         transform(level.begin(), level.end(), level.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
 
-        if (level == __T("advanced"))
+        if (level == "advanced")
             return Help_Advanced();
-        else if (level == __T("ssl"))
+        else if (level == "ssl")
             return Help_Ssl();
-        else if (level == __T("ssh"))
+        else if (level == "ssh")
             return Help_Ssh();
     }
     return Help();
@@ -154,8 +154,8 @@ CL_OPTION(Version)
 CL_OPTION(Report)
 {
     //Form : --Inform=Text
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos==String::npos)
+    size_t Egal_Pos=Argument.find('=');
+    if (Egal_Pos==std::string::npos)
         return Help();
 
     // Removing defaults
@@ -166,12 +166,12 @@ CL_OPTION(Report)
     }
         
     // New requested reports
-    String Tool=Argument.substr(Egal_Pos+1);
-    if (Tool==__T("MediaConch") || Tool==__T("mediaconch"))
+    std::string Tool=Argument.substr(Egal_Pos+1);
+    if (Tool=="MediaConch" || Tool=="mediaconch")
         MI.Report.set(MediaConch::Core::report_MediaConch);
-    if (Tool==__T("MediaInfo") || Tool==__T("mediainfo"))
+    if (Tool=="MediaInfo" || Tool=="mediainfo")
         MI.Report.set(MediaConch::Core::report_MediaInfo);
-    if (Tool==__T("MediaTrace") || Tool==__T("mediatrace"))
+    if (Tool=="MediaTrace" || Tool=="mediatrace")
         MI.Report.set(MediaConch::Core::report_MediaTrace);
 
     return 0;
@@ -181,20 +181,20 @@ CL_OPTION(Report)
 CL_OPTION(Format)
 {
     //Form : --Inform=Text
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos==String::npos)
+    size_t Egal_Pos=Argument.find('=');
+    if (Egal_Pos==std::string::npos)
         return Help();
 
-    String Format=Argument.substr(Egal_Pos+1);
-    if (Format==__T("Text") || Format==__T("text"))
+    std::string Format=Argument.substr(Egal_Pos+1);
+    if (Format=="Text" || Format=="text")
         MI.Format=MediaConch::Core::format_Text;
-    if (Format==__T("XML") || Format==__T("xml"))
+    if (Format=="XML" || Format=="xml")
         MI.Format=MediaConch::Core::format_Xml;
-    if (Format==__T("MAXML") || Format==__T("maxml"))
+    if (Format=="MAXML" || Format=="maxml")
         MI.Format=MediaConch::Core::format_MaXml;
-    if (Format==__T("JSTREE") || Format==__T("jstree"))
+    if (Format=="JSTREE" || Format=="jstree")
         MI.Format=MediaConch::Core::format_JsTree;
-    if (Format==__T("HTML") || Format==__T("html"))
+    if (Format=="HTML" || Format=="html")
         MI.Format=MediaConch::Core::format_Html;
 
     return 0;
@@ -204,14 +204,14 @@ CL_OPTION(Format)
 CL_OPTION(PolicyOption)
 {
     //Form : --Inform=Text
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos==String::npos)
+    size_t Egal_Pos=Argument.find('=');
+    if (Egal_Pos==std::string::npos)
         return Help_Policy();
 
-    String file;
+    std::string file;
     file.assign(Argument, Egal_Pos+1, std::string::npos);
     MI.PoliciesFiles.push_back(file);
-    Report(MI, __T("--report=MediaConch"));
+    Report(MI, "--report=MediaConch");
     return 0;
 }
 
@@ -219,11 +219,11 @@ CL_OPTION(PolicyOption)
 CL_OPTION(Display)
 {
     //Form : --Inform=Text
-    size_t Egal_Pos=Argument.find(__T('='));
-    if (Egal_Pos==String::npos)
+    size_t Egal_Pos=Argument.find('=');
+    if (Egal_Pos==std::string::npos)
         return Help();
 
-    String file;
+    std::string file;
     file.assign(Argument, Egal_Pos+1, std::string::npos);
     MI.xsltDisplay = file;
     return 0;
@@ -233,7 +233,8 @@ CL_OPTION(Display)
 CL_OPTION(LogFile)
 {
     //Form : --LogFile=Text
-    LogFile_FileName.assign(Argument, 10, std::string::npos);
+    (void)MI;
+    LogFile_FileName.assign(Ztring().From_UTF8(Argument), 10, std::string::npos);
 
     return 0;
 }
@@ -245,10 +246,10 @@ CL_OPTION(Default)
     size_t Egal_Pos=Argument.find(__T('='));
     if (Egal_Pos<2)
         return 0;
-    MediaInfoNameSpace::String Option(Argument, 2, Egal_Pos-2);
+    MediaInfoNameSpace::String Option(Ztring().From_UTF8(Argument), 2, Egal_Pos-2);
     MediaInfoNameSpace::String Value;
     if (Egal_Pos!=std::string::npos)
-        Value.assign(Argument, Egal_Pos+1, std::string::npos);
+        Value.assign(Ztring().From_UTF8(Argument), Egal_Pos+1, std::string::npos);
     else
         Value=__T('1');
 

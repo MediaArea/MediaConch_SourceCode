@@ -45,10 +45,10 @@ public:
     virtual ~Policy();
     Policy(const Policy*);
 
-    String     import_schema(const std::string& filename);
-    String     import_schema_from_memory(const std::string& filename, const char* memory, int len);
-    void       export_schema(const char* filename);
-    virtual xmlDocPtr  create_doc() = 0;
+    std::string       import_schema(const std::string& filename);
+    std::string       import_schema_from_memory(const std::string& filename, const char* memory, int len);
+    void              export_schema(const char* filename);
+    virtual xmlDocPtr create_doc() = 0;
 
     std::string          filename;
     std::string          title;
@@ -58,7 +58,7 @@ public:
 
 protected:
     // HELPER
-    virtual String import_schema_from_doc(const std::string& filename, xmlDocPtr doc) = 0;
+    virtual std::string import_schema_from_doc(const std::string& filename, xmlDocPtr doc) = 0;
 
 private:
     Policy& operator=(const Policy&);

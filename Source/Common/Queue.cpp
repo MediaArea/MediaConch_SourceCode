@@ -11,6 +11,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include "ZenLib/Ztring.h"
 #include "Queue.h"
 #include "Scheduler.h"
 //---------------------------------------------------------------------------
@@ -32,7 +33,7 @@ void QueueElement::Entry()
     MI.Option(__T("ReadByHuman"), __T("1"));
     MI.Option(__T("Language"), __T("raw"));
     MI.Option(__T("Inform"), __T("XML"));
-    MI.Open(filename);
+    MI.Open(Ztring().From_UTF8(filename));
     scheduler->work_finished(this, &MI);
     MI.Close();
 }
@@ -47,7 +48,7 @@ Queue::~Queue()
     clear();
 }
 
-int Queue::add_element(QueuePriority priority, int id, String filename)
+int Queue::add_element(QueuePriority priority, int id, std::string filename)
 {
     QueueElement *el = new QueueElement(scheduler);
 
@@ -74,7 +75,7 @@ int Queue::remove_element(int id)
     return 0;
 }
 
-int Queue::remove_elements(String filename)
+int Queue::remove_elements(std::string filename)
 {
     std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
 

@@ -101,7 +101,7 @@ MainWindow::~MainWindow()
 //---------------------------------------------------------------------------
 void MainWindow::addFileToList(const QString& file)
 {
-    C.List.push_back(file.toStdWString());
+    C.List.push_back(file.toStdString());
 }
 
 void MainWindow::policy_to_delete(int index)
@@ -141,13 +141,13 @@ void MainWindow::Run()
 }
 
 //---------------------------------------------------------------------------
-String MainWindow::transformWithXsltFile(String& report, String trans)
+std::string MainWindow::transformWithXsltFile(std::string& report, std::string trans)
 {
     return C.transformWithXsltFile(report, trans);
 }
 
 //---------------------------------------------------------------------------
-String MainWindow::transformWithXsltMemory(String& report, std::string memory)
+std::string MainWindow::transformWithXsltMemory(std::string& report, std::string memory)
 {
     return C.transformWithXsltMemory(report, memory);
 }
@@ -177,7 +177,7 @@ void MainWindow::checker_add_policy_files(QFileInfoList& list, QString& policy)
 }
 
 //---------------------------------------------------------------------------
-const std::vector<String>& MainWindow::policy_file_registered()
+const std::vector<std::string>& MainWindow::policy_file_registered()
 {
     return C.PoliciesFiles;
 }
@@ -247,7 +247,7 @@ void MainWindow::exporting_policy(int pos)
 }
 
 //---------------------------------------------------------------------------
-bool MainWindow::ValidatePolicy(const String& file, int policy, bool& valid, String& report)
+bool MainWindow::ValidatePolicy(const std::string& file, int policy, bool& valid, std::string& report)
 {
     return C.ValidatePolicy(file, policy, valid, report);
 }
@@ -326,7 +326,7 @@ void MainWindow::removeXsltDisplay()
 //---------------------------------------------------------------------------
 void MainWindow::addPolicyToList(QString& policy)
 {
-    C.PoliciesFiles.push_back(policy.toStdWString());
+    C.PoliciesFiles.push_back(policy.toStdString());
 }
 
 //---------------------------------------------------------------------------
@@ -366,7 +366,7 @@ void MainWindow::on_actionOpen_triggered()
 
     C.List.clear();
     for (int Pos=0; Pos<List.size(); Pos++)
-        C.List.push_back(List[Pos].toStdWString());
+        C.List.push_back(List[Pos].toStdString());
 
     current_view = RUN_CHECKER_VIEW;
     Run();
@@ -606,7 +606,7 @@ void MainWindow::display_selected()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::analyze(String& file)
+void MainWindow::analyze(std::string& file)
 {
     C.Close();
     C.Report.reset();
@@ -621,56 +621,56 @@ void MainWindow::wait_analyze_finished()
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_implementationreport_xml(const String& file)
+QString MainWindow::get_implementationreport_xml(const std::string& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaConch);
-    return QString().fromStdWString(C.GetOutput_Xml(file));
+    return QString().fromStdString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediainfo_and_mediatrace_xml(const String& file)
+QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaInfo);
     C.Report.set(Core::report_MediaTrace);
-    return QString().fromStdWString(C.GetOutput_Xml(file));
+    return QString().fromStdString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediainfo_xml(const String& file)
+QString MainWindow::get_mediainfo_xml(const std::string& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaInfo);
-    return QString().fromStdWString(C.GetOutput_Xml(file));
+    return QString().fromStdString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediainfo_jstree(const String& file)
+QString MainWindow::get_mediainfo_jstree(const std::string& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaInfo);
-    String report;
+    std::string report;
     C.GetOutput_JStree(file, report);
-    return QString().fromStdWString(report);
+    return QString().fromStdString(report);
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediatrace_xml(const String& file)
+QString MainWindow::get_mediatrace_xml(const std::string& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaTrace);
-    return QString().fromStdWString(C.GetOutput_Xml(file));
+    return QString().fromStdString(C.GetOutput_Xml(file));
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediatrace_jstree(const String& file)
+QString MainWindow::get_mediatrace_jstree(const std::string& file)
 {
     C.Report.reset();
     C.Report.set(Core::report_MediaTrace);
-    String report;
+    std::string report;
     C.GetOutput_JStree(file, report);
-    return QString().fromStdWString(report);
+    return QString().fromStdString(report);
 }
 
 }

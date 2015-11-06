@@ -50,7 +50,7 @@ namespace MediaConch
         QueueElement(Scheduler *s) : Thread(), scheduler(s) {}
         virtual ~QueueElement() {}
         int          id;
-        String       filename;
+        std::string  filename;
 
         void         Entry();
 
@@ -80,9 +80,9 @@ namespace MediaConch
         Queue(Scheduler *s) : scheduler(s){}
         ~Queue();
 
-        int add_element(QueuePriority priority, int id, String filename);
+        int add_element(QueuePriority priority, int id, std::string filename);
         int remove_element(int id);
-        int remove_elements(String filename);
+        int remove_elements(std::string filename);
         void clear();
 
         QueueElement* run_next();

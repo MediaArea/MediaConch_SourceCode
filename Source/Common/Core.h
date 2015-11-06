@@ -78,27 +78,27 @@ public:
         format_Max,
     };
     format Format;
-    String ReportAndFormatCombination_IsValid();
-    vector<String> List;
+    std::string ReportAndFormatCombination_IsValid();
+    vector<std::string> List;
 
-    void   Close();
-    void   Run(String file = String());
-    String GetOutput();
-    String GetOutput_Text(const String& file);
-    String GetOutput_Text_Implementation(const String& file);
-    String GetOutput_Xml(const String& file);
-    String GetOutput_Xml_Implementation(const String& file);
-    void   GetOutput_JStree(const String& file, String& report);
-    void   GetOutput_Html(const String& file, String& report);
-    String PoliciesCheck();
+    void        Close();
+    void        Run(std::string file = std::string());
+    std::string GetOutput();
+    std::string GetOutput_Text(const std::string& file);
+    std::string GetOutput_Text_Implementation(const std::string& file);
+    std::string GetOutput_Xml(const std::string& file);
+    std::string GetOutput_Xml_Implementation(const std::string& file);
+    void        GetOutput_JStree(const std::string& file, std::string& report);
+    void        GetOutput_Html(const std::string& file, std::string& report);
+    std::string PoliciesCheck();
 
-    bool ValidatePolicy(const String& file, int policy, bool& valid, String& report);
-    String transformWithXsltFile(String& report, String& Xslt);
-    String transformWithXsltMemory(String& report, std::string& memory);
+    bool ValidatePolicy(const std::string& file, int policy, bool& valid, std::string& report);
+    std::string transformWithXsltFile(std::string& report, std::string& Xslt);
+    std::string transformWithXsltMemory(std::string& report, std::string& memory);
 
-    std::vector<String> PoliciesFiles;
+    std::vector<std::string> PoliciesFiles;
     Policies policies;
-    String xsltDisplay;
+    std::string xsltDisplay;
 
     //General Configuration
     void load_configuration();
@@ -108,7 +108,7 @@ public:
     //General Database
     void load_database();
     bool database_is_enabled() const;
-    void register_file_to_database(String& file, MediaInfoNameSpace::MediaInfoList* MI);
+    void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
 
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
@@ -123,22 +123,22 @@ private:
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
 
-    bool PolicySchematron(const String& file, std::wstringstream& Out);
-    bool PolicyXslt(const String& file, std::wstringstream& Out);
+    bool PolicySchematron(const std::string& file, std::stringstream& Out);
+    bool PolicyXslt(const std::string& file, std::stringstream& Out);
 
     //Helper
-    bool validation(const String& file, Schema* S, String& report);
-    void validateSchematronPolicy(const String& file, int pos, bool& valid, String& report);
-    void validateXsltPolicy(const String& file, int pos, bool& valid, String& report);
-    void validateXsltPolicyFromMemory(const String& file, const std::string& memory, bool& valid, String& report);
-    bool is_schematron_file(const String& file);
+    bool validation(const std::string& file, Schema* S, std::string& report);
+    void validateSchematronPolicy(const std::string& file, int pos, bool& valid, std::string& report);
+    void validateXsltPolicy(const std::string& file, int pos, bool& valid, std::string& report);
+    void validateXsltPolicyFromMemory(const std::string& file, const std::string& memory, bool& valid, std::string& report);
+    bool is_schematron_file(const std::string& file);
 
-    bool   file_is_registered_in_db(String& file);
+    bool   file_is_registered_in_db(std::string& file);
     time_t get_last_modification_file(const std::string& file);
-    String get_report_saved(const String& file, report reportKind, format f);
-    void get_Reports_Output(const String& file, String& report);
+    std::string get_report_saved(const std::string& file, report reportKind, format f);
+    void get_Reports_Output(const std::string& file, std::string& report);
 
-    void register_file_to_database(String& file);
+    void register_file_to_database(std::string& file);
     void register_report_mediainfo_text_to_database(std::string& file, time_t time,
                                                     MediaInfoNameSpace::MediaInfoList* MI);
     void register_report_mediainfo_xml_to_database(std::string& file, time_t time,
@@ -151,7 +151,7 @@ private:
                                                                   MediaInfoNameSpace::MediaInfoList* MI);
     std::string get_config_path();
     Database *get_db();
-    void open_file(String& filename);
+    void open_file(std::string& filename);
 };
 
 }
