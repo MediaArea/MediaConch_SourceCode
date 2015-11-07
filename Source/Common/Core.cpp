@@ -676,13 +676,22 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, time_t 
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time,
-                                                                    MediaInfoNameSpace::MediaInfoList* curMI)
+void Core::get_content_of_media_in_xml(std::string& report)
 {
-    curMI->Option(__T("Details"), __T("1"));
-    curMI->Option(__T("Inform"), __T("MAXML"));
-    std::string report = Ztring(curMI->Inform()).To_UTF8();
-    db->save_report(report_MediaConch, format_MaXml, file, time, report);
+    std::string media_start("<media ref");
+    size_t start = report.find(media_start);
+
+    if (start == std::string::npos)
+        return;
+
+    start += media_start.length();
+    media_start = std::string(">");
+    start = report.find(media_start, start);
+    size_t end = report.rfind("</media>");
+    if (start == std::string::npos || end == std::string::npos)
+        return;
+
+    report = report.substr(start + media_start.length(), end - start - media_start.length());
 }
 
 //---------------------------------------------------------------------------
@@ -697,9 +706,6 @@ void Core::register_file_to_database(std::string& filename, MediaInfoNameSpace::
     // MediaTrace
     register_report_mediatrace_text_to_database(filename, time, curMI);
     register_report_mediatrace_xml_to_database(filename, time, curMI);
-
-    // MediaInfo + MediaTrace (MaXML)
-    register_report_mediainfo_and_mediatrace_xml_to_database(filename, time, curMI);
 }
 
 //---------------------------------------------------------------------------
@@ -714,9 +720,56 @@ void Core::register_file_to_database(std::string& filename)
     // MediaTrace
     register_report_mediatrace_text_to_database(filename, time, MI);
     register_report_mediatrace_xml_to_database(filename, time, MI);
+}
 
-    // MediaInfo + MediaTrace (MaXML)
-    register_report_mediainfo_and_mediatrace_xml_to_database(filename, time, MI);
+//---------------------------------------------------------------------------
+void Core::create_report_mi_xml(const std::string& filename, std::string& report)
+{
+    report += get_report_saved(filename, report_MediaInfo, format_Xml);
+}
+
+//---------------------------------------------------------------------------
+void Core::create_report_mt_xml(const std::string& filename, std::string& report)
+{
+    report += get_report_saved(filename, report_MediaTrace, format_Xml);
+}
+
+//---------------------------------------------------------------------------
+void Core::create_report_ma_xml(const std::string& filename, std::string& report)
+{
+
+    std::string start("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                      "<MediaArea\n"
+                      "xmlns=\"https://mediaarea.net/mediaarea\"\n"
+                      "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                      "xsi:schemaLocation=\"https://mediaarea.net/mediaarea https://mediaarea.net/mediaarea/mediaarea_0_1.xsd\"\n"
+                      "version=\"0.1\">\n"
+                      "<!-- Work in progress, not for production -->\n"
+                      "<creatingLibrary version=\"0.7.79\" url=\"https://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n"
+                      "<media ref=\"");
+    start += filename + "\">\n";
+    report += start;
+
+    std::string info = get_report_saved(filename, report_MediaInfo, format_Xml);
+    get_content_of_media_in_xml(info);
+    if (info.length())
+    {
+        info = "<MediaInfo xmlns=\"https://mediaarea.net/mediainfo\" version=\"2.0beta1\">" + info + "</MediaInfo>\n";
+        report +=info;
+    }
+
+    std::string trace = get_report_saved(filename, report_MediaTrace, format_Xml);
+    get_content_of_media_in_xml(trace);
+    if (trace.length())
+    {
+        trace = "<MediaTrace xmlns=\"https://mediaarea.net/mediatrace\" version=\"0.1\">"
+                + trace + "</MediaTrace>\n";
+        report += trace;
+    }
+
+    std::string end("</media>\n"
+                    "</MediaArea>");
+    report += end;
 }
 
 //---------------------------------------------------------------------------
@@ -725,6 +778,12 @@ std::string Core::get_report_saved(const std::string& filename, report reportKin
     if (reportKind >= report_Max || f >= format_Max)
         return std::string();
 
+    if (f == format_MaXml)
+    {
+        std::string report;
+        create_report_ma_xml(filename, report);
+        return report;
+    }
     time_t time = get_last_modification_file(filename);
     return db->get_report(reportKind, f, filename, time);
 }
@@ -743,19 +802,25 @@ void Core::get_Reports_Output(const std::string& file, std::string& report)
 
     if (Report[report_MediaTrace] && Report[report_MediaInfo] && Format == format_MaXml)
     {
-        report += get_report_saved(file, report_MediaConch, Format);
+        create_report_ma_xml(file, report);
         report += "\r\n";
     }
     else
     {
         if (Report[report_MediaInfo])
         {
-            report += get_report_saved(file, report_MediaInfo, Format);
+            if (Format == format_Xml)
+                create_report_mi_xml(file, report);
+            else
+                report += get_report_saved(file, report_MediaInfo, Format);
             report += "\r\n";
         }
         if (Report[report_MediaTrace])
         {
-            report += get_report_saved(file, report_MediaTrace, Format);
+            if (Format == format_Xml)
+                create_report_mt_xml(file, report);
+            else
+                report += get_report_saved(file, report_MediaTrace, Format);
             report += "\r\n";
         }
     }

@@ -109,6 +109,9 @@ public:
     void load_database();
     bool database_is_enabled() const;
     void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
+    void create_report_mi_xml(const std::string& filename, std::string& report);
+    void create_report_mt_xml(const std::string& filename, std::string& report);
+    void create_report_ma_xml(const std::string& filename, std::string& report);
 
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
@@ -147,8 +150,8 @@ private:
                                                      MediaInfoNameSpace::MediaInfoList* MI);
     void register_report_mediatrace_xml_to_database(std::string& file, time_t time,
                                                     MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediainfo_and_mediatrace_xml_to_database(std::string& file, time_t time,
-                                                                  MediaInfoNameSpace::MediaInfoList* MI);
+    void get_content_of_media_in_xml(std::string& report);
+
     std::string get_config_path();
     Database *get_db();
     void open_file(std::string& filename);
