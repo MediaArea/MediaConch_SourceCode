@@ -111,7 +111,7 @@ public:
     void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
     void create_report_mi_xml(const std::string& filename, std::string& report);
     void create_report_mt_xml(const std::string& filename, std::string& report);
-    void create_report_ma_xml(const std::string& filename, std::string& report);
+    void create_report_ma_xml(const std::string& filename, std::string& report, bitset<report_Max> reports);
 
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
@@ -140,6 +140,7 @@ private:
     time_t get_last_modification_file(const std::string& file);
     std::string get_report_saved(const std::string& file, report reportKind, format f);
     void get_Reports_Output(const std::string& file, std::string& report);
+    void get_implementation_report(const std::string& file, std::string& report);
 
     void register_file_to_database(std::string& file);
     void register_report_mediainfo_text_to_database(std::string& file, time_t time,
@@ -150,7 +151,11 @@ private:
                                                      MediaInfoNameSpace::MediaInfoList* MI);
     void register_report_mediatrace_xml_to_database(std::string& file, time_t time,
                                                     MediaInfoNameSpace::MediaInfoList* MI);
+    void register_report_implementation_xml_to_database(const std::string& file, time_t time,
+                                                        std::string& report);
     void get_content_of_media_in_xml(std::string& report);
+    //No idea how to do it better way
+    bitset<report_Max> get_bitset_with_mi_mt();
 
     std::string get_config_path();
     Database *get_db();
