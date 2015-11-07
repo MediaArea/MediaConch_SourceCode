@@ -153,10 +153,6 @@ std::string Core::ReportAndFormatCombination_IsValid ()
     // Test of incompatibilities
     if (Report[report_MediaConch] && Report[report_MediaTrace] && Format==format_Text)
         return "Combination of MediaConch and MediaTrace is currently not possible with Text output";
-    if (Report[report_MediaConch] && Report[report_MediaInfo] && Format==format_MaXml)
-        return "Combination of MediaConch and MediaInfo or MediaTrace is currently not possible with XML output";
-    if (Report[report_MediaConch] && Format==format_MaXml)
-        return "MediaConch is currently not possible with MAXML output";
 
     return std::string();
 }
@@ -265,12 +261,10 @@ void Core::GetOutput_Html (const std::string& file, std::string& report)
     if (Report[report_MediaConch])
     {
         std::string tmp;
-        bool valid;
-        std::string memory(implementation_report_xsl);
-        validateXsltPolicyFromMemory(file, memory, valid, tmp);
+        get_implementation_report(file, tmp);
 
         // Apply an XSLT to have HTML
-        memory = std::string(implementation_report_display_html_xsl);
+        std::string memory(implementation_report_display_html_xsl);
         report += transformWithXsltMemory(tmp, memory);
     }
 }
@@ -278,33 +272,28 @@ void Core::GetOutput_Html (const std::string& file, std::string& report)
 //---------------------------------------------------------------------------
 std::string Core::GetOutput_Text_Implementation (const std::string& file)
 {
-    std::string report;
-    bool valid;
-    std::string memory(implementation_report_xsl);
-    validateXsltPolicyFromMemory(file, memory, valid, report);
+    std::string tmp;
+    get_implementation_report(file, tmp);
 
     // Apply an XSLT to have Text
 #if defined(_WIN32) || defined(WIN32)
-    memory = std::string(implementation_report_display_text_xsl);
+    std::string memory(implementation_report_display_text_xsl);
 #else //defined(_WIN32) || defined(WIN32)
-    memory = std::string(implementation_report_display_textunicode_xsl);
+    std::string memory(implementation_report_display_textunicode_xsl);
 #endif //defined(_WIN32) || defined(WIN32)
-    report = transformWithXsltMemory(report, memory);
-    return report;
+    return transformWithXsltMemory(tmp, memory);
 }
 
 //---------------------------------------------------------------------------
 std::string Core::GetOutput_Xml_Implementation (const std::string& file)
 {
-    std::string report;
-    bool valid;
-    std::string memory(implementation_report_xsl);
-    validateXsltPolicyFromMemory(file, memory, valid, report);
+    std::string tmp;
+    get_implementation_report(file, tmp);
 
     // Apply an XSLT to have XML
     if (xsltDisplay.length())
-        report = Core::transformWithXsltFile(report, xsltDisplay);
-    return report;
+        return transformWithXsltFile(tmp, xsltDisplay);
+    return tmp;
 }
 
 //---------------------------------------------------------------------------
@@ -676,6 +665,13 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, time_t 
 }
 
 //---------------------------------------------------------------------------
+void Core::register_report_implementation_xml_to_database(const std::string& file, time_t time,
+                                                          std::string& report)
+{
+    db->save_report(report_MediaConch, format_Xml, file, time, report);
+}
+
+//---------------------------------------------------------------------------
 void Core::get_content_of_media_in_xml(std::string& report)
 {
     std::string media_start("<media ref");
@@ -735,7 +731,8 @@ void Core::create_report_mt_xml(const std::string& filename, std::string& report
 }
 
 //---------------------------------------------------------------------------
-void Core::create_report_ma_xml(const std::string& filename, std::string& report)
+void Core::create_report_ma_xml(const std::string& filename, std::string& report,
+                                bitset<report_Max> reports)
 {
 
     std::string start("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -750,23 +747,41 @@ void Core::create_report_ma_xml(const std::string& filename, std::string& report
     start += filename + "\">\n";
     report += start;
 
-    std::string info = get_report_saved(filename, report_MediaInfo, format_Xml);
-    get_content_of_media_in_xml(info);
-    if (info.length())
+    if (reports[report_MediaInfo])
     {
-        info = "<MediaInfo xmlns=\"https://mediaarea.net/mediainfo\" version=\"2.0beta1\">" + info + "</MediaInfo>\n";
-        report +=info;
+        std::string info = get_report_saved(filename, report_MediaInfo, format_Xml);
+        get_content_of_media_in_xml(info);
+        if (info.length())
+        {
+            info = "<MediaInfo xmlns=\"https://mediaarea.net/mediainfo\" version=\"2.0beta1\">" + info + "</MediaInfo>\n";
+            report +=info;
+        }
     }
 
-    std::string trace = get_report_saved(filename, report_MediaTrace, format_Xml);
-    get_content_of_media_in_xml(trace);
-    if (trace.length())
+    if (reports[report_MediaTrace])
     {
-        trace = "<MediaTrace xmlns=\"https://mediaarea.net/mediatrace\" version=\"0.1\">"
+        std::string trace = get_report_saved(filename, report_MediaTrace, format_Xml);
+        get_content_of_media_in_xml(trace);
+        if (trace.length())
+        {
+            trace = "<MediaTrace xmlns=\"https://mediaarea.net/mediatrace\" version=\"0.1\">"
                 + trace + "</MediaTrace>\n";
-        report += trace;
+            report += trace;
+        }
     }
 
+    if (reports[report_MediaConch])
+    {
+        std::string implem;
+        get_implementation_report(filename, implem);
+        get_content_of_media_in_xml(implem);
+        if (implem.length())
+        {
+            implem = "<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" version=\"0.1\">"
+            + implem + "</MediaConch>\n";
+            report += implem;
+        }
+    }
     std::string end("</media>\n"
                     "</MediaArea>");
     report += end;
@@ -775,15 +790,16 @@ void Core::create_report_ma_xml(const std::string& filename, std::string& report
 //---------------------------------------------------------------------------
 std::string Core::get_report_saved(const std::string& filename, report reportKind, format f)
 {
-    if (reportKind >= report_Max || f >= format_Max)
-        return std::string();
-
     if (f == format_MaXml)
     {
         std::string report;
-        create_report_ma_xml(filename, report);
+        create_report_ma_xml(filename, report, get_bitset_with_mi_mt());
         return report;
     }
+
+    if (reportKind >= report_Max || f >= format_Max)
+        return std::string();
+
     time_t time = get_last_modification_file(filename);
     return db->get_report(reportKind, f, filename, time);
 }
@@ -791,18 +807,9 @@ std::string Core::get_report_saved(const std::string& filename, report reportKin
 //---------------------------------------------------------------------------
 void Core::get_Reports_Output(const std::string& file, std::string& report)
 {
-    if (Report[report_MediaConch])
+    if (Format == format_MaXml)
     {
-        if (Format == format_Xml)
-            report += GetOutput_Xml_Implementation(file);
-        else
-            report += GetOutput_Text_Implementation(file);
-        report += "\r\n";
-    }
-
-    if (Report[report_MediaTrace] && Report[report_MediaInfo] && Format == format_MaXml)
-    {
-        create_report_ma_xml(file, report);
+        create_report_ma_xml(file, report, Report);
         report += "\r\n";
     }
     else
@@ -823,7 +830,34 @@ void Core::get_Reports_Output(const std::string& file, std::string& report)
                 report += get_report_saved(file, report_MediaTrace, Format);
             report += "\r\n";
         }
+        if (Report[report_MediaConch])
+        {
+            if (Format == format_Xml)
+                report += GetOutput_Xml_Implementation(file);
+            else
+                report += GetOutput_Text_Implementation(file);
+            report += "\r\n";
+        }
     }
+}
+
+//---------------------------------------------------------------------------
+void Core::get_implementation_report(const std::string& file, std::string& report)
+{
+    std::string r = get_report_saved(file, report_MediaConch, format_Xml);
+
+    if (!r.length())
+    {
+        bool valid;
+        std::string memory(implementation_report_xsl);
+        validateXsltPolicyFromMemory(file, memory, valid, r);
+        if (valid)
+        {
+            time_t time = get_last_modification_file(file);
+            register_report_implementation_xml_to_database(file, time, r);
+        }
+    }
+    report += r;
 }
 
 //---------------------------------------------------------------------------
@@ -915,6 +949,16 @@ void Core::WaitRunIsFinished()
             break;
         usleep(50000);
     }
+}
+
+//---------------------------------------------------------------------------
+bitset<Core::report_Max> Core::get_bitset_with_mi_mt()
+{
+    bitset<report_Max> bits;
+
+    bits.set(report_MediaInfo);
+    bits.set(report_MediaTrace);
+    return bits;
 }
 
 }
