@@ -18,7 +18,6 @@
 <ul>
 <li><a href="#structure-of-a-mediainfo-xml">Structure of a MediaInfo XML</a></li>
 <li><a href="#generating-a-mediainfo-xml">Generating a MediaInfo XML</a></li>
-<li><a href="#mediainfo-xml-schema">MediaInfo XML Schema</a></li>
 </ul>
 
 <h4><a href="#mediaconch-xml">MediaConch XML</a></h4>
@@ -26,7 +25,6 @@
 <ul>
 <li><a href="#structure-of-a-mediaconch-xml">Structure of a MediaConch XML</a></li>
 <li><a href="#generating-a-mediaconch-xml">Generating a MediaConch XML</a></li>
-<li><a href="#mediaconch-xml-schema">MediaConch XML Schema</a></li>
 </ul>
 
 <h4><a href="#mediatrace-xml">MediaTrace XML</a></h4>
@@ -73,10 +71,6 @@
 <li><p>With MediaConch (GUI): Select View Mode in the <code>MediaInfo</code> tab from the resulting file Checker reports</p></li>
 </ul>
 
-<h4><a name="mediainfo-xml-schema">MediaInfo XML Schema</a></h4>
-
-<p>An XML Schema for MediaAreaXML is available at . </p>
-
 <h3><a name="mediaconch-xml">MediaConch XML</a></h3>
 
 <p>The MediaConch XML is designed specifically for file conformance checking using MediaArea’s MediaConch software, and contains reportage pertaining to a user-defined policy or policies. Additional information on MediaConch is available <a href="https://mediaarea.net/MediaConch/">here</a>.</p>
@@ -106,11 +100,9 @@
 
 <p>-With MediaConch (CLI): <code>mediaconch -mi -fx file.mov</code></p>
 
+<p>Note: The command mediaconch <code>-fx file.mov</code>will automatically default to <code>-mc</code>and produce equivalent results.</p>
+
 <p>-With MediaConch (GUI): Select View Mode in the <code>Policy Report</code> tab from the resulting file Checker reports</p>
-
-<h4><a name="mediaconch-xml-schema">MediaConch XML Schema</a></h4>
-
-<p>An XML Schema for MediaAreaXML is available at <a href="url">url</a>. </p>
 
 <h3><a name="mediatrace-xml">MediaTrace XML</a></h3>
 
@@ -152,7 +144,7 @@
 
 <h4><a name="mediatrace-xml-schema">MediaTrace XML Schema</a></h4>
 
-<p>An XML Schema for MediaTrace is available at https://mediaarea.net/mediatrace/mediatrace.xsd. </p>
+<p>An XML Schema for MediaTrace is available <a href="https://mediaarea.net/mediatrace/mediatrace.xsd">here</a>.</p>
 
 <h3><a name="mediaarea-xml">MediaArea XML</a></h3>
 
@@ -168,11 +160,9 @@
 
 <p>-With MediaInfo: <code>mediainfo --Details=1 --Output=MAXML file.mkv</code></p>
 
-<p>-With MediaConch (CLI): <code>mediaconch -mt -fx file.mkv</code></p>
-
 <h4><a name="mediaarea-xml-schema">MediaArea XML Schema</a></h4>
 
-<p>An XML Schema for MediaAreaXML is available at https://mediaarea.net/mediaarea/mediaarea<em>0</em>1.xsd.</p>
+<p>An XML Schema for MediaAreaXML is available <a href="https://mediaarea.net/mediaarea/mediaarea_0_1.xsd">here</a>.</p>
 
       <script src="qrc:/jquery.js"></script>
       <script src="qrc:/bootstrap.js"></script>
