@@ -514,17 +514,26 @@ bool XsltPolicy::find_template_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-std::string XsltPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
+int XsltPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
 {
     if (!doc)
-        return "The XSL doc is not valid";
+    {
+        error = "The XSL doc is not valid";
+        return -1;
+    }
 
     xmlNodePtr root = xmlDocGetRootElement(doc);
     if (!root)
-        return "No root node, leaving";
+    {
+        error = "No root node, leaving";
+        return -1;
+    }
 
     if (!find_xslt_header(root))
-        return "Format not detected";
+    {
+        error = "Format not detected";
+        return -1;
+    }
 
     this->filename = filename;
     xmlNodePtr child = root->children;
@@ -552,7 +561,7 @@ std::string XsltPolicy::import_schema_from_doc(const std::string& filename, xmlD
         child = child->next;
     }
     xmlSetGenericErrorFunc(NULL, NULL);
-    return std::string();
+    return 0;
 }
 
 //---------------------------------------------------------------------------

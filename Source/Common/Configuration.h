@@ -21,14 +21,6 @@
 
 namespace MediaConch {
 
-#ifdef WINDOWS
-    const std::string Path_Separator("\\");
-    /* const String WPath_Separator(__T("\\")); */
-#else
-    const std::string Path_Separator("/");
-    /* const String WPath_Separator(__T("/")); */
-#endif
-
 //***************************************************************************
 // Class Configuration
 //***************************************************************************

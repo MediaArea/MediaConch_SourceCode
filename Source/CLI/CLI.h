@@ -1,0 +1,55 @@
+/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a GPLv3+/MPLv2+ license that can
+ *  be found in the License.html file in the root of the source tree.
+ */
+
+#ifndef CLIH
+#define CLIH
+
+//---------------------------------------------------------------------------
+#include <string>
+#include <vector>
+#include "MediaInfo/MediaInfo.h"
+#include "Common/MediaConchLib.h"
+
+//***************************************************************************
+// CLI
+//***************************************************************************
+
+namespace MediaConch
+{
+    //--------------------------------------------------------------------------
+    class CLI
+    {
+      public:
+        CLI();
+        ~CLI();
+
+        int parse_args(int ac, char** av);
+        int init();
+        int run();
+        int finish();
+        void set_report_set(std::string& report_kind);
+        void set_report_reset();
+        int set_format(MediaConchLib::format f);
+        int set_format(const std::string& f);
+        void add_policy(const std::string& policy);
+        void set_display_file(const std::string& file);
+        void register_option(const std::string& opt);
+
+      private:
+        CLI(const CLI&);
+        CLI& operator=(const CLI&);
+
+        MediaConchLib MCL;
+        std::vector<std::string> files;
+        std::vector<std::string> policies;
+        std::string              display_file;
+        std::bitset<MediaConchLib::report_Max> report_set;
+        MediaConchLib::format format;
+    };
+
+}
+
+#endif

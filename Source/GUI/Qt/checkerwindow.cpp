@@ -63,8 +63,8 @@ CheckerWindow::~CheckerWindow()
 //---------------------------------------------------------------------------
 void CheckerWindow::checker_add_file(QString& file, int policy)
 {
-    mainwindow->addFileToList(file);
-    updateWebView(file.toStdString(), policy);
+    mainwindow->add_file_to_list(file);
+    update_web_view(file.toStdString(), policy);
 }
 
 //---------------------------------------------------------------------------
@@ -73,19 +73,19 @@ void CheckerWindow::checker_add_files(QFileInfoList& list, int policy)
     for (int i = 0; i < list.count(); ++i)
     {
         QString file = list[i].absoluteFilePath();
-        mainwindow->addFileToList(file);
+        mainwindow->add_file_to_list(file);
     }
-    updateWebView(list, policy);
+    update_web_view(list, policy);
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::checker_add_policy_file(QString& file, QString& policy)
 {
-    mainwindow->addFileToList(file);
+    mainwindow->add_file_to_list(file);
 
-    mainwindow->addPolicyToList(policy);
-    updateWebView(file.toStdString(), -1);
-    mainwindow->clearPolicyList();
+    mainwindow->add_policy_to_list(policy);
+    update_web_view(file.toStdString(), -1);
+    mainwindow->clear_policy_list();
 }
 
 //---------------------------------------------------------------------------
@@ -94,11 +94,11 @@ void CheckerWindow::checker_add_policy_files(QFileInfoList& list, QString& polic
     for (int i = 0; i < list.count(); ++i)
     {
         QString file = list[i].absoluteFilePath();
-        mainwindow->addFileToList(file);
+        mainwindow->add_file_to_list(file);
     }
-    mainwindow->addPolicyToList(policy);
-    updateWebView(list, -1);
-    mainwindow->clearPolicyList();
+    mainwindow->add_policy_to_list(policy);
+    update_web_view(list, -1);
+    mainwindow->clear_policy_list();
 }
 
 //---------------------------------------------------------------------------
@@ -114,9 +114,9 @@ bool CheckerWindow::is_analyzes_done()
 //---------------------------------------------------------------------------
 void CheckerWindow::actionCloseAllTriggered()
 {
-    mainwindow->clearFileList();
+    mainwindow->clear_file_list();
     clearVisualElements();
-    createWebView();
+    create_web_view();
     analyse = false;
 }
 
@@ -158,9 +158,9 @@ void CheckerWindow::createWebViewFinished(bool ok)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::setWebViewContent(QString& html)
+void CheckerWindow::set_web_view_content(QString& html)
 {
-    MainView=new WebView(mainwindow);
+    MainView = new WebView(mainwindow);
 
     WebPage* page = new WebPage(mainwindow, MainView);
     MainView->setPage(page);
@@ -176,7 +176,7 @@ void CheckerWindow::setWebViewContent(QString& html)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::createWebView()
+void CheckerWindow::create_web_view()
 {
     if (MainView)
         return;
@@ -189,11 +189,11 @@ void CheckerWindow::createWebView()
     progressBar->show();
 
     QString html = create_html();
-    setWebViewContent(html);
+    set_web_view_content(html);
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::updateWebView(std::string file, int policy)
+void CheckerWindow::update_web_view(std::string file, int policy)
 {
     if (!MainView)
         return;
@@ -211,7 +211,9 @@ void CheckerWindow::updateWebView(std::string file, int policy)
     progressBar->get_progress_bar()->setMaximum(100);
 
     // Analyze
-    mainwindow->analyze(file);
+    std::vector<std::string> files;
+    files.push_back(file);
+    mainwindow->analyze(files);
 
     // TODO: do not wait until the end of the analyzed
     mainwindow->wait_analyze_finished();
@@ -219,12 +221,12 @@ void CheckerWindow::updateWebView(std::string file, int policy)
     //Add the file detail to the web page
     add_file_detail_to_html(html, file, policy);
 
-    setWebViewContent(html);
+    set_web_view_content(html);
     analyse = true;
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
+void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
 {
     if (!MainView)
         return;
@@ -240,34 +242,34 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
     progressBar->get_progress_bar()->setMaximum(0);
 
     // Analyze
+    std::vector<std::string> vfiles;
     for (int i = 0; i < files.count(); ++i)
-    {
-        std::string file = files[i].absoluteFilePath().toStdString();
-        mainwindow->analyze(file);
-    }
+        vfiles.push_back(files[i].absoluteFilePath().toStdString());
 
     progressBar->get_progress_bar()->setMaximum(100);
     progressBar->get_progress_bar()->setValue(1);
+
+    mainwindow->analyze(vfiles);
     // TODO: do not wait until the end of the analyzed
     mainwindow->wait_analyze_finished();
 
     //Add the files details to the web page
-    QString displayXsltRetain = displayXslt;
+    QString displayXsltRetain = display_xslt;
     for (int i = 0; i < files.count(); ++i)
     {
-        displayXslt = displayXsltRetain;
+        display_xslt = displayXsltRetain;
         std::string file = files[i].absoluteFilePath().toStdString();
         add_file_detail_to_html(html, file, policy);
         progressBar->get_progress_bar()->setValue(((i + 1) * 100) / files.count());
     }
-    resetDisplayXslt();
+    reset_display_xslt();
 
-    setWebViewContent(html);
+    set_web_view_content(html);
     analyse = true;
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::changeLocalFiles(QStringList& files)
+void CheckerWindow::change_local_files(QStringList& files)
 {
     if (!MainView || !MainView->page())
         return;
@@ -638,22 +640,22 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, std::stri
     std::string r = report.toStdString();
     QString save_ext = "xml";
     bool is_html = false;
-    if (displayXslt.length())
+    if (display_xslt.length())
     {
-        if (displayXslt.startsWith(":/displays/"))
+        if (display_xslt.startsWith(":/displays/"))
         {
-            QFile display_file(displayXslt);
+            QFile display_file(display_xslt);
             if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 QByteArray data = display_file.readAll();
                 display_file.close();
-                r = mainwindow->transformWithXsltMemory(r, data.data());
+                mainwindow->transform_with_xslt_memory(r, data.data(), r);
             }
         }
         else
         {
-            std::string trans = displayXslt.toStdString();
-            r = mainwindow->transformWithXsltFile(r, trans);
+            std::string trans = display_xslt.toStdString();
+            mainwindow->transform_with_xslt_file(r, trans, r);
         }
 
         report = QString().fromUtf8(r.c_str(), r.length());
@@ -662,7 +664,7 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, std::stri
     }
     else
     {
-        r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
+        mainwindow->transform_with_xslt_memory(r, implementation_report_display_html_xsl, r);
         report = QString().fromUtf8(r.c_str(), r.length());
         is_html = report_is_html(report);
         save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
@@ -716,42 +718,40 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, std::st
         return;
     }
 
-    bool valid;
     std::string r;
-    if (!mainwindow->ValidatePolicy(file, policy, valid, r))
-        valid = false;
+    bool valid = mainwindow->validate_policy(file, policy, r);
 
     // Default without display
     QString save_ext("xml");
     bool is_html = false;
 
     QString report = QString().fromUtf8(r.c_str(), r.length());
-    if (displayXslt.length())
+    if (display_xslt.length())
     {
-        if (displayXslt.startsWith(":/displays/"))
+        if (display_xslt.startsWith(":/displays/"))
         {
-            QFile display_file(displayXslt);
+            QFile display_file(display_xslt);
             if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 QByteArray data = display_file.readAll();
                 display_file.close();
-                r = mainwindow->transformWithXsltMemory(r, data.data());
+                mainwindow->transform_with_xslt_memory(r, data.data(), r);
             }
         }
         else
         {
-            std::string trans = displayXslt.toStdString();
-            r = mainwindow->transformWithXsltFile(r, trans);
+            std::string trans = display_xslt.toStdString();
+            mainwindow->transform_with_xslt_file(r, trans, r);
         }
 
         report = QString().fromUtf8(r.c_str(), r.length());
         is_html = report_is_html(report);
         save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-        resetDisplayXslt();
+        reset_display_xslt();
     }
     else
     {
-        r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
+        mainwindow->transform_with_xslt_memory(r, implementation_report_display_html_xsl, r);
         report = QString().fromUtf8(r.c_str(), r.length());
         is_html = report_is_html(report);
         save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";

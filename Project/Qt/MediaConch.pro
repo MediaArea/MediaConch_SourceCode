@@ -18,7 +18,8 @@ CONFIG += no_keywords
 
 DEFINES          +=  _UNICODE
 
-SOURCES          += ../../Source/Common/Core.cpp \
+SOURCES          += ../../Source/Common/MediaConchLib.cpp \
+                    ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schema.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Xslt.cpp \
@@ -62,7 +63,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/displaymenu.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp
 
-HEADERS          += ../../Source/Common/Core.h \
+HEADERS          += ../../Source/Common/MediaConchLib.h \
+                    ../../Source/Common/Core.h \
                     ../../Source/Common/Schema.h \
                     ../../Source/Common/Schematron.h \
                     ../../Source/Common/Xslt.h \

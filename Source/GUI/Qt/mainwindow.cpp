@@ -40,6 +40,7 @@
     #include <QFontDatabase>
 #endif
 #include <sstream>
+#include <unistd.h>
 
 namespace MediaConch {
 
@@ -54,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Core configuration
-    C.load_configuration();
+    MCL.load_configuration();
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
@@ -99,15 +100,15 @@ MainWindow::~MainWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void MainWindow::addFileToList(const QString& file)
+void MainWindow::add_file_to_list(const QString& file)
 {
-    C.List.push_back(file.toStdString());
+    files.push_back(file.toStdString());
 }
 
 void MainWindow::policy_to_delete(int index)
 {
     //Delete policy
-    C.policies.erase_policy(index);
+    MCL.remove_policy((size_t)index);
 }
 
 //***************************************************************************
@@ -121,7 +122,7 @@ void MainWindow::Run()
     {
         case RUN_CHECKER_VIEW:
             //TODO: fill the view if file already here
-            // if (!C.List.empty())
+            // if (!files.empty())
             //     C.Run();
             createWebView();
             break;
@@ -133,7 +134,7 @@ void MainWindow::Run()
             break;
         default:
             //TODO: fill the view if file already here
-            // if (!C.List.empty())
+            // if (!files.empty())
             //     C.Run();
             createWebView();
             break;
@@ -141,15 +142,15 @@ void MainWindow::Run()
 }
 
 //---------------------------------------------------------------------------
-std::string MainWindow::transformWithXsltFile(std::string& report, std::string trans)
+int MainWindow::transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result)
 {
-    return C.transformWithXsltFile(report, trans);
+    return MCL.transform_with_xslt_file(report, file, result);
 }
 
 //---------------------------------------------------------------------------
-std::string MainWindow::transformWithXsltMemory(std::string& report, std::string memory)
+int MainWindow::transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result)
 {
-    return C.transformWithXsltMemory(report, memory);
+    return MCL.transform_with_xslt_memory(report, memory, result);
 }
 
 //---------------------------------------------------------------------------
@@ -179,7 +180,7 @@ void MainWindow::checker_add_policy_files(QFileInfoList& list, QString& policy)
 //---------------------------------------------------------------------------
 const std::vector<std::string>& MainWindow::policy_file_registered()
 {
-    return C.PoliciesFiles;
+    return policies;
 }
 
 //---------------------------------------------------------------------------
@@ -203,24 +204,7 @@ QString MainWindow::ask_for_schema_file()
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::exporting_to_schematron_file(int pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-    if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
-        path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".sch";
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                              path, tr("Schematron (*.sch)"));
-
-    if (!filename.length())
-        return -1;
-    C.policies.export_schema(filename.toStdString().c_str(), pos);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_xslt_file(int pos)
+int MainWindow::exporting_to_schematron_file(size_t pos)
 {
     QString path = get_local_folder();
     path += "/policies";
@@ -228,28 +212,59 @@ int MainWindow::exporting_to_xslt_file(int pos)
     QDir dir(path);
     if (!dir.exists())
         dir.mkpath(dir.absolutePath());
-    if (pos < (int)C.policies.policies.size() && pos >= 0 && C.policies.policies[pos])
-        path += "/" + QString().fromStdString(C.policies.policies[pos]->title) + ".xsl";
 
+    Policy* p = MCL.get_policy(pos);
+    if (!p)
+        return -1;
+
+    path += "/" + QString().fromStdString(p->title) + ".sch";
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                              path, tr("Schematron (*.sch)"));
+
+    if (!filename.length())
+        return -1;
+
+    std::string f = filename.toStdString();
+    MCL.save_policy(pos, &f);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::exporting_to_xslt_file(size_t pos)
+{
+    QString path = get_local_folder();
+    path += "/policies";
+
+    QDir dir(path);
+    if (!dir.exists())
+        dir.mkpath(dir.absolutePath());
+
+    Policy* p = MCL.get_policy(pos);
+    if (!p)
+        return -1;
+
+    path += "/" + QString().fromStdString(p->title) + ".xsl";
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
                                               path, tr("XSLT (*.xsl)"));
 
     if (!filename.length())
         return -1;
-    C.policies.export_schema(filename.toStdString().c_str(), pos);
+
+    std::string f = filename.toStdString();
+    MCL.save_policy(pos, &f);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::exporting_policy(int pos)
+void MainWindow::exporting_policy(size_t pos)
 {
-    C.policies.export_schema(NULL, pos);
+    MCL.save_policy(pos, NULL);
 }
 
 //---------------------------------------------------------------------------
-bool MainWindow::ValidatePolicy(const std::string& file, int policy, bool& valid, std::string& report)
+bool MainWindow::validate_policy(const std::string& file, int policy, std::string& report)
 {
-    return C.ValidatePolicy(file, policy, valid, report);
+    return MCL.validate_policy(file, policy, report);
 }
 
 //---------------------------------------------------------------------------
@@ -267,7 +282,9 @@ void MainWindow::add_default_policy()
             continue;
         QByteArray schematron = file.readAll();
         const std::string& file_str = list[i].absoluteFilePath().toStdString();
-        C.policies.import_schema_from_memory(file_str, schematron.constData(), schematron.length());
+        std::string memory(schematron.constData(), schematron.length());
+        std::string err;
+        MCL.import_policy_from_memory(memory, file_str, err);
     }
 
     QString path = get_local_folder();
@@ -283,8 +300,10 @@ void MainWindow::add_default_policy()
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
         QByteArray data = file.readAll();
-        C.policies.import_schema_from_memory(list[i].absoluteFilePath().toStdString(),
-                                             data.constData(), data.length());
+        std::string memory(data.constData(), data.length());
+        std::string err;
+        MCL.import_policy_from_memory(memory, list[i].absoluteFilePath().toStdString(),
+                                      err);
     }
 }
 
@@ -296,7 +315,7 @@ void MainWindow::add_default_displays()
     displays_dir.setFilter(QDir::Files);
     QFileInfoList list = displays_dir.entryInfoList();
     for (int i = 0; i < list.count(); ++i)
-        displaysList.push_back(list[i].absoluteFilePath());
+        displays_list.push_back(list[i].absoluteFilePath());
 
     QString path = get_local_folder();
     path += "/displays";
@@ -307,50 +326,50 @@ void MainWindow::add_default_displays()
         dir.setFilter(QDir::Files);
         list = dir.entryInfoList();
         for (int i = 0; i < list.size(); ++i)
-            displaysList.push_back(list[i].absoluteFilePath());
+            displays_list.push_back(list[i].absoluteFilePath());
     }
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addXsltDisplay(QString& display_xslt)
+void MainWindow::add_xslt_display(const QString& display_xslt)
 {
-    MainView->setDisplayXslt(display_xslt);
+    MainView->set_display_xslt(display_xslt);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::removeXsltDisplay()
+void MainWindow::remove_xslt_display()
 {
-    MainView->resetDisplayXslt();
+    MainView->reset_display_xslt();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::addPolicyToList(QString& policy)
+void MainWindow::add_policy_to_list(const QString& policy)
 {
-    C.PoliciesFiles.push_back(policy.toStdString());
+    policies.push_back(policy.toStdString());
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::clearPolicyList()
+void MainWindow::clear_policy_list()
 {
-    C.PoliciesFiles.clear();
+    policies.clear();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::clearFileList()
+void MainWindow::clear_file_list()
 {
-    C.List.clear();
+    files.clear();
 }
 
 //---------------------------------------------------------------------------
 const std::vector<Policy *>& MainWindow::get_all_policies() const
 {
-    return C.policies.policies;
+    return MCL.get_policies();
 }
 
 //---------------------------------------------------------------------------
 std::vector<QString>& MainWindow::get_displays()
 {
-    return displaysList;
+    return displays_list;
 }
 
 //***************************************************************************
@@ -360,20 +379,19 @@ std::vector<QString>& MainWindow::get_displays()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionOpen_triggered()
 {
-    QStringList List=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
-    if (List.empty())
+    QStringList list=QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    if (list.empty())
         return;
 
-    C.List.clear();
-    for (int Pos=0; Pos<List.size(); Pos++)
-        C.List.push_back(List[Pos].toStdString());
+    for (int pos = 0; pos < list.size(); ++pos)
+        files.push_back(list[pos].toStdString());
 
     current_view = RUN_CHECKER_VIEW;
     Run();
 
     if (!MainView)
         return;
-    MainView->changeLocalFiles(List);
+    MainView->change_local_files(list);
 }
 
 //---------------------------------------------------------------------------
@@ -416,7 +434,8 @@ void MainWindow::on_actionChooseSchema_triggered()
     if (!file.length())
         return;
 
-    if (!C.policies.import_schema(file.toStdString()).length())
+    std::string err;
+    if (MCL.import_policy_from_file(file.toStdString(), err) < 0)
     {
         //TODO error
     }
@@ -435,22 +454,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
                            tr("All policy changes not saved will be discarded?"),
                            QMessageBox::Ok | QMessageBox::Save | QMessageBox::Cancel, this);
         QString info("Policies not saved:");
-        for (size_t i = 0; i < C.policies.policies.size(); ++i)
-            if (!C.policies.policies[i]->saved)
+        for (size_t i = 0; i < MCL.get_policies_count(); ++i)
+            if (!MCL.get_policy(i)->saved)
             {
                 info += "\r\n\t";
-                info += QString().fromStdString(C.policies.policies[i]->title);
+                info += QString().fromStdString(MCL.get_policy(i)->title);
             }
 
         msgBox.setInformativeText(info);
 
         int ret = msgBox.exec();
         if (ret == QMessageBox::Save)
-        {
-            for (size_t i = 0; i < C.policies.policies.size(); ++i)
-                if (!C.policies.policies[i]->saved)
-                    C.policies.export_schema(NULL, i);
-        }
+            MCL.save_policies();
         else if (ret == QMessageBox::Cancel)
         {
             event->ignore();
@@ -463,12 +478,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //---------------------------------------------------------------------------
 bool MainWindow::is_all_policies_saved()
 {
-    for (size_t i = 0; i < C.policies.policies.size(); ++i)
-    {
-        if (!C.policies.policies[i]->saved)
-            return false;
-    }
-    return true;
+    return MCL.is_policies_saved();
 }
 
 //***************************************************************************
@@ -550,7 +560,7 @@ void MainWindow::createWebView()
     MainView = new CheckerWindow(this);
     QObject::connect(ui->actionCloseAll, SIGNAL(triggered()),
                      MainView, SLOT(actionCloseAllTriggered()));
-    MainView->createWebView();
+    MainView->create_web_view();
 }
 
 //---------------------------------------------------------------------------
@@ -606,70 +616,147 @@ void MainWindow::display_selected()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::analyze(std::string& file)
+int MainWindow::import_policy(const QString& file, std::string& err)
 {
-    C.Close();
-    C.Report.reset();
-    C.Report.set(Core::report_MediaConch);
-    C.Run(file);
+    return MCL.import_policy_from_file(file.toStdString(), err);
+}
+
+//---------------------------------------------------------------------------
+bool MainWindow::policy_exists(const std::string& title)
+{
+    return MCL.policy_exists(title);
+}
+
+//---------------------------------------------------------------------------
+Policy* MainWindow::get_policy(size_t pos)
+{
+    return MCL.get_policy(pos);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::remove_policy(size_t pos)
+{
+    return MCL.remove_policy(pos);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::add_policy(Policy* policy)
+{
+    return MCL.add_policy(policy);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::clear_policies()
+{
+    return MCL.clear_policies();
+}
+
+//---------------------------------------------------------------------------
+size_t MainWindow::get_policies_count() const
+{
+    return MCL.get_policies_count();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::analyze(const std::vector<std::string>& files)
+{
+    MCL.analyze(files);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::wait_analyze_finished()
 {
-    C.WaitRunIsFinished();
+    while (1)
+    {
+        double percent_done;
+        if (MCL.is_done(files, percent_done))
+            break;
+        usleep(50000);
+    }
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_implementationreport_xml(const std::string& file)
 {
-    C.Report.reset();
-    C.Report.set(Core::report_MediaConch);
-    return QString().fromStdString(C.GetOutput_Xml(file));
+    std::bitset<MediaConchLib::report_Max> report_set;
+    report_set.set(MediaConchLib::report_MediaConch);
+    std::string report;
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    std::vector<std::string> policies;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    return QString().fromStdString(report);
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file)
 {
-    C.Report.reset();
-    C.Report.set(Core::report_MediaInfo);
-    C.Report.set(Core::report_MediaTrace);
-    return QString().fromStdString(C.GetOutput_Xml(file));
+    std::bitset<MediaConchLib::report_Max> report_set;
+    report_set.set(MediaConchLib::report_MediaInfo);
+    report_set.set(MediaConchLib::report_MediaTrace);
+    std::string report;
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    std::vector<std::string> policies;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    return QString().fromStdString(report);
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_xml(const std::string& file)
 {
-    C.Report.reset();
-    C.Report.set(Core::report_MediaInfo);
-    return QString().fromStdString(C.GetOutput_Xml(file));
+    std::bitset<MediaConchLib::report_Max> report_set;
+    report_set.set(MediaConchLib::report_MediaInfo);
+    std::string report;
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    std::vector<std::string> policies;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    return QString().fromStdString(report);
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_jstree(const std::string& file)
 {
-    C.Report.reset();
-    C.Report.set(Core::report_MediaInfo);
+    std::bitset<MediaConchLib::report_Max> report_set;
+    report_set.set(MediaConchLib::report_MediaInfo);
     std::string report;
-    C.GetOutput_JStree(file, report);
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    std::vector<std::string> policies;
+    MCL.get_report(report_set, MediaConchLib::format_JsTree, files, policies, report);
     return QString().fromStdString(report);
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediatrace_xml(const std::string& file)
 {
-    C.Report.reset();
-    C.Report.set(Core::report_MediaTrace);
-    return QString().fromStdString(C.GetOutput_Xml(file));
+    std::bitset<MediaConchLib::report_Max> report_set;
+    report_set.set(MediaConchLib::report_MediaTrace);
+    std::string report;
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    std::vector<std::string> policies;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    return QString().fromStdString(report);
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediatrace_jstree(const std::string& file)
 {
-    C.Report.reset();
-    C.Report.set(Core::report_MediaTrace);
+    std::bitset<MediaConchLib::report_Max> report_set;
+    report_set.set(MediaConchLib::report_MediaTrace);
     std::string report;
-    C.GetOutput_JStree(file, report);
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    std::vector<std::string> policies;
+    MCL.get_report(report_set, MediaConchLib::format_JsTree, files, policies, report);
     return QString().fromStdString(report);
 }
 

@@ -200,13 +200,13 @@ namespace MediaConch
         {
             QStringList display_xslt_list = file_selector.value("checkerUpload[step1][display_xslt]", QStringList());
             if (display_xslt_list.length())
-                mainwindow->addXsltDisplay(display_xslt_list.last());
+                mainwindow->add_xslt_display(display_xslt_list.last());
         }
         else
         {
             int index = display_xslt.toInt();
             if (index >= 0 && index < (int)mainwindow->get_displays().size())
-                mainwindow->addXsltDisplay(mainwindow->get_displays()[index]);
+                mainwindow->add_xslt_display(mainwindow->get_displays()[index]);
         }
 
         if (policy == "-1")
@@ -239,13 +239,13 @@ namespace MediaConch
         {
             QStringList display_xslt_list = file_selector.value("checkerOnline[step1][display_xslt]", QStringList());
             if (display_xslt_list.length())
-                mainwindow->addXsltDisplay(display_xslt_list.last());
+                mainwindow->add_xslt_display(display_xslt_list.last());
         }
         else
         {
             int index = display_xslt.toInt();
             if (index >= 0 && index < (int)mainwindow->get_displays().size())
-                mainwindow->addXsltDisplay(mainwindow->get_displays()[index]);
+                mainwindow->add_xslt_display(mainwindow->get_displays()[index]);
         }
 
         if (policy == "-1")
@@ -282,13 +282,13 @@ namespace MediaConch
         {
             QStringList display_xslt_list = file_selector.value("checkerRepository[step1][display_xslt]", QStringList());
             if (display_xslt_list.length())
-                mainwindow->addXsltDisplay(display_xslt_list.last());
+                mainwindow->add_xslt_display(display_xslt_list.last());
         }
         else
         {
             int index = display_xslt.toInt();
             if (index >= 0 && index < (int)mainwindow->get_displays().size())
-                mainwindow->addXsltDisplay(mainwindow->get_displays()[index]);
+                mainwindow->add_xslt_display(mainwindow->get_displays()[index]);
         }
 
         if (policy == "-1")

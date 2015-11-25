@@ -57,17 +57,18 @@ public:
     Policies(Core*);
     ~Policies();
 
-    std::string import_schema(const std::string& filename);
-    std::string import_schema_from_memory(const std::string& filename, const char* memory, int len);
+    int         import_schema(const std::string& filename);
+    int         import_schema_from_memory(const std::string& filename, const char* memory, int len);
     void        export_schema(const char* filename, size_t pos);
     xmlDocPtr   create_doc(size_t pos);
     void        erase_policy(size_t index);
-    bool        policy_exists(std::string policy);
+    bool        policy_exists(const std::string& policy);
 
     static bool        try_parsing_test(std::string data, SchematronAssert *r);
     static std::string serialize_assert_for_test(SchematronAssert *r);
 
     std::vector<Policy *> policies;
+    std::string get_error() const { return error; }
     //***************************************************************************
     // Type/Field/Validator
     //***************************************************************************
@@ -92,7 +93,8 @@ public:
     static bool check_test_validator(const std::string& validator);
 
 private:
-    Core *core;
+    Core        *core;
+    std::string  error;
 
     Policies (const Policies&);
     Policies& operator=(const Policies&);

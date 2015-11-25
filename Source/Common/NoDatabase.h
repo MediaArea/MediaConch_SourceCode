@@ -33,9 +33,9 @@ public:
 
     virtual int init();
     virtual int create_report_table();
-    virtual int save_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report);
-    virtual std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification);
-    virtual bool file_is_registered(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification);
+    virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report);
+    virtual std::string get_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
+    virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
 
 protected:
     virtual int execute();
@@ -46,8 +46,8 @@ private:
 
     struct Report
     {
-        Core::report reportKind;
-        Core::format format;
+        MediaConchLib::report reportKind;
+        MediaConchLib::format format;
         std::string file_last_modification;
         std::string report;
     };

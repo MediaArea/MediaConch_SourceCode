@@ -36,7 +36,7 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int Scheduler::add_element_to_queue(std::string& filename)
+    int Scheduler::add_element_to_queue(const std::string& filename)
     {
         static int index = 0;
 
@@ -86,5 +86,30 @@ namespace MediaConch {
         size_t size = working.size();
         CS.Leave();
         return size == 0;
+    }
+
+    bool Scheduler::element_is_finished(const std::string& filename, double& percent_done)
+    {
+        bool ret = true;
+        CS.Enter();
+        if (queue->has_element(filename))
+        {
+            percent_done = 0.0;
+            CS.Leave();
+            return false;
+        }
+
+        std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
+        for (; it != working.end(); ++it)
+            if (it->first->filename == filename)
+                break;
+        if (it != working.end())
+        {
+            //TODO: find the real percent done
+            percent_done = 0.5;
+            ret = false;
+        }
+        CS.Leave();
+        return ret;
     }
 }

@@ -33,7 +33,7 @@ void QueueElement::Entry()
     MI.Option(__T("ReadByHuman"), __T("1"));
     MI.Option(__T("Language"), __T("raw"));
     MI.Option(__T("Inform"), __T("XML"));
-    MI.Open(Ztring().From_UTF8(filename));
+    MI.Open(ZenLib::Ztring().From_UTF8(filename));
     scheduler->work_finished(this, &MI);
     MI.Close();
 }
@@ -48,7 +48,7 @@ Queue::~Queue()
     clear();
 }
 
-int Queue::add_element(QueuePriority priority, int id, std::string filename)
+int Queue::add_element(QueuePriority priority, int id, const std::string& filename)
 {
     QueueElement *el = new QueueElement(scheduler);
 
@@ -56,6 +56,21 @@ int Queue::add_element(QueuePriority priority, int id, std::string filename)
     el->filename = filename;
     queue[priority].push_back(el);
     return 0;
+}
+
+bool Queue::has_element(const std::string& filename)
+{
+    std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
+
+    for (; it != queue.end(); ++it)
+    {
+        std::list<QueueElement*>::iterator it_l = it->second.begin();
+        for (; it_l != it->second.end() ; ++it_l)
+            if ((*it_l)->filename == filename)
+                return true;
+    }
+
+    return false;
 }
 
 int Queue::remove_element(int id)
@@ -75,7 +90,7 @@ int Queue::remove_element(int id)
     return 0;
 }
 
-int Queue::remove_elements(std::string filename)
+int Queue::remove_elements(const std::string& filename)
 {
     std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
 

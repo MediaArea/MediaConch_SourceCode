@@ -50,9 +50,10 @@ public:
     Scheduler(Core *c);
     virtual ~Scheduler();
 
-    int add_element_to_queue(std::string& filename);
+    int add_element_to_queue(const std::string& filename);
     void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfoList* MI);
     bool is_finished();
+    bool element_is_finished(const std::string& filename, double& percent_done);
     void set_max_threads(size_t nb) { max_threads = nb; }
 
 private:

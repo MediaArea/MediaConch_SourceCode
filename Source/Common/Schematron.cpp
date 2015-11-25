@@ -95,11 +95,12 @@ bool Schematron::register_schema_from_memory(const std::string& schem)
 }
 
 //---------------------------------------------------------------------------
-int Schematron::validate_xml(std::string& xml, bool silent)
+int Schematron::validate_xml(const std::string& x, bool silent)
 {
     if (schematron_ctx == NULL)
         return -1;
 
+    std::string xml(x);
     //Hack for removing namespace so we use .sch without namespace. TODO: find a way to keep namespace with .sch policy input
     std::string xmlns("xmlns=\"https://mediaarea.net/mediaarea\"");
     size_t xmlns_pos=xml.rfind(xmlns, 1000);

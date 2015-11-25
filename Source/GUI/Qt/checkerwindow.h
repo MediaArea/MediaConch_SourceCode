@@ -31,12 +31,12 @@ public:
     ~CheckerWindow();
 
     // Functions
-    void                        createWebView();
-    void                        updateWebView(std::string file, int policy);
-    void                        updateWebView(QList<QFileInfo>& files, int policy);
-    void                        setDisplayXslt(QString& d) { displayXslt = d; }
-    void                        resetDisplayXslt() { displayXslt.clear(); }
-    void                        changeLocalFiles(QStringList& files);
+    void                        create_web_view();
+    void                        update_web_view(std::string file, int policy);
+    void                        update_web_view(QList<QFileInfo>& files, int policy);
+    void                        set_display_xslt(const QString& d) { display_xslt = d; }
+    void                        reset_display_xslt() { display_xslt.clear(); }
+    void                        change_local_files(QStringList& files);
 
     // Helpers
     void                        checker_add_file(QString& file, int policy);
@@ -50,11 +50,11 @@ private:
     MainWindow*                 mainwindow;
     WebView*                    MainView;
     ProgressBar*                progressBar;
-    QString                     displayXslt;
+    QString                     display_xslt;
     bool                        analyse;
 
     void                        clearVisualElements();
-    void                        setWebViewContent(QString& html);
+    void                        set_web_view_content(QString& html);
 
 //***************************************************************************
 // HELPER

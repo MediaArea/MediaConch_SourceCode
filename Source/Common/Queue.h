@@ -16,24 +16,11 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#ifdef MEDIAINFO_DLL_RUNTIME
-    #include "MediaInfoDLL/MediaInfoDLL.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#elif defined MEDIAINFO_DLL_STATIC
-    #include "MediaInfoDLL/MediaInfoDLL_Static.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#else
-    #include "MediaInfo/MediaInfoList.h"
-    #define MediaInfoNameSpace MediaInfoLib
-#endif
 #include "ZenLib/Thread.h"
 #include "ZenLib/CriticalSection.h"
 //---------------------------------------------------------------------------
 #include <map>
 #include <list>
-
-using namespace MediaInfoNameSpace;
-using namespace ZenLib;
 
 namespace MediaConch
 {
@@ -44,7 +31,7 @@ namespace MediaConch
     class Queue;
     class Scheduler;
 
-    class QueueElement : public Thread
+    class QueueElement : public ZenLib::Thread
     {
     public:
         QueueElement(Scheduler *s) : Thread(), scheduler(s) {}
@@ -80,9 +67,10 @@ namespace MediaConch
         Queue(Scheduler *s) : scheduler(s){}
         ~Queue();
 
-        int add_element(QueuePriority priority, int id, std::string filename);
+        int add_element(QueuePriority priority, int id, const std::string& filename);
+        bool has_element(const std::string& filename);
         int remove_element(int id);
-        int remove_elements(std::string filename);
+        int remove_elements(const std::string& filename);
         void clear();
 
         QueueElement* run_next();
