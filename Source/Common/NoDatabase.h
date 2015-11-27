@@ -6,55 +6,55 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// SQLLite functions
+// NoDatabase functions
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#ifdef HAVE_SQLITE
+//---------------------------------------------------------------------------
+#ifndef NODATABASEH
+#define NODATABASEH
 
 //---------------------------------------------------------------------------
-#ifndef SQLLiteH
-#define SQLLiteH
-//---------------------------------------------------------------------------
-
 #include "Database.h"
-#include <sqlite3.h>
-//---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
 namespace MediaConch {
 
 //***************************************************************************
-// Class SQLLite
+// Class NoDatabase
 //***************************************************************************
 
-class SQLLite : public Database
+class NoDatabase : public Database
 {
 public:
     //Constructor/Destructor
-    SQLLite();
-    virtual ~SQLLite();
+    NoDatabase();
+    virtual ~NoDatabase();
 
+    virtual int init();
     virtual int create_report_table();
     virtual int save_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification, const std::string& report);
     virtual std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification);
     virtual bool file_is_registered(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification);
 
 protected:
-    void        add_report(std::string key, std::string report);
     virtual int execute();
-    virtual int init();
 
 private:
-    sqlite3 *db;
+    NoDatabase (const NoDatabase&);
+    NoDatabase& operator=(const NoDatabase&);
 
-    static int callback(void* data, int , char**, char**);
+    struct Report
+    {
+        Core::report reportKind;
+        Core::format format;
+        time_t file_last_modification;
+        std::string report;
+    };
 
-    SQLLite (const SQLLite&);
-    SQLLite& operator=(const SQLLite&);
+    std::map<std::string, std::vector<Report*> > reports_saved;
 };
 
 }
 
-#endif /* !SQLLiteH */
-
-#endif /* !HAVE_SQLITE */
+#endif /* !NODATABASEH */

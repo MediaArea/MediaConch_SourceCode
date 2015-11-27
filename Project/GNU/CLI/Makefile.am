@@ -15,6 +15,7 @@ mediaconch_SOURCES = \
     ../../../Source/Common/SchematronPolicy.cpp \
     ../../../Source/Common/XsltPolicy.cpp \
     ../../../Source/Common/Database.cpp \
+    ../../../Source/Common/NoDatabase.cpp \
     ../../../Source/Common/SQLLite.cpp \
     ../../../Source/Common/Json.cpp \
     ../../../Source/Common/Configuration.cpp \
