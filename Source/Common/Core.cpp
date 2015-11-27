@@ -14,6 +14,7 @@
 #include "Core.h"
 #include "Common/Schema.h"
 #include "Database.h"
+#include "NoDatabase.h"
 #include "SQLLite.h"
 #include "Configuration.h"
 #include "Json.h"
@@ -127,6 +128,9 @@ void Core::load_database()
     db = new SQLLite;
 
     db->set_database_directory(db_path);
+    db->init();
+#else
+    db = new NoDatabase;
     db->init();
 #endif
 }
@@ -868,7 +872,8 @@ bool Core::file_is_registered_in_db(std::string& filename)
 
     time_t time = get_last_modification_file(filename);
 
-    return db->file_is_registered(filename, time);
+    // TODO: test all cases
+    return db->file_is_registered(Core::report_MediaInfo, Core::format_Xml, filename, time);
 }
 
 //---------------------------------------------------------------------------

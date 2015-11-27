@@ -28,6 +28,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/XsltPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/Common/Database.cpp \
+                    ../../Source/Common/NoDatabase.cpp \
                     ../../Source/Common/SQLLite.cpp \
                     ../../Source/Common/Json.cpp \
                     ../../Source/Common/Configuration.cpp \
@@ -75,6 +76,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/ImplementationReportDisplayTextXsl.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
                     ../../Source/Common/Database.h \
+                    ../../Source/Common/NoDatabase.h \
                     ../../Source/Common/SQLLite.h \
                     ../../Source/Common/Json.h \
                     ../../Source/Common/Container.h \
