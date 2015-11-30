@@ -1,5 +1,5 @@
-%define mediaconch_version          15.10
-%define libmediainfo_version        0.7.79
+%define mediaconch_version          15.11
+%define libmediainfo_version        0.7.80
 %define libzen_version              0.4.32
 
 Name:           mediaconch
