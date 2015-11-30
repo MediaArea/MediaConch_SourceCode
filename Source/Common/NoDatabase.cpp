@@ -107,6 +107,17 @@ std::string NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchL
 }
 
 //---------------------------------------------------------------------------
+int NoDatabase::remove_report(const std::string& filename)
+{
+    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
+    if (it == reports_saved.end())
+        return -1;
+
+    reports_saved.erase(it);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 bool NoDatabase::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& filename, const std::string& file_last_modification)
 {

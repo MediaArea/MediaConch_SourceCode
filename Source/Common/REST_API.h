@@ -46,7 +46,7 @@ public:
         NO_REPORT,
         POLICY,
         IMPLEMENTATION,
-        MI_XML,
+        MEDIAINFO,
         MEDIATRACE,
     };
 
@@ -60,7 +60,7 @@ public:
         {
             ReportString(POLICY);
             ReportString(IMPLEMENTATION);
-            ReportString(MI_XML);
+            ReportString(MEDIAINFO);
             ReportString(MEDIATRACE);
             default:
                 break;
@@ -77,7 +77,7 @@ public:
 
         ReportString(POLICY);
         ReportString(IMPLEMENTATION);
-        ReportString(MI_XML);
+        ReportString(MEDIAINFO);
         ReportString(MEDIATRACE);
 
 #undef ReportString
@@ -118,35 +118,36 @@ public:
         return NO_REASON;
     }
 
-    // Check
-    struct Check_Arg
+    // Analyze
+    struct Analyze_Arg
     {
         std::string            file;
         int                    id;
     };
 
-    struct Check_Req
+    struct Analyze_Req
     {
-        std::vector<Check_Arg> args;
-        std::string            schematron;
+        std::vector<Analyze_Arg> args;
     };
 
-    struct Check_Ok
+    struct Analyze_Ok
     {
         int                    inId;
         int                    outId;
+        bool                   create;
     };
 
-    struct Check_Nok
+    struct Analyze_Nok
     {
         int                    id;
         Reason                 error;
     };
 
-    struct Check_Res
+    struct Analyze_Res
     {
-        std::vector<Check_Ok>  ok;
-        std::vector<Check_Nok> nok;
+        ~Analyze_Res();
+        std::vector<Analyze_Ok*>  ok;
+        std::vector<Analyze_Nok*> nok;
     };
 
     // Status
@@ -157,11 +158,11 @@ public:
 
     struct Status_Ok
     {
-        Status_Ok() : has_validity(false) {}
+        Status_Ok() : has_percent(false) {}
         int                     id;
         bool                    finished;
-        bool                    has_validity;
-        bool                    validity;
+        bool                    has_percent;
+        double                  done;
     };
 
     struct Status_Nok
@@ -172,34 +173,29 @@ public:
 
     struct Status_Res
     {
-        std::vector<Status_Ok>  ok;
-        std::vector<Status_Nok> nok;
+        ~Status_Res();
+        std::vector<Status_Ok*>  ok;
+        std::vector<Status_Nok*> nok;
     };
 
     // Report
-    struct Report_Arg
-    {
-        Report_Arg() : has_offset(false), has_length(false) {}
-        Report                 kind;
-        int                    offset;
-        int                    length;
-        bool                   has_offset;
-        bool                   has_length;
-    };
-
     struct Report_Req
     {
         std::vector<int>        ids;
-        std::vector<Report_Arg> reports;
+        std::vector<Report>     reports;
+        std::string             policy_name;
+        std::string             policy_content;
+        std::string             display_name;
+        std::string             display_content;
     };
 
     struct Report_Ok
     {
-        int                          id;
-        std::string                  policy;
-        std::string                  implementation;
-        std::string                  mi_xml;
-        std::string                  mediatrace;
+        Report_Ok() :           has_policy_validity(false) {}
+        int                     id;
+        std::string             report;
+        bool                    has_policy_validity;
+        bool                    policy_validity;
     };
 
     struct Report_Nok
@@ -210,8 +206,9 @@ public:
 
     struct Report_Res
     {
-        std::vector<Report_Ok>  ok;
-        std::vector<Report_Nok> nok;
+        ~Report_Res();
+        std::vector<Report_Ok*>  ok;
+        std::vector<Report_Nok*> nok;
     };
 
     // Retry
@@ -228,8 +225,9 @@ public:
 
     struct Retry_Res
     {
-        std::vector<int>       ok;
-        std::vector<Retry_Nok> nok;
+        ~Retry_Res();
+        std::vector<int>        ok;
+        std::vector<Retry_Nok*> nok;
     };
 
     // Clear
@@ -246,8 +244,9 @@ public:
 
     struct Clear_Res
     {
-        std::vector<int>       ok;
-        std::vector<Clear_Nok> nok;
+        ~Clear_Res();
+        std::vector<int>        ok;
+        std::vector<Clear_Nok*> nok;
     };
 
 public:
@@ -256,28 +255,35 @@ public:
     virtual ~RESTAPI();
 
     // Serialize: Request
-    std::string serialize_check_req(Check_Req& req);
+    std::string serialize_analyze_req(Analyze_Req& req);
     std::string serialize_status_req(Status_Req& req);
     std::string serialize_report_req(Report_Req& req);
     std::string serialize_retry_req(Retry_Req& req);
     std::string serialize_clear_req(Clear_Req& req);
 
     // Serialize: Result
-    std::string serialize_check_res(Check_Res& res);
+    std::string serialize_analyze_res(Analyze_Res& res);
     std::string serialize_status_res(Status_Res& res);
     std::string serialize_report_res(Report_Res& res);
     std::string serialize_retry_res(Retry_Res& res);
     std::string serialize_clear_res(Clear_Res& res);
 
     // Parse: Request
-    Check_Req *parse_check_req(std::string data);
+    Analyze_Req *parse_analyze_req(std::string data);
     Status_Req *parse_status_req(std::string data);
     Report_Req *parse_report_req(std::string data);
     Retry_Req *parse_retry_req(std::string data);
     Clear_Req *parse_clear_req(std::string data);
 
+    // Parse: URI Request
+    Analyze_Req *parse_uri_analyze_req(const std::string& uri);
+    Status_Req *parse_uri_status_req(const std::string& uri);
+    Report_Req *parse_uri_report_req(const std::string& uri);
+    Retry_Req *parse_uri_retry_req(const std::string& uri);
+    Clear_Req *parse_uri_clear_req(const std::string& uri);
+
     // Parse: Request
-    Check_Res *parse_check_res(std::string data);
+    Analyze_Res *parse_analyze_res(std::string data);
     Status_Res *parse_status_res(std::string data);
     Report_Res *parse_report_res(std::string data);
     Retry_Res *parse_retry_res(std::string data);
@@ -291,20 +297,21 @@ private:
     std::string error;
 
     //Helper
-    Container::Value serialize_check_args(std::vector<Check_Arg>& args);
+    Container::Value serialize_analyze_args(std::vector<Analyze_Arg>& args);
     Container::Value serialize_ids(std::vector<int>& ids);
-    Container::Value serialize_report_reports(std::vector<Report_Arg>& args);
+    Container::Value serialize_report_reports(std::vector<Report>& args);
+    Container::Value serialize_report_string(const std::string& args);
     Container::Value serialize_generic_nok(int id, Reason error);
-    Container::Value serialize_check_oks(std::vector<Check_Ok>& array);
-    Container::Value serialize_status_oks(std::vector<Status_Ok>& array);
-    Container::Value serialize_report_oks(std::vector<Report_Ok>& array);
+    Container::Value serialize_analyze_oks(std::vector<Analyze_Ok*>& array);
+    Container::Value serialize_status_oks(std::vector<Status_Ok*>& array);
+    Container::Value serialize_report_oks(std::vector<Report_Ok*>& array);
 
-    int parse_check_arg(Container::Value *v, std::vector<Check_Arg>& args);
-    int parse_report_arg(Container::Value *v, std::vector<Report_Arg>& args);
+    int parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& args);
+    int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
     int parse_generic_nok(Container::Value *v, int& id, Reason& error);
-    int parse_check_ok(Container::Value *v, std::vector<Check_Ok>& ok);
-    int parse_status_ok(Container::Value *v, std::vector<Status_Ok>& ok);
-    int parse_report_ok(Container::Value *v, std::vector<Report_Ok>& ok);
+    int parse_analyze_ok(Container::Value *v, std::vector<Analyze_Ok*>& ok);
+    int parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& ok);
+    int parse_report_ok(Container::Value *v, std::vector<Report_Ok*>& ok);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

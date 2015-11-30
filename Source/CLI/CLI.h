@@ -26,17 +26,18 @@ namespace MediaConch
         CLI();
         ~CLI();
 
-        int parse_args(int ac, char** av);
-        int init();
-        int run();
-        int finish();
+        int  parse_args(int ac, char** av);
+        int  init();
+        int  run();
+        int  finish();
         void set_report_set(std::string& report_kind);
         void set_report_reset();
-        int set_format(MediaConchLib::format f);
-        int set_format(const std::string& f);
+        int  set_format(MediaConchLib::format f);
+        int  set_format(const std::string& f);
         void add_policy(const std::string& policy);
         void set_display_file(const std::string& file);
-        void register_option(const std::string& opt);
+        int  register_option(const std::string& opt);
+        void set_use_daemon(bool use) { use_daemon = use; }
 
       private:
         CLI(const CLI&);
@@ -48,6 +49,7 @@ namespace MediaConch
         std::string              display_file;
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format format;
+        bool use_daemon;
     };
 
 }

@@ -110,6 +110,7 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
 {
     // clean error
     error.clear();
+    result.clear();
 
     struct evhttp_request *req = evhttp_request_new(result_coming, this);
     if (req == NULL)

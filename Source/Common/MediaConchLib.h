@@ -63,19 +63,23 @@ public:
     };
 
     //Options
-    int add_option(const std::string& option);
+    int add_option(const std::string& option, std::string& report);
 
     // Analyze
     int  analyze(const std::vector<std::string>& files);
+    int  analyze(const std::string& file, bool& registered);
     bool is_done(const std::vector<std::string>& files, double& percent);
+    bool is_done(const std::string& file, double& percent);
 
     // Output
     int get_report(const std::bitset<report_Max>& Report, format f,
                    const std::vector<std::string>& files, const std::vector<std::string>& policies,
                    std::string& report);
+    int remove_report(const std::vector<std::string>& files);
 
     // Policy
     bool validate_policy(const std::string& file, int policy, std::string& report);
+    bool validate_policy_memory(const std::string& file, const std::string& policy, std::string& report);
     bool validate_policies(const std::string& file, std::vector<std::string>& policies, std::string& report);
 
     // Xsl Transformation

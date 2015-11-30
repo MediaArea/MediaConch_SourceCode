@@ -14,7 +14,6 @@
 #include "Core.h"
 #include "Scheduler.h"
 #include "Queue.h"
-#include <stdio.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -109,6 +108,14 @@ namespace MediaConch {
             percent_done = 0.5;
             ret = false;
         }
+        CS.Leave();
+        return ret;
+    }
+
+    bool Scheduler::element_exists(const std::string& filename)
+    {
+        CS.Enter();
+        bool ret = queue->has_element(filename);
         CS.Leave();
         return ret;
     }

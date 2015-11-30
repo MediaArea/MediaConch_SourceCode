@@ -35,9 +35,9 @@ public:
     virtual int start() = 0;
     virtual int finish() = 0;
 
-    int send_request(RESTAPI::Check_Req& req);
+    int send_request(RESTAPI::Analyze_Req& req);
     int send_request(RESTAPI::Status_Req& req);
-    /* int send_request(RESTAPI::Status_Req& req); */
+    /* int send_request(RESTAPI::List_Req& req); */
     int send_request(RESTAPI::Report_Req& req);
     int send_request(RESTAPI::Retry_Req& req);
     int send_request(RESTAPI::Clear_Req& req);
@@ -46,6 +46,7 @@ public:
     void set_address(std::string& address);
 
     std::string get_error() const { return error; }
+    std::string get_result() const { return result; }
 
 protected:
     RESTAPI     rest;

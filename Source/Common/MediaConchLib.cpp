@@ -10,6 +10,7 @@
 #endif
 
 //---------------------------------------------------------------------------
+#include "ZenLib/Ztring.h"
 #include "MediaConchLib.h"
 #include "Core.h"
 #include "Policy.h"
@@ -36,8 +37,25 @@ MediaConchLib::~MediaConchLib()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::add_option(const std::string& option)
+int MediaConchLib::add_option(const std::string& option, std::string& report)
 {
+    size_t egal_pos = option.find(__T('='));
+    if (egal_pos < 2)
+    {
+        MediaInfoNameSpace::String Option(ZenLib::Ztring().From_UTF8(option), 2, egal_pos-2);
+        MediaInfoNameSpace::String Value;
+        if (egal_pos != std::string::npos)
+            Value.assign(Ztring().From_UTF8(option), egal_pos + 1, std::string::npos);
+        else
+            Value=__T('1');
+
+        String Result = core->Menu_Option_Preferences_Option(Option, Value);
+        if (!Result.empty())
+        {
+            report = Ztring(Result).To_UTF8();
+            return -1;
+        }
+    }
     Options.push_back(option);
     return 0;
 }
@@ -79,9 +97,19 @@ int MediaConchLib::analyze(const std::vector<std::string>& files)
     if (!files.size())
         return -1;
 
+    bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
-        core->open_file(files[i]);
+        core->open_file(files[i], registered);
     return 0;
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::analyze(const std::string& file, bool& registered)
+{
+    if (!file.length())
+        return -1;
+
+    return core->open_file(file, registered);
 }
 
 //---------------------------------------------------------------------------
@@ -107,6 +135,15 @@ bool MediaConchLib::is_done(const std::vector<std::string>& files, double& perce
     return done;
 }
 
+//---------------------------------------------------------------------------
+bool MediaConchLib::is_done(const std::string& file, double& percent)
+{
+    if (!file.length())
+        return false;
+
+    return core->is_done(file, percent);
+}
+
 //***************************************************************************
 // Output
 //***************************************************************************
@@ -119,8 +156,16 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
     if (!files.size())
         return -1;
 
-    core->GetOutput(report_set, f, files, policies, report);
-    return 0;
+    return core->GetOutput(report_set, f, files, policies, report);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::remove_report(const std::vector<std::string>& files)
+{
+    if (!files.size())
+        return -1;
+
+    return core->remove_report(files);
 }
 
 //***************************************************************************
@@ -131,6 +176,12 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
 bool MediaConchLib::validate_policy(const std::string& file, int policy, std::string& report)
 {
     return core->validate_policy(file, policy, report);
+}
+
+//---------------------------------------------------------------------------
+bool MediaConchLib::validate_policy_memory(const std::string& file, const std::string& policy, std::string& report)
+{
+    return core->validate_policy_memory(file, policy, report);
 }
 
 //---------------------------------------------------------------------------

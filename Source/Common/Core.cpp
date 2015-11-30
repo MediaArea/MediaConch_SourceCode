@@ -147,14 +147,18 @@ void Core::Close ()
 void Core::Run (std::string file)
 {
     // Parsing
+    bool registered = false;
     if (file.length())
-        open_file(file);
+        open_file(file, registered);
 }
 
 //---------------------------------------------------------------------------
-void Core::open_file(const std::string& file)
+int  Core::open_file(const std::string& file, bool& registered)
 {
-    bool registered = file_is_registered_in_db(file);
+    if (!ZenLib::File::Exists(Ztring().From_UTF8(file)))
+        return -1;
+
+    registered = file_is_registered(file);
     if (!registered)
     {
         if (get_db())
@@ -162,7 +166,9 @@ void Core::open_file(const std::string& file)
         else
             MI->Open(Ztring().From_UTF8(file));
     }
+    return 0;
 }
+
 //---------------------------------------------------------------------------
 bool Core::is_done(const std::string& file, double& percent_done)
 {
@@ -175,7 +181,7 @@ int Core::GetOutput(const std::bitset<MediaConchLib::report_Max>& report_set, Me
                             std::string& report)
 {
     if (!policies.empty())
-        return PoliciesCheck(report, f);
+        return PoliciesCheck(report, f, policies);
 
     for (size_t i = 0; i < files.size(); ++i)
     {
@@ -196,6 +202,17 @@ int Core::GetOutput(const std::bitset<MediaConchLib::report_Max>& report_set, Me
                 return -1;
         }
     }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Core::remove_report(const std::vector<std::string>& files)
+{
+    if (!get_db())
+        return false;
+
+    for (size_t i = 0; i < files.size(); ++i)
+        db->remove_report(files[i]);
     return 0;
 }
 
@@ -279,22 +296,21 @@ std::string Core::GetOutput_Xml_Implementation (const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-int Core::PoliciesCheck(std::string& report, MediaConchLib::format f)
+int Core::PoliciesCheck(std::string& report, MediaConchLib::format f, const std::vector<std::string>& policies)
 {
-    if (PoliciesFiles.size())
+    if (policies.size())
     {
-        std::vector<std::string>& vec = PoliciesFiles;
         std::stringstream Out;
-        for (size_t i = 0; i < vec.size(); ++i)
+        for (size_t i = 0; i < policies.size(); ++i)
         {
             std::stringstream tmp;
-            if (is_schematron_file(vec[i]))
+            if (is_schematron_file(policies[i]))
             {
-                if (!PolicySchematron(vec[i], f, tmp))
+                if (!PolicySchematron(policies[i], f, tmp))
                 {
                     std::string retain = tmp.str();
                     tmp.str(std::string());
-                    if (!PolicyXslt(vec[i], f, tmp))
+                    if (!PolicyXslt(policies[i], f, tmp))
                         Out << retain;
                     else
                         Out << tmp.str();
@@ -304,11 +320,11 @@ int Core::PoliciesCheck(std::string& report, MediaConchLib::format f)
             }
             else
             {
-                if (!PolicyXslt(vec[i], f, tmp))
+                if (!PolicyXslt(policies[i], f, tmp))
                 {
                     std::string retain = tmp.str();
                     tmp.str(std::string());
-                    if (!PolicySchematron(vec[i], f, tmp))
+                    if (!PolicySchematron(policies[i], f, tmp))
                         Out << retain;
                     else
                         Out << tmp.str();
@@ -455,6 +471,26 @@ bool Core::validate_policy(const std::string& file, int policy, std::string& rep
 }
 
 //---------------------------------------------------------------------------
+bool Core::validate_policy_memory(const std::string& file, const std::string& policy, std::string& report)
+{
+    if (!policy.length())
+    {
+        report = "Policy invalid";
+        return false;
+    }
+
+    bool valid = validate_schematron_policy_from_memory(file, policy, report);
+    if (!valid)
+    {
+        std::string tmp = report;
+        valid = validate_xslt_policy_from_memory(file, policy, report);
+        if (!valid)
+            report = tmp;
+    }
+    return valid;
+}
+
+//---------------------------------------------------------------------------
 std::string Core::transform_with_xslt_file(const std::string& report, const std::string& xslt)
 {
     Schema *S = new Xslt;
@@ -519,6 +555,30 @@ bool Core::validate_schematron_policy(const std::string& file, int pos, std::str
         report = Out.str();
     }
     xmlFreeDoc(doc);
+    delete S;
+    return valid;
+}
+
+//---------------------------------------------------------------------------
+bool Core::validate_schematron_policy_from_memory(const std::string& file, const std::string& memory, std::string& report)
+{
+    bool valid = true;
+    Schema *S = new Schematron;
+
+    if (S->register_schema_from_memory(memory))
+        valid = validation(file, S, report);
+    else
+    {
+        valid = false;
+
+        std::stringstream Out;
+        std::vector<std::string> errors = S->get_errors();
+
+        Out << "internal error for parsing Policies" << endl;
+        for (size_t i = 0; i < errors.size(); i++)
+            Out << "\t" << errors[i].c_str();
+        report = Out.str();
+    }
     delete S;
     return valid;
 }
@@ -863,8 +923,24 @@ bool Core::file_is_registered_in_db(const std::string& filename)
 
     std::string time = get_last_modification_file(filename);
 
-    // TODO: test all cases
     return db->file_is_registered(MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, filename, time);
+}
+
+//---------------------------------------------------------------------------
+bool Core::file_is_registered_in_queue(const std::string& filename)
+{
+    if (!scheduler)
+        return false;
+
+    return scheduler->element_exists(filename);;
+}
+
+//---------------------------------------------------------------------------
+bool Core::file_is_registered(const std::string& filename)
+{
+    if (file_is_registered_in_queue(filename))
+        return true;
+    return file_is_registered_in_db(filename);
 }
 
 //---------------------------------------------------------------------------

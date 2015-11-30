@@ -1,0 +1,25 @@
+# bin
+mediaconchd
+
+# autotools generated
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.guess
+config.sub
+configure
+depcomp
+install-sh
+ltmain.sh
+missing
+
+# configure generated
+.deps/
+Makefile
+config.log
+config.status
+libtool
+
+# make generated
+*.o

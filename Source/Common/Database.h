@@ -36,6 +36,7 @@ public:
 
     virtual int create_report_table() = 0;
     virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report) = 0;
+    virtual int remove_report(const std::string& filename) = 0;
     virtual std::string get_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification) = 0;
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& file, const std::string& file_last_modification) = 0;
 

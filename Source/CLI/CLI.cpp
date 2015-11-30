@@ -32,7 +32,7 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI()
+    CLI::CLI() : use_daemon(false)
     {
         MCL.load_configuration();
         format = MediaConchLib::format_Text;
@@ -177,9 +177,17 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    void CLI::register_option(const std::string& opt)
+    int CLI::register_option(const std::string& opt)
     {
-        MCL.add_option(opt);
+        std::string report;
+        if (MCL.add_option(opt, report) < 0)
+        {
+            ZenLib::Ztring str;
+            str.From_UTF8(report);
+            STRINGOUT(str);
+            return -1;
+        }
+        return 0;
     }
 
 }

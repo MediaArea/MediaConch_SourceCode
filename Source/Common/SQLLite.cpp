@@ -16,6 +16,7 @@
 //---------------------------------------------------------------------------
 #include "SQLLite.h"
 #include <sstream>
+#include <stdio.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -93,6 +94,17 @@ int SQLLite::save_report(MediaConchLib::report reportKind, MediaConchLib::format
     create << format << ", ";
     create << "'" << report << "');";
     query = create.str();
+    return execute();
+}
+
+int SQLLite::remove_report(const std::string& filename)
+{
+    std::stringstream delete_query;
+
+    reports.clear();
+    delete_query << "DELETE FROM " << "Report";
+    delete_query << " WHERE FILENAME = '" << filename << "';";
+    query = delete_query.str();
     return execute();
 }
 

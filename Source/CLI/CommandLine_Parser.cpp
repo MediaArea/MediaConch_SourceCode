@@ -221,27 +221,7 @@ CL_OPTION(LogFile)
 //---------------------------------------------------------------------------
 CL_OPTION(Default)
 {
-    cli->register_option(argument);
-    // //Form : --Option=Text
-    // size_t egal_pos = argument.find(__T('='));
-    // if (egal_pos < 2)
-    //     return 0;
-
-    // MediaInfoNameSpace::String Option(Ztring().From_UTF8(argument), 2, egal_pos-2);
-    // MediaInfoNameSpace::String Value;
-    // if (egal_pos != std::string::npos)
-    //     Value.assign(Ztring().From_UTF8(argument), egal_pos + 1, std::string::npos);
-    // else
-    //     Value=__T('1');
-
-    // String Result=MI.Menu_Option_Preferences_Option(Option, Value);
-    // if (!Result.empty())
-    // {
-    //     STRINGOUT(Result);
-    //     return -1;
-    // }
-
-    return 0;
+    return cli->register_option(argument);
 }
 
 //---------------------------------------------------------------------------
@@ -259,5 +239,9 @@ void LogFile_Action(ZenLib::Ztring Inform)
 void CallBack_Set(MediaConch::CLI* cli, void* Event_CallBackFunction)
 {
     //CallBack configuration
-    // cli->Menu_Option_Preferences_Option(__T("Event_CallBackFunction"), __T("CallBack=memory://")+ZenLib::Ztring::ToZtring((size_t)Event_CallBackFunction));
+    std::stringstream callback_mem;
+    callback_mem << "Event_CallBackFunction=";
+    callback_mem << "CallBack=memory://";
+    callback_mem << (size_t)Event_CallBackFunction;
+    cli->register_option(callback_mem.str());
 }
