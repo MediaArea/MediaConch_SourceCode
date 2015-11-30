@@ -8,6 +8,17 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 15.11, 2015-11-30
+-------------
+Open all nodes by default for MediaInfo jstree
+Add system or user policies/displays group
+Detection of truncated Matroska files
+Documentation update
+Support of MKVMerge statistics tags (duration frame count, stream size, bit rate) per track
+Count of subtitle elements
+Frame rate detection algorithm revisited
+Showing precision of 1/1.001 frame rates (e.g. "23.976 (24000/1001) fps" and "23.976 (23976/1000) fps")
+
 Version 15.10, 2015-11-02
 -------------
 Implementation checker with some EBML tests
