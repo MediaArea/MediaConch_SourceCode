@@ -33,9 +33,9 @@ public:
 
     virtual int init();
     virtual int create_report_table();
-    virtual int save_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification, const std::string& report);
-    virtual std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification);
-    virtual bool file_is_registered(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification);
+    virtual int save_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report);
+    virtual std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification);
+    virtual bool file_is_registered(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification);
 
 protected:
     virtual int execute();
@@ -48,7 +48,7 @@ private:
     {
         Core::report reportKind;
         Core::format format;
-        time_t file_last_modification;
+        std::string file_last_modification;
         std::string report;
     };
 
