@@ -62,7 +62,7 @@ int NoDatabase::create_report_table()
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::save_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification,
+int NoDatabase::save_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification,
                           const std::string& report)
 {
     Report* r = new Report;
@@ -89,7 +89,7 @@ int NoDatabase::save_report(Core::report reportKind, Core::format format, const 
 }
 
 //---------------------------------------------------------------------------
-std::string NoDatabase::get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification)
+std::string NoDatabase::get_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it == reports_saved.end())
@@ -98,7 +98,7 @@ std::string NoDatabase::get_report(Core::report reportKind, Core::format format,
     for (size_t i = 0; i < it->second.size(); ++i)
     {
         Report* r = it->second[i];
-        if (r->format != format || r->reportKind != reportKind || r->file_last_modification < file_last_modification)
+        if (r->format != format || r->reportKind != reportKind || r->file_last_modification != file_last_modification)
             continue;
 
         return r->report;
@@ -108,7 +108,7 @@ std::string NoDatabase::get_report(Core::report reportKind, Core::format format,
 
 //---------------------------------------------------------------------------
 bool NoDatabase::file_is_registered(Core::report reportKind, Core::format format,
-                                    const std::string& filename, time_t file_last_modification)
+                                    const std::string& filename, const std::string& file_last_modification)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
 
@@ -120,7 +120,7 @@ bool NoDatabase::file_is_registered(Core::report reportKind, Core::format format
         Report* r = it->second[i];
 
         if (r->format == format && r->reportKind == reportKind
-            && r->file_last_modification >= file_last_modification)
+            && r->file_last_modification == file_last_modification)
             return true;
     }
     return false;

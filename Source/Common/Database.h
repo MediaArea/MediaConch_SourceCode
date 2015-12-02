@@ -34,9 +34,9 @@ public:
     virtual ~Database();
 
     virtual int create_report_table() = 0;
-    virtual int save_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification, const std::string& report) = 0;
-    virtual std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification) = 0;
-    virtual bool file_is_registered(Core::report reportKind, Core::format format, const std::string& file, time_t file_last_modification) = 0;
+    virtual int save_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report) = 0;
+    virtual std::string get_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification) = 0;
+    virtual bool file_is_registered(Core::report reportKind, Core::format format, const std::string& file, const std::string& file_last_modification) = 0;
 
     void        set_database_directory(const std::string& dirname);
     virtual int init() = 0;

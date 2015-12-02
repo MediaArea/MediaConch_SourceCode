@@ -620,16 +620,14 @@ bool Core::is_schematron_file(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-time_t Core::get_last_modification_file(const std::string& filename)
+std::string Core::get_last_modification_file(const std::string& filename)
 {
-    struct stat stat_base;
-    if (lstat(filename.c_str(), &stat_base))
-        return 0;
-    return stat_base.st_mtime;
+    Ztring time = ZenLib::File::Modified_Get(Ztring().From_UTF8(filename));
+    return time.To_UTF8();
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_text_to_database(std::string& file, time_t time,
+void Core::register_report_mediainfo_text_to_database(std::string& file, const std::string& time,
                                                       MediaInfoNameSpace::MediaInfoList* curMI)
 {
     curMI->Option(__T("Details"), __T("0"));
@@ -639,7 +637,7 @@ void Core::register_report_mediainfo_text_to_database(std::string& file, time_t 
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_xml_to_database(std::string& file, time_t time,
+void Core::register_report_mediainfo_xml_to_database(std::string& file, const std::string& time,
                                                      MediaInfoNameSpace::MediaInfoList* curMI)
 {
     curMI->Option(__T("Details"), __T("0"));
@@ -649,7 +647,7 @@ void Core::register_report_mediainfo_xml_to_database(std::string& file, time_t t
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediatrace_text_to_database(std::string& file, time_t time,
+void Core::register_report_mediatrace_text_to_database(std::string& file, const std::string& time,
                                                        MediaInfoNameSpace::MediaInfoList* curMI)
 {
     curMI->Option(__T("Details"), __T("1"));
@@ -659,7 +657,7 @@ void Core::register_report_mediatrace_text_to_database(std::string& file, time_t
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediatrace_xml_to_database(std::string& file, time_t time,
+void Core::register_report_mediatrace_xml_to_database(std::string& file, const std::string& time,
                                                       MediaInfoNameSpace::MediaInfoList* curMI)
 {
     curMI->Option(__T("Details"), __T("1"));
@@ -669,7 +667,7 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, time_t 
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_implementation_xml_to_database(const std::string& file, time_t time,
+void Core::register_report_implementation_xml_to_database(const std::string& file, const std::string& time,
                                                           std::string& report)
 {
     db->save_report(report_MediaConch, format_Xml, file, time, report);
@@ -697,7 +695,7 @@ void Core::get_content_of_media_in_xml(std::string& report)
 //---------------------------------------------------------------------------
 void Core::register_file_to_database(std::string& filename, MediaInfoNameSpace::MediaInfoList* curMI)
 {
-    time_t time = get_last_modification_file(filename);
+    const std::string& time = get_last_modification_file(filename);
 
     // MediaInfo
     register_report_mediainfo_text_to_database(filename, time, curMI);
@@ -711,7 +709,7 @@ void Core::register_file_to_database(std::string& filename, MediaInfoNameSpace::
 //---------------------------------------------------------------------------
 void Core::register_file_to_database(std::string& filename)
 {
-    time_t time = get_last_modification_file(filename);
+    const std::string& time = get_last_modification_file(filename);
 
     // MediaInfo
     register_report_mediainfo_text_to_database(filename, time, MI);
@@ -804,7 +802,7 @@ std::string Core::get_report_saved(const std::string& filename, report reportKin
     if (reportKind >= report_Max || f >= format_Max)
         return std::string();
 
-    time_t time = get_last_modification_file(filename);
+    std::string time = get_last_modification_file(filename);
     return db->get_report(reportKind, f, filename, time);
 }
 
@@ -857,7 +855,7 @@ void Core::get_implementation_report(const std::string& file, std::string& repor
         validateXsltPolicyFromMemory(file, memory, valid, r);
         if (valid)
         {
-            time_t time = get_last_modification_file(file);
+            std::string time = get_last_modification_file(file);
             register_report_implementation_xml_to_database(file, time, r);
         }
     }
@@ -870,7 +868,7 @@ bool Core::file_is_registered_in_db(std::string& filename)
     if (!get_db())
         return false;
 
-    time_t time = get_last_modification_file(filename);
+    std::string time = get_last_modification_file(filename);
 
     // TODO: test all cases
     return db->file_is_registered(Core::report_MediaInfo, Core::format_Xml, filename, time);

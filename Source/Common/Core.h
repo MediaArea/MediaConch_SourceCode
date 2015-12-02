@@ -137,21 +137,21 @@ private:
     bool is_schematron_file(const std::string& file);
 
     bool   file_is_registered_in_db(std::string& file);
-    time_t get_last_modification_file(const std::string& file);
+    std::string get_last_modification_file(const std::string& file);
     std::string get_report_saved(const std::string& file, report reportKind, format f);
     void get_Reports_Output(const std::string& file, std::string& report);
     void get_implementation_report(const std::string& file, std::string& report);
 
     void register_file_to_database(std::string& file);
-    void register_report_mediainfo_text_to_database(std::string& file, time_t time,
+    void register_report_mediainfo_text_to_database(std::string& file, const std::string& time,
                                                     MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediainfo_xml_to_database(std::string& file, time_t time,
+    void register_report_mediainfo_xml_to_database(std::string& file, const std::string& time,
                                                    MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediatrace_text_to_database(std::string& file, time_t time,
+    void register_report_mediatrace_text_to_database(std::string& file, const std::string& time,
                                                      MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediatrace_xml_to_database(std::string& file, time_t time,
+    void register_report_mediatrace_xml_to_database(std::string& file, const std::string& time,
                                                     MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_implementation_xml_to_database(const std::string& file, time_t time,
+    void register_report_implementation_xml_to_database(const std::string& file, const std::string& time,
                                                         std::string& report);
     void get_content_of_media_in_xml(std::string& report);
     //No idea how to do it better way

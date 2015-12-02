@@ -76,7 +76,7 @@ int SQLLite::create_report_table()
     return execute();
 }
 
-int SQLLite::save_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification,
+int SQLLite::save_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification,
                           const std::string& report)
 {
     std::stringstream create;
@@ -84,8 +84,8 @@ int SQLLite::save_report(Core::report reportKind, Core::format format, const std
     reports.clear();
     create << "INSERT INTO " << "Report";
     create << " (FILENAME, FILE_LAST_MODIFICATION, TOOL, FORMAT, REPORT)";
-    create << " VALUES ('" << filename << "', ";
-    create << file_last_modification << ", ";
+    create << " VALUES ('" << filename << "', '";
+    create << file_last_modification << "', ";
     create << reportKind << ", ";
     create << format << ", ";
     create << "'" << report << "');";
@@ -93,7 +93,7 @@ int SQLLite::save_report(Core::report reportKind, Core::format format, const std
     return execute();
 }
 
-std::string SQLLite::get_report(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification)
+std::string SQLLite::get_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification)
 {
     std::stringstream create;
     std::string key("REPORT");
@@ -101,7 +101,7 @@ std::string SQLLite::get_report(Core::report reportKind, Core::format format, co
     reports.clear();
     create << "SELECT " << key << " FROM " << "Report" << " WHERE ";
     create << "FILENAME = '" << filename << "' ";
-    create << "AND FILE_LAST_MODIFICATION = " << file_last_modification << " ";
+    create << "AND FILE_LAST_MODIFICATION = '" << file_last_modification << "' ";
     create << "AND TOOL = " << reportKind << " ";
     create << "AND FORMAT = " << format << ";";
     query = create.str();
@@ -111,7 +111,7 @@ std::string SQLLite::get_report(Core::report reportKind, Core::format format, co
     return reports[key];
 }
 
-bool SQLLite::file_is_registered(Core::report reportKind, Core::format format, const std::string& filename, time_t file_last_modification)
+bool SQLLite::file_is_registered(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification)
 {
     std::stringstream create;
     std::string key("COUNT(REPORT)");
@@ -119,7 +119,7 @@ bool SQLLite::file_is_registered(Core::report reportKind, Core::format format, c
     reports.clear();
     create << "SELECT " << key << " FROM " << "Report" << " WHERE ";
     create << "FILENAME = '" << filename << "' ";
-    create << "AND FILE_LAST_MODIFICATION = " << file_last_modification << " ";
+    create << "AND FILE_LAST_MODIFICATION = '" << file_last_modification << "' ";
     create << "AND TOOL = " << reportKind << " ";
     create << "AND FORMAT = " << format << ";";
     query = create.str();
