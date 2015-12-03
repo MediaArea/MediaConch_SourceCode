@@ -45,7 +45,6 @@ AC_ARG_ENABLE(arch-i386,        AC_HELP_STRING([--enable-arch-i386],        [Cre
 AC_ARG_ENABLE(arch-x86_64,      AC_HELP_STRING([--enable-arch-x86_64],      [Create Mac x86_64 architecture]),            , enable_arch_x86_64=no)
 AC_ARG_ENABLE(staticlibs,       AC_HELP_STRING([--enable-staticlibs],       [Use static libmediainfo and libzen]),        , enable_staticlibs=no)
 AC_ARG_ENABLE([stream_missing],    [AS_HELP_STRING(([--enable-stream_missing],    [Disable stream support (old compilers)]))],    , [enable_stream_missing=no])
-AC_ARG_ENABLE(sqlite,           AC_HELP_STRING([--enable-sqlite],           [Enable Sqlite DB]),                          , enable_sqlite=no)
 
 dnl -------------------------------------------------------------------------
 dnl Arguments - With
@@ -54,6 +53,9 @@ AC_ARG_WITH(macosx-sdk,         AC_HELP_STRING([--with-macosx-sdk],         [For
 AC_ARG_WITH(macosx-version-min, AC_HELP_STRING([--with-macosx-version-min], [Force the Mac Version]),                     , with_macosx_version_min=no)
 AC_ARG_WITH(dll,            AC_HELP_STRING([--with-dll],            [Do not link to libmediainfo, dynamic loading]), , with_dll=no)
 AC_ARG_WITH(libmediainfo-name,  AC_HELP_STRING([--with-libmediainfo-name],  [Force libmediainfo filename]),                  		  , with_libmediainfo_name=mediainfo)
+AC_ARG_WITH(sqlite,             AC_HELP_STRING([--with-sqlite],             [Enable SQLite DB]),                          , with_sqlite=yes)
+AC_ARG_WITH(jansson,            AC_HELP_STRING([--with-jansson],            [Enable Jansson Library]),                    , with_jansson=yes)
+AC_ARG_WITH(libevent,           AC_HELP_STRING([--with-libevent],           [Enable Libevent]),                           , with_libevent=yes)
 
 dnl -------------------------------------------------------------------------
 dnl External options
@@ -305,11 +307,10 @@ fi
 dnl -------------------------------------------------------------------------
 dnl libsqlite3
 dnl
-if test "$enable_sqlite" = "yes"; then
+if test "$with_sqlite" = "yes"; then
     if test -e ../../../../sqlite/.libs/libsqlite3.la; then
         CXXFLAGS="$CXXFLAGS -DHAVE_SQLITE  -I../../../../sqlite"
-        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../sqlite"
-        if test "$enable_staticlibs" = "yes"; then
+        if test "with_staticlibs" = "yes"; then
             with_libsqlite3="builtin (static)"
             LIBS="$LIBS  ../../../../sqlite/.libs/libsqlite3.a"
         else
@@ -318,7 +319,6 @@ if test "$enable_sqlite" = "yes"; then
         fi
     elif pkg-config --exists sqlite3; then
         CXXFLAGS="$CXXFLAGS -DHAVE_SQLITE $(pkg-config --cflags sqlite3)"
-        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags sqlite3)"
         if test "$enable_staticlibs" = "yes"; then
             with_libsqlite3="system (static)"
             LIBS="$LIBS $(pkg-config --static --libs sqlite3)"
@@ -336,9 +336,9 @@ fi
 dnl -------------------------------------------------------------------------
 dnl libjansson
 dnl
-if test -e ../../../../jansson/build/lib/libjansson.a; then
-        CXXFLAGS="$CXXFLAGS -I../../../../jansson/build/include"
-        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../jansson/build/include"
+if test "$with_jansson" = "yes"; then
+    if test -e ../../../../jansson/build/lib/libjansson.a; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_JANSSON -I../../../../jansson/build/include"
         if test "$enable_staticlibs" = "yes"; then
             with_libjansson="builtin (static)"
             LIBS="$LIBS ../../../../jansson/build/lib/libjansson.a"
@@ -346,9 +346,8 @@ if test -e ../../../../jansson/build/lib/libjansson.a; then
             with_libjansson="builtin"
             LIBS="$LIBS  -L../../../../jansson/build/lib -ljansson"
         fi
-elif pkg-config --exists jansson; then
-        CXXFLAGS="$CXXFLAGS $(pkg-config --cflags jansson)"
-        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags jansson)"
+    elif pkg-config --exists jansson; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_JANSSON $(pkg-config --cflags jansson)"
         if test "$enable_staticlibs" = "yes"; then
             with_libjansson="system (static)"
             LIBS="$LIBS $(pkg-config --static --libs jansson)"
@@ -356,16 +355,19 @@ elif pkg-config --exists jansson; then
             with_libjansson="system"
             LIBS="$LIBS $(pkg-config --libs jansson)"
         fi
-else
+    else
         AC_MSG_ERROR([libjansson configuration is not found])
+    fi
+else
+    with_libjansson="No"
 fi
 
 dnl -------------------------------------------------------------------------
 dnl libevent2
 dnl
-if test -e ../../../../libevent/build/lib/libevent.a; then
-        CXXFLAGS="$CXXFLAGS -I../../../../libevent/build/include"
-        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libevent/build/include"
+if test "$with_libevent" = "yes"; then
+    if test -e ../../../../libevent/build/lib/libevent.a; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_LIBEVENT -I../../../../libevent/build/include"
         if test "$enable_staticlibs" = "yes"; then
             with_libevent="builtin (static)"
             LIBS="$LIBS ../../../../libevent/build/lib/libevent.a"
@@ -373,9 +375,8 @@ if test -e ../../../../libevent/build/lib/libevent.a; then
             with_libevent="builtin"
             LIBS="$LIBS  -L../../../../libevent/build/lib -levent"
         fi
-elif pkg-config --exists libevent; then
-        CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libevent)"
-        MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libevent)"
+    elif pkg-config --exists libevent; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_LIBEVENT $(pkg-config --cflags libevent)"
         if test "$enable_staticlibs" = "yes"; then
             with_libevent="system (static)"
             LIBS="$LIBS $(pkg-config --static --libs libevent)"
@@ -383,8 +384,11 @@ elif pkg-config --exists libevent; then
             with_libevent="system"
             LIBS="$LIBS $(pkg-config --libs libevent)"
         fi
-else
+    else
         AC_MSG_ERROR([libevent configuration is not found])
+    fi
+else
+    with_libevent="No"
 fi
 
 dnl #########################################################################
