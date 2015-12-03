@@ -23,6 +23,14 @@
 #include <jansson.h>
 #include "Container.h"
 
+#ifndef json_object_foreach
+# define json_object_foreach(obj, key, value)                                    \
+    for (key = json_object_iter_key(json_object_iter(obj));                      \
+         key && (value = json_object_iter_value(json_object_iter_at(obj, key))); \
+         key = json_object_iter_key(json_object_iter_next(obj,                   \
+                                                json_object_iter_at(obj, key))))
+#endif
+
 namespace MediaConch {
 
 //***************************************************************************
