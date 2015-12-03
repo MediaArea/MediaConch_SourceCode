@@ -17,6 +17,7 @@
 #include "Core.h"
 #include "Configuration.h"
 #include "Json.h"
+#include "NoContainer.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -34,7 +35,12 @@ namespace MediaConch {
 Configuration::Configuration()
 {
     parse_error = true;
-    c = new Json();
+#ifdef HAVE_JANSSON
+    c = new Json;
+#else
+    c = new NoContainer;
+#endif
+
 }
 
 //---------------------------------------------------------------------------

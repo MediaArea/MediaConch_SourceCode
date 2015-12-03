@@ -6,57 +6,41 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// JSON functions
+// NOCONTAINER functions
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifdef HAVE_JANSSON
+#ifndef NoContainerH
+#define NoContainerH
 
 //---------------------------------------------------------------------------
-#ifndef JsonH
-#define JsonH
-
-//---------------------------------------------------------------------------
-#include <string>
-#include <vector>
-#include <jansson.h>
 #include "Container.h"
 
 namespace MediaConch {
 
 //***************************************************************************
-// Class Json
+// Class NoContainer
 //***************************************************************************
 
 
-class Json : public Container
+class NoContainer : public Container
 {
 public:
-public:
     //Constructor/Destructor
-    Json();
-    ~Json();
+    NoContainer() {}
+    virtual ~NoContainer() {}
 
-    virtual int parse(std::string data, Value &v);
-    virtual std::string serialize(Value &v);
-    virtual Value* get_value_by_key(Value& v, std::string key);
-    virtual Value* get_value_in_array_by_key(Value& v, std::string key);
-    
+    virtual int parse(std::string, Value&) { return -1; } //TODO
+    virtual std::string serialize(Value &v) { return std::string(); }
+    virtual Value* get_value_by_key(Value& v, std::string key) { return NULL; }
+    virtual Value* get_value_in_array_by_key(Value& v, std::string key) { return NULL; }
+
 private:
-    json_t       *current_node;
-
-    int parse_node(Value &v);
-    int get_type_node(Value &v);
-    json_t *set_basic_node(Value &v);
-    json_t *serialize_node(Value &v);
-
-    Json(const Json&);
-    Json& operator=(const Json&);
+    NoContainer(const NoContainer&);
+    NoContainer& operator=(const NoContainer&);
 };
 
 }
 
-#endif // !JsonH
-
-#endif // !HAVE_JANSSON
+#endif // !NoContainerH

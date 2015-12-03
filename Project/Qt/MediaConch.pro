@@ -80,6 +80,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/SQLLite.h \
                     ../../Source/Common/Json.h \
                     ../../Source/Common/Container.h \
+                    ../../Source/Common/NoContainer.h \
                     ../../Source/Common/Configuration.h \
                     ../../Source/Common/REST_API.h \
                     ../../Source/Common/Httpd.h \
@@ -189,20 +190,24 @@ else {
 exists(../../../jansson/build/lib/libjansson.a) {
     INCLUDEPATH      += ../../../jansson/build/include
     LIBS             += ../../../jansson/build/lib/libjansson.a
+    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
     message("libjansson  : custom")
 }
 else {
     LIBS             += -ljansson
+    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
     message("libjansson  : system")
 }
 
 exists(../../../libevent/build/lib/libevent.a) {
     INCLUDEPATH      += ../../../libevent/build/include
     LIBS             += ../../../libevent/build/lib/libevent.a
+    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
     message("libevent    : custom")
 }
 else {
     LIBS             += -levent
+    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
     message("libevent    : system")
 }
 
