@@ -175,6 +175,10 @@ else {
     message("libxslt     : system")
 }
 
+
+contains(NO_SQLITE, yes|1) {
+    message("libsqlite3  : no")
+} else {
 exists(../../../sqlite/.libs/libsqlite3.a) {
     INCLUDEPATH      += ../../../sqlite
     LIBS             += ../../../sqlite/.libs/libsqlite3.a
@@ -185,8 +189,12 @@ else {
     LIBS             += -lsqlite3
     QMAKE_CXXFLAGS   += -DHAVE_SQLITE
     message("libsqlite3  : system")
+    }
 }
 
+contains(NO_JANSSON, yes|1) {
+    message("libjansson  : no")
+} else {
 exists(../../../jansson/build/lib/libjansson.a) {
     INCLUDEPATH      += ../../../jansson/build/include
     LIBS             += ../../../jansson/build/lib/libjansson.a
@@ -197,8 +205,12 @@ else {
     LIBS             += -ljansson
     QMAKE_CXXFLAGS   += -DHAVE_JANSSON
     message("libjansson  : system")
+    }
 }
 
+contains(NO_LIBEVENT, yes|1) {
+    message("libevent    : no")
+} else {
 exists(../../../libevent/build/lib/libevent.a) {
     INCLUDEPATH      += ../../../libevent/build/include
     LIBS             += ../../../libevent/build/lib/libevent.a
@@ -209,6 +221,7 @@ else {
     LIBS             += -levent
     QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
     message("libevent    : system")
+}
 }
 
 LIBS             += -lz
