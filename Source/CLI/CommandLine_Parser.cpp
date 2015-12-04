@@ -64,6 +64,8 @@ int Parse(MediaConch::Core &MI, MediaInfoNameSpace::String Argument)
     // Help short options
     if (Argument==__T("-ha"))
         Argument = __T("--help=Advanced");
+    if (Argument==__T("-v"))
+        Argument = __T("--version");
 
     // Backward compatibility
     if (Argument==__T("-tc"))

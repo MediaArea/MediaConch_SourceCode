@@ -31,6 +31,8 @@ int Help()
     TEXTOUT("                    Display this help and exit");
     TEXTOUT("--Help=Advanced, -ha");
     TEXTOUT("                    Display the advanced help and exit");
+    TEXTOUT("--Version, -v");
+    TEXTOUT("                    Display the version and exit");
     TEXTOUT("");
 
     TEXTOUT("Reporting Elements:");
