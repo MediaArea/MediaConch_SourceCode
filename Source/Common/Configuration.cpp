@@ -54,7 +54,7 @@ Configuration::~Configuration()
 }
 
 //---------------------------------------------------------------------------
-void Configuration::set_path(std::string& path)
+void Configuration::set_path(const std::string& path)
 {
     this->path = path;
 }
@@ -101,7 +101,7 @@ int Configuration::parse()
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(std::string key, std::string &val)
+int Configuration::get(const std::string& key, std::string &val)
 {
     Container::Value *v = get_value_for_key(key);
 
@@ -115,7 +115,7 @@ int Configuration::get(std::string key, std::string &val)
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(std::string key, long &val)
+int Configuration::get(const std::string& key, long &val)
 {
     Container::Value *v = get_value_for_key(key);
 
@@ -129,7 +129,7 @@ int Configuration::get(std::string key, long &val)
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(std::string key, double &val)
+int Configuration::get(const std::string& key, double &val)
 {
     Container::Value *v = get_value_for_key(key);
 
@@ -143,7 +143,7 @@ int Configuration::get(std::string key, double &val)
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(std::string key, bool &val)
+int Configuration::get(const std::string& key, bool &val)
 {
     Container::Value *v = get_value_for_key(key);
 
@@ -157,7 +157,7 @@ int Configuration::get(std::string key, bool &val)
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(std::string key)
+int Configuration::get(const std::string& key)
 {
     Container::Value *v = get_value_for_key(key);
 
@@ -170,7 +170,7 @@ int Configuration::get(std::string key)
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(std::string key, std::vector<Container::Value>& val)
+int Configuration::get(const std::string& key, std::vector<Container::Value>& val)
 {
     Container::Value *v = get_value_for_key(key);
 
@@ -184,7 +184,7 @@ int Configuration::get(std::string key, std::vector<Container::Value>& val)
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(std::string key, std::vector<std::pair<std::string, Container::Value> >& val)
+int Configuration::get(const std::string& key, std::vector<std::pair<std::string, Container::Value> >& val)
 {
     Container::Value *v = get_value_for_key(key);
 
@@ -198,7 +198,7 @@ int Configuration::get(std::string key, std::vector<std::pair<std::string, Conta
 }
 
 //---------------------------------------------------------------------------
-Container::Value *Configuration::get_value_for_key(std::string key)
+Container::Value *Configuration::get_value_for_key(const std::string& key)
 {
     if (parse_error)
         return NULL;
