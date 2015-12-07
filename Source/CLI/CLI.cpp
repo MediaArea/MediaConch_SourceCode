@@ -49,6 +49,10 @@ namespace MediaConch
         if (files.empty())
             return Help_Nothing();
 
+        // If no report selected, use Implementation by default
+        if (!report_set.count())
+            report_set.set(MediaConchLib::report_MediaConch);
+
         std::string reason;
         if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
                                                     format, reason))
