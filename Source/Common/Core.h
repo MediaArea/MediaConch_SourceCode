@@ -89,6 +89,8 @@ public:
     void set_configuration_path(const std::string& path);
     const std::string& get_configuration_path() const;
 
+    bool is_using_daemon() const;
+
     //General Database
     void load_database();
     bool database_is_enabled() const;

@@ -34,7 +34,6 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     CLI::CLI() : use_daemon(false)
     {
-        MCL.load_configuration();
         format = MediaConchLib::format_Text;
     }
 
@@ -59,6 +58,7 @@ namespace MediaConch
         }
 
         MCL.load_configuration();
+        use_daemon = MCL.get_use_daemon();
         return 0;
     }
 

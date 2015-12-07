@@ -999,7 +999,7 @@ bool Core::database_is_enabled() const
     if (!config)
         return false;
     bool enabled = false;
-    if (config->get("SQLite_Path", enabled))
+    if (config->get("Database_Enabled", enabled))
         return false;
     return enabled;
 }
@@ -1031,6 +1031,15 @@ std::bitset<MediaConchLib::report_Max> Core::get_bitset_with_mi_mt()
     bits.set(MediaConchLib::report_MediaInfo);
     bits.set(MediaConchLib::report_MediaTrace);
     return bits;
+}
+
+//---------------------------------------------------------------------------
+bool Core::is_using_daemon() const
+{
+    bool use_daemon = false;
+    if (config->get("Use_Daemon", use_daemon) < 0)
+        return false;
+    return use_daemon;
 }
 
 }

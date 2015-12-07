@@ -115,10 +115,15 @@ public:
     void                        clear_policies();
     const std::vector<Policy *>& get_policies() const;
 
+    // Daemon
+    void set_use_daemon(bool use);
+    bool get_use_daemon() const;
+
 private:
     MediaConchLib (const MediaConchLib&);
     std::vector<std::string> Options;
     Core *core;
+    bool use_daemon;
 };
 
 }

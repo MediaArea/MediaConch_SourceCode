@@ -228,6 +228,7 @@ int MediaConchLib::transform_with_xslt_memory(const std::string& report, const s
 void MediaConchLib::load_configuration()
 {
     core->load_configuration();
+    use_daemon = core->is_using_daemon();
 }
 
 //---------------------------------------------------------------------------
@@ -343,6 +344,18 @@ void MediaConchLib::clear_policies()
     for (size_t i = 0; i < core->policies.policies.size(); ++i)
         delete core->policies.policies[i];
     core->policies.policies.clear();
+}
+
+//---------------------------------------------------------------------------
+void MediaConchLib::set_use_daemon(bool use)
+{
+    use_daemon = use;
+}
+
+//---------------------------------------------------------------------------
+bool MediaConchLib::get_use_daemon() const
+{
+    return use_daemon;
 }
 
 }
