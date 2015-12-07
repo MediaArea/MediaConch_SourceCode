@@ -47,7 +47,8 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int Daemon::init()
     {
-        MCL.load_configuration();
+        MCL.init();
+        MCL.set_use_daemon(false);
         httpd = new LibEventHttpd(&MCL);
         //TODO: Set
         httpd->set_port(4242);
@@ -99,6 +100,7 @@ namespace MediaConch
     {
         if (httpd)
             httpd->finish();
+        MCL.close();
         return 0;
     }
 
@@ -279,14 +281,14 @@ namespace MediaConch
             return -1;
 
         MediaConchLib::format format = MediaConchLib::format_Xml;
-        if (req->display_name == "TEXT")
+        if (req->display_name == MediaConchLib::display_text_name)
             format = MediaConchLib::format_Text;
-        else if (req->display_name == "HTML")
+        else if (req->display_name == MediaConchLib::display_maxml_name)
+            format = MediaConchLib::format_MaXml;
+        else if (req->display_name == MediaConchLib::display_html_name)
             format = MediaConchLib::format_Html;
-
-        std::vector<std::string> policies;
-        if (req->policy_name.length())
-            policies.push_back(req->policy_name);
+        else if (req->display_name == MediaConchLib::display_jstree_name)
+            format = MediaConchLib::format_JsTree;
 
         std::bitset<MediaConchLib::report_Max> report_set;
         bool has_policy = false;
@@ -301,7 +303,8 @@ namespace MediaConch
             if (req->reports[j] == RESTAPI::POLICY)
                 has_policy = true;
         }
-        if (report_set.count() && has_policy)
+
+        if (!report_set.count() && !has_policy)
             return -1;
 
         for (size_t i = 0; i < req->ids.size(); ++i)
@@ -317,7 +320,7 @@ namespace MediaConch
             }
 
             double percent_done = 0.0;
-            bool is_done = d->MCL.is_done(*d->current_files[i], percent_done);
+            bool is_done = d->MCL.is_done(*d->current_files[id], percent_done);
             if (!is_done)
             {
                 RESTAPI::Report_Nok *nok = new RESTAPI::Report_Nok;
@@ -332,15 +335,11 @@ namespace MediaConch
 
             // Output
             std::vector<std::string> files;
-            files.push_back(*d->current_files[i]);
+            files.push_back(*d->current_files[id]);
 
-            if (has_policy && req->policy_content.length())
-            {
-                ok->has_policy_validity = true;
-                ok->policy_validity = d->MCL.validate_policy_memory(*d->current_files[i], req->policy_content, ok->report);
-            }
-            else
-                d->MCL.get_report(report_set, format, files, policies, ok->report);
+            std::vector<std::string> vec;
+            d->MCL.get_report(report_set, format, files, req->policies_names,
+                              req->policies_contents, ok->report);
 
             // Display
             if (req->display_name.length())

@@ -99,4 +99,24 @@ void Policy::export_schema(const char* filename)
     saved = true;
 }
 
+//---------------------------------------------------------------------------
+int Policy::dump_schema(std::string& data)
+{
+    xmlDocPtr new_doc = create_doc();
+
+    if (!new_doc)
+        return -1;
+
+    xmlChar *mem = NULL;
+    int size = 0;
+    xmlDocDumpFormatMemory(new_doc, &mem, &size, 2);
+    if (size > 0)
+    {
+        data = std::string((const char*)mem, size);
+        xmlFree(mem);
+    }
+    xmlFreeDoc(new_doc);
+    return 0;
+}
+
 }

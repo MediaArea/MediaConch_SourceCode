@@ -152,10 +152,10 @@ std::string RESTAPI::serialize_report_req(Report_Req& req)
     child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
     child.obj.push_back(std::make_pair("reports", serialize_report_reports(req.reports)));
 
-    if (req.policy_name.length())
-        child.obj.push_back(std::make_pair("policy_name", serialize_report_string(req.policy_name)));
-    if (req.policy_content.length())
-        child.obj.push_back(std::make_pair("policy_content", serialize_report_string(req.policy_content)));
+    if (req.policies_names.size())
+        child.obj.push_back(std::make_pair("policies_names", serialize_report_arr_str(req.policies_names)));
+    if (req.policies_contents.size())
+        child.obj.push_back(std::make_pair("policies_contents", serialize_report_arr_str(req.policies_contents)));
 
     if (req.display_name.length())
         child.obj.push_back(std::make_pair("display_name", serialize_report_string(req.display_name)));
@@ -405,11 +405,11 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *reports, *policy_name, *policy_content, *display_name, *display_content;
+    Container::Value *ids, *reports, *policies_names, *policies_contents, *display_name, *display_content;
     ids = model->get_value_by_key(*child, "ids");
     reports = model->get_value_by_key(*child, "reports");
-    policy_name = model->get_value_by_key(*child, "policy_name");
-    policy_content = model->get_value_by_key(*child, "policy_content");
+    policies_names = model->get_value_by_key(*child, "policies_names");
+    policies_contents = model->get_value_by_key(*child, "policies_contents");
     display_name = model->get_value_by_key(*child, "display_name");
     display_content = model->get_value_by_key(*child, "display_content");
 
@@ -434,10 +434,18 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
         return NULL;
     }
 
-    if (policy_name && policy_name->type == Container::Value::CONTAINER_TYPE_STRING)
-        req->policy_name = policy_name->s;
-    if (policy_content && policy_content->type == Container::Value::CONTAINER_TYPE_STRING)
-        req->policy_content = policy_content->s;
+    if (policies_names && policies_names->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < policies_names->array.size(); ++i)
+            if (policies_names->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->policies_names.push_back(policies_names->array[i].s);
+    }
+    if (policies_contents && policies_contents->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < policies_contents->array.size(); ++i)
+            if (policies_contents->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->policies_contents.push_back(policies_contents->array[i].s);
+    }
     if (display_name && display_name->type == Container::Value::CONTAINER_TYPE_STRING)
         req->display_name = display_name->s;
     if (display_content && display_content->type == Container::Value::CONTAINER_TYPE_STRING)
@@ -519,7 +527,7 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string& uri)
+RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
 {
     Analyze_Req *req = new Analyze_Req;
     //TODO
@@ -556,7 +564,7 @@ finish:
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Report_Req *RESTAPI::parse_uri_report_req(const std::string& uri)
+RESTAPI::Report_Req *RESTAPI::parse_uri_report_req(const std::string&)
 {
     Report_Req *req = new Report_Req;
     //TODO
@@ -564,7 +572,7 @@ RESTAPI::Report_Req *RESTAPI::parse_uri_report_req(const std::string& uri)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Retry_Req *RESTAPI::parse_uri_retry_req(const std::string& uri)
+RESTAPI::Retry_Req *RESTAPI::parse_uri_retry_req(const std::string&)
 {
     Retry_Req *req = new Retry_Req;
     //TODO
@@ -949,6 +957,24 @@ Container::Value RESTAPI::serialize_report_string(const std::string& reports)
     str_val.s = reports;
 
     return str_val;
+}
+
+//---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_report_arr_str(const std::vector<std::string>& reports)
+{
+    Container::Value arr_val;
+
+    arr_val.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        Container::Value str_val;
+
+        str_val.type = Container::Value::CONTAINER_TYPE_STRING;
+        str_val.s = reports[i];
+        arr_val.array.push_back(str_val);
+    }
+
+    return arr_val;
 }
 
 //---------------------------------------------------------------------------

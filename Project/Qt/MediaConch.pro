@@ -40,6 +40,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/LibEventHttp.cpp \
                     ../../Source/Common/Scheduler.cpp \
                     ../../Source/Common/Queue.cpp \
+                    ../../Source/Common/DaemonClient.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -91,6 +92,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/LibEventHttp.h \
                     ../../Source/Common/Scheduler.h \
                     ../../Source/Common/Queue.h \
+                    ../../Source/Common/DaemonClient.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \

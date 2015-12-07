@@ -61,7 +61,7 @@ namespace MediaConch
             return -1;
         }
 
-        MCL.load_configuration();
+        MCL.init();
         use_daemon = MCL.get_use_daemon();
         return 0;
     }
@@ -96,25 +96,43 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::run()
     {
-        MCL.analyze(files);
-
-        // // In CLI mode, wait it is finished
-        while (1)
+        std::vector<std::string> file_to_report;
+        for (size_t i = 0; i < files.size(); ++i)
         {
+            bool registered = false;
+            if (MCL.analyze(files[i], registered) < 0)
+                continue;
+
+            if (!registered)
+            {
+                std::stringstream str;
+                str << "Registering ";
+                str << files[i];
+                str << " to analyze";
+                STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
+            }
             double percent_done = 0;
-            if (MCL.is_done(files, percent_done))
-                break;
-            usleep(50000);
+            if (!MCL.is_done(files, percent_done))
+            {
+                std::stringstream str;
+                str << "Analyzing ";
+                str << files[i];
+                str << " ; done: ";
+                str << percent_done * 1000;
+                str << "%";
+                STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
+                continue;
+            }
+            file_to_report.push_back(files[i]);
         }
 
         //Output
         std::string report;
-        if (MCL.get_report(report_set, format, files, policies, report) < 0)
-            return -1;
-
+        std::vector<std::string> policies_contents;
+        MCL.get_report(report_set, format, file_to_report, policies, policies_contents, report);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(report);
-        STRINGOUT(report_mi);
 
+        STRINGOUT(report_mi);
         //Output, in a file if needed
         if (!LogFile_FileName.empty())
             LogFile_Action(report_mi);
@@ -124,6 +142,7 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::finish()
     {
+        MCL.close();
         return 0;
     }
 

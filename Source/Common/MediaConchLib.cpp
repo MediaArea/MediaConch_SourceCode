@@ -13,16 +13,30 @@
 #include "ZenLib/Ztring.h"
 #include "MediaConchLib.h"
 #include "Core.h"
+#include "DaemonClient.h"
 #include "Policy.h"
+#include "Http.h"
+#include "LibEventHttp.h"
 
 namespace MediaConch {
+
+//***************************************************************************
+// Statics
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+const std::string MediaConchLib::display_xml_name = std::string("XML");
+const std::string MediaConchLib::display_maxml_name = std::string("MAXML");
+const std::string MediaConchLib::display_text_name = std::string("TEXT");
+const std::string MediaConchLib::display_html_name = std::string("HTML");
+const std::string MediaConchLib::display_jstree_name = std::string("JSTREE");
 
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-MediaConchLib::MediaConchLib()
+MediaConchLib::MediaConchLib() : daemon_client(NULL)
 {
     core = new Core;
 }
@@ -30,6 +44,34 @@ MediaConchLib::MediaConchLib()
 MediaConchLib::~MediaConchLib()
 {
     delete core;
+}
+
+//***************************************************************************
+// General
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+int MediaConchLib::init()
+{
+    load_configuration();
+    use_daemon = core->is_using_daemon();
+    if (use_daemon)
+    {
+        daemon_client = new DaemonClient(core);
+        daemon_client->init();
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::close()
+{
+    if (daemon_client)
+    {
+        daemon_client->close();
+        daemon_client = NULL;
+    }
+    return 0;
 }
 
 //***************************************************************************
@@ -99,7 +141,7 @@ int MediaConchLib::analyze(const std::vector<std::string>& files)
 
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
-        core->open_file(files[i], registered);
+        analyze(files[i], registered);
     return 0;
 }
 
@@ -109,6 +151,8 @@ int MediaConchLib::analyze(const std::string& file, bool& registered)
     if (!file.length())
         return -1;
 
+    if (use_daemon)
+        return daemon_client->analyze(file, registered);
     return core->open_file(file, registered);
 }
 
@@ -124,7 +168,7 @@ bool MediaConchLib::is_done(const std::vector<std::string>& files, double& perce
     for (size_t i = 0; i < files.size(); ++i)
     {
         double percent_done;
-        if (core->is_done(files[i], percent_done))
+        if (is_done(files[i], percent_done))
             percent += unit_percent;
         else
         {
@@ -141,6 +185,8 @@ bool MediaConchLib::is_done(const std::string& file, double& percent)
     if (!file.length())
         return false;
 
+    if (use_daemon)
+        return daemon_client->is_done(file, percent);
     return core->is_done(file, percent);
 }
 
@@ -150,13 +196,17 @@ bool MediaConchLib::is_done(const std::string& file, double& percent)
 
 //---------------------------------------------------------------------------
 int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format f,
-                              const std::vector<std::string>& files, const std::vector<std::string>& policies,
+                              const std::vector<std::string>& files,
+                              const std::vector<std::string>& policies_names,
+                              const std::vector<std::string>& policies_contents,
                               std::string& report)
 {
     if (!files.size())
         return -1;
 
-    return core->GetOutput(report_set, f, files, policies, report);
+    if (use_daemon)
+        return daemon_client->get_report(report_set, f, files, policies_names, policies_contents, report);
+    return core->get_report(report_set, f, files, policies_names, policies_contents, report);
 }
 
 //---------------------------------------------------------------------------
@@ -175,6 +225,19 @@ int MediaConchLib::remove_report(const std::vector<std::string>& files)
 //---------------------------------------------------------------------------
 bool MediaConchLib::validate_policy(const std::string& file, int policy, std::string& report)
 {
+    Policy* p = get_policy((size_t)policy);
+    if (!p)
+    {
+        report = "Policy not found";
+        return false;
+    }
+
+    if (use_daemon)
+    {
+        std::string policy_content;
+        p->dump_schema(policy_content);
+        return daemon_client->validate_policy(file, policy_content, report);
+    }
     return core->validate_policy(file, policy, report);
 }
 
@@ -185,7 +248,7 @@ bool MediaConchLib::validate_policy_memory(const std::string& file, const std::s
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::validate_policies(const std::string& file, std::vector<std::string>& policies,
+bool MediaConchLib::validate_policies(const std::string& file, const std::vector<std::string>& policies,
                                       std::string& report)
 {
     if (!policies.size())
@@ -194,7 +257,7 @@ bool MediaConchLib::validate_policies(const std::string& file, std::vector<std::
     bool ret = true;
     for (size_t i = 0; i < policies.size(); ++i)
     {
-        if (!core->validate_policy(file, i, report))
+        if (!core->validate_policy_file(file, policies[i], report))
             ret = false;
         report += "\r\n";
     }
@@ -228,7 +291,6 @@ int MediaConchLib::transform_with_xslt_memory(const std::string& report, const s
 void MediaConchLib::load_configuration()
 {
     core->load_configuration();
-    use_daemon = core->is_using_daemon();
 }
 
 //---------------------------------------------------------------------------
@@ -243,7 +305,7 @@ const std::string& MediaConchLib::get_configuration_path() const
     return core->get_configuration_path();
 }
 //***************************************************************************
-// Database
+// Policy
 //***************************************************************************
 
 //---------------------------------------------------------------------------

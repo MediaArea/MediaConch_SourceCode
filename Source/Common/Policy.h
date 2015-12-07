@@ -48,6 +48,7 @@ public:
     int               import_schema(const std::string& filename);
     int               import_schema_from_memory(const std::string& filename, const char* memory, int len);
     void              export_schema(const char* filename);
+    int               dump_schema(std::string& data);
     std::string       get_error() const { return error; }
     virtual xmlDocPtr create_doc() = 0;
 

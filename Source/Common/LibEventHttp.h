@@ -43,6 +43,7 @@ public:
 
     int init();
     int start();
+    int stop();
     int finish();
 
 private:

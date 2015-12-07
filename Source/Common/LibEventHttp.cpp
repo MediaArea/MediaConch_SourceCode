@@ -64,13 +64,20 @@ int LibEventHttp::start()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::finish()
+int LibEventHttp::stop()
 {
     if (connection)
     {
         evhttp_connection_free(connection);
         connection = NULL;
     }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int LibEventHttp::finish()
+{
+    stop();
     if (base)
     {
         event_base_free(base);

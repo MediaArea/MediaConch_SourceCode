@@ -33,6 +33,7 @@ public:
 
     virtual int init() = 0;
     virtual int start() = 0;
+    virtual int stop() = 0;
     virtual int finish() = 0;
 
     int send_request(RESTAPI::Analyze_Req& req);

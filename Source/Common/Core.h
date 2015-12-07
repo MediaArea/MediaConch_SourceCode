@@ -64,23 +64,29 @@ public:
     bool        is_done(const std::string& file, double& percent_done);
     int         open_file(const std::string& filename, bool& registered);
     int         remove_report(const std::vector<std::string>& files);
-    int GetOutput(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
-                  const std::vector<std::string>& files, const std::vector<std::string>& policies,
-                  std::string& report);
-    std::string GetOutput_Text(const std::bitset<MediaConchLib::report_Max>& report_set, const std::string& file);
-    std::string GetOutput_Text_Implementation(const std::string& file);
-    std::string GetOutput_Xml(const std::bitset<MediaConchLib::report_Max>& report_set, const std::string& file);
-    std::string GetOutput_Xml_Implementation(const std::string& file);
-    int         GetOutput_JStree(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    void        GetOutput_Html(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    int         PoliciesCheck(std::string& report, MediaConchLib::format f, const std::vector<std::string>& policies);
+    int         get_report(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
+                           const std::vector<std::string>& files,
+                           const std::vector<std::string>& policies_names,
+                           const std::vector<std::string>& policies_contents,
+                           std::string& report);
+    int         get_reports_output_Text(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
+    int         get_reports_output_Text_Implementation(const std::string& file, std::string& report);
+    int         get_reports_output_Xml(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
+    int         get_reports_output_Xml_Implementation(const std::string& file, std::string& report);
+    int         get_reports_output_JStree(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
+    int         get_reports_output_Html(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
+    int         policies_check(MediaConchLib::format f,
+                               const std::vector<std::string>& files,
+                               const std::vector<std::string>& policies_names,
+                               const std::vector<std::string>& policies_contents,
+                               std::string& report);
 
     bool validate_policy(const std::string& file, int policy, std::string& report);
+    bool validate_policy_file(const std::string& file, const std::string& policy, std::string& report);
     bool validate_policy_memory(const std::string& file, const std::string& policy, std::string& report);
     std::string transform_with_xslt_file(const std::string& report, const std::string& Xslt);
     std::string transform_with_xslt_memory(const std::string& report, const std::string& memory);
 
-    std::vector<std::string> PoliciesFiles;
     Policies policies;
     std::string xslt_display;
 
@@ -90,6 +96,7 @@ public:
     const std::string& get_configuration_path() const;
 
     bool is_using_daemon() const;
+    void get_daemon_address(std::string& addr, int& port) const;
 
     //General Database
     void load_database();
@@ -112,15 +119,23 @@ private:
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
 
-    bool PolicySchematron(const std::string& file, MediaConchLib::format f, std::stringstream& Out);
-    bool PolicyXslt(const std::string& file, MediaConchLib::format f, std::stringstream& Out);
+    int policies_check_contents(MediaConchLib::format f, const std::string& files,
+                                const std::vector<std::string>& policies_contents,
+                                std::stringstream& Out);
+    int policies_check_files(MediaConchLib::format f, const std::string& files,
+                             const std::vector<std::string>& policies_names,
+                             std::stringstream& Out);
+    bool policy_schematron(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out);
+    bool policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out);
 
     //Helper
     bool validation(const std::string& file, Schema* S, std::string& report);
     bool validate_schematron_policy(const std::string& file, int pos, std::string& report);
     bool validate_schematron_policy_from_memory(const std::string& file, const std::string& memory, std::string& report);
+    bool validate_schematron_policy_from_file(const std::string& file, const std::string& policy, std::string& report);
     bool validate_xslt_policy(const std::string& file, int pos, std::string& report);
     bool validate_xslt_policy_from_memory(const std::string& file, const std::string& memory, std::string& report);
+    bool validate_xslt_policy_from_file(const std::string& file, const std::string& policy, std::string& report);
     bool is_schematron_file(const std::string& file);
 
     bool   file_is_registered(const std::string& file);

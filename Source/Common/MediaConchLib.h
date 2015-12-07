@@ -22,7 +22,9 @@
 namespace MediaConch {
 
 class Core;
+class DaemonClient;
 class Policy;
+class Http;
 
 #ifdef WINDOWS
     const std::string Path_Separator("\\");
@@ -62,6 +64,16 @@ public:
         format_Max,
     };
 
+    static const std::string display_xml_name;
+    static const std::string display_maxml_name;
+    static const std::string display_text_name;
+    static const std::string display_html_name;
+    static const std::string display_jstree_name;
+
+    // General
+    int init();
+    int close();
+
     //Options
     int add_option(const std::string& option, std::string& report);
 
@@ -73,14 +85,16 @@ public:
 
     // Output
     int get_report(const std::bitset<report_Max>& Report, format f,
-                   const std::vector<std::string>& files, const std::vector<std::string>& policies,
+                   const std::vector<std::string>& files,
+                   const std::vector<std::string>& policies_names,
+                   const std::vector<std::string>& policies_contents,
                    std::string& report);
     int remove_report(const std::vector<std::string>& files);
 
     // Policy
     bool validate_policy(const std::string& file, int policy, std::string& report);
     bool validate_policy_memory(const std::string& file, const std::string& policy, std::string& report);
-    bool validate_policies(const std::string& file, std::vector<std::string>& policies, std::string& report);
+    bool validate_policies(const std::string& file, const std::vector<std::string>& policies, std::string& report);
 
     // Xsl Transformation
     int  transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
@@ -119,11 +133,17 @@ public:
     void set_use_daemon(bool use);
     bool get_use_daemon() const;
 
+    // Helper
+    int init_http_client();
+    int close_http_client();
+
 private:
     MediaConchLib (const MediaConchLib&);
-    std::vector<std::string> Options;
-    Core *core;
-    bool use_daemon;
+
+    std::vector<std::string>  Options;
+    Core                     *core;
+    bool                      use_daemon;
+    DaemonClient             *daemon_client;
 };
 
 }

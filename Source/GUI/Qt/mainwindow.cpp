@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Core configuration
-    MCL.load_configuration();
+    MCL.init();
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
@@ -259,12 +259,6 @@ int MainWindow::exporting_to_xslt_file(size_t pos)
 void MainWindow::exporting_policy(size_t pos)
 {
     MCL.save_policy(pos, NULL);
-}
-
-//---------------------------------------------------------------------------
-bool MainWindow::validate_policy(const std::string& file, int policy, std::string& report)
-{
-    return MCL.validate_policy(file, policy, report);
 }
 
 //---------------------------------------------------------------------------
@@ -684,8 +678,8 @@ QString MainWindow::get_implementationreport_xml(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    std::vector<std::string> policies;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    std::vector<std::string> vec;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, vec, vec, report);
     return QString().fromStdString(report);
 }
 
@@ -699,8 +693,8 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    std::vector<std::string> policies;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    std::vector<std::string> vec;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, vec, vec, report);
     return QString().fromStdString(report);
 }
 
@@ -713,8 +707,8 @@ QString MainWindow::get_mediainfo_xml(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    std::vector<std::string> policies;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    std::vector<std::string> vec;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, vec, vec, report);
     return QString().fromStdString(report);
 }
 
@@ -727,8 +721,8 @@ QString MainWindow::get_mediainfo_jstree(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    std::vector<std::string> policies;
-    MCL.get_report(report_set, MediaConchLib::format_JsTree, files, policies, report);
+    std::vector<std::string> vec;
+    MCL.get_report(report_set, MediaConchLib::format_JsTree, files, vec, vec, report);
     return QString().fromStdString(report);
 }
 
@@ -741,8 +735,8 @@ QString MainWindow::get_mediatrace_xml(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    std::vector<std::string> policies;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files, policies, report);
+    std::vector<std::string> vec;
+    MCL.get_report(report_set, MediaConchLib::format_Xml, files, vec, vec, report);
     return QString().fromStdString(report);
 }
 
@@ -755,9 +749,15 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    std::vector<std::string> policies;
-    MCL.get_report(report_set, MediaConchLib::format_JsTree, files, policies, report);
+    std::vector<std::string> vec;
+    MCL.get_report(report_set, MediaConchLib::format_JsTree, files, vec, vec, report);
     return QString().fromStdString(report);
+}
+
+//---------------------------------------------------------------------------
+bool MainWindow::validate_policy(const std::string& file, int policy, std::string& report)
+{
+    return MCL.validate_policy(file, policy, report);
 }
 
 }
