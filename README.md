@@ -12,6 +12,8 @@ All open source digital assets for the software developed by MediaArea during th
 
 # How to build MediaConch
 
+[![Build Status](https://travis-ci.org/MediaArea/MediaConch_SourceCode.svg?branch=master)](https://travis-ci.org/MediaArea/MediaConch_SourceCode)
+
 ## Build under Unix (Mac and Linux)
 
 First, you must create a directory which will receive the MediaConch directory, and some of its dependencies depending on your configuration: ZenLib and MediaInfoLib if you decide to compile them yourself, and under Mac libxml2 and libxslt.
