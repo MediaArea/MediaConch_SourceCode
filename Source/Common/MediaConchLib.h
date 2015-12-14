@@ -64,6 +64,12 @@ public:
         format_Max,
     };
 
+    struct ReportRes
+    {
+        std::string       report;
+        std::vector<bool> policies_validities;
+    };
+
     static const std::string display_xml_name;
     static const std::string display_maxml_name;
     static const std::string display_text_name;
@@ -88,13 +94,21 @@ public:
                    const std::vector<std::string>& files,
                    const std::vector<std::string>& policies_names,
                    const std::vector<std::string>& policies_contents,
-                   std::string& report);
+                   MediaConchLib::ReportRes* result,
+                   const std::string* display_name = NULL,
+                   const std::string* display_content = NULL);
     int remove_report(const std::vector<std::string>& files);
 
     // Policy
-    bool validate_policy(const std::string& file, int policy, std::string& report);
-    bool validate_policy_memory(const std::string& file, const std::string& policy, std::string& report);
-    bool validate_policies(const std::string& file, const std::vector<std::string>& policies, std::string& report);
+    bool validate_policy(const std::string& file, int policy,
+                         MediaConchLib::ReportRes* result,
+                         const std::string* display_name, const std::string* display_content);
+    bool validate_policy_memory(const std::string& file, const std::string& policy,
+                                MediaConchLib::ReportRes* result,
+                                const std::string* display_name, const std::string* display_content);
+    int validate_policies(const std::string& file, const std::vector<std::string>& policies,
+                           MediaConchLib::ReportRes* result,
+                           const std::string* display_name, const std::string* display_content);
 
     // Xsl Transformation
     int  transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);

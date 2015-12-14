@@ -91,6 +91,7 @@ private:
     bool implementationreport_is_valid(QString& report);
     void change_report_policy_save_name(std::string& file, QString& ext, QString& html);
     QString file_remove_ext(std::string& file);
+    void get_displays_use(std::string& display_name, std::string& display_content);
 
 public Q_SLOTS:
     void actionCloseAllTriggered();

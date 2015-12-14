@@ -68,7 +68,9 @@ public:
                            const std::vector<std::string>& files,
                            const std::vector<std::string>& policies_names,
                            const std::vector<std::string>& policies_contents,
-                           std::string& report);
+                           MediaConchLib::ReportRes* res,
+                           const std::string* display_names = NULL,
+                           const std::string* display_contents = NULL);
     int         get_reports_output_Text(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         get_reports_output_Text_Implementation(const std::string& file, std::string& report);
     int         get_reports_output_Xml(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
@@ -77,15 +79,23 @@ public:
     int         get_reports_output_Html(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         policies_check(MediaConchLib::format f,
                                const std::vector<std::string>& files,
-                               const std::vector<std::string>& policies_names,
-                               const std::vector<std::string>& policies_contents,
-                               std::string& report);
+                               MediaConchLib::ReportRes *result,
+                               const std::vector<std::string>* policies_names = NULL,
+                               const std::vector<std::string>* policies_contents = NULL);
 
-    bool validate_policy(const std::string& file, int policy, std::string& report);
-    bool validate_policy_file(const std::string& file, const std::string& policy, std::string& report);
-    bool validate_policy_memory(const std::string& file, const std::string& policy, std::string& report);
-    std::string transform_with_xslt_file(const std::string& report, const std::string& Xslt);
-    std::string transform_with_xslt_memory(const std::string& report, const std::string& memory);
+    bool        validate_policy(const std::string& file, int policy,
+                                MediaConchLib::ReportRes* result,
+                                const std::string* display_name = NULL, const std::string* display_content = NULL);
+    bool        validate_policy_file(const std::string& file, const std::string& policy,
+                                     MediaConchLib::ReportRes* result,
+                                     const std::string* display_name = NULL, const std::string* display_content = NULL);
+    bool        validate_policy_memory(const std::string& file, const std::string& policy,
+                                       MediaConchLib::ReportRes* result,
+                                       const std::string* display_name = NULL, const std::string* display_content = NULL);
+
+    // Apply display
+    int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);
+    int  transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
 
     Policies policies;
     std::string xslt_display;

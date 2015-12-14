@@ -180,30 +180,44 @@ int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, M
                      const std::vector<std::string>& files,
                      const std::vector<std::string>& policies_names,
                      const std::vector<std::string>& policies_contents,
-                     std::string& report)
+                     MediaConchLib::ReportRes* result,
+                     const std::string* display_name,
+                     const std::string* display_content)
 {
     if (!policies_names.empty() || !policies_contents.empty())
-        return policies_check(f, files, policies_names, policies_contents, report);
-
-    for (size_t i = 0; i < files.size(); ++i)
     {
-        switch (f)
+        if (policies_check(f, files, result,
+                           policies_names.size() ? &policies_names : NULL,
+                           policies_contents.size() ? &policies_contents : NULL) < 0)
+            return -1;
+    }
+    else
+    {
+        for (size_t i = 0; i < files.size(); ++i)
         {
-            case MediaConchLib::format_Text:
-            case MediaConchLib::format_Xml:
-            case MediaConchLib::format_MaXml:
-                get_reports_output(files[i], f, report_set, report);
-                break;
-            case MediaConchLib::format_JsTree:
-                get_reports_output_JStree(files[i], report_set, report);
-                break;
-            case MediaConchLib::format_Html:
-                get_reports_output_Html(files[i], report_set, report);
-                break;
-            default:
-                return -1;
+            switch (f)
+            {
+                case MediaConchLib::format_Text:
+                case MediaConchLib::format_Xml:
+                case MediaConchLib::format_MaXml:
+                    get_reports_output(files[i], f, report_set, result->report);
+                    break;
+                case MediaConchLib::format_JsTree:
+                    get_reports_output_JStree(files[i], report_set, result->report);
+                    break;
+                case MediaConchLib::format_Html:
+                    get_reports_output_Html(files[i], report_set, result->report);
+                    break;
+                default:
+                    return -1;
+            }
         }
     }
+
+    if (display_name)
+        transform_with_xslt_file(result->report, *display_name, result->report);
+    else if (display_content)
+        transform_with_xslt_memory(result->report, *display_content, result->report);
     return 0;
 }
 
@@ -271,7 +285,8 @@ int Core::get_reports_output_Html(const std::string& file,
 
         // Apply an XSLT to have HTML
         std::string memory(implementation_report_display_html_xsl);
-        report += transform_with_xslt_memory(tmp, memory);
+        transform_with_xslt_memory(tmp, memory, tmp);
+        report += tmp;
     }
     return 0;
 }
@@ -288,7 +303,8 @@ int Core::get_reports_output_Text_Implementation(const std::string& file, std::s
 #else //defined(_WIN32) || defined(WIN32)
     std::string memory(implementation_report_display_textunicode_xsl);
 #endif //defined(_WIN32) || defined(WIN32)
-    report = transform_with_xslt_memory(tmp, memory);
+    transform_with_xslt_memory(tmp, memory, tmp);
+    report += tmp;
     return 0;
 }
 
@@ -299,7 +315,7 @@ int Core::get_reports_output_Xml_Implementation (const std::string& file, std::s
 
     // Apply an XSLT to have XML
     if (xslt_display.length())
-        report = transform_with_xslt_file(report, xslt_display);
+        transform_with_xslt_file(report, xslt_display, report);
 
     return 0;
 }
@@ -332,7 +348,6 @@ int Core::policies_check_files(MediaConchLib::format f, const std::string& file,
                                const std::vector<std::string>& policies_names,
                                std::stringstream& Out)
 {
-    Out << file << ": ";
     for (size_t i = 0; i < policies_names.size(); ++i)
     {
         std::string tmp;
@@ -343,12 +358,12 @@ int Core::policies_check_files(MediaConchLib::format f, const std::string& file,
                 std::string retain = tmp;
                 tmp = std::string();
                 if (!validate_xslt_policy_from_file(file, policies_names[i], tmp))
-                    Out << retain;
+                    Out << file << ": " << retain;
                 else
                     Out << tmp;
             }
             else
-                Out << tmp;
+                Out << file << ": "  << tmp;
         }
         else
         {
@@ -359,7 +374,7 @@ int Core::policies_check_files(MediaConchLib::format f, const std::string& file,
                 if (!validate_schematron_policy_from_file(file, policies_names[i], tmp))
                     Out << retain;
                 else
-                    Out << tmp;
+                    Out << file << ": "  << tmp;
             }
             else
                 Out << tmp;
@@ -371,31 +386,37 @@ int Core::policies_check_files(MediaConchLib::format f, const std::string& file,
 //---------------------------------------------------------------------------
 int Core::policies_check(MediaConchLib::format f,
                          const std::vector<std::string>& files,
-                         const std::vector<std::string>& policies_names,
-                         const std::vector<std::string>& policies_contents,
-                         std::string& report)
+                         MediaConchLib::ReportRes* result,
+                         const std::vector<std::string>* policies_names,
+                         const std::vector<std::string>* policies_contents)
 {
     if (!files.size())
     {
-        report = "No file to validate";
+        result->report = "No file to validate";
         return -1;
     }
 
-    if (!policies_names.size() && !policies_contents.size())
+    if (!policies_names && !policies_contents)
     {
-        report = "No policy to apply";
+        result->report = "No policy to apply";
         return -1;
     }
 
+    //int size = files.size();
+    // if (policies_names)
+    //    size *= policies_names->size();
+    // if (policies_names)
+    //    size *= policies_contents->size();
+    //result->valid = new [size] bool
     std::stringstream Out;
     for (size_t i = 0; i < files.size(); ++i)
     {
-        if (policies_names.size())
-            policies_check_files(f, files[i], policies_names, Out);
-        if (policies_contents.size())
-            policies_check_contents(f, files[i], policies_contents, Out);
+        if (policies_names)
+            policies_check_files(f, files[i], *policies_names, Out);
+        if (policies_contents)
+            policies_check_contents(f, files[i], *policies_contents, Out);
     }
-    report = Out.str();
+    result->report = Out.str();
     return 0;
 }
 
@@ -441,7 +462,7 @@ bool Core::policy_xslt(const std::string& file, const std::string& policy, Media
         std::string report;
         valid = validation(file, S, report);
         if (xslt_display.length())
-            report = Core::transform_with_xslt_file(report, xslt_display);
+            transform_with_xslt_file(report, xslt_display, report);
         else 
             switch (f)
             {
@@ -453,14 +474,14 @@ bool Core::policy_xslt(const std::string& file, const std::string& policy, Media
                                     #else //defined(_WIN32) || defined(WIN32)
                                         std::string memory(implementation_report_display_textunicode_xsl);
                                     #endif //defined(_WIN32) || defined(WIN32)
-                                        report = transform_with_xslt_memory(report, memory);
+                                        transform_with_xslt_memory(report, memory, report);
                                     }
                                     break;
                 case MediaConchLib::format_Html:
                                     {
                                         // Apply an XSLT to have Text
                                         std::string memory(implementation_report_display_html_xsl);
-                                        report = transform_with_xslt_memory(report, memory);
+                                        transform_with_xslt_memory(report, memory, report);
                                     }
                                     break;
                 default:            ;
@@ -485,90 +506,134 @@ bool Core::policy_xslt(const std::string& file, const std::string& policy, Media
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool Core::validate_policy(const std::string& file, int policy, std::string& report)
+bool Core::validate_policy(const std::string& file, int policy,
+                           MediaConchLib::ReportRes* result,
+                           const std::string* display_name,
+                           const std::string* display_content)
 {
+    bool valid = false;
     if (policy == -1)
     {
-        report = "Policy not found";
-        return false;
+        result->report = "Policy not found";
+        return valid;
     }
 
     if (policies.policies[policy]->type == Policies::POLICY_SCHEMATRON)
-        return validate_schematron_policy(file, policy, report);
-    return validate_xslt_policy(file, policy, report);
-}
+        valid = validate_schematron_policy(file, policy, result->report);
+    else
+        valid = validate_xslt_policy(file, policy, result->report);
 
-//---------------------------------------------------------------------------
-bool Core::validate_policy_file(const std::string& file, const std::string& policy, std::string& report)
-{
-    if (!policy.length())
-    {
-        report = "Policy invalid";
-        return false;
-    }
+    if (valid && display_name)
+        transform_with_xslt_file(result->report, *display_name, result->report);
+    else if (valid && display_content)
+        transform_with_xslt_memory(result->report, *display_content, result->report);
 
-    bool valid = validate_schematron_policy_from_file(file, policy, report);
-    if (!valid)
-    {
-        std::string tmp = report;
-        valid = validate_xslt_policy_from_file(file, policy, report);
-        if (!valid)
-            report = tmp;
-    }
     return valid;
 }
 
 //---------------------------------------------------------------------------
-bool Core::validate_policy_memory(const std::string& file, const std::string& policy, std::string& report)
+bool Core::validate_policy_file(const std::string& file, const std::string& policy,
+                                MediaConchLib::ReportRes* result,
+                                const std::string* display_name,
+                                const std::string* display_content)
 {
     if (!policy.length())
     {
-        report = "Policy invalid";
+        result->report = "Policy invalid";
         return false;
     }
 
-    bool valid = validate_schematron_policy_from_memory(file, policy, report);
+    bool valid = validate_schematron_policy_from_file(file, policy, result->report);
     if (!valid)
     {
-        std::string tmp = report;
-        valid = validate_xslt_policy_from_memory(file, policy, report);
+        std::string tmp = result->report;
+        valid = validate_xslt_policy_from_file(file, policy, result->report);
         if (!valid)
-            report = tmp;
+            result->report = tmp;
     }
+
+    if (valid && display_name)
+        transform_with_xslt_file(result->report, *display_name, result->report);
+    else if (valid && display_content)
+        transform_with_xslt_memory(result->report, *display_content, result->report);
+
     return valid;
 }
 
 //---------------------------------------------------------------------------
-std::string Core::transform_with_xslt_file(const std::string& report, const std::string& xslt)
+bool Core::validate_policy_memory(const std::string& file, const std::string& policy,
+                                  MediaConchLib::ReportRes* result,
+                                  const std::string* display_name,
+                                  const std::string* display_content)
+{
+    if (!policy.length())
+    {
+        result->report = "Policy invalid";
+        return false;
+    }
+
+    bool valid = validate_schematron_policy_from_memory(file, policy, result->report);
+    if (!valid)
+    {
+        std::string tmp = result->report;
+        valid = validate_xslt_policy_from_memory(file, policy, result->report);
+        if (!valid)
+            result->report = tmp;
+    }
+
+    if (valid && display_name)
+        transform_with_xslt_file(result->report, *display_name, result->report);
+    else if (valid && display_content)
+        transform_with_xslt_memory(result->report, *display_content, result->report);
+
+    return valid;
+}
+
+//---------------------------------------------------------------------------
+int Core::transform_with_xslt_file(const std::string& report, const std::string& xslt, std::string& result)
 {
     Schema *S = new Xslt;
 
     if (!S->register_schema_from_file(xslt.c_str()))
-        return report;
+    {
+        result = report;
+        return -1;
+    }
 
     int valid = S->validate_xml(report);
     if (valid < 0)
-        return report;
+    {
+        result = report;
+        return -1;
+    }
 
-    std::string r = S->get_report();
+    result = S->get_report();
     delete S;
-    return r;
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-std::string Core::transform_with_xslt_memory(const std::string& report, const std::string& memory)
+int Core::transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                     std::string& result)
 {
     Schema *S = new Xslt;
 
     if (!S->register_schema_from_memory(memory))
-        return report;
+    {
+        result = report;
+        return -1;
+    }
 
     int valid = S->validate_xml(report);
     if (valid < 0)
-        return report;
-    std::string r = S->get_report();
+    {
+        result = report;
+        return -1;
+    }
+
+    result = S->get_report();
     delete S;
-    return r;
+    return 0;
 }
 
 //***************************************************************************

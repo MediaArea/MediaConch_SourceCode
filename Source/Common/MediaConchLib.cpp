@@ -109,14 +109,20 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
                                                        std::string& reason)
 {
     // Forcing some formats
+    if (Format == MediaConchLib::format_Text && !display.empty())
+        Format = format_Xml; //Forcing Text (default) to XML
+
+    if (Format != MediaConchLib::format_Xml && !display.empty())
+    {
+        reason = "If a display is used, no other output format can be used";
+        return false;
+    }
+
     if (files.size() > 1 && Format == MediaConchLib::format_Xml)
         Format = format_MaXml;
 
     if (reports.count() > 1 && Format == MediaConchLib::format_Xml)
         Format = MediaConchLib::format_MaXml;
-
-    if (Format == MediaConchLib::format_Text && !display.empty())
-        Format = format_Xml; //Forcing XML output in order to apply the Display XSL
     
     // Test of incompatibilities
     if (reports[MediaConchLib::report_MediaConch] && reports[MediaConchLib::report_MediaTrace]
@@ -199,14 +205,22 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
                               const std::vector<std::string>& files,
                               const std::vector<std::string>& policies_names,
                               const std::vector<std::string>& policies_contents,
-                              std::string& report)
+                              MediaConchLib::ReportRes* result,
+                              const std::string* display_name,
+                              const std::string* display_content)
 {
     if (!files.size())
         return -1;
 
     if (use_daemon)
-        return daemon_client->get_report(report_set, f, files, policies_names, policies_contents, report);
-    return core->get_report(report_set, f, files, policies_names, policies_contents, report);
+        return daemon_client->get_report(report_set, f, files,
+                                         policies_names, policies_contents,
+                                         result,
+                                         display_name, display_content);
+    return core->get_report(report_set, f, files,
+                            policies_names, policies_contents,
+                            result,
+                            display_name, display_content);
 }
 
 //---------------------------------------------------------------------------
@@ -223,12 +237,15 @@ int MediaConchLib::remove_report(const std::vector<std::string>& files)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::validate_policy(const std::string& file, int policy, std::string& report)
+bool MediaConchLib::validate_policy(const std::string& file, int policy,
+                                    MediaConchLib::ReportRes* result,
+                                    const std::string* display_name,
+                                    const std::string* display_content)
 {
     Policy* p = get_policy((size_t)policy);
     if (!p)
     {
-        report = "Policy not found";
+        result->report = "Policy not found";
         return false;
     }
 
@@ -236,33 +253,40 @@ bool MediaConchLib::validate_policy(const std::string& file, int policy, std::st
     {
         std::string policy_content;
         p->dump_schema(policy_content);
-        return daemon_client->validate_policy(file, policy_content, report);
+        return daemon_client->validate_policy(file, policy_content, result,
+                                              display_name, display_content);
     }
-    return core->validate_policy(file, policy, report);
+    return core->validate_policy(file, policy, result, display_name, display_content);
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::validate_policy_memory(const std::string& file, const std::string& policy, std::string& report)
+bool MediaConchLib::validate_policy_memory(const std::string& file, const std::string& policy,
+                                           MediaConchLib::ReportRes* result,
+                                           const std::string* display_name,
+                                           const std::string* display_content)
 {
-    return core->validate_policy_memory(file, policy, report);
+    return core->validate_policy_memory(file, policy, result, display_name, display_content);
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::validate_policies(const std::string& file, const std::vector<std::string>& policies,
-                                      std::string& report)
+int MediaConchLib::validate_policies(const std::string& file, const std::vector<std::string>& policies,
+                                     MediaConchLib::ReportRes* result,
+                                     const std::string* display_name,
+                                     const std::string* display_content)
 {
     if (!policies.size())
-        return false;
+        return -1;
 
-    bool ret = true;
+    std::string report;
     for (size_t i = 0; i < policies.size(); ++i)
     {
-        if (!core->validate_policy_file(file, policies[i], report))
-            ret = false;
-        report += "\r\n";
+        if (core->validate_policy_file(file, policies[i], result, display_name, display_content) < 0)
+            return -1;
+        result->report += report;
+        result->report += "\r\n";
     }
 
-    return ret;
+    return 0;
 }
 
 //***************************************************************************
@@ -272,15 +296,13 @@ bool MediaConchLib::validate_policies(const std::string& file, const std::vector
 //---------------------------------------------------------------------------
 int MediaConchLib::transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result)
 {
-    result = core->transform_with_xslt_file(report, file);
-    return 0;
+    return core->transform_with_xslt_file(report, file, result);
 }
 
 //---------------------------------------------------------------------------
 int MediaConchLib::transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result)
 {
-    result = core->transform_with_xslt_memory(report, memory);
-    return 0;
+    return core->transform_with_xslt_memory(report, memory, result);
 }
 
 //***************************************************************************

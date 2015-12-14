@@ -337,15 +337,15 @@ namespace MediaConch
             std::vector<std::string> files;
             files.push_back(*d->current_files[id]);
 
-            std::vector<std::string> vec;
-            d->MCL.get_report(report_set, format, files, req->policies_names,
-                              req->policies_contents, ok->report);
-
-            // Display
-            if (req->display_name.length())
-                d->MCL.transform_with_xslt_file(ok->report, req->display_name, ok->report);
-            if (req->display_content.length())
-                d->MCL.transform_with_xslt_memory(ok->report, req->display_content, ok->report);
+            MediaConchLib::ReportRes result;
+            const std::string* display_name = req->display_name.length() ? &req->display_name : NULL;
+            const std::string* display_content = req->display_content.length() ? &req->display_content : NULL;
+            d->MCL.get_report(report_set, format, files,
+                              req->policies_names, req->policies_contents,
+                              &result, display_name, display_content);
+            ok->report = result.report;
+            if (result.policies_validities.size())
+                ok->policies_validities = result.policies_validities;
 
             // Save it
             res.ok.push_back(ok);

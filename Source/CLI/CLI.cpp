@@ -127,10 +127,11 @@ namespace MediaConch
         }
 
         //Output
-        std::string report;
+        MediaConchLib::ReportRes result;
         std::vector<std::string> policies_contents;
-        MCL.get_report(report_set, format, file_to_report, policies, policies_contents, report);
-        MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(report);
+        MCL.get_report(report_set, format, file_to_report, policies,
+                       policies_contents, &result, &display_file, NULL);
+        MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
         STRINGOUT(report_mi);
         //Output, in a file if needed

@@ -53,9 +53,13 @@ public:
                    const std::vector<std::string>& files,
                    const std::vector<std::string>& policies_names,
                    const std::vector<std::string>& policies_contents,
-                   std::string& report);
-    int validate_policy(const std::string& file, const std::string& policy,
-                        std::string& report);
+                   MediaConchLib::ReportRes* result,
+                   const std::string* display_name = NULL,
+                   const std::string* display_content = NULL);
+    bool validate_policy(const std::string& file, const std::string& policy,
+                         MediaConchLib::ReportRes* result,
+                         const std::string* display_name = NULL,
+                         const std::string* display_content = NULL);
 
 private:
     Core *core;

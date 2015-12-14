@@ -49,7 +49,7 @@ protected:
     std::vector<std::string> errors;
 
     // HELPER
-    std::string  read_file(const char* filename);
+    int          read_file(const char* filename, std::string& buffer);
 
 private:
     Schema(const Schema&);

@@ -59,11 +59,11 @@ public:
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     void                        analyze(const std::vector<std::string>& files);
     void                        wait_analyze_finished();
-    QString                     get_implementationreport_xml(const std::string& file);
-    QString                     get_mediainfo_and_mediatrace_xml(const std::string& file);
-    QString                     get_mediainfo_xml(const std::string& file);
+    QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_jstree(const std::string& file);
-    QString                     get_mediatrace_xml(const std::string& file);
+    QString                     get_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediatrace_jstree(const std::string& file);
     QString                     ask_for_schema_file();
     void                        checker_selected();
@@ -71,7 +71,7 @@ public:
     void                        display_selected();
     void                        add_default_policy();
     void                        add_default_displays();
-    bool                        validate_policy(const std::string& file, int policy, std::string& report);
+    bool                        validate_policy(const std::string& file, int policy, const std::string& display_name, const std::string& display_content, std::string& report);
     bool                        is_all_policies_saved();
 
     void                        add_policy_to_list(const QString& policy);

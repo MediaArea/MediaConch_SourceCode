@@ -614,7 +614,9 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, std::strin
         reg = QRegExp("<p class=\"modal-body\">");
         if ((pos = reg.indexIn(html, pos)) != -1)
         {
-            report = mainwindow->get_mediainfo_xml(file);
+            std::string display_name;
+            std::string display_content;
+            report = mainwindow->get_mediainfo_xml(file, display_name, display_content);
 #if QT_VERSION >= 0x050200
             report = report.toHtmlEscaped();
 #else
@@ -630,7 +632,14 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, std::strin
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_conformance(QString& html, std::string& file)
 {
-    QString report = mainwindow->get_implementationreport_xml(file);
+    std::string display_name;
+    std::string display_content;
+    get_displays_use(display_name, display_content);
+
+    QString report = mainwindow->get_implementationreport_xml(file, display_name, display_content);
+    bool is_html = report_is_html(report);
+    QString save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
+
     bool is_valid = true;
 
     if (report.indexOf(" outcome=\"fail\"") != -1)
@@ -638,37 +647,6 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, std::stri
 
     // Apply HTML default display
     std::string r = report.toStdString();
-    QString save_ext = "xml";
-    bool is_html = false;
-    if (display_xslt.length())
-    {
-        if (display_xslt.startsWith(":/displays/"))
-        {
-            QFile display_file(display_xslt);
-            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
-            {
-                QByteArray data = display_file.readAll();
-                display_file.close();
-                mainwindow->transform_with_xslt_memory(r, data.data(), r);
-            }
-        }
-        else
-        {
-            std::string trans = display_xslt.toStdString();
-            mainwindow->transform_with_xslt_file(r, trans, r);
-        }
-
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-    }
-    else
-    {
-        mainwindow->transform_with_xslt_memory(r, implementation_report_display_html_xsl, r);
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-    }
 
     if (!is_html)
     {
@@ -718,44 +696,16 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, std::st
         return;
     }
 
+    std::string display_name;
+    std::string display_content;
+    get_displays_use(display_name, display_content);
+
     std::string r;
-    bool valid = mainwindow->validate_policy(file, policy, r);
-
-    // Default without display
-    QString save_ext("xml");
-    bool is_html = false;
-
+    bool valid = mainwindow->validate_policy(file, policy, display_name, display_content, r);
     QString report = QString().fromUtf8(r.c_str(), r.length());
-    if (display_xslt.length())
-    {
-        if (display_xslt.startsWith(":/displays/"))
-        {
-            QFile display_file(display_xslt);
-            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
-            {
-                QByteArray data = display_file.readAll();
-                display_file.close();
-                mainwindow->transform_with_xslt_memory(r, data.data(), r);
-            }
-        }
-        else
-        {
-            std::string trans = display_xslt.toStdString();
-            mainwindow->transform_with_xslt_file(r, trans, r);
-        }
 
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-        reset_display_xslt();
-    }
-    else
-    {
-        mainwindow->transform_with_xslt_memory(r, implementation_report_display_html_xsl, r);
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-    }
+    bool is_html = report_is_html(report);
+    QString save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
 
     QString policy_name;
     if (policy >= 0)
@@ -848,7 +798,9 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, std::string& fi
         reg = QRegExp("<p class=\"modal-body\">");
         if ((pos = reg.indexIn(html, pos)) != -1)
         {
-            report = mainwindow->get_mediatrace_xml(file);
+            std::string display_name;
+            std::string display_content;
+            report = mainwindow->get_mediatrace_xml(file, display_name, display_content);
 #if QT_VERSION >= 0x050200
             report = report.toHtmlEscaped();
 #else
@@ -991,6 +943,28 @@ QString CheckerWindow::file_remove_ext(std::string& file)
     if ((pos = ret.lastIndexOf('.')) != -1)
         ret.chop(ret.length() - pos);
     return ret;
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::get_displays_use(std::string& display_name, std::string& display_content)
+{
+    if (display_xslt.length())
+    {
+        if (display_xslt.startsWith(":/displays/"))
+        {
+            QFile display_file(display_xslt);
+            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QByteArray data = display_file.readAll();
+                display_file.close();
+                display_content = data.data();
+            }
+        }
+        else
+            display_name = display_xslt.toStdString();
+    }
+    else
+        display_content = implementation_report_display_html_xsl;
 }
 
 }

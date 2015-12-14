@@ -145,7 +145,9 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
                              MediaConchLib::format f, const std::vector<std::string>& files,
                              const std::vector<std::string>& policies_names,
                              const std::vector<std::string>& policies_contents,
-                             std::string& report)
+                             MediaConchLib::ReportRes* result,
+                             const std::string* display_name,
+                             const std::string* display_content)
 {
     if (!http_client)
         return -1;
@@ -184,7 +186,12 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
 
     // FORMAT
     if (f == MediaConchLib::format_Xml)
-        req.display_name = MediaConchLib::display_xml_name;
+    {
+        if (display_name)
+            req.display_name = *display_name;
+        else if (!display_content)
+            req.display_name = MediaConchLib::display_xml_name;
+    }
     else if (f == MediaConchLib::format_MaXml)
         req.display_name = MediaConchLib::display_maxml_name;
     else if (f == MediaConchLib::format_Text)
@@ -193,6 +200,9 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
         req.display_name = MediaConchLib::display_html_name;
     else if (f == MediaConchLib::format_JsTree)
         req.display_name = MediaConchLib::display_jstree_name;
+
+    if (display_content)
+        req.display_content = *display_content;
 
     http_client->start();
     if (http_client->send_request(req) < 0)
@@ -208,15 +218,18 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
     if (!res || res->ok.size() != 1)
         return -1;
 
-    report = res->ok[0]->report;
+    result->report = res->ok[0]->report;
+    delete res;
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::validate_policy(const std::string& file, const std::string& policy, std::string& report)
+bool DaemonClient::validate_policy(const std::string& file, const std::string& policy,
+                                   MediaConchLib::ReportRes* result,
+                                   const std::string* display_name, const std::string* display_content)
 {
     if (!http_client)
-        return -1;
+        return false;
 
     std::bitset<MediaConchLib::report_Max> report_set;
 
@@ -227,7 +240,12 @@ int DaemonClient::validate_policy(const std::string& file, const std::string& po
     std::vector<std::string> policies_contents;
     policies_contents.push_back(policy);
 
-    return get_report(report_set, MediaConchLib::format_Xml, files, policies_names, policies_contents, report);
+    if (get_report(report_set, MediaConchLib::format_Xml, files,
+                   policies_names, policies_contents,
+                   result,
+                   display_name, display_content) < 0)
+        return false;
+    return true;
 }
 
 }

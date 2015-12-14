@@ -191,11 +191,9 @@ public:
 
     struct Report_Ok
     {
-        Report_Ok() :           has_policy_validity(false) {}
         int                     id;
         std::string             report;
-        bool                    has_policy_validity;
-        bool                    policy_validity;
+        std::vector<bool>       policies_validities;
     };
 
     struct Report_Nok
