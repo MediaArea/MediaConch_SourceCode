@@ -337,14 +337,14 @@ dnl -------------------------------------------------------------------------
 dnl libjansson
 dnl
 if test "$with_jansson" = "yes"; then
-    if test -e ../../../../jansson/build/lib/libjansson.a; then
-        CXXFLAGS="$CXXFLAGS -DHAVE_JANSSON -I../../../../jansson/build/include"
+    if test -e ../../../../jansson/src/.libs/libjansson.a; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_JANSSON -I../../../../jansson/src"
         if test "$enable_staticlibs" = "yes"; then
             with_libjansson="builtin (static)"
-            LIBS="$LIBS ../../../../jansson/build/lib/libjansson.a"
+            LIBS="$LIBS ../../../../jansson/src/.libs/libjansson.a"
         else
             with_libjansson="builtin"
-            LIBS="$LIBS  -L../../../../jansson/build/lib -ljansson"
+            LIBS="$LIBS  -L../../../../jansson/src/.libs -ljansson"
         fi
     elif pkg-config --exists jansson; then
         CXXFLAGS="$CXXFLAGS -DHAVE_JANSSON $(pkg-config --cflags jansson)"
@@ -366,14 +366,14 @@ dnl -------------------------------------------------------------------------
 dnl libevent2
 dnl
 if test "$with_libevent" = "yes"; then
-    if test -e ../../../../libevent/build/lib/libevent.a; then
-        CXXFLAGS="$CXXFLAGS -DHAVE_LIBEVENT -I../../../../libevent/build/include"
+    if test -e ../../../../libevent/.libs/libevent.a; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_LIBEVENT -I../../../../libevent/include"
         if test "$enable_staticlibs" = "yes"; then
             with_libevent="builtin (static)"
-            LIBS="$LIBS ../../../../libevent/build/lib/libevent.a"
+            LIBS="$LIBS ../../../../libevent/.libs/libevent.a"
         else
             with_libevent="builtin"
-            LIBS="$LIBS  -L../../../../libevent/build/lib -levent"
+            LIBS="$LIBS  -L../../../../libevent/.libs -levent"
         fi
     elif pkg-config --exists libevent; then
         CXXFLAGS="$CXXFLAGS -DHAVE_LIBEVENT $(pkg-config --cflags libevent)"

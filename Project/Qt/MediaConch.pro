@@ -195,9 +195,9 @@ else {
 contains(NO_JANSSON, yes|1) {
     message("libjansson  : no")
 } else {
-exists(../../../jansson/build/lib/libjansson.a) {
-    INCLUDEPATH      += ../../../jansson/build/include
-    LIBS             += ../../../jansson/build/lib/libjansson.a
+exists(../../../jansson/src/.libs/libjansson.a) {
+    INCLUDEPATH      += ../../../jansson/src
+    LIBS             += ../../../jansson/src/.libs/libjansson.a
     QMAKE_CXXFLAGS   += -DHAVE_JANSSON
     message("libjansson  : custom")
 }
@@ -211,9 +211,9 @@ else {
 contains(NO_LIBEVENT, yes|1) {
     message("libevent    : no")
 } else {
-exists(../../../libevent/build/lib/libevent.a) {
-    INCLUDEPATH      += ../../../libevent/build/include
-    LIBS             += ../../../libevent/build/lib/libevent.a
+exists(../../../libevent/.libs/libevent.a) {
+    INCLUDEPATH      += ../../../libevent/include
+    LIBS             += ../../../libevent/.libs/libevent.a
     QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
     message("libevent    : custom")
 }
