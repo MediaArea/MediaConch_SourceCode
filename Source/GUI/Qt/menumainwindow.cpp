@@ -65,7 +65,7 @@ void MenuMainWindow::createMenu()
     if (!url.isValid())
         return;
 
-    MenuView->setContent(QString(html).toUtf8(), "text/html", url);
+    MenuView->setContent(html, "text/html", url);
 }
 
 }
