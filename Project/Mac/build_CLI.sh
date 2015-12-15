@@ -12,6 +12,9 @@ cd ../../../..
 # Dependencies
 cp -r ~/Documents/almin/libxml2 .
 cp -r ~/Documents/almin/libxslt .
+cp -r ~/Documents/almin/sqlite .
+cp -r ~/Documents/almin/jansson .
+cp -r ~/Documents/almin/libevent .
 
 # libxml2 and libcurl doesn’t like multiarch
 #./CLI_Compile.sh --enable-arch-x86_64 --enable-arch-i386
