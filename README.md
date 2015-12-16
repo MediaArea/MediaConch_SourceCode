@@ -128,27 +128,27 @@ apt-get install libcurl4-gnutls-dev
 *Build tools and CLI/GUI dependancies*
 
 ```sh
-yum install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
+sudo yum install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
 ```
 
 *MediaArea tools*
 
-Go to https://mediaarea.net/MediaConch/downloads/fedora.html and download the libmediainfo0, libmediainfo-devel, libzen0 and libzen-devel packages corresponding to your Fedora version. Then install them with :
+Go to https://mediaarea.net/MediaConch/downloads/fedora.html and download the libmediainfo0, libmediainfo-devel, libzen0 and libzen-devel packages corresponding to your Fedora version and CPU architecture. Then install them with :
 
 ```sh
-rpm -i libmediainfo* libzen*
+sudo yum install libmediainfo*.rpm libzen*.rpm
 ```
 
 *GUI only dependancies*
 
 ```sh
-yum install qt-devel qtwebkit-devel desktop-file-utils
+sudo yum install qt-devel qtwebkit-devel desktop-file-utils
 ```
 
 *Optional dependancy (for online checker)*
 
 ```sh
-yum install libcurl-devel libopenssh2-devel libidn-devel openldap-devel
+sudo yum install libcurl-devel
 ```
 
 #### Debian
