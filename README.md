@@ -24,7 +24,7 @@ In this document, this directory will be refered as $BUILD_DIR.
 
 #### macport
 
-Some dependancies are availables with macport. To install macport:
+Some dependencies are availables with macport. To install macport:
 https://guide.macports.org/#installing
 
 ```sh
@@ -80,24 +80,24 @@ http://download.qt.io/archive/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg
 * libzen0
 * libmediainfo0
 
-*CLI and GUI dependancies*
+*CLI and GUI dependencies*
 
 * zlib
 * libxml2
 * libxslt
 
-*GUI only dependancies*
+*GUI only dependencies*
 
 * qt4
 * qtwebkit
 
-*Optional dependancy (for online checker)*
+*Optional dependency (for online checker)*
 
 * libcurl
 
 #### Ubuntu
 
-*Build tools and CLI/GUI dependancies*
+*Build tools and CLI/GUI dependencies*
 
 ```sh
 apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
@@ -111,13 +111,13 @@ Go to https://mediaarea.net/MediaConch/downloads/ubuntu.html and download the li
 dpkg -i libmediainfo* libzen*
 ```
 
-*GUI only dependancies*
+*GUI only dependencies*
 
 ```sh
 apt-get install libqt4-dev libqtwebkit-dev
 ```
 
-*Optional dependancy (for online checker)*
+*Optional dependency (for online checker)*
 
 ```sh
 apt-get install libcurl4-gnutls-dev
@@ -125,7 +125,7 @@ apt-get install libcurl4-gnutls-dev
 
 #### Fedora
 
-*Build tools and CLI/GUI dependancies*
+*Build tools and CLI/GUI dependencies*
 
 ```sh
 sudo yum install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
@@ -139,13 +139,13 @@ Go to https://mediaarea.net/MediaConch/downloads/fedora.html and download the li
 sudo yum install libmediainfo*.rpm libzen*.rpm
 ```
 
-*GUI only dependancies*
+*GUI only dependencies*
 
 ```sh
 sudo yum install qt-devel qtwebkit-devel desktop-file-utils
 ```
 
-*Optional dependancy (for online checker)*
+*Optional dependency (for online checker)*
 
 ```sh
 sudo yum install libcurl-devel
@@ -153,7 +153,7 @@ sudo yum install libcurl-devel
 
 #### Debian
 
-*Build tools and CLI/GUI dependancies*
+*Build tools and CLI/GUI dependencies*
 
 ```sh
 apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
@@ -167,13 +167,13 @@ Go to https://mediaarea.net/MediaConch/downloads/debian.html and download the li
 dpkg -i libmediainfo* libzen*
 ```
 
-*GUI only dependancies*
+*GUI only dependencies*
 
 ```sh
 apt-get install libqt4-dev libqtwebkit-dev
 ```
 
-*Optional dependancy (for online checker)*
+*Optional dependency (for online checker)*
 
 ```sh
 apt-get install libcurl4-gnutls-dev
@@ -181,7 +181,7 @@ apt-get install libcurl4-gnutls-dev
 
 #### OpenSUSE
 
-*Build tools and CLI/GUI dependancies*
+*Build tools and CLI/GUI dependencies*
 
 ```sh
 zypper install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
@@ -195,13 +195,13 @@ Go to https://mediaarea.net/MediaConch/downloads/opensuse.html and download the 
 rpm -i libmediainfo* libzen*
 ```
 
-*GUI only dependancies*
+*GUI only dependencies*
 
 ```sh
 zypper install libqt4-devel libQtWebKit-devel update-desktop-files
 ```
 
-*Optional dependancy (for online checker)*
+*Optional dependency (for online checker)*
 
 ```sh
 zypper install libcurl-devel
@@ -261,7 +261,7 @@ make
 
 ##### With online checker
 
-You must install the online checker dependancies. Then run:
+You must install the online checker dependencies. Then run:
 
 ```sh
 ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
@@ -328,7 +328,7 @@ make
 
 Under Linux:
 
-You must install the online checker dependancies. Then run:
+You must install the online checker dependencies. Then run:
 
 ```sh
 ./configure --with-libcurl
