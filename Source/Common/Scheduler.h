@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Policies functions
+// Scheduler functions
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef PolicYH
-#define PolicYH
+#ifndef SchedulerH
+#define SchedulerH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -26,42 +26,47 @@
     #include "MediaInfo/MediaInfoList.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
-#include <vector>
-#include <libxml/tree.h>
-#include "Policies.h"
-using namespace MediaInfoNameSpace;
-//---------------------------------------------------------------------------
+#include "ZenLib/CriticalSection.h"
+#include <map>
 
+using namespace MediaInfoNameSpace;
+using namespace ZenLib;
+
+//---------------------------------------------------------------------------
 namespace MediaConch {
 
+class Queue;
+class QueueElement;
+class Core;
+
 //***************************************************************************
-// Policy
+// Class Scheduler
 //***************************************************************************
 
-class Policy
+class Scheduler
 {
 public:
-    Policy(Policies::PolicyType t) : type(t), saved(false) {}
-    virtual ~Policy();
-    Policy(const Policy*);
+    //Constructor/Destructor
+    Scheduler(Core *c);
+    virtual ~Scheduler();
 
-    std::string       import_schema(const std::string& filename);
-    std::string       import_schema_from_memory(const std::string& filename, const char* memory, int len);
-    void              export_schema(const char* filename);
-    virtual xmlDocPtr create_doc() = 0;
-
-    std::string          filename;
-    std::string          title;
-    std::string          description;
-    Policies::PolicyType type;
-    bool                 saved;
-
-protected:
-    // HELPER
-    virtual std::string import_schema_from_doc(const std::string& filename, xmlDocPtr doc) = 0;
+    int add_element_to_queue(std::string& filename);
+    void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfoList* MI);
+    bool is_finished();
+    void set_max_threads(size_t nb) { max_threads = nb; }
 
 private:
-    Policy& operator=(const Policy&);
+    Scheduler(const Scheduler&);
+    Scheduler&     operator=(const Scheduler&);
+
+    Core                                   *core;
+    Queue                                  *queue;
+    int                                     threads_launch;
+    size_t                                  max_threads;
+    std::map<QueueElement*, QueueElement*>  working;
+    CriticalSection                         CS;
+
+    void run_element();
 };
 
 }

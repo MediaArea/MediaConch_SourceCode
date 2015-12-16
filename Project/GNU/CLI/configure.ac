@@ -53,6 +53,9 @@ AC_ARG_WITH(macosx-sdk,         AC_HELP_STRING([--with-macosx-sdk],         [For
 AC_ARG_WITH(macosx-version-min, AC_HELP_STRING([--with-macosx-version-min], [Force the Mac Version]),                     , with_macosx_version_min=no)
 AC_ARG_WITH(dll,            AC_HELP_STRING([--with-dll],            [Do not link to libmediainfo, dynamic loading]), , with_dll=no)
 AC_ARG_WITH(libmediainfo-name,  AC_HELP_STRING([--with-libmediainfo-name],  [Force libmediainfo filename]),                  		  , with_libmediainfo_name=mediainfo)
+AC_ARG_WITH(sqlite,             AC_HELP_STRING([--with-sqlite],             [Enable SQLite DB]),                          , with_sqlite=yes)
+AC_ARG_WITH(jansson,            AC_HELP_STRING([--with-jansson],            [Enable Jansson Library]),                    , with_jansson=yes)
+AC_ARG_WITH(libevent,           AC_HELP_STRING([--with-libevent],           [Enable Libevent]),                           , with_libevent=yes)
 
 dnl -------------------------------------------------------------------------
 dnl External options
@@ -301,6 +304,93 @@ else
 	fi
 fi
 
+dnl -------------------------------------------------------------------------
+dnl libsqlite3
+dnl
+if test "$with_sqlite" = "yes"; then
+    if test -e ../../../../sqlite/.libs/libsqlite3.la; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_SQLITE  -I../../../../sqlite"
+        if test "with_staticlibs" = "yes"; then
+            with_libsqlite3="builtin (static)"
+            LIBS="$LIBS  ../../../../sqlite/.libs/libsqlite3.a"
+        else
+            with_libsqlite3="builtin"
+            LIBS="$LIBS  -L../../../../sqlite/.libs -lsqlite3"
+        fi
+    elif pkg-config --exists sqlite3; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_SQLITE $(pkg-config --cflags sqlite3)"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libsqlite3="system (static)"
+            LIBS="$LIBS $(pkg-config --static --libs sqlite3)"
+        else
+            with_libsqlite3="system"
+            LIBS="$LIBS $(pkg-config --libs sqlite3)"
+        fi
+    else
+        AC_MSG_ERROR([libsqlite3 configuration is not found])
+    fi
+else
+    with_libsqlite3="No"
+fi
+
+dnl -------------------------------------------------------------------------
+dnl libjansson
+dnl
+if test "$with_jansson" = "yes"; then
+    if test -e ../../../../jansson/src/.libs/libjansson.a; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_JANSSON -I../../../../jansson/src"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libjansson="builtin (static)"
+            LIBS="$LIBS ../../../../jansson/src/.libs/libjansson.a"
+        else
+            with_libjansson="builtin"
+            LIBS="$LIBS  -L../../../../jansson/src/.libs -ljansson"
+        fi
+    elif pkg-config --exists jansson; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_JANSSON $(pkg-config --cflags jansson)"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libjansson="system (static)"
+            LIBS="$LIBS $(pkg-config --static --libs jansson)"
+        else
+            with_libjansson="system"
+            LIBS="$LIBS $(pkg-config --libs jansson)"
+        fi
+    else
+        AC_MSG_ERROR([libjansson configuration is not found])
+    fi
+else
+    with_libjansson="No"
+fi
+
+dnl -------------------------------------------------------------------------
+dnl libevent2
+dnl
+if test "$with_libevent" = "yes"; then
+    if test -e ../../../../libevent/.libs/libevent.a; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_LIBEVENT -I../../../../libevent/include"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libevent="builtin (static)"
+            LIBS="$LIBS ../../../../libevent/.libs/libevent.a"
+        else
+            with_libevent="builtin"
+            LIBS="$LIBS  -L../../../../libevent/.libs -levent"
+        fi
+    elif pkg-config --exists libevent; then
+        CXXFLAGS="$CXXFLAGS -DHAVE_LIBEVENT $(pkg-config --cflags libevent)"
+        if test "$enable_staticlibs" = "yes"; then
+            with_libevent="system (static)"
+            LIBS="$LIBS $(pkg-config --static --libs libevent)"
+        else
+            with_libevent="system"
+            LIBS="$LIBS $(pkg-config --libs libevent)"
+        fi
+    else
+        AC_MSG_ERROR([libevent configuration is not found])
+    fi
+else
+    with_libevent="No"
+fi
+
 dnl #########################################################################
 dnl ### Compiler specific
 dnl #########################################################################
@@ -383,6 +473,9 @@ echo ""
 echo "  Unicode?                                                $enable_unicode"
 echo "  stream missing support?                                 $enable_stream_missing"
 echo ""
+echo "  Using libevent?                                         $with_libevent"
+echo "  Using libjansson?                                       $with_libjansson"
+echo "  Using libsqlite3?                                       $with_libsqlite3"
 echo "  Using libxml2?                                          $with_libxml2"
 echo "  Using libzen?                                           $with_zenlib"
 echo "  Using libmediainfo?                                     $with_mediainfolib"

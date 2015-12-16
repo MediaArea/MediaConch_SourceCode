@@ -13,7 +13,19 @@ mediaconch_SOURCES = \
     ../../../Source/Common/Policies.cpp \
     ../../../Source/Common/Policy.cpp \
     ../../../Source/Common/SchematronPolicy.cpp \
-    ../../../Source/Common/XsltPolicy.cpp
+    ../../../Source/Common/XsltPolicy.cpp \
+    ../../../Source/Common/Database.cpp \
+    ../../../Source/Common/NoDatabase.cpp \
+    ../../../Source/Common/SQLLite.cpp \
+    ../../../Source/Common/Json.cpp \
+    ../../../Source/Common/Configuration.cpp \
+    ../../../Source/Common/REST_API.cpp \
+    ../../../Source/Common/Httpd.cpp \
+    ../../../Source/Common/LibEventHttpd.cpp \
+    ../../../Source/Common/Http.cpp \
+    ../../../Source/Common/LibEventHttp.cpp \
+    ../../../Source/Common/Queue.cpp \
+    ../../../Source/Common/Scheduler.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)

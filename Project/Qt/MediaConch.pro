@@ -27,6 +27,18 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/SchematronPolicy.cpp \
                     ../../Source/Common/XsltPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
+                    ../../Source/Common/Database.cpp \
+                    ../../Source/Common/NoDatabase.cpp \
+                    ../../Source/Common/SQLLite.cpp \
+                    ../../Source/Common/Json.cpp \
+                    ../../Source/Common/Configuration.cpp \
+                    ../../Source/Common/REST_API.cpp \
+                    ../../Source/Common/Httpd.cpp \
+                    ../../Source/Common/LibEventHttpd.cpp \
+                    ../../Source/Common/Http.cpp \
+                    ../../Source/Common/LibEventHttp.cpp \
+                    ../../Source/Common/Scheduler.cpp \
+                    ../../Source/Common/Queue.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -63,6 +75,20 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/ImplementationReportDisplayTextUnicodeXsl.h \
                     ../../Source/Common/ImplementationReportDisplayTextXsl.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
+                    ../../Source/Common/Database.h \
+                    ../../Source/Common/NoDatabase.h \
+                    ../../Source/Common/SQLLite.h \
+                    ../../Source/Common/Json.h \
+                    ../../Source/Common/Container.h \
+                    ../../Source/Common/NoContainer.h \
+                    ../../Source/Common/Configuration.h \
+                    ../../Source/Common/REST_API.h \
+                    ../../Source/Common/Httpd.h \
+                    ../../Source/Common/LibEventHttpd.h \
+                    ../../Source/Common/Http.h \
+                    ../../Source/Common/LibEventHttp.h \
+                    ../../Source/Common/Scheduler.h \
+                    ../../Source/Common/Queue.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \
@@ -117,32 +143,87 @@ else {
 LIBS             += $$system(pkg-config --libs libmediainfo)
 }
 }
+
 exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
-INCLUDEPATH      += ../../../ZenLib/Source
-LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
-message("custom libzen      : yes")
+    INCLUDEPATH      += ../../../ZenLib/Source
+    LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
+    message("libzen      : custom")
 }
 else {
-LIBS             += -lzen
+    LIBS             += -lzen
+    message("libzen      : system")
 }
+
 exists(../../../libxml2/.libs/libxml2.a) {
-INCLUDEPATH      += ../../../libxml2/include
-LIBS             += ../../../libxml2/.libs/libxml2.a
-message("custom libxml2      : yes")
+    INCLUDEPATH      += ../../../libxml2/include
+    LIBS             += ../../../libxml2/.libs/libxml2.a
+    message("libxml2     : custom")
 }
 else {
-INCLUDEPATH      += /usr/include/libxml2
-LIBS             += -lxml2
+    INCLUDEPATH      += /usr/include/libxml2
+    LIBS             += -lxml2
+    message("libxml2     : system")
 }
 exists(../../../libxslt/libxslt/.libs/libxslt.a) {
-INCLUDEPATH      += ../../../libxslt/libxslt
-LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
-message("custom libxslt      : yes")
+    INCLUDEPATH      += ../../../libxslt/libxslt
+    LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
+    message("libxslt     : custom")
 }
 else {
-INCLUDEPATH      += /usr/include/libxslt
-LIBS             += -lxslt
+    INCLUDEPATH      += /usr/include/libxslt
+    LIBS             += -lxslt
+    message("libxslt     : system")
 }
+
+
+contains(NO_SQLITE, yes|1) {
+    message("libsqlite3  : no")
+} else {
+exists(../../../sqlite/.libs/libsqlite3.a) {
+    INCLUDEPATH      += ../../../sqlite
+    LIBS             += ../../../sqlite/.libs/libsqlite3.a
+    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    message("libsqlite3  : custom")
+}
+else {
+    LIBS             += -lsqlite3
+    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    message("libsqlite3  : system")
+    }
+}
+
+contains(NO_JANSSON, yes|1) {
+    message("libjansson  : no")
+} else {
+exists(../../../jansson/src/.libs/libjansson.a) {
+    INCLUDEPATH      += ../../../jansson/src
+    LIBS             += ../../../jansson/src/.libs/libjansson.a
+    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
+    message("libjansson  : custom")
+}
+else {
+    LIBS             += -ljansson
+    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
+    message("libjansson  : system")
+    }
+}
+
+contains(NO_LIBEVENT, yes|1) {
+    message("libevent    : no")
+} else {
+exists(../../../libevent/.libs/libevent.a) {
+    INCLUDEPATH      += ../../../libevent/include
+    LIBS             += ../../../libevent/.libs/libevent.a
+    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
+    message("libevent    : custom")
+}
+else {
+    LIBS             += -levent
+    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
+    message("libevent    : system")
+}
+}
+
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
 

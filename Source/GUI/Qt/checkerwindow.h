@@ -32,7 +32,7 @@ public:
 
     // Functions
     void                        createWebView();
-    void                        updateWebView(String file, int policy);
+    void                        updateWebView(std::string file, int policy);
     void                        updateWebView(QList<QFileInfo>& files, int policy);
     void                        setDisplayXslt(QString& d) { displayXslt = d; }
     void                        resetDisplayXslt() { displayXslt.clear(); }
@@ -77,20 +77,20 @@ private:
     void create_policy_options(QString& policies);
     void add_display_to_form_selection(QString& displays, QString& form, const char *selector);
     void create_displays_options(QString& displays);
-    void add_file_detail_to_html(QString& html, String& file, int policy);
-    QString create_html_file_detail(String& file, int policy);
-    void change_html_file_detail(QString& html, String& file);
-    void change_html_file_detail_inform_xml(QString& html, String& file);
-    void change_html_file_detail_conformance(QString& html, String& file);
-    void change_html_file_detail_policy_report(QString& html, String& file, int policy);
-    void change_html_file_detail_trace(QString& html, String& file);
+    void add_file_detail_to_html(QString& html, std::string& file, int policy);
+    QString create_html_file_detail(std::string& file, int policy);
+    void change_html_file_detail(QString& html, std::string& file);
+    void change_html_file_detail_inform_xml(QString& html, std::string& file);
+    void change_html_file_detail_conformance(QString& html, std::string& file);
+    void change_html_file_detail_policy_report(QString& html, std::string& file, int policy);
+    void change_html_file_detail_trace(QString& html, std::string& file);
     void remove_html_file_detail_policy_report(QString& html);
     bool report_is_html(QString &report);
     bool report_is_xml(QString &report);
     bool is_policy_html_valid(QString &report);
     bool implementationreport_is_valid(QString& report);
-    void change_report_policy_save_name(String& file, QString& ext, QString& html);
-    QString file_remove_ext(String& file);
+    void change_report_policy_save_name(std::string& file, QString& ext, QString& html);
+    QString file_remove_ext(std::string& file);
 
 public Q_SLOTS:
     void actionCloseAllTriggered();

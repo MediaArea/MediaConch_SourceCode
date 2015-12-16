@@ -45,31 +45,31 @@ public:
     JsTree() {}
     ~JsTree() {}
 
-    String       format_from_trace_XML(const String& xml);
-    String       format_from_inform_XML(const String& xml);
+    std::string  format_from_trace_XML(const std::string& xml);
+    std::string  format_from_inform_XML(const std::string& xml);
 
-    String       get_error() const { return error; }
+    std::string  get_error() const { return error; }
 
 private:
     JsTree (const JsTree&);
     JsTree&      operator=(const JsTree&);
 
-    String       error;
+    std::string  error;
 
-    void         find_trace_media_node(xmlNodePtr node, bool& sep, String& json);
-    void         find_trace_block_node(xmlNodePtr node, bool& sep, String& json);
-    void         find_trace_data_node(xmlNodePtr node, bool& sep, String& json);
+    void         find_trace_media_node(xmlNodePtr node, bool& sep, std::string& json);
+    void         find_trace_block_node(xmlNodePtr node, bool& sep, std::string& json);
+    void         find_trace_data_node(xmlNodePtr node, bool& sep, std::string& json);
     bool         has_block_data(xmlNodePtr child);
-    void         find_inform_data_node(xmlNodePtr node, bool& sep, String& json);
-    void         find_inform_media_node(xmlNodePtr node, bool& sep, String& json);
-    void         find_inform_track_type(xmlNodePtr node, bool& sep, String& json);
+    void         find_inform_data_node(xmlNodePtr node, bool& sep, std::string& json);
+    void         find_inform_media_node(xmlNodePtr node, bool& sep, std::string& json);
+    void         find_inform_track_type(xmlNodePtr node, bool& sep, std::string& json);
 
-    void         interpret_trace_data_in_block(xmlNodePtr block, String& json);
-    void         interpret_trace_data_in_data(xmlNodePtr data, String& json);
+    void         interpret_trace_data_in_block(xmlNodePtr block, std::string& json);
+    void         interpret_trace_data_in_data(xmlNodePtr data, std::string& json);
 
     std::string decimal_to_hexa(std::string val);
-    void interpret_offset(std::string& offset, bool coma, String& json);
-    void interpret_value(std::string& value, bool coma, String& json);
+    void interpret_offset(std::string& offset, bool coma, std::string& json);
+    void interpret_value(std::string& value, bool coma, std::string& json);
 };
 
 }

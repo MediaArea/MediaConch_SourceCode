@@ -2,19 +2,19 @@
 
 if qmake --version >/dev/null 2>&1
 then
-    qmake "$*"
+    qmake $*
 elif qmake-qt5 --version >/dev/null 2>&1
 then
-    qmake-qt5 "$*"
+    qmake-qt5 $*
 elif qmake5 --version >/dev/null 2>&1
 then
-    qmake5 "$*"
+    qmake5 $*
 elif qmake-qt4 --version >/dev/null 2>&1
 then
-    qmake-qt4 "$*"
+    qmake-qt4 $*
 elif qmake4 --version >/dev/null 2>&1
 then
-    qmake4 "$*"
+    qmake4 $*
 else
     echo qmake not found
     exit

@@ -13,7 +13,6 @@
 //---------------------------------------------------------------------------
 #include <string>
 #include <sstream>
-#include "ZenLib/Ztring.h"
 #include "JS_Tree.h"
 using namespace ZenLib;
 //---------------------------------------------------------------------------
@@ -25,23 +24,22 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-String JsTree::format_from_trace_XML(const String& xml)
+std::string JsTree::format_from_trace_XML(const std::string& xml)
 {
-    String json(__T("["));
-    std::string xml_not_unicode=Ztring(xml).To_UTF8();
+    std::string json("[");
 
-    xmlDocPtr doc = xmlParseMemory(xml_not_unicode.c_str(), xml_not_unicode.length());
+    xmlDocPtr doc = xmlParseMemory(xml.c_str(), xml.length());
     if (!doc)
     {
-        error = __T("The report given cannot be parsed");
-        return String();
+        error = "The report given cannot be parsed";
+        return std::string();
     }
 
     xmlNodePtr root = xmlDocGetRootElement(doc);
     if (!root)
     {
-        error = __T("No root node, leaving");
-        return String();
+        error = "No root node, leaving";
+        return std::string();
     }
 
     xmlNodePtr child = root->children;
@@ -52,14 +50,14 @@ String JsTree::format_from_trace_XML(const String& xml)
         child = child->next;
     }
 
-    json += String(__T("]"));
+    json += "]";
 
     xmlFreeDoc(doc);
     return json;
 }
 
 //---------------------------------------------------------------------------
-void JsTree::find_trace_media_node(xmlNodePtr node, bool& sep, String& json)
+void JsTree::find_trace_media_node(xmlNodePtr node, bool& sep, std::string& json)
 {
     std::string name("media");
 
@@ -76,7 +74,7 @@ void JsTree::find_trace_media_node(xmlNodePtr node, bool& sep, String& json)
 }
 
 //---------------------------------------------------------------------------
-void JsTree::find_trace_block_node(xmlNodePtr node, bool& sep, String& json)
+void JsTree::find_trace_block_node(xmlNodePtr node, bool& sep, std::string& json)
 {
     std::string def("block");
     if (!node || node->type != XML_ELEMENT_NODE ||
@@ -84,17 +82,17 @@ void JsTree::find_trace_block_node(xmlNodePtr node, bool& sep, String& json)
         return;
 
     if (sep)
-        json += __T(", ");
+        json += ", ";
     else
         sep = true;
 
-    json += __T("{\"type\":\"block\"");
+    json += "{\"type\":\"block\"";
 
     interpret_trace_data_in_block(node, json);
     xmlNodePtr child = node->children;
     if (has_block_data(child))
     {
-        json += __T(", \"children\":[");
+        json += ", \"children\":[";
         bool new_sep = false;
         while (child)
         {
@@ -102,14 +100,14 @@ void JsTree::find_trace_block_node(xmlNodePtr node, bool& sep, String& json)
             find_trace_data_node(child, new_sep, json);
             child = child->next;
         }
-        json += __T("]");
+        json += "]";
     }
 
-    json += __T("}");
+    json += "}";
 }
 
 //---------------------------------------------------------------------------
-void JsTree::find_trace_data_node(xmlNodePtr node, bool& sep, String& json)
+void JsTree::find_trace_data_node(xmlNodePtr node, bool& sep, std::string& json)
 {
     std::string def("data");
     if (!node || node->type != XML_ELEMENT_NODE ||
@@ -117,18 +115,18 @@ void JsTree::find_trace_data_node(xmlNodePtr node, bool& sep, String& json)
         return;
 
     if (sep)
-        json += __T(", ");
+        json += ", ";
     else
         sep = true;
 
-    json += __T("{\"type\":\"data\"");
+    json += "{\"type\":\"data\"";
 
     interpret_trace_data_in_data(node, json);
 
     xmlNodePtr child = node->children;
     if (has_block_data(child))
     {
-        json += __T(", \"children\":[");
+        json += ", \"children\":[";
         bool new_sep = false;
         while (child)
         {
@@ -136,10 +134,10 @@ void JsTree::find_trace_data_node(xmlNodePtr node, bool& sep, String& json)
             find_trace_data_node(child, new_sep, json);
             child = child->next;
         }
-        json += __T("]");
+        json += "]";
     }
 
-    json += __T("}");
+    json += "}";
 }
 
 //---------------------------------------------------------------------------
@@ -160,24 +158,22 @@ bool JsTree::has_block_data(xmlNodePtr child)
 }
 
 //---------------------------------------------------------------------------
-String JsTree::format_from_inform_XML(const String& xml)
+std::string JsTree::format_from_inform_XML(const std::string& xml)
 {
-    String json(__T("["));
+    std::string json("[");
 
-    std::string xml_not_unicode=Ztring(xml).To_UTF8();
-
-    xmlDocPtr doc = xmlParseMemory(xml_not_unicode.c_str(), xml_not_unicode.length());
+    xmlDocPtr doc = xmlParseMemory(xml.c_str(), xml.length());
     if (!doc)
     {
-        error = __T("The report given cannot be parsed");
-        return String();
+        error = "The report given cannot be parsed";
+        return std::string();
     }
 
     xmlNodePtr root = xmlDocGetRootElement(doc);
     if (!root)
     {
-        error = __T("No root node, leaving");
-        return String();
+        error = "No root node, leaving";
+        return std::string();
     }
 
     xmlNodePtr child = root->children;
@@ -188,23 +184,23 @@ String JsTree::format_from_inform_XML(const String& xml)
         child = child->next;
     }
 
-    json += String(__T("]"));
+    json += "]";
     xmlFreeDoc(doc);
     return json;
 }
 
 //---------------------------------------------------------------------------
-void JsTree::find_inform_data_node(xmlNodePtr node, bool& sep, String& json)
+void JsTree::find_inform_data_node(xmlNodePtr node, bool& sep, std::string& json)
 {
     if (!node || node->type != XML_ELEMENT_NODE)
         return;
 
     if (sep)
-        json += __T(", ");
+        json += ", ";
     else
         sep = true;
 
-    json += __T("{\"type\":\"data\"");
+    json += "{\"type\":\"data\"";
 
     xmlChar *value_c = xmlNodeGetContent(node);
 
@@ -232,24 +228,24 @@ void JsTree::find_inform_data_node(xmlNodePtr node, bool& sep, String& json)
 
     if (name.length())
     {
-        json += __T(", \"text\":\"");
-        json += Ztring().From_UTF8(name);
-        json += __T("\"");
+        json += ", \"text\":\"";
+        json += name;
+        json += "\"";
     }
 
     if (value_c != NULL)
     {
         std::string value((const char *)value_c);
-        json += __T(", \"data\":{\"dataValue\":\"");
-        json += Ztring().From_UTF8(value);
-        json += __T("\"}");
+        json += ", \"data\":{\"dataValue\":\"";
+        json += value;
+        json += "\"}";
     }
 
-    json += __T("}");
+    json += "}";
 }
 
 //---------------------------------------------------------------------------
-void JsTree::find_inform_track_type(xmlNodePtr node, bool& sep, String& json)
+void JsTree::find_inform_track_type(xmlNodePtr node, bool& sep, std::string& json)
 {
     std::string name("track");
 
@@ -263,32 +259,32 @@ void JsTree::find_inform_track_type(xmlNodePtr node, bool& sep, String& json)
         type = (const  char *)type_c;
 
     if (sep)
-        json += __T(", ");
+        json += ", ";
     else
         sep = true;
 
-    json += __T("{\"type\":\"block\", \"text\":\"");
-    json += Ztring().From_UTF8(type);
-    json += __T("\"");
+    json += "{\"type\":\"block\", \"text\":\"";
+    json += type;
+    json += "\"";
 
     xmlNodePtr child = node->children;
     if (child)
     {
-        json += __T(", \"children\":[");
+        json += ", \"children\":[";
         bool new_sep = false;
         while (child)
         {
             find_inform_data_node(child, new_sep, json);
             child = child->next;
         }
-        json += __T("]");
+        json += "]";
     }
 
-    json += __T("}");
+    json += "}";
 }
 
 //---------------------------------------------------------------------------
-void JsTree::find_inform_media_node(xmlNodePtr node, bool& sep, String& json)
+void JsTree::find_inform_media_node(xmlNodePtr node, bool& sep, std::string& json)
 {
     std::string name("media");
 
@@ -302,31 +298,31 @@ void JsTree::find_inform_media_node(xmlNodePtr node, bool& sep, String& json)
         file = (const char *)file_c;
 
     if (sep)
-        json += __T(", ");
+        json += ", ";
     else
         sep = true;
 
-    json += __T("{\"type\":\"block\", \"text\":\"");
-    json += Ztring().From_UTF8(file);
-    json += __T("\"");
+    json += "{\"type\":\"block\", \"text\":\"";
+    json += file;
+    json += "\"";
 
     xmlNodePtr child = node->children;
     if (child)
     {
-        json += __T(", \"children\":[");
+        json += ", \"children\":[";
         bool new_sep = false;
         while (child)
         {
             find_inform_track_type(child, new_sep, json);
             child = child->next;
         }
-        json += __T("]");
+        json += "]";
     }
-    json += __T("}");
+    json += "}";
 }
 
 //---------------------------------------------------------------------------
-void JsTree::interpret_trace_data_in_block(xmlNodePtr block, String& json)
+void JsTree::interpret_trace_data_in_block(xmlNodePtr block, std::string& json)
 {
     //Format: "text": "name[ - info] (size bytes)", "data": {"offset": "offset_hexa"}
     std::string offset;
@@ -348,31 +344,30 @@ void JsTree::interpret_trace_data_in_block(xmlNodePtr block, String& json)
         size = std::string((const  char *)size_c);
 
     //Block data
-    json += __T(", \"text\":\"");
-    json += Ztring().From_UTF8(name);
+    json += ", \"text\":\"";
+    json += name;
     if (info.length())
     {
-        json += __T(" - ");
-        json += Ztring().From_UTF8(info);
+        json += " - ";
+        json += info;
     }
-    json += __T(" (");
-    json += Ztring().From_UTF8(size);
-    json += __T(" bytes)");
-    json += __T("\"");
+    json += " (";
+    json += size;
+    json += " bytes)\"";
 
     //Block data
-    json += __T(", \"data\":{");
+    json += ", \"data\":{";
     bool coma = false;
     if (offset_c)
     {
         interpret_offset(offset, coma, json);
         coma = true;
     }
-    json += __T("}");
+    json += "}";
 }
 
 //---------------------------------------------------------------------------
-void JsTree::interpret_trace_data_in_data(xmlNodePtr data, String& json)
+void JsTree::interpret_trace_data_in_data(xmlNodePtr data, std::string& json)
 {
     //Format: "text": "name", "data": {"offset": "offset_hexa", "dataValue": "value (value_in_hexa)"}
     std::string offset; //Decimal to hexa
@@ -390,11 +385,11 @@ void JsTree::interpret_trace_data_in_data(xmlNodePtr data, String& json)
     if (value_c != NULL)
         value = std::string((const char *)value_c);
 
-    json += __T(", \"text\":\"");
-    json += Ztring().From_UTF8(name);
+    json += ", \"text\":\"";
+    json += name;
 
     //Block data
-    json += __T("\", \"data\":{");
+    json += "\", \"data\":{";
     bool coma = false;
     if (offset_c)
     {
@@ -406,53 +401,52 @@ void JsTree::interpret_trace_data_in_data(xmlNodePtr data, String& json)
         interpret_value(value, coma, json);
         coma = true;
     }
-    json += __T("}");
+    json += "}";
 }
 
 //---------------------------------------------------------------------------
-void JsTree::interpret_offset(std::string& offset, bool coma, String& json)
+void JsTree::interpret_offset(std::string& offset, bool coma, std::string& json)
 {
     if (coma)
-        json += __T(", ");
-    json += __T("\"offset\":");
+        json += ", ";
+    json += "\"offset\":";
 
     // Not numerical
     std::size_t found = offset.find_first_not_of("0123456789.");
     if (found != std::string::npos)
         offset = "0";
-    json += __T("\"0x");
+    json += "\"0x";
 
     std::string hexa = decimal_to_hexa(offset);
     int zero = 8 - hexa.length();
     while (zero > 0)
     {
-        json += __T("0");
+        json += "0";
         --zero;
     }
-    json += Ztring().From_UTF8(hexa);
+    json += hexa;
 
-    json += __T("\"");
+    json += "\"";
 }
 
 //---------------------------------------------------------------------------
-void JsTree::interpret_value(std::string& value, bool coma, String& json)
+void JsTree::interpret_value(std::string& value, bool coma, std::string& json)
 {
     if (coma)
-        json += __T(", ");
-    json += __T("\"dataValue\":\"");
+        json += ", ";
+    json += "\"dataValue\":\"";
 
-    json += Ztring().From_UTF8(value);
+    json += value;
 
     // Not numerical
     std::size_t found = value.find_first_not_of("0123456789.");
     if (found == std::string::npos)
     {
-        json += __T(" (0x");
-        std::string hexa = decimal_to_hexa(value);
-        json += Ztring().From_UTF8(hexa);
-        json += __T(")");
+        json += " (0x";
+        json += decimal_to_hexa(value);
+        json += ")";
     }
-    json += __T("\"");
+    json += "\"";
 }
 
 //---------------------------------------------------------------------------

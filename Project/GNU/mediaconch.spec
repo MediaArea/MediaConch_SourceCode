@@ -28,14 +28,26 @@ BuildRequires:  libqt4-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  libcurl-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  libevent-devel
+
 %if 0%{?fedora_version}
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
 BuildRequires:  desktop-file-utils
 %endif
+
 %if 0%{?suse_version}
 BuildRequires:  libQtWebKit-devel
 BuildRequires:  update-desktop-files
+%endif
+
+%if 0%{?suse_version}
+%if 0%{?is_opensuse}
+BuildRequires:  libjansson-devel
+%endif
+%else
+BuildRequires:  jansson-devel
 %endif
 
 %description
@@ -77,7 +89,19 @@ popd
 
 pushd Project/Qt
     chmod u+x prepare
-    ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+    %if 0%{?suse_version} && ! 0%{?is_opensuse}
+        %if 0%{?suse_version} < 1200
+            ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" NO_JANSSON=yes NO_LIBEVENT=yes
+        %else
+            ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" NO_JANSSON=yes
+        %endif
+    %else
+        %if 0%{?suse_version} < 1200
+            ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" NO_LIBEVENT=yes
+        %else
+            ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+        %endif
+    %endif
 popd
 
 %build
@@ -86,7 +110,19 @@ export CXXFLAGS="%{optflags}"
 
 # build CLI
 pushd Project/GNU/CLI
-    %configure
+    %if 0%{?suse_version} && ! 0%{?is_opensuse}
+        %if 0%{?suse_version} < 1200
+            %configure --without-jansson --without-libevent
+        %else
+            %configure --without-jansson
+        %endif
+    %else
+        %if 0%{?suse_version} < 1200
+            %configure --without-libevent
+        %else
+            %configure
+        %endif
+    %endif
     make %{?_smp_mflags}
 popd
 
