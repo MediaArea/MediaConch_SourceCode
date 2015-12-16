@@ -67,7 +67,9 @@ public:
     struct ReportRes
     {
         std::string       report;
-        std::vector<bool> policies_validities;
+        bool              has_valid;
+        bool              valid;
+        ReportRes() :     has_valid(false), valid(true) {}
     };
 
     static const std::string display_xml_name;

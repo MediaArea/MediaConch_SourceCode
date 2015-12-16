@@ -186,7 +186,7 @@ int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, M
 {
     if (!policies_names.empty() || !policies_contents.empty())
     {
-        if (policies_check(f, files, result,
+        if (policies_check(files, result,
                            policies_names.size() ? &policies_names : NULL,
                            policies_contents.size() ? &policies_contents : NULL) < 0)
             return -1;
@@ -204,7 +204,7 @@ int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, M
                 case MediaConchLib::format_Text:
                 case MediaConchLib::format_Xml:
                 case MediaConchLib::format_MaXml:
-                    get_reports_output(files[i], f, report_set, result->report);
+                    get_reports_output(files[i], f, report_set, result);
                     break;
                 case MediaConchLib::format_JsTree:
                     get_reports_output_JStree(files[i], report_set, result->report);
@@ -233,24 +233,6 @@ int Core::remove_report(const std::vector<std::string>& files)
 
     for (size_t i = 0; i < files.size(); ++i)
         db->remove_report(files[i]);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int Core::get_reports_output_Text(const std::string& file,
-                                  const std::bitset<MediaConchLib::report_Max>& report_set,
-                                  std::string& report)
-{
-    get_reports_output(file, MediaConchLib::format_Text, report_set, report);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int Core::get_reports_output_Xml(const std::string& file,
-                                         const std::bitset<MediaConchLib::report_Max>& report_set,
-                                         std::string& report)
-{
-    get_reports_output(file, MediaConchLib::format_Xml, report_set, report);
     return 0;
 }
 
@@ -295,10 +277,11 @@ int Core::get_reports_output_Html(const std::string& file,
 }
 
 //---------------------------------------------------------------------------
-int Core::get_reports_output_Text_Implementation(const std::string& file, std::string& report)
+int Core::get_reports_output_Text_Implementation(const std::string& file, std::string& report, bool& is_valid)
 {
     std::string tmp;
     get_implementation_report(file, tmp);
+    is_valid = policy_is_valid(tmp);
 
     // Apply an XSLT to have Text
     transform_with_xslt_text_memory(tmp, tmp);
@@ -307,22 +290,20 @@ int Core::get_reports_output_Text_Implementation(const std::string& file, std::s
 }
 
 //---------------------------------------------------------------------------
-int Core::get_reports_output_Xml_Implementation (const std::string& file, std::string& report)
+int Core::get_reports_output_Xml_Implementation(const std::string& file, std::string& report, bool& is_valid)
 {
     get_implementation_report(file, report);
-
-    // Apply an XSLT to have XML
-    if (xslt_display.length())
-        transform_with_xslt_file(report, xslt_display, report);
+    is_valid = policy_is_valid(report);
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int Core::policies_check_contents(MediaConchLib::format f, const std::string& file,
-                                  const std::vector<std::string>& policies_contents,
-                                  std::stringstream& Out)
+bool Core::policies_check_contents(const std::string& file,
+                                   const std::vector<std::string>& policies_contents,
+                                   std::stringstream& Out)
 {
+    bool valid = true;
     for (size_t i = 0; i < policies_contents.size(); ++i)
     {
         std::string tmp;
@@ -331,21 +312,29 @@ int Core::policies_check_contents(MediaConchLib::format f, const std::string& fi
             std::string retain = tmp;
             tmp = std::string();
             if (!validate_schematron_policy_from_memory(file, policies_contents[i], tmp))
+            {
                 Out << retain;
+                valid = false;
+            }
             else
                 Out << tmp;
         }
         else
+        {
             Out << tmp;
+            if (!policy_is_valid(tmp))
+                valid = false;
+        }
     }
-    return 0;
+    return valid;
 }
 
 //---------------------------------------------------------------------------
-int Core::policies_check_files(MediaConchLib::format f, const std::string& file,
-                               const std::vector<std::string>& policies_names,
-                               std::stringstream& Out)
+bool Core::policies_check_files(const std::string& file,
+                                const std::vector<std::string>& policies_names,
+                                std::stringstream& Out)
 {
+    bool valid = true;
     for (size_t i = 0; i < policies_names.size(); ++i)
     {
         std::string tmp;
@@ -356,9 +345,16 @@ int Core::policies_check_files(MediaConchLib::format f, const std::string& file,
                 std::string retain = tmp;
                 tmp = std::string();
                 if (!validate_xslt_policy_from_file(file, policies_names[i], tmp))
-                    Out << file << ": " << retain;
+                {
+                    Out << file << retain;
+                    valid = false;
+                }
                 else
+                {
                     Out << tmp;
+                    if (!policy_is_valid(tmp))
+                        valid = false;
+                }
             }
             else
                 Out << file << ": "  << tmp;
@@ -370,20 +366,26 @@ int Core::policies_check_files(MediaConchLib::format f, const std::string& file,
                 std::string retain = tmp;
                 tmp = std::string();
                 if (!validate_schematron_policy_from_file(file, policies_names[i], tmp))
+                {
                     Out << retain;
+                    valid = false;
+                }
                 else
                     Out << file << ": "  << tmp;
             }
             else
+            {
+                if (!policy_is_valid(tmp))
+                    valid = false;
                 Out << tmp;
+            }
         }
     }
-    return 0;
+    return valid;
 }
 
 //---------------------------------------------------------------------------
-int Core::policies_check(MediaConchLib::format f,
-                         const std::vector<std::string>& files,
+int Core::policies_check(const std::vector<std::string>& files,
                          MediaConchLib::ReportRes* result,
                          const std::vector<std::string>* policies_names,
                          const std::vector<std::string>* policies_contents)
@@ -400,94 +402,93 @@ int Core::policies_check(MediaConchLib::format f,
         return -1;
     }
 
-    //int size = files.size();
-    // if (policies_names)
-    //    size *= policies_names->size();
-    // if (policies_names)
-    //    size *= policies_contents->size();
-    //result->valid = new [size] bool
     std::stringstream Out;
+    bool valid = true;
     for (size_t i = 0; i < files.size(); ++i)
     {
         if (policies_names)
-            policies_check_files(f, files[i], *policies_names, Out);
+            if (!policies_check_files(files[i], *policies_names, Out))
+                valid = false;
         if (policies_contents)
-            policies_check_contents(f, files[i], *policies_contents, Out);
+            if (!policies_check_contents(files[i], *policies_contents, Out))
+                valid = false;
     }
     result->report = Out.str();
+    result->has_valid = true;
+    result->valid = valid;
     return 0;
 }
 
-//---------------------------------------------------------------------------
-bool Core::policy_schematron(const std::string& file, const std::string& policy,
-                             MediaConchLib::format, std::stringstream& Out)
-{
-    Schema* S = new Schematron;
-    bool valid = false;
+// //---------------------------------------------------------------------------
+// bool Core::policy_schematron(const std::string& file, const std::string& policy,
+//                              MediaConchLib::format, std::stringstream& Out)
+// {
+//     Schema* S = new Schematron;
+//     bool valid = false;
 
-    if (S->register_schema_from_file(policy.c_str()))
-    {
-        std::string report;
-        valid = validation(file, S, report);
+//     if (S->register_schema_from_file(policy.c_str()))
+//     {
+//         std::string report;
+//         valid = validation(file, S, report);
 
-        if (!valid)
-        {
-            Out << "NOT VALID\n";
-            Out << report;
-        }
-        else
-            Out << "VALID";
-    }
-    else
-    {
-        std::vector<std::string> errors = S->get_errors();
-        Out << "internal error for parsing file" << std::endl;
-        for (size_t pos = 0; pos < errors.size(); pos++)
-            Out << "\t" << errors[pos].c_str();
-    }
-    delete S;
-    return valid;
-}
+//         if (!valid)
+//         {
+//             Out << "NOT VALID\n";
+//             Out << report;
+//         }
+//         else
+//             Out << "VALID";
+//     }
+//     else
+//     {
+//         std::vector<std::string> errors = S->get_errors();
+//         Out << "internal error for parsing file" << std::endl;
+//         for (size_t pos = 0; pos < errors.size(); pos++)
+//             Out << "\t" << errors[pos].c_str();
+//     }
+//     delete S;
+//     return valid;
+// }
 
-//---------------------------------------------------------------------------
-bool Core::policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out)
-{
-    Schema *S = new Xslt;
-    bool valid = false;
+// //---------------------------------------------------------------------------
+// bool Core::policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out)
+// {
+//     Schema *S = new Xslt;
+//     bool valid = false;
 
-    if (S->register_schema_from_file(policy.c_str()))
-    {
-        std::string report;
-        valid = validation(file, S, report);
-        if (xslt_display.length())
-            transform_with_xslt_file(report, xslt_display, report);
-        else 
-            switch (f)
-            {
-                case MediaConchLib::format_Text:
-                                        // Apply an XSLT to have Text
-                                        transform_with_xslt_text_memory(report, report);
-                                    break;
-                case MediaConchLib::format_Html:
-                                        // Apply an XSLT to have HTML
-                                        transform_with_xslt_html_memory(report, report);
-                                    break;
-                default:            ;
-            }
+//     if (S->register_schema_from_file(policy.c_str()))
+//     {
+//         std::string report;
+//         valid = validation(file, S, report);
+//         if (xslt_display.length())
+//             transform_with_xslt_file(report, xslt_display, report);
+//         else 
+//             switch (f)
+//             {
+//                 case MediaConchLib::format_Text:
+//                                         // Apply an XSLT to have Text
+//                                         transform_with_xslt_text_memory(report, report);
+//                                     break;
+//                 case MediaConchLib::format_Html:
+//                                         // Apply an XSLT to have HTML
+//                                         transform_with_xslt_html_memory(report, report);
+//                                     break;
+//                 default:            ;
+//             }
 
-        Out << report;
-    }
-    else
-    {
-        std::vector<std::string> errors = S->get_errors();
-        Out << file << ": ";
-        Out << "internal error for parsing file" << endl;
-        for (size_t pos = 0; pos < errors.size(); pos++)
-            Out << "\t" << errors[pos].c_str();
-    }
-    delete S;
-    return valid;
-}
+//         Out << report;
+//     }
+//     else
+//     {
+//         std::vector<std::string> errors = S->get_errors();
+//         Out << file << ": ";
+//         Out << "internal error for parsing file" << endl;
+//         for (size_t pos = 0; pos < errors.size(); pos++)
+//             Out << "\t" << errors[pos].c_str();
+//     }
+//     delete S;
+//     return valid;
+// }
 
 //***************************************************************************
 // API
@@ -1025,40 +1026,47 @@ std::string Core::get_report_saved(const std::string& filename, MediaConchLib::r
 //---------------------------------------------------------------------------
 void Core::get_reports_output(const std::string& file, MediaConchLib::format f,
                               std::bitset<MediaConchLib::report_Max> report_set,
-                              std::string& report)
+                              MediaConchLib::ReportRes* result)
 {
     if (f == MediaConchLib::format_MaXml)
     {
-        create_report_ma_xml(file, report, report_set);
-        report += "\r\n";
+        create_report_ma_xml(file, result->report, report_set);
+        result->report += "\r\n";
     }
     else
     {
         if (report_set[MediaConchLib::report_MediaInfo])
         {
             if (f == MediaConchLib::format_Xml)
-                create_report_mi_xml(file, report);
+                create_report_mi_xml(file, result->report);
             else
-                report += get_report_saved(file, MediaConchLib::report_MediaInfo, f);
-            report += "\r\n";
+                result->report += get_report_saved(file, MediaConchLib::report_MediaInfo, f);
+            result->report += "\r\n";
         }
         if (report_set[MediaConchLib::report_MediaTrace])
         {
             if (f == MediaConchLib::format_Xml)
-                create_report_mt_xml(file, report);
+                create_report_mt_xml(file, result->report);
             else
-                report += get_report_saved(file, MediaConchLib::report_MediaTrace, f);
-            report += "\r\n";
+                result->report += get_report_saved(file, MediaConchLib::report_MediaTrace, f);
+            result->report += "\r\n";
         }
+
         if (report_set[MediaConchLib::report_MediaConch])
         {
             std::string tmp;
+            bool is_valid = true;
             if (f == MediaConchLib::format_Xml)
-                get_reports_output_Xml_Implementation(file, tmp);
+                get_reports_output_Xml_Implementation(file, tmp, is_valid);
             else
-                get_reports_output_Text_Implementation(file, tmp);
-            report += tmp;
-            report += "\r\n";
+                get_reports_output_Text_Implementation(file, tmp, is_valid);
+            result->report += tmp;
+
+            if (!result->has_valid)
+                result->has_valid = true;
+            if (!is_valid)
+                result->valid = false;
+            result->report += "\r\n";
         }
     }
 }
@@ -1217,6 +1225,15 @@ void Core::get_daemon_address(std::string& addr, int& port) const
     long int port_l;
     if (config->get("Daemon_Port", port_l) >= 0)
         port = (int)port_l;
+}
+
+//---------------------------------------------------------------------------
+bool Core::policy_is_valid(const std::string& report)
+{
+    size_t pos = report.find(" outcome=\"fail\"");
+    if (pos != std::string::npos)
+        return false;
+    return true;
 }
 
 }

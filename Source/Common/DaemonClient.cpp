@@ -215,10 +215,14 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
 
     RESTAPI rest;
     RESTAPI::Report_Res *res = rest.parse_report_res(data);
-    if (!res || res->ok.size() != 1)
+    if (!res || !res->ok.report.length())
         return -1;
 
-    result->report = res->ok[0]->report;
+    result->report = res->ok.report;
+
+    result->has_valid = res->ok.has_valid;
+    result->valid = res->ok.valid;
+
     delete res;
     return 0;
 }

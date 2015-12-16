@@ -672,7 +672,8 @@ void MainWindow::wait_analyze_finished()
 //---------------------------------------------------------------------------
 QString MainWindow::get_implementationreport_xml(const std::string& file,
                                                  const std::string& display_name,
-                                                 const std::string& display_content)
+                                                 const std::string& display_content,
+                                                 bool& is_valid)
 {
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(MediaConchLib::report_MediaConch);
@@ -684,6 +685,11 @@ QString MainWindow::get_implementationreport_xml(const std::string& file,
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
                    &result, &display_name, &display_content);
+    if (result.has_valid)
+        is_valid = result.valid;
+    else
+        is_valid = false;
+
     return QString().fromStdString(result.report);
 }
 
@@ -790,9 +796,9 @@ bool MainWindow::validate_policy(const std::string& file, int policy,
     if (MCL.validate_policy(file, policy, &result, dname, dcontent) < 0)
         return false;
     report = result.report;
-    if (!result.policies_validities.size())
-        return false;
-    return result.policies_validities[0];
+    if (!result.has_valid)
+        return true;
+    return result.valid;
 }
 
 }

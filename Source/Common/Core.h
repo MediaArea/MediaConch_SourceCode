@@ -71,14 +71,11 @@ public:
                            MediaConchLib::ReportRes* res,
                            const std::string* display_names = NULL,
                            const std::string* display_contents = NULL);
-    int         get_reports_output_Text(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    int         get_reports_output_Text_Implementation(const std::string& file, std::string& report);
-    int         get_reports_output_Xml(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    int         get_reports_output_Xml_Implementation(const std::string& file, std::string& report);
+    int         get_reports_output_Text_Implementation(const std::string& file, std::string& report, bool& is_valid);
+    int         get_reports_output_Xml_Implementation(const std::string& file, std::string& report, bool& is_valid);
     int         get_reports_output_JStree(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         get_reports_output_Html(const std::string& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    int         policies_check(MediaConchLib::format f,
-                               const std::vector<std::string>& files,
+    int         policies_check(const std::vector<std::string>& files,
                                MediaConchLib::ReportRes *result,
                                const std::vector<std::string>* policies_names = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
@@ -129,14 +126,15 @@ private:
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
 
-    int policies_check_contents(MediaConchLib::format f, const std::string& files,
-                                const std::vector<std::string>& policies_contents,
-                                std::stringstream& Out);
-    int policies_check_files(MediaConchLib::format f, const std::string& files,
-                             const std::vector<std::string>& policies_names,
-                             std::stringstream& Out);
-    bool policy_schematron(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out);
-    bool policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out);
+    bool policies_check_contents(const std::string& files,
+                                 const std::vector<std::string>& policies_contents,
+                                 std::stringstream& Out);
+    bool policies_check_files(const std::string& files,
+                              const std::vector<std::string>& policies_names,
+                              std::stringstream& Out);
+    bool policy_is_valid(const std::string& report);
+    /* bool policy_schematron(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out); */
+    /* bool policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out); */
 
     //Helper
     bool validation(const std::string& file, Schema* S, std::string& report);
@@ -158,7 +156,7 @@ private:
     std::string get_report_saved(const std::string& file, MediaConchLib::report reportKind, MediaConchLib::format f);
     void get_reports_output(const std::string& file, MediaConchLib::format f,
                             std::bitset<MediaConchLib::report_Max> report_set,
-                            std::string& report);
+                            MediaConchLib::ReportRes* result);
     void get_implementation_report(const std::string& file, std::string& report);
 
     void register_file_to_database(std::string& file);

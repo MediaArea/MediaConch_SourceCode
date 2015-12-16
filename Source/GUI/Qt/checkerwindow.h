@@ -88,7 +88,6 @@ private:
     bool report_is_html(QString &report);
     bool report_is_xml(QString &report);
     bool is_policy_html_valid(QString &report);
-    bool implementationreport_is_valid(QString& report);
     void change_report_policy_save_name(std::string& file, QString& ext, QString& html);
     QString file_remove_ext(std::string& file);
     void get_displays_use(std::string& display_name, std::string& display_content);

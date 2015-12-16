@@ -636,14 +636,10 @@ void CheckerWindow::change_html_file_detail_conformance(QString& html, std::stri
     std::string display_content;
     get_displays_use(display_name, display_content);
 
-    QString report = mainwindow->get_implementationreport_xml(file, display_name, display_content);
+    bool is_valid = true;
+    QString report = mainwindow->get_implementationreport_xml(file, display_name, display_content, is_valid);
     bool is_html = report_is_html(report);
     QString save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-
-    bool is_valid = true;
-
-    if (report.indexOf(" outcome=\"fail\"") != -1)
-        is_valid = false;
 
     // Apply HTML default display
     std::string r = report.toStdString();
@@ -908,17 +904,6 @@ bool CheckerWindow::report_is_xml(QString& report)
         return true;
 
     return false;
-}
-
-//---------------------------------------------------------------------------
-bool CheckerWindow::implementationreport_is_valid(QString& report)
-{
-    QRegExp reg("Fail \\|", Qt::CaseInsensitive);
-
-    if (reg.indexIn(report, 0) != -1)
-        return false;
-
-    return true;
 }
 
 //---------------------------------------------------------------------------

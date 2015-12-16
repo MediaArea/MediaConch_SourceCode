@@ -80,10 +80,6 @@ RESTAPI::Status_Res::~Status_Res()
 //---------------------------------------------------------------------------
 RESTAPI::Report_Res::~Report_Res()
 {
-    for (size_t i = 0; i < ok.size(); ++i)
-        delete ok[i];
-    ok.clear();
-
     for (size_t i = 0; i < nok.size(); ++i)
         delete nok[i];
     nok.clear();
@@ -263,7 +259,7 @@ std::string RESTAPI::serialize_report_res(Report_Res& res)
         nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_report_oks(res.ok)));
+    child.obj.push_back(std::make_pair("ok", serialize_report_ok(res.ok)));
     child.obj.push_back(std::make_pair("nok", nok));
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -1066,48 +1062,26 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok*>& array)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_oks(std::vector<Report_Ok*>& array)
+Container::Value RESTAPI::serialize_report_ok(Report_Ok& obj)
 {
     Container::Value ok;
 
-    ok.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    ok.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    Container::Value report, valid;
 
-    for (size_t i = 0; i < array.size(); ++i)
+    if (obj.report.length() > 0)
     {
-        if (!array[i])
-            continue;
-
-        Container::Value v, id, report, validities;
-
-        v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-
-        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        id.l = array[i]->id;
-        v.obj.push_back(std::make_pair("id", id));
-
-        if (array[i]->report.length() > 0)
-        {
-            report.type = Container::Value::CONTAINER_TYPE_STRING;
-            report.s = array[i]->report;
-            v.obj.push_back(std::make_pair("report", report));
-        }
-
-        if (array[i]->policies_validities.size())
-        {
-            validities.type = Container::Value::CONTAINER_TYPE_BOOL;
-            for (size_t j = 0; array[i]->policies_validities.size(); ++j)
-            {
-                Container::Value validity;
-                validity.type = Container::Value::CONTAINER_TYPE_BOOL;
-                validity.b = array[i]->policies_validities[j];
-                validities.array.push_back(validity);
-            }
-            v.obj.push_back(std::make_pair("policies_validities", validities));
-        }
-
-        ok.array.push_back(v);
+        report.type = Container::Value::CONTAINER_TYPE_STRING;
+        report.s = obj.report;
+        ok.obj.push_back(std::make_pair("report", report));
     }
 
+    if (obj.has_valid)
+    {
+        valid.type = Container::Value::CONTAINER_TYPE_BOOL;
+        valid.b = obj.valid;
+        ok.obj.push_back(std::make_pair("valid", valid));
+    }
     return ok;
 }
 
@@ -1265,52 +1239,29 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& oks)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_report_ok(Container::Value *v, std::vector<Report_Ok*>& oks)
+int RESTAPI::parse_report_ok(Container::Value *v, Report_Ok& ok)
 {
-    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return -1;
 
-    for (size_t i = 0; i < v->array.size(); ++i)
+    Container::Value *report, *valid;
+
+    report = model->get_value_by_key(*v, "report");
+    valid = model->get_value_by_key(*v, "valid");
+
+    if (report)
     {
-        Container::Value *obj = &v->array[i];
-
-        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        if (report->type != Container::Value::CONTAINER_TYPE_STRING)
             return -1;
+        ok.report = report->s;
+    }
 
-        Container::Value *id, *report, *validities;
-
-        id = model->get_value_by_key(*obj, "id");
-        report = model->get_value_by_key(*obj, "report");
-        validities = model->get_value_by_key(*obj, "policies_validities");
-
-        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    if (valid)
+    {
+        if (valid->type != Container::Value::CONTAINER_TYPE_BOOL)
             return -1;
-
-        Report_Ok *ok = new Report_Ok;
-        ok->id = id->l;
-
-        if (report)
-        {
-            if (report->type != Container::Value::CONTAINER_TYPE_STRING)
-                return -1;
-            ok->report = report->s;
-        }
-        if (validities)
-        {
-            if (validities->type != Container::Value::CONTAINER_TYPE_ARRAY)
-                return -1;
-
-            size_t j = 0;
-            for (; j < validities->array.size(); ++j)
-            {
-                if (validities->array[j].type != Container::Value::CONTAINER_TYPE_ARRAY)
-                    return -1;
-
-                ok->policies_validities.push_back(validities->array[j].b);
-            }
-        }
-
-        oks.push_back(ok);
+        ok.has_valid = true;
+        ok.valid = valid->b;
     }
 
     return 0;

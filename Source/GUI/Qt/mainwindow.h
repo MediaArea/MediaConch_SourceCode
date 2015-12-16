@@ -59,7 +59,7 @@ public:
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     void                        analyze(const std::vector<std::string>& files);
     void                        wait_analyze_finished();
-    QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
+    QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content, bool& is_valid);
     QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_jstree(const std::string& file);

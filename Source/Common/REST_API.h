@@ -191,9 +191,10 @@ public:
 
     struct Report_Ok
     {
-        int                     id;
+        Report_Ok() :           has_valid(false) {}
         std::string             report;
-        std::vector<bool>       policies_validities;
+        bool                    has_valid;
+        bool                    valid;
     };
 
     struct Report_Nok
@@ -205,7 +206,7 @@ public:
     struct Report_Res
     {
         ~Report_Res();
-        std::vector<Report_Ok*>  ok;
+        Report_Ok                ok;
         std::vector<Report_Nok*> nok;
     };
 
@@ -303,14 +304,14 @@ private:
     Container::Value serialize_generic_nok(int id, Reason error);
     Container::Value serialize_analyze_oks(std::vector<Analyze_Ok*>& array);
     Container::Value serialize_status_oks(std::vector<Status_Ok*>& array);
-    Container::Value serialize_report_oks(std::vector<Report_Ok*>& array);
+    Container::Value serialize_report_ok(Report_Ok& ok);
 
     int parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& args);
     int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
     int parse_generic_nok(Container::Value *v, int& id, Reason& error);
     int parse_analyze_ok(Container::Value *v, std::vector<Analyze_Ok*>& ok);
     int parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& ok);
-    int parse_report_ok(Container::Value *v, std::vector<Report_Ok*>& ok);
+    int parse_report_ok(Container::Value *v, Report_Ok& ok);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);
