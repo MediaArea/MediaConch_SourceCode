@@ -148,6 +148,9 @@ private:
     bool validate_xslt_policy_from_file(const std::string& file, const std::string& policy, std::string& report);
     bool is_schematron_file(const std::string& file);
 
+    int transform_with_xslt_text_memory(const std::string& report, std::string& result);
+    int transform_with_xslt_html_memory(const std::string& report, std::string& result);
+
     bool   file_is_registered(const std::string& file);
     bool   file_is_registered_in_db(const std::string& file);
     bool   file_is_registered_in_queue(const std::string& file);

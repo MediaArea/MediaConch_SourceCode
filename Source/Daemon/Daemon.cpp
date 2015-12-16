@@ -290,6 +290,11 @@ namespace MediaConch
         else if (req->display_name == MediaConchLib::display_jstree_name)
             format = MediaConchLib::format_JsTree;
 
+        const std::string* display_name = req->display_name.length() ? &req->display_name : NULL;
+        const std::string* display_content = req->display_content.length() ? &req->display_content : NULL;
+        if (format != MediaConchLib::format_Xml)
+            display_name = NULL;
+
         std::bitset<MediaConchLib::report_Max> report_set;
         bool has_policy = false;
         for (size_t j = 0; j < req->reports.size(); ++j)
@@ -338,8 +343,6 @@ namespace MediaConch
             files.push_back(*d->current_files[id]);
 
             MediaConchLib::ReportRes result;
-            const std::string* display_name = req->display_name.length() ? &req->display_name : NULL;
-            const std::string* display_content = req->display_content.length() ? &req->display_content : NULL;
             d->MCL.get_report(report_set, format, files,
                               req->policies_names, req->policies_contents,
                               &result, display_name, display_content);

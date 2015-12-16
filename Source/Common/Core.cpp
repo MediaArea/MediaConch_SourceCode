@@ -190,6 +190,10 @@ int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, M
                            policies_names.size() ? &policies_names : NULL,
                            policies_contents.size() ? &policies_contents : NULL) < 0)
             return -1;
+        if (f == MediaConchLib::format_Text)
+            transform_with_xslt_text_memory(result->report, result->report);
+        else if (f == MediaConchLib::format_Html)
+            transform_with_xslt_html_memory(result->report, result->report);
     }
     else
     {
@@ -284,8 +288,7 @@ int Core::get_reports_output_Html(const std::string& file,
         get_implementation_report(file, tmp);
 
         // Apply an XSLT to have HTML
-        std::string memory(implementation_report_display_html_xsl);
-        transform_with_xslt_memory(tmp, memory, tmp);
+        transform_with_xslt_html_memory(tmp, tmp);
         report += tmp;
     }
     return 0;
@@ -298,12 +301,7 @@ int Core::get_reports_output_Text_Implementation(const std::string& file, std::s
     get_implementation_report(file, tmp);
 
     // Apply an XSLT to have Text
-#if defined(_WIN32) || defined(WIN32)
-    std::string memory(implementation_report_display_text_xsl);
-#else //defined(_WIN32) || defined(WIN32)
-    std::string memory(implementation_report_display_textunicode_xsl);
-#endif //defined(_WIN32) || defined(WIN32)
-    transform_with_xslt_memory(tmp, memory, tmp);
+    transform_with_xslt_text_memory(tmp, tmp);
     report += tmp;
     return 0;
 }
@@ -467,22 +465,12 @@ bool Core::policy_xslt(const std::string& file, const std::string& policy, Media
             switch (f)
             {
                 case MediaConchLib::format_Text:
-                                    {
                                         // Apply an XSLT to have Text
-                                    #if defined(_WIN32) || defined(WIN32)
-                                        std::string memory(implementation_report_display_text_xsl);
-                                    #else //defined(_WIN32) || defined(WIN32)
-                                        std::string memory(implementation_report_display_textunicode_xsl);
-                                    #endif //defined(_WIN32) || defined(WIN32)
-                                        transform_with_xslt_memory(report, memory, report);
-                                    }
+                                        transform_with_xslt_text_memory(report, report);
                                     break;
                 case MediaConchLib::format_Html:
-                                    {
-                                        // Apply an XSLT to have Text
-                                        std::string memory(implementation_report_display_html_xsl);
-                                        transform_with_xslt_memory(report, memory, report);
-                                    }
+                                        // Apply an XSLT to have HTML
+                                        transform_with_xslt_html_memory(report, report);
                                     break;
                 default:            ;
             }
@@ -634,6 +622,24 @@ int Core::transform_with_xslt_memory(const std::string& report, const std::strin
     result = S->get_report();
     delete S;
     return 0;
+}
+
+//---------------------------------------------------------------------------
+int Core::transform_with_xslt_html_memory(const std::string& report, std::string& result)
+{
+    std::string memory(implementation_report_display_html_xsl);
+    return transform_with_xslt_memory(report, memory, result);
+}
+
+//---------------------------------------------------------------------------
+int Core::transform_with_xslt_text_memory(const std::string& report, std::string& result)
+{
+#if defined(_WIN32) || defined(WIN32)
+    std::string memory(implementation_report_display_text_xsl);
+#else //defined(_WIN32) || defined(WIN32)
+    std::string memory(implementation_report_display_textunicode_xsl);
+#endif //defined(_WIN32) || defined(WIN32)
+    return transform_with_xslt_memory(report, memory, result);
 }
 
 //***************************************************************************
