@@ -153,10 +153,11 @@ void Core::Run (std::string file)
 }
 
 //---------------------------------------------------------------------------
-int  Core::open_file(const std::string& file, bool& registered)
+int Core::open_file(const std::string& file, bool& registered)
 {
-    if (!ZenLib::File::Exists(Ztring().From_UTF8(file)))
-        return -1;
+    //TODO: When ZenLib will manage network files
+    // if (!ZenLib::File::Exists(Ztring().From_UTF8(file)))
+    //     return -1;
 
     registered = file_is_registered(file);
     if (!registered)
