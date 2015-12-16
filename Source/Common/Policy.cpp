@@ -43,7 +43,7 @@ Policy::~Policy()
 }
 
 //---------------------------------------------------------------------------
-String Policy::import_schema(const std::string& filename)
+std::string Policy::import_schema(const std::string& filename)
 {
     Schematron s;
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
@@ -52,20 +52,20 @@ String Policy::import_schema(const std::string& filename)
     if (!doc)
     {
         // maybe put the errors from s.errors
-        return String(__T("The schema cannot be parsed"));
+        return "The schema cannot be parsed";
     }
 
-    String ret = import_schema_from_doc(filename, doc);
+    std::string ret = import_schema_from_doc(filename, doc);
     xmlFreeDoc(doc);
     saved = true;
     return ret;
 }
 
 //---------------------------------------------------------------------------
-String Policy::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
+std::string Policy::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
 {
     if (!buffer || !len)
-        return String(__T("The schematron does not exist"));
+        return "The schematron does not exist";
 
     Schematron s;
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
@@ -74,10 +74,10 @@ String Policy::import_schema_from_memory(const std::string& filename, const char
     if (!doc)
     {
         // maybe put the errors from s.errors
-        return String(__T("The schema given cannot be parsed"));
+        return "The schema given cannot be parsed";
     }
 
-    String ret = import_schema_from_doc(filename, doc);
+    std::string ret = import_schema_from_doc(filename, doc);
     xmlFreeDoc(doc);
     saved = true;
     return ret;

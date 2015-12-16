@@ -51,26 +51,27 @@ public:
     void                        Run();
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
-    String                      transformWithXsltFile(String& report, String trans);
-    String                      transformWithXsltMemory(String& report, std::string memory);
+    std::string                 transformWithXsltFile(std::string& report, std::string trans);
+    std::string                 transformWithXsltMemory(std::string& report, std::string memory);
     void                        checker_add_file(QString& file, int policy);
     void                        checker_add_files(QList<QFileInfo>& file, int policy);
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
-    void                        analyze(String& file);
-    QString                     get_implementationreport_xml();
-    QString                     get_mediainfo_and_mediatrace_xml();
-    QString                     get_mediainfo_xml();
-    QString                     get_mediainfo_jstree();
-    QString                     get_mediatrace_xml();
-    QString                     get_mediatrace_jstree();
+    void                        analyze(std::string& file);
+    void                        wait_analyze_finished();
+    QString                     get_implementationreport_xml(const std::string& file);
+    QString                     get_mediainfo_and_mediatrace_xml(const std::string& file);
+    QString                     get_mediainfo_xml(const std::string& file);
+    QString                     get_mediainfo_jstree(const std::string& file);
+    QString                     get_mediatrace_xml(const std::string& file);
+    QString                     get_mediatrace_jstree(const std::string& file);
     QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();
     void                        display_selected();
     void                        add_default_policy();
     void                        add_default_displays();
-    bool                        ValidatePolicy(int policy, bool& valid, String& report);
+    bool                        ValidatePolicy(const std::string& file, int policy, bool& valid, std::string& report);
     bool                        is_all_policies_saved();
 
     void                        addPolicyToList(QString& policy);
@@ -78,12 +79,12 @@ public:
     void                        clearFileList();
     void                        addXsltDisplay(QString& display_xslt);
     void                        removeXsltDisplay();
-    const std::vector<Policy *>& get_all_policies() const;
-    std::vector<QString>&       get_displays();
-    const std::vector<String>&  policy_file_registered();
-    QString                     get_local_folder() const;
 
-    Policies&                   get_policies() { return C.policies; }
+    const std::vector<Policy *>&    get_all_policies() const;
+    std::vector<QString>&           get_displays();
+    const std::vector<std::string>& policy_file_registered();
+    QString                         get_local_folder() const;
+    Policies&                       get_policies() { return C.policies; }
 
     const map<string, list<string> >* providePolicyExistingType() const {return &C.policies.existing_type; }
 

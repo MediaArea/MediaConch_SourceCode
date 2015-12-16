@@ -112,18 +112,19 @@ int main(int argc, char* argv_ansi[])
 
     //Configure MediaConch core
     MediaConch::Core MI;
+    MI.load_configuration();
 
-    //Retrieve command line (mainly for Unicode)
-    GETCOMMANDLINE();
+    // TODO: Retrieve command line (mainly for Unicode)
+    // GETCOMMANDLINE();
 
     //Parse command line
     for (int Pos=1; Pos<argc; Pos++)
     {
         //First part of argument (before "=") should be case insensitive
-        String Argument(argv[Pos]);
-        if (!Argument.compare(0, 1, __T("-")))
+        std::string Argument(argv_ansi[Pos]);
+        if (!Argument.compare(0, 1, "-"))
         {
-            size_t Egal_Pos=Argument.find(__T('='));
+            size_t Egal_Pos=Argument.find('=');
             if (Egal_Pos==string::npos)
                 Egal_Pos=Argument.size();
             transform(Argument.begin(), Argument.begin()+Egal_Pos, Argument.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
@@ -131,18 +132,19 @@ int main(int argc, char* argv_ansi[])
         int Return=Parse (MI, Argument);
         if (Return<0)
             return Return; //no more tasks to do
+
         if (Return>0)
-            MI.List.push_back(argv[Pos]); //Append the filename to the list of filenames to parse
+            MI.List.push_back(argv_ansi[Pos]); //Append the filename to the list of filenames to parse
     }
 
     //If no filenames (and no options)
     if (MI.List.empty())
         return Help_Nothing();
 
-    String CombinationTest=MI.ReportAndFormatCombination_IsValid();
+    std::string CombinationTest=MI.ReportAndFormatCombination_IsValid();
     if (!CombinationTest.empty())
     {
-        STRINGOUT(CombinationTest);
+        STRINGOUT(Ztring().From_UTF8(CombinationTest));
         return -1;
     }
 
@@ -151,13 +153,16 @@ int main(int argc, char* argv_ansi[])
 
     for (size_t i = 0; i < MI.List.size(); ++i)
         MI.Run(MI.List[i]);
-    
+
+    // In CLI mode, wait it is finished
+    MI.WaitRunIsFinished();
+
     //Output
-    STRINGOUT(MI.GetOutput());
+    STRINGOUT(Ztring().From_UTF8(MI.GetOutput()));
 
     //Output, in a file if needed
     if (!LogFile_FileName.empty())
-        LogFile_Action(MI.GetOutput());
+        LogFile_Action(Ztring().From_UTF8(MI.GetOutput()));
 
     return 0;
 }

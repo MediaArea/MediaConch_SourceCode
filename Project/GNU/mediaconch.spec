@@ -28,6 +28,8 @@ BuildRequires:  libqt4-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  libcurl-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  libevent-devel
 %if 0%{?fedora_version}
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
@@ -36,6 +38,9 @@ BuildRequires:  desktop-file-utils
 %if 0%{?suse_version}
 BuildRequires:  libQtWebKit-devel
 BuildRequires:  update-desktop-files
+BuildRequires:  libjansson-devel
+%else
+BuildRequires:  jansson-devel
 %endif
 
 %description

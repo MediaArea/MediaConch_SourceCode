@@ -5,47 +5,42 @@
  */
 
 //---------------------------------------------------------------------------
-#ifndef CommandLine_ParserH
-#define CommandLine_ParserH
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-#include "Common/Core.h"
-#include "Config.h"
-//---------------------------------------------------------------------------
-
-//***************************************************************************
-//
-//***************************************************************************
-
-int Parse(MediaConch::Core& I, std::string& Argument);
-
-
-//---------------------------------------------------------------------------
-#define CL_METHOD(_NAME) \
-    int _NAME(MediaConch::Core& MI, const std::string& Argument)
-
-#define CL_OPTION(_NAME) \
-    int _NAME(MediaConch::Core& MI, const std::string& Argument)
-
-CL_OPTION(Help);
-CL_OPTION(Inform);
-CL_OPTION(Report);
-CL_OPTION(Language);
-CL_OPTION(Format);
-CL_OPTION(LogFile);
-CL_OPTION(Bom);
-CL_OPTION(Version);
-CL_OPTION(PolicyOption);
-CL_OPTION(Display);
-CL_OPTION(LogFile);
-CL_OPTION(Default);
-
-//***************************************************************************
-// Options which need actions
-//***************************************************************************
-
-void LogFile_Action(ZenLib::Ztring Inform);
-void CallBack_Set(MediaConch::Core& MI, void* Event_CallBackFunction);
-
+#ifdef __BORLANDC__
+    #pragma hdrstop
 #endif
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+#include "Database.h"
+#include <sstream>
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+namespace MediaConch {
+
+//***************************************************************************
+// Database
+//***************************************************************************
+
+//***************************************************************************
+// Constructor/Destructor
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+Database::Database()
+{
+    db_file = databaseName;
+}
+
+//---------------------------------------------------------------------------
+Database::~Database()
+{
+}
+
+//---------------------------------------------------------------------------
+void Database::set_database_directory(const std::string& dirname)
+{
+    db_file = dirname + Path_Separator + databaseName;
+}
+
+}
