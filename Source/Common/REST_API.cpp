@@ -11,10 +11,12 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include <sstream>
 #include "REST_API.h"
 #include "Container.h"
 #include "NoContainer.h"
 #include "Json.h"
+#include "stdlib.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -22,6 +24,8 @@ namespace MediaConch {
 //***************************************************************************
 // RESTAPI
 //***************************************************************************
+
+const std::string RESTAPI::API_VERSION = "1";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -48,23 +52,71 @@ RESTAPI::~RESTAPI()
 }
 
 //***************************************************************************
+// Destructors
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+RESTAPI::Analyze_Res::~Analyze_Res()
+{
+    for (size_t i = 0; i < ok.size(); ++i)
+        delete ok[i];
+    ok.clear();
+
+    for (size_t i = 0; i < nok.size(); ++i)
+        delete nok[i];
+    nok.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Status_Res::~Status_Res()
+{
+    for (size_t i = 0; i < ok.size(); ++i)
+        delete ok[i];
+    ok.clear();
+
+    for (size_t i = 0; i < nok.size(); ++i)
+        delete nok[i];
+    nok.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Report_Res::~Report_Res()
+{
+    for (size_t i = 0; i < nok.size(); ++i)
+        delete nok[i];
+    nok.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Retry_Res::~Retry_Res()
+{
+    for (size_t i = 0; i < nok.size(); ++i)
+        delete nok[i];
+    nok.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Clear_Res::~Clear_Res()
+{
+    for (size_t i = 0; i < nok.size(); ++i)
+        delete nok[i];
+    nok.clear();
+}
+
+//***************************************************************************
 // Serialize: Request
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::serialize_check_req(Check_Req& req)
+std::string RESTAPI::serialize_analyze_req(Analyze_Req& req)
 {
-    Container::Value v, child, schematron;
-
-    schematron.type = Container::Value::CONTAINER_TYPE_STRING;
-    schematron.s = req.schematron;
+    Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("args", serialize_check_args(req.args)));
-    child.obj.push_back(std::make_pair("schematron", schematron));
+    child.obj.push_back(std::make_pair("args", serialize_analyze_args(req.args)));
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("CHECK", child));
+    v.obj.push_back(std::make_pair("ANALYZE", child));
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -75,18 +127,18 @@ std::string RESTAPI::serialize_check_req(Check_Req& req)
 //---------------------------------------------------------------------------
 std::string RESTAPI::serialize_status_req(Status_Req& req)
 {
-    Container::Value v, child;
+    //URI
+    std::stringstream ss;
 
-    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
-
-    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("STATUS", child));
-
-    std::string ret = model->serialize(v);
-    if (!ret.length())
-        error = model->get_error();
-    return ret;
+    if (req.ids.size() > 0)
+        ss << "?";
+    for (size_t i = 0; i < req.ids.size(); ++i)
+    {
+        if (i)
+            ss << "&";
+        ss << "id=" << req.ids[i];
+    }
+    return ss.str();
 }
 
 //---------------------------------------------------------------------------
@@ -97,6 +149,16 @@ std::string RESTAPI::serialize_report_req(Report_Req& req)
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
     child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
     child.obj.push_back(std::make_pair("reports", serialize_report_reports(req.reports)));
+
+    if (req.policies_names.size())
+        child.obj.push_back(std::make_pair("policies_names", serialize_report_arr_str(req.policies_names)));
+    if (req.policies_contents.size())
+        child.obj.push_back(std::make_pair("policies_contents", serialize_report_arr_str(req.policies_contents)));
+
+    if (req.display_name.length())
+        child.obj.push_back(std::make_pair("display_name", serialize_report_string(req.display_name)));
+    if (req.display_content.length())
+        child.obj.push_back(std::make_pair("display_content", serialize_report_string(req.display_content)));
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj.push_back(std::make_pair("REPORT", child));
@@ -127,18 +189,18 @@ std::string RESTAPI::serialize_retry_req(Retry_Req& req)
 //---------------------------------------------------------------------------
 std::string RESTAPI::serialize_clear_req(Clear_Req& req)
 {
-    Container::Value v, child;
+    //URI
+    std::stringstream ss;
 
-    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
-
-    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("CLEAR", child));
-
-    std::string ret = model->serialize(v);
-    if (!ret.length())
-        error = model->get_error();
-    return ret;
+    if (req.ids.size() > 0)
+        ss << "?";
+    for (size_t i = 0; i < req.ids.size(); ++i)
+    {
+        if (i)
+            ss << "&";
+        ss << "id=" << req.ids[i];
+    }
+    return ss.str();
 }
 
 //***************************************************************************
@@ -146,22 +208,20 @@ std::string RESTAPI::serialize_clear_req(Clear_Req& req)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::serialize_check_res(Check_Res& res)
+std::string RESTAPI::serialize_analyze_res(Analyze_Res& res)
 {
     Container::Value v, child, nok;
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-    {
-        nok.array.push_back(serialize_generic_nok(res.nok[i].id, res.nok[i].error));
-    }
+        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_check_oks(res.ok)));
+    child.obj.push_back(std::make_pair("ok", serialize_analyze_oks(res.ok)));
     child.obj.push_back(std::make_pair("nok", nok));
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("CHECK_RESULT", child));
+    v.obj.push_back(std::make_pair("ANALYZE_RESULT", child));
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -176,9 +236,7 @@ std::string RESTAPI::serialize_status_res(Status_Res& res)
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-    {
-        nok.array.push_back(serialize_generic_nok(res.nok[i].id, res.nok[i].error));
-    }
+        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
     child.obj.push_back(std::make_pair("ok", serialize_status_oks(res.ok)));
@@ -200,12 +258,10 @@ std::string RESTAPI::serialize_report_res(Report_Res& res)
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-    {
-        nok.array.push_back(serialize_generic_nok(res.nok[i].id, res.nok[i].error));
-    }
+        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_report_oks(res.ok)));
+    child.obj.push_back(std::make_pair("ok", serialize_report_ok(res.ok)));
     child.obj.push_back(std::make_pair("nok", nok));
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -224,9 +280,7 @@ std::string RESTAPI::serialize_retry_res(Retry_Res& res)
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-    {
-        nok.array.push_back(serialize_generic_nok(res.nok[i].id, res.nok[i].error));
-    }
+        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
     child.obj.push_back(std::make_pair("ok", serialize_ids(res.ok)));
@@ -248,9 +302,7 @@ std::string RESTAPI::serialize_clear_res(Clear_Res& res)
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-    {
-        nok.array.push_back(serialize_generic_nok(res.nok[i].id, res.nok[i].error));
-    }
+        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
     child.obj.push_back(std::make_pair("ok", serialize_ids(res.ok)));
@@ -270,7 +322,7 @@ std::string RESTAPI::serialize_clear_res(Clear_Res& res)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-RESTAPI::Check_Req *RESTAPI::parse_check_req(std::string data)
+RESTAPI::Analyze_Req *RESTAPI::parse_analyze_req(std::string data)
 {
     Container::Value v, *child;
 
@@ -280,23 +332,15 @@ RESTAPI::Check_Req *RESTAPI::parse_check_req(std::string data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "CHECK");
+    child = model->get_value_by_key(v, "ANALYZE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
-    Check_Req *req = new Check_Req;
+    Analyze_Req *req = new Analyze_Req;
 
-    Container::Value *args, *schematron;
+    Container::Value *args;
     args = model->get_value_by_key(*child, "args");
-    schematron = model->get_value_by_key(*child, "schematron");
 
-    if (!args || !schematron ||
-        schematron->type != Container::Value::CONTAINER_TYPE_STRING)
-    {
-        delete req;
-        return NULL;
-    }
-    req->schematron = schematron->s;
-    if (parse_check_arg(args, req->args))
+    if (!args || parse_analyze_arg(args, req->args) < 0)
     {
         delete req;
         return NULL;
@@ -329,6 +373,7 @@ RESTAPI::Status_Req *RESTAPI::parse_status_req(std::string data)
         delete req;
         return NULL;
     }
+
     for (size_t i = 0; i < ids->array.size(); ++i)
     {
         Container::Value *id = &ids->array[i];
@@ -358,9 +403,13 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *reports;
+    Container::Value *ids, *reports, *policies_names, *policies_contents, *display_name, *display_content;
     ids = model->get_value_by_key(*child, "ids");
     reports = model->get_value_by_key(*child, "reports");
+    policies_names = model->get_value_by_key(*child, "policies_names");
+    policies_contents = model->get_value_by_key(*child, "policies_contents");
+    display_name = model->get_value_by_key(*child, "display_name");
+    display_content = model->get_value_by_key(*child, "display_content");
 
     if (!ids || !reports || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
@@ -377,11 +426,29 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
         }
         req->ids.push_back(id->l);
     }
-    if (parse_report_arg(reports, req->reports))
+    if (parse_report_reports(reports, req->reports))
     {
         delete req;
         return NULL;
     }
+
+    if (policies_names && policies_names->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < policies_names->array.size(); ++i)
+            if (policies_names->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->policies_names.push_back(policies_names->array[i].s);
+    }
+    if (policies_contents && policies_contents->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < policies_contents->array.size(); ++i)
+            if (policies_contents->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->policies_contents.push_back(policies_contents->array[i].s);
+    }
+    if (display_name && display_name->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->display_name = display_name->s;
+    if (display_content && display_content->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->display_content = display_content->s;
+
     return req;
 }
 
@@ -458,7 +525,88 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Check_Res *RESTAPI::parse_check_res(std::string data)
+RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
+{
+    Analyze_Req *req = new Analyze_Req;
+    //TODO
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Status_Req *RESTAPI::parse_uri_status_req(const std::string& uri)
+{
+    Status_Req *req = new Status_Req;
+
+    size_t end, start = 0;
+    while (1)
+    {
+        end = uri.find("=", start);
+        if (end == std::string::npos || uri.substr(start, end - start) != "id")
+            goto finish;
+        start = end + 1;
+
+        end = uri.find("&", start);
+
+        std::string id = uri.substr(start, end - start);
+        if (!id.length())
+            goto finish;
+
+        req->ids.push_back(strtoll(id.c_str(), NULL, 10));
+        if (end == std::string::npos)
+            goto finish;
+        start = end + 1;
+    }
+
+finish:
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Report_Req *RESTAPI::parse_uri_report_req(const std::string&)
+{
+    Report_Req *req = new Report_Req;
+    //TODO
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Retry_Req *RESTAPI::parse_uri_retry_req(const std::string&)
+{
+    Retry_Req *req = new Retry_Req;
+    //TODO
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
+{
+    Clear_Req *req = new Clear_Req;
+    size_t end, start = 0;
+    while (1)
+    {
+        end = uri.find("=", start);
+        if (end == std::string::npos || uri.substr(start, end - start) != "id")
+            goto finish;
+        start = end + 1;
+
+        end = uri.find("&", start);
+
+        std::string id = uri.substr(start, end - start);
+        if (!id.length())
+            goto finish;
+
+        req->ids.push_back(strtoll(id.c_str(), NULL, 10));
+        if (end == std::string::npos)
+            goto finish;
+        start = end + 1;
+    }
+
+finish:
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(std::string data)
 {
     Container::Value v, *child;
 
@@ -468,7 +616,7 @@ RESTAPI::Check_Res *RESTAPI::parse_check_res(std::string data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "CHECK_RESULT");
+    child = model->get_value_by_key(v, "ANALYZE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -476,8 +624,9 @@ RESTAPI::Check_Res *RESTAPI::parse_check_res(std::string data)
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
-    Check_Res *res = new Check_Res;
-    if (ok && parse_check_ok(ok, res->ok))
+    Analyze_Res *res = new Analyze_Res;
+
+    if (ok && parse_analyze_ok(ok, res->ok))
     {
         delete res;
         return NULL;
@@ -494,9 +643,9 @@ RESTAPI::Check_Res *RESTAPI::parse_check_res(std::string data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Check_Nok tmp;
+        Analyze_Nok *tmp = new Analyze_Nok;
 
-        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
             delete res;
             return NULL;
@@ -543,9 +692,9 @@ RESTAPI::Status_Res *RESTAPI::parse_status_res(std::string data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Status_Nok tmp;
+        Status_Nok *tmp = new Status_Nok;
 
-        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
             delete res;
             return NULL;
@@ -592,9 +741,9 @@ RESTAPI::Report_Res *RESTAPI::parse_report_res(std::string data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Report_Nok tmp;
+        Report_Nok *tmp = new Report_Nok;
 
-        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
             delete res;
             return NULL;
@@ -655,9 +804,9 @@ RESTAPI::Retry_Res *RESTAPI::parse_retry_res(std::string data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Retry_Nok tmp;
+        Retry_Nok *tmp = new Retry_Nok;
 
-        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
             delete res;
             return NULL;
@@ -718,9 +867,9 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Clear_Nok tmp;
+        Clear_Nok *tmp = new Clear_Nok;
 
-        if (parse_generic_nok(&nok->array[i], tmp.id, tmp.error))
+        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
             delete res;
             return NULL;
@@ -735,7 +884,7 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_check_args(std::vector<Check_Arg>& args)
+Container::Value RESTAPI::serialize_analyze_args(std::vector<Analyze_Arg>& args)
 {
     Container::Value args_val;
 
@@ -748,11 +897,12 @@ Container::Value RESTAPI::serialize_check_args(std::vector<Check_Arg>& args)
 
         file.type = Container::Value::CONTAINER_TYPE_STRING;
         file.s = args[i].file;
-        args_val.obj.push_back(std::make_pair("file", file));
+        arg.obj.push_back(std::make_pair("file", file));
 
         id.type = Container::Value::CONTAINER_TYPE_INTEGER;
         id.l = args[i].id;
-        args_val.obj.push_back(std::make_pair("id", id));
+        arg.obj.push_back(std::make_pair("id", id));
+        args_val.array.push_back(arg);
     }
 
     return args_val;
@@ -777,33 +927,52 @@ Container::Value RESTAPI::serialize_ids(std::vector<int>& ids)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_reports(std::vector<Report_Arg>& args)
+Container::Value RESTAPI::serialize_report_reports(std::vector<Report>& reports)
 {
-    Container::Value args_val;
+    Container::Value reports_val;
 
-    args_val.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    reports_val.type = Container::Value::CONTAINER_TYPE_ARRAY;
 
-    for (size_t i = 0; i < args.size(); ++i)
+    for (size_t i = 0; i < reports.size(); ++i)
     {
-        Container::Value arg, kind, offset, length;
-        arg.type = Container::Value::CONTAINER_TYPE_OBJECT;
+        Container::Value report;
 
-        kind.type = Container::Value::CONTAINER_TYPE_STRING;
-        kind.s = get_Report_string(args[i].kind);
-        arg.obj.push_back(std::make_pair("kind", kind));
+        report.type = Container::Value::CONTAINER_TYPE_STRING;
+        report.s = get_Report_string(reports[i]);
 
-        offset.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        offset.l = args[i].has_offset ? args[i].offset : -1;
-        arg.obj.push_back(std::make_pair("offset", offset));
-
-        length.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        length.l = args[i].has_length ? args[i].length : -1;
-        arg.obj.push_back(std::make_pair("length", length));
-
-        args_val.array.push_back(arg);
+        reports_val.array.push_back(report);
     }
 
-    return args_val;
+    return reports_val;
+}
+
+//---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_report_string(const std::string& reports)
+{
+    Container::Value str_val;
+
+    str_val.type = Container::Value::CONTAINER_TYPE_STRING;
+    str_val.s = reports;
+
+    return str_val;
+}
+
+//---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_report_arr_str(const std::vector<std::string>& reports)
+{
+    Container::Value arr_val;
+
+    arr_val.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        Container::Value str_val;
+
+        str_val.type = Container::Value::CONTAINER_TYPE_STRING;
+        str_val.s = reports[i];
+        arr_val.array.push_back(str_val);
+    }
+
+    return arr_val;
 }
 
 //---------------------------------------------------------------------------
@@ -824,7 +993,7 @@ Container::Value RESTAPI::serialize_generic_nok(int id, Reason error)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_check_oks(std::vector<Check_Ok>& array)
+Container::Value RESTAPI::serialize_analyze_oks(std::vector<Analyze_Ok*>& array)
 {
     Container::Value ok;
 
@@ -832,17 +1001,25 @@ Container::Value RESTAPI::serialize_check_oks(std::vector<Check_Ok>& array)
 
     for (size_t i = 0; i < array.size(); ++i)
     {
-        Container::Value v, in, out;
+        if (!array[i])
+            continue;
+
+        Container::Value v, in, out, create;
 
         v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         in.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        in.l = array[i].inId;
+        in.l = array[i]->inId;
         v.obj.push_back(std::make_pair("inId", in));
 
         out.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        out.l = array[i].outId;
+        out.l = array[i]->outId;
         v.obj.push_back(std::make_pair("outId", out));
+
+        create.type = Container::Value::CONTAINER_TYPE_BOOL;
+        create.b = array[i]->create;
+        v.obj.push_back(std::make_pair("create", create));
+
         ok.array.push_back(v);
     }
 
@@ -850,7 +1027,7 @@ Container::Value RESTAPI::serialize_check_oks(std::vector<Check_Ok>& array)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok>& array)
+Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok*>& array)
 {
     Container::Value ok;
 
@@ -858,23 +1035,26 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok>& array)
 
     for (size_t i = 0; i < array.size(); ++i)
     {
-        Container::Value v, id, finished, validity;
+        if (!array[i])
+            continue;
+
+        Container::Value v, id, finished, done;
 
         v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        id.l = array[i].id;
+        id.l = array[i]->id;
         v.obj.push_back(std::make_pair("id", id));
 
         finished.type = Container::Value::CONTAINER_TYPE_BOOL;
-        finished.b = array[i].finished;
+        finished.b = array[i]->finished;
         v.obj.push_back(std::make_pair("finished", finished));
 
-        if (array[i].has_validity)
+        if (array[i]->has_percent)
         {
-            validity.type = Container::Value::CONTAINER_TYPE_BOOL;
-            validity.b = array[i].validity;
-            v.obj.push_back(std::make_pair("validity", validity));
+            done.type = Container::Value::CONTAINER_TYPE_REAL;
+            done.d = array[i]->done;
+            v.obj.push_back(std::make_pair("done", done));
         }
 
         ok.array.push_back(v);
@@ -884,58 +1064,31 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok>& array)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_oks(std::vector<Report_Ok>& array)
+Container::Value RESTAPI::serialize_report_ok(Report_Ok& obj)
 {
     Container::Value ok;
 
-    ok.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    ok.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    Container::Value report, valid;
 
-    for (size_t i = 0; i < array.size(); ++i)
+    if (obj.report.length() > 0)
     {
-        Container::Value v, id, policy, implementation, mi_xml, mediatrace;
-
-        v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-
-        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        id.l = array[i].id;
-        v.obj.push_back(std::make_pair("id", id));
-
-        if (array[i].policy.length() > 0)
-        {
-            policy.type = Container::Value::CONTAINER_TYPE_STRING;
-            policy.s = array[i].policy;
-            v.obj.push_back(std::make_pair("policy", policy));
-        }
-
-        if (array[i].implementation.length() > 0)
-        {
-            implementation.type = Container::Value::CONTAINER_TYPE_STRING;
-            implementation.s = array[i].implementation;
-            v.obj.push_back(std::make_pair("implementation", implementation));
-        }
-
-        if (array[i].mi_xml.length() > 0)
-        {
-            mi_xml.type = Container::Value::CONTAINER_TYPE_STRING;
-            mi_xml.s = array[i].mi_xml;
-            v.obj.push_back(std::make_pair("mi_xml", mi_xml));
-        }
-
-        if (array[i].mediatrace.length() > 0)
-        {
-            mediatrace.type = Container::Value::CONTAINER_TYPE_STRING;
-            mediatrace.s = array[i].mediatrace;
-            v.obj.push_back(std::make_pair("mediatrace", mediatrace));
-        }
-
-        ok.array.push_back(v);
+        report.type = Container::Value::CONTAINER_TYPE_STRING;
+        report.s = obj.report;
+        ok.obj.push_back(std::make_pair("report", report));
     }
 
+    if (obj.has_valid)
+    {
+        valid.type = Container::Value::CONTAINER_TYPE_BOOL;
+        valid.b = obj.valid;
+        ok.obj.push_back(std::make_pair("valid", valid));
+    }
     return ok;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_check_arg(Container::Value *v, std::vector<Check_Arg>& args)
+int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& args)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -956,7 +1109,7 @@ int RESTAPI::parse_check_arg(Container::Value *v, std::vector<Check_Arg>& args)
             id->type != Container::Value::CONTAINER_TYPE_INTEGER)
             return -1;
 
-        Check_Arg arg;
+        Analyze_Arg arg;
         arg.file = file->s;
         arg.id = id->l;
         args.push_back(arg);
@@ -966,7 +1119,7 @@ int RESTAPI::parse_check_arg(Container::Value *v, std::vector<Check_Arg>& args)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_report_arg(Container::Value *v, std::vector<Report_Arg>& args)
+int RESTAPI::parse_report_reports(Container::Value *v, std::vector<Report>& reports)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -975,32 +1128,10 @@ int RESTAPI::parse_report_arg(Container::Value *v, std::vector<Report_Arg>& args
     {
         Container::Value *obj = &v->array[i];
 
-        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        if (obj->type != Container::Value::CONTAINER_TYPE_STRING)
             return -1;
 
-        Container::Value *kind, *offset, *length;
-
-        kind = model->get_value_by_key(*obj, "kind");
-        offset = model->get_value_by_key(*obj, "offset");
-        length = model->get_value_by_key(*obj, "length");
-
-        if (!kind || kind->type != Container::Value::CONTAINER_TYPE_STRING)
-            return -1;
-
-        Report_Arg arg;
-        arg.kind = string_to_Report(kind->s);
-
-        if (offset && offset->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        {
-            arg.offset = offset->l;
-            arg.has_offset = true;
-        }
-        if (length && length->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        {
-            arg.length = length->l;
-            arg.has_length = true;
-        }
-        args.push_back(arg);
+        reports.push_back(string_to_Report(obj->s));
     }
 
     return 0;
@@ -1027,7 +1158,7 @@ int RESTAPI::parse_generic_nok(Container::Value *v, int& id, Reason& error)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_check_ok(Container::Value *v, std::vector<Check_Ok>& oks)
+int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Analyze_Ok*>& oks)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -1039,18 +1170,21 @@ int RESTAPI::parse_check_ok(Container::Value *v, std::vector<Check_Ok>& oks)
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *inId, *outId;
+        Container::Value *inId, *outId, *create;
 
         inId = model->get_value_by_key(*obj, "inId");
         outId = model->get_value_by_key(*obj, "outId");
+        create = model->get_value_by_key(*obj, "create");
 
         if (!inId || inId->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !outId || outId->type != Container::Value::CONTAINER_TYPE_INTEGER)
             return -1;
 
-        Check_Ok ok;
-        ok.inId = inId->l;
-        ok.outId = outId->l;
+        Analyze_Ok *ok = new Analyze_Ok;
+        ok->inId = inId->l;
+        ok->outId = outId->l;
+        if (create && create->type == Container::Value::CONTAINER_TYPE_BOOL)
+            ok->create = create->b;
 
         oks.push_back(ok);
     }
@@ -1059,7 +1193,7 @@ int RESTAPI::parse_check_ok(Container::Value *v, std::vector<Check_Ok>& oks)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok>& oks)
+int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& oks)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -1071,28 +1205,31 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok>& oks)
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *id, *finished, *validity;
+        Container::Value *id, *finished, *done;
 
         id = model->get_value_by_key(*obj, "id");
         finished = model->get_value_by_key(*obj, "finished");
-        validity = model->get_value_by_key(*obj, "validity");
+        done = model->get_value_by_key(*obj, "done");
 
         if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !finished || finished->type != Container::Value::CONTAINER_TYPE_BOOL)
             return -1;
 
-        Status_Ok ok;
-        ok.id = id->l;
-        ok.finished = finished->b;
+        Status_Ok *ok = new Status_Ok;
+        ok->id = id->l;
+        ok->finished = finished->b;
 
-        if (!validity)
-            ok.has_validity = false;
-        else if (validity->type == Container::Value::CONTAINER_TYPE_BOOL)
+        if (!done)
+            ok->has_percent = false;
+        else if (done->type == Container::Value::CONTAINER_TYPE_REAL)
         {
-            if (!ok.finished)
-                return -1;
-            ok.has_validity = true;
-            ok.validity = validity->b;
+            ok->has_percent = true;
+            ok->done = done->d;
+        }
+        else if (done->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            ok->has_percent = true;
+            ok->done = (double)done->l;
         }
         else
             return -1;
@@ -1104,58 +1241,29 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok>& oks)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_report_ok(Container::Value *v, std::vector<Report_Ok>& oks)
+int RESTAPI::parse_report_ok(Container::Value *v, Report_Ok& ok)
 {
-    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return -1;
 
-    for (size_t i = 0; i < v->array.size(); ++i)
+    Container::Value *report, *valid;
+
+    report = model->get_value_by_key(*v, "report");
+    valid = model->get_value_by_key(*v, "valid");
+
+    if (report)
     {
-        Container::Value *obj = &v->array[i];
-
-        if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        if (report->type != Container::Value::CONTAINER_TYPE_STRING)
             return -1;
+        ok.report = report->s;
+    }
 
-        Container::Value *id, *policy, *implementation, *mi_xml, *mediatrace;
-
-        id = model->get_value_by_key(*obj, "id");
-        policy = model->get_value_by_key(*obj, "policy");
-        implementation = model->get_value_by_key(*obj, "implementation");
-        mi_xml = model->get_value_by_key(*obj, "mi_xml");
-        mediatrace = model->get_value_by_key(*obj, "mediatrace");
-
-        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    if (valid)
+    {
+        if (valid->type != Container::Value::CONTAINER_TYPE_BOOL)
             return -1;
-
-        Report_Ok ok;
-        ok.id = id->l;
-
-        if (policy)
-        {
-            if (policy->type != Container::Value::CONTAINER_TYPE_STRING)
-                return -1;
-            ok.policy = policy->s;
-        }
-        if (implementation)
-        {
-            if (implementation->type != Container::Value::CONTAINER_TYPE_STRING)
-                return -1;
-            ok.implementation = implementation->s;
-        }
-        if (mi_xml)
-        {
-            if (mi_xml->type != Container::Value::CONTAINER_TYPE_STRING)
-                return -1;
-            ok.mi_xml = mi_xml->s;
-        }
-        if (mediatrace)
-        {
-            if (mediatrace->type != Container::Value::CONTAINER_TYPE_STRING)
-                return -1;
-            ok.mediatrace = mediatrace->s;
-        }
-
-        oks.push_back(ok);
+        ok.has_valid = true;
+        ok.valid = valid->b;
     }
 
     return 0;

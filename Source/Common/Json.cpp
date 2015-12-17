@@ -39,7 +39,7 @@ Json::~Json()
 }
 
 //---------------------------------------------------------------------------
-int Json::parse(std::string data, Value &v)
+int Json::parse(const std::string& data, Value &v)
 {
     json_error_t err;
     json_t       *elements = NULL;
@@ -84,7 +84,7 @@ std::string Json::serialize(Value &v)
 }
 
 //---------------------------------------------------------------------------
-Container::Value* Json::get_value_by_key(Value& v, std::string key)
+Container::Value* Json::get_value_by_key(Value& v, const std::string& key)
 {
     if (v.type != Value::CONTAINER_TYPE_OBJECT)
         return NULL;
@@ -97,7 +97,7 @@ Container::Value* Json::get_value_by_key(Value& v, std::string key)
 }
 
 //---------------------------------------------------------------------------
-Container::Value* Json::get_value_in_array_by_key(Value& v, std::string key)
+Container::Value* Json::get_value_in_array_by_key(Value& v, const std::string& key)
 {
     if (v.type != Value::CONTAINER_TYPE_ARRAY)
         return NULL;

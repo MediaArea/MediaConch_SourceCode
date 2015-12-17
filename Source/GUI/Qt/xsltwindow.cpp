@@ -107,15 +107,15 @@ void XsltWindow::delete_policy()
         return;
 
     // Internal data
-    Policy *p = mainwindow->get_policies().policies[row];
+    Policy *p = mainwindow->get_policy(row);
     p->saved = true;
     for (size_t i = 0; i < ((XsltPolicy*)p)->rules.size(); ++i)
         delete ((XsltPolicy*)p)->rules[i];
     ((XsltPolicy*)p)->rules.clear();
 
-    QFile file(QString().fromStdString(mainwindow->get_policies().policies[row]->filename));
+    QFile file(QString().fromStdString(mainwindow->get_policy(row)->filename));
     file.remove();
-    mainwindow->get_policies().policies.erase(mainwindow->get_policies().policies.begin() + row);
+    mainwindow->remove_policy(row);
 
     // Visual
     policieswindow->policy_deleted(item, row);
@@ -132,11 +132,11 @@ void XsltWindow::duplicate_policy()
     if (row < 0)
         return;
 
-    Policy *p = new XsltPolicy((XsltPolicy*)mainwindow->get_policies().policies[row]);
+    Policy *p = new XsltPolicy((XsltPolicy*)mainwindow->get_policy(row));
 
     p->title = p->title + string(" (Copy)");
 
-    mainwindow->get_policies().policies.push_back(p);
+    mainwindow->add_policy(p);
     policieswindow->new_policy_filename(p);
 
     QTreeWidgetItem* parent = item->parent();
@@ -170,8 +170,8 @@ void XsltWindow::add_new_rule()
     QString name = QString().fromStdString(r->title);
     QTreeWidgetItem* item = new QTreeWidgetItem(parent, QStringList(name));
 
-    mainwindow->get_policies().policies[rowPolicy]->saved = false;
-    ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules.push_back(r);
+    mainwindow->get_policy(rowPolicy)->saved = false;
+    ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules.push_back(r);
     parent->setExpanded(true);
     parent->setSelected(false);
     item->setSelected(true);
@@ -189,7 +189,7 @@ void XsltWindow::duplicate_rule()
     if (rowPolicy < 0 || row < 0)
         return;
 
-    XsltPolicy* p = (XsltPolicy*)mainwindow->get_policies().policies[rowPolicy];
+    XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(rowPolicy);
     XsltRule *r = new XsltRule(*p->rules[row]);
 
     r->title = r->title + string(" (Copy)");
@@ -217,7 +217,7 @@ void XsltWindow::delete_rule()
 
     policieswindow->disconnectPoliciesTreeSelectionChanged();
     // Internal data
-    XsltPolicy* p = (XsltPolicy*)mainwindow->get_policies().policies[rowPolicy];
+    XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(rowPolicy);
     p->rules.erase(p->rules.begin() + row);
     p->saved = false;
 
@@ -255,7 +255,7 @@ void XsltWindow::edit_policy_title()
     if (row < 0)
         return;
 
-    Policy *p = mainwindow->get_policies().policies[row];
+    Policy *p = mainwindow->get_policy(row);
     if (p->title != qtitle.toStdString())
     {
         p->title = qtitle.toStdString();
@@ -279,7 +279,7 @@ void XsltWindow::edit_policy_description()
     if (row < 0)
         return;
 
-    Policy *p = mainwindow->get_policies().policies[row];
+    Policy *p = mainwindow->get_policy(row);
     if (p->description != qdescription.toStdString())
     {
         p->description = qdescription.toStdString();
@@ -342,14 +342,15 @@ void XsltWindow::displayPolicyMenu(QString title)
 
     policyMenu->get_savePolicy_button()->setEnabled(false);
     int index = policieswindow->get_index_in_tree();
-    if (index >= 0 && index < (int)mainwindow->get_policies().policies.size())
+    if (index >= 0 && index < (int)mainwindow->get_policies_count())
     {
-        if (mainwindow->get_policies().policies[index])
+        Policy* p = mainwindow->get_policy(index);
+        if (p)
         {
-            if (mainwindow->get_policies().policies[index]->filename.length())
+            if (p->filename.length())
                 policyMenu->get_savePolicy_button()->setEnabled(true);
             QLineEdit* descr = policyMenu->get_description_line();
-            descr->setText(QString().fromStdString(mainwindow->get_policies().policies[index]->description));
+            descr->setText(QString().fromStdString(p->description));
         }
     }
 }
@@ -381,11 +382,11 @@ void XsltWindow::edit_rule_name(QString new_name)
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
     if (r->title != new_name.toStdString())
     {
         r->title = new_name.toStdString();
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        mainwindow->get_policy(rowPolicy)->saved = false;
         QString name = QString().fromStdString(r->title);
         item->setText(0, name);
     }
@@ -403,11 +404,11 @@ void XsltWindow::edit_rule_type()
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
     if (r->type != ruleEdit->get_type_select()->currentText().toStdString())
     {
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        mainwindow->get_policy(rowPolicy)->saved = false;
         r->type = ruleEdit->get_type_select()->currentText().toStdString();
         ruleEdit->change_values_of_field_selector();
     }
@@ -425,11 +426,11 @@ void XsltWindow::edit_rule_field()
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
     if (r->field != ruleEdit->get_field_select()->currentText().toStdString())
     {
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        mainwindow->get_policy(rowPolicy)->saved = false;
         r->field = ruleEdit->get_field_select()->currentText().toStdString();
     }
 }
@@ -446,11 +447,11 @@ void XsltWindow::edit_rule_operator()
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
     if (r->ope != ruleEdit->get_operator_select()->currentText().toStdString())
     {
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        mainwindow->get_policy(rowPolicy)->saved = false;
         r->ope = ruleEdit->get_operator_select()->currentText().toStdString();
     }
 }
@@ -467,11 +468,11 @@ void XsltWindow::edit_rule_value()
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
     if (r->value != ruleEdit->get_value_line()->text().toStdString())
     {
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        mainwindow->get_policy(rowPolicy)->saved = false;
         r->value = ruleEdit->get_value_line()->text().toStdString();
     }
 }
@@ -488,11 +489,11 @@ void XsltWindow::edit_rule_occurrence()
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
     if (r->occurrence != ruleEdit->get_occurrence_box()->value())
     {
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        mainwindow->get_policy(rowPolicy)->saved = false;
         r->occurrence = ruleEdit->get_occurrence_box()->value();
     }
 }
@@ -509,11 +510,11 @@ void XsltWindow::edit_rule_freeText()
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
     if (r->text != ruleEdit->get_freeText_text()->toPlainText().toStdString())
     {
-        mainwindow->get_policies().policies[rowPolicy]->saved = false;
+        mainwindow->get_policy(rowPolicy)->saved = false;
         r->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
         r->use_free_text = true;
     }
@@ -534,7 +535,7 @@ void XsltWindow::rule_free_text_selected(bool checked)
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
     r->use_free_text = true;
     ruleEdit->rule_clicked(r);
 }
@@ -554,7 +555,7 @@ void XsltWindow::rule_editor_selected(bool checked)
     if (row < 0 || rowPolicy < 0)
         return;
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[row];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
     r->use_free_text = false;
     ruleEdit->rule_clicked(r);
 }
@@ -564,7 +565,7 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
 {
     createRuleEdit();
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policies().policies[rowPolicy])->rules[rowRule];
+    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[rowRule];
     ruleEdit->rule_clicked(r);
 
     QObject::connect(ruleEdit->get_name_line(), SIGNAL(textEdited(QString)),

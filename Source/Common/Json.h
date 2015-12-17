@@ -46,10 +46,10 @@ public:
     Json();
     ~Json();
 
-    virtual int parse(std::string data, Value &v);
+    virtual int parse(const std::string& data, Value &v);
     virtual std::string serialize(Value &v);
-    virtual Value* get_value_by_key(Value& v, std::string key);
-    virtual Value* get_value_in_array_by_key(Value& v, std::string key);
+    virtual Value* get_value_by_key(Value& v, const std::string& key);
+    virtual Value* get_value_in_array_by_key(Value& v, const std::string& key);
     
 private:
     json_t       *current_node;

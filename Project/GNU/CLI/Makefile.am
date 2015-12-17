@@ -3,9 +3,12 @@ AUTOMAKE_OPTIONS = foreign
 bin_PROGRAMS = mediaconch
 mediaconch_SOURCES = \
     ../../../Source/CLI/CLI_Main.cpp \
+    ../../../Source/CLI/CLI.cpp \
     ../../../Source/CLI/CommandLine_Parser.cpp \
     ../../../Source/CLI/Help.cpp \
+    ../../../Source/Common/MediaConchLib.cpp \
     ../../../Source/Common/Core.cpp \
+    ../../../Source/Common/DaemonClient.cpp \
     ../../../Source/Common/Schema.cpp \
     ../../../Source/Common/Schematron.cpp \
     ../../../Source/Common/Xslt.cpp \

@@ -13,23 +13,25 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "Common/Core.h"
-#include "CommandLine_Parser.h"
-#include "Help.h"
+#ifdef MEDIAINFO_DLL_RUNTIME
+    #include "MediaInfoDLL/MediaInfoDLL.h"
+    #define MediaInfoNameSpace MediaInfoDLL
+#elif defined MEDIAINFO_DLL_STATIC
+    #include "MediaInfoDLL/MediaInfoDLL_Static.h"
+    #define MediaInfoNameSpace MediaInfoDLL
+#else
+    #include "MediaInfo/MediaInfoList.h"
+    #define MediaInfoNameSpace MediaInfoLib
+#endif
 #if defined(_MSC_VER) && defined(UNICODE)
     #include "io.h"
     #include "fcntl.h"
 #endif
-using namespace std;
-using namespace MediaInfoNameSpace;
+#include "CLI.h"
+#include "CommandLine_Parser.h"
+#include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/MediaInfo_Events.h"
 //---------------------------------------------------------------------------
-
-//****************************************************************************
-// Extern
-//****************************************************************************
-
-extern ZenLib::Ztring LogFile_FileName;
 
 //****************************************************************************
 // Event to manage
@@ -38,7 +40,7 @@ extern ZenLib::Ztring LogFile_FileName;
 void Log_0 (struct MediaInfo_Event_Log_0* Event, struct UserHandle_struct* UserHandler)
 {
     (void)UserHandler;
-    String MessageString;
+    MediaInfoLib::String MessageString;
 
     if (Event->Type>=0xC0)
         MessageString+=__T("E: ");
@@ -97,73 +99,37 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
 // Main
 //***************************************************************************
 
+//---------------------------------------------------------------------------
 int main(int argc, char* argv_ansi[])
 {
     //Localisation
     setlocale(LC_ALL, "");
-    MediaInfo::Option_Static(__T("CharSet"), __T(""));
+    MediaInfoLib::MediaInfo::Option_Static(__T("CharSet"), __T(""));
 
     //Initialize terminal (to fix Unicode output on Win32)
     #if defined(_MSC_VER) && defined(UNICODE)
         _setmode(_fileno(stdout), _O_U8TEXT);
         _setmode(_fileno(stderr), _O_U8TEXT);
     #endif
-    MediaInfo::Option_Static(__T("LineSeparator"), __T("\n")); //Using sdtout
-
-    //Configure MediaConch core
-    MediaConch::Core MI;
-    MI.load_configuration();
+    MediaInfoLib::MediaInfo::Option_Static(__T("LineSeparator"), __T("\n")); //Using sdtout
 
     // TODO: Retrieve command line (mainly for Unicode)
     // GETCOMMANDLINE();
 
-    //Parse command line
-    for (int Pos=1; Pos<argc; Pos++)
-    {
-        //First part of argument (before "=") should be case insensitive
-        std::string Argument(argv_ansi[Pos]);
-        if (!Argument.compare(0, 1, "-"))
-        {
-            size_t Egal_Pos=Argument.find('=');
-            if (Egal_Pos==string::npos)
-                Egal_Pos=Argument.size();
-            transform(Argument.begin(), Argument.begin()+Egal_Pos, Argument.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
-        }
-        int Return=Parse (MI, Argument);
-        if (Return<0)
-            return Return; //no more tasks to do
+    MediaConch::CLI cli;
 
-        if (Return>0)
-            MI.List.push_back(argv_ansi[Pos]); //Append the filename to the list of filenames to parse
-    }
+    if (cli.parse_args(argc, argv_ansi) < 0)
+        return 1;
 
-    //If no filenames (and no options)
-    if (MI.List.empty())
-        return Help_Nothing();
-
-    std::string CombinationTest=MI.ReportAndFormatCombination_IsValid();
-    if (!CombinationTest.empty())
-    {
-        STRINGOUT(Ztring().From_UTF8(CombinationTest));
-        return -1;
-    }
+    if (cli.init() < 0)
+        return 1;
 
     //Callback for error handling
-    CallBack_Set(MI, (void*)Event_CallBackFunction);
+    CallBack_Set(&cli, (void*)Event_CallBackFunction);
 
-    for (size_t i = 0; i < MI.List.size(); ++i)
-        MI.Run(MI.List[i]);
+    cli.run();
 
-    // In CLI mode, wait it is finished
-    MI.WaitRunIsFinished();
-
-    //Output
-    STRINGOUT(Ztring().From_UTF8(MI.GetOutput()));
-
-    //Output, in a file if needed
-    if (!LogFile_FileName.empty())
-        LogFile_Action(Ztring().From_UTF8(MI.GetOutput()));
+    cli.finish();
 
     return 0;
 }
-//---------------------------------------------------------------------------

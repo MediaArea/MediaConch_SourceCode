@@ -26,7 +26,10 @@
 
 //---------------------------------------------------------------------------
 
-namespace MediaConch {
+namespace MediaConch
+{
+
+class MediaConchLib;
 
 //***************************************************************************
 // Class LibEventHttpd
@@ -36,7 +39,7 @@ class LibEventHttpd : public Httpd
 {
 public:
     //Constructor/Destructor
-    LibEventHttpd();
+    LibEventHttpd(void* arg);
     virtual ~LibEventHttpd();
 
     int init();
@@ -52,6 +55,11 @@ private:
 
     static void request_coming(struct evhttp_request *req, void *arg);
     int get_body(struct evhttp_request *req, std::string& json, std::string& ret_msg);
+    void request_get_coming(struct evhttp_request *req);
+    void request_post_coming(struct evhttp_request *req);
+    void request_put_coming(struct evhttp_request *req);
+    void request_delete_coming(struct evhttp_request *req);
+    int  uri_api_version_is_valid(std::string& uri, struct evhttp_request *req);
 
     LibEventHttpd (const LibEventHttpd&);
     LibEventHttpd& operator=(const LibEventHttpd&);

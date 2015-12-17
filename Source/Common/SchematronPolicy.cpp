@@ -301,17 +301,26 @@ SchematronAssert* SchematronPolicy::create_assert_from_data(std::string descr, s
 }
 
 //---------------------------------------------------------------------------
-std::string SchematronPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
+int SchematronPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
 {
     if (!doc)
-        return "The schematron doc is not valid";
+    {
+        error = "The schematron doc is not valid";
+        return -1;
+    }
 
     xmlNodePtr root = xmlDocGetRootElement(doc);
     if (!root)
-        return "No root node, leaving";
+    {
+        error = "No root node, leaving";
+        return -1;
+    }
 
     if (!find_schematron_header(root))
-        return "Format not detected";
+    {
+        error = "Format not detected";
+        return -1;
+    }
 
     this->filename = filename;
     xmlNodePtr child = root->children;
@@ -333,13 +342,14 @@ std::string SchematronPolicy::import_schema_from_doc(const std::string& filename
         if (end_index != std::string::npos)
             title = title.substr(0, end_index);
     }
+
     while (child)
     {
         find_patterns_node(child, patterns);
         child = child->next;
     }
     xmlSetGenericErrorFunc(NULL, NULL);
-    return std::string();
+    return 0;
 }
 
 //---------------------------------------------------------------------------

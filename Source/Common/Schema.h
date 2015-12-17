@@ -36,7 +36,7 @@ public:
     virtual bool register_schema_from_memory(const std::string& schem) = 0;
     virtual bool register_schema_from_doc(void* doc) = 0;
 
-    virtual int  validate_xml(std::string& xml, bool silent=true) = 0;
+    virtual int  validate_xml(const std::string& xml, bool silent=true) = 0;
     virtual int  validate_xml_from_file(const char* file, bool silent=true);
 
     std::string  get_schema() const { return schema; }
@@ -49,7 +49,7 @@ protected:
     std::vector<std::string> errors;
 
     // HELPER
-    std::string  read_file(const char* filename);
+    int          read_file(const char* filename, std::string& buffer);
 
 private:
     Schema(const Schema&);

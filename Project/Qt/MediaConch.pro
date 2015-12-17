@@ -18,7 +18,8 @@ CONFIG += no_keywords
 
 DEFINES          +=  _UNICODE
 
-SOURCES          += ../../Source/Common/Core.cpp \
+SOURCES          += ../../Source/Common/MediaConchLib.cpp \
+                    ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schema.cpp \
                     ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Xslt.cpp \
@@ -39,6 +40,7 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/Common/LibEventHttp.cpp \
                     ../../Source/Common/Scheduler.cpp \
                     ../../Source/Common/Queue.cpp \
+                    ../../Source/Common/DaemonClient.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/WebPage.cpp \
                     ../../Source/GUI/Qt/WebView.cpp \
@@ -62,7 +64,8 @@ SOURCES          += ../../Source/Common/Core.cpp \
                     ../../Source/GUI/Qt/displaymenu.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp
 
-HEADERS          += ../../Source/Common/Core.h \
+HEADERS          += ../../Source/Common/MediaConchLib.h \
+                    ../../Source/Common/Core.h \
                     ../../Source/Common/Schema.h \
                     ../../Source/Common/Schematron.h \
                     ../../Source/Common/Xslt.h \
@@ -89,6 +92,7 @@ HEADERS          += ../../Source/Common/Core.h \
                     ../../Source/Common/LibEventHttp.h \
                     ../../Source/Common/Scheduler.h \
                     ../../Source/Common/Queue.h \
+                    ../../Source/Common/DaemonClient.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/helpwindow.h \

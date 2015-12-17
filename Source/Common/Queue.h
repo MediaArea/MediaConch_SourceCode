@@ -32,9 +32,6 @@
 #include <map>
 #include <list>
 
-using namespace MediaInfoNameSpace;
-using namespace ZenLib;
-
 namespace MediaConch
 {
     //***************************************************************************
@@ -44,18 +41,20 @@ namespace MediaConch
     class Queue;
     class Scheduler;
 
-    class QueueElement : public Thread
+    class QueueElement : public ZenLib::Thread
     {
     public:
-        QueueElement(Scheduler *s) : Thread(), scheduler(s) {}
-        virtual ~QueueElement() {}
+        QueueElement(Scheduler *s);
+        virtual ~QueueElement();
         int          id;
         std::string  filename;
 
         void         Entry();
+        double       percent_done();
 
     private:
-        Scheduler*   scheduler;
+        Scheduler*                         scheduler;
+        MediaInfoNameSpace::MediaInfoList *MI;
     };
 
     //***************************************************************************
@@ -80,9 +79,10 @@ namespace MediaConch
         Queue(Scheduler *s) : scheduler(s){}
         ~Queue();
 
-        int add_element(QueuePriority priority, int id, std::string filename);
+        int add_element(QueuePriority priority, int id, const std::string& filename);
+        bool has_element(const std::string& filename);
         int remove_element(int id);
-        int remove_elements(std::string filename);
+        int remove_elements(const std::string& filename);
         void clear();
 
         QueueElement* run_next();

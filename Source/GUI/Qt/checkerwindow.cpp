@@ -36,6 +36,7 @@
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
+#include <unistd.h>
 
 namespace MediaConch {
 
@@ -63,8 +64,8 @@ CheckerWindow::~CheckerWindow()
 //---------------------------------------------------------------------------
 void CheckerWindow::checker_add_file(QString& file, int policy)
 {
-    mainwindow->addFileToList(file);
-    updateWebView(file.toStdString(), policy);
+    mainwindow->add_file_to_list(file);
+    update_web_view(file.toStdString(), policy);
 }
 
 //---------------------------------------------------------------------------
@@ -73,19 +74,19 @@ void CheckerWindow::checker_add_files(QFileInfoList& list, int policy)
     for (int i = 0; i < list.count(); ++i)
     {
         QString file = list[i].absoluteFilePath();
-        mainwindow->addFileToList(file);
+        mainwindow->add_file_to_list(file);
     }
-    updateWebView(list, policy);
+    update_web_view(list, policy);
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::checker_add_policy_file(QString& file, QString& policy)
 {
-    mainwindow->addFileToList(file);
+    mainwindow->add_file_to_list(file);
 
-    mainwindow->addPolicyToList(policy);
-    updateWebView(file.toStdString(), -1);
-    mainwindow->clearPolicyList();
+    mainwindow->add_policy_to_list(policy);
+    update_web_view(file.toStdString(), -1);
+    mainwindow->clear_policy_list();
 }
 
 //---------------------------------------------------------------------------
@@ -94,11 +95,11 @@ void CheckerWindow::checker_add_policy_files(QFileInfoList& list, QString& polic
     for (int i = 0; i < list.count(); ++i)
     {
         QString file = list[i].absoluteFilePath();
-        mainwindow->addFileToList(file);
+        mainwindow->add_file_to_list(file);
     }
-    mainwindow->addPolicyToList(policy);
-    updateWebView(list, -1);
-    mainwindow->clearPolicyList();
+    mainwindow->add_policy_to_list(policy);
+    update_web_view(list, -1);
+    mainwindow->clear_policy_list();
 }
 
 //---------------------------------------------------------------------------
@@ -114,9 +115,9 @@ bool CheckerWindow::is_analyzes_done()
 //---------------------------------------------------------------------------
 void CheckerWindow::actionCloseAllTriggered()
 {
-    mainwindow->clearFileList();
+    mainwindow->clear_file_list();
     clearVisualElements();
-    createWebView();
+    create_web_view();
     analyse = false;
 }
 
@@ -158,9 +159,9 @@ void CheckerWindow::createWebViewFinished(bool ok)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::setWebViewContent(QString& html)
+void CheckerWindow::set_web_view_content(QString& html)
 {
-    MainView=new WebView(mainwindow);
+    MainView = new WebView(mainwindow);
 
     WebPage* page = new WebPage(mainwindow, MainView);
     MainView->setPage(page);
@@ -176,7 +177,7 @@ void CheckerWindow::setWebViewContent(QString& html)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::createWebView()
+void CheckerWindow::create_web_view()
 {
     if (MainView)
         return;
@@ -189,11 +190,11 @@ void CheckerWindow::createWebView()
     progressBar->show();
 
     QString html = create_html();
-    setWebViewContent(html);
+    set_web_view_content(html);
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::updateWebView(std::string file, int policy)
+void CheckerWindow::update_web_view(std::string file, int policy)
 {
     if (!MainView)
         return;
@@ -211,20 +212,29 @@ void CheckerWindow::updateWebView(std::string file, int policy)
     progressBar->get_progress_bar()->setMaximum(100);
 
     // Analyze
-    mainwindow->analyze(file);
+    std::vector<std::string> files;
+    files.push_back(file);
+    mainwindow->analyze(files);
 
-    // TODO: do not wait until the end of the analyzed
-    mainwindow->wait_analyze_finished();
+    // TODO: do a signal/slot to update percent auto-magically
+    while (1)
+    {
+        double percent_done;
+        if (!mainwindow->is_analyze_finished(files, percent_done))
+            break;
+        progressBar->get_progress_bar()->setValue(percent_done);
+        usleep(50000);
+    }
 
     //Add the file detail to the web page
     add_file_detail_to_html(html, file, policy);
 
-    setWebViewContent(html);
+    set_web_view_content(html);
     analyse = true;
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
+void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
 {
     if (!MainView)
         return;
@@ -240,34 +250,41 @@ void CheckerWindow::updateWebView(QList<QFileInfo>& files, int policy)
     progressBar->get_progress_bar()->setMaximum(0);
 
     // Analyze
+    std::vector<std::string> vfiles;
     for (int i = 0; i < files.count(); ++i)
-    {
-        std::string file = files[i].absoluteFilePath().toStdString();
-        mainwindow->analyze(file);
-    }
+        vfiles.push_back(files[i].absoluteFilePath().toStdString());
 
     progressBar->get_progress_bar()->setMaximum(100);
     progressBar->get_progress_bar()->setValue(1);
-    // TODO: do not wait until the end of the analyzed
-    mainwindow->wait_analyze_finished();
+
+    mainwindow->analyze(vfiles);
+
+    while (1)
+    {
+        double percent_done;
+        if (!mainwindow->is_analyze_finished(vfiles, percent_done))
+            break;
+        progressBar->get_progress_bar()->setValue(percent_done / 2);
+        usleep(50000);
+    }
 
     //Add the files details to the web page
-    QString displayXsltRetain = displayXslt;
+    QString displayXsltRetain = display_xslt;
     for (int i = 0; i < files.count(); ++i)
     {
-        displayXslt = displayXsltRetain;
+        display_xslt = displayXsltRetain;
         std::string file = files[i].absoluteFilePath().toStdString();
         add_file_detail_to_html(html, file, policy);
-        progressBar->get_progress_bar()->setValue(((i + 1) * 100) / files.count());
+        progressBar->get_progress_bar()->setValue(50 + ((i + 1) * 50) / files.count());
     }
-    resetDisplayXslt();
+    reset_display_xslt();
 
-    setWebViewContent(html);
+    set_web_view_content(html);
     analyse = true;
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::changeLocalFiles(QStringList& files)
+void CheckerWindow::change_local_files(QStringList& files)
 {
     if (!MainView || !MainView->page())
         return;
@@ -612,7 +629,9 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, std::strin
         reg = QRegExp("<p class=\"modal-body\">");
         if ((pos = reg.indexIn(html, pos)) != -1)
         {
-            report = mainwindow->get_mediainfo_xml(file);
+            std::string display_name;
+            std::string display_content;
+            report = mainwindow->get_mediainfo_xml(file, display_name, display_content);
 #if QT_VERSION >= 0x050200
             report = report.toHtmlEscaped();
 #else
@@ -628,45 +647,17 @@ void CheckerWindow::change_html_file_detail_inform_xml(QString& html, std::strin
 //---------------------------------------------------------------------------
 void CheckerWindow::change_html_file_detail_conformance(QString& html, std::string& file)
 {
-    QString report = mainwindow->get_implementationreport_xml(file);
-    bool is_valid = true;
+    std::string display_name;
+    std::string display_content;
+    get_displays_use(display_name, display_content);
 
-    if (report.indexOf(" outcome=\"fail\"") != -1)
-        is_valid = false;
+    bool is_valid = true;
+    QString report = mainwindow->get_implementationreport_xml(file, display_name, display_content, is_valid);
+    bool is_html = report_is_html(report);
+    QString save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
 
     // Apply HTML default display
     std::string r = report.toStdString();
-    QString save_ext = "xml";
-    bool is_html = false;
-    if (displayXslt.length())
-    {
-        if (displayXslt.startsWith(":/displays/"))
-        {
-            QFile display_file(displayXslt);
-            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
-            {
-                QByteArray data = display_file.readAll();
-                display_file.close();
-                r = mainwindow->transformWithXsltMemory(r, data.data());
-            }
-        }
-        else
-        {
-            std::string trans = displayXslt.toStdString();
-            r = mainwindow->transformWithXsltFile(r, trans);
-        }
-
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-    }
-    else
-    {
-        r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-    }
 
     if (!is_html)
     {
@@ -716,46 +707,16 @@ void CheckerWindow::change_html_file_detail_policy_report(QString& html, std::st
         return;
     }
 
-    bool valid;
+    std::string display_name;
+    std::string display_content;
+    get_displays_use(display_name, display_content);
+
     std::string r;
-    if (!mainwindow->ValidatePolicy(file, policy, valid, r))
-        valid = false;
-
-    // Default without display
-    QString save_ext("xml");
-    bool is_html = false;
-
+    bool valid = mainwindow->validate_policy(file, policy, display_name, display_content, r);
     QString report = QString().fromUtf8(r.c_str(), r.length());
-    if (displayXslt.length())
-    {
-        if (displayXslt.startsWith(":/displays/"))
-        {
-            QFile display_file(displayXslt);
-            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
-            {
-                QByteArray data = display_file.readAll();
-                display_file.close();
-                r = mainwindow->transformWithXsltMemory(r, data.data());
-            }
-        }
-        else
-        {
-            std::string trans = displayXslt.toStdString();
-            r = mainwindow->transformWithXsltFile(r, trans);
-        }
 
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-        resetDisplayXslt();
-    }
-    else
-    {
-        r = mainwindow->transformWithXsltMemory(r, implementation_report_display_html_xsl);
-        report = QString().fromUtf8(r.c_str(), r.length());
-        is_html = report_is_html(report);
-        save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-    }
+    bool is_html = report_is_html(report);
+    QString save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
 
     QString policy_name;
     if (policy >= 0)
@@ -848,7 +809,9 @@ void CheckerWindow::change_html_file_detail_trace(QString& html, std::string& fi
         reg = QRegExp("<p class=\"modal-body\">");
         if ((pos = reg.indexIn(html, pos)) != -1)
         {
-            report = mainwindow->get_mediatrace_xml(file);
+            std::string display_name;
+            std::string display_content;
+            report = mainwindow->get_mediatrace_xml(file, display_name, display_content);
 #if QT_VERSION >= 0x050200
             report = report.toHtmlEscaped();
 #else
@@ -959,17 +922,6 @@ bool CheckerWindow::report_is_xml(QString& report)
 }
 
 //---------------------------------------------------------------------------
-bool CheckerWindow::implementationreport_is_valid(QString& report)
-{
-    QRegExp reg("Fail \\|", Qt::CaseInsensitive);
-
-    if (reg.indexIn(report, 0) != -1)
-        return false;
-
-    return true;
-}
-
-//---------------------------------------------------------------------------
 void CheckerWindow::change_report_policy_save_name(std::string& file, QString& ext, QString& html)
 {
     QRegExp reg("data-save-name=\"PolicyReport.txt\"");
@@ -991,6 +943,28 @@ QString CheckerWindow::file_remove_ext(std::string& file)
     if ((pos = ret.lastIndexOf('.')) != -1)
         ret.chop(ret.length() - pos);
     return ret;
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::get_displays_use(std::string& display_name, std::string& display_content)
+{
+    if (display_xslt.length())
+    {
+        if (display_xslt.startsWith(":/displays/"))
+        {
+            QFile display_file(display_xslt);
+            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QByteArray data = display_file.readAll();
+                display_file.close();
+                display_content = data.data();
+            }
+        }
+        else
+            display_name = display_xslt.toStdString();
+    }
+    else
+        display_content = implementation_report_display_html_xsl;
 }
 
 }

@@ -99,7 +99,7 @@ bool Xslt::register_schema_from_memory(const std::string& schem)
 }
 
 //---------------------------------------------------------------------------
-int Xslt::validate_xml(std::string& xml, bool)
+int Xslt::validate_xml(const std::string& xml, bool)
 {
     report.clear();
     if (!xslt_ctx)

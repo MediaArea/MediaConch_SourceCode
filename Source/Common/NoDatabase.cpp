@@ -62,7 +62,7 @@ int NoDatabase::create_report_table()
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::save_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification,
+int NoDatabase::save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification,
                           const std::string& report)
 {
     Report* r = new Report;
@@ -89,7 +89,7 @@ int NoDatabase::save_report(Core::report reportKind, Core::format format, const 
 }
 
 //---------------------------------------------------------------------------
-std::string NoDatabase::get_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification)
+std::string NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it == reports_saved.end())
@@ -107,7 +107,18 @@ std::string NoDatabase::get_report(Core::report reportKind, Core::format format,
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabase::file_is_registered(Core::report reportKind, Core::format format,
+int NoDatabase::remove_report(const std::string& filename)
+{
+    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
+    if (it == reports_saved.end())
+        return -1;
+
+    reports_saved.erase(it);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+bool NoDatabase::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& filename, const std::string& file_last_modification)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);

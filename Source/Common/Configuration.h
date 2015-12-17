@@ -21,14 +21,6 @@
 
 namespace MediaConch {
 
-#ifdef WINDOWS
-    const std::string Path_Separator("\\");
-    /* const String WPath_Separator(__T("\\")); */
-#else
-    const std::string Path_Separator("/");
-    /* const String WPath_Separator(__T("/")); */
-#endif
-
 //***************************************************************************
 // Class Configuration
 //***************************************************************************
@@ -42,16 +34,16 @@ public:
     Configuration();
     virtual ~Configuration();
 
-    void set_path(std::string& path);
+    void set_path(const std::string& path);
     int parse();
 
-    int get(std::string key, std::string &val);
-    int get(std::string key, long &val);
-    int get(std::string key, double &val);
-    int get(std::string key, bool &val);
-    int get(std::string key);
-    int get(std::string key, std::vector<Container::Value>& val);
-    int get(std::string key, std::vector<std::pair<std::string, Container::Value> >& val);
+    int get(const std::string& key, std::string &val);
+    int get(const std::string& key, long &val);
+    int get(const std::string& key, double &val);
+    int get(const std::string& key, bool &val);
+    int get(const std::string& key);
+    int get(const std::string& key, std::vector<Container::Value>& val);
+    int get(const std::string& key, std::vector<std::pair<std::string, Container::Value> >& val);
 
     std::string get_error() const;
 private:
@@ -61,7 +53,7 @@ private:
     std::string       error;
     bool              parse_error;
     
-    Container::Value *get_value_for_key(std::string key);
+    Container::Value *get_value_for_key(const std::string& key);
 
     Configuration (const Configuration&);
     Configuration& operator=(const Configuration&);

@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "Common/Core.h"
+#include "CLI.h"
 #include "Config.h"
 //---------------------------------------------------------------------------
 
@@ -18,15 +18,15 @@
 //
 //***************************************************************************
 
-int Parse(MediaConch::Core& I, std::string& Argument);
+int Parse(MediaConch::CLI* cli, std::string& argument);
 
 
 //---------------------------------------------------------------------------
 #define CL_METHOD(_NAME) \
-    int _NAME(MediaConch::Core& MI, const std::string& Argument)
+    int _NAME(MediaConch::CLI* cli, const std::string& argument)
 
 #define CL_OPTION(_NAME) \
-    int _NAME(MediaConch::Core& MI, const std::string& Argument)
+    int _NAME(MediaConch::CLI* cli, const std::string& argument)
 
 CL_OPTION(Help);
 CL_OPTION(Inform);
@@ -46,6 +46,6 @@ CL_OPTION(Default);
 //***************************************************************************
 
 void LogFile_Action(ZenLib::Ztring Inform);
-void CallBack_Set(MediaConch::Core& MI, void* Event_CallBackFunction);
+void CallBack_Set(MediaConch::CLI* cli, void* Event_CallBackFunction);
 
 #endif

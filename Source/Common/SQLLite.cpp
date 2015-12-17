@@ -16,6 +16,7 @@
 //---------------------------------------------------------------------------
 #include "SQLLite.h"
 #include <sstream>
+#include <stdio.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -50,7 +51,10 @@ int SQLLite::init()
     int ret = sqlite3_open(database.c_str(), &db);
     if (ret)
     {
-        fprintf(stderr, "Error to open the DB: %s\n", sqlite3_errmsg(db));
+        std::stringstream err("Error to open the DB: ");
+        err << sqlite3_errmsg(db);
+        errors.push_back(err.str());
+
         sqlite3_close(db);
         db = NULL;
         return -1;
@@ -76,7 +80,7 @@ int SQLLite::create_report_table()
     return execute();
 }
 
-int SQLLite::save_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification,
+int SQLLite::save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification,
                           const std::string& report)
 {
     std::stringstream create;
@@ -93,7 +97,18 @@ int SQLLite::save_report(Core::report reportKind, Core::format format, const std
     return execute();
 }
 
-std::string SQLLite::get_report(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification)
+int SQLLite::remove_report(const std::string& filename)
+{
+    std::stringstream delete_query;
+
+    reports.clear();
+    delete_query << "DELETE FROM " << "Report";
+    delete_query << " WHERE FILENAME = '" << filename << "';";
+    query = delete_query.str();
+    return execute();
+}
+
+std::string SQLLite::get_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification)
 {
     std::stringstream create;
     std::string key("REPORT");
@@ -111,7 +126,7 @@ std::string SQLLite::get_report(Core::report reportKind, Core::format format, co
     return reports[key];
 }
 
-bool SQLLite::file_is_registered(Core::report reportKind, Core::format format, const std::string& filename, const std::string& file_last_modification)
+bool SQLLite::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification)
 {
     std::stringstream create;
     std::string key("COUNT(REPORT)");

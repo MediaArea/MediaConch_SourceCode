@@ -38,8 +38,8 @@ Schema::~Schema()
 //---------------------------------------------------------------------------
 bool Schema::register_schema_from_file(const char* filename)
 {
-    schema = read_file(filename);
-    if (!schema.length()) {
+    if (read_file(filename, schema) < 0)
+    {
         std::stringstream error;
 
         error << "Schema file:'";
@@ -53,30 +53,35 @@ bool Schema::register_schema_from_file(const char* filename)
 }
 
 //---------------------------------------------------------------------------
-std::string Schema::read_file(const char* filename)
+int Schema::read_file(const char* filename, std::string& buffer)
 {
     // open at the end (ate) to get the length of the file
     std::ifstream file_handler(filename, std::ios_base::ate);
-    std::string buffer;
 
-    if (!file_handler) {
-        return buffer;
-    }
-    buffer.reserve(file_handler.tellg());
+    buffer = std::string();
+    if (!file_handler)
+        return -1;
+
+    int size = file_handler.tellg();
+    if (size < 0)
+        return -1;
+    buffer.reserve(size);
     file_handler.seekg(0, file_handler.beg);
 
     buffer.assign(std::istreambuf_iterator<char>(file_handler),
                   std::istreambuf_iterator<char>());
     file_handler.close();
-    return buffer;
+    return 0;
 }
 
 //---------------------------------------------------------------------------
 int Schema::validate_xml_from_file(const char* filename, bool silent)
 {
-    std::string xml = read_file(filename);
-    if (!xml.length())
+    std::string xml;
+
+    if (read_file(filename, xml) < 0)
         return -1;
+
     return validate_xml(xml, silent);
 }
 

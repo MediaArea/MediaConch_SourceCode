@@ -64,13 +64,20 @@ int LibEventHttp::start()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::finish()
+int LibEventHttp::stop()
 {
     if (connection)
     {
         evhttp_connection_free(connection);
         connection = NULL;
     }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int LibEventHttp::finish()
+{
+    stop();
     if (base)
     {
         event_base_free(base);
@@ -110,6 +117,7 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
 {
     // clean error
     error.clear();
+    result.clear();
 
     struct evhttp_request *req = evhttp_request_new(result_coming, this);
     if (req == NULL)

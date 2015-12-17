@@ -14,7 +14,6 @@
 #include "Core.h"
 #include "Scheduler.h"
 #include "Queue.h"
-#include <stdio.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -36,7 +35,7 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int Scheduler::add_element_to_queue(std::string& filename)
+    int Scheduler::add_element_to_queue(const std::string& filename)
     {
         static int index = 0;
 
@@ -86,5 +85,47 @@ namespace MediaConch {
         size_t size = working.size();
         CS.Leave();
         return size == 0;
+    }
+
+    bool Scheduler::element_is_finished(const std::string& filename, double& percent_done)
+    {
+        bool ret = true;
+        CS.Enter();
+
+        std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
+        for (; it != working.end(); ++it)
+            if (it->first->filename == filename)
+                break;
+        if (it != working.end())
+        {
+            //TODO: get percent without blocking
+            //percent_done = it->first->percent_done();
+            percent_done = 50.0;
+            CS.Leave();
+            return false;
+        }
+        if (queue->has_element(filename))
+        {
+            percent_done = 0.0;
+            ret = false;
+        }
+
+        CS.Leave();
+        return ret;
+    }
+
+    bool Scheduler::element_exists(const std::string& filename)
+    {
+        CS.Enter();
+        bool ret = queue->has_element(filename);
+
+        std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
+        for (; it != working.end(); ++it)
+            if (it->first->filename == filename)
+                break;
+        if (it != working.end())
+            ret = true;
+        CS.Leave();
+        return ret;
     }
 }
