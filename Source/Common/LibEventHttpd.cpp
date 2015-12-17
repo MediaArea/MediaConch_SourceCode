@@ -30,7 +30,7 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-LibEventHttpd::LibEventHttpd(MediaConchLib* mcl) : Httpd(mcl), base(NULL), http(NULL), handle(NULL)
+LibEventHttpd::LibEventHttpd(void* arg) : Httpd(arg), base(NULL), http(NULL), handle(NULL)
 {
 }
 

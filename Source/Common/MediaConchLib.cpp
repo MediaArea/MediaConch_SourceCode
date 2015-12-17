@@ -36,8 +36,10 @@ const std::string MediaConchLib::display_jstree_name = std::string("JSTREE");
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-MediaConchLib::MediaConchLib() : daemon_client(NULL)
+MediaConchLib::MediaConchLib(bool no_daemon) : use_daemon(false), force_no_daemon(false), daemon_client(NULL)
 {
+    if (no_daemon)
+        force_no_daemon = true;
     core = new Core;
 }
 
@@ -54,11 +56,18 @@ MediaConchLib::~MediaConchLib()
 int MediaConchLib::init()
 {
     load_configuration();
-    use_daemon = core->is_using_daemon();
-    if (use_daemon)
+    if (!force_no_daemon)
     {
-        daemon_client = new DaemonClient(this);
-        daemon_client->init();
+        use_daemon = core->is_using_daemon();
+        if (use_daemon)
+        {
+            daemon_client = new DaemonClient(this);
+            if (daemon_client->init() < 0)
+            {
+                // Fallback to no daemon
+                use_daemon = false;
+            }
+        }
     }
     return 0;
 }
@@ -433,6 +442,10 @@ void MediaConchLib::clear_policies()
 //---------------------------------------------------------------------------
 void MediaConchLib::set_use_daemon(bool use)
 {
+    if (!use)
+        force_no_daemon = true;
+    else
+        force_no_daemon = false;
     use_daemon = use;
 }
 

@@ -38,22 +38,23 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     Daemon::Daemon() : is_daemon(true), httpd(NULL)
     {
+        MCL = new MediaConchLib(true);
     }
 
     //--------------------------------------------------------------------------
     Daemon::~Daemon()
     {
+        delete MCL;
     }
 
     //--------------------------------------------------------------------------
     int Daemon::init()
     {
-        MCL.init();
-        MCL.set_use_daemon(false);
-        httpd = new LibEventHttpd(&MCL);
+        MCL->init();
+        httpd = new LibEventHttpd(this);
         int port = -1;
         std::string address;
-        MCL.get_daemon_address(address, port);
+        MCL->get_daemon_address(address, port);
         if (address.length())
             httpd->set_address(address);
         if (port != -1)
@@ -107,7 +108,7 @@ namespace MediaConch
     {
         if (httpd)
             httpd->finish();
-        MCL.close();
+        MCL->close();
         return 0;
     }
 
@@ -165,7 +166,7 @@ namespace MediaConch
     int Daemon::parse_other(const std::string& argument)
     {
         std::string report;
-        if (MCL.add_option(argument, report) < 0)
+        if (MCL->add_option(argument, report) < 0)
         {
             ZenLib::Ztring str;
             str.From_UTF8(report);
@@ -223,7 +224,7 @@ namespace MediaConch
         for (size_t i = 0; i < req->args.size(); ++i)
         {
             bool registered = false;
-            int ret = d->MCL.analyze(req->args[i].file, registered);
+            int ret = d->MCL->analyze(req->args[i].file, registered);
             if (ret < 0)
             {
                 RESTAPI::Analyze_Nok *nok = new RESTAPI::Analyze_Nok;
@@ -283,7 +284,7 @@ namespace MediaConch
 
             RESTAPI::Status_Ok *ok = new RESTAPI::Status_Ok;
             double percent_done = 0.0;
-            bool is_done = d->MCL.is_done(*d->current_files[i], percent_done);
+            bool is_done = d->MCL->is_done(*d->current_files[i], percent_done);
             ok->id = id;
             ok->finished = is_done;
             if (!is_done)
@@ -351,7 +352,7 @@ namespace MediaConch
             }
 
             double percent_done = 0.0;
-            bool is_done = d->MCL.is_done(*d->current_files[id], percent_done);
+            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
             if (!is_done)
             {
                 RESTAPI::Report_Nok *nok = new RESTAPI::Report_Nok;
@@ -366,7 +367,7 @@ namespace MediaConch
             files.push_back(*d->current_files[id]);
 
             MediaConchLib::ReportRes result;
-            d->MCL.get_report(report_set, format, files,
+            d->MCL->get_report(report_set, format, files,
                               req->policies_names, req->policies_contents,
                               &result, display_name, display_content);
             res.ok.report = result.report;
@@ -404,9 +405,9 @@ namespace MediaConch
 
             std::vector<std::string> files;
             files.push_back(*d->current_files[id]);
-            d->MCL.remove_report(files);
+            d->MCL->remove_report(files);
             bool registered = false;
-            int ret = d->MCL.analyze(*d->current_files[id], registered);
+            int ret = d->MCL->analyze(*d->current_files[id], registered);
             if (ret < 0)
             {
                 RESTAPI::Retry_Nok *nok = new RESTAPI::Retry_Nok;
@@ -442,7 +443,7 @@ namespace MediaConch
 
             std::vector<std::string> files;
             files.push_back(*d->current_files[id]);
-            d->MCL.remove_report(files);
+            d->MCL->remove_report(files);
             delete d->current_files[id];
             d->current_files[id] = NULL;
             res.ok.push_back(id);

@@ -39,7 +39,7 @@ class LibEventHttpd : public Httpd
 {
 public:
     //Constructor/Destructor
-    LibEventHttpd(MediaConchLib* mcl);
+    LibEventHttpd(void* arg);
     virtual ~LibEventHttpd();
 
     int init();

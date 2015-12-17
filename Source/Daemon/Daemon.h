@@ -38,7 +38,7 @@ namespace MediaConch
         Daemon(const Daemon&);
         Daemon& operator=(const Daemon&);
 
-        MediaConchLib  MCL;
+        MediaConchLib *MCL;
         bool           is_daemon;
         Httpd         *httpd;
 

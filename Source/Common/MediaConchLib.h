@@ -42,7 +42,7 @@ class MediaConchLib
 {
 public:
     //Constructor/Destructor
-    MediaConchLib();
+    MediaConchLib(bool no_daemon = false);
     ~MediaConchLib();
 
     //Config
@@ -158,8 +158,9 @@ private:
     MediaConchLib (const MediaConchLib&);
 
     std::vector<std::string>  Options;
-    Core                     *core;
     bool                      use_daemon;
+    bool                      force_no_daemon;
+    Core                     *core;
     DaemonClient             *daemon_client;
 };
 
