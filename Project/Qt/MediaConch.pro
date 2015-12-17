@@ -224,6 +224,7 @@ else {
 }
 }
 
+macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
 

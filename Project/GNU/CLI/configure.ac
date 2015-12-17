@@ -310,7 +310,7 @@ dnl
 if test "$with_sqlite" = "yes"; then
     if test -e ../../../../sqlite/.libs/libsqlite3.la; then
         CXXFLAGS="$CXXFLAGS -DHAVE_SQLITE  -I../../../../sqlite"
-        if test "with_staticlibs" = "yes"; then
+        if test "$enable_staticlibs" = "yes"; then
             with_libsqlite3="builtin (static)"
             LIBS="$LIBS  ../../../../sqlite/.libs/libsqlite3.a"
         else
