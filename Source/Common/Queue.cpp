@@ -19,23 +19,42 @@
 //---------------------------------------------------------------------------
 namespace MediaConch {
 
+//---------------------------------------------------------------------------
+QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s)
+{
+    MI = new MediaInfoNameSpace::MediaInfoList;
+}
 
+//---------------------------------------------------------------------------
+QueueElement::~QueueElement()
+{
+    if (MI)
+        delete MI;
+}
+
+//---------------------------------------------------------------------------
 void QueueElement::Entry()
 {
-    MediaInfoNameSpace::MediaInfoList MI;
     // Currently avoiding to have a big trace
-    MI.Option(__T("ParseSpeed"), __T("0"));
+    MI->Option(__T("ParseSpeed"), __T("0"));
     
     // Configuration of the parsing
-    MI.Option(__T("Details"), __T("1"));
+    MI->Option(__T("Details"), __T("1"));
 
     // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
-    MI.Option(__T("ReadByHuman"), __T("1"));
-    MI.Option(__T("Language"), __T("raw"));
-    MI.Option(__T("Inform"), __T("XML"));
-    MI.Open(ZenLib::Ztring().From_UTF8(filename));
-    scheduler->work_finished(this, &MI);
-    MI.Close();
+    MI->Option(__T("ReadByHuman"), __T("1"));
+    MI->Option(__T("Language"), __T("raw"));
+    MI->Option(__T("Inform"), __T("XML"));
+    MI->Open(ZenLib::Ztring().From_UTF8(filename));
+    scheduler->work_finished(this, MI);
+    MI->Close();
+}
+
+//---------------------------------------------------------------------------
+double QueueElement::percent_done()
+{
+    size_t state = MI->State_Get();
+    return (double)state / 100;
 }
 
 //***************************************************************************

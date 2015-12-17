@@ -660,7 +660,7 @@ void MainWindow::analyze(const std::vector<std::string>& files)
 int MainWindow::is_analyze_finished(const std::vector<std::string>& files, double& percent_done)
 {
     if (MCL.is_done(files, percent_done))
-            return 0;
+        return 0;
     return 1;
 }
 

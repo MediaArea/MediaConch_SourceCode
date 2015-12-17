@@ -1183,7 +1183,7 @@ int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Analyze_Ok*>& oks
         Analyze_Ok *ok = new Analyze_Ok;
         ok->inId = inId->l;
         ok->outId = outId->l;
-        if (create && create->type != Container::Value::CONTAINER_TYPE_BOOL)
+        if (create && create->type == Container::Value::CONTAINER_TYPE_BOOL)
             ok->create = create->b;
 
         oks.push_back(ok);

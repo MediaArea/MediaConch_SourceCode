@@ -284,7 +284,7 @@ namespace MediaConch
 
             RESTAPI::Status_Ok *ok = new RESTAPI::Status_Ok;
             double percent_done = 0.0;
-            bool is_done = d->MCL->is_done(*d->current_files[i], percent_done);
+            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
             ok->id = id;
             ok->finished = is_done;
             if (!is_done)

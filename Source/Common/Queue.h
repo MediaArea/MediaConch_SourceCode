@@ -16,6 +16,16 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#ifdef MEDIAINFO_DLL_RUNTIME
+    #include "MediaInfoDLL/MediaInfoDLL.h"
+    #define MediaInfoNameSpace MediaInfoDLL
+#elif defined MEDIAINFO_DLL_STATIC
+    #include "MediaInfoDLL/MediaInfoDLL_Static.h"
+    #define MediaInfoNameSpace MediaInfoDLL
+#else
+    #include "MediaInfo/MediaInfoList.h"
+    #define MediaInfoNameSpace MediaInfoLib
+#endif
 #include "ZenLib/Thread.h"
 #include "ZenLib/CriticalSection.h"
 //---------------------------------------------------------------------------
@@ -34,15 +44,17 @@ namespace MediaConch
     class QueueElement : public ZenLib::Thread
     {
     public:
-        QueueElement(Scheduler *s) : Thread(), scheduler(s) {}
-        virtual ~QueueElement() {}
+        QueueElement(Scheduler *s);
+        virtual ~QueueElement();
         int          id;
         std::string  filename;
 
         void         Entry();
+        double       percent_done();
 
     private:
-        Scheduler*   scheduler;
+        Scheduler*                         scheduler;
+        MediaInfoNameSpace::MediaInfoList *MI;
     };
 
     //***************************************************************************
