@@ -40,11 +40,12 @@ DaemonClient::~DaemonClient()
 //---------------------------------------------------------------------------
 int DaemonClient::init()
 {
-#ifndef HAVE_LIBEVENT
+#ifdef HAVE_LIBEVENT
+    http_client = new LibEventHttp;
+#else
     return -1;
 #endif
 
-    http_client = new LibEventHttp;
     std::string server;
     int port = -1;
     core->get_daemon_address(server, port);
