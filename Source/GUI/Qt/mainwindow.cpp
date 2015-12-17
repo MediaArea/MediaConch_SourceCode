@@ -40,7 +40,6 @@
     #include <QFontDatabase>
 #endif
 #include <sstream>
-#include <unistd.h>
 
 namespace MediaConch {
 
@@ -658,15 +657,11 @@ void MainWindow::analyze(const std::vector<std::string>& files)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::wait_analyze_finished()
+int MainWindow::is_analyze_finished(const std::vector<std::string>& files, double& percent_done)
 {
-    while (1)
-    {
-        double percent_done;
-        if (MCL.is_done(files, percent_done))
-            break;
-        usleep(50000);
-    }
+    if (MCL.is_done(files, percent_done))
+            return 0;
+    return 1;
 }
 
 //---------------------------------------------------------------------------

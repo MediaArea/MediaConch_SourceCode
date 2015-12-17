@@ -36,6 +36,7 @@
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
+#include <unistd.h>
 
 namespace MediaConch {
 
@@ -215,8 +216,15 @@ void CheckerWindow::update_web_view(std::string file, int policy)
     files.push_back(file);
     mainwindow->analyze(files);
 
-    // TODO: do not wait until the end of the analyzed
-    mainwindow->wait_analyze_finished();
+    // TODO: do a signal/slot to update percent auto-magically
+    while (1)
+    {
+        double percent_done;
+        if (!mainwindow->is_analyze_finished(files, percent_done))
+            break;
+        progressBar->get_progress_bar()->setValue(percent_done);
+        usleep(50000);
+    }
 
     //Add the file detail to the web page
     add_file_detail_to_html(html, file, policy);
@@ -250,8 +258,15 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
     progressBar->get_progress_bar()->setValue(1);
 
     mainwindow->analyze(vfiles);
-    // TODO: do not wait until the end of the analyzed
-    mainwindow->wait_analyze_finished();
+
+    while (1)
+    {
+        double percent_done;
+        if (!mainwindow->is_analyze_finished(vfiles, percent_done))
+            break;
+        progressBar->get_progress_bar()->setValue(percent_done / 2);
+        usleep(50000);
+    }
 
     //Add the files details to the web page
     QString displayXsltRetain = display_xslt;
@@ -260,7 +275,7 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
         display_xslt = displayXsltRetain;
         std::string file = files[i].absoluteFilePath().toStdString();
         add_file_detail_to_html(html, file, policy);
-        progressBar->get_progress_bar()->setValue(((i + 1) * 100) / files.count());
+        progressBar->get_progress_bar()->setValue(50 + ((i + 1) * 50) / files.count());
     }
     reset_display_xslt();
 

@@ -103,7 +103,7 @@ namespace MediaConch
             if (MCL.analyze(files[i], registered) < 0)
                 continue;
 
-            if (!registered)
+            if (use_daemon && !registered)
             {
                 std::stringstream str;
                 str << "Registering ";
@@ -111,18 +111,13 @@ namespace MediaConch
                 str << " to analyze";
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
             }
-            double percent_done = 0;
-            if (!MCL.is_done(files, percent_done))
-            {
-                std::stringstream str;
-                str << "Analyzing ";
-                str << files[i];
-                str << " ; done: ";
-                str << percent_done * 1000;
-                str << "%";
-                STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
+
+            int ready = is_ready(i);
+            if (ready > 0)
                 continue;
-            }
+            else if (ready < 0)
+                //TODO: PROBLEM
+                ;
             file_to_report.push_back(files[i]);
         }
 
@@ -210,6 +205,33 @@ namespace MediaConch
             str.From_UTF8(report);
             STRINGOUT(str);
             return -1;
+        }
+        return 0;
+    }
+    
+    //--------------------------------------------------------------------------
+    int CLI::is_ready(size_t i)
+    {
+        std::vector<std::string> vec;
+        vec.push_back(files[i]);
+        double percent_done = 0;
+
+        if (use_daemon)
+        {
+            if (!MCL.is_done(files[i], percent_done))
+            {
+                std::stringstream str;
+                str << "Analyzing " << files[i] << " ; done: " << percent_done  << "%";
+                STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
+                return 1;
+            }
+        }
+        else
+        {
+            while (!MCL.is_done(files[i], percent_done))
+            {
+                usleep(5000);
+            }
         }
         return 0;
     }

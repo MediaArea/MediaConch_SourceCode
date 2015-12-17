@@ -43,6 +43,8 @@ namespace MediaConch
         CLI(const CLI&);
         CLI& operator=(const CLI&);
 
+        int is_ready(size_t i);
+
         MediaConchLib MCL;
         std::vector<std::string> files;
         std::vector<std::string> policies;
