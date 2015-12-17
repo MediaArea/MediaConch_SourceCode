@@ -148,6 +148,7 @@ public:
     // Daemon
     void set_use_daemon(bool use);
     bool get_use_daemon() const;
+    void get_daemon_address(std::string& addr, int& port) const;
 
     // Helper
     int init_http_client();

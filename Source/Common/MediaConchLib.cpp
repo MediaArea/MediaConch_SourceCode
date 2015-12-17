@@ -57,7 +57,7 @@ int MediaConchLib::init()
     use_daemon = core->is_using_daemon();
     if (use_daemon)
     {
-        daemon_client = new DaemonClient(core);
+        daemon_client = new DaemonClient(this);
         daemon_client->init();
     }
     return 0;
@@ -440,6 +440,12 @@ void MediaConchLib::set_use_daemon(bool use)
 bool MediaConchLib::get_use_daemon() const
 {
     return use_daemon;
+}
+
+//---------------------------------------------------------------------------
+void MediaConchLib::get_daemon_address(std::string& addr, int& port) const
+{
+    core->get_daemon_address(addr, port);
 }
 
 }

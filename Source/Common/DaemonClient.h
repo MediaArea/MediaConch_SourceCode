@@ -25,7 +25,6 @@ namespace MediaConch
 {
 
 class Http;
-class Core;
 
 //***************************************************************************
 // Class DaemonClient
@@ -35,7 +34,7 @@ class DaemonClient
 {
 public:
     //Constructor/Destructor
-    DaemonClient(Core* c);
+    DaemonClient(MediaConchLib* m);
     ~DaemonClient();
 
     // General
@@ -62,8 +61,8 @@ public:
                          const std::string* display_content = NULL);
 
 private:
-    Core *core;
-    Http *http_client;
+    MediaConchLib *mcl;
+    Http          *http_client;
 
     DaemonClient(const DaemonClient&);
     DaemonClient& operator=(const DaemonClient&);

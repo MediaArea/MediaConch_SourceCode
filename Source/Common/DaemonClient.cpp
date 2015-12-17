@@ -11,7 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include "DaemonClient.h"
-#include "Core.h"
+#include "MediaConchLib.h"
 #include "Http.h"
 #include "LibEventHttp.h"
 #include "REST_API.h"
@@ -28,7 +28,7 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-DaemonClient::DaemonClient(Core* c) : core(c), http_client(NULL)
+DaemonClient::DaemonClient(MediaConchLib* m) : mcl(m), http_client(NULL)
 {
 }
 
@@ -48,7 +48,7 @@ int DaemonClient::init()
 
     std::string server;
     int port = -1;
-    core->get_daemon_address(server, port);
+    mcl->get_daemon_address(server, port);
 
     if (server.length() != 0)
         http_client->set_address(server);

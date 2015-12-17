@@ -50,8 +50,13 @@ namespace MediaConch
         MCL.init();
         MCL.set_use_daemon(false);
         httpd = new LibEventHttpd(&MCL);
-        //TODO: Set
-        httpd->set_port(4242);
+        int port = -1;
+        std::string address;
+        MCL.get_daemon_address(address, port);
+        if (address.length())
+            httpd->set_address(address);
+        if (port != -1)
+            httpd->set_port(port);
         httpd->init();
 
         httpd->commands.analyze_cb = on_analyze_command;
