@@ -16,6 +16,7 @@
 #include "Common/LibEventHttpd.h"
 #include "Daemon.h"
 #include "Help.h"
+#include "Config.h"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -83,7 +84,8 @@ namespace MediaConch
                 transform(argument.begin(), argument.begin() + egal_pos,
                           argument.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
             }
-            if (parse(argument) < 0)
+            int ret = parse(argument);
+            if (ret < 0)
                 return -1;
         }
         return 0;
@@ -130,10 +132,13 @@ namespace MediaConch
         if (0);
         OPTION("--help", help)
         OPTION("--fork", fork)
+        OPTION("--",     other)
+        else
+            return Help();
         return 0;
 
-        #undef OPTION
-        #undef LAUNCH
+#undef OPTION
+#undef LAUNCH
     }
 
     //--------------------------------------------------------------------------
@@ -154,6 +159,20 @@ namespace MediaConch
         (void)argument;
         Help();
         return -1;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_other(const std::string& argument)
+    {
+        std::string report;
+        if (MCL.add_option(argument, report) < 0)
+        {
+            ZenLib::Ztring str;
+            str.From_UTF8(report);
+            STRINGOUT(str);
+            return -1;
+        }
+        return 0;
     }
 
 #if defined(_WIN32) || defined(WIN32)

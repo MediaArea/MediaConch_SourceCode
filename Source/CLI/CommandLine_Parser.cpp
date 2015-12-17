@@ -240,7 +240,7 @@ void CallBack_Set(MediaConch::CLI* cli, void* Event_CallBackFunction)
 {
     //CallBack configuration
     std::stringstream callback_mem;
-    callback_mem << "Event_CallBackFunction=";
+    callback_mem << "--Event_CallBackFunction=";
     callback_mem << "CallBack=memory://";
     callback_mem << (size_t)Event_CallBackFunction;
     cli->register_option(callback_mem.str());

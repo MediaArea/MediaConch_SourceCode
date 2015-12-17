@@ -81,8 +81,8 @@ int MediaConchLib::close()
 //---------------------------------------------------------------------------
 int MediaConchLib::add_option(const std::string& option, std::string& report)
 {
-    size_t egal_pos = option.find(__T('='));
-    if (egal_pos < 2)
+    size_t egal_pos = option.find('=');
+    if (egal_pos == std::string::npos || egal_pos > 2)
     {
         MediaInfoNameSpace::String Option(ZenLib::Ztring().From_UTF8(option), 2, egal_pos-2);
         MediaInfoNameSpace::String Value;

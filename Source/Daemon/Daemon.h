@@ -49,6 +49,7 @@ namespace MediaConch
         int parse(std::string& argument);
         int parse_help(const std::string& argument);
         int parse_fork(const std::string& argument);
+        int parse_other(const std::string& argument);
 
         // Request received callbacks
         static int on_analyze_command(const RESTAPI::Analyze_Req* req,
