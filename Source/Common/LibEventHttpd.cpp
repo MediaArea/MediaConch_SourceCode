@@ -128,8 +128,12 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
     std::string ret_msg("OK");
 
     const evhttp_uri *uri = evhttp_request_get_evhttp_uri(req);
+    std::string uri_path(evhttp_uri_get_path(uri));
+
+    if (uri_api_version_is_valid(uri_path, req) < 0)
+        return;
     const char* query_str = evhttp_uri_get_query(uri);
-    if (query_str && !std::string("/status").compare(evhttp_uri_get_path(uri)))
+    if (query_str && !std::string("/status").compare(uri_path))
     {
         std::string query(query_str);
         RESTAPI::Status_Req *r = NULL;
@@ -171,7 +175,11 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
     }
 
     const evhttp_uri *uri = evhttp_request_get_evhttp_uri(req);
-    if (!std::string("/analyze").compare(evhttp_uri_get_path(uri)))
+    std::string uri_path(evhttp_uri_get_path(uri));
+
+    if (uri_api_version_is_valid(uri_path, req) < 0)
+        return;
+    if (!std::string("/analyze").compare(uri_path))
     {
         RESTAPI::Analyze_Req *r = NULL;
         get_request(json, &r);
@@ -194,7 +202,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (!result.length())
             error = rest.get_error();
     }
-    else if (!std::string("/report").compare(evhttp_uri_get_path(uri)))
+    else if (!std::string("/report").compare(uri_path))
     {
         RESTAPI::Report_Req *r = NULL;
         get_request(json, &r);
@@ -241,7 +249,11 @@ void LibEventHttpd::request_put_coming(struct evhttp_request *req)
     }
 
     const evhttp_uri *uri = evhttp_request_get_evhttp_uri(req);
-    if (!std::string("/retry").compare(evhttp_uri_get_path(uri)))
+    std::string uri_path(evhttp_uri_get_path(uri));
+
+    if (uri_api_version_is_valid(uri_path, req) < 0)
+        return;
+    if (!std::string("/retry").compare(uri_path))
     {
         RESTAPI::Retry_Req *r = NULL;
         get_request(json, &r);
@@ -280,8 +292,13 @@ void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
     std::string ret_msg("OK");
 
     const evhttp_uri *uri = evhttp_request_get_evhttp_uri(req);
+    std::string uri_path(evhttp_uri_get_path(uri));
+
+    if (uri_api_version_is_valid(uri_path, req) < 0)
+        return;
+
     const char* query_str = evhttp_uri_get_query(uri);
-    if (query_str && !std::string("/clear").compare(evhttp_uri_get_path(uri)))
+    if (query_str && !std::string("/clear").compare(uri_path))
     {
         std::string query(query_str);
         RESTAPI::Clear_Req *r = NULL;
@@ -361,6 +378,21 @@ int LibEventHttpd::get_body(struct evhttp_request *req, std::string& json, std::
     tmpBuf[n] = '\0';
 
     json = std::string(tmpBuf);
+    return 0;
+}
+
+int LibEventHttpd::uri_api_version_is_valid(std::string& uri, struct evhttp_request *req)
+{
+    std::string search("/" + RESTAPI::API_VERSION);
+    size_t pos = uri.find(search);
+    if (pos != 0)
+    {
+        error = std::string("The API version is not valid");
+        std::string ret_msg = "WRONG_API_VERSION";
+        send_result(HTTP_BADREQUEST, ret_msg, req);
+        return -1;
+    }
+    uri = uri.substr(search.length());
     return 0;
 }
 

@@ -40,9 +40,11 @@ Http::~Http()
 int Http::send_request(RESTAPI::Analyze_Req& req)
 {
     std::string cmd = rest.serialize_analyze_req(req);
-    std::string uri("/analyze");
+    std::stringstream uri;
 
-    return send_request_post(uri, cmd);
+    uri << "/" << RESTAPI::API_VERSION << "/"<< "analyze";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
 }
 
 // //---------------------------------------------------------------------------
@@ -58,7 +60,7 @@ int Http::send_request(RESTAPI::Status_Req& req)
     std::string query = rest.serialize_status_req(req);
     std::stringstream uri;
 
-    uri << "/status" << query;
+    uri << "/" << RESTAPI::API_VERSION << "/"<< "status" << query;
 
     std::string uri_str = uri.str();
     return send_request_get(uri_str);
@@ -68,18 +70,22 @@ int Http::send_request(RESTAPI::Status_Req& req)
 int Http::send_request(RESTAPI::Report_Req& req)
 {
     std::string cmd = rest.serialize_report_req(req);
-    std::string uri("/report");
+    std::stringstream uri;
 
-    return send_request_post(uri, cmd);
+    uri << "/" << RESTAPI::API_VERSION << "/"<< "report";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
 }
 
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Retry_Req& req)
 {
     std::string cmd = rest.serialize_retry_req(req);
-    std::string uri("/retry");
+    std::stringstream uri;
 
-    return send_request_put(uri, cmd);
+    uri << "/" << RESTAPI::API_VERSION << "/"<< "retry";
+    std::string uri_str = uri.str();
+    return send_request_put(uri_str, cmd);
 }
 
 //---------------------------------------------------------------------------
@@ -88,7 +94,7 @@ int Http::send_request(RESTAPI::Clear_Req& req)
     std::string query = rest.serialize_clear_req(req);
     std::stringstream uri;
 
-    uri << "/clear" << query;
+    uri << "/" << RESTAPI::API_VERSION << "/" << "clear" << query;
 
     std::string uri_str = uri.str();
     return send_request_delete(uri_str);

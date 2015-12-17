@@ -59,6 +59,7 @@ private:
     void request_post_coming(struct evhttp_request *req);
     void request_put_coming(struct evhttp_request *req);
     void request_delete_coming(struct evhttp_request *req);
+    int  uri_api_version_is_valid(std::string& uri, struct evhttp_request *req);
 
     LibEventHttpd (const LibEventHttpd&);
     LibEventHttpd& operator=(const LibEventHttpd&);

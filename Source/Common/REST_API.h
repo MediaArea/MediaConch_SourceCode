@@ -33,6 +33,8 @@ class RESTAPI
 {
 public:
 
+    static const std::string API_VERSION;
+
     enum Reason
     {
         NO_REASON,
