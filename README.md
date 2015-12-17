@@ -105,7 +105,7 @@ apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev lib
  
 *MediaArea tools*
 
-Go to https://mediaarea.net/MediaConch/downloads/ubuntu.html and download the libmediainfo0, libmediainfo-dev, libzen0 and libzen-dev packages corresponding to your Ubuntu version (Ubuntu 15.10 is not supported yet). Then install them with :
+Go to https://mediaarea.net/MediaConch/downloads/ubuntu.html and download the libmediainfo0, libmediainfo-dev, libzen0 and libzen-dev packages corresponding to your Ubuntu version. Then install them with :
 
 ```sh
 dpkg -i libmediainfo* libzen*
