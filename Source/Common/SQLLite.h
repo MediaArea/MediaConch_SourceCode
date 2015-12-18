@@ -41,14 +41,13 @@ public:
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
 
 protected:
-    void        add_report(std::string key, std::string report);
+    void        add_report(const std::string& key, const std::string& report);
     virtual int execute();
     virtual int init();
 
 private:
-    sqlite3 *db;
-
-    static int callback(void* data, int , char**, char**);
+    sqlite3      *db;
+    sqlite3_stmt *stmt; // Statement handler
 
     SQLLite (const SQLLite&);
     SQLLite& operator=(const SQLLite&);
