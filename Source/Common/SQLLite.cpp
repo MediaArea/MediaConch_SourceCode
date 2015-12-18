@@ -34,6 +34,7 @@ namespace MediaConch {
 SQLLite::SQLLite() : Database()
 {
     db = NULL;
+    stmt = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -75,8 +76,12 @@ int SQLLite::create_report_table()
     create << "FORMAT                 INT  NOT NULL,";
     create << "REPORT                 TEXT          ";
     create << ");";
-
     query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
     return execute();
 }
 
@@ -88,12 +93,34 @@ int SQLLite::save_report(MediaConchLib::report reportKind, MediaConchLib::format
     reports.clear();
     create << "INSERT INTO " << "Report";
     create << " (FILENAME, FILE_LAST_MODIFICATION, TOOL, FORMAT, REPORT)";
-    create << " VALUES ('" << filename << "', '";
-    create << file_last_modification << "', ";
-    create << reportKind << ", ";
-    create << format << ", ";
-    create << "'" << report << "');";
+    create << " VALUES (?, ?, ?, ?, ?);";
     query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 2, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 3, (int)reportKind);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 4, (int)format);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 5, report.c_str(), report.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
     return execute();
 }
 
@@ -102,9 +129,17 @@ int SQLLite::remove_report(const std::string& filename)
     std::stringstream delete_query;
 
     reports.clear();
-    delete_query << "DELETE FROM " << "Report";
-    delete_query << " WHERE FILENAME = '" << filename << "';";
-    query = delete_query.str();
+    query = "DELETE FROM Report WHERE FILENAME = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
     return execute();
 }
 
@@ -115,14 +150,36 @@ std::string SQLLite::get_report(MediaConchLib::report reportKind, MediaConchLib:
 
     reports.clear();
     create << "SELECT " << key << " FROM " << "Report" << " WHERE ";
-    create << "FILENAME = '" << filename << "' ";
-    create << "AND FILE_LAST_MODIFICATION = '" << file_last_modification << "' ";
-    create << "AND TOOL = " << reportKind << " ";
-    create << "AND FORMAT = " << format << ";";
+    create << "FILENAME = ? ";
+    create << "AND FILE_LAST_MODIFICATION = ? ";
+    create << "AND TOOL = ? ";
+    create << "AND FORMAT = ?;";
     query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return std::string();
+
+    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return std::string();
+
+    ret = sqlite3_bind_blob(stmt, 2, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return std::string();
+
+    ret = sqlite3_bind_int(stmt, 3, (int)reportKind);
+    if (ret != SQLITE_OK)
+        return std::string();
+
+    ret = sqlite3_bind_int(stmt, 4, (int)format);
+    if (ret != SQLITE_OK)
+        return std::string();
 
     if (execute() || !reports.size() || reports.find(key) == reports.end())
         return std::string();
+
     return reports[key];
 }
 
@@ -133,11 +190,32 @@ bool SQLLite::file_is_registered(MediaConchLib::report reportKind, MediaConchLib
 
     reports.clear();
     create << "SELECT " << key << " FROM " << "Report" << " WHERE ";
-    create << "FILENAME = '" << filename << "' ";
-    create << "AND FILE_LAST_MODIFICATION = '" << file_last_modification << "' ";
-    create << "AND TOOL = " << reportKind << " ";
-    create << "AND FORMAT = " << format << ";";
+    create << "FILENAME = ? ";
+    create << "AND FILE_LAST_MODIFICATION = ? ";
+    create << "AND TOOL = ? ";
+    create << "AND FORMAT = ?;";
     query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 2, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 3, (int)reportKind);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 4, (int)format);
+    if (ret != SQLITE_OK)
+        return -1;
 
     if (execute() || !reports.size() || reports.find(key) == reports.end())
         return false;
@@ -150,34 +228,48 @@ bool SQLLite::file_is_registered(MediaConchLib::report reportKind, MediaConchLib
 //---------------------------------------------------------------------------
 int SQLLite::execute()
 {
-    if (!db)
+    if (!db || !stmt)
         return -1;
 
     errors.clear();
-    char *error = NULL;
+    int ret;
 
-    int ret = sqlite3_exec(db, query.c_str(), callback, this, &error);
-    if (ret != SQLITE_OK)
+    while (1)
     {
-        errors.push_back(std::string(error));
-        sqlite3_free(error); //copy
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_DONE)
+            break;
+        else if (ret == SQLITE_ROW)
+        {
+            for (int i = 0; i < sqlite3_column_count(stmt); ++i)
+            {
+                std::string name(sqlite3_column_name(stmt, i));
+                const void *blob = sqlite3_column_blob(stmt, i);
+                std::string value((const char *)blob, sqlite3_column_bytes(stmt, i));
+                add_report(name, value);
+            }
+        }
+        else
+        {
+            ret = sqlite3_reset(stmt);
+            #if SQLITE_VERSION_NUMBER >= 3007015
+            errors.push_back(sqlite3_errstr(ret));
+            #else
+            errors.push_back("Error occurs during execution");
+            #endif
+            break;
+        }
     }
 
-    return ret;
+    sqlite3_finalize(stmt);
+    stmt = NULL;
+    if(ret == SQLITE_DONE)
+        return 0;
+    return -1;
 }
 
 //---------------------------------------------------------------------------
-int SQLLite::callback(void* data, int columns, char **column_texts, char** column_name)
-{
-    SQLLite *ptr = (SQLLite*)data;
-
-    for (int i = 0; i < columns; ++i)
-        ptr->add_report(column_name[i], column_texts[i]);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-void SQLLite::add_report(std::string key, std::string report)
+void SQLLite::add_report(const std::string& key, const std::string& report)
 {
     reports[key] = report;
 }
