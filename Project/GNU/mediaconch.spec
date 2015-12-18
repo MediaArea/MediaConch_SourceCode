@@ -96,7 +96,7 @@ pushd Project/Qt
             ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" NO_JANSSON=yes
         %endif
     %else
-        %if 0%{?suse_version} < 1200
+        %if 0%{?suse_version} && 0%{?suse_version} < 1200
             ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" NO_LIBEVENT=yes
         %else
             ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
@@ -117,7 +117,7 @@ pushd Project/GNU/CLI
             %configure --without-jansson
         %endif
     %else
-        %if 0%{?suse_version} < 1200
+        %if 0%{?suse_version} && 0%{?suse_version} < 1200
             %configure --without-libevent
         %else
             %configure
