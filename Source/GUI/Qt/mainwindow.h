@@ -72,6 +72,9 @@ public:
     void                        add_default_policy();
     void                        add_default_displays();
     bool                        validate_policy(const std::string& file, int policy, const std::string& display_name, const std::string& display_content, std::string& report);
+    bool                        validate_policies(const std::string& file, const std::string& display_name,
+                                                  const std::string& display_content,
+                                                  std::string& report);
     bool                        is_all_policies_saved();
 
     void                        add_policy_to_list(const QString& policy);
