@@ -949,18 +949,25 @@ void Core::create_report_mt_xml(const std::string& filename, std::string& report
 void Core::create_report_ma_xml(const std::string& filename, std::string& report,
                                 std::bitset<MediaConchLib::report_Max> reports)
 {
+    std::string version = ZenLib::Ztring(Menu_Option_Preferences_Option (__T("Info_Version"), __T(""))).To_UTF8();
+    std::string search(" - v");
+    size_t pos = version.find(search);
+    if (pos != std::string::npos)
+        version = version.substr(pos + search.length());
 
-    std::string start("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                      "<MediaArea\n"
-                      "xmlns=\"https://mediaarea.net/mediaarea\"\n"
-                      "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                      "xsi:schemaLocation=\"https://mediaarea.net/mediaarea https://mediaarea.net/mediaarea/mediaarea_0_1.xsd\"\n"
-                      "version=\"0.1\">\n"
-                      "<!-- Work in progress, not for production -->\n"
-                      "<creatingLibrary version=\"0.7.79\" url=\"https://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n"
-                      "<media ref=\"");
-    start += filename + "\">\n";
-    report += start;
+    std::stringstream start("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+    start << "<MediaArea\n";
+    start << "xmlns=\"https://mediaarea.net/mediaarea\"\n";
+    start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
+    start << "xsi:schemaLocation=\"https://mediaarea.net/mediaarea https://mediaarea.net/mediaarea/mediaarea_0_1.xsd\"\n";
+    start << "version=\"0.1\">\n";
+    start << "<!-- Work in progress, not for production -->\n";
+    start << "<creatingLibrary version=\"";
+    start << version;
+    start << "\" url=\"https://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
+    start << "<media ref=\"";
+    start << filename << "\">\n";
+    report += start.str();
 
     if (reports[MediaConchLib::report_MediaInfo])
     {
