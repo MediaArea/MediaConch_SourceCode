@@ -670,6 +670,9 @@ QString MainWindow::get_implementationreport_xml(const std::string& file,
                                                  const std::string& display_content,
                                                  bool& is_valid)
 {
+    const std::string* dname = display_name.length() ? &display_name : NULL;
+    const std::string* dcontent = display_content.length() ? &display_content : NULL;
+
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(MediaConchLib::report_MediaConch);
     std::vector<std::string> files;
@@ -679,13 +682,13 @@ QString MainWindow::get_implementationreport_xml(const std::string& file,
     std::vector<std::string> vec;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
-                   &result, &display_name, &display_content);
+                   &result, dname, dcontent);
     if (result.has_valid)
         is_valid = result.valid;
     else
         is_valid = false;
 
-    return QString().fromStdString(result.report);
+    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
@@ -724,7 +727,7 @@ QString MainWindow::get_mediainfo_xml(const std::string& file,
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
                    &result, &display_name, &display_content);
-    return QString().fromStdString(result.report);
+    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
@@ -740,7 +743,7 @@ QString MainWindow::get_mediainfo_jstree(const std::string& file)
     std::vector<std::string> vec;
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
                    vec, vec, &result);
-    return QString().fromStdString(result.report);
+    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
@@ -759,7 +762,7 @@ QString MainWindow::get_mediatrace_xml(const std::string& file,
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
                    &result, &display_name, &display_content);
-    return QString().fromStdString(result.report);
+    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
@@ -776,7 +779,7 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
                    vec, vec,
                    &result);
-    return QString().fromStdString(result.report);
+    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
@@ -785,12 +788,41 @@ bool MainWindow::validate_policy(const std::string& file, int policy,
                                  const std::string& display_content,
                                  std::string& report)
 {
+    if (policy == -1)
+        return validate_policies(file, display_name, display_content, report);
+
     MediaConchLib::ReportRes result;
     const std::string* dname = display_name.length() ? &display_name : NULL;
     const std::string* dcontent = display_content.length() ? &display_content : NULL;
     if (MCL.validate_policy(file, policy, &result, dname, dcontent) < 0)
         return false;
     report = result.report;
+    if (!result.has_valid)
+        return true;
+    return result.valid;
+}
+
+//---------------------------------------------------------------------------
+bool MainWindow::validate_policies(const std::string& file, const std::string& display_name,
+                                   const std::string& display_content,
+                                   std::string& report)
+{
+    const std::string* dname = display_name.length() ? &display_name : NULL;
+    const std::string* dcontent = display_content.length() ? &display_content : NULL;
+
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    MediaConchLib::ReportRes result;
+    std::bitset<MediaConchLib::report_Max> report_set;
+    std::vector<std::string> vec;
+    if (MCL.get_report(report_set, MediaConchLib::format_Xml, files,
+                       policies, vec,
+                       &result, dname, dcontent) < 0)
+        return false;
+
+    report = result.report;
+
     if (!result.has_valid)
         return true;
     return result.valid;
