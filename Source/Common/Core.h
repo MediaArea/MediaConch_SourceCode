@@ -175,6 +175,7 @@ private:
     bitset<MediaConchLib::report_Max> get_bitset_with_mi_mt();
 
     std::string get_config_path();
+    std::string get_database_path();
     Database *get_db();
 };
 

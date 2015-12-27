@@ -119,8 +119,8 @@ void Core::load_database()
 {
 #ifdef HAVE_SQLITE
     std::string db_path;
-    if (!config || config->get("SQLite_Path", db_path))
-        db_path = std::string(".");
+    if (!config || config->get("SQLite_Path", db_path) < 0)
+        db_path = get_database_path();
     db_path += Path_Separator;
 
     db = new SQLLite;
@@ -1128,6 +1128,43 @@ bool Core::file_is_registered(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
+std::string Core::get_database_path()
+{
+    std::string database_path(".");
+#if defined(WINDOWS)
+    char username[UNLEN+1];
+    DWORD username_len = UNLEN+1;
+    GetUserName(username, &username_len);
+
+    std::string wuser(username, username_len);
+    std::string user_name(wuser.begin(), wuser.end());
+    std::stringstream path;
+
+    path << "C:/Users/" << user_name << "/AppData/Local/MediaConch/";
+    database_path = path.str();
+#elif defined(UNIX)
+    const char* home;
+
+    if ((home = getenv("HOME")) == NULL)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw)
+            home = pw->pw_dir;
+        else
+            home = ".";
+    }
+    database_path = std::string(home) + Path_Separator + std::string(".local/share/MediaConch/");
+#elif defined(MACOS) || defined(MACOSX)
+    database_path = std::string("~/Library/Application Support/MediaConch/");
+#endif
+
+    std::ifstream ifile(database_path.c_str());
+    if (!ifile)
+        database_path = std::string(".") + Path_Separator;
+    return database_path;
+}
+
+//---------------------------------------------------------------------------
 std::string Core::get_config_path()
 {
     if (configuration_path.length())
@@ -1153,6 +1190,8 @@ std::string Core::get_config_path()
         struct passwd *pw = getpwuid(getuid());
         if (pw)
             home = pw->pw_dir;
+        else
+            home = ".";
     }
     config_path = std::string(home) + Path_Separator + std::string(".config/");
 #elif defined(MACOS) || defined(MACOSX)

@@ -20,7 +20,7 @@ Each entry corresponding to the option wanted.
 
 ==== Reconized entry ====
 
-* SQLite_Path: give the path where the database should be created, default is the current path.
+* SQLite_Path: give the path where the database should be created, default is the data application path.
 
 * Database_Enabled: enable or not the database, default yes.
 
