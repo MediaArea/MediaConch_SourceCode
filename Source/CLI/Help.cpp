@@ -35,6 +35,12 @@ int Help()
     TEXTOUT("                    Display the version and exit");
     TEXTOUT("");
 
+    TEXTOUT("Configuration Element:");
+    TEXTOUT("--Configuration=ConfigurationFile, -c ConfigurationFile");
+    TEXTOUT("                    Use ConfigurationFile as configuration file");
+    TEXTOUT("                    Default, it uses the one in the user data application file");
+    TEXTOUT("");
+
     TEXTOUT("Reporting Elements:");
     TEXTOUT("--Mediaconch, -mc");
     TEXTOUT("                    Output MediaConch report (default)");

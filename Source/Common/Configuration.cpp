@@ -54,9 +54,9 @@ Configuration::~Configuration()
 }
 
 //---------------------------------------------------------------------------
-void Configuration::set_path(const std::string& path)
+void Configuration::set_file(const std::string& file)
 {
-    this->path = path;
+    this->file = file;
 }
 
 //---------------------------------------------------------------------------
@@ -70,15 +70,12 @@ int Configuration::parse()
 {
     parse_error = true;
 
-    std::stringstream filename;
-    filename << path << Path_Separator << configName;
-
-    std::ifstream file_handler(filename.str().c_str(), std::ios_base::ate);
+    std::ifstream file_handler(file.c_str(), std::ios_base::ate);
 
     if (!file_handler)
     {
         std::stringstream streamError;
-        streamError << "Cannot open file: " << filename;
+        streamError << "Cannot open file: " << file;
         error = streamError.str();
         return -1;
     }
