@@ -6,7 +6,7 @@ By default, the configuration file will be read from the user local data.
 
 On Linux, it will be in ~/.config/MediaConch.rc.
 
-On Windows, it will be in C:/Users/$USER_NAME/AppData/Local/MediaConch/MediaConch.rc
+On Windows, it will be in C:\Users\$USER_NAME\AppData\Roaming\MediaConch\MediaConch.rc
 
 On Mac OS, it will be in ~/Library/Preferences/MediaConch.rc.
 

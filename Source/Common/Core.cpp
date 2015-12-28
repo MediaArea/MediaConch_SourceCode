@@ -1140,7 +1140,7 @@ std::string Core::get_database_path()
     std::string user_name(wuser.begin(), wuser.end());
     std::stringstream path;
 
-    path << "C:/Users/" << user_name << "/AppData/Local/MediaConch/";
+    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
     database_path = path.str();
 #elif defined(UNIX)
     const char* home;
@@ -1180,7 +1180,7 @@ std::string Core::get_config_file()
     std::string user_name(wuser.begin(), wuser.end());
     std::stringstream path;
 
-    path << "C:\\Users\\" << user_name << "\\AppData\\Local\\MediaConch\\";
+    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
     config_file = path.str();
 #elif defined(UNIX)
     const char* home = NULL;
