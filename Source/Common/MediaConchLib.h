@@ -118,8 +118,8 @@ public:
 
     // Configuration
     void load_configuration();
-    void set_configuration_path(const std::string& path);
-    const std::string& get_configuration_path() const;
+    void set_configuration_file(const std::string& file);
+    const std::string& get_configuration_file() const;
 
     bool ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
                                             const std::bitset<MediaConchLib::report_Max>& reports,

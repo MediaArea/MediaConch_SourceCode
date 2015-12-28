@@ -125,15 +125,28 @@ namespace MediaConch
 #define OPTION(_TEXT, _TOLAUNCH)                                    \
         else if (argument.find(_TEXT)==0)        LAUNCH(_TOLAUNCH)
 
+        if (last_argument.length())
+        {
+            argument = last_argument + argument;
+            last_argument = std::string();
+        }
+
         if (argument=="-h")
             argument="--help";
         if (argument=="-n")
             argument="--fork=No";
 
+        if (argument=="-c")
+        {
+            last_argument="--configuration=";
+            return 0;
+        }
+
         if (0);
-        OPTION("--help", help)
-        OPTION("--fork", fork)
-        OPTION("--",     other)
+        OPTION("--help",          help)
+        OPTION("--fork",          fork)
+        OPTION("--configuration", configuration)
+        OPTION("--",              other)
         else
             return Help();
         return 0;
@@ -160,6 +173,18 @@ namespace MediaConch
         (void)argument;
         Help();
         return -1;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_configuration(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+            return 0;
+
+        std::string file = argument.substr(equal_pos + 1);
+        MCL->set_configuration_file(file);
+        return 0;
     }
 
     //--------------------------------------------------------------------------

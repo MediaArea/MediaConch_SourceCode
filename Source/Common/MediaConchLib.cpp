@@ -325,15 +325,15 @@ void MediaConchLib::load_configuration()
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::set_configuration_path(const std::string& path)
+void MediaConchLib::set_configuration_file(const std::string& file)
 {
-    core->set_configuration_path(path);
+    core->set_configuration_file(file);
 }
 
 //---------------------------------------------------------------------------
-const std::string& MediaConchLib::get_configuration_path() const
+const std::string& MediaConchLib::get_configuration_file() const
 {
-    return core->get_configuration_path();
+    return core->get_configuration_file();
 }
 //***************************************************************************
 // Policy

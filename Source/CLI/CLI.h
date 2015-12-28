@@ -38,6 +38,7 @@ namespace MediaConch
         void set_display_file(const std::string& file);
         int  register_option(const std::string& opt);
         void set_use_daemon(bool use) { use_daemon = use; }
+        void set_configuration_file(const std::string& file);
 
       private:
         CLI(const CLI&);
@@ -49,6 +50,7 @@ namespace MediaConch
         std::vector<std::string> files;
         std::vector<std::string> policies;
         std::string              display_file;
+        std::string              configuration_file;
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format format;
         bool use_daemon;

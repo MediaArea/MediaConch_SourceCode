@@ -99,8 +99,8 @@ public:
 
     //General Configuration
     void load_configuration();
-    void set_configuration_path(const std::string& path);
-    const std::string& get_configuration_path() const;
+    void set_configuration_file(const std::string& file);
+    const std::string& get_configuration_file() const;
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
@@ -122,7 +122,7 @@ private:
     MediaInfoNameSpace::MediaInfoList* MI;
     Database*                          db;
     Configuration*                     config;
-    std::string                        configuration_path;
+    std::string                        configuration_file;
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
 
@@ -174,7 +174,8 @@ private:
     //No idea how to do it better way
     bitset<MediaConchLib::report_Max> get_bitset_with_mi_mt();
 
-    std::string get_config_path();
+    std::string get_config_file();
+    std::string get_database_path();
     Database *get_db();
 };
 

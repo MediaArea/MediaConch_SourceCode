@@ -34,7 +34,7 @@ public:
     Configuration();
     virtual ~Configuration();
 
-    void set_path(const std::string& path);
+    void set_file(const std::string& file);
     int parse();
 
     int get(const std::string& key, std::string &val);
@@ -49,7 +49,7 @@ public:
 private:
     Container        *c;
     Container::Value  values;
-    std::string       path;
+    std::string       file;
     std::string       error;
     bool              parse_error;
     

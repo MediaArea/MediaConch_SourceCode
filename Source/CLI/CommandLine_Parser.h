@@ -39,6 +39,7 @@ CL_OPTION(Version);
 CL_OPTION(PolicyOption);
 CL_OPTION(Display);
 CL_OPTION(LogFile);
+CL_OPTION(Configuration);
 CL_OPTION(Default);
 
 //***************************************************************************

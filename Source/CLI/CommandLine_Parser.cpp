@@ -52,12 +52,19 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
         argument = Last_Argument.append(argument);
         Last_Argument = "";
     }
-    if (argument=="-p") {
+    if (argument=="-p")
+    {
         Last_Argument = "--policy=";
         return 0;
     }
-    if (argument=="-d") {
+    if (argument=="-d")
+    {
         Last_Argument = "--display=";
+        return 0;
+    }
+    if (argument=="-c")
+    {
+        Last_Argument = "--configuration=";
         return 0;
     }
 
@@ -113,6 +120,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--policy",                                      PolicyOption)
     OPTION("--display",                                     Display)
     OPTION("--logfile",                                     LogFile)
+    OPTION("--configuration",                               Configuration)
     //Default
     OPTION("--",                                            Default)
     else
@@ -215,6 +223,20 @@ CL_OPTION(LogFile)
     (void)cli;
     LogFile_FileName.assign(ZenLib::Ztring().From_UTF8(argument), 10, std::string::npos);
 
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(Configuration)
+{
+    //Form : --Configuration=File
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+        return Help();
+
+    std::string file;
+    file.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_configuration_file(file);
     return 0;
 }
 

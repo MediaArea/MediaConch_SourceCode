@@ -101,8 +101,8 @@ String Core::Menu_Option_Preferences_Option (const String& Param, const String& 
 void Core::load_configuration()
 {
     config = new Configuration;
-    std::string config_path = get_config_path();
-    config->set_path(config_path);
+    std::string config_file = get_config_file();
+    config->set_file(config_file);
     config->parse();
 
     long scheduler_max_threads = 1;
@@ -119,8 +119,8 @@ void Core::load_database()
 {
 #ifdef HAVE_SQLITE
     std::string db_path;
-    if (!config || config->get("SQLite_Path", db_path))
-        db_path = std::string(".");
+    if (!config || config->get("SQLite_Path", db_path) < 0)
+        db_path = get_database_path();
     db_path += Path_Separator;
 
     db = new SQLLite;
@@ -1128,12 +1128,9 @@ bool Core::file_is_registered(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-std::string Core::get_config_path()
+std::string Core::get_database_path()
 {
-    if (configuration_path.length())
-        return configuration_path;
-
-    std::string config_path(".");
+    std::string database_path(".");
 #if defined(WINDOWS)
     char username[UNLEN+1];
     DWORD username_len = UNLEN+1;
@@ -1143,8 +1140,48 @@ std::string Core::get_config_path()
     std::string user_name(wuser.begin(), wuser.end());
     std::stringstream path;
 
-    path << "C:/Users/" << user_name << "/AppData/Local/MediaConch/";
-    config_path = path.str();
+    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
+    database_path = path.str();
+#elif defined(UNIX)
+    const char* home;
+
+    if ((home = getenv("HOME")) == NULL)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw)
+            home = pw->pw_dir;
+        else
+            home = ".";
+    }
+    database_path = std::string(home) + Path_Separator + std::string(".local/share/MediaConch/");
+#elif defined(MACOS) || defined(MACOSX)
+    database_path = std::string("~/Library/Application Support/MediaConch/");
+#endif
+
+    std::ifstream ifile(database_path.c_str());
+    if (!ifile)
+        database_path = std::string(".") + Path_Separator;
+    return database_path;
+}
+
+//---------------------------------------------------------------------------
+std::string Core::get_config_file()
+{
+    if (configuration_file.length())
+        return configuration_file;
+
+    std::string config_file(".");
+#if defined(WINDOWS)
+    char username[UNLEN+1];
+    DWORD username_len = UNLEN+1;
+    GetUserName(username, &username_len);
+
+    std::string wuser(username, username_len);
+    std::string user_name(wuser.begin(), wuser.end());
+    std::stringstream path;
+
+    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
+    config_file = path.str();
 #elif defined(UNIX)
     const char* home = NULL;
 
@@ -1153,28 +1190,31 @@ std::string Core::get_config_path()
         struct passwd *pw = getpwuid(getuid());
         if (pw)
             home = pw->pw_dir;
+        else
+            home = ".";
     }
-    config_path = std::string(home) + Path_Separator + std::string(".config/");
+    config_file = std::string(home) + Path_Separator + std::string(".config/");
 #elif defined(MACOS) || defined(MACOSX)
-    config_path = std::string("~/Library/Preferences/");
+    config_file = std::string("~/Library/Preferences/");
 #endif
 
-    std::ifstream ifile(config_path.c_str());
+    std::ifstream ifile(config_file.c_str());
     if (!ifile)
-        config_path = std::string(".") + Path_Separator;
-    return config_path;
+        config_file = std::string(".") + Path_Separator;
+    config_file += configName;
+    return config_file;
 }
 
 //---------------------------------------------------------------------------
-void Core::set_configuration_path(const std::string& path)
+void Core::set_configuration_file(const std::string& file)
 {
-    configuration_path = path;
+    configuration_file = file;
 }
 
 //---------------------------------------------------------------------------
-const std::string& Core::get_configuration_path() const
+const std::string& Core::get_configuration_file() const
 {
-    return configuration_path;
+    return configuration_file;
 }
 
 //---------------------------------------------------------------------------
