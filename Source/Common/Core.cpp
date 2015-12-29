@@ -39,6 +39,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#elif defined(MACOS) || defined(MACOSX)
+#include <sys/types.h>
+#include <pwd.h>
+#include <uuid/uuid.h>
 #endif
 
 //---------------------------------------------------------------------------
@@ -1155,7 +1159,15 @@ std::string Core::get_database_path()
     }
     database_path = std::string(home) + Path_Separator + std::string(".local/share/MediaConch/");
 #elif defined(MACOS) || defined(MACOSX)
-    database_path = std::string("~/Library/Application Support/MediaConch/");
+    const char* user = NULL;
+
+    if ((user = getenv("USER")) == NULL)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw)
+            user = pw->pw_name;
+    }
+    database_path = std::string("/Users/") + user + std::string("/Library/Application Support/MediaConch/");
 #endif
 
     std::ifstream ifile(database_path.c_str());
@@ -1195,7 +1207,15 @@ std::string Core::get_config_file()
     }
     config_file = std::string(home) + Path_Separator + std::string(".config/");
 #elif defined(MACOS) || defined(MACOSX)
-    config_file = std::string("~/Library/Preferences/");
+    const char* user = NULL;
+
+    if ((user = getenv("USER")) == NULL)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw)
+            user = pw->pw_name;
+    }
+    config_file = std::string("/Users/") + user + std::string("/Library/Preferences/");
 #endif
 
     std::ifstream ifile(config_file.c_str());
