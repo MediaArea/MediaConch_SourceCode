@@ -39,6 +39,7 @@ namespace MediaConch
         int  register_option(const std::string& opt);
         void set_use_daemon(bool use) { use_daemon = use; }
         void set_configuration_file(const std::string& file);
+        void set_implementation_schema_file(const std::string& file);
 
       private:
         CLI(const CLI&);

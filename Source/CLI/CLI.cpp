@@ -53,6 +53,10 @@ namespace MediaConch
         if (!report_set.count())
             report_set.set(MediaConchLib::report_MediaConch);
 
+        // If no Implementation Schema registered, use one by default
+        if (!MCL.get_implementation_schema_file().length())
+            MCL.create_default_implementation_schema();
+
         std::string reason;
         if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
                                                     format, reason))
@@ -200,6 +204,12 @@ namespace MediaConch
     void CLI::set_configuration_file(const std::string& file)
     {
         configuration_file = file;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_implementation_schema_file(const std::string& file)
+    {
+        MCL.set_implementation_schema_file(file);
     }
 
     //--------------------------------------------------------------------------

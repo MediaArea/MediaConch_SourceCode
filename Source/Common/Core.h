@@ -101,6 +101,9 @@ public:
     void load_configuration();
     void set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
+    void set_implementation_schema_file(const std::string& file);
+    const std::string& get_implementation_schema_file();
+    void create_default_implementation_schema();
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
@@ -123,6 +126,7 @@ private:
     Database*                          db;
     Configuration*                     config;
     std::string                        configuration_file;
+    std::map<std::string, std::string> implementation_options;
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
 
@@ -142,7 +146,7 @@ private:
     bool validate_schematron_policy_from_memory(const std::string& file, const std::string& memory, std::string& report);
     bool validate_schematron_policy_from_file(const std::string& file, const std::string& policy, std::string& report);
     bool validate_xslt_policy(const std::string& file, int pos, std::string& report);
-    bool validate_xslt_policy_from_memory(const std::string& file, const std::string& memory, std::string& report);
+    bool validate_xslt_policy_from_memory(const std::string& file, const std::string& memory, std::string& report, bool is_implem=false);
     bool validate_xslt_policy_from_file(const std::string& file, const std::string& policy, std::string& report);
     bool is_schematron_file(const std::string& file);
 
@@ -177,6 +181,9 @@ private:
     std::string get_config_file();
     std::string get_database_path();
     Database *get_db();
+
+    std::string get_local_data_path();
+    std::string get_local_config_path();
 };
 
 }

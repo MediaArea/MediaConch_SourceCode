@@ -67,6 +67,11 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
         Last_Argument = "--configuration=";
         return 0;
     }
+    if (argument=="-i")
+    {
+        Last_Argument = "--implementationschema=";
+        return 0;
+    }
 
     // Help short options
     if (argument=="-ha")
@@ -121,6 +126,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--display",                                     Display)
     OPTION("--logfile",                                     LogFile)
     OPTION("--configuration",                               Configuration)
+    OPTION("--implementationschema",                        ImplementationSchema)
     //Default
     OPTION("--",                                            Default)
     else
@@ -237,6 +243,20 @@ CL_OPTION(Configuration)
     std::string file;
     file.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_configuration_file(file);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(ImplementationSchema)
+{
+    //Form : --ImplemnetationSchema=File
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+        return Help();
+
+    std::string file;
+    file.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_implementation_schema_file(file);
     return 0;
 }
 

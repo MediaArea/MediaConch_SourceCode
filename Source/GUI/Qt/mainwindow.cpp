@@ -54,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Core configuration
+    if (!MCL.get_implementation_schema_file().length())
+        MCL.create_default_implementation_schema();
     MCL.init();
 
     // Groups

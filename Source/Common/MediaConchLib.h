@@ -102,6 +102,9 @@ public:
     int remove_report(const std::vector<std::string>& files);
 
     // Policy
+    void               set_implementation_schema_file(const std::string& file);
+    const std::string& get_implementation_schema_file();
+    void               create_default_implementation_schema();
     bool validate_policy(const std::string& file, int policy,
                          MediaConchLib::ReportRes* result,
                          const std::string* display_name, const std::string* display_content);

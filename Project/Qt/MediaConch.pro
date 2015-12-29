@@ -78,6 +78,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/ImplementationReportDisplayTextUnicodeXsl.h \
                     ../../Source/Common/ImplementationReportDisplayTextXsl.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
+                    ../../Source/Common/ImplementationReportMatroskaSchema.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/NoDatabase.h \
                     ../../Source/Common/SQLLite.h \
