@@ -12,6 +12,7 @@
 
 //---------------------------------------------------------------------------
 #include <libxml/tree.h>
+#include <libexslt/exslt.h>
 #include "Xslt.h"
 #include <fstream>
 #include <sstream>
@@ -29,6 +30,7 @@ Xslt::Xslt() : Schema()
 {
     xslt_ctx = NULL;
     doc_ctx = NULL;
+    exsltRegisterAll();
 }
 
 //---------------------------------------------------------------------------
