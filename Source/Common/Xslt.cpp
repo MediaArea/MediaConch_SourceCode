@@ -12,9 +12,11 @@
 
 //---------------------------------------------------------------------------
 #include <libxml/tree.h>
+#include <libexslt/exslt.h>
 #include "Xslt.h"
 #include <fstream>
 #include <sstream>
+#include <string.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -29,6 +31,7 @@ Xslt::Xslt() : Schema()
 {
     xslt_ctx = NULL;
     doc_ctx = NULL;
+    exsltRegisterAll();
 }
 
 //---------------------------------------------------------------------------
@@ -119,7 +122,29 @@ int Xslt::validate_xml(const std::string& xml, bool)
     if (!doc)
         return -1;
 
-    xmlDocPtr res = xsltApplyStylesheet(xslt_ctx, doc, NULL);
+    const char** params = NULL;
+    std::vector<std::string> vec;
+
+    if (options.size())
+    {
+        std::map<std::string, std::string>::iterator it = options.begin();
+        for (; it != options.end(); ++it)
+        {
+            vec.push_back(std::string(it->first));
+            vec.push_back(std::string(it->second));
+        }
+
+        params = new const char* [vec.size() + 1];
+        size_t i = 0;
+        for(; i < vec.size(); ++i)
+            params[i] = vec[i].c_str();
+        params[i] = NULL;
+    }
+
+    xmlDocPtr res = xsltApplyStylesheet(xslt_ctx, doc, params);
+
+    if (params)
+        delete [] params;
 
     if (!res)
     {

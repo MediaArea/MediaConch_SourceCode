@@ -99,6 +99,8 @@ int Help_Advanced()
 {
     TEXTOUT("--LogFile=...");
     TEXTOUT("                    Save the output in the specified file");
+    TEXTOUT("--ImplementationSchema=File");
+    TEXTOUT("                    Use the specified File for implementation validation");
     TEXTOUT("--Help=Ssl");
     TEXTOUT("                    More details about SSL specific options (e.g. for HTTPS or FTPS)");
     TEXTOUT("--Help=Ssh");

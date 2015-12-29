@@ -18,6 +18,7 @@
 //---------------------------------------------------------------------------
 #include <string>
 #include <vector>
+#include <map>
 
 namespace MediaConch {
 
@@ -43,10 +44,13 @@ public:
     std::string  get_report() const { return report; }
     std::vector<std::string> get_errors() const { return errors; }
 
+    void set_options(const std::map<std::string, std::string>& opt) { options = opt; }
+
 protected:
-    std::string              schema;
-    std::string              report;
-    std::vector<std::string> errors;
+    std::string                        schema;
+    std::string                        report;
+    std::vector<std::string>           errors;
+    std::map<std::string, std::string> options;
 
     // HELPER
     int          read_file(const char* filename, std::string& buffer);

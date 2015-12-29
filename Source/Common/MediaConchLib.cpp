@@ -246,6 +246,24 @@ int MediaConchLib::remove_report(const std::vector<std::string>& files)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void MediaConchLib::set_implementation_schema_file(const std::string& file)
+{
+    core->set_implementation_schema_file(file);
+}
+
+//---------------------------------------------------------------------------
+const std::string& MediaConchLib::get_implementation_schema_file()
+{
+    return core->get_implementation_schema_file();
+}
+
+//---------------------------------------------------------------------------
+void MediaConchLib::create_default_implementation_schema()
+{
+    core->create_default_implementation_schema();
+}
+
+//---------------------------------------------------------------------------
 bool MediaConchLib::validate_policy(const std::string& file, int policy,
                                     MediaConchLib::ReportRes* result,
                                     const std::string* display_name,

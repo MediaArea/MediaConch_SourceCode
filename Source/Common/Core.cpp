@@ -28,8 +28,10 @@
 #include "Common/ImplementationReportDisplayTextUnicodeXsl.h"
 #endif //defined(_WIN32) || defined(WIN32)
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/ImplementationReportMatroskaSchema.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
+#include "ZenLib/Dir.h"
 #include <sstream>
 #include <fstream>
 #include <sys/stat.h>
@@ -135,6 +137,44 @@ void Core::load_database()
     db = new NoDatabase;
     db->init();
 #endif
+}
+
+//---------------------------------------------------------------------------
+void Core::set_implementation_schema_file(const std::string& file)
+{
+    if (!file.length())
+        return;
+    std::string f;
+
+    if (file[0] == '"')
+        f = std::string("'") + file + std::string("'");
+    else
+        f = std::string("\"") + file + std::string("\"");
+    implementation_options["schema"] = f;
+}
+
+//---------------------------------------------------------------------------
+const std::string& Core::get_implementation_schema_file()
+{
+    return implementation_options["schema"];
+}
+
+//---------------------------------------------------------------------------
+void Core::create_default_implementation_schema()
+{
+    std::string path = get_local_data_path();
+    std::string file = path + "MatroskaSchema.xml";
+
+    std::ofstream ofs;
+    ofs.open(file.c_str(), std::ofstream::out | std::ofstream::binary);
+
+    if (!ofs.is_open())
+        return;
+
+    ofs << xsl_schema_matroska_schema;
+    ofs.close();
+
+    set_implementation_schema_file(file);
 }
 
 //***************************************************************************
@@ -784,10 +824,14 @@ bool Core::validate_xslt_policy_from_file(const std::string& file, const std::st
 }
 
 //---------------------------------------------------------------------------
-bool Core::validate_xslt_policy_from_memory(const std::string& file, const std::string& memory, std::string& report)
+bool Core::validate_xslt_policy_from_memory(const std::string& file, const std::string& memory,
+                                            std::string& report, bool is_implem)
 {
     bool valid = true;
     Schema *S = new Xslt;
+
+    if (is_implem)
+        S->set_options(implementation_options);
 
     if (S->register_schema_from_memory(memory))
         valid = validation(file, S, report);
@@ -959,7 +1003,8 @@ void Core::create_report_ma_xml(const std::string& filename, std::string& report
     if (pos != std::string::npos)
         version = version.substr(pos + search.length());
 
-    std::stringstream start("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+    std::stringstream start;
+    start << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     start << "<MediaArea\n";
     start << "xmlns=\"https://mediaarea.net/mediaarea\"\n";
     start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
@@ -1093,7 +1138,7 @@ void Core::get_implementation_report(const std::string& file, std::string& repor
     {
         bool valid;
         std::string memory(implementation_report_xsl);
-        valid = validate_xslt_policy_from_memory(file, memory, r);
+        valid = validate_xslt_policy_from_memory(file, memory, r, true);
         if (valid)
         {
             std::string time = get_last_modification_file(file);
@@ -1132,9 +1177,9 @@ bool Core::file_is_registered(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-std::string Core::get_database_path()
+std::string Core::get_local_config_path()
 {
-    std::string database_path(".");
+    std::string local_path(".");
 #if defined(WINDOWS)
     char username[UNLEN+1];
     DWORD username_len = UNLEN+1;
@@ -1145,7 +1190,53 @@ std::string Core::get_database_path()
     std::stringstream path;
 
     path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
-    database_path = path.str();
+    local_path = path.str();
+#elif defined(UNIX)
+    const char* home = NULL;
+
+    if ((home = getenv("HOME")) == NULL)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw)
+            home = pw->pw_dir;
+        else
+            home = ".";
+    }
+    local_path = std::string(home) + Path_Separator + std::string(".config/");
+#elif defined(MACOS) || defined(MACOSX)
+    const char* user = NULL;
+
+    if ((user = getenv("USER")) == NULL)
+    {
+        struct passwd *pw = getpwuid(getuid());
+        if (pw)
+            user = pw->pw_name;
+    }
+    local_path = std::string("/Users/") + user + std::string("/Library/Preferences/");
+#endif
+
+    Ztring z_path = ZenLib::Ztring().From_UTF8(local_path);
+    if (!ZenLib::Dir::Exists(z_path))
+        ZenLib::Dir::Create(z_path);
+
+    return local_path;
+}
+
+//---------------------------------------------------------------------------
+std::string Core::get_local_data_path()
+{
+    std::string local_path(".");
+#if defined(WINDOWS)
+    char username[UNLEN+1];
+    DWORD username_len = UNLEN+1;
+    GetUserName(username, &username_len);
+
+    std::string wuser(username, username_len);
+    std::string user_name(wuser.begin(), wuser.end());
+    std::stringstream path;
+
+    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
+    local_path = path.str();
 #elif defined(UNIX)
     const char* home;
 
@@ -1157,7 +1248,7 @@ std::string Core::get_database_path()
         else
             home = ".";
     }
-    database_path = std::string(home) + Path_Separator + std::string(".local/share/MediaConch/");
+    local_path = std::string(home) + Path_Separator + std::string(".local/share/MediaConch/");
 #elif defined(MACOS) || defined(MACOSX)
     const char* user = NULL;
 
@@ -1167,8 +1258,20 @@ std::string Core::get_database_path()
         if (pw)
             user = pw->pw_name;
     }
-    database_path = std::string("/Users/") + user + std::string("/Library/Application Support/MediaConch/");
+    local_path = std::string("/Users/") + user + std::string("/Library/Application Support/MediaConch/");
 #endif
+
+    Ztring z_path = ZenLib::Ztring().From_UTF8(local_path);
+    if (!ZenLib::Dir::Exists(z_path))
+        ZenLib::Dir::Create(z_path);
+
+    return local_path;
+}
+
+//---------------------------------------------------------------------------
+std::string Core::get_database_path()
+{
+    std::string database_path = get_local_data_path();
 
     std::ifstream ifile(database_path.c_str());
     if (!ifile)
@@ -1182,46 +1285,12 @@ std::string Core::get_config_file()
     if (configuration_file.length())
         return configuration_file;
 
-    std::string config_file(".");
-#if defined(WINDOWS)
-    char username[UNLEN+1];
-    DWORD username_len = UNLEN+1;
-    GetUserName(username, &username_len);
+    std::string config_file = get_local_config_path();
 
-    std::string wuser(username, username_len);
-    std::string user_name(wuser.begin(), wuser.end());
-    std::stringstream path;
-
-    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
-    config_file = path.str();
-#elif defined(UNIX)
-    const char* home = NULL;
-
-    if ((home = getenv("HOME")) == NULL)
-    {
-        struct passwd *pw = getpwuid(getuid());
-        if (pw)
-            home = pw->pw_dir;
-        else
-            home = ".";
-    }
-    config_file = std::string(home) + Path_Separator + std::string(".config/");
-#elif defined(MACOS) || defined(MACOSX)
-    const char* user = NULL;
-
-    if ((user = getenv("USER")) == NULL)
-    {
-        struct passwd *pw = getpwuid(getuid());
-        if (pw)
-            user = pw->pw_name;
-    }
-    config_file = std::string("/Users/") + user + std::string("/Library/Preferences/");
-#endif
-
+    config_file += configName;
     std::ifstream ifile(config_file.c_str());
     if (!ifile)
-        config_file = std::string(".") + Path_Separator;
-    config_file += configName;
+        config_file = std::string(".") + Path_Separator + configName;
     return config_file;
 }
 
