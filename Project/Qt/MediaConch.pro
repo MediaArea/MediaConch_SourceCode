@@ -170,12 +170,15 @@ else {
 }
 exists(../../../libxslt/libxslt/.libs/libxslt.a) {
     INCLUDEPATH      += ../../../libxslt/libxslt
+    INCLUDEPATH      += ../../../libxslt/libexslt
     LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
+    LIBS             += ../../../libxslt/libexslt/.libs/libexslt.a
     message("libxslt     : custom")
 }
 else {
     INCLUDEPATH      += /usr/include/libxslt
-    LIBS             += -lxslt
+    INCLUDEPATH      += /usr/include/libexslt
+    LIBS             += -lxslt -lexslt
     message("libxslt     : system")
 }
 

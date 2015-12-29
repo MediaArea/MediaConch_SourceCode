@@ -281,23 +281,30 @@ dnl
 if test -e ../../../../libxslt/libxslt/.libs/libxslt.la; then
 	CXXFLAGS="$CXXFLAGS  -I../../../../libxslt/libxslt"
 	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libxslt/libxslt"
+	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libxslt/libexslt"
 	if test "$enable_staticlibs" = "yes"; then
 		with_libxslt="builtin (static)"
 		LIBS="$LIBS  ../../../../libxslt/libxslt/.libs/libxslt.a"
+		LIBS="$LIBS  ../../../../libxslt/libexslt/.libs/libexslt.a"
 	else
 		with_libxslt="builtin"
 		LIBS="$LIBS  -L../../../../libxslt/libxslt/.libs -lxslt"
+		LIBS="$LIBS  -L../../../../libxslt/libexslt/.libs -lexslt"
 	fi
 else
 	if pkg-config --exists libxslt; then
 		CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libxslt)"
+		CXXFLAGS="$CXXFLAGS $(pkg-config --cflags libexslt)"
 		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libxslt)"
+		MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(pkg-config --cflags libexslt)"
 		if test "$enable_staticlibs" = "yes"; then
 			with_libxslt="system (static)"
 			LIBS="$LIBS $(pkg-config --static --libs libxslt)"
+			LIBS="$LIBS $(pkg-config --static --libs libexslt)"
 		else
 			with_libxslt="system"
 			LIBS="$LIBS $(pkg-config --libs libxslt)"
+			LIBS="$LIBS $(pkg-config --libs libexslt)"
 		fi
 	else
 		AC_MSG_ERROR([libxslt configuration is not found])
@@ -477,6 +484,7 @@ echo "  Using libevent?                                         $with_libevent"
 echo "  Using libjansson?                                       $with_libjansson"
 echo "  Using libsqlite3?                                       $with_libsqlite3"
 echo "  Using libxml2?                                          $with_libxml2"
+echo "  Using libxslt?                                          $with_libxslt"
 echo "  Using libzen?                                           $with_zenlib"
 echo "  Using libmediainfo?                                     $with_mediainfolib"
 echo ""
