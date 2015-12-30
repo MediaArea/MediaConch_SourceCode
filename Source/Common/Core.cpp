@@ -130,7 +130,6 @@ void Core::load_database()
     std::string db_path;
     if (!config || config->get("SQLite_Path", db_path) < 0)
         db_path = get_database_path();
-    db_path += Path_Separator;
 
     db = new SQLLite;
 
@@ -1298,8 +1297,8 @@ std::string Core::get_database_path()
 {
     std::string database_path = get_local_data_path();
 
-    std::ifstream ifile(database_path.c_str());
-    if (!ifile)
+    Ztring z_path = ZenLib::Ztring().From_UTF8(database_path);
+    if (!ZenLib::Dir::Exists(z_path))
         database_path = std::string(".") + Path_Separator;
     return database_path;
 }

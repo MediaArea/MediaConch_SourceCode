@@ -91,9 +91,9 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013\include/QtGui;D:\Qt\5.5\msvc2013\include/QtWidgets;D:\Qt\5.5\msvc2013\include/QtCore;D:\Qt\5.5\msvc2013\include;D:\Qt\5.5\msvc2013\include/QtWebKit;D:\Qt\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013\include/QtGui;D:\Qt\5.5\msvc2013\include/QtWidgets;D:\Qt\5.5\msvc2013\include/QtCore;D:\Qt\5.5\msvc2013\include;D:\Qt\5.5\msvc2013\include/QtWebKit;D:\Qt\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -108,9 +108,9 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013_64\include/QtGui;D:\Qt\5.5\msvc2013_64\include/QtWidgets;D:\Qt\5.5\msvc2013_64\include/QtCore;D:\Qt\5.5\msvc2013_64\include;D:\Qt\5.5\msvc2013_64\include/QtWebKit;D:\Qt\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013_64\include/QtGui;D:\Qt\5.5\msvc2013_64\include/QtWidgets;D:\Qt\5.5\msvc2013_64\include/QtCore;D:\Qt\5.5\msvc2013_64\include;D:\Qt\5.5\msvc2013_64\include/QtWebKit;D:\Qt\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -126,9 +126,9 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013\include/QtGui;D:\Qt\5.5\msvc2013\include/QtWidgets;D:\Qt\5.5\msvc2013\include/QtCore;D:\Qt\5.5\msvc2013\include;D:\Qt\5.5\msvc2013\include/QtWebKit;D:\Qt\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013\include/QtGui;D:\Qt\5.5\msvc2013\include/QtWidgets;D:\Qt\5.5\msvc2013\include/QtCore;D:\Qt\5.5\msvc2013\include;D:\Qt\5.5\msvc2013\include/QtWebKit;D:\Qt\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -148,9 +148,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013_64\include/QtGui;D:\Qt\5.5\msvc2013_64\include/QtWidgets;D:\Qt\5.5\msvc2013_64\include/QtCore;D:\Qt\5.5\msvc2013_64\include;D:\Qt\5.5\msvc2013_64\include/QtWebKit;D:\Qt\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013_64\include/QtGui;D:\Qt\5.5\msvc2013_64\include/QtWidgets;D:\Qt\5.5\msvc2013_64\include/QtCore;D:\Qt\5.5\msvc2013_64\include;D:\Qt\5.5\msvc2013_64\include/QtWebKit;D:\Qt\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -166,6 +166,7 @@
     <ResourceCompile Include="MediaConch_GUI.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\sqlite\sqlite3.c" />
     <ClCompile Include="..\..\..\Source\Common\Configuration.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Common\DaemonClient.cpp" />
@@ -186,6 +187,7 @@
     <ClCompile Include="..\..\..\Source\Common\Schema.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
@@ -234,11 +236,13 @@
     <ClCompile Include="_Automated\qrc_Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\sqlite\sqlite3.h" />
     <ClInclude Include="..\..\..\Source\Common\Core.h" />
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
     <ClInclude Include="..\..\..\Source\Common\Policy.h" />
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h" />
+    <ClInclude Include="..\..\..\Source\Common\SQLLite.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h" />
