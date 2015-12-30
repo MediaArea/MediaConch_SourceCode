@@ -40,7 +40,7 @@ Database::~Database()
 //---------------------------------------------------------------------------
 void Database::set_database_directory(const std::string& dirname)
 {
-    db_file = dirname + Path_Separator + databaseName;
+    db_file = dirname + databaseName;
 }
 
 }

@@ -25,6 +25,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="sqlite">
+      <UniqueIdentifier>{3c62d1d8-29ba-45c4-8828-7a5e54664aa9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\CLI\CLI_Main.cpp">
@@ -108,6 +111,9 @@
     <ClCompile Include="..\..\..\Source\CLI\CLI.cpp">
       <Filter>Source Files\CLI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\sqlite\sqlite3.c">
+      <Filter>sqlite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\CLI\CLI_Main.h">
@@ -139,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h">
       <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\sqlite\sqlite3.h">
+      <Filter>sqlite</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

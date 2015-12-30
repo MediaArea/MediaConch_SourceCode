@@ -26,7 +26,7 @@ class DaemonClient;
 class Policy;
 class Http;
 
-#ifdef WINDOWS
+#ifdef _WIN32
     const std::string Path_Separator("\\");
     /* const String WPath_Separator(__T("\\")); */
 #else
