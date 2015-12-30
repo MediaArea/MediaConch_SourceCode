@@ -26,6 +26,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxml2", "..\..\..\libxml2
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxslt_so", "..\..\..\libxslt\win32\libxslt\libxslt_so.vcxproj", "{9B8B6CF0-FC48-447F-9A89-88410DA3A577}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libexslt_so", "..\..\..\libxslt\win32\libexslt\libexslt_so.vcxproj", "{C66B92E2-E917-4556-84D9-6D32C10C3185}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -126,6 +128,16 @@ Global
 		{9B8B6CF0-FC48-447F-9A89-88410DA3A577}.Release|Win32.Build.0 = Release|Win32
 		{9B8B6CF0-FC48-447F-9A89-88410DA3A577}.Release|x64.ActiveCfg = Release|x64
 		{9B8B6CF0-FC48-447F-9A89-88410DA3A577}.Release|x64.Build.0 = Release|x64
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Debug|ARM.ActiveCfg = Debug|Win32
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Debug|Win32.Build.0 = Debug|Win32
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Debug|x64.ActiveCfg = Debug|x64
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Debug|x64.Build.0 = Debug|x64
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Release|ARM.ActiveCfg = Release|Win32
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Release|Win32.ActiveCfg = Release|Win32
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Release|Win32.Build.0 = Release|Win32
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Release|x64.ActiveCfg = Release|x64
+		{C66B92E2-E917-4556-84D9-6D32C10C3185}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,5 +149,6 @@ Global
 		{BE6D3EF8-2F82-4F1E-956A-890C3614A2D5} = {70DAF034-E8BA-4636-A42C-CC581B3ECC94}
 		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C} = {70DAF034-E8BA-4636-A42C-CC581B3ECC94}
 		{9B8B6CF0-FC48-447F-9A89-88410DA3A577} = {70DAF034-E8BA-4636-A42C-CC581B3ECC94}
+		{C66B92E2-E917-4556-84D9-6D32C10C3185} = {70DAF034-E8BA-4636-A42C-CC581B3ECC94}
 	EndGlobalSection
 EndGlobal

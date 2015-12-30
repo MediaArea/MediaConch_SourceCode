@@ -135,7 +135,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -155,7 +155,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -175,7 +175,7 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -198,7 +198,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <SetChecksum>true</SetChecksum>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -220,7 +220,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <SetChecksum>true</SetChecksum>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxml2.lib;zlib.lib;kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -241,20 +241,35 @@
       <TargetMachine>MachineX64</TargetMachine>
       <SetChecksum>true</SetChecksum>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\CLI\CLI.cpp" />
     <ClCompile Include="..\..\..\Source\CLI\CLI_Main.cpp" />
     <ClCompile Include="..\..\..\Source\CLI\CommandLine_Parser.cpp" />
     <ClCompile Include="..\..\..\Source\CLI\Help.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Configuration.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\DaemonClient.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Database.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Http.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Httpd.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Json.cpp" />
     <ClCompile Include="..\..\..\Source\Common\JS_Tree.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\LibEventHttp.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\LibEventHttpd.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\MediaConchLib.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\NoDatabase.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policy.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Queue.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\REST_API.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Scheduler.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schema.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
   </ItemGroup>
@@ -274,6 +289,15 @@
     <ResourceCompile Include="MediaConch_CLI.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\libxml2\win32\VC12\libxml2.vcxproj">
+      <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\libxslt\win32\libexslt\libexslt_so.vcxproj">
+      <Project>{c66b92e2-e917-4556-84d9-6d32c10c3185}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\libxslt\win32\libxslt\libxslt_so.vcxproj">
+      <Project>{9b8b6cf0-fc48-447f-9a89-88410da3a577}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\MediaInfoLib\Project\MSVC2013\Dll\MediaInfoDll.vcxproj">
       <Project>{be6d3ef8-2f82-4f1e-956a-890c3614a2d5}</Project>
     </ProjectReference>
