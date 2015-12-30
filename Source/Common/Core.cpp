@@ -557,9 +557,9 @@ bool Core::validate_policy(const std::string& file, int policy,
     else
         valid = validate_xslt_policy(file, policy, result->report);
 
-    if (valid && display_name)
+    if (display_name)
         transform_with_xslt_file(result->report, *display_name, result->report);
-    else if (valid && display_content)
+    else if (display_content)
         transform_with_xslt_memory(result->report, *display_content, result->report);
 
     return valid;
@@ -586,9 +586,9 @@ bool Core::validate_policy_file(const std::string& file, const std::string& poli
             result->report = tmp;
     }
 
-    if (valid && display_name)
+    if (display_name)
         transform_with_xslt_file(result->report, *display_name, result->report);
-    else if (valid && display_content)
+    else if (display_content)
         transform_with_xslt_memory(result->report, *display_content, result->report);
 
     return valid;
@@ -615,9 +615,9 @@ bool Core::validate_policy_memory(const std::string& file, const std::string& po
             result->report = tmp;
     }
 
-    if (valid && display_name)
+    if (display_name)
         transform_with_xslt_file(result->report, *display_name, result->report);
-    else if (valid && display_content)
+    else if (display_content)
         transform_with_xslt_memory(result->report, *display_content, result->report);
 
     return valid;
