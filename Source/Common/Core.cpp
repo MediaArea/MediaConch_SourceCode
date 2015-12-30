@@ -150,6 +150,17 @@ void Core::set_implementation_schema_file(const std::string& file)
         f = std::string("'") + file + std::string("'");
     else
         f = std::string("\"") + file + std::string("\"");
+
+    //TODO: real uri encoding
+    while (1)
+    {
+        size_t pos = 0;
+        pos = f.find(" ");
+        if (pos == std::string::npos)
+          break;
+
+        f.replace(pos, 1, "%20");
+    }
     implementation_options["schema"] = f;
 }
 
