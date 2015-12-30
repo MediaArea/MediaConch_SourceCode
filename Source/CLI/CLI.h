@@ -26,7 +26,7 @@ namespace MediaConch
         CLI();
         ~CLI();
 
-        int  parse_args(int ac, char** av);
+        int  parse_args(const std::vector<std::string>& args);
         int  init();
         int  run();
         int  finish();

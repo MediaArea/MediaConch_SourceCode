@@ -114,11 +114,17 @@ int main(int argc, char* argv_ansi[])
     MediaInfoLib::MediaInfo::Option_Static(__T("LineSeparator"), __T("\n")); //Using sdtout
 
     // TODO: Retrieve command line (mainly for Unicode)
-    // GETCOMMANDLINE();
+    GETCOMMANDLINE();
+    std::vector<std::string> args;
+    for (int i = 0; i < argc; ++i)
+    {
+        MediaInfoLib::String Argument(argv[i]);
+        args.push_back(ZenLib::Ztring(Argument).To_UTF8());
+    }
 
     MediaConch::CLI cli;
 
-    if (cli.parse_args(argc, argv_ansi) < 0)
+    if (cli.parse_args(args) < 0)
         return 1;
 
     if (cli.init() < 0)
