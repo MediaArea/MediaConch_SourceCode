@@ -72,13 +72,13 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int CLI::parse_args(int argc, char **argv)
+    int CLI::parse_args(const std::vector<std::string>& args)
     {
         //Parse command line
-        for (int pos = 1; pos < argc; ++pos)
+        for (size_t pos = 1; pos < args.size(); ++pos)
         {
             //First part of argument (before "=") should be case insensitive
-            std::string argument(argv[pos]);
+            std::string argument(args[pos]);
             if (!argument.compare(0, 1, "-"))
             {
                 size_t egal_pos = argument.find('=');
@@ -93,7 +93,7 @@ namespace MediaConch
                 return ret; //no more tasks to do
 
             if (ret > 0)
-                files.push_back(argv[pos]); //Append the filename to the list of filenames to parse
+                files.push_back(args[pos]); //Append the filename to the list of filenames to parse
         }
         return 0;
     }
