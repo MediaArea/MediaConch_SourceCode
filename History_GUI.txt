@@ -8,6 +8,15 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 15.12, 2015-12-31
+-------------
+New icon
+Database support (speed improvement: file is parsed once, then policies are applied to the pre-analyzed content)
+More explicit licences (MediaConch and MediaInfo library are GPLv3+ and MPLv2+, list of third party libraries and their licences)
+Matroska: negative timecodes were not correctly handled
+Better support of non-English filenames
+Display format is applied also on invalid files
+
 Version 15.11, 2015-11-30
 -------------
 Detection of truncated Matroska files
