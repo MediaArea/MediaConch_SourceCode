@@ -152,7 +152,7 @@ void Core::set_implementation_schema_file(const std::string& file)
         f = std::string("\"") + file + std::string("\"");
 
     //TODO: real uri encoding
-    while (1)
+    for (;;)
     {
         size_t pos = 0;
         pos = f.find(" ");
