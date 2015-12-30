@@ -45,6 +45,9 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <uuid/uuid.h>
+#elif defined(WINDOWS)
+#include <windows.h>
+#include <Lmcons.h>
 #endif
 
 //---------------------------------------------------------------------------
@@ -1194,9 +1197,9 @@ std::string Core::get_local_config_path()
 #if defined(WINDOWS)
     char username[UNLEN+1];
     DWORD username_len = UNLEN+1;
-    GetUserName(username, &username_len);
+    GetUserNameA(username, &username_len);
 
-    std::string wuser(username, username_len);
+    std::string wuser(username, username_len-1);
     std::string user_name(wuser.begin(), wuser.end());
     std::stringstream path;
 
@@ -1240,9 +1243,9 @@ std::string Core::get_local_data_path()
 #if defined(WINDOWS)
     char username[UNLEN+1];
     DWORD username_len = UNLEN+1;
-    GetUserName(username, &username_len);
+    GetUserNameA(username, &username_len);
 
-    std::string wuser(username, username_len);
+    std::string wuser(username, username_len-1);
     std::string user_name(wuser.begin(), wuser.end());
     std::stringstream path;
 
@@ -1343,7 +1346,11 @@ void Core::WaitRunIsFinished()
     {
         if (scheduler->is_finished())
             break;
+        #ifdef WINDOWS
+        ::Sleep((DWORD)50);
+        #else
         usleep(50000);
+        #endif
     }
 }
 

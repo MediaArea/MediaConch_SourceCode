@@ -15,7 +15,9 @@
 #include "CommandLine_Parser.h"
 #include "Help.h"
 
-#include <unistd.h>
+#if !defined(WINDOWS)
+    #include <unistd.h>
+#endif //!defined(WINDOWS)
 
 //****************************************************************************
 // Extern
@@ -247,7 +249,11 @@ namespace MediaConch
         {
             while (!MCL.is_done(files[i], percent_done))
             {
+                #ifdef WINDOWS
+                ::Sleep((DWORD)5);
+                #else
                 usleep(5000);
+                #endif
             }
         }
         return 0;

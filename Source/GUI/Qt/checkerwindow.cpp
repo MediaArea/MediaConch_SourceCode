@@ -36,7 +36,11 @@
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
 #endif
-#include <unistd.h>
+#if defined(WINDOWS)
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif //!defined(WINDOWS)
 
 namespace MediaConch {
 
@@ -223,7 +227,11 @@ void CheckerWindow::update_web_view(std::string file, int policy)
         if (!mainwindow->is_analyze_finished(files, percent_done))
             break;
         progressBar->get_progress_bar()->setValue(percent_done);
+        #ifdef WINDOWS
+        ::Sleep((DWORD)50);
+        #else
         usleep(50000);
+        #endif
     }
 
     //Add the file detail to the web page
@@ -265,7 +273,11 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
         if (!mainwindow->is_analyze_finished(vfiles, percent_done))
             break;
         progressBar->get_progress_bar()->setValue(percent_done / 2);
+        #ifdef WINDOWS
+        ::Sleep((DWORD)50);
+        #else
         usleep(50000);
+        #endif
     }
 
     //Add the files details to the web page
