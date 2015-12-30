@@ -164,6 +164,17 @@ void Core::set_implementation_schema_file(const std::string& file)
 
         f.replace(pos, 1, "%20");
     }
+    #ifdef WIN32
+    for (;;)
+    {
+        size_t pos = 0;
+        pos = f.find('\\');
+        if (pos == std::string::npos)
+          break;
+
+        f[pos]='/'; // Windows path separators are replaced by / else it is reected by libxml2
+    }
+    #endif //WIN32
     implementation_options["schema"] = f;
 }
 
