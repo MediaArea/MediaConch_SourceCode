@@ -796,6 +796,7 @@ bool MainWindow::validate_policy(const std::string& file, int policy,
     MediaConchLib::ReportRes result;
     const std::string* dname = display_name.length() ? &display_name : NULL;
     const std::string* dcontent = display_content.length() ? &display_content : NULL;
+
     if (MCL.validate_policy(file, policy, &result, dname, dcontent) < 0)
         return false;
     report = result.report;
