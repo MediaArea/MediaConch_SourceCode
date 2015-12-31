@@ -69,13 +69,16 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
 }
 
 //---------------------------------------------------------------------------
-void XsltRuleEdit::fill_editor_fields(const XsltRule *r)
+void XsltRuleEdit::fill_editor_fields(XsltRule *r)
 {
     int pos = ui->type->findText(QString().fromStdString(r->type));
     if (pos != -1)
         ui->type->setCurrentIndex(pos);
 
+    //Updating field selector makes r->field reseting
+    std::string remain(r->field);
     change_values_of_field_selector();
+    r->field = remain;
 
     pos = ui->field->findText(QString().fromStdString(r->field));
     if (pos != -1)

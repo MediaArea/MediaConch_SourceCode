@@ -54,7 +54,7 @@ public:
 // Visual element
 //***************************************************************************
     void rule_clicked(XsltRule *r);
-    void fill_editor_fields(const XsltRule *r);
+    void fill_editor_fields(XsltRule *r);
     const QPushButton *get_delRule_button();
     const QPushButton *get_duplicateRule_button();
     const QLineEdit   *get_name_line();
