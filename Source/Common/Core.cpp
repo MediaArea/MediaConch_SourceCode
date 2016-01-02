@@ -42,6 +42,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #elif defined(MACOS) || defined(MACOSX)
+#include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <uuid/uuid.h>
