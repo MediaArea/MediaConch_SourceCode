@@ -72,7 +72,7 @@ int DaemonClient::close()
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::analyze(const std::string& file, bool& registered)
+int DaemonClient::analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!http_client)
         return -1;

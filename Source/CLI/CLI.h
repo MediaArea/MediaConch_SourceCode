@@ -41,6 +41,7 @@ namespace MediaConch
         void set_configuration_file(const std::string& file);
         void set_implementation_schema_file(const std::string& file);
         int  set_compression_mode(const std::string& mode_str);
+        void set_force_analyze(bool force);
 
       private:
         CLI(const CLI&);
@@ -56,6 +57,7 @@ namespace MediaConch
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format format;
         bool use_daemon;
+        bool force_analyze;
     };
 
 }

@@ -42,7 +42,7 @@ public:
     int close();
 
     // Analyze
-    int analyze(const std::string& file, bool& registered);
+    int analyze(const std::string& file, bool& registered, bool force_analyze);
 
     // Status
     bool is_done(const std::string& file, double& done);

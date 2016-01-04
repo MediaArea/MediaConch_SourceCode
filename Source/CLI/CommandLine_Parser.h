@@ -42,6 +42,7 @@ CL_OPTION(LogFile);
 CL_OPTION(Configuration);
 CL_OPTION(ImplementationSchema);
 CL_OPTION(Compression);
+CL_OPTION(Force);
 CL_OPTION(Default);
 
 //***************************************************************************

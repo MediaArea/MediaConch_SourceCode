@@ -107,6 +107,8 @@ int Help_Advanced()
     TEXTOUT("                    Same as --Compression=ZLib");
     TEXTOUT("--ImplementationSchema=File");
     TEXTOUT("                    Use the specified File for implementation validation");
+    TEXTOUT("--Force");
+    TEXTOUT("                    Force to parse the file if registered in database");
     TEXTOUT("--Help=Ssl");
     TEXTOUT("                    More details about SSL specific options (e.g. for HTTPS or FTPS)");
     TEXTOUT("--Help=Ssh");

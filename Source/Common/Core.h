@@ -62,7 +62,7 @@ public:
     void        Close();
     void        Run(std::string file = std::string());
     bool        is_done(const std::string& file, double& percent_done);
-    int         open_file(const std::string& filename, bool& registered);
+    int         open_file(const std::string& filename, bool& registered, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
     int         get_report(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
                            const std::vector<std::string>& files,

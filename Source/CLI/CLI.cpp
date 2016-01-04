@@ -34,7 +34,7 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : use_daemon(false)
+    CLI::CLI() : use_daemon(false), force_analyze(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -107,7 +107,7 @@ namespace MediaConch
         for (size_t i = 0; i < files.size(); ++i)
         {
             bool registered = false;
-            if (MCL.analyze(files[i], registered) < 0)
+            if (MCL.analyze(files[i], registered, force_analyze) < 0)
                 continue;
 
             if (use_daemon && !registered)
@@ -272,6 +272,12 @@ namespace MediaConch
             }
         }
         return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_force_analyze(bool force)
+    {
+        force_analyze = force;
     }
 
 }

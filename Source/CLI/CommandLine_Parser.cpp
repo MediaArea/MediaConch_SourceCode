@@ -78,6 +78,8 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
         argument = "--help=Advanced";
     if (argument=="-v")
         argument = "--version";
+    if (argument=="-f")
+        argument = "--force";
 
     // Backward compatibility
     if (argument=="-tc")
@@ -132,6 +134,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--configuration",                               Configuration)
     OPTION("--implementationschema",                        ImplementationSchema)
     OPTION("--compression",                                 Compression)
+    OPTION("--force",                                       Force)
     //Default
     OPTION("--",                                            Default)
     else
@@ -278,6 +281,14 @@ CL_OPTION(Compression)
     transform(mode.begin(), mode.end(), mode.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
 
     return cli->set_compression_mode(mode);
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(Force)
+{
+    (void)argument;
+    cli->set_force_analyze(true);
+    return 0;
 }
 
 //---------------------------------------------------------------------------

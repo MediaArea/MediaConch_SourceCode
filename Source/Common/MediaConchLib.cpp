@@ -149,26 +149,26 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::analyze(const std::vector<std::string>& files)
+int MediaConchLib::analyze(const std::vector<std::string>& files, bool force_analyze)
 {
     if (!files.size())
         return -1;
 
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
-        analyze(files[i], registered);
+        analyze(files[i], registered, force_analyze);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::analyze(const std::string& file, bool& registered)
+int MediaConchLib::analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!file.length())
         return -1;
 
     if (use_daemon)
-        return daemon_client->analyze(file, registered);
-    return core->open_file(file, registered);
+        return daemon_client->analyze(file, registered, force_analyze);
+    return core->open_file(file, registered, force_analyze);
 }
 
 //---------------------------------------------------------------------------

@@ -93,8 +93,8 @@ public:
     int add_option(const std::string& option, std::string& report);
 
     // Analyze
-    int  analyze(const std::vector<std::string>& files);
-    int  analyze(const std::string& file, bool& registered);
+    int  analyze(const std::vector<std::string>& files, bool force_analyze = false);
+    int  analyze(const std::string& file, bool& registered, bool force_analyze = false);
     bool is_done(const std::vector<std::string>& files, double& percent);
     bool is_done(const std::string& file, double& percent);
 
