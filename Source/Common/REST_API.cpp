@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1";
+const std::string RESTAPI::API_VERSION = "1.1";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -892,7 +892,7 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Analyze_Arg>& args)
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        Container::Value arg, file, id;
+        Container::Value arg, file, id, force;
         arg.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         file.type = Container::Value::CONTAINER_TYPE_STRING;
@@ -902,6 +902,14 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Analyze_Arg>& args)
         id.type = Container::Value::CONTAINER_TYPE_INTEGER;
         id.l = args[i].id;
         arg.obj.push_back(std::make_pair("id", id));
+
+        if (args[i].has_force_analyze)
+        {
+            force.type = Container::Value::CONTAINER_TYPE_BOOL;
+            force.b = args[i].force_analyze;
+            arg.obj.push_back(std::make_pair("force", force));
+        }
+
         args_val.array.push_back(arg);
     }
 
@@ -1100,10 +1108,11 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& ar
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *file, *id;
+        Container::Value *file, *id, *force;
 
         file = model->get_value_by_key(*obj, "file");
         id = model->get_value_by_key(*obj, "id");
+        force = model->get_value_by_key(*obj, "force");
 
         if (!file || !id || file->type != Container::Value::CONTAINER_TYPE_STRING ||
             id->type != Container::Value::CONTAINER_TYPE_INTEGER)
@@ -1112,6 +1121,13 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& ar
         Analyze_Arg arg;
         arg.file = file->s;
         arg.id = id->l;
+
+        if (force && force->type == Container::Value::CONTAINER_TYPE_BOOL)
+        {
+            arg.has_force_analyze = true;
+            arg.force_analyze = force->b;
+        }
+
         args.push_back(arg);
     }
 

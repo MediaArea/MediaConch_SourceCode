@@ -82,6 +82,11 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
 
     arg.id = 0;
     arg.file = file;
+    if (force_analyze)
+    {
+        arg.has_force_analyze = true;
+        arg.force_analyze = force_analyze;
+    }
     req.args.push_back(arg);
 
     if (http_client->start() < 0 || http_client->send_request(req) < 0)
