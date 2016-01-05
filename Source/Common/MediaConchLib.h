@@ -64,6 +64,13 @@ public:
         format_Max,
     };
 
+    enum compression
+    {
+        compression_None = 0,
+        compression_ZLib,
+        compression_Max,
+    };
+
     struct ReportRes
     {
         std::string       report;

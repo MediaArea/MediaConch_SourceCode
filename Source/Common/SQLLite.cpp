@@ -47,9 +47,7 @@ SQLLite::~SQLLite()
 //---------------------------------------------------------------------------
 int SQLLite::init()
 {
-    std::string database(db_file.begin(), db_file.end());
-
-    int ret = sqlite3_open(database.c_str(), &db);
+    int ret = sqlite3_open(db_file.c_str(), &db);
     if (ret)
     {
         std::stringstream err("Error to open the DB: ");
@@ -67,16 +65,23 @@ int SQLLite::init()
 //---------------------------------------------------------------------------
 int SQLLite::create_report_table()
 {
-    std::stringstream create;
-    create << "CREATE TABLE IF NOT EXISTS " << "Report"; //Table name
-    create << "(";
-    create << "FILENAME               TEXT NOT NULL,";
-    create << "FILE_LAST_MODIFICATION INT  NOT NULL,";
-    create << "TOOL                   INT  NOT NULL,";
-    create << "FORMAT                 INT  NOT NULL,";
-    create << "REPORT                 TEXT          ";
-    create << ");";
-    query = create.str();
+    get_sql_query_for_create_report_table(query);
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+    ret = execute();
+    if (ret < 0)
+        return -1;
+
+    return update_report_table();
+}
+
+//---------------------------------------------------------------------------
+int SQLLite::update_report_table()
+{
+    get_sql_query_for_update_report_table(query);
 
     const char* end = NULL;
     int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
@@ -86,14 +91,14 @@ int SQLLite::create_report_table()
 }
 
 int SQLLite::save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification,
-                          const std::string& report)
+                         const std::string& report, MediaConchLib::compression compress)
 {
     std::stringstream create;
 
     reports.clear();
     create << "INSERT INTO " << "Report";
-    create << " (FILENAME, FILE_LAST_MODIFICATION, TOOL, FORMAT, REPORT)";
-    create << " VALUES (?, ?, ?, ?, ?);";
+    create << " (FILENAME, FILE_LAST_MODIFICATION, TOOL, FORMAT, REPORT, COMPRESS)";
+    create << " VALUES (?, ?, ?, ?, ?, ?);";
     query = create.str();
 
     const char* end = NULL;
@@ -121,6 +126,10 @@ int SQLLite::save_report(MediaConchLib::report reportKind, MediaConchLib::format
     if (ret != SQLITE_OK)
         return -1;
 
+    ret = sqlite3_bind_int(stmt, 6, (int)compress);
+    if (ret != SQLITE_OK)
+        return -1;
+
     return execute();
 }
 
@@ -143,13 +152,14 @@ int SQLLite::remove_report(const std::string& filename)
     return execute();
 }
 
-std::string SQLLite::get_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification)
+void SQLLite::get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
+                         const std::string& filename, const std::string& file_last_modification,
+                         std::string& report, MediaConchLib::compression& compress)
 {
     std::stringstream create;
-    std::string key("REPORT");
 
     reports.clear();
-    create << "SELECT " << key << " FROM " << "Report" << " WHERE ";
+    create << "SELECT REPORT, COMPRESS FROM " << "Report" << " WHERE ";
     create << "FILENAME = ? ";
     create << "AND FILE_LAST_MODIFICATION = ? ";
     create << "AND TOOL = ? ";
@@ -159,28 +169,38 @@ std::string SQLLite::get_report(MediaConchLib::report reportKind, MediaConchLib:
     const char* end = NULL;
     int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
     if (ret != SQLITE_OK || !stmt || (end && *end))
-        return std::string();
+        return;
 
     ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
-        return std::string();
+        return;
 
     ret = sqlite3_bind_blob(stmt, 2, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
-        return std::string();
+        return;
 
     ret = sqlite3_bind_int(stmt, 3, (int)reportKind);
     if (ret != SQLITE_OK)
-        return std::string();
+        return;
 
     ret = sqlite3_bind_int(stmt, 4, (int)format);
     if (ret != SQLITE_OK)
-        return std::string();
+        return;
 
-    if (execute() || !reports.size() || reports.find(key) == reports.end())
-        return std::string();
+    if (execute() || !reports.size() || reports.find("REPORT") == reports.end())
+        return;
 
-    return reports[key];
+    if (reports.find("COMPRESS") != reports.end())
+    {
+        const std::string& c = reports["COMPRESS"];
+        if (c == "0")
+            compress = MediaConchLib::compression_None;
+        else if (c == "1")
+            compress = MediaConchLib::compression_ZLib;
+        else
+            compress = MediaConchLib::compression_None;
+    }
+    report += reports["REPORT"];
 }
 
 bool SQLLite::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification)

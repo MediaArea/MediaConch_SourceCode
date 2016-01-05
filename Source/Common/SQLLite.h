@@ -35,10 +35,16 @@ public:
     virtual ~SQLLite();
 
     virtual int create_report_table();
-    virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report);
+    virtual int update_report_table();
+    virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
+                            const std::string& filename, const std::string& file_last_modification,
+                            const std::string& report, MediaConchLib::compression);
     virtual int remove_report(const std::string& filename);
-    virtual std::string get_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
-    virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
+    virtual void get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
+                            const std::string& filename, const std::string& file_last_modification,
+                            std::string& report, MediaConchLib::compression&);
+    virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
+                                    const std::string& filename, const std::string& file_last_modification);
 
 protected:
     void        add_report(const std::string& key, const std::string& report);
