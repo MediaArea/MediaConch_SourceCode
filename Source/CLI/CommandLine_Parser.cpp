@@ -114,7 +114,11 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
         argument = "--format=JSTREE";
     if (argument=="-fh")
         argument = "--format=HTML";
-    
+
+    // Compression short options
+    if (argument=="-cz")
+        argument = "--compression=zlib";
+
     // Listing
     if (0);
     OPTION("--help",                                        Help)
@@ -127,6 +131,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--logfile",                                     LogFile)
     OPTION("--configuration",                               Configuration)
     OPTION("--implementationschema",                        ImplementationSchema)
+    OPTION("--compression",                                 Compression)
     //Default
     OPTION("--",                                            Default)
     else
@@ -258,6 +263,21 @@ CL_OPTION(ImplementationSchema)
     file.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_implementation_schema_file(file);
     return 0;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(Compression)
+{
+    //Form : --Compression=Mode
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+        return Help();
+
+    std::string mode;
+    mode.assign(argument, egal_pos + 1 , std::string::npos);
+    transform(mode.begin(), mode.end(), mode.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+
+    return cli->set_compression_mode(mode);
 }
 
 //---------------------------------------------------------------------------

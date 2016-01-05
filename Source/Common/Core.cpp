@@ -74,6 +74,7 @@ Core::Core() : policies(this)
     db = NULL;
     scheduler = new Scheduler(this);
     policies.create_values_from_csv();
+    compression_mode = MediaConchLib::compression_ZLib;
 }
 
 Core::~Core()
@@ -200,6 +201,12 @@ void Core::create_default_implementation_schema()
     ofs.close();
 
     set_implementation_schema_file(file);
+}
+
+//---------------------------------------------------------------------------
+void Core::set_compression_mode(MediaConchLib::compression compress)
+{
+    compression_mode = compress;
 }
 
 //***************************************************************************
