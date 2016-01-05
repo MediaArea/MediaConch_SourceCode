@@ -142,10 +142,15 @@ namespace MediaConch
             return 0;
         }
 
+        // Compression short option
+        if (argument=="-cz")
+            argument = "--compression=zlib";
+
         if (0);
         OPTION("--help",          help)
         OPTION("--fork",          fork)
         OPTION("--configuration", configuration)
+        OPTION("--compression", compression)
         OPTION("--",              other)
         else
             return Help();
@@ -184,6 +189,29 @@ namespace MediaConch
 
         std::string file = argument.substr(equal_pos + 1);
         MCL->set_configuration_file(file);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_compression(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+            return Help();
+
+        std::string mode_str;
+        mode_str.assign(argument, equal_pos + 1 , std::string::npos);
+        transform(mode_str.begin(), mode_str.end(), mode_str.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+        MediaConchLib::compression mode;
+
+        if (mode_str == "none")
+            mode = MediaConchLib::compression_None;
+        else if (mode_str == "zlib")
+            mode = MediaConchLib::compression_ZLib;
+        else
+            return Help();
+
+        MCL->set_compression_mode(mode);
         return 0;
     }
 

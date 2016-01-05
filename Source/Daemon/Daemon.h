@@ -51,6 +51,7 @@ namespace MediaConch
         int parse_help(const std::string& argument);
         int parse_fork(const std::string& argument);
         int parse_configuration(const std::string& argument);
+        int parse_compression(const std::string& argument);
         int parse_other(const std::string& argument);
 
         // Request received callbacks
