@@ -32,6 +32,7 @@
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
+#include <zlib.h>
 #include <sstream>
 #include <fstream>
 #include <sys/stat.h>
@@ -916,6 +917,68 @@ bool Core::is_schematron_file(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
+void Core::compress_report(std::string& report, MediaConchLib::compression& compress)
+{
+    if (compress == MediaConchLib::compression_None || compress >= MediaConchLib::compression_Max)
+        return;
+
+    if (compress == MediaConchLib::compression_ZLib)
+    {
+        uLongf dst_len, src_len;
+
+        src_len = report.length();
+        dst_len = src_len;
+        Bytef* dst = new Bytef [src_len + 1];
+
+        if (compress2((Bytef*)dst, &dst_len, (const Bytef*)report.c_str(), src_len, Z_BEST_COMPRESSION) != Z_OK || src_len <= dst_len)
+            //Fallback to no compression
+            compress = MediaConchLib::compression_None;
+        else
+            report = std::string((const char *)dst, dst_len);
+        delete [] dst;
+    }
+}
+
+//---------------------------------------------------------------------------
+int Core::uncompress_report(std::string& report, MediaConchLib::compression compress)
+{
+    switch (compress)
+    {
+        case MediaConchLib::compression_None:
+            break;
+        case MediaConchLib::compression_ZLib:
+            uLongf dst_len, src_len;
+
+            src_len = report.length();
+            dst_len = src_len;
+
+            do
+            {
+                Bytef* dst = new Bytef [dst_len + 1];
+
+                int ret;
+                if ((ret = uncompress(dst, &dst_len, (const Bytef*)report.c_str(), src_len)) != Z_OK)
+                {
+                    delete [] dst;
+                    if (ret == Z_BUF_ERROR)
+                    {
+                        dst_len += 4096;
+                        continue;
+                    }
+                    return -1;
+                }
+                report = std::string((const char*)dst, dst_len);
+                delete [] dst;
+                break;
+            } while (1);
+            break;
+        default:
+            break;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 std::string Core::get_last_modification_file(const std::string& filename)
 {
     Ztring time = ZenLib::File::Modified_Get(Ztring().From_UTF8(filename));
@@ -929,9 +992,12 @@ void Core::register_report_mediainfo_text_to_database(std::string& file, const s
     curMI->Option(__T("Details"), __T("0"));
     curMI->Option(__T("Inform"), String());
     std::string report = Ztring(curMI->Inform()).To_UTF8();
+
+    MediaConchLib::compression mode = compression_mode;
+    compress_report(report, mode);
     db->save_report(MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
                     file, time,
-                    report, MediaConchLib::compression_None);
+                    report, mode);
 }
 
 //---------------------------------------------------------------------------
@@ -941,9 +1007,11 @@ void Core::register_report_mediainfo_xml_to_database(std::string& file, const st
     curMI->Option(__T("Details"), __T("0"));
     curMI->Option(__T("Inform"), __T("MIXML"));
     std::string report = Ztring(curMI->Inform()).To_UTF8();
+    MediaConchLib::compression mode = compression_mode;
+    compress_report(report, mode);
     db->save_report(MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
                     file, time,
-                    report, MediaConchLib::compression_None);
+                    report, mode);
 }
 
 //---------------------------------------------------------------------------
@@ -953,9 +1021,11 @@ void Core::register_report_mediatrace_text_to_database(std::string& file, const 
     curMI->Option(__T("Details"), __T("1"));
     curMI->Option(__T("Inform"), String());
     std::string report = Ztring(curMI->Inform()).To_UTF8();
+    MediaConchLib::compression mode = compression_mode;
+    compress_report(report, mode);
     db->save_report(MediaConchLib::report_MediaTrace, MediaConchLib::format_Text,
                     file, time,
-                    report, MediaConchLib::compression_None);
+                    report, mode);
 }
 
 //---------------------------------------------------------------------------
@@ -965,18 +1035,23 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, const s
     curMI->Option(__T("Details"), __T("1"));
     curMI->Option(__T("Inform"), __T("XML"));
     std::string report = Ztring(curMI->Inform()).To_UTF8();
+    MediaConchLib::compression mode = compression_mode;
+    compress_report(report, mode);
     db->save_report(MediaConchLib::report_MediaTrace, MediaConchLib::format_Xml,
                     file, time,
-                    report, MediaConchLib::compression_None);
+                    report, mode);
 }
 
 //---------------------------------------------------------------------------
 void Core::register_report_implementation_xml_to_database(const std::string& file, const std::string& time,
                                                           std::string& report)
 {
+    compress_report(report, compression_mode);
+    MediaConchLib::compression mode = compression_mode;
+    compress_report(report, mode);
     db->save_report(MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
                     file, time,
-                    report, MediaConchLib::compression_None);
+                    report, mode);
 }
 
 //---------------------------------------------------------------------------
@@ -1118,15 +1193,8 @@ void Core::get_report_saved(const std::string& filename,
     std::string time = get_last_modification_file(filename);
     std::string raw;
     db->get_report(reportKind, f, filename, time, raw, compress);
-    switch (compress)
-    {
-        case MediaConchLib::compression_ZLib:
-            //TODO
-        case MediaConchLib::compression_None:
-        default:
-            report += raw;
-            break;
-    }
+    uncompress_report(raw, compress);
+    report += raw;
 }
 
 //---------------------------------------------------------------------------
