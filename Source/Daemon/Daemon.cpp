@@ -276,8 +276,11 @@ namespace MediaConch
 
         for (size_t i = 0; i < req->args.size(); ++i)
         {
+            bool force = false;
+            if (req->args[i].has_force_analyze)
+                force = req->args[i].force_analyze;
             bool registered = false;
-            int ret = d->MCL->analyze(req->args[i].file, registered);
+            int ret = d->MCL->analyze(req->args[i].file, registered, force);
             if (ret < 0)
             {
                 RESTAPI::Analyze_Nok *nok = new RESTAPI::Analyze_Nok;

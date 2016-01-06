@@ -123,8 +123,11 @@ public:
     // Analyze
     struct Analyze_Arg
     {
+        Analyze_Arg() : has_force_analyze(false) {}
         std::string            file;
         int                    id;
+        bool                   has_force_analyze;
+        bool                   force_analyze;
     };
 
     struct Analyze_Req
