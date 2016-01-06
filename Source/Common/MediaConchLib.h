@@ -64,6 +64,13 @@ public:
         format_Max,
     };
 
+    enum compression
+    {
+        compression_None = 0,
+        compression_ZLib,
+        compression_Max,
+    };
+
     struct ReportRes
     {
         std::string       report;
@@ -123,6 +130,7 @@ public:
     void load_configuration();
     void set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
+    void set_compression_mode(compression compress);
 
     bool ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
                                             const std::bitset<MediaConchLib::report_Max>& reports,

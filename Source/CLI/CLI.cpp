@@ -215,6 +215,21 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int CLI::set_compression_mode(const std::string& mode_str)
+    {
+        MediaConchLib::compression mode;
+        if (mode_str == "none")
+            mode = MediaConchLib::compression_None;
+        else if (mode_str == "zlib")
+            mode = MediaConchLib::compression_ZLib;
+        else
+            return Help();
+
+        MCL.set_compression_mode(mode);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::register_option(const std::string& opt)
     {
         std::string report;

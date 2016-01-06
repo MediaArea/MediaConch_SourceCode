@@ -28,13 +28,13 @@ int main(int argc, char* argv_ansi[])
     MediaConch::Daemon daemon;
     //Parse command line
     if (daemon.parse_args(argc, argv_ansi) < 0)
-        return 0;
+        return 1;
 
     if (daemon.init() < 0)
-        return -1;
+        return 1;
 
     if (daemon.run() < 0)
-        return -1;
+        return 1;
 
     return 0;
 }

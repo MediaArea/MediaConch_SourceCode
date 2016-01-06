@@ -104,6 +104,7 @@ public:
     void set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void create_default_implementation_schema();
+    void set_compression_mode(MediaConchLib::compression compress);
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
@@ -129,6 +130,7 @@ private:
     std::map<std::string, std::string> implementation_options;
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
+    MediaConchLib::compression         compression_mode;
 
     bool policies_check_contents(const std::string& files,
                                  const std::vector<std::string>& policies_contents,
@@ -157,7 +159,9 @@ private:
     bool   file_is_registered_in_db(const std::string& file);
     bool   file_is_registered_in_queue(const std::string& file);
     std::string get_last_modification_file(const std::string& file);
-    std::string get_report_saved(const std::string& file, MediaConchLib::report reportKind, MediaConchLib::format f);
+    void compress_report(std::string& report, MediaConchLib::compression& compress);
+    int  uncompress_report(std::string& report, MediaConchLib::compression compress);
+    void get_report_saved(const std::string& file, MediaConchLib::report reportKind, MediaConchLib::format f, std::string& report);
     void get_reports_output(const std::string& file, MediaConchLib::format f,
                             std::bitset<MediaConchLib::report_Max> report_set,
                             MediaConchLib::ReportRes* result);

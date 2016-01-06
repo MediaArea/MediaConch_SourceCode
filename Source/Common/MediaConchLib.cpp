@@ -333,7 +333,7 @@ int MediaConchLib::transform_with_xslt_memory(const std::string& report, const s
 }
 
 //***************************************************************************
-// Database
+// Configuration
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -353,6 +353,14 @@ const std::string& MediaConchLib::get_configuration_file() const
 {
     return core->get_configuration_file();
 }
+
+//---------------------------------------------------------------------------
+void MediaConchLib::set_compression_mode(compression compress)
+{
+    if (core)
+        core->set_compression_mode(compress);
+}
+
 //***************************************************************************
 // Policy
 //***************************************************************************
