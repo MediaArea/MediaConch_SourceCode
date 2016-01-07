@@ -21,6 +21,16 @@
 #define ConfigH
 
 //---------------------------------------------------------------------------
+// Return value for parsing
+enum CLIReturnValue
+{
+    CLI_RETURN_ERROR  = -1,
+    CLI_RETURN_NONE   = 0,
+    CLI_RETURN_FILE   = 1,
+    CLI_RETURN_FINISH = 2,
+};
+
+//---------------------------------------------------------------------------
 //Get command line args in main()
 #ifdef UNICODE
     #ifdef _WIN32

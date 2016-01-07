@@ -124,8 +124,11 @@ int main(int argc, char* argv_ansi[])
 
     MediaConch::CLI cli;
 
-    if (cli.parse_args(args) < 0)
+    int ret = cli.parse_args(args);
+    if (ret == CLI_RETURN_ERROR)
         return 1;
+    else if (ret == CLI_RETURN_FINISH)
+        return 0;
 
     if (cli.init() < 0)
         return 1;

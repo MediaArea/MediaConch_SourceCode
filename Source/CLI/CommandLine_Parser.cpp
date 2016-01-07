@@ -22,7 +22,7 @@
 #define LAUNCH(_METHOD) \
     { \
         int Return=_METHOD(cli, argument); \
-        if (Return < 0) \
+        if (Return == CLI_RETURN_ERROR || Return == CLI_RETURN_FINISH) \
             return Return; \
     } \
 
@@ -55,22 +55,22 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     if (argument=="-p")
     {
         Last_Argument = "--policy=";
-        return 0;
+        return CLI_RETURN_NONE;
     }
     if (argument=="-d")
     {
         Last_Argument = "--display=";
-        return 0;
+        return CLI_RETURN_NONE;
     }
     if (argument=="-c")
     {
         Last_Argument = "--configuration=";
-        return 0;
+        return CLI_RETURN_NONE;
     }
     if (argument=="-i")
     {
         Last_Argument = "--implementationschema=";
-        return 0;
+        return CLI_RETURN_NONE;
     }
 
     // Help short options
@@ -138,9 +138,9 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     //Default
     OPTION("--",                                            Default)
     else
-        return 1;
+        return CLI_RETURN_FILE;
 
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -178,13 +178,16 @@ CL_OPTION(Report)
     //Form : --Inform=Text
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
-        return Help();
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
         
     // New requested reports
     std::string report_kind = argument.substr(egal_pos + 1);
     cli->set_report_set(report_kind);
 
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -193,7 +196,10 @@ CL_OPTION(Format)
     //Form : --Inform=Text
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
-        return Help();
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
 
     std::string format = argument.substr(egal_pos + 1);
     return cli->set_format(format);
@@ -205,7 +211,10 @@ CL_OPTION(PolicyOption)
     //Form : --Inform=Text
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
-        return Help_Policy();
+    {
+        Help_Policy();
+        return CLI_RETURN_ERROR;
+    }
 
     std::string file;
     file.assign(argument, egal_pos + 1, std::string::npos);
@@ -213,7 +222,7 @@ CL_OPTION(PolicyOption)
 
     std::string report = "MediaConch";
     cli->set_report_set(report);
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -222,12 +231,15 @@ CL_OPTION(Display)
     //Form : --Inform=Text
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
-        return Help();
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
 
     std::string file;
     file.assign(argument, egal_pos +1 , std::string::npos);
     cli->set_display_file(file);
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -237,7 +249,7 @@ CL_OPTION(LogFile)
     (void)cli;
     LogFile_FileName.assign(ZenLib::Ztring().From_UTF8(argument), 10, std::string::npos);
 
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -246,12 +258,15 @@ CL_OPTION(Configuration)
     //Form : --Configuration=File
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
-        return Help();
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
 
     std::string file;
     file.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_configuration_file(file);
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -260,12 +275,15 @@ CL_OPTION(ImplementationSchema)
     //Form : --ImplemnetationSchema=File
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
-        return Help();
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
 
     std::string file;
     file.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_implementation_schema_file(file);
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -274,7 +292,10 @@ CL_OPTION(Compression)
     //Form : --Compression=Mode
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
-        return Help();
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
 
     std::string mode;
     mode.assign(argument, egal_pos + 1 , std::string::npos);
@@ -288,7 +309,7 @@ CL_OPTION(Force)
 {
     (void)argument;
     cli->set_force_analyze(true);
-    return 0;
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------

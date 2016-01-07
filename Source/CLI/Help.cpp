@@ -74,7 +74,7 @@ int Help()
     TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
 
-    return -1;
+    return CLI_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ int Help_Usage()
 {
     TEXTOUT("Usage: \"MediaConch [-Options...] FileName1 [Filename2...]\"");
 
-    return -1;
+    return CLI_RETURN_ERROR;
 }
 
 //---------------------------------------------------------------------------
@@ -91,7 +91,7 @@ int Help_Nothing()
     Help_Usage();
     TEXTOUT("\"MediaConch --Help\" for displaying more information");
 
-    return -1;
+    return CLI_RETURN_ERROR;
 }
 
 //---------------------------------------------------------------------------
@@ -114,7 +114,7 @@ int Help_Advanced()
     TEXTOUT("--Help=Ssh");
     TEXTOUT("                    More details about SSH specific options (e.g. for SFTP)");
 
-    return -1;
+    return CLI_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------
@@ -148,7 +148,7 @@ int Help_Ssl()
     TEXTOUT("                    Does not verify the authenticity of the peer's certificate");
     TEXTOUT("                    Use it at your own risks");
 
-    return -1;
+    return CLI_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------
@@ -181,7 +181,7 @@ int Help_Ssh()
     TEXTOUT("                    (you don't need to accept the key with ssh first)");
     TEXTOUT("                    Use it at your own risks");
 
-    return -1;
+    return CLI_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------
@@ -193,7 +193,7 @@ int Help_Policy()
     TEXTOUT("FileName is the Schematron file used to validate");
     TEXTOUT("");
 
-    return -1;
+    return CLI_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------
@@ -205,7 +205,7 @@ int Help_Xslt()
     TEXTOUT("FileName is the XSLT file used to validate");
     TEXTOUT("");
 
-    return -1;
+    return CLI_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------
@@ -213,5 +213,5 @@ int Version()
 {
     TEXTOUT("MediaConch Command Line Interface 15.12");
 
-    return -1;
+    return CLI_RETURN_FINISH;
 }
