@@ -1049,7 +1049,6 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, const s
 void Core::register_report_implementation_xml_to_database(const std::string& file, const std::string& time,
                                                           std::string& report)
 {
-    compress_report(report, compression_mode);
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
     db->save_report(MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
@@ -1262,8 +1261,9 @@ void Core::get_implementation_report(const std::string& file, std::string& repor
         valid = validate_xslt_policy_from_memory(file, memory, r, true);
         if (valid)
         {
+            std::string tmp = r;
             std::string time = get_last_modification_file(file);
-            register_report_implementation_xml_to_database(file, time, r);
+            register_report_implementation_xml_to_database(file, time, tmp);
         }
     }
     report += r;
