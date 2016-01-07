@@ -28,6 +28,7 @@ namespace MediaConch
       public:
         Daemon();
         ~Daemon();
+        static std::string version;
 
         int parse_args(int ac, char** av);
         int init();
@@ -49,6 +50,7 @@ namespace MediaConch
         // Parse option helper
         int parse(std::string& argument);
         int parse_help(const std::string& argument);
+        int parse_version(const std::string& argument);
         int parse_fork(const std::string& argument);
         int parse_configuration(const std::string& argument);
         int parse_compression(const std::string& argument);

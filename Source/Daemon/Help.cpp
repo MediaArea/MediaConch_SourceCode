@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "Help.h"
 #include "Config.h"
+#include "Daemon.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -30,13 +31,16 @@ int Help()
     TEXTOUT("Help:");
     TEXTOUT("--Help, -h");
     TEXTOUT("                    Display this help and exit");
+    TEXTOUT("--Version, -v");
+    TEXTOUT("                    Display the version and exit");
+    TEXTOUT("");
 
     TEXTOUT("Daemon fork:");
     TEXTOUT("--Fork=[Yes/No]");
     TEXTOUT("                    If No, MediaConchd will not fork, default it forks");
     TEXTOUT("-n");
     TEXTOUT("                    Same as --Fork=No");
-    return -1;
+    return DAEMON_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------
@@ -44,13 +48,13 @@ int Help_Usage()
 {
     TEXTOUT("Usage: \"MediaConchD [-Options...]\"");
 
-    return -1;
+    return DAEMON_RETURN_ERROR;
 }
 
 //---------------------------------------------------------------------------
 int Version()
 {
-    TEXTOUT("MediaConch Daemon 0.1.0");
+    TEXTOUT(std::string("MediaConch Daemon " + MediaConch::Daemon::version).c_str());
 
-    return -1;
+    return DAEMON_RETURN_FINISH;
 }

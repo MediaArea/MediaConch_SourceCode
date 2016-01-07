@@ -91,13 +91,13 @@ namespace MediaConch
             }
 
             int ret = Parse(this, argument);
-            if (ret < 0)
+            if (ret == CLI_RETURN_ERROR || ret == CLI_RETURN_FINISH)
                 return ret; //no more tasks to do
 
-            if (ret > 0)
+            if (ret == CLI_RETURN_FILE)
                 files.push_back(args[pos]); //Append the filename to the list of filenames to parse
         }
-        return 0;
+        return CLI_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -238,9 +238,11 @@ namespace MediaConch
             ZenLib::Ztring str;
             str.From_UTF8(report);
             STRINGOUT(str);
-            return -1;
+            if (report == "Option not known")
+                return CLI_RETURN_ERROR;
+            return CLI_RETURN_FINISH;
         }
-        return 0;
+        return CLI_RETURN_NONE;
     }
     
     //--------------------------------------------------------------------------
