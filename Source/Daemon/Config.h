@@ -21,6 +21,15 @@
 #define ConfigH
 
 //---------------------------------------------------------------------------
+// Return value for parsing
+enum DaemonReturnValue
+{
+    DAEMON_RETURN_ERROR  = -1,
+    DAEMON_RETURN_NONE   = 0,
+    DAEMON_RETURN_FINISH = 1,
+};
+
+//---------------------------------------------------------------------------
 //Get command line args in main()
 #ifdef UNICODE
     #ifdef _WIN32

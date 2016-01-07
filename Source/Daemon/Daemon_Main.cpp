@@ -11,6 +11,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include "Daemon_Main.h"
 #include "Common/MediaConchLib.h"
 #include "Help.h"
 #include "Daemon.h"
@@ -27,8 +28,11 @@ int main(int argc, char* argv_ansi[])
 
     MediaConch::Daemon daemon;
     //Parse command line
-    if (daemon.parse_args(argc, argv_ansi) < 0)
+    int ret = daemon.parse_args(argc, argv_ansi);
+    if (ret == DAEMON_RETURN_ERROR)
         return 1;
+    else if (ret == DAEMON_RETURN_FINISH)
+        return 0;
 
     if (daemon.init() < 0)
         return 1;

@@ -34,6 +34,7 @@ namespace MediaConch
     //**************************************************************************
     // Daemon
     //**************************************************************************
+    std::string Daemon::version = "0.1.0";
 
     //--------------------------------------------------------------------------
     Daemon::Daemon() : is_daemon(true), httpd(NULL)
@@ -86,10 +87,10 @@ namespace MediaConch
                           argument.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
             }
             int ret = parse(argument);
-            if (ret < 0)
-                return -1;
+            if (ret == DAEMON_RETURN_ERROR || ret == DAEMON_RETURN_FINISH)
+                return ret;
         }
-        return 0;
+        return DAEMON_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -115,11 +116,11 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int Daemon::parse(std::string& argument)
     {
-#define LAUNCH(_METHOD)                             \
-        {                                           \
-            int ret = parse_##_METHOD(argument);    \
-            if (ret < 0)                            \
-                return ret;                         \
+#define LAUNCH(_METHOD)                                                    \
+        {                                                                  \
+            int ret = parse_##_METHOD(argument);                           \
+            if (ret == DAEMON_RETURN_ERROR || ret == DAEMON_RETURN_FINISH) \
+                return ret;                                                \
         }
 
 #define OPTION(_TEXT, _TOLAUNCH)                                    \
@@ -133,13 +134,15 @@ namespace MediaConch
 
         if (argument=="-h")
             argument="--help";
+        if (argument=="-v")
+            argument="--version";
         if (argument=="-n")
             argument="--fork=No";
 
         if (argument=="-c")
         {
             last_argument="--configuration=";
-            return 0;
+            return DAEMON_RETURN_NONE;
         }
 
         // Compression short option
@@ -148,13 +151,17 @@ namespace MediaConch
 
         if (0);
         OPTION("--help",          help)
+        OPTION("--version",          version)
         OPTION("--fork",          fork)
         OPTION("--configuration", configuration)
         OPTION("--compression", compression)
         OPTION("--",              other)
         else
-            return Help();
-        return 0;
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+        return DAEMON_RETURN_NONE;
 
 #undef OPTION
 #undef LAUNCH
@@ -165,19 +172,26 @@ namespace MediaConch
     {
         size_t equal_pos = argument.find('=');
         if (equal_pos == std::string::npos)
-            return 0;
+            return DAEMON_RETURN_NONE;
+
         std::string not_daemon = argument.substr(equal_pos + 1);
         if (not_daemon == "no" || not_daemon == "No")
             is_daemon = false;
-        return 0;
+        return DAEMON_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
     int Daemon::parse_help(const std::string& argument)
     {
         (void)argument;
-        Help();
-        return -1;
+        return Help();
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_version(const std::string& argument)
+    {
+        (void)argument;
+        return Version();
     }
 
     //--------------------------------------------------------------------------
@@ -185,11 +199,11 @@ namespace MediaConch
     {
         size_t equal_pos = argument.find('=');
         if (equal_pos == std::string::npos)
-            return 0;
+            return DAEMON_RETURN_NONE;
 
         std::string file = argument.substr(equal_pos + 1);
         MCL->set_configuration_file(file);
-        return 0;
+        return DAEMON_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -197,7 +211,10 @@ namespace MediaConch
     {
         size_t equal_pos = argument.find('=');
         if (equal_pos == std::string::npos)
-            return Help();
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
 
         std::string mode_str;
         mode_str.assign(argument, equal_pos + 1 , std::string::npos);
@@ -209,10 +226,13 @@ namespace MediaConch
         else if (mode_str == "zlib")
             mode = MediaConchLib::compression_ZLib;
         else
-            return Help();
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
 
         MCL->set_compression_mode(mode);
-        return 0;
+        return DAEMON_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -224,9 +244,11 @@ namespace MediaConch
             ZenLib::Ztring str;
             str.From_UTF8(report);
             STRINGOUT(str);
-            return -1;
+            if (report == "Option not known")
+                return DAEMON_RETURN_ERROR;
+            return DAEMON_RETURN_FINISH;
         }
-        return 0;
+        return DAEMON_RETURN_NONE;
     }
 
 #if defined(_WIN32) || defined(WIN32)
