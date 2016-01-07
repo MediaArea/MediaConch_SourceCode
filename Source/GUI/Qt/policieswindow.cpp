@@ -274,9 +274,11 @@ void PoliciesWindow::delete_all_policies()
     removeTreeChildren(policies);
     for (size_t i = 0; i < mainwindow->get_policies_count(); ++i)
     {
-        QFile file(QString().fromStdString(mainwindow->get_policy(i)->filename));
+        QString filename = QString().fromStdString(mainwindow->get_policy(i)->filename);
+        if (filename.startsWith(":/"))
+            continue;
+        QFile file(filename);
         file.remove();
-        delete mainwindow->get_policy(i);
     }
     mainwindow->clear_policies();
     policiesMenu->get_deletePolicies_button()->setEnabled(false);
