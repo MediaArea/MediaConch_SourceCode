@@ -45,6 +45,9 @@ public:
     void                        new_policy_filename(Policy* policy);
     void                        connectPoliciesTreeSelectionChanged();
     void                        disconnectPoliciesTreeSelectionChanged();
+    void                        emphasis_policy_name_in_tree(QTreeWidgetItem *item);
+    void                        emphasis_tree_widget_and_children(QTreeWidgetItem *item, bool root=false);
+    void                        unemphasis_policy_name_in_tree(QTreeWidgetItem *item);
 
     // Visual elements
     void                        updatePoliciesTreeSchematronPattern(SchematronPattern *p, QTreeWidgetItem *parent);

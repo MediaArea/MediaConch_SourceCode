@@ -153,6 +153,7 @@ void SchematronWindow::duplicate_policy()
     for (size_t i = 0; i < ((SchematronPolicy*)p)->patterns.size(); ++i)
         policieswindow->updatePoliciesTreeSchematronPattern(((SchematronPolicy*)p)->patterns[i], new_item);
     new_item->setSelected(true);
+    policieswindow->emphasis_policy_name_in_tree(new_item);
 }
 
 //---------------------------------------------------------------------------
@@ -172,6 +173,7 @@ void SchematronWindow::add_new_gor()
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString name = QString().fromStdString(p->name);
     item->setText(0, name);
+    policieswindow->emphasis_policy_name_in_tree(item);
 
     ((SchematronPolicy*)mainwindow->get_policy(rowPolicy))->patterns.push_back(p);
     mainwindow->get_policy(rowPolicy)->saved = false;
@@ -209,6 +211,7 @@ void SchematronWindow::duplicate_gor()
     new_item->setText(0, title);
     for (size_t i = 0; i < pat->rules.size(); ++i)
         policieswindow->updatePoliciesTreeSchematronRule(pat->rules[i], new_item);
+    policieswindow->emphasis_policy_name_in_tree(new_item);
     new_item->setSelected(true);
 }
 
@@ -227,6 +230,7 @@ void SchematronWindow::add_new_rule()
 
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     item->setText(0, QString("Rule"));
+    policieswindow->emphasis_policy_name_in_tree(item);
 
     ((SchematronPolicy*)mainwindow->get_policy(rowPolicy))->patterns[rowGor]->rules.push_back(r);
     mainwindow->get_policy(rowPolicy)->saved = false;
@@ -271,6 +275,7 @@ void SchematronWindow::duplicate_rule()
         QString descr = QString().fromStdString(assert->description);
         a->setText(0, descr);
     }
+    policieswindow->emphasis_policy_name_in_tree(new_item);
     new_item->setSelected(true);
 }
 
@@ -293,6 +298,7 @@ void SchematronWindow::add_new_assert()
     a->use_free_text = false;
     QString name = QString().fromStdString(a->description);
     QTreeWidgetItem* item = new QTreeWidgetItem(parent, QStringList(name));
+    policieswindow->emphasis_policy_name_in_tree(item);
 
     ((SchematronPolicy*)mainwindow->get_policy(rowPolicy))->patterns[rowGor]->rules[rowRule]->asserts.push_back(a);
     parent->setExpanded(true);
@@ -326,6 +332,7 @@ void SchematronWindow::duplicate_assert()
         return;
 
     QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
+    policieswindow->emphasis_policy_name_in_tree(new_item);
     new_item->setText(0, QString().fromStdString(a->description));
     item->setSelected(false);
     new_item->setSelected(true);
@@ -355,6 +362,7 @@ void SchematronWindow::delete_gor()
     ((SchematronPolicy*)p)->patterns.erase(((SchematronPolicy*)p)->patterns.begin() + row);
 
     // Visual
+    policieswindow->emphasis_policy_name_in_tree(item);
     policieswindow->removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
     parent->takeChild(row);
@@ -395,6 +403,7 @@ void SchematronWindow::delete_rule()
     p->rules.erase(p->rules.begin() + row);
 
     // Visual
+    policieswindow->emphasis_policy_name_in_tree(item);
     policieswindow->removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
     parent->takeChild(row);
@@ -436,6 +445,7 @@ void SchematronWindow::delete_assert()
 
     // Visual
     QTreeWidgetItem* parent = item->parent();
+    policieswindow->emphasis_policy_name_in_tree(item);
     parent->takeChild(row);
     for (int i = 0; i < parent->childCount(); ++i)
     {
@@ -471,6 +481,7 @@ void SchematronWindow::edit_policy_title()
     if (p->title != qtitle.toStdString())
     {
         p->saved = false;
+        policieswindow->emphasis_policy_name_in_tree(item);
         p->title = qtitle.toStdString();
         QString title = QString().fromStdString(p->title);
         item->setText(0, title);
@@ -501,6 +512,7 @@ void SchematronWindow::edit_gor_title()
     SchematronPattern *p = po->patterns[row];
     if (p->name != qname.toStdString())
     {
+        policieswindow->emphasis_policy_name_in_tree(item);
         po->saved = false;
         p->name = qname.toStdString();
         QString title = QString().fromStdString(p->name);
@@ -534,6 +546,7 @@ void SchematronWindow::edit_assert_name(QString new_name)
 
     if (a->description != new_name.toStdString())
     {
+        policieswindow->emphasis_policy_name_in_tree(item);
         po->saved = false;
         a->description = new_name.toStdString();
         QString name = QString().fromStdString(a->description);
@@ -560,6 +573,7 @@ void SchematronWindow::edit_assert_type()
 
     if (a->type != ruleEdit->get_type_select()->currentText().toStdString())
     {
+        policieswindow->emphasis_policy_name_in_tree(item);
         po->saved = false;
         a->type = ruleEdit->get_type_select()->currentText().toStdString();
         a->use_free_text = false;
@@ -586,6 +600,7 @@ void SchematronWindow::edit_assert_field()
 
     if (a->field != ruleEdit->get_field_select()->currentText().toStdString())
     {
+        policieswindow->emphasis_policy_name_in_tree(item);
         po->saved = false;
         a->field = ruleEdit->get_field_select()->currentText().toStdString();
         a->use_free_text = false;
@@ -611,6 +626,7 @@ void SchematronWindow::edit_assert_validator()
 
     if (a->validator != ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString()))
     {
+        policieswindow->emphasis_policy_name_in_tree(item);
         po->saved = false;
         a->validator = ruleEdit->get_validator_value_from_pretty_name(ruleEdit->get_validator_select()->currentText().toStdString());
         a->use_free_text = false;
@@ -636,6 +652,7 @@ void SchematronWindow::edit_assert_value()
 
     if (a->value != ruleEdit->get_value_line()->text().toStdString())
     {
+        policieswindow->emphasis_policy_name_in_tree(item);
         po->saved = false;
         a->value = ruleEdit->get_value_line()->text().toStdString();
         ruleEdit->value_to_quotted_value(a->value);
@@ -662,6 +679,7 @@ void SchematronWindow::edit_assert_freeText()
 
     if (a->text != ruleEdit->get_freeText_text()->toPlainText().toStdString())
     {
+        policieswindow->emphasis_policy_name_in_tree(item);
         po->saved = false;
         a->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
         a->use_free_text = true;
@@ -694,6 +712,9 @@ void SchematronWindow::assert_free_text_selected(bool checked)
     ruleEdit->get_freeText_text()->setText(QString().fromStdString(assertStr));
     ruleEdit->get_freeText_text()->show();
     ruleEdit->get_editor_frame()->hide();
+
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    policieswindow->emphasis_policy_name_in_tree(item);
 }
 
 //---------------------------------------------------------------------------
@@ -714,6 +735,9 @@ void SchematronWindow::assert_editor_selected(bool checked)
     }
     ruleEdit->get_editor_frame()->show();
     ruleEdit->get_freeText_text()->hide();
+
+    QTreeWidgetItem* item = policieswindow->get_item_in_tree();
+    policieswindow->emphasis_policy_name_in_tree(item);
 }
 
 //***************************************************************************

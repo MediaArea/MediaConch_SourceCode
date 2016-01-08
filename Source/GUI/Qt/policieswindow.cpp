@@ -111,10 +111,15 @@ int PoliciesWindow::save_policy_to(Policies::PolicyType type)
     if (row < 0)
         return -1;
 
+    QTreeWidgetItem* item = get_item_in_tree();
+    int ret = 0;
     if (type == Policies::POLICY_SCHEMATRON)
-        return mainwindow->exporting_to_schematron_file(row);
+        ret = mainwindow->exporting_to_schematron_file(row);
     else
-        return mainwindow->exporting_to_xslt_file(row);
+        ret = mainwindow->exporting_to_xslt_file(row);
+
+    unemphasis_policy_name_in_tree(item);
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -125,6 +130,8 @@ void PoliciesWindow::save_policy()
         return;
 
     mainwindow->exporting_policy(row);
+    QTreeWidgetItem* item = get_item_in_tree();
+    unemphasis_policy_name_in_tree(item);
 }
 
 //---------------------------------------------------------------------------
@@ -185,6 +192,7 @@ void PoliciesWindow::add_new_schematron_policy(QTreeWidgetItem* parent)
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(p->title);
     item->setText(0, title);
+    emphasis_policy_name_in_tree(item);
 
     mainwindow->add_policy(p);
     clearPoliciesElements();
@@ -221,6 +229,7 @@ void PoliciesWindow::add_new_xslt_policy(QTreeWidgetItem* parent)
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(p->title);
     item->setText(0, title);
+    emphasis_policy_name_in_tree(item);
 
     mainwindow->add_policy(p);
     policywindow = new XsltWindow(this, mainwindow);
@@ -282,12 +291,14 @@ void PoliciesWindow::delete_all_policies()
     }
     mainwindow->clear_policies();
     policiesMenu->get_deletePolicies_button()->setEnabled(false);
+    unemphasis_policy_name_in_tree(policies);
 }
 
 //---------------------------------------------------------------------------
 void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
 {
     disconnectPoliciesTreeSelectionChanged();
+    unemphasis_policy_name_in_tree(item);
     removeTreeChildren(item);
     QTreeWidgetItem* parent = item->parent();
     parent->takeChild(row);
@@ -630,6 +641,62 @@ void PoliciesWindow::disconnectPoliciesTreeSelectionChanged()
 
     QObject::disconnect(policiesTree->get_policies_tree(), SIGNAL(itemSelectionChanged()),
                      this, SLOT(policiesTree_selectionChanged()));
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::emphasis_tree_widget_and_children(QTreeWidgetItem *item, bool do_parent)
+{
+    if (!item)
+        return;
+
+    QFont font = item->font(0);
+    font.setBold(true);
+    item->setFont(0, font);
+
+    if (do_parent && item->parent())
+    {
+        QFont font = item->parent()->font(0);
+        font.setBold(true);
+        item->parent()->setFont(0, font);
+    }
+
+    for (int i = 0; i < item->childCount(); ++i)
+        emphasis_tree_widget_and_children(item->child(i), false);
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::emphasis_policy_name_in_tree(QTreeWidgetItem *item)
+{
+    if (!item || !item->parent())
+        return;
+
+    QTreeWidgetItem *tmp = item;
+    for (; ; tmp = tmp->parent())
+        if (!tmp->parent() || !tmp->parent()->parent())
+            break;
+
+    emphasis_tree_widget_and_children(tmp, true);
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::unemphasis_policy_name_in_tree(QTreeWidgetItem *item)
+{
+    if (!item)
+        return;
+
+    QFont font = item->font(0);
+    font.setBold(false);
+    item->setFont(0, font);
+
+    for (int i = 0; i < item->childCount(); ++i)
+        unemphasis_policy_name_in_tree(item->child(i));
+
+    if (mainwindow->is_all_policies_saved() && item->parent())
+    {
+        QFont font = item->parent()->font(0);
+        font.setBold(false);
+        item->parent()->setFont(0, font);
+    }
 }
 
 }
