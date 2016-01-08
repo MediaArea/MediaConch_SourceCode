@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    version="1.1"
    id="svg2"
-   viewBox="0 0 744.09448819 1052.3622047"
-   height="297mm"
-   width="210mm">
+   viewBox="0 0 256 256"
+   height="256"
+   width="256">
   <defs
      id="defs4">
     <clipPath
@@ -33,7 +33,8 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1">
+     id="layer1"
+     transform="matrix(0.91249483,0,0,0.91249483,-145.74844,-120.3823)">
     <g
        id="g3344"
        transform="matrix(1.25,0,0,-1.25,139.99997,432.64101)">
