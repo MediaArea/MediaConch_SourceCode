@@ -221,15 +221,6 @@ void Core::Close ()
 }
 
 //---------------------------------------------------------------------------
-void Core::Run (std::string file)
-{
-    // Parsing
-    bool registered = false;
-    if (file.length())
-        open_file(file, registered);
-}
-
-//---------------------------------------------------------------------------
 int Core::open_file(const std::string& file, bool& registered, bool force_analyze)
 {
     //TODO: When ZenLib will manage network files
@@ -501,77 +492,6 @@ int Core::policies_check(const std::vector<std::string>& files,
     result->valid = valid;
     return 0;
 }
-
-// //---------------------------------------------------------------------------
-// bool Core::policy_schematron(const std::string& file, const std::string& policy,
-//                              MediaConchLib::format, std::stringstream& Out)
-// {
-//     Schema* S = new Schematron;
-//     bool valid = false;
-
-//     if (S->register_schema_from_file(policy.c_str()))
-//     {
-//         std::string report;
-//         valid = validation(file, S, report);
-
-//         if (!valid)
-//         {
-//             Out << "NOT VALID\n";
-//             Out << report;
-//         }
-//         else
-//             Out << "VALID";
-//     }
-//     else
-//     {
-//         std::vector<std::string> errors = S->get_errors();
-//         Out << "internal error for parsing file" << std::endl;
-//         for (size_t pos = 0; pos < errors.size(); pos++)
-//             Out << "\t" << errors[pos].c_str();
-//     }
-//     delete S;
-//     return valid;
-// }
-
-// //---------------------------------------------------------------------------
-// bool Core::policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out)
-// {
-//     Schema *S = new Xslt;
-//     bool valid = false;
-
-//     if (S->register_schema_from_file(policy.c_str()))
-//     {
-//         std::string report;
-//         valid = validation(file, S, report);
-//         if (xslt_display.length())
-//             transform_with_xslt_file(report, xslt_display, report);
-//         else 
-//             switch (f)
-//             {
-//                 case MediaConchLib::format_Text:
-//                                         // Apply an XSLT to have Text
-//                                         transform_with_xslt_text_memory(report, report);
-//                                     break;
-//                 case MediaConchLib::format_Html:
-//                                         // Apply an XSLT to have HTML
-//                                         transform_with_xslt_html_memory(report, report);
-//                                     break;
-//                 default:            ;
-//             }
-
-//         Out << report;
-//     }
-//     else
-//     {
-//         std::vector<std::string> errors = S->get_errors();
-//         Out << file << ": ";
-//         Out << "internal error for parsing file" << endl;
-//         for (size_t pos = 0; pos < errors.size(); pos++)
-//             Out << "\t" << errors[pos].c_str();
-//     }
-//     delete S;
-//     return valid;
-// }
 
 //***************************************************************************
 // API

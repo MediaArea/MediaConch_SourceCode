@@ -60,7 +60,6 @@ public:
     String  Menu_Option_Preferences_Option  (const MediaInfoNameSpace::String &Param, const MediaInfoNameSpace::String &Value);
 
     void        Close();
-    void        Run(std::string file = std::string());
     bool        is_done(const std::string& file, double& percent_done);
     int         open_file(const std::string& filename, bool& registered, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
@@ -139,8 +138,6 @@ private:
                               const std::vector<std::string>& policies_names,
                               std::stringstream& Out);
     bool policy_is_valid(const std::string& report);
-    /* bool policy_schematron(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out); */
-    /* bool policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out); */
 
     //Helper
     bool validation(const std::string& file, Schema* S, std::string& report);
