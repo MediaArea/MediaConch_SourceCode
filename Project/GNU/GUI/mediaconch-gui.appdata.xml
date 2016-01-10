@@ -9,6 +9,18 @@
  <description>
    <p>MediaConch is an implementation checker, a policy checker, a reporter, and a fixer</p>
  </description>
- <url type="homepage">https://mediaarea.net/MediaConch</url>
+ <keywords>
+  <keyword>implementation</keyword>
+  <keyword>policy</keyword>
+  <keyword>checker</keyword>
+  <keyword>reporter</keyword>
+  <keyword>trace</keyword>
+  <keyword>mkv</keyword>
+  <keyword>matroska</keyword>
+  <keyword>ffv1</keyword>
+  <keyword>pcm</keyword>
+ </keywords>
+ <url type="homepage">https://mediaarea.net/MediaConch/</url>
+ <url type="bugtracker">https://github.com/MediaArea/MediaConch/issues</url>
  <updatecontact>info@mediaarea.net</updatecontact>
 </component>
