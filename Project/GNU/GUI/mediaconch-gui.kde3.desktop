@@ -3,6 +3,7 @@ Name=mediaconch-gui.desktop
 ServiceTypes=audio/*,video/*,image/*,application/x-flash-video
 Actions=mediaconch-gui
 X-KDE-Priority=TopLevel
+Keywords=implementation;policy;checker;reporter;trace;mkv;matroska;ffv1;pcm;
 
 [Desktop Action mediaconch-gui]
 Name=MediaConch
