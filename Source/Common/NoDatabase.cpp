@@ -62,8 +62,14 @@ int NoDatabase::create_report_table()
 }
 
 //---------------------------------------------------------------------------
+int NoDatabase::update_report_table()
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int NoDatabase::save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification,
-                          const std::string& report)
+                          const std::string& report, MediaConchLib::compression)
 {
     Report* r = new Report;
     r->reportKind = reportKind;
@@ -89,11 +95,13 @@ int NoDatabase::save_report(MediaConchLib::report reportKind, MediaConchLib::for
 }
 
 //---------------------------------------------------------------------------
-std::string NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification)
+void NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
+                                   const std::string& filename, const std::string& file_last_modification,
+                                   std::string& report, MediaConchLib::compression&)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it == reports_saved.end())
-        return std::string();
+        return;
 
     for (size_t i = 0; i < it->second.size(); ++i)
     {
@@ -101,9 +109,9 @@ std::string NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchL
         if (r->format != format || r->reportKind != reportKind || r->file_last_modification != file_last_modification)
             continue;
 
-        return r->report;
+        report = r->report;
+        return;
     }
-    return std::string();
 }
 
 //---------------------------------------------------------------------------
