@@ -59,7 +59,6 @@ public:
     void    Menu_Option_Preferences_Inform  (const MediaInfoNameSpace::String &Inform);
     String  Menu_Option_Preferences_Option  (const MediaInfoNameSpace::String &Param, const MediaInfoNameSpace::String &Value);
 
-    void        Close();
     bool        is_done(const std::string& file, double& percent_done);
     int         open_file(const std::string& filename, bool& registered, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
@@ -78,13 +77,6 @@ public:
                                MediaConchLib::ReportRes *result,
                                const std::vector<std::string>* policies_names = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
-
-    /* bool        validate_policy_file(const std::string& file, const std::string& policy, */
-    /*                                  MediaConchLib::ReportRes* result, */
-    /*                                  const std::string* display_name = NULL, const std::string* display_content = NULL); */
-    /* bool        validate_policy_memory(const std::string& file, const std::string& policy, */
-    /*                                    MediaConchLib::ReportRes* result, */
-    /*                                    const std::string* display_name = NULL, const std::string* display_content = NULL); */
 
     // Apply display
     int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);

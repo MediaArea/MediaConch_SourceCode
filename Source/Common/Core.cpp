@@ -215,12 +215,6 @@ void Core::set_compression_mode(MediaConchLib::compression compress)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Core::Close ()
-{
-    MI->Close();
-}
-
-//---------------------------------------------------------------------------
 int Core::open_file(const std::string& file, bool& registered, bool force_analyze)
 {
     //TODO: When ZenLib will manage network files
@@ -563,7 +557,7 @@ int Core::transform_with_xslt_text_memory(const std::string& report, std::string
 }
 
 //***************************************************************************
-// HELPER
+// Policy validation
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -755,6 +749,10 @@ bool Core::is_schematron_file(const std::string& file)
     return true;
 }
 
+//***************************************************************************
+// Compression
+//***************************************************************************
+
 //---------------------------------------------------------------------------
 void Core::compress_report(std::string& report, MediaConchLib::compression& compress)
 {
@@ -816,6 +814,10 @@ int Core::uncompress_report(std::string& report, MediaConchLib::compression comp
     }
     return 0;
 }
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
 
 //---------------------------------------------------------------------------
 std::string Core::get_last_modification_file(const std::string& filename)
