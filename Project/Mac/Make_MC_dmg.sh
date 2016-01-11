@@ -4,7 +4,7 @@ if test -d ~/Qt/5.3/clang_64/bin; then
     PATH=$PATH:~/Qt/5.3/clang_64/bin
 fi
 
-if [ $# != 3 ]; then
+if [ $# != 2 ]; then
     echo
     echo "Usage: Make_MC_dmg.sh kind version"
     echo
