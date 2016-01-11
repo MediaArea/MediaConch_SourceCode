@@ -793,13 +793,35 @@ bool MainWindow::validate_policy(const std::string& file, int policy,
     if (policy == -1)
         return validate_policies(file, display_name, display_content, report);
 
-    MediaConchLib::ReportRes result;
+    Policy* p = get_policy((size_t)policy);
+    if (!p)
+    {
+        report = "Policy not found";
+        return false;
+    }
+    std::string policy_content;
+    p->dump_schema(policy_content);
+
     const std::string* dname = display_name.length() ? &display_name : NULL;
     const std::string* dcontent = display_content.length() ? &display_content : NULL;
 
-    if (MCL.validate_policy(file, policy, &result, dname, dcontent) < 0)
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    MediaConchLib::ReportRes result;
+    std::bitset<MediaConchLib::report_Max> report_set;
+    std::vector<std::string> policies_contents;
+    policies_contents.push_back(policy_content);
+
+    std::vector<std::string> vec;
+
+    if (MCL.get_report(report_set, MediaConchLib::format_Xml, files,
+                       vec, policies_contents,
+                       &result, dname, dcontent) < 0)
         return false;
+
     report = result.report;
+
     if (!result.has_valid)
         return true;
     return result.valid;

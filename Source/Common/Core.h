@@ -79,15 +79,12 @@ public:
                                const std::vector<std::string>* policies_names = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
 
-    bool        validate_policy(const std::string& file, int policy,
-                                MediaConchLib::ReportRes* result,
-                                const std::string* display_name = NULL, const std::string* display_content = NULL);
-    bool        validate_policy_file(const std::string& file, const std::string& policy,
-                                     MediaConchLib::ReportRes* result,
-                                     const std::string* display_name = NULL, const std::string* display_content = NULL);
-    bool        validate_policy_memory(const std::string& file, const std::string& policy,
-                                       MediaConchLib::ReportRes* result,
-                                       const std::string* display_name = NULL, const std::string* display_content = NULL);
+    /* bool        validate_policy_file(const std::string& file, const std::string& policy, */
+    /*                                  MediaConchLib::ReportRes* result, */
+    /*                                  const std::string* display_name = NULL, const std::string* display_content = NULL); */
+    /* bool        validate_policy_memory(const std::string& file, const std::string& policy, */
+    /*                                    MediaConchLib::ReportRes* result, */
+    /*                                    const std::string* display_name = NULL, const std::string* display_content = NULL); */
 
     // Apply display
     int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);

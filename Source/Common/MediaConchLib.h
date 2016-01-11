@@ -112,25 +112,18 @@ public:
     void               set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void               create_default_implementation_schema();
-    bool validate_policy(const std::string& file, int policy,
-                         MediaConchLib::ReportRes* result,
-                         const std::string* display_name, const std::string* display_content);
-    bool validate_policy_memory(const std::string& file, const std::string& policy,
-                                MediaConchLib::ReportRes* result,
-                                const std::string* display_name, const std::string* display_content);
-    int validate_policies(const std::string& file, const std::vector<std::string>& policies,
-                           MediaConchLib::ReportRes* result,
-                           const std::string* display_name, const std::string* display_content);
 
     // Xsl Transformation
-    int  transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
-    int  transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
+    int  transform_with_xslt_file(const std::string& report, const std::string& file,
+                                  std::string& result);
+    int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                    std::string& result);
 
     // Configuration
-    void load_configuration();
-    void set_configuration_file(const std::string& file);
+    void               load_configuration();
+    void               set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
-    void set_compression_mode(compression compress);
+    void               set_compression_mode(compression compress);
 
     bool ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
                                             const std::bitset<MediaConchLib::report_Max>& reports,

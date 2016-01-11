@@ -263,59 +263,6 @@ void MediaConchLib::create_default_implementation_schema()
     core->create_default_implementation_schema();
 }
 
-//---------------------------------------------------------------------------
-bool MediaConchLib::validate_policy(const std::string& file, int policy,
-                                    MediaConchLib::ReportRes* result,
-                                    const std::string* display_name,
-                                    const std::string* display_content)
-{
-    Policy* p = get_policy((size_t)policy);
-    if (!p)
-    {
-        result->report = "Policy not found";
-        return false;
-    }
-
-    if (use_daemon)
-    {
-        std::string policy_content;
-        p->dump_schema(policy_content);
-        return daemon_client->validate_policy(file, policy_content, result,
-                                              display_name, display_content);
-    }
-    return core->validate_policy(file, policy, result, display_name, display_content);
-}
-
-//---------------------------------------------------------------------------
-bool MediaConchLib::validate_policy_memory(const std::string& file, const std::string& policy,
-                                           MediaConchLib::ReportRes* result,
-                                           const std::string* display_name,
-                                           const std::string* display_content)
-{
-    return core->validate_policy_memory(file, policy, result, display_name, display_content);
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::validate_policies(const std::string& file, const std::vector<std::string>& policies,
-                                     MediaConchLib::ReportRes* result,
-                                     const std::string* display_name,
-                                     const std::string* display_content)
-{
-    if (!policies.size())
-        return -1;
-
-    std::string report;
-    for (size_t i = 0; i < policies.size(); ++i)
-    {
-        if (core->validate_policy_file(file, policies[i], result, display_name, display_content) < 0)
-            return -1;
-        result->report += report;
-        result->report += "\r\n";
-    }
-
-    return 0;
-}
-
 //***************************************************************************
 // XSL Transformation
 //***************************************************************************
