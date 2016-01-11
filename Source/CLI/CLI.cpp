@@ -47,7 +47,7 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::init()
     {
-        // //If no filenames (and no options)
+        // If no filenames (and no options)
         if (files.empty())
             return Help_Nothing();
 
@@ -107,8 +107,9 @@ namespace MediaConch
         for (size_t i = 0; i < files.size(); ++i)
         {
             bool registered = false;
-            if (MCL.analyze(files[i], registered, force_analyze) < 0)
-                continue;
+            int ret = MCL.analyze(files[i], registered, force_analyze);
+            if (ret < 0)
+                return ret;
 
             if (use_daemon && !registered)
             {
@@ -120,11 +121,11 @@ namespace MediaConch
             }
 
             int ready = is_ready(i);
-            if (ready > 0)
+            if (ready == MediaConchLib::errorHttp_NONE)
                 continue;
             else if (ready < 0)
                 //TODO: PROBLEM
-                ;
+                return ready;
             file_to_report.push_back(files[i]);
         }
 
@@ -252,34 +253,59 @@ namespace MediaConch
         vec.push_back(files[i]);
         double percent_done = 0;
 
+        int ret = MCL.is_done(files[i], percent_done);
         if (use_daemon)
         {
-            if (!MCL.is_done(files[i], percent_done))
+            if (ret == MediaConchLib::errorHttp_NONE)
             {
                 std::stringstream str;
                 str << "Analyzing " << files[i] << " ; done: " << percent_done  << "%";
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
                 return 1;
             }
+            return ret;
         }
         else
         {
-            while (!MCL.is_done(files[i], percent_done))
+            while (ret != MediaConchLib::errorHttp_TRUE)
             {
+                if (ret < 0)
+                    return ret;
                 #ifdef WINDOWS
                 ::Sleep((DWORD)5);
                 #else
                 usleep(5000);
                 #endif
+                ret = MCL.is_done(files[i], percent_done);
             }
         }
-        return 0;
+        return MediaConchLib::errorHttp_TRUE;
     }
 
     //--------------------------------------------------------------------------
     void CLI::set_force_analyze(bool force)
     {
         force_analyze = force;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::print_error(MediaConchLib::errorHttp code)
+    {
+        switch (code)
+        {
+            case MediaConchLib::errorHttp_INVALID_DATA:
+                TEXTOUT("Data sent to the daemon is not correct");
+                break;
+            case MediaConchLib::errorHttp_INIT:
+                TEXTOUT("Cannot initialize the HTTP connection");
+                break;
+            case MediaConchLib::errorHttp_CONNECT:
+                TEXTOUT("Cannot connect to the daemon");
+                break;
+            default:
+                TEXTOUT("Internal error");
+                break;
+        }
     }
 
 }

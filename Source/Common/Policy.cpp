@@ -57,7 +57,6 @@ int Policy::import_schema(const std::string& filename)
     }
 
     int ret = import_schema_from_doc(filename, doc);
-    printf("ret is neg=%d\n", ret);
     xmlFreeDoc(doc);
     saved = true;
     return ret;

@@ -13,6 +13,7 @@
 #endif
 
 //---------------------------------------------------------------------------
+#include "MediaConchLib.h"
 #include "LibEventHttp.h"
 #include <sstream>
 //---------------------------------------------------------------------------
@@ -45,10 +46,10 @@ int LibEventHttp::init()
     base = event_base_new();
     if (!base)
     {
-        error = std::string("cannot create an event-base");
-        return -1;
+        error = MediaConchLib::errorHttp_INIT;
+        return MediaConchLib::errorHttp_INIT;
     }
-    return 0;
+    return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -57,10 +58,10 @@ int LibEventHttp::start()
     connection = evhttp_connection_base_new(base, NULL, address.c_str(), port);
     if (!connection)
     {
-        error = std::string("cannot make an event-http connection");
-        return -1;
+        error = MediaConchLib::errorHttp_CONNECT;
+        return MediaConchLib::errorHttp_CONNECT;
     }
-    return 0;
+    return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -71,7 +72,7 @@ int LibEventHttp::stop()
         evhttp_connection_free(connection);
         connection = NULL;
     }
-    return 0;
+    return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -83,7 +84,7 @@ int LibEventHttp::finish()
         event_base_free(base);
         base = NULL;
     }
-    return 0;
+    return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -116,14 +117,14 @@ int LibEventHttp::send_request_delete(std::string& uri)
 int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_cmd_type type)
 {
     // clean error
-    error.clear();
+    error = MediaConchLib::errorHttp_NONE;
     result.clear();
 
     struct evhttp_request *req = evhttp_request_new(result_coming, this);
     if (req == NULL)
     {
-        error = std::string("cannot create event-http request failed");
-        return -1;
+        error = MediaConchLib::errorHttp_CONNECT;
+        return MediaConchLib::errorHttp_CONNECT;
     }
 
     struct evkeyvalq *evOutHeaders;
@@ -135,8 +136,8 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
         struct evbuffer *evOutBuf = evhttp_request_get_output_buffer(req);;
         if (!evOutBuf)
         {
-            error = std::string("cannot get the output event-http buffer");
-            return -1;
+            error = MediaConchLib::errorHttp_CONNECT;
+            return MediaConchLib::errorHttp_MAX;
         }
 
         evbuffer_add(evOutBuf, str.c_str(), str.length());
@@ -149,12 +150,13 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
     int r = evhttp_make_request(connection, req, type, uri.c_str());
     if (r)
     {
-        error = std::string("cannot make the request");
-        return -1;
+        error = MediaConchLib::errorHttp_INVALID_DATA;
+        return MediaConchLib::errorHttp_INVALID_DATA;
     }
 
-    event_base_dispatch(base);
-    return 0;
+    if (event_base_dispatch(base) < 0)
+        return MediaConchLib::errorHttp_MAX;
+    return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -164,7 +166,18 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
 
     if (!req)
     {
-        //TODO
+        evHttp->error = MediaConchLib::errorHttp_CONNECT;
+        return;
+    }
+
+    int code = evhttp_request_get_response_code(req);
+    if (code != HTTP_OK)
+    {
+        if (code >= 400 && code < 500)
+            evHttp->error = MediaConchLib::errorHttp_INVALID_DATA;
+        else
+            evHttp->error = MediaConchLib::errorHttp_CONNECT;
+        event_base_loopexit(evHttp->base, 0);
         return;
     }
 
@@ -179,13 +192,7 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
         buff[n >= 0 ? n : 0] = '\0';
         data = std::string(buff, n);
     }
-    if (evhttp_request_get_response_code(req) != HTTP_OK)
-    {
-        //TODO
-        evHttp->error = data;
-    }
-    else
-        evHttp->result = data;
+    evHttp->result = data;
     event_base_loopexit(evHttp->base, 0);
 }
 

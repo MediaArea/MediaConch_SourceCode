@@ -84,10 +84,10 @@ void PoliciesWindow::import_schema()
 
     displayPoliciesTree();
     if (ret < 0)
-        policiesTree->get_error_bar()->showMessage(QString().fromStdString(err));
+        mainwindow->set_msg_to_status_bar(QString().fromStdString(err));
     else
     {
-        policiesTree->get_error_bar()->clearMessage();
+        mainwindow->clear_msg_in_status_bar();
         int row = (int)mainwindow->get_policies_count() - 1;
         QTreeWidgetItem* parent = policiesTree->get_policies_tree()->topLevelItem(0);
         if (row < 0 || !parent)
@@ -571,9 +571,9 @@ void PoliciesWindow::displayPoliciesMenu()
 //---------------------------------------------------------------------------
 QStatusBar* PoliciesWindow::get_error_bar()
 {
-    if (!policiesTree)
+    if (!mainwindow)
         return NULL;
-    return policiesTree->get_error_bar();
+    return mainwindow->get_status_bar();
 }
 
 //---------------------------------------------------------------------------

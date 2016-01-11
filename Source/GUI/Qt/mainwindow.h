@@ -21,6 +21,7 @@ class QVBoxLayout;
 class QLabel;
 class QFile;
 class QStringList;
+class QLineEdit;
 
 namespace MediaConch {
 
@@ -45,7 +46,11 @@ public:
     void exporting_policy(size_t pos);
 
     // UI
-    void                        Ui_Init                     ();
+    void                        Ui_Init();
+    QStatusBar                 *get_status_bar();
+    void                        set_msg_to_status_bar(const QString& message);
+    void                        set_msg_error_to_status_bar(const QString& message);
+    void                        clear_msg_in_status_bar();
 
     // Helpers
     void                        Run();
@@ -57,7 +62,7 @@ public:
     void                        checker_add_files(QList<QFileInfo>& file, int policy);
     void                        checker_add_policy_file(QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
-    void                        analyze(const std::vector<std::string>& files);
+    int                         analyze(const std::vector<std::string>& files);
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
     QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content, bool& is_valid);
     QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
@@ -113,6 +118,7 @@ private:
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
+    QLineEdit*                  status_msg;
 
     std::vector<QString>        displays_list;
 
@@ -144,6 +150,8 @@ private Q_SLOTS:
     void on_actionGettingStarted_triggered();
     void on_actionHowToUse_triggered();
     void on_actionDataFormat_triggered();
+
+    void update_status_bar();
 };
 
 }

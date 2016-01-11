@@ -151,20 +151,21 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 //---------------------------------------------------------------------------
 int MediaConchLib::analyze(const std::vector<std::string>& files, bool force_analyze)
 {
-    if (!files.size())
-        return -1;
-
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
-        analyze(files[i], registered, force_analyze);
-    return 0;
+    {
+        int ret = analyze(files[i], registered, force_analyze);
+        if (ret < 0)
+            return ret;
+    }
+    return errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
 int MediaConchLib::analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!file.length())
-        return -1;
+        return errorHttp_INVALID_DATA;
 
     if (use_daemon)
         return daemon_client->analyze(file, registered, force_analyze);
@@ -172,33 +173,36 @@ int MediaConchLib::analyze(const std::string& file, bool& registered, bool force
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::is_done(const std::vector<std::string>& files, double& percent)
+int MediaConchLib::is_done(const std::vector<std::string>& files, double& percent)
 {
     if (!files.size())
         return true;
 
-    bool done = true;
+    int done = errorHttp_TRUE;
     percent = 0.0;
     double unit_percent = (1.0 / files.size()) * 100.0;
     for (size_t i = 0; i < files.size(); ++i)
     {
         double percent_done;
-        if (is_done(files[i], percent_done))
+        int ret = is_done(files[i], percent_done);
+        if (ret == errorHttp_TRUE)
             percent += unit_percent;
-        else
+        else if (ret == errorHttp_NONE)
         {
             percent += unit_percent * percent_done;
-            done = false;
+            done = errorHttp_NONE;
         }
+        else
+            return ret;
     }
     return done;
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::is_done(const std::string& file, double& percent)
+int MediaConchLib::is_done(const std::string& file, double& percent)
 {
     if (!file.length())
-        return false;
+        return errorHttp_NONE;
 
     if (use_daemon)
         return daemon_client->is_done(file, percent);
@@ -219,7 +223,7 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
                               const std::string* display_content)
 {
     if (!files.size())
-        return -1;
+        return errorHttp_INVALID_DATA;
 
     if (use_daemon)
         return daemon_client->get_report(report_set, f, files,
@@ -236,7 +240,7 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
 int MediaConchLib::remove_report(const std::vector<std::string>& files)
 {
     if (!files.size())
-        return -1;
+        return errorHttp_INVALID_DATA;
 
     return core->remove_report(files);
 }

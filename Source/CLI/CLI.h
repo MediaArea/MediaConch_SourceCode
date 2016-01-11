@@ -43,6 +43,8 @@ namespace MediaConch
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
 
+        void print_error(MediaConchLib::errorHttp code);
+
       private:
         CLI(const CLI&);
         CLI& operator=(const CLI&);

@@ -55,6 +55,7 @@ private:
 
     void                        clearVisualElements();
     void                        set_web_view_content(QString& html);
+    void                        set_error_http(MediaConchLib::errorHttp error);
 
 //***************************************************************************
 // HELPER
