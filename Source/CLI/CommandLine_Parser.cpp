@@ -39,6 +39,7 @@
 
 ZenLib::Ztring LogFile_FileName;
 std::string Last_Argument;
+bool Separator = false;
 
 //***************************************************************************
 // Main
@@ -46,6 +47,15 @@ std::string Last_Argument;
 
 int Parse(MediaConch::CLI* cli, std::string& argument)
 {
+    if (argument == "--")
+    {
+        Separator = true;
+        return CLI_RETURN_NONE;
+    }
+
+    if (Separator)
+        return CLI_RETURN_FILE;
+
     // With 1 other argument
     if (Last_Argument.length())
     {
@@ -138,7 +148,11 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     //Default
     OPTION("--",                                            Default)
     else
+    {
+        if (argument[0] == '-')
+            return Help_Usage();
         return CLI_RETURN_FILE;
+    }
 
     return CLI_RETURN_NONE;
 }
