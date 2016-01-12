@@ -35,6 +35,13 @@ int Help()
     TEXTOUT("                    Display the version and exit");
     TEXTOUT("");
 
+    TEXTOUT("Implementation Checker:");
+    TEXTOUT("--ImplementationVerbosity=V, -iv V");
+    TEXTOUT("                    Select verbosity (V) of the implementation check, default 5");
+    TEXTOUT("                    <= 4, show only fails and N/A");
+    TEXTOUT("                    >= 5, show fails, N/A and pass");
+    TEXTOUT("");
+
     TEXTOUT("Daemon fork:");
     TEXTOUT("--Fork=[Yes/No]");
     TEXTOUT("                    If No, MediaConchd will not fork, default it forks");

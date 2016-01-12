@@ -92,6 +92,8 @@ public:
     void set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void create_default_implementation_schema();
+    void set_implementation_verbosity(const std::string& verbosity);
+    const std::string& get_implementation_verbosity();
     void set_compression_mode(MediaConchLib::compression compress);
 
     bool is_using_daemon() const;
@@ -151,7 +153,7 @@ private:
     void get_reports_output(const std::string& file, MediaConchLib::format f,
                             std::bitset<MediaConchLib::report_Max> report_set,
                             MediaConchLib::ReportRes* result);
-    void get_implementation_report(const std::string& file, std::string& report);
+    bool get_implementation_report(const std::string& file, std::string& report);
 
     void register_file_to_database(std::string& file);
     void register_report_mediainfo_text_to_database(std::string& file, const std::string& time,

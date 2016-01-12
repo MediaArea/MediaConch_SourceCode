@@ -267,6 +267,18 @@ void MediaConchLib::create_default_implementation_schema()
     core->create_default_implementation_schema();
 }
 
+//---------------------------------------------------------------------------
+void MediaConchLib::set_implementation_verbosity(const std::string& verbosity)
+{
+    core->set_implementation_verbosity(verbosity);
+}
+
+//---------------------------------------------------------------------------
+const std::string& MediaConchLib::get_implementation_verbosity()
+{
+    return core->get_implementation_verbosity();
+}
+
 //***************************************************************************
 // XSL Transformation
 //***************************************************************************

@@ -52,6 +52,11 @@ namespace MediaConch
     int Daemon::init()
     {
         MCL->init();
+
+        // If no Implementation verbosity registered, use one by default
+        if (!MCL->get_implementation_verbosity().length())
+            MCL->set_implementation_verbosity("5");
+
         httpd = new LibEventHttpd(this);
         int port = -1;
         std::string address;
@@ -144,18 +149,24 @@ namespace MediaConch
             last_argument="--configuration=";
             return DAEMON_RETURN_NONE;
         }
+        if (argument=="-iv")
+        {
+            last_argument = "--implementationverbosity=";
+            return DAEMON_RETURN_NONE;
+        }
 
         // Compression short option
         if (argument=="-cz")
             argument = "--compression=zlib";
 
         if (0);
-        OPTION("--help",          help)
-        OPTION("--version",          version)
-        OPTION("--fork",          fork)
-        OPTION("--configuration", configuration)
-        OPTION("--compression", compression)
-        OPTION("--",              other)
+        OPTION("--help",                    help)
+        OPTION("--version",                 version)
+        OPTION("--fork",                    fork)
+        OPTION("--configuration",           configuration)
+        OPTION("--compression",             compression)
+        OPTION("--implementationverbosity", implementationverbosity)
+        OPTION("--",                        other)
         else
         {
             Help();
@@ -232,6 +243,23 @@ namespace MediaConch
         }
 
         MCL->set_compression_mode(mode);
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_implementationverbosity(const std::string& argument)
+    {
+        //Form : --ImplemnetationSchema=File
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string verbosity;
+        verbosity.assign(argument, egal_pos + 1 , std::string::npos);
+        MCL->set_implementation_verbosity(verbosity);
         return DAEMON_RETURN_NONE;
     }
 

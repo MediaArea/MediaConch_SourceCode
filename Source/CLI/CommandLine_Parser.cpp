@@ -67,6 +67,11 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--implementationschema=";
         return true;
     }
+    if (argument=="-iv")
+    {
+        Last_Argument = "--implementationverbosity=";
+        return true;
+    }
     return false;
 }
 
@@ -154,6 +159,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--logfile",                                     LogFile)
     OPTION("--configuration",                               Configuration)
     OPTION("--implementationschema",                        ImplementationSchema)
+    OPTION("--implementationverbosity",                     ImplementationVerbosity)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
     //Default
@@ -308,6 +314,23 @@ CL_OPTION(ImplementationSchema)
     std::string file;
     file.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_implementation_schema_file(file);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(ImplementationVerbosity)
+{
+    //Form : --ImplemnetationSchema=File
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help_Usage();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string verbosity;
+    verbosity.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_implementation_verbosity(verbosity);
     return CLI_RETURN_NONE;
 }
 

@@ -207,6 +207,27 @@ void Core::create_default_implementation_schema()
 }
 
 //---------------------------------------------------------------------------
+void Core::set_implementation_verbosity(const std::string& verbosity)
+{
+    if (!verbosity.length())
+        return;
+    std::string v;
+
+    if (verbosity[0] == '"')
+        v = std::string("'") + verbosity + std::string("'");
+    else
+        v = std::string("\"") + verbosity + std::string("\"");
+
+    implementation_options["verbosity"] = v;
+}
+
+//---------------------------------------------------------------------------
+const std::string& Core::get_implementation_verbosity()
+{
+    return implementation_options["verbosity"];
+}
+
+//---------------------------------------------------------------------------
 void Core::set_compression_mode(MediaConchLib::compression compress)
 {
     compression_mode = compress;
@@ -337,10 +358,11 @@ int Core::get_reports_output_Html(const std::string& file,
     if (report_set[MediaConchLib::report_MediaConch])
     {
         std::string tmp;
-        get_implementation_report(file, tmp);
-
-        // Apply an XSLT to have HTML
-        transform_with_xslt_html_memory(tmp, tmp);
+        if (get_implementation_report(file, tmp))
+        {
+            // Apply an XSLT to have HTML
+            transform_with_xslt_html_memory(tmp, tmp);
+        }
         report += tmp;
     }
     if (report_set[MediaConchLib::report_MediaTrace])
@@ -364,8 +386,11 @@ int Core::get_reports_output_Text_Implementation(const std::string& file, std::s
     get_implementation_report(file, tmp);
     is_valid = policy_is_valid(tmp);
 
-    // Apply an XSLT to have Text
-    transform_with_xslt_text_memory(tmp, tmp);
+    if (is_valid)
+    {
+        // Apply an XSLT to have Text
+        transform_with_xslt_text_memory(tmp, tmp);
+    }
     report += tmp;
     return 0;
 }
@@ -373,9 +398,10 @@ int Core::get_reports_output_Text_Implementation(const std::string& file, std::s
 //---------------------------------------------------------------------------
 int Core::get_reports_output_Xml_Implementation(const std::string& file, std::string& report, bool& is_valid)
 {
-    get_implementation_report(file, report);
-    is_valid = policy_is_valid(report);
-
+    if (get_implementation_report(file, report))
+        is_valid = policy_is_valid(report);
+    else
+        is_valid = false;
     return 0;
 }
 
@@ -736,8 +762,7 @@ bool Core::validate_xslt_policy_from_memory(const std::string& file, const std::
 bool Core::validation(const std::string& file, Schema* S, std::string& report)
 {
     std::string xml;
-    get_report_saved(file, MediaConchLib::report_MediaConch,
-                     MediaConchLib::format_MaXml, xml);
+    create_report_ma_xml(file, xml, get_bitset_with_mi_mt());
     bool valid = true;
 
     int ret = S->validate_xml(xml);
@@ -883,17 +908,6 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, const s
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_implementation_xml_to_database(const std::string& file, const std::string& time,
-                                                          std::string& report)
-{
-    MediaConchLib::compression mode = compression_mode;
-    compress_report(report, mode);
-    db->save_report(MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
-                    file, time,
-                    report, mode);
-}
-
-//---------------------------------------------------------------------------
 void Core::get_content_of_media_in_xml(std::string& report)
 {
     std::string media_start("<media ref");
@@ -998,13 +1012,13 @@ void Core::create_report_ma_xml(const std::string& filename, std::string& report
     if (reports[MediaConchLib::report_MediaConch])
     {
         std::string implem;
-        get_implementation_report(filename, implem);
-        get_content_of_media_in_xml(implem);
-        if (implem.length())
-        {
-            report += "<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" version=\"0.1\">"
+        if (get_implementation_report(filename, implem))
+            get_content_of_media_in_xml(implem);
+        else
+            implem = std::string();
+
+        report += "<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" version=\"0.1\">"
             + implem + "</MediaConch>\n";
-        }
     }
     report += std::string("</media>\n"
                           "</MediaArea>");
@@ -1026,9 +1040,17 @@ void Core::get_report_saved(const std::string& filename,
 
     if (!get_db())
         return;
+
+    std::string raw;
+    if (reportKind == MediaConchLib::report_MediaConch)
+    {
+        get_implementation_report(filename, raw);
+        report += raw;
+        return;
+    }
+
     MediaConchLib::compression compress;
     std::string time = get_last_modification_file(filename);
-    std::string raw;
     db->get_report(reportKind, f, filename, time, raw, compress);
     uncompress_report(raw, compress);
     report += raw;
@@ -1097,25 +1119,13 @@ void Core::get_reports_output(const std::string& file, MediaConchLib::format f,
 }
 
 //---------------------------------------------------------------------------
-void Core::get_implementation_report(const std::string& file, std::string& report)
+bool Core::get_implementation_report(const std::string& file, std::string& report)
 {
+    std::string memory(implementation_report_xsl);
     std::string r;
-    get_report_saved(file, MediaConchLib::report_MediaConch,
-                     MediaConchLib::format_Xml, r);
-
-    if (!r.length())
-    {
-        bool valid;
-        std::string memory(implementation_report_xsl);
-        valid = validate_xslt_policy_from_memory(file, memory, r, true);
-        if (valid)
-        {
-            std::string tmp = r;
-            std::string time = get_last_modification_file(file);
-            register_report_implementation_xml_to_database(file, time, tmp);
-        }
-    }
+    bool valid = validate_xslt_policy_from_memory(file, memory, r, true);
     report += r;
+    return valid;
 }
 
 //---------------------------------------------------------------------------
