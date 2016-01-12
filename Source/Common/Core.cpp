@@ -29,6 +29,8 @@
 #endif //defined(_WIN32) || defined(WIN32)
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/ImplementationReportMatroskaSchema.h"
+#include "Common/MediaTraceDisplayTextXsl.h"
+#include "Common/MediaTraceDisplayHtmlXsl.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
@@ -354,6 +356,17 @@ int Core::get_reports_output_Html(const std::string& file,
 
         // Apply an XSLT to have HTML
         transform_with_xslt_html_memory(tmp, tmp);
+        report += tmp;
+    }
+    if (report_set[MediaConchLib::report_MediaTrace])
+    {
+        std::string tmp;
+        get_report_saved(file, MediaConchLib::report_MediaTrace,
+                         MediaConchLib::format_Xml, tmp);
+
+        // Apply an XSLT to have HTML
+        std::string memory(media_trace_display_html_xsl);
+        transform_with_xslt_memory(tmp, memory, tmp);
         report += tmp;
     }
     return 0;
@@ -1018,20 +1031,6 @@ void Core::register_report_mediainfo_xml_to_database(std::string& file, const st
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediatrace_text_to_database(std::string& file, const std::string& time,
-                                                       MediaInfoNameSpace::MediaInfoList* curMI)
-{
-    curMI->Option(__T("Details"), __T("1"));
-    curMI->Option(__T("Inform"), String());
-    std::string report = Ztring(curMI->Inform()).To_UTF8();
-    MediaConchLib::compression mode = compression_mode;
-    compress_report(report, mode);
-    db->save_report(MediaConchLib::report_MediaTrace, MediaConchLib::format_Text,
-                    file, time,
-                    report, mode);
-}
-
-//---------------------------------------------------------------------------
 void Core::register_report_mediatrace_xml_to_database(std::string& file, const std::string& time,
                                                       MediaInfoNameSpace::MediaInfoList* curMI)
 {
@@ -1085,7 +1084,6 @@ void Core::register_file_to_database(std::string& filename, MediaInfoNameSpace::
     register_report_mediainfo_xml_to_database(filename, time, curMI);
 
     // MediaTrace
-    register_report_mediatrace_text_to_database(filename, time, curMI);
     register_report_mediatrace_xml_to_database(filename, time, curMI);
 }
 
@@ -1099,7 +1097,6 @@ void Core::register_file_to_database(std::string& filename)
     register_report_mediainfo_xml_to_database(filename, time, MI);
 
     // MediaTrace
-    register_report_mediatrace_text_to_database(filename, time, MI);
     register_report_mediatrace_xml_to_database(filename, time, MI);
 }
 
@@ -1221,10 +1218,24 @@ void Core::get_reports_output(const std::string& file, MediaConchLib::format f,
         }
         if (report_set[MediaConchLib::report_MediaTrace])
         {
+            std::string tmp;
+            create_report_mt_xml(file, tmp);
             if (f == MediaConchLib::format_Xml)
-                create_report_mt_xml(file, result->report);
-            else
-                get_report_saved(file, MediaConchLib::report_MediaTrace, f, result->report);
+                result->report += tmp;
+            else if (f == MediaConchLib::format_Html)
+            {
+                // Apply an XSLT to have HTML
+                std::string memory(media_trace_display_html_xsl);
+                transform_with_xslt_memory(tmp, memory, tmp);
+                result->report += tmp;
+            }
+            else if (f == MediaConchLib::format_Text)
+            {
+                // Apply an XSLT to have Text
+                std::string memory(media_trace_display_text_xsl);
+                transform_with_xslt_memory(tmp, memory, tmp);
+                result->report += tmp;
+            }
             result->report += "\r\n";
         }
 
