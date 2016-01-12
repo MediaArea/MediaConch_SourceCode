@@ -70,6 +70,7 @@ private:
     std::string decimal_to_hexa(std::string val);
     void interpret_offset(std::string& offset, bool coma, std::string& json);
     void interpret_value(std::string& value, bool coma, std::string& json);
+    void unified_json_value(std::string& value);
 };
 
 }

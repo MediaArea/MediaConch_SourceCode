@@ -430,8 +430,34 @@ void JsTree::interpret_offset(std::string& offset, bool coma, std::string& json)
 }
 
 //---------------------------------------------------------------------------
+void JsTree::unified_json_value(std::string& value)
+{
+    size_t pos = 0;
+    while (pos != std::string::npos)
+    {
+        pos = value.find("\n", pos);
+        if (pos != std::string::npos)
+        {
+            value.replace(pos, 1, "\\n");
+            pos += 2;
+        }
+    }
+    pos = 0;
+    while (pos != std::string::npos)
+    {
+        pos = value.find("\"", pos);
+        if (pos != std::string::npos)
+        {
+            value.replace(pos, 1, "\\\"");
+            pos += 2;
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
 void JsTree::interpret_value(std::string& value, bool coma, std::string& json)
 {
+    unified_json_value(value);
     if (coma)
         json += ", ";
     json += "\"dataValue\":\"";
