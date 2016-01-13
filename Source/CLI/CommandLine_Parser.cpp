@@ -39,40 +39,39 @@
 
 ZenLib::Ztring LogFile_FileName;
 std::string Last_Argument;
+bool Separator = false;
 
 //***************************************************************************
 // Main
 //***************************************************************************
 
-int Parse(MediaConch::CLI* cli, std::string& argument)
+static bool wait_for_another_argument(std::string& argument)
 {
-    // With 1 other argument
-    if (Last_Argument.length())
-    {
-        argument = Last_Argument.append(argument);
-        Last_Argument = "";
-    }
     if (argument=="-p")
     {
         Last_Argument = "--policy=";
-        return CLI_RETURN_NONE;
+        return true;
     }
     if (argument=="-d")
     {
         Last_Argument = "--display=";
-        return CLI_RETURN_NONE;
+        return true;
     }
     if (argument=="-c")
     {
         Last_Argument = "--configuration=";
-        return CLI_RETURN_NONE;
+        return true;
     }
     if (argument=="-i")
     {
         Last_Argument = "--implementationschema=";
-        return CLI_RETURN_NONE;
+        return true;
     }
+    return false;
+}
 
+static void change_short_options_to_long(std::string& argument)
+{
     // Help short options
     if (argument=="-ha")
         argument = "--help=Advanced";
@@ -120,6 +119,28 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     // Compression short options
     if (argument=="-cz")
         argument = "--compression=zlib";
+}
+
+int Parse(MediaConch::CLI* cli, std::string& argument)
+{
+    if (argument == "--")
+    {
+        Separator = true;
+        return CLI_RETURN_NONE;
+    }
+
+    if (Separator)
+        return CLI_RETURN_FILE;
+
+    // With 1 other argument
+    if (Last_Argument.length())
+    {
+        argument = Last_Argument.append(argument);
+        Last_Argument = "";
+    }
+    if (wait_for_another_argument(argument))
+        return CLI_RETURN_NONE;
+    change_short_options_to_long(argument);
 
     // Listing
     if (0);
@@ -138,7 +159,11 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     //Default
     OPTION("--",                                            Default)
     else
+    {
+        if (argument[0] == '-')
+            return Help_Usage();
         return CLI_RETURN_FILE;
+    }
 
     return CLI_RETURN_NONE;
 }
