@@ -31,6 +31,7 @@
 #include <QStatusBar>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QTimer>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -89,6 +90,13 @@ MainWindow::MainWindow(QWidget *parent) :
     add_default_policy();
     add_default_displays();
     on_actionChecker_triggered();
+
+    // Status bar
+    statusBar()->show();
+    status_msg = new QLineEdit(statusBar());
+    status_msg->setReadOnly(true);
+    statusBar()->addWidget(status_msg, 2);
+    clear_msg_in_status_bar();
 }
 
 MainWindow::~MainWindow()
@@ -431,9 +439,8 @@ void MainWindow::on_actionChooseSchema_triggered()
 
     std::string err;
     if (MCL.import_policy_from_file(file.toStdString(), err) < 0)
-    {
-        //TODO error
-    }
+        set_msg_error_to_status_bar("Policy not valid");
+
     if (!ui->actionPolicies->isChecked())
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
@@ -576,6 +583,45 @@ void MainWindow::createDisplayView()
     displayView->displayDisplay();
 }
 
+void MainWindow::set_msg_to_status_bar(const QString& message)
+{
+    statusBar()->clearMessage();
+    status_msg->setText(message);
+    QTimer::singleShot(5000, this, SLOT(update_status_bar()));
+}
+
+void MainWindow::set_msg_error_to_status_bar(const QString& message)
+{
+    statusBar()->clearMessage();
+
+    QPalette pal = status_msg->palette();
+    pal.setColor(QPalette::WindowText, Qt::red);
+    pal.setColor(QPalette::Text, Qt::red);
+    status_msg->setPalette(pal);
+    status_msg->setText(message);
+
+    QTimer::singleShot(5000, this, SLOT(update_status_bar()));
+}
+
+void MainWindow::clear_msg_in_status_bar()
+{
+    statusBar()->clearMessage();
+    QPalette pal = status_msg->palette();
+    pal.setColor(QPalette::WindowText, Qt::black);
+    status_msg->setPalette(pal);
+    status_msg->setText(QString());
+}
+
+QStatusBar *MainWindow::get_status_bar()
+{
+    return statusBar();
+}
+
+void MainWindow::update_status_bar()
+{
+    clear_msg_in_status_bar();
+}
+
 //***************************************************************************
 // HELPER
 //***************************************************************************
@@ -653,17 +699,15 @@ size_t MainWindow::get_policies_count() const
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::analyze(const std::vector<std::string>& files)
+int MainWindow::analyze(const std::vector<std::string>& files)
 {
-    MCL.analyze(files);
+    return MCL.analyze(files);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::is_analyze_finished(const std::vector<std::string>& files, double& percent_done)
 {
-    if (MCL.is_done(files, percent_done))
-        return 0;
-    return 1;
+    return MCL.is_done(files, percent_done);
 }
 
 //---------------------------------------------------------------------------
@@ -793,13 +837,35 @@ bool MainWindow::validate_policy(const std::string& file, int policy,
     if (policy == -1)
         return validate_policies(file, display_name, display_content, report);
 
-    MediaConchLib::ReportRes result;
+    Policy* p = get_policy((size_t)policy);
+    if (!p)
+    {
+        report = "Policy not found";
+        return false;
+    }
+    std::string policy_content;
+    p->dump_schema(policy_content);
+
     const std::string* dname = display_name.length() ? &display_name : NULL;
     const std::string* dcontent = display_content.length() ? &display_content : NULL;
 
-    if (MCL.validate_policy(file, policy, &result, dname, dcontent) < 0)
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    MediaConchLib::ReportRes result;
+    std::bitset<MediaConchLib::report_Max> report_set;
+    std::vector<std::string> policies_contents;
+    policies_contents.push_back(policy_content);
+
+    std::vector<std::string> vec;
+
+    if (MCL.get_report(report_set, MediaConchLib::format_Xml, files,
+                       vec, policies_contents,
+                       &result, dname, dcontent) < 0)
         return false;
+
     report = result.report;
+
     if (!result.has_valid)
         return true;
     return result.valid;

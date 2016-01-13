@@ -29,7 +29,6 @@ namespace Ui {
 class QTreeWidget;
 class QFrame;
 class QLayout;
-class QStatusBar;
 
 namespace MediaConch {
 
@@ -48,7 +47,6 @@ public:
     QTreeWidget *get_policies_tree();
     QFrame      *get_menu_frame();
     QLayout     *get_menu_layout();
-    QStatusBar  *get_error_bar();
 
 //***************************************************************************
 // Visual element
@@ -56,7 +54,6 @@ public:
 
 private:
     Ui::PoliciesTree *ui;
-    QStatusBar       *error;
 
 //***************************************************************************
 // Slots

@@ -31,10 +31,6 @@ PoliciesTree::PoliciesTree(QWidget *parent) :
     ui->menu->setLayout(Layout);
     ui->policies->setColumnCount(1);
     ui->policies->header()->hide();
-
-    error = new QStatusBar(this);
-    error->setObjectName(QString::fromUtf8("error"));
-    ui->gridLayout->addWidget(error, 1, 0, 1, 1);
 }
 
 PoliciesTree::~PoliciesTree()
@@ -62,11 +58,6 @@ QFrame *PoliciesTree::get_menu_frame()
 QLayout *PoliciesTree::get_menu_layout()
 {
     return ui->menu->layout();
-}
-
-QStatusBar *PoliciesTree::get_error_bar()
-{
-    return error;
 }
 
 //***************************************************************************

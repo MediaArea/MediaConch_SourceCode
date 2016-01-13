@@ -217,21 +217,6 @@ void Core::set_compression_mode(MediaConchLib::compression compress)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Core::Close ()
-{
-    MI->Close();
-}
-
-//---------------------------------------------------------------------------
-void Core::Run (std::string file)
-{
-    // Parsing
-    bool registered = false;
-    if (file.length())
-        open_file(file, registered);
-}
-
-//---------------------------------------------------------------------------
 int Core::open_file(const std::string& file, bool& registered, bool force_analyze)
 {
     //TODO: When ZenLib will manage network files
@@ -515,164 +500,9 @@ int Core::policies_check(const std::vector<std::string>& files,
     return 0;
 }
 
-// //---------------------------------------------------------------------------
-// bool Core::policy_schematron(const std::string& file, const std::string& policy,
-//                              MediaConchLib::format, std::stringstream& Out)
-// {
-//     Schema* S = new Schematron;
-//     bool valid = false;
-
-//     if (S->register_schema_from_file(policy.c_str()))
-//     {
-//         std::string report;
-//         valid = validation(file, S, report);
-
-//         if (!valid)
-//         {
-//             Out << "NOT VALID\n";
-//             Out << report;
-//         }
-//         else
-//             Out << "VALID";
-//     }
-//     else
-//     {
-//         std::vector<std::string> errors = S->get_errors();
-//         Out << "internal error for parsing file" << std::endl;
-//         for (size_t pos = 0; pos < errors.size(); pos++)
-//             Out << "\t" << errors[pos].c_str();
-//     }
-//     delete S;
-//     return valid;
-// }
-
-// //---------------------------------------------------------------------------
-// bool Core::policy_xslt(const std::string& file, const std::string& policy, MediaConchLib::format f, std::stringstream& Out)
-// {
-//     Schema *S = new Xslt;
-//     bool valid = false;
-
-//     if (S->register_schema_from_file(policy.c_str()))
-//     {
-//         std::string report;
-//         valid = validation(file, S, report);
-//         if (xslt_display.length())
-//             transform_with_xslt_file(report, xslt_display, report);
-//         else 
-//             switch (f)
-//             {
-//                 case MediaConchLib::format_Text:
-//                                         // Apply an XSLT to have Text
-//                                         transform_with_xslt_text_memory(report, report);
-//                                     break;
-//                 case MediaConchLib::format_Html:
-//                                         // Apply an XSLT to have HTML
-//                                         transform_with_xslt_html_memory(report, report);
-//                                     break;
-//                 default:            ;
-//             }
-
-//         Out << report;
-//     }
-//     else
-//     {
-//         std::vector<std::string> errors = S->get_errors();
-//         Out << file << ": ";
-//         Out << "internal error for parsing file" << endl;
-//         for (size_t pos = 0; pos < errors.size(); pos++)
-//             Out << "\t" << errors[pos].c_str();
-//     }
-//     delete S;
-//     return valid;
-// }
-
 //***************************************************************************
-// API
+// XSL transform
 //***************************************************************************
-
-//---------------------------------------------------------------------------
-bool Core::validate_policy(const std::string& file, int policy,
-                           MediaConchLib::ReportRes* result,
-                           const std::string* display_name,
-                           const std::string* display_content)
-{
-    bool valid = false;
-    if (policy == -1)
-    {
-        result->report = "Policy not found";
-        return valid;
-    }
-
-    if (policies.policies[policy]->type == Policies::POLICY_SCHEMATRON)
-        valid = validate_schematron_policy(file, policy, result->report);
-    else
-        valid = validate_xslt_policy(file, policy, result->report);
-
-    if (display_name)
-        transform_with_xslt_file(result->report, *display_name, result->report);
-    else if (display_content)
-        transform_with_xslt_memory(result->report, *display_content, result->report);
-
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::validate_policy_file(const std::string& file, const std::string& policy,
-                                MediaConchLib::ReportRes* result,
-                                const std::string* display_name,
-                                const std::string* display_content)
-{
-    if (!policy.length())
-    {
-        result->report = "Policy invalid";
-        return false;
-    }
-
-    bool valid = validate_schematron_policy_from_file(file, policy, result->report);
-    if (!valid)
-    {
-        std::string tmp = result->report;
-        valid = validate_xslt_policy_from_file(file, policy, result->report);
-        if (!valid)
-            result->report = tmp;
-    }
-
-    if (display_name)
-        transform_with_xslt_file(result->report, *display_name, result->report);
-    else if (display_content)
-        transform_with_xslt_memory(result->report, *display_content, result->report);
-
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::validate_policy_memory(const std::string& file, const std::string& policy,
-                                  MediaConchLib::ReportRes* result,
-                                  const std::string* display_name,
-                                  const std::string* display_content)
-{
-    if (!policy.length())
-    {
-        result->report = "Policy invalid";
-        return false;
-    }
-
-    bool valid = validate_schematron_policy_from_memory(file, policy, result->report);
-    if (!valid)
-    {
-        std::string tmp = result->report;
-        valid = validate_xslt_policy_from_memory(file, policy, result->report);
-        if (!valid)
-            result->report = tmp;
-    }
-
-    if (display_name)
-        transform_with_xslt_file(result->report, *display_name, result->report);
-    else if (display_content)
-        transform_with_xslt_memory(result->report, *display_content, result->report);
-
-    return valid;
-}
 
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_file(const std::string& report, const std::string& xslt, std::string& result)
@@ -740,7 +570,7 @@ int Core::transform_with_xslt_text_memory(const std::string& report, std::string
 }
 
 //***************************************************************************
-// HELPER
+// Policy validation
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -932,6 +762,10 @@ bool Core::is_schematron_file(const std::string& file)
     return true;
 }
 
+//***************************************************************************
+// Compression
+//***************************************************************************
+
 //---------------------------------------------------------------------------
 void Core::compress_report(std::string& report, MediaConchLib::compression& compress)
 {
@@ -993,6 +827,10 @@ int Core::uncompress_report(std::string& report, MediaConchLib::compression comp
     }
     return 0;
 }
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
 
 //---------------------------------------------------------------------------
 std::string Core::get_last_modification_file(const std::string& filename)

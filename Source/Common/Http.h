@@ -15,6 +15,7 @@
 #define HttpH
 //---------------------------------------------------------------------------
 #include "REST_API.h"
+#include "MediaConchLib.h"
 #include <string>
 //---------------------------------------------------------------------------
 
@@ -46,15 +47,15 @@ public:
     void set_port(int port);
     void set_address(std::string& address);
 
-    std::string get_error() const { return error; }
-    std::string get_result() const { return result; }
+    MediaConchLib::errorHttp get_error() const { return error; }
+    std::string              get_result() const { return result; }
 
 protected:
-    RESTAPI     rest;
-    std::string address;
-    int         port;
-    std::string result;
-    std::string error;
+    RESTAPI                  rest;
+    std::string              address;
+    int                      port;
+    std::string              result;
+    MediaConchLib::errorHttp error;
 
     virtual int send_request_get(std::string& uri) = 0;
     virtual int send_request_post(std::string& uri, std::string& str) = 0;

@@ -32,9 +32,9 @@ public:
     virtual ~NoContainer() {}
 
     virtual int parse(const std::string&, Value&) { return -1; } //TODO
-    virtual std::string serialize(Value &v) { return std::string(); }
-    virtual Value* get_value_by_key(Value& v, const std::string& key) { return NULL; }
-    virtual Value* get_value_in_array_by_key(Value& v, const std::string& key) { return NULL; }
+    virtual std::string serialize(Value &) { return std::string(); }
+    virtual Value* get_value_by_key(Value&, const std::string&) { return NULL; }
+    virtual Value* get_value_in_array_by_key(Value&, const std::string&) { return NULL; }
 
 private:
     NoContainer(const NoContainer&);

@@ -136,7 +136,8 @@ int main(int argc, char* argv_ansi[])
     //Callback for error handling
     CallBack_Set(&cli, (void*)Event_CallBackFunction);
 
-    cli.run();
+    if ((ret = cli.run()) < 0)
+        cli.print_error((MediaConch::MediaConchLib::errorHttp)ret);
 
     cli.finish();
 

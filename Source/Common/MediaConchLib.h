@@ -71,6 +71,16 @@ public:
         compression_Max,
     };
 
+    enum errorHttp
+    {
+        errorHttp_TRUE         = 1,
+        errorHttp_NONE         = 0,
+        errorHttp_INVALID_DATA = -1,
+        errorHttp_INIT         = -2,
+        errorHttp_CONNECT      = -3,
+        errorHttp_MAX          = -4,
+    };
+
     struct ReportRes
     {
         std::string       report;
@@ -95,42 +105,35 @@ public:
     // Analyze
     int  analyze(const std::vector<std::string>& files, bool force_analyze = false);
     int  analyze(const std::string& file, bool& registered, bool force_analyze = false);
-    bool is_done(const std::vector<std::string>& files, double& percent);
-    bool is_done(const std::string& file, double& percent);
+    int  is_done(const std::vector<std::string>& files, double& percent);
+    int  is_done(const std::string& file, double& percent);
 
     // Output
-    int get_report(const std::bitset<report_Max>& Report, format f,
-                   const std::vector<std::string>& files,
-                   const std::vector<std::string>& policies_names,
-                   const std::vector<std::string>& policies_contents,
-                   MediaConchLib::ReportRes* result,
-                   const std::string* display_name = NULL,
-                   const std::string* display_content = NULL);
-    int remove_report(const std::vector<std::string>& files);
+    int  get_report(const std::bitset<report_Max>& Report, format f,
+                    const std::vector<std::string>& files,
+                    const std::vector<std::string>& policies_names,
+                    const std::vector<std::string>& policies_contents,
+                    MediaConchLib::ReportRes* result,
+                    const std::string* display_name = NULL,
+                    const std::string* display_content = NULL);
+    int  remove_report(const std::vector<std::string>& files);
 
     // Policy
     void               set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void               create_default_implementation_schema();
-    bool validate_policy(const std::string& file, int policy,
-                         MediaConchLib::ReportRes* result,
-                         const std::string* display_name, const std::string* display_content);
-    bool validate_policy_memory(const std::string& file, const std::string& policy,
-                                MediaConchLib::ReportRes* result,
-                                const std::string* display_name, const std::string* display_content);
-    int validate_policies(const std::string& file, const std::vector<std::string>& policies,
-                           MediaConchLib::ReportRes* result,
-                           const std::string* display_name, const std::string* display_content);
 
     // Xsl Transformation
-    int  transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
-    int  transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
+    int  transform_with_xslt_file(const std::string& report, const std::string& file,
+                                  std::string& result);
+    int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                    std::string& result);
 
     // Configuration
-    void load_configuration();
-    void set_configuration_file(const std::string& file);
+    void               load_configuration();
+    void               set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
-    void set_compression_mode(compression compress);
+    void               set_compression_mode(compression compress);
 
     bool ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
                                             const std::bitset<MediaConchLib::report_Max>& reports,

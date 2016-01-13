@@ -75,7 +75,7 @@ int DaemonClient::close()
 int DaemonClient::analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!http_client)
-        return -1;
+        return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Analyze_Req req;
     RESTAPI::Analyze_Arg arg;
@@ -89,61 +89,69 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
     }
     req.args.push_back(arg);
 
-    if (http_client->start() < 0 || http_client->send_request(req) < 0)
-        return -1;
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
 
     std::string data = http_client->get_result();
     http_client->stop();
     if (!data.length())
-        return -1;
+        return http_client->get_error();
 
     RESTAPI rest;
     RESTAPI::Analyze_Res *res = rest.parse_analyze_res(data);
     if (!res || res->ok.size() != 1)
-        return -1;
+        return MediaConchLib::errorHttp_INVALID_DATA;
 
     registered = !res->ok[0]->create;
 
     file_ids[file] = res->ok[0]->outId;
-    return 0;
+    return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
-bool DaemonClient::is_done(const std::string& file, double& done)
+int DaemonClient::is_done(const std::string& file, double& done)
 {
     if (!http_client)
-        return false;
+        return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Status_Req req;
     std::map<std::string, int>::iterator it = file_ids.find(file);
     if (it == file_ids.end())
-        return false;
+        return MediaConchLib::errorHttp_MAX;
     req.ids.push_back(it->second);
 
-    http_client->start();
-    if (http_client->send_request(req) < 0)
-        return false;
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
 
     std::string data = http_client->get_result();
     http_client->stop();
     if (!data.length())
-        return false;
+        return MediaConchLib::errorHttp_INVALID_DATA;
 
     RESTAPI rest;
     RESTAPI::Status_Res *res = rest.parse_status_res(data);
     if (!res || res->ok.size() != 1)
-        return false;
+        return MediaConchLib::errorHttp_INVALID_DATA;
 
     RESTAPI::Status_Ok *ok = res->ok[0];
 
     if (ok->finished)
-        return true;
+        return MediaConchLib::errorHttp_TRUE;
 
     if (ok->has_percent)
         done = ok->done;
     else
         done = 0.0;
-    return false;
+    return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------

@@ -218,13 +218,20 @@ void CheckerWindow::update_web_view(std::string file, int policy)
     // Analyze
     std::vector<std::string> files;
     files.push_back(file);
-    mainwindow->analyze(files);
+    int ret = 0;
+    if ((ret = mainwindow->analyze(files)) < 0)
+    {
+        set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
+        return;
+    }
 
     // TODO: do a signal/slot to update percent auto-magically
     while (1)
     {
         double percent_done;
-        if (!mainwindow->is_analyze_finished(files, percent_done))
+        ret = mainwindow->is_analyze_finished(files, percent_done);
+        if (ret)
             break;
         progressBar->get_progress_bar()->setValue(percent_done);
         #ifdef WINDOWS
@@ -232,6 +239,13 @@ void CheckerWindow::update_web_view(std::string file, int policy)
         #else
         usleep(50000);
         #endif
+    }
+
+    if (ret < 0)
+    {
+        set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
+        return;
     }
 
     //Add the file detail to the web page
@@ -265,12 +279,19 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
     progressBar->get_progress_bar()->setMaximum(100);
     progressBar->get_progress_bar()->setValue(1);
 
-    mainwindow->analyze(vfiles);
+    int ret = 0;
+    if ((ret = mainwindow->analyze(vfiles)) < 0)
+    {
+        set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
+        return;
+    }
 
     while (1)
     {
         double percent_done;
-        if (!mainwindow->is_analyze_finished(vfiles, percent_done))
+        ret = mainwindow->is_analyze_finished(vfiles, percent_done);
+        if (ret)
             break;
         progressBar->get_progress_bar()->setValue(percent_done / 2);
         #ifdef WINDOWS
@@ -278,6 +299,13 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
         #else
         usleep(50000);
         #endif
+    }
+
+    if (ret < 0)
+    {
+        set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
+        return;
     }
 
     //Add the files details to the web page
@@ -977,6 +1005,28 @@ void CheckerWindow::get_displays_use(std::string& display_name, std::string& dis
     }
     else
         display_content = implementation_report_display_html_xsl;
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::set_error_http(MediaConchLib::errorHttp code)
+{
+    QString error_msg;
+    switch (code)
+    {
+        case MediaConchLib::errorHttp_INVALID_DATA:
+            error_msg = "Data sent to the daemon is not correct";
+            break;
+        case MediaConchLib::errorHttp_INIT:
+            error_msg = "Cannot initialize the HTTP connection";
+            break;
+        case MediaConchLib::errorHttp_CONNECT:
+            error_msg = "Cannot connect to the daemon";
+            break;
+        default:
+            error_msg = "Error not known";
+            break;
+    }
+    mainwindow->set_msg_error_to_status_bar(error_msg);
 }
 
 }
