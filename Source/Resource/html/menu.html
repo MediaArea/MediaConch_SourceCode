@@ -1,28 +1,38 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
-        <meta charset="UTF-8" />
+        <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="qrc:/bootstrap.css">
         <link rel="stylesheet" type="text/css" href="qrc:/main.css" media="screen"/>
+        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     </head>
     <body id="body">
         <div class="container">
             <div class="navbar-header page-scroll">
-                <a class="navbar-brand serif" href="">🐚 <strong>MediaConch</strong></a>
+                <a class="navbar-brand serif" href="">🐚<strong>MediaConch</strong></a>
             </div>
 
             <div class="collapse navbar-collapse">
               <ul class="nav navbar navbar-nav navbar-right">
-                <li><a href="">Checker</a></li>
-                <li><a href="">Policies</a></li>
-                <li><a href="">Display</a></li>
+                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Checker</a></li>
+                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Policies</a></li>
+                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Display</a></li>
                 </ul>
             </div>
     </div> <!-- ends container -->
 
         <script src="qrc:/jquery.js"></script>
         <script src="qrc:/bootstrap.js"></script>
+        <script>
+          var webpage;
+          $(document).ready(function() {
+              // Register Qt WebPage object
+              new QWebChannel(qt.webChannelTransport, function (channel) {
+                  webpage = channel.objects.webpage;
+              });
+          });
+        </script>
     </body>
 </html>

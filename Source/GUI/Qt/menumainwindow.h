@@ -8,8 +8,8 @@
 #define MENUMAINWINDOW_H
 
 #include <QProgressBar>
-#include <QWebView>
 #include <QWidget>
+#include "WebView.h"
 
 namespace MediaConch
 {
@@ -24,7 +24,7 @@ public:
 
 private:
     QWidget*      parent;
-    QWebView*     MenuView;
+    WebView*      MenuView;
     QProgressBar* progressBar;
 
     void          createMenu();

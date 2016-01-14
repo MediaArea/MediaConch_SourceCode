@@ -7,7 +7,12 @@
 #include "menumainwindow.h"
 #include "mainwindow.h"
 #include "WebPage.h"
+#if (QT_VERSION >= 0x050600)
+#include <QWebEnginePage>
+#include <QWebChannel>
+#else
 #include <QWebFrame>
+#endif
 #include <QFile>
 
 namespace MediaConch {
@@ -36,9 +41,13 @@ void MenuMainWindow::createMenuFinished(bool)
     if (!MenuView)
         return;
 
+#if (QT_VERSION >= 0x050600)
+    //TODO : remove scroll bar
+#else
     QWebFrame *frame = MenuView->page()->currentFrame();
     frame->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
     frame->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -46,7 +55,7 @@ void MenuMainWindow::createMenu()
 {
     QFile menu_file(":/menu.html");
 
-    MenuView = new QWebView(parent);
+    MenuView = new WebView(parent);
     MenuView->setAcceptDrops(true);
     MenuView->setMaximumHeight(75);
     MenuView->setMinimumHeight(75);
@@ -65,7 +74,15 @@ void MenuMainWindow::createMenu()
     if (!url.isValid())
         return;
 
+#if (QT_VERSION >= 0x050600)
+    QWebChannel *channel = new QWebChannel(page);
+    page->setWebChannel(channel);
+    channel->registerObject("webpage", page);
+    MenuView->setHtml(html, url);
+#else
     MenuView->setContent(html, "text/html", url);
+#endif
+
 }
 
 }

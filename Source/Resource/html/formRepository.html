@@ -15,7 +15,7 @@
           <label class="control-label" for="checkerRepository_step1_xslt">
             Or a policy file
           </label>
-          <input id="checkerRepository_step1_xslt" name="checkerRepository[step1][xslt]" required="required" type="file">
+          <input id="checkerRepository_step1_xslt" name="checkerRepository[step1][xslt]" type="file" onclick="webpage.onInputChanged(this.name);">
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
           <label class="control-label" for="checkerUpload_step1_display_xslt">
             Or a display file
           </label>
-          <input id="checkerRepository_step1_display_xslt" name="checkerRepository[step1][display_xslt]" required="required" type="file">
+          <input id="checkerRepository_step1_display_xslt" name="checkerRepository[step1][display_xslt]" type="file" onclick="webpage.onInputChanged(this.name);">
         </div>
       </div>
     </div>
@@ -42,10 +42,10 @@
       <label class="control-label required" for="checkerRepository_file">
         Select folder
         </label>
-      <input id="checkerRepository_directory" name="checkerRepository[directory]" required="required" type="file">
+      <input id="checkerRepository_directory" name="checkerRepository[directory]" required="required" type="file" onclick="webpage.onInputChanged(this.name);">
     </div>
     <div class="form-group">
-      <button type="submit" id="checkerRepository_Check files" name="checkerRepository[Check files]" class="btn-warning btn">
+      <button type="submit" id="checkerRepository_Check files" name="checkerRepository[Check files]" class="btn-warning btn" onclick="webpage.onButtonClicked(this.id);">
         Check folder
       </button>
     </div>

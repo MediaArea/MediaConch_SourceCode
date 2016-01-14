@@ -11,6 +11,7 @@
         <file alias="formOnline.html">html/formOnline.html</file>
         <file alias="formRepository.html">html/formRepository.html</file>
         <file alias="fileDetailChecker.html">html/fileDetailChecker.html</file>
+        <file alias="fileDetailChecker.js">html/js/fileDetailChecker.js</file>
         <file alias="jquery.js">html/js/jquery-1.11.2.min.js</file>
         <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
         <file alias="jstree.js">html/js/jstree.min.js</file>

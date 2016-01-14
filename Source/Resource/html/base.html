@@ -11,6 +11,7 @@
         <script src="qrc:/bootstrap.js"></script>
         <script src="qrc:/jstree.js"></script>
         <script src="qrc:/jstreegrid.js"></script>
+        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     </head>
     <body id="body">
         <div class="container">
@@ -23,9 +24,10 @@
             </div>
     </div> <!-- ends container -->
 
+
         <script>
-          $(document).ready(function() {
-              // Remove result block
+          function update_results()
+          {
               $('.checker-results .panel-heading .close').each(function() {
                   $(this).click(function () {
                       $(this).parent().parent().remove();
@@ -48,6 +50,15 @@
                   });
                   // Remove close all button
                   $(this).addClass('hidden');
+              });
+          }
+          var webpage;
+          $(document).ready(function() {
+              // Remove result block
+              update_results();
+              // Register Qt WebPage object
+              new QWebChannel(qt.webChannelTransport, function (channel) {
+                  webpage = channel.objects.webpage;
               });
           });
         </script>

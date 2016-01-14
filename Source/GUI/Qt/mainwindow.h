@@ -58,9 +58,9 @@ public:
     void                        remove_widget_from_layout(QWidget* w);
     int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
-    void                        checker_add_file(QString& file, int policy);
+    void                        checker_add_file(const QString& file, int policy);
     void                        checker_add_files(QList<QFileInfo>& file, int policy);
-    void                        checker_add_policy_file(QString& file, QString& policy);
+    void                        checker_add_policy_file(const QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     int                         analyze(const std::vector<std::string>& files);
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);

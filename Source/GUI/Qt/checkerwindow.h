@@ -39,9 +39,9 @@ public:
     void                        change_local_files(QStringList& files);
 
     // Helpers
-    void                        checker_add_file(QString& file, int policy);
+    void                        checker_add_file(const QString& file, int policy);
     void                        checker_add_files(QList<QFileInfo>& file, int policy);
-    void                        checker_add_policy_file(QString& file, QString& policy);
+    void                        checker_add_policy_file(const QString& file, QString& policy);
     void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     bool                        is_analyzes_done();
 
@@ -52,6 +52,7 @@ private:
     ProgressBar*                progressBar;
     QString                     display_xslt;
     bool                        analyse;
+    unsigned int                result_index;
 
     void                        clearVisualElements();
     void                        set_web_view_content(QString& html);
@@ -71,6 +72,7 @@ private:
     QString create_form_upload();
     QString create_form_online();
     QString create_form_repository();
+    void add_script_js_tree(std::string& file);
     void remove_form_online(int pos, QString& html);
     void change_collapse_form(QString& html);
     void change_body_in_template(QString& body, QString& html);
@@ -78,8 +80,8 @@ private:
     void create_policy_options(QString& policies);
     void add_display_to_form_selection(QString& displays, QString& form, const char *selector);
     void create_displays_options(QString& displays);
-    void add_file_detail_to_html(QString& html, std::string& file, int policy);
-    QString create_html_file_detail(std::string& file, int policy);
+    void add_file_detail_to_html(std::string& file, int policy);
+    void create_html_file_detail(std::string& file, int policy, QString& html);
     void change_html_file_detail(QString& html, std::string& file);
     void change_html_file_detail_inform_xml(QString& html, std::string& file);
     void change_html_file_detail_conformance(QString& html, std::string& file);
