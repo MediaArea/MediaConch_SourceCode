@@ -59,6 +59,10 @@ namespace MediaConch
         if (!MCL.get_implementation_schema_file().length())
             MCL.create_default_implementation_schema();
 
+        // If no Implementation verbosity registered, use one by default
+        if (!MCL.get_implementation_verbosity().length())
+            MCL.set_implementation_verbosity("5");
+
         std::string reason;
         if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
                                                     format, reason))
@@ -213,6 +217,12 @@ namespace MediaConch
     void CLI::set_implementation_schema_file(const std::string& file)
     {
         MCL.set_implementation_schema_file(file);
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_implementation_verbosity(const std::string& verbosity)
+    {
+        MCL.set_implementation_verbosity(verbosity);
     }
 
     //--------------------------------------------------------------------------

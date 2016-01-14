@@ -118,10 +118,12 @@ public:
                     const std::string* display_content = NULL);
     int  remove_report(const std::vector<std::string>& files);
 
-    // Policy
+    // Implementation checker arguments
     void               set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void               create_default_implementation_schema();
+    void               set_implementation_verbosity(const std::string& verbosity);
+    const std::string& get_implementation_verbosity();
 
     // Xsl Transformation
     int  transform_with_xslt_file(const std::string& report, const std::string& file,

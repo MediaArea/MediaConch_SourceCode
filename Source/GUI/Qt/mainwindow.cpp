@@ -54,10 +54,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    MCL.init();
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
-    MCL.init();
+    // Verbosity option
+    if (!MCL.get_implementation_verbosity().length())
+        MCL.set_implementation_verbosity("5");
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);

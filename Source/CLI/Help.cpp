@@ -51,11 +51,6 @@ int Help()
     TEXTOUT("                    Output a trace of the file");
     TEXTOUT("");
 
-    // TEXTOUT("Implementation Checker:");
-    // TEXTOUT("--Implementation-verbosity, -iv");
-    // TEXTOUT("                    Select verbosity of the implementation check (not yet implemented)");
-    // TEXTOUT("");
-
     TEXTOUT("Policy Checker:");
     TEXTOUT("--Policy=PolicyFileName, -p PolicyFileName");
     TEXTOUT("                    Apply the policy (XSL or Schematron) ");
@@ -105,8 +100,15 @@ int Help_Advanced()
     TEXTOUT("                    [Mode] can be ZLib to use zlib");
     TEXTOUT("--cz");
     TEXTOUT("                    Same as --Compression=ZLib");
+    TEXTOUT("");
+    TEXTOUT("Implementation Checker:");
     TEXTOUT("--ImplementationSchema=File");
     TEXTOUT("                    Use the specified File for implementation validation");
+    TEXTOUT("--ImplementationVerbosity=V, -iv V");
+    TEXTOUT("                    Select verbosity (V) of the implementation check, default 5");
+    TEXTOUT("                    <= 4, show only fails and N/A");
+    TEXTOUT("                    >= 5, show fails, N/A and pass");
+    TEXTOUT("");
     TEXTOUT("--Force");
     TEXTOUT("                    Force to parse the file if registered in database");
     TEXTOUT("--Help=Ssl");

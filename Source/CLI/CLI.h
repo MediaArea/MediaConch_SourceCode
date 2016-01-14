@@ -40,6 +40,7 @@ namespace MediaConch
         void set_use_daemon(bool use) { use_daemon = use; }
         void set_configuration_file(const std::string& file);
         void set_implementation_schema_file(const std::string& file);
+        void set_implementation_verbosity(const std::string& verbosity);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
 
