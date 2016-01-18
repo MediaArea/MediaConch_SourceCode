@@ -19,5 +19,3 @@ cp -r ~/Documents/almin/libevent .
 # libxml2 and libcurl doesn’t like multiarch
 #./CLI_Compile.sh --enable-arch-x86_64 --enable-arch-i386
 ./CLI_Compile.sh
-
-strip -u -r MediaConch/Project/GNU/CLI/mediaconch
