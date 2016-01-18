@@ -5,6 +5,8 @@ cd ZenLib/Project/GNU/Library
 ./autogen.sh
 cd ../../../../MediaInfoLib/Project/GNU/Library
 ./autogen.sh
+cd ../../../../MediaConch/Project/GNU/Daemon
+./autogen.sh
 cd ../../../..
 
 # Dependencies
@@ -14,6 +16,4 @@ cp -r ~/Documents/almin/sqlite .
 cp -r ~/Documents/almin/jansson .
 cp -r ~/Documents/almin/libevent .
 
-# libxml2 and libcurl doesn’t like multiarch
-#./GUI_Compile.sh --enable-arch-x86_64 --enable-arch-i386
-./GUI_Compile.sh
+./Daemon_Compile.sh

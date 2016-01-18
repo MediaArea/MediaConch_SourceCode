@@ -60,6 +60,14 @@ This project is maintained by MediaArea and funded by PREFORMA.
 
 This package includes the command line interface.
 
+# The %package directive creates subpackage names by prepending the
+# package name, unless we use -n
+%package -n mediaconchd
+Summary:    Supplies technical and tag information about a video or audio file (Daemon)
+Group:      Applications/Multimedia
+Requires:   libzen0 >= %{libzen_version}
+Requires:   libmediainfo0 >= %{libmediainfo_version}
+
 %package gui
 Summary:    Supplies technical and tag information about a video or audio file (GUI)
 Group:      Applications/Multimedia
@@ -76,6 +84,16 @@ This project is maintained by MediaArea and funded by PREFORMA.
 
 This package includes the graphical user interface.
 
+%description -n mediaconchd
+MediaConch is an implementation checker, policy checker, reporter,
+and fixer that targets preservation-level audiovisual files
+(specifically Matroska, Linear Pulse Code Modulation (LPCM)
+and FF Video Codec 1 (FFV1)).
+
+This project is maintained by MediaArea and funded by PREFORMA.
+
+This package includes the daemon.
+
 %prep
 %setup -q -n MediaConch
 sed -i 's/.$//' *.txt *.html Release/*.txt
@@ -84,6 +102,10 @@ find Source -type f -exec chmod 644 {} ';'
 chmod 644 *.html *.txt Release/*.txt
 
 pushd Project/GNU/CLI
+    autoreconf -i
+popd
+
+pushd Project/GNU/Daemon
     autoreconf -i
 popd
 
@@ -126,6 +148,24 @@ pushd Project/GNU/CLI
     make %{?_smp_mflags}
 popd
 
+# build daemon
+pushd Project/GNU/Daemon
+    %if 0%{?suse_version} && ! 0%{?is_opensuse}
+        %if 0%{?suse_version} < 1200
+            %configure --without-jansson --without-libevent
+        %else
+            %configure --without-jansson
+        %endif
+    %else
+        %if 0%{?suse_version} && 0%{?suse_version} < 1200
+            %configure --without-libevent
+        %else
+            %configure
+        %endif
+    %endif
+    make %{?_smp_mflags}
+popd
+
 # now build GUI
 pushd Project/Qt
     make %{?_smp_mflags}
@@ -134,6 +174,10 @@ popd
 
 %install
 pushd Project/GNU/CLI
+    make install-strip DESTDIR=%{buildroot}
+popd
+
+pushd Project/GNU/Daemon
     make install-strip DESTDIR=%{buildroot}
 popd
 
@@ -177,6 +221,10 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}/%{_datad
 %defattr(-,root,root,-)
 %doc Release/ReadMe_CLI_Linux.txt License.html History_CLI.txt
 %{_bindir}/mediaconch
+
+%files -n mediaconchd
+%defattr(-,root,root,-)
+%{_bindir}/mediaconchd
 
 %files gui
 %defattr(-,root,root,-)

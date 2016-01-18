@@ -32,6 +32,17 @@ Description: Implementation checker, policy checker, reporter, and fixer
  .
  This package includes the command line interface.
 
+Package: mediaconchd
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Implementation checker, policy checker, reporter, and fixer
+ that targets preservation-level audiovisual files (specifically Matroska,
+ Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
+ .
+ This project is maintained by MediaArea and funded by PREFORMA.
+ .
+ This package includes the daemon.
+
 Package: mediaconch-gui
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
