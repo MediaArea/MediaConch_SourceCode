@@ -68,22 +68,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -93,13 +93,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;HAVE_SQLITE;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013\include/QtGui;D:\Qt\5.5\msvc2013\include/QtWidgets;D:\Qt\5.5\msvc2013\include/QtCore;D:\Qt\5.5\msvc2013\include;D:\Qt\5.5\msvc2013\include/QtWebKit;D:\Qt\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013\include;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);D:\Qt\5.5\msvc2013\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\Qt5.5\5.5\msvc2013\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -110,14 +110,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;HAVE_SQLITE;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013_64\include/QtGui;D:\Qt\5.5\msvc2013_64\include/QtWidgets;D:\Qt\5.5\msvc2013_64\include/QtCore;D:\Qt\5.5\msvc2013_64\include;D:\Qt\5.5\msvc2013_64\include/QtWebKit;D:\Qt\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);D:\Qt\5.5\msvc2013_64\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\Qt5.5\5.5\msvc2013_64\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,8 +127,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;HAVE_SQLITE;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013\include/QtGui;D:\Qt\5.5\msvc2013\include/QtWidgets;D:\Qt\5.5\msvc2013\include/QtCore;D:\Qt\5.5\msvc2013\include;D:\Qt\5.5\msvc2013\include/QtWebKit;D:\Qt\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013\include;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -137,7 +136,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);D:\Qt\5.5\msvc2013\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\Qt5.5\5.5\msvc2013\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebKit.lib;Qt5WebKitWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -146,11 +145,13 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;HAVE_SQLITE;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;D:\Qt\5.5\msvc2013_64\include/QtGui;D:\Qt\5.5\msvc2013_64\include/QtWidgets;D:\Qt\5.5\msvc2013_64\include/QtCore;D:\Qt\5.5\msvc2013_64\include;D:\Qt\5.5\msvc2013_64\include/QtWebKit;D:\Qt\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013_64\include;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -158,8 +159,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);D:\Qt\5.5\msvc2013_64\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MediaInfo.lib;ZenLib.lib;libxslt_so.lib;libxml2.lib;zlib.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebKit.lib;Qt5WebKitWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\Qt5.5\5.5\msvc2013_64\lib;..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC12\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2013\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebKit.lib;Qt5WebKitWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -278,17 +279,20 @@
     <ProjectReference Include="..\..\..\..\libxml2\win32\VC12\libxml2.vcxproj">
       <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\libxslt\win32\libexslt\libexslt_so.vcxproj">
+    <ProjectReference Include="..\..\..\..\libxslt\win32\VC12\libexslt\libexslt_so.vcxproj">
       <Project>{c66b92e2-e917-4556-84d9-6d32c10c3185}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\libxslt\win32\libxslt\libxslt_so.vcxproj">
-      <Project>{9b8b6cf0-fc48-447f-9a89-88410da3a577}</Project>
+    <ProjectReference Include="..\..\..\..\libxslt\win32\VC12\libxslt\libxslt_so.vcxproj">
+      <Project>{f8c03828-5050-4e68-a7b4-41131f9049d7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\MediaInfoLib\Project\MSVC2013\Dll\MediaInfoDll.vcxproj">
-      <Project>{be6d3ef8-2f82-4f1e-956a-890c3614a2d5}</Project>
+    <ProjectReference Include="..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\MediaInfoLib.vcxproj">
+      <Project>{20e0f8d6-213c-460b-b361-9c725cb375c7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ZenLib\Project\MSVC2013\Library\ZenLib.vcxproj">
       <Project>{0da1da7d-f393-4e7c-a7ce-cb5c6a67bc94}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\zlib\contrib\vstudio\vc12\zlibstat.vcxproj">
+      <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
