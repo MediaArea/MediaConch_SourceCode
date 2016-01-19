@@ -60,7 +60,7 @@ This project is maintained by MediaArea and funded by PREFORMA.
 
 This package includes the command line interface.
 
-# The %package directive creates subpackage names by prepending the
+# The package directive creates subpackage names by prepending the
 # package name, unless we use -n
 %package -n mediaconchd
 Summary:    Supplies technical and tag information about a video or audio file (Daemon)
