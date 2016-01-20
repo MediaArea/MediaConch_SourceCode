@@ -31,7 +31,10 @@
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{ca9be640-a193-4ba5-a1ea-2bbea3b077f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="sqlite">
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{0d330ddd-8c38-4d7c-9944-c00240a228fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\sqlite">
       <UniqueIdentifier>{92bd129a-a825-4860-8967-4c4af26d195b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -242,8 +245,8 @@
     <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\sqlite\sqlite3.c">
-      <Filter>sqlite</Filter>
+    <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c">
+      <Filter>ThirdParty\sqlite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -355,8 +358,8 @@
     <ClInclude Include="..\..\..\Source\Common\SQLLite.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\sqlite\sqlite3.h">
-      <Filter>sqlite</Filter>
+    <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h">
+      <Filter>ThirdParty\sqlite</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
