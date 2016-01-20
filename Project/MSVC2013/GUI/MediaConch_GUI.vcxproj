@@ -91,7 +91,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013\include;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -108,7 +108,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;_DEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -126,7 +126,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013\include;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -148,7 +148,7 @@
       <FunctionLevelLinking>
       </FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HAVE_SQLITE;NDEBUG;_WINDOWS;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>
       </SDLCheck>
       <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../sqlite;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5\5.5\msvc2013_64\include;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5\5.5\msvc2013_64\include/QtWebKitWidgets</AdditionalIncludeDirectories>
@@ -279,10 +279,10 @@
     <ProjectReference Include="..\..\..\..\libxml2\win32\VC12\libxml2.vcxproj">
       <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\libxslt\win32\VC12\libexslt\libexslt_so.vcxproj">
+    <ProjectReference Include="..\..\..\..\libxslt\win32\VC12\libexslt\libexslt.vcxproj">
       <Project>{c66b92e2-e917-4556-84d9-6d32c10c3185}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\libxslt\win32\VC12\libxslt\libxslt_so.vcxproj">
+    <ProjectReference Include="..\..\..\..\libxslt\win32\VC12\libxslt\libxslt.vcxproj">
       <Project>{f8c03828-5050-4e68-a7b4-41131f9049d7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\MediaInfoLib.vcxproj">
