@@ -155,7 +155,7 @@
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 }
 
-.mc_header h1, h2, div {
+.mc_header h1, .mc_header h2, .mc_header div {
   text-align: center;
 }
 
