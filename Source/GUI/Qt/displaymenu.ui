@@ -19,7 +19,7 @@
   <property name="columnCount" stdset="0">
    <number>1</number>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="displayMenuLayout">
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -81,7 +81,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
+        <layout class="QGridLayout" name="frameLayout">
          <item row="5" column="0" colspan="2">
           <widget class="QPushButton" name="deleteFile">
            <property name="focusPolicy">
