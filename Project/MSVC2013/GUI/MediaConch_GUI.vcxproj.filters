@@ -362,4 +362,42 @@
       <Filter>ThirdParty\sqlite</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\mainwindow.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policiesmenu.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policiestree.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policymenu.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\progressbar.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\Resource\Resources.qrc">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\ruleedit.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\rulemenu.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\xsltruleedit.ui">
+      <Filter>Resource Files</Filter>
+    </Xml>
+  </ItemGroup>
 </Project>
