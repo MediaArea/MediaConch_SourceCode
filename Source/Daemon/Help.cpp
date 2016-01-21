@@ -36,6 +36,8 @@ int Help()
     TEXTOUT("");
 
     TEXTOUT("Implementation Checker:");
+    TEXTOUT("--ImplementationSchema=File");
+    TEXTOUT("                    Use the specified File for implementation validation");
     TEXTOUT("--ImplementationVerbosity=V, -iv V");
     TEXTOUT("                    Select verbosity (V) of the implementation check, default 5");
     TEXTOUT("                    <= 4, show only fails and N/A");
