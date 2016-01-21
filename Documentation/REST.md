@@ -3,6 +3,7 @@
 ### Usage
 
 This API is used by the daemon with the others client to communicate.
+
 It is used above an HTTP connection.
 
 ### History
@@ -28,7 +29,7 @@ It is used above an HTTP connection.
 
 #### Analyze
 
-Json format for the parameters.
+JSON format for the parameters.
 
 ##### Request
 
@@ -84,7 +85,7 @@ Parameters:
 
 #### Report
 
-Json format for the parameters.
+JSON format for the parameters.
 
 ##### Request
 
@@ -115,7 +116,7 @@ Parameters:
 
 #### Retry
 
-Json format for the parameters.
+JSON format for the parameters.
 
 ##### Request
 

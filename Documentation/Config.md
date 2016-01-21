@@ -2,11 +2,11 @@
 
 ### File
 
-By default, the configuration file will be read from the user local data.
+By default, the configuration file will be read from the user's local data.
 
 On Linux, it will be in `/home/$USER/.config/MediaConch.rc`.
 
-On Windows, it will be in `C:\Users\$USER_NAME\AppData\Roaming\MediaConch\MediaConch.rc`.
+On Windows, it will be in `C:\Users\$USER\AppData\Roaming\MediaConch\MediaConch.rc`.
 
 On Mac OS, it will be in `/Users/$USER/Library/Preferences/MediaConch.rc`.
 
@@ -14,9 +14,7 @@ On Mac OS, it will be in `/Users/$USER/Library/Preferences/MediaConch.rc`.
 
 The format of the configuration file is *JSON*.
 
-It should be an array of entries.
-
-Each entry corresponding to the option wanted.
+It should be an array of entries with each entry corresponding to the option wanted.
 
 #### Reconized entries
 
@@ -40,4 +38,4 @@ Each entry corresponding to the option wanted.
 
 #### Note
 
-Consider using Scheduler\_Max\_Threads with you real cores number. If you use too much, your computer could freeze.
+Consider using Scheduler\_Max\_Threads with your computer's real core number. If you use too many, your computer could freeze.
