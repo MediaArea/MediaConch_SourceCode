@@ -32,7 +32,7 @@ Description: Implementation checker, policy checker, reporter, and fixer
  .
  This package includes the command line interface.
 
-Package: mediaconchd
+Package: mediaconch-server
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Implementation checker, policy checker, reporter, and fixer
@@ -41,7 +41,7 @@ Description: Implementation checker, policy checker, reporter, and fixer
  .
  This project is maintained by MediaArea and funded by PREFORMA.
  .
- This package includes the daemon.
+ This package includes the server.
 
 Package: mediaconch-gui
 Architecture: any

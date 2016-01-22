@@ -60,10 +60,8 @@ This project is maintained by MediaArea and funded by PREFORMA.
 
 This package includes the command line interface.
 
-# The package directive creates subpackage names by prepending the
-# package name, unless we use -n
-%package -n mediaconchd
-Summary:    Supplies technical and tag information about a video or audio file (Daemon)
+%package server
+Summary:    Supplies technical and tag information about a video or audio file (Server)
 Group:      Applications/Multimedia
 Requires:   libzen0 >= %{libzen_version}
 Requires:   libmediainfo0 >= %{libmediainfo_version}
@@ -84,7 +82,7 @@ This project is maintained by MediaArea and funded by PREFORMA.
 
 This package includes the graphical user interface.
 
-%description -n mediaconchd
+%description server
 MediaConch is an implementation checker, policy checker, reporter,
 and fixer that targets preservation-level audiovisual files
 (specifically Matroska, Linear Pulse Code Modulation (LPCM)
@@ -92,7 +90,7 @@ and FF Video Codec 1 (FFV1)).
 
 This project is maintained by MediaArea and funded by PREFORMA.
 
-This package includes the daemon.
+This package includes the server.
 
 %prep
 %setup -q -n MediaConch
@@ -105,7 +103,7 @@ pushd Project/GNU/CLI
     autoreconf -i
 popd
 
-pushd Project/GNU/Daemon
+pushd Project/GNU/Server
     autoreconf -i
 popd
 
@@ -148,8 +146,8 @@ pushd Project/GNU/CLI
     make %{?_smp_mflags}
 popd
 
-# build daemon
-pushd Project/GNU/Daemon
+# build server
+pushd Project/GNU/Server
     %if 0%{?suse_version} && ! 0%{?is_opensuse}
         %if 0%{?suse_version} < 1200
             %configure --without-jansson --without-libevent
@@ -177,7 +175,7 @@ pushd Project/GNU/CLI
     make install-strip DESTDIR=%{buildroot}
 popd
 
-pushd Project/GNU/Daemon
+pushd Project/GNU/Server
     make install-strip DESTDIR=%{buildroot}
 popd
 
@@ -222,7 +220,7 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}/%{_datad
 %doc Release/ReadMe_CLI_Linux.txt License.html History_CLI.txt
 %{_bindir}/mediaconch
 
-%files -n mediaconchd
+%files server
 %defattr(-,root,root,-)
 %{_bindir}/mediaconchd
 

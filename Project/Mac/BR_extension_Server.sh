@@ -5,7 +5,7 @@ cd ZenLib/Project/GNU/Library
 ./autogen.sh
 cd ../../../../MediaInfoLib/Project/GNU/Library
 ./autogen.sh
-cd ../../../../MediaConch/Project/GNU/Daemon
+cd ../../../../MediaConch/Project/GNU/Server
 ./autogen.sh
 cd ../../../..
 
@@ -16,4 +16,4 @@ cp -r ~/Documents/almin/sqlite .
 cp -r ~/Documents/almin/jansson .
 cp -r ~/Documents/almin/libevent .
 
-./Daemon_Compile.sh
+./Server_Compile.sh

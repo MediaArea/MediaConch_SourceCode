@@ -113,8 +113,8 @@ cd $Home
 ##################################################################
 # MediaConch
 
-if test -e MediaConch/Project/GNU/Daemon/configure; then
-    cd MediaConch/Project/GNU/Daemon/
+if test -e MediaConch/Project/GNU/Server/configure; then
+    cd MediaConch/Project/GNU/Server/
     test -e Makefile && rm Makefile
     chmod +x configure
     if [ "$OS" = "mac" ]; then
@@ -126,13 +126,13 @@ if test -e MediaConch/Project/GNU/Daemon/configure; then
         make clean
         Parallel_Make
         if test -e mediaconchd; then
-        echo "MediaConch (Daemon) compiled"
+        echo "MediaConch (Server) compiled"
         else
-            echo "Problem while compiling MediaConch (Daemon)"
+            echo "Problem while compiling MediaConch (Server)"
             exit
         fi
     else
-        echo "Problem while configuring MediaConch (Daemon)"
+        echo "Problem while configuring MediaConch (Server)"
         exit
     fi
 else
@@ -143,7 +143,7 @@ cd $Home
 
 ##################################################################
 
-echo "MediaConch Daemon executable is MediaConch/Project/GNU/Daemon/mediaconchd"
-echo "For installing, cd MediaConch/Project/GNU/Daemon && make install"
+echo "MediaConch Server executable is MediaConch/Project/GNU/Server/mediaconchd"
+echo "For installing, cd MediaConch/Project/GNU/Server && make install"
 
 unset -v Home ZenLib_Options MacOptions OS
