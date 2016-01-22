@@ -16,13 +16,13 @@ VERSION="$2"
 
 if [ "$KIND" = "CLI" ] || [ "$KIND" = "cli" ]; then
     KIND="CLI"
-elif [ "$KIND" = "Daemon" ] || [ "$KIND" = "daemon" ]; then
-    KIND="Daemon"
+elif [ "$KIND" = "Server" ] || [ "$KIND" = "server" ]; then
+    KIND="Server"
 elif [ "$KIND" = "GUI" ] || [ "$KIND" = "gui" ]; then
     KIND="GUI"
 else
     echo
-    echo "KIND must be either [CLI | cli] or [Daemon | daemon ] or [GUI | gui]"
+    echo "KIND must be either [CLI | cli] or [Server | server ] or [GUI | gui]"
     echo
     exit 1
 fi
@@ -79,11 +79,11 @@ if [ "$KIND" = "CLI" ]; then
 
 fi
 
-if [ "$KIND" = "Daemon" ]; then
+if [ "$KIND" = "Server" ]; then
 
     APPNAME_lower="mediaconchd"
 
-    cd ../GNU/Daemon
+    cd ../GNU/Server
     if test -e ".libs/${APPNAME_lower}"; then
         mv -f ".libs/${APPNAME_lower}" .
     fi
@@ -97,7 +97,7 @@ if [ "$KIND" = "Daemon" ]; then
     cd ../../Mac
 
     mkdir -p "${FILES}-Root/usr/local/bin"
-    cp "../GNU/Daemon/${APPNAME_lower}" "${FILES}-Root/usr/local/bin"
+    cp "../GNU/Server/${APPNAME_lower}" "${FILES}-Root/usr/local/bin"
     codesign --force --verbose --sign "Developer ID Application: ${SIGNATURE}" "${FILES}-Root/usr/local/bin/${APPNAME_lower}"
 
     pkgbuild --root "${FILES}-Root" --identifier "net.mediaarea.${APPNAME_lower}.mac-${KIND_lower}" --sign "Developer ID Installer: ${SIGNATURE}" --version "${VERSION}" "${FILES}/${APPNAME_lower}.pkg"
