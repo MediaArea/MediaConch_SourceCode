@@ -23,6 +23,7 @@ xcopy /D %1\bin\Qt5Sql.dll %2 | find /v "0 " || cd %CD%
 xcopy /D %1\bin\icudt54.dll %2 | find /v "0 " || cd %CD%
 xcopy /D %1\bin\icuin54.dll %2 | find /v "0 " || cd %CD%
 xcopy /D %1\bin\icuuc54.dll %2 | find /v "0 " || cd %CD%
+xcopy /D %1\plugins\platforms\qwindows.dll %2platforms\ | find /v "0 " || cd %CD%
 ) else (
 xcopy /D %1\bin\Qt5Cored.dll %2 | find /v "0 " || cd %CD%
 xcopy /D %1\bin\Qt5Quickd.dll %2 | find /v "0 " || cd %CD%
@@ -43,5 +44,6 @@ xcopy /D %1\bin\Qt5Sqld.dll %2 | find /v "0 " || cd %CD%
 xcopy /D %1\bin\icudt54.dll %2 | find /v "0 " || cd %CD%
 xcopy /D %1\bin\icuin54.dll %2 | find /v "0 " || cd %CD%
 xcopy /D %1\bin\icuuc54.dll %2 | find /v "0 " || cd %CD%
+xcopy /D %1\plugins\platforms\qwindowsd.dll %2platforms\ | find /v "0 " || cd %CD%
 )
 
