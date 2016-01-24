@@ -52,14 +52,7 @@ namespace MediaConch
 
     void WebPage::onButtonClicked(const QString& id)
     {
-        QWebElement button = currentFrame()->documentElement().findFirst(QString("button[id=\"%1\"]").arg(id));
-        QString form_id = button.parent().parent().attribute("id");
-        if (form_id == "checkerUpload")
-            onFileUploadSelected(button.parent().parent());
-        else if (form_id == "checkerOnline")
-            onFileOnlineSelected(button.parent().parent());
-        else if (form_id == "checkerRepository")
-            onFileRepositorySelected(button.parent().parent());
+        button_clicked_id = id;
     }
 
     void WebPage::onDownloadReport(const QString& target, const QString& save_name)
@@ -231,7 +224,17 @@ namespace MediaConch
                                           QWebPage::NavigationType type)
     {
         if (type == QWebPage::NavigationTypeFormSubmitted || type == QWebPage::NavigationTypeFormResubmitted)
+        {
+            QWebElement button = currentFrame()->documentElement().findFirst(QString("button[id=\"%1\"]").arg(button_clicked_id));
+            QString form_id = button.parent().parent().attribute("id");
+            if (form_id == "checkerUpload")
+                onFileUploadSelected(button.parent().parent());
+            else if (form_id == "checkerOnline")
+                onFileOnlineSelected(button.parent().parent());
+            else if (form_id == "checkerRepository")
+                onFileRepositorySelected(button.parent().parent());
             return false;
+        }
         return QWebPage::acceptNavigationRequest(frame, request, type);
     }
 

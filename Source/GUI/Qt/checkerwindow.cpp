@@ -174,7 +174,11 @@ void CheckerWindow::set_web_view_content(QString& html)
     if (!MainView)
         MainView = new WebView(mainwindow);
     else
+    {
+        clearVisualElements();
         MainView->show();
+        return;
+    }
 
     WebPage* page = new WebPage(mainwindow, MainView);
     MainView->setPage(page);
@@ -217,6 +221,10 @@ void CheckerWindow::update_web_view(std::string file, int policy)
     if (!MainView)
         return;
 
+    QString html;
+#if (QT_VERSION < 0x050600)
+    html = MainView->page()->currentFrame()->toHtml();;
+#endif
     //Load the new page
     clearVisualElements();
 
@@ -234,6 +242,7 @@ void CheckerWindow::update_web_view(std::string file, int policy)
     if ((ret = mainwindow->analyze(files)) < 0)
     {
         set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
         return;
     }
 
@@ -255,14 +264,21 @@ void CheckerWindow::update_web_view(std::string file, int policy)
     if (ret < 0)
     {
         set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
         return;
     }
 
     //Add the file detail to the web page
+#if (QT_VERSION >= 0x050600)
     add_file_detail_to_html(file, policy);
+#else
+    add_file_detail_to_html(file, policy, html);
+    delete MainView;
+    MainView = NULL;
+#endif
+
     analyse = true;
-    clearVisualElements();
-    MainView->show();
+    set_web_view_content(html);
 }
 
 //---------------------------------------------------------------------------
@@ -270,6 +286,11 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
 {
     if (!MainView)
         return;
+
+    QString html;
+#if (QT_VERSION < 0x050600)
+    html = MainView->page()->currentFrame()->toHtml();;
+#endif
 
     //Load the new page
     clearVisualElements();
@@ -291,6 +312,7 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
     if ((ret = mainwindow->analyze(vfiles)) < 0)
     {
         set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
         return;
     }
 
@@ -311,6 +333,7 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
     if (ret < 0)
     {
         set_error_http((MediaConchLib::errorHttp)ret);
+        set_web_view_content(html);
         return;
     }
 
@@ -320,13 +343,22 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
     {
         display_xslt = displayXsltRetain;
         std::string file = files[i].absoluteFilePath().toStdString();
+#if (QT_VERSION >= 0x050600)
         add_file_detail_to_html(file, policy);
+#else
+        add_file_detail_to_html(file, policy, html);
+#endif
         progressBar->get_progress_bar()->setValue(50 + ((i + 1) * 50) / files.count());
     }
     reset_display_xslt();
     analyse = true;
-    clearVisualElements();
-    MainView->show();
+
+#if (QT_VERSION < 0x050600)
+    delete MainView;
+    MainView = NULL;
+#endif
+
+    set_web_view_content(html);
 }
 
 //---------------------------------------------------------------------------
@@ -915,7 +947,7 @@ void CheckerWindow::create_html_file_detail(std::string& file, int policy, QStri
     change_html_file_detail_inform_xml(base, file);
     // /!\: always has to be after inform_xml (need to be runned one time)
     change_html_file_detail_policy_report(base, file, policy);
-    // change_html_file_detail_trace(base, file);
+    change_html_file_detail_trace(base, file);
 }
 
 //---------------------------------------------------------------------------
@@ -947,6 +979,8 @@ void CheckerWindow::add_script_js_tree(std::string& file)
     page->use_javascript(script);
 }
 
+#if (QT_VERSION >= 0x050600)
+
 //---------------------------------------------------------------------------
 void CheckerWindow::add_file_detail_to_html(std::string& file, int policy)
 {
@@ -966,6 +1000,42 @@ void CheckerWindow::add_file_detail_to_html(std::string& file, int policy)
 
     add_script_js_tree(file);
 }
+
+#else
+
+//---------------------------------------------------------------------------
+void CheckerWindow::add_file_detail_to_html(std::string& file, int policy, QString& html)
+{
+    ++result_index;
+
+    QString new_html;
+    create_html_file_detail(file, policy, new_html);
+
+    QFile f(":/fileDetailChecker.js");
+    f.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray content = f.readAll();
+    f.close();
+    QString js(content);
+
+    js = QString("<script>") + js + QString("</script>");
+    change_html_file_detail(js, file);
+    change_html_file_detail_inform_xml(js, file);
+    change_html_file_detail_trace(js, file);
+
+    new_html += js;
+
+    QRegExp reg("<div class=\"col-md-6\" id=\"display_result\">");
+    reg.setMinimal(true);
+
+    int pos = 0;
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, new_html);
+    }
+}
+
+#endif
 
 //---------------------------------------------------------------------------
 bool CheckerWindow::report_is_html(QString& report)

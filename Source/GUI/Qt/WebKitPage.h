@@ -45,6 +45,7 @@ protected:
     MainWindow                 *mainwindow;
     QMap<QString, QStringList>  file_selector;
     QString                     select_file_name;
+    QString                     button_clicked_id;
 };
 
 }
