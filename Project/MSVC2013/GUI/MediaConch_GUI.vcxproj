@@ -77,8 +77,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -98,8 +98,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -119,8 +119,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -143,10 +143,10 @@
     <ClCompile>
       <FunctionLevelLinking>
       </FunctionLevelLinking>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>
       </SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -278,6 +278,12 @@
     <ClInclude Include="_Automated\ui_xsltruleedit.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\jansson\Contrib\VC12\Jansson\Jansson.vcxproj">
+      <Project>{40460a4d-243e-48db-a2f6-f5c57acde134}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\libevent\Contrib\VC12\event\event.vcxproj">
+      <Project>{f687c268-c5d7-36df-80c4-641ed9c82bc8}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\libxml2\win32\VC12\libxml2.vcxproj">
       <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
     </ProjectReference>
