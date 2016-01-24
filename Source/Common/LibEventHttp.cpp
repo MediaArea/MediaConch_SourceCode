@@ -186,11 +186,13 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
     int len = evbuffer_get_length(evInputBuf);
     if (len > 0)
     {
-        char buff[len + 1];
+        char* buff=new char[len + 1];
         int n = evbuffer_remove(evInputBuf, buff, len);
 
         buff[n >= 0 ? n : 0] = '\0';
         data = std::string(buff, n);
+
+        delete[] buff;
     }
     evHttp->result = data;
     event_base_loopexit(evHttp->base, 0);

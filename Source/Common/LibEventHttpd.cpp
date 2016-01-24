@@ -366,10 +366,11 @@ int LibEventHttpd::get_body(struct evhttp_request *req, std::string& json, std::
     }
 
     int len = evbuffer_get_length(evBuf);
-    char tmpBuf[len + 1];
+    char* tmpBuf = new char[len + 1];
     int n = evbuffer_remove(evBuf, tmpBuf, len);
     if (n <= 0)
     {
+        delete[] tmpBuf; 
         error = std::string("body of the request should contain the command");
         ret_msg = "NOVALIDCONTENT";
         send_result(HTTP_BADREQUEST, ret_msg, req);
@@ -378,6 +379,8 @@ int LibEventHttpd::get_body(struct evhttp_request *req, std::string& json, std::
     tmpBuf[n] = '\0';
 
     json = std::string(tmpBuf);
+    delete[] tmpBuf;
+
     return 0;
 }
 
