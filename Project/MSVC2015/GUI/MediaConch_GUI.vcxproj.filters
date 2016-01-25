@@ -236,16 +236,28 @@
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c">
       <Filter>ThirdParty\sqlite</Filter>
     </ClCompile>
+    <ClCompile Include="_Automated\moc_WebEnginePage.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebEngineView.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_WebEnginePage.cpp">
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitPage.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_WebEngineView.cpp">
+    <ClCompile Include="_Automated\moc_WebKitView.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
   </ItemGroup>
@@ -362,6 +374,12 @@
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebChoose.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>

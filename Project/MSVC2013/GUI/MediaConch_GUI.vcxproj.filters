@@ -101,18 +101,6 @@
     <ClCompile Include="_Automated\moc_groupofrules.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebPage.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_WebPage.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebView.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_WebView.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\JS_Tree.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -248,6 +236,30 @@
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c">
       <Filter>ThirdParty\sqlite</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebEnginePage.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebEngineView.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitPage.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitView.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -360,6 +372,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h">
       <Filter>ThirdParty\sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitPage.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitView.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
