@@ -166,7 +166,7 @@ int MainWindow::transform_with_xslt_memory(const std::string& report, const std:
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_file(QString& file, int policy)
+void MainWindow::checker_add_file(const QString& file, int policy)
 {
     MainView->checker_add_file(file, policy);
 }
@@ -178,7 +178,7 @@ void MainWindow::checker_add_files(QFileInfoList& list, int policy)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::checker_add_policy_file(QString& file, QString& policy)
+void MainWindow::checker_add_policy_file(const QString& file, QString& policy)
 {
     MainView->checker_add_policy_file(file, policy);
 }

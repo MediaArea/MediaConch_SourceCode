@@ -4,6 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#if defined(WEB_MACHINE_KIT)
+
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebElement>
@@ -31,89 +33,6 @@ namespace MediaConch
 
         QWebFrame* frame = mainFrame();
         frame->addToJavaScriptWindowObject("webpage", this);
-
-        QWebElementCollection forms = frame->findAllElements("form");
-        for (int i = 0; i < forms.count(); i++)
-        {
-            QWebElement form = forms[i];
-
-            //Input with file to get the full file name
-            QWebElementCollection inputs = form.findAll("input[type=\"file\"]");
-            for (int j = 0; j < inputs.count(); j++)
-            {
-                QWebElement input = inputs[j];
-                input.setAttribute("onclick", QString("webpage.onInputChanged(this.name);"));
-            }
-
-            //To know the check button pushed
-            QWebElementCollection buttons = form.findAll("button[type=\"submit\"]");
-            for (int j = 0; j < buttons.count(); j++)
-            {
-                QWebElement button = buttons[j];
-                button.setAttribute("onclick", QString("webpage.onButtonClicked(this.id);"));
-            }
-        }
-
-        QWebElementCollection uls = frame->findAllElements("ul.navbar");
-        for (int i = 0; i < uls.count(); i++)
-        {
-            QWebElement form = uls[i];
-            QWebElementCollection lis = form.findAll("li");
-            for (int j = 0; j < lis.count(); j++)
-            {
-                QWebElement link = lis[j].findFirst("a");
-                if (link.isNull())
-                    break;
-                link.setAttribute("onclick", QString("webpage.menu_link_checker(this.text);"));
-            }
-        }
-
-        //Results
-        QWebElementCollection results = frame->findAllElements(".checker-results");
-        for (int i = 0; i < results.count(); i++)
-        {
-            QWebElement result = results[i];
-
-            QWebElementCollection downloads = frame->findAllElements("a");
-            for (int j = 0; j < downloads.count(); j++)
-            {
-                QString data_toggle = downloads[j].attribute("data-toggle");
-                if (!data_toggle.length() || data_toggle != "results-dld")
-                    continue;
-
-                QWebElement parent = downloads[j].parent();
-                QWebElementCollection links = parent.findAll("a");
-                QString target;
-                QString save_name;
-                for (int k = 0; k < links.count(); k++)
-                {
-                    QString data_toggle = links[k].attribute("data-toggle");
-                    if (data_toggle.length() || data_toggle == "modal")
-                    {
-                        target = links[k].attribute("data-target");
-                        break;
-                    }
-                }
-                save_name = downloads[j].attribute("data-save-name");
-
-                downloads[j].setAttribute("onclick", QString("webpage.onDownloadReport(\"%1\", \"%2\");").arg(target).arg(save_name));
-            }
-        }
-
-        //Results
-        QWebElementCollection report_dld = frame->findAllElements(".report-dld");
-        for (int i = 0; i < report_dld.count(); ++i)
-            report_dld[i].setAttribute("onclick", QString("webpage.onDownloadReport($(this).data('target'), $(this).data('save-name'));"));
-
-        // Add download info ajax button to result list
-        QWebElementCollection download_infos = frame->findAllElements(".results-dld-info-ajax");
-        for (int i = 0; i < download_infos.count(); ++i)
-            download_infos[i].setAttribute("onclick", QString("webpage.onSaveInfo($(this).data('target'), $(this).data('save-name'));"));
-
-        // Add download trace ajax button to result list
-        QWebElementCollection download_traces = frame->findAllElements(".results-dld-trace-ajax");
-        for (int i = 0; i < download_traces.count(); ++i)
-            download_traces[i].setAttribute("onclick", QString("webpage.onSaveTrace($(this).data('target'), $(this).data('save-name'));"));
     }
 
     void WebPage::menu_link_checker(const QString& name)
@@ -308,12 +227,7 @@ namespace MediaConch
     {
         if (type == QWebPage::NavigationTypeFormSubmitted || type == QWebPage::NavigationTypeFormResubmitted)
         {
-            QMapIterator<QString, QStringList> it(file_selector);
-            QWebFrame *frame = currentFrame();
-            QWebElement document = frame->documentElement();
-
-            QWebElement button = document.findFirst(QString("button[id=\"%1\"]").arg(button_clicked_id));
-
+            QWebElement button = currentFrame()->documentElement().findFirst(QString("button[id=\"%1\"]").arg(button_clicked_id));
             QString form_id = button.parent().parent().attribute("id");
             if (form_id == "checkerUpload")
                 onFileUploadSelected(button.parent().parent());
@@ -321,7 +235,6 @@ namespace MediaConch
                 onFileOnlineSelected(button.parent().parent());
             else if (form_id == "checkerRepository")
                 onFileRepositorySelected(button.parent().parent());
-
             return false;
         }
         return QWebPage::acceptNavigationRequest(frame, request, type);
@@ -336,6 +249,12 @@ namespace MediaConch
             value_input = QFileDialog::getOpenFileName(view(), NULL, suggested);
 
         QMap<QString, QStringList>::iterator it = file_selector.find(select_file_name);
+        if (!value_input.length())
+        {
+            if (it != file_selector.end())
+                file_selector.erase(it);
+            return QString();
+        }
         if (it != file_selector.end())
             file_selector[select_file_name] << value_input;
         else
@@ -409,4 +328,11 @@ namespace MediaConch
 
         onFileUploadSelected(form);
     }
+
+    void WebPage::use_javascript(const QString& js)
+    {
+        mainFrame()->evaluateJavaScript(js);
+    }
 }
+
+#endif

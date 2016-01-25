@@ -4,10 +4,30 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webkit
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-greaterThan(QT_MAJOR_VERSION, 4): QT += webkitwidgets
+
+WEB_MACHINE=
+
+contains(USE_WEBKIT, yes|1) {
+    WEB_MACHINE = webkit
+}
+contains(USE_WEBENGINE, yes|1) {
+    WEB_MACHINE = webengine
+}
+
+isEmpty(WEB_MACHINE) {
+    WEB_MACHINE = webengine
+    lessThan(QT_MAJOR_VERSION, 5) {
+        WEB_MACHINE = webkit
+    }
+    equals(QT_MAJOR_VERSION, 5) {
+        lessThan(QT_MINOR_VERSION, 6) {
+            WEB_MACHINE = webkit
+        }
+    }
+}
 
 !macx:TARGET = mediaconch-gui
 macx:TARGET = MediaConch
@@ -42,8 +62,6 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/Queue.cpp \
                     ../../Source/Common/DaemonClient.cpp \
                     ../../Source/GUI/Qt/main.cpp \
-                    ../../Source/GUI/Qt/WebPage.cpp \
-                    ../../Source/GUI/Qt/WebView.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
@@ -94,9 +112,9 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Scheduler.h \
                     ../../Source/Common/Queue.h \
                     ../../Source/Common/DaemonClient.h \
+                    ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
-                    ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \
@@ -127,6 +145,23 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/xsltruleedit.ui \
                     ../../Source/GUI/Qt/displaymenu.ui \
                     ../../Source/GUI/Qt/progressbar.ui
+
+
+equals(WEB_MACHINE, webengine) {
+    QT += webenginewidgets webchannel
+    SOURCES += ../../Source/GUI/Qt/WebEnginePage.cpp \
+               ../../Source/GUI/Qt/WebEngineView.cpp
+    HEADERS += ../../Source/GUI/Qt/WebEnginePage.h \
+               ../../Source/GUI/Qt/WebEngineView.h
+    QMAKE_CXXFLAGS   += -DWEB_MACHINE_ENGINE
+} else {
+    QT += webkit webkitwidgets
+    SOURCES += ../../Source/GUI/Qt/WebKitPage.cpp \
+               ../../Source/GUI/Qt/WebKitView.cpp
+    HEADERS += ../../Source/GUI/Qt/WebKitPage.h \
+               ../../Source/GUI/Qt/WebKitView.h
+    QMAKE_CXXFLAGS   += -DWEB_MACHINE_KIT
+}
 
 INCLUDEPATH      += ../../Source
 

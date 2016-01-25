@@ -9,28 +9,28 @@
                             <div class="checker-result-text">Policy report ({{ check.getPolicy }}) <span class="text-uppercase text-{{ check.getStatus ? 'success' : 'danger' }}"><b>{{ check.getStatus ? '' : 'not ' }}valid</b></span></div>
                             <div class="checker-result-buttons">
                                 <a href="#" data-toggle="modal" data-target="#modalPolicy{{ loop.index }}" title="View report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                                <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="PolicyReport.txt"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                                <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="PolicyReport.txt" onclick="webpage.onDownloadReport($('#modalPolicy{{ loop.index }} .modal-body').html(), $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </div>
                         </li>
                         <li class="list-group-item report">
                             <div class="checker-result-text">Implementation report <span class="text-uppercase text-{{ check.getStatus ? 'success' : 'danger' }}"><b>{{ check.getStatus ? '' : 'not ' }}valid</b></span></div>
                             <div class="checker-result-buttons">
                                 <a href="#" data-toggle="modal" data-target="#modalConformance{{ loop.index }}" title="View report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                                <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="ImplementationReport.txt"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                                <a href="#" class="results-dld" data-toggle="results-dld" data-save-name="ImplementationReport.txt" onclick="webpage.onDownloadReport($('#modalConformance{{ loop.index }} .modal-body').html(), $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </div>
                         </li>
                         <li class="list-group-item report">
                             <div class="checker-result-text">MediaInfo</div>
                             <div class="checker-result-buttons">
                               <a href="#" data-toggle="modal" class="results-view-info-ajax" data-target="#modalInfo{{ loop.index }}" data-filename="{{ check.getInfo }}" title="View MediaInfo"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                              <a href="#" data-toggle="results-dld" class="results-dld-info-ajax" data-target="#infoXml{{ loop.index }}" data-filename="{{ check.getInfo }}" data-save-name="MediaInfo.xml" title="Download MediaInfo"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                              <a href="#" data-toggle="results-dld" class="results-dld-info-ajax" data-target="#infoXml{{ loop.index }}" data-filename="{{ check.getInfo }}" data-save-name="MediaInfo.xml" title="Download MediaInfo" onclick="webpage.onDownloadReport($($(this).data('target') + ' .modal-body').html(), $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </div>
                         </li>
                         <li class="list-group-item report">
                             <div class="checker-result-text">MediaTrace</div>
                             <div class="checker-result-buttons">
                               <a href="#" data-toggle="modal" class="results-view-trace-ajax" data-target="#modalTrace{{ loop.index }}" data-filename="{{ check.getTrace }}" title="View trace"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-                              <a href="#" data-toggle="results-dld" class="results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-filename="{{ check.getTrace }}" data-save-name="MediaTrace.xml" title="Download trace"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                              <a href="#" data-toggle="results-dld" class="results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-filename="{{ check.getTrace }}" data-save-name="MediaTrace.xml" title="Download trace" onclick="webpage.onSaveTrace($($(this).data('target') + ' .modal-body').html(), $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
                             </div>
                         </li>
                 </ul>
@@ -47,7 +47,7 @@
                                 {% if check.getPolicy|length > 0 %}
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-primary report-dld" data-target="#modalPolicy{{ loop.index }}" data-save-name="PolicyReport.txt">Download report</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalPolicy{{ loop.index }}" data-save-name="PolicyReport.txt" onclick="webpage.onDownloadReport($($(this).data('target') + ' .modal-body').html(), $(this).data('save-name'));">Download report</button>
                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -65,7 +65,7 @@
                                 {{ check.getConformance|replace({' ': '&nbsp;'})|raw|nl2br }}
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="ImplementationReport.txt">Download report</button>
+                              <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="ImplementationReport.txt" onclick="webpage.onDownloadReport($($(this).data('target') + ' .modal-body').html(), $(this).data('save-name'));">Download report</button>
                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -90,7 +90,7 @@
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-primary results-dld-info-ajax" data-target="#infoXml{{ loop.index }}" data-save-name="MediaInfo.xml" data-filename="{{ check.getInfo }}">Download MediaInfo</button>
+                        <button type="button" class="btn btn-primary results-dld-info-ajax" data-target="#infoXml{{ loop.index }}" data-save-name="MediaInfo.xml" data-filename="{{ check.getInfo }}" onclick="webpage.onSaveInfo($($(this).data('target') + ' .modal-body').html(), $(this).data('save-name'));">Download MediaInfo</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       </div>
                     </div>
@@ -118,7 +118,7 @@
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-primary results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-save-name="MediaTrace.xml" data-filename="{{ check.getTrace }}">Download MediaTrace</button>
+                        <button type="button" class="btn btn-primary results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-save-name="MediaTrace.xml" data-filename="{{ check.getTrace }}" onclick="webpage.onSaveTrace($($(this).data('target') + ' .modal-body').html(), $(this).data('save-name'));">Download MediaTrace</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       </div>
                     </div>
@@ -128,110 +128,4 @@
                   <p class="modal-body"></p>
                 </div>
         </div>
-        <script>
-            $('#modalTrace{{ loop.index }}').on('show.bs.modal',
-                function() {
-                    $('#trace{{ loop.index }}').jstree({
-                        'core' : {
-                            'check_callback' : function (operation, node, parent, position, more) {
-                                if (operation === 'copy_node' || operation === 'move_node') {
-                                    return false; // disable copy and move
-                                }
-                                else {
-                                    return true;
-                                }
-                            },
-                            'multiple' : false,
-                            'dblclick_toggle' : false,
-                            'data' : {{ check.getTrace.jstree|raw }}
-                        },
-                        "plugins" : ['search', 'types', 'grid'],
-                        'types' : {
-                            'default' : {'icon' : 'glyphicon glyphicon-folder-open'},
-                            'block' : {'icon' : 'glyphicon glyphicon-folder-open'},
-                            'data' : {'icon' : 'glyphicon glyphicon-file'},
-                        },
-                        'grid' : {
-                            columns : [
-                                {header: "Offset", value: 'offset'},
-                                {header: "Key", tree: true},
-                                {header: "Value",  value: 'dataValue'},
-                            ],
-                            resizable: true,
-                        },
-                    })
-                });
-
-            $('#trace{{ loop.index }}').on('ready.jstree', function () {
-                $(function () {
-                    var to = false;
-                    $('#traceSearch{{ loop.index }}').keyup(function () {
-                        if(to) { clearTimeout(to); }
-                        to = setTimeout(function () {
-                            var v = $('#traceSearch{{ loop.index }}').val();
-                            $('#trace{{ loop.index }}').jstree(true).search(v);
-                        }, 250);
-                    });
-                });
-            });
-            $('#trace{{ loop.index }}').on('loaded.jstree', function (e, data) {
-                data.instance.get_container().find('li').each(function () {
-                    data.instance.open_node($(this));
-                })
-            });
-            $('#trace{{ loop.index }}').on('select_node.jstree', function (e, data) {
-                data.instance.toggle_node(data.node);
-            });
-
-            $('#modalInfo{{ loop.index }}').on('show.bs.modal',
-                function() {
-                    $('#info{{ loop.index }}').jstree({
-                        'core' : {
-                            'check_callback' : function (operation, node, parent, position, more) {
-                                if (operation === 'copy_node' || operation === 'move_node') {
-                                    return false; // disable copy and move
-                                }
-                                else {
-                                    return true;
-                                }
-                            },
-                            'multiple' : false,
-                            'dblclick_toggle' : false,
-                            'data' : {{ check.getInfo.jstree|raw }}
-                        },
-                        "plugins" : ['search', 'types', 'grid'],
-                        'types' : {
-                            'default' : {'icon' : 'glyphicon glyphicon-folder-open'},
-                            'block' : {'icon' : 'glyphicon glyphicon-folder-open'},
-                            'data' : {'icon' : 'glyphicon glyphicon-file'},
-                        },
-                        'grid' : {
-                            columns : [
-                                {header: "Key", tree: true},
-                                {header: "Value",  value: 'dataValue'},
-                            ],
-                            resizable: true,
-                        },
-                    })
-                });
-
-            $('#info{{ loop.index }}').on('ready.jstree', function () {
-                $(function () {
-                    var to = false;
-                    $('#infoSearch{{ loop.index }}').keyup(function () {
-                        if(to) { clearTimeout(to); }
-                        to = setTimeout(function () {
-                            var v = $('#infoSearch{{ loop.index }}').val();
-                            $('#info{{ loop.index }}').jstree(true).search(v);
-                        }, 250);
-                    });
-                });
-            });
-            $('#info{{ loop.index }}').on('loaded.jstree', function (e, data) {
-                data.instance.open_all();
-            });
-            $('#info{{ loop.index }}').on('select_node.jstree', function (e, data) {
-                data.instance.toggle_node(data.node);
-            });
-        </script>
 

@@ -4,19 +4,13 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#include <QWebView>
-namespace MediaConch {
+#ifndef WEBVIEW_H
+#define WEBVIEW_H
 
-class WebView : public QWebView
-{
-    Q_OBJECT
+#if defined(WEB_MACHINE_ENGINE)
+#include "WebEngineView.h"
+#else
+#include "WebKitView.h"
+#endif
 
-public:
-    explicit WebView(QWidget *parent = 0);
-    virtual ~WebView();
-
-protected:
-    void dropEvent(QDropEvent *event);
-};
-
-}
+#endif // WEBVIEW_H

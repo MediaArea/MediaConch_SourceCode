@@ -4,7 +4,9 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-#include <QWebView>
+#if defined(WEB_MACHINE_ENGINE)
+
+#include <QWebEngineView>
 #include <QMimeData>
 #include <QDropEvent>
 #include "WebView.h"
@@ -12,7 +14,7 @@
 
 namespace MediaConch
 {
-    WebView::WebView(QWidget *parent) : QWebView(parent)
+    WebView::WebView(QWidget *parent) : QWebEngineView(parent)
     {
         setAcceptDrops(true);
     }
@@ -36,3 +38,5 @@ namespace MediaConch
         }
     }
 }
+
+#endif
