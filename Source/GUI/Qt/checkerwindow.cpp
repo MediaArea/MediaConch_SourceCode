@@ -36,7 +36,8 @@
 
 #if defined(WEB_MACHINE_ENGINE)
 #include <QWebChannel>
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
 #include <QWebFrame>
 #endif
 
@@ -271,7 +272,8 @@ void CheckerWindow::update_web_view(std::string file, int policy)
     //Add the file detail to the web page
 #if defined(WEB_MACHINE_ENGINE)
     add_file_detail_to_html(file, policy);
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
     add_file_detail_to_html(file, policy, html);
     delete MainView;
     MainView = NULL;
@@ -345,7 +347,8 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
         std::string file = files[i].absoluteFilePath().toStdString();
 #if defined(WEB_MACHINE_ENGINE)
         add_file_detail_to_html(file, policy);
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
         add_file_detail_to_html(file, policy, html);
 #endif
         progressBar->get_progress_bar()->setValue(50 + ((i + 1) * 50) / files.count());
@@ -1001,7 +1004,8 @@ void CheckerWindow::add_file_detail_to_html(std::string& file, int policy)
     add_script_js_tree(file);
 }
 
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
 
 //---------------------------------------------------------------------------
 void CheckerWindow::add_file_detail_to_html(std::string& file, int policy, QString& html)

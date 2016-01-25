@@ -78,7 +78,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebEngine;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebEngineWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebChannel;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -87,10 +87,10 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;Qt5WebChanneld.lib;Qt5WebEngined.lib;Qt5WebEngineWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013</Command>
+      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013 Kit</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>Post-Build.bat ..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013 $(OutDir) $(Configuration)</Command>
@@ -99,7 +99,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebEngine;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebEngineWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebChannel;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -108,10 +108,10 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebKitd.lib;Qt5WebKitWidgetsd.lib;Qt5WebChanneld.lib;Qt5WebEngined.lib;Qt5WebEngineWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64</Command>
+      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64 Kit</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>Post-Build.bat ..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64 $(OutDir) $(Configuration)</Command>
@@ -120,7 +120,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebEngine;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebEngineWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebChannel;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -130,10 +130,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebKit.lib;Qt5WebKitWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebKit.lib;Qt5WebKitWidgets.lib;Qt5WebChannel.lib;Qt5WebEngine.lib;Qt5WebEngineWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013</Command>
+      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013 Kit</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>Post-Build.bat ..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013 $(OutDir) $(Configuration)</Command>
@@ -146,7 +146,7 @@
       <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>
       </SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebEngine;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebEngineWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebChannel;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -156,10 +156,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebKit.lib;Qt5WebKitWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebKit.lib;Qt5WebKitWidgets.lib;Qt5WebChannel.lib;Qt5WebEngine.lib;Qt5WebEngineWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64</Command>
+      <Command>Pre-Build.bat ..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64 Kit</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>Post-Build.bat ..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64 $(OutDir) $(Configuration)</Command>
@@ -209,8 +209,10 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebPage.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebView.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltwindow.cpp" />
@@ -231,8 +233,20 @@
     <ClCompile Include="_Automated\moc_ruleedit.cpp" />
     <ClCompile Include="_Automated\moc_rulemenu.cpp" />
     <ClCompile Include="_Automated\moc_schematronwindow.cpp" />
-    <ClCompile Include="_Automated\moc_WebPage.cpp" />
-    <ClCompile Include="_Automated\moc_WebView.cpp" />
+    <ClCompile Include="_Automated\moc_WebEnginePage.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebEngineView.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitPage.cpp" />
+    <ClCompile Include="_Automated\moc_WebKitView.cpp" />
     <ClCompile Include="_Automated\moc_xsltpolicymenu.cpp" />
     <ClCompile Include="_Automated\moc_xsltruleedit.cpp" />
     <ClCompile Include="_Automated\moc_xsltwindow.cpp" />
@@ -260,6 +274,10 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitPage.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitView.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.h" />

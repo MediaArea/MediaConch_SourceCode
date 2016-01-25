@@ -7,9 +7,13 @@
 #ifndef WEBVIEW_H
 #define WEBVIEW_H
 
+#include "WebChoose.h"
+
 #if defined(WEB_MACHINE_ENGINE)
 #include "WebEngineView.h"
-#else
+#endif
+
+#if defined(WEB_MACHINE_KIT)
 #include "WebKitView.h"
 #endif
 

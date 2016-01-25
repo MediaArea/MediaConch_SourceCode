@@ -10,7 +10,8 @@
 #if defined(WEB_MACHINE_ENGINE)
 #include <QWebEnginePage>
 #include <QWebChannel>
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
 #include <QWebFrame>
 #endif
 #include <QFile>
@@ -43,7 +44,8 @@ void MenuMainWindow::createMenuFinished(bool)
 
 #if defined(WEB_MACHINE_ENGINE)
     //TODO : remove scroll bar
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
     QWebFrame *frame = MenuView->page()->currentFrame();
     frame->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
     frame->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
@@ -79,7 +81,8 @@ void MenuMainWindow::createMenu()
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
     MenuView->setHtml(html, url);
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
     MenuView->setContent(html, "text/html", url);
 #endif
 

@@ -7,9 +7,12 @@
 #ifndef WEBPAGE_H
 #define WEBPAGE_H
 
+#include "WebChoose.h"
+
 #if defined(WEB_MACHINE_ENGINE)
 #include "WebEnginePage.h"
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
 #include "WebKitPage.h"
 #endif
 
