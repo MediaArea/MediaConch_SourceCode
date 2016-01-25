@@ -4,6 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#include "WebChoose.h"
+
 #if defined(WEB_MACHINE_ENGINE)
 
 #include <QWebEngineView>

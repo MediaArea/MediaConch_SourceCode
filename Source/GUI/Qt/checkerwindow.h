@@ -11,6 +11,7 @@
 
 #include <QFileInfo>
 #include <QString>
+#include "WebChoose.h"
 
 class QFrame;
 class QFile;
@@ -82,7 +83,8 @@ private:
     void create_displays_options(QString& displays);
 #if defined(WEB_MACHINE_ENGINE)
     void add_file_detail_to_html(std::string& file, int policy);
-#else
+#endif
+#if defined(WEB_MACHINE_KIT)
     void add_file_detail_to_html(std::string& file, int policy, QString& html);
 #endif
     void create_html_file_detail(std::string& file, int policy, QString& html);
