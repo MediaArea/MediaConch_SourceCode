@@ -92,7 +92,7 @@ bool Xslt::register_schema_from_memory(const std::string& schem)
 #endif // !XML_PARSE_BIG_LINES
     xmlDocPtr doc = xmlReadMemory(schem.c_str(), schem.length(), NULL, NULL, doc_flags);
     if (doc == NULL)
-        return -1;
+        return false;
 
     bool ret = register_schema_from_doc(doc);
 
