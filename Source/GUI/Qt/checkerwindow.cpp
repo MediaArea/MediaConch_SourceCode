@@ -34,7 +34,7 @@
     #include <QFontDatabase>
 #endif
 
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
 #include <QWebChannel>
 #else
 #include <QWebFrame>
@@ -190,7 +190,7 @@ void CheckerWindow::set_web_view_content(QString& html)
     if (!url.isValid())
         return;
 
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
     QWebChannel *channel = new QWebChannel(page);
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
@@ -222,7 +222,7 @@ void CheckerWindow::update_web_view(std::string file, int policy)
         return;
 
     QString html;
-#if (QT_VERSION < 0x050600)
+#if defined(WEB_MACHINE_KIT)
     html = MainView->page()->currentFrame()->toHtml();;
 #endif
     //Load the new page
@@ -269,7 +269,7 @@ void CheckerWindow::update_web_view(std::string file, int policy)
     }
 
     //Add the file detail to the web page
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
     add_file_detail_to_html(file, policy);
 #else
     add_file_detail_to_html(file, policy, html);
@@ -288,7 +288,7 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
         return;
 
     QString html;
-#if (QT_VERSION < 0x050600)
+#if defined(WEB_MACHINE_KIT)
     html = MainView->page()->currentFrame()->toHtml();;
 #endif
 
@@ -343,7 +343,7 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
     {
         display_xslt = displayXsltRetain;
         std::string file = files[i].absoluteFilePath().toStdString();
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
         add_file_detail_to_html(file, policy);
 #else
         add_file_detail_to_html(file, policy, html);
@@ -353,7 +353,7 @@ void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
     reset_display_xslt();
     analyse = true;
 
-#if (QT_VERSION < 0x050600)
+#if defined(WEB_MACHINE_KIT)
     delete MainView;
     MainView = NULL;
 #endif
@@ -979,7 +979,7 @@ void CheckerWindow::add_script_js_tree(std::string& file)
     page->use_javascript(script);
 }
 
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
 
 //---------------------------------------------------------------------------
 void CheckerWindow::add_file_detail_to_html(std::string& file, int policy)

@@ -4,6 +4,9 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#ifndef QWEBKITVIEW_H
+#define QWEBKITVIEW_H
+
 #include <QWebView>
 namespace MediaConch {
 
@@ -20,3 +23,5 @@ protected:
 };
 
 }
+
+#endif

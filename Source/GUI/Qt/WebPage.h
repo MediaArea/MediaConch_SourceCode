@@ -7,7 +7,7 @@
 #ifndef WEBPAGE_H
 #define WEBPAGE_H
 
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
 #include "WebEnginePage.h"
 #else
 #include "WebKitPage.h"

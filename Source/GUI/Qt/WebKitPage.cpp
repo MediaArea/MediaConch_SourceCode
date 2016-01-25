@@ -4,6 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#if defined(WEB_MACHINE_KIT)
+
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebElement>
@@ -332,3 +334,5 @@ namespace MediaConch
         mainFrame()->evaluateJavaScript(js);
     }
 }
+
+#endif

@@ -4,9 +4,13 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#ifndef WEBKITPAGE_H
+#define WEBKITPAGE_H
+
 #include <QMap>
 #include <QWebPage>
 #include <QWebView>
+
 namespace MediaConch {
 
 class MainWindow;
@@ -49,3 +53,5 @@ protected:
 };
 
 }
+
+#endif

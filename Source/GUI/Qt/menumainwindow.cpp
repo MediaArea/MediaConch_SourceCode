@@ -7,7 +7,7 @@
 #include "menumainwindow.h"
 #include "mainwindow.h"
 #include "WebPage.h"
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
 #include <QWebEnginePage>
 #include <QWebChannel>
 #else
@@ -41,7 +41,7 @@ void MenuMainWindow::createMenuFinished(bool)
     if (!MenuView)
         return;
 
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
     //TODO : remove scroll bar
 #else
     QWebFrame *frame = MenuView->page()->currentFrame();
@@ -74,7 +74,7 @@ void MenuMainWindow::createMenu()
     if (!url.isValid())
         return;
 
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
     QWebChannel *channel = new QWebChannel(page);
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);

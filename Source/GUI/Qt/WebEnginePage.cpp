@@ -4,6 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#if defined(WEB_MACHINE_ENGINE)
+
 #include <QWebEnginePage>
 #include <QFileDialog>
 #include <QFile>
@@ -11,11 +13,7 @@
 #include <QTextStream>
 
 #include "mainwindow.h"
-#if (QT_VERSION >= 0x050600)
-#include "WebEnginePage.h"
-#else
 #include "WebPage.h"
-#endif
 #include <QtGlobal>
 #include <QWebChannel>
 
@@ -323,3 +321,5 @@ namespace MediaConch
         runJavaScript(js);
     }
 }
+
+#endif

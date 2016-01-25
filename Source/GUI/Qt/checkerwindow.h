@@ -80,7 +80,7 @@ private:
     void create_policy_options(QString& policies);
     void add_display_to_form_selection(QString& displays, QString& form, const char *selector);
     void create_displays_options(QString& displays);
-#if (QT_VERSION >= 0x050600)
+#if defined(WEB_MACHINE_ENGINE)
     void add_file_detail_to_html(std::string& file, int policy);
 #else
     void add_file_detail_to_html(std::string& file, int policy, QString& html);

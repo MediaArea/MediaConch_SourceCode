@@ -4,6 +4,8 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#if defined(WEB_MACHINE_ENGINE)
+
 #include <QWebEngineView>
 #include <QMimeData>
 #include <QDropEvent>
@@ -36,3 +38,5 @@ namespace MediaConch
         }
     }
 }
+
+#endif

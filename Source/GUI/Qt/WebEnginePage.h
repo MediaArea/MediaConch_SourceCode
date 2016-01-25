@@ -4,6 +4,9 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+#ifndef WEBENGINEPAGE_H
+#define WEBENGINEPAGE_H
+
 #include <QMap>
 #include <QWebEnginePage>
 #include <QWebEngineView>
@@ -51,3 +54,5 @@ protected:
 };
 
 }
+
+#endif
