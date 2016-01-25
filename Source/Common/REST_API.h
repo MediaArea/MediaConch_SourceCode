@@ -124,6 +124,7 @@ public:
     struct Analyze_Arg
     {
         Analyze_Arg() : has_force_analyze(false) {}
+        std::string            to_str() const;
         std::string            file;
         int                    id;
         bool                   has_force_analyze;
@@ -133,6 +134,7 @@ public:
     struct Analyze_Req
     {
         std::vector<Analyze_Arg> args;
+        std::string              to_str() const;
     };
 
     struct Analyze_Ok
@@ -140,12 +142,14 @@ public:
         int                    inId;
         int                    outId;
         bool                   create;
+        std::string            to_str() const;
     };
 
     struct Analyze_Nok
     {
         int                    id;
         Reason                 error;
+        std::string            to_str() const;
     };
 
     struct Analyze_Res
@@ -153,12 +157,14 @@ public:
         ~Analyze_Res();
         std::vector<Analyze_Ok*>  ok;
         std::vector<Analyze_Nok*> nok;
+        std::string               to_str() const;
     };
 
     // Status
     struct Status_Req
     {
         std::vector<int>        ids;
+        std::string             to_str() const;
     };
 
     struct Status_Ok
@@ -168,12 +174,14 @@ public:
         bool                    finished;
         bool                    has_percent;
         double                  done;
+        std::string             to_str() const;
     };
 
     struct Status_Nok
     {
         int                     id;
         Reason                  error;
+        std::string             to_str() const;
     };
 
     struct Status_Res
@@ -181,6 +189,7 @@ public:
         ~Status_Res();
         std::vector<Status_Ok*>  ok;
         std::vector<Status_Nok*> nok;
+        std::string              to_str() const;
     };
 
     // Report
@@ -192,6 +201,7 @@ public:
         std::vector<std::string> policies_contents;
         std::string              display_name;
         std::string              display_content;
+        std::string              to_str() const;
     };
 
     struct Report_Ok
@@ -200,12 +210,14 @@ public:
         std::string             report;
         bool                    has_valid;
         bool                    valid;
+        std::string             to_str() const;
     };
 
     struct Report_Nok
     {
         int                     id;
         Reason                  error;
+        std::string             to_str() const;
     };
 
     struct Report_Res
@@ -213,18 +225,21 @@ public:
         ~Report_Res();
         Report_Ok                ok;
         std::vector<Report_Nok*> nok;
+        std::string              to_str() const;
     };
 
     // Retry
     struct Retry_Req
     {
         std::vector<int>        ids;
+        std::string             to_str() const;
     };
 
     struct Retry_Nok
     {
         int                     id;
         Reason                  error;
+        std::string             to_str() const;
     };
 
     struct Retry_Res
@@ -232,18 +247,21 @@ public:
         ~Retry_Res();
         std::vector<int>        ok;
         std::vector<Retry_Nok*> nok;
+        std::string             to_str() const;
     };
 
     // Clear
     struct Clear_Req
     {
         std::vector<int>        ids;
+        std::string             to_str() const;
     };
 
     struct Clear_Nok
     {
         int                     id;
         Reason                  error;
+        std::string             to_str() const;
     };
 
     struct Clear_Res
@@ -251,6 +269,7 @@ public:
         ~Clear_Res();
         std::vector<int>        ok;
         std::vector<Clear_Nok*> nok;
+        std::string             to_str() const;
     };
 
 public:

@@ -39,10 +39,12 @@ namespace MediaConch
         Daemon(const Daemon&);
         Daemon& operator=(const Daemon&);
 
-        MediaConchLib *MCL;
-        bool           is_daemon;
-        Httpd         *httpd;
-        std::string    last_argument;
+        MediaConchLib  *MCL;
+        bool            is_daemon;
+        Httpd          *httpd;
+        std::string     last_argument;
+        std::ofstream  *logger;
+        std::streambuf *clog_buffer;
 
         // Helper
         int daemonize();
@@ -56,6 +58,7 @@ namespace MediaConch
         int parse_compression(const std::string& argument);
         int parse_implementationschema(const std::string& argument);
         int parse_implementationverbosity(const std::string& argument);
+        int parse_outputlog(const std::string& argument);
         int parse_other(const std::string& argument);
 
         // Request received callbacks
@@ -72,6 +75,7 @@ namespace MediaConch
 
         size_t get_first_free_slot();
         bool id_is_existing(int id) const;
+        std::string get_date() const;
 
         std::vector<std::string*> current_files;
     };
