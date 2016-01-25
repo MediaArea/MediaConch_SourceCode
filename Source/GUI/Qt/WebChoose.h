@@ -9,6 +9,12 @@
 
 #include <QtGlobal>
 
+#if defined(WEB_MACHINE_ENGINE) && defined(WEB_MACHINE_KIT)
+#pragma message ("WEB_MACHINE_ENGINE and WEB_MACHINE_KIT defined, you must choose one of them")
+#undef WEB_MACHINE_ENGINE
+#undef WEB_MACHINE_KIT
+#endif
+
 #if !defined(WEB_MACHINE_ENGINE) && !defined(WEB_MACHINE_KIT)
 #if (QT_VERSION >= 0x050600)
 #define WEB_MACHINE_ENGINE
