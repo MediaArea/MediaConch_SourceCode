@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Jansson", "..\..\..\jansson
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event", "..\..\..\libevent\Contrib\VC12\event\event.vcxproj", "{F687C268-C5D7-36DF-80C4-641ED9C82BC8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MediaConch-Server", "Server\MediaConch-Server.vcxproj", "{66830D9C-0A1E-4664-B846-F5DAEDB574E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -124,6 +126,14 @@ Global
 		{F687C268-C5D7-36DF-80C4-641ED9C82BC8}.Release|Win32.Build.0 = Release|Win32
 		{F687C268-C5D7-36DF-80C4-641ED9C82BC8}.Release|x64.ActiveCfg = Release|x64
 		{F687C268-C5D7-36DF-80C4-641ED9C82BC8}.Release|x64.Build.0 = Release|x64
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Debug|Win32.Build.0 = Debug|Win32
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Debug|x64.ActiveCfg = Debug|x64
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Debug|x64.Build.0 = Debug|x64
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Release|Win32.ActiveCfg = Release|Win32
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Release|Win32.Build.0 = Release|Win32
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Release|x64.ActiveCfg = Release|x64
+		{66830D9C-0A1E-4664-B846-F5DAEDB574E6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

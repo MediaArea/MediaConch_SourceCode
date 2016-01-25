@@ -15,6 +15,10 @@
 #include "Common/MediaConchLib.h"
 #include "Help.h"
 #include "Daemon.h"
+#if defined(_MSC_VER) && defined(UNICODE)
+#include "io.h"
+#include "fcntl.h"
+#endif
 
 //***************************************************************************
 // Main
@@ -23,6 +27,27 @@
 //---------------------------------------------------------------------------
 int main(int argc, char* argv_ansi[])
 {
+    //Localisation
+    setlocale(LC_ALL, "");
+    MediaInfoLib::MediaInfo::Option_Static(__T("CharSet"), __T(""));
+
+    //Initialize terminal (to fix Unicode output on Win32)
+#if defined(_MSC_VER) && defined(UNICODE)
+    //_setmode(_fileno(stdout), _O_U8TEXT);
+    //_setmode(_fileno(stderr), _O_U8TEXT);
+#endif
+    MediaInfoLib::MediaInfo::Option_Static(__T("LineSeparator"), __T("\n")); //Using sdtout
+
+#ifdef _WIN32
+    //Initialize sockets (needed before using sockets on Windows)
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData))
+    {
+        printf("WSAStartup failed\n");
+        return 1;
+    }
+#endif //_WIN32
+
     // TODO: Retrieve command line (mainly for Unicode)
     // GETCOMMANDLINE();
 
@@ -30,15 +55,17 @@ int main(int argc, char* argv_ansi[])
     //Parse command line
     int ret = daemon.parse_args(argc, argv_ansi);
     if (ret == DAEMON_RETURN_ERROR)
-        return 1;
+        ret = 1;
     else if (ret == DAEMON_RETURN_FINISH)
-        return 0;
+        ret = 0;
+    else if (daemon.init() < 0)
+        ret = 1;
+    else if (daemon.run() < 0)
+        ret = 1;
 
-    if (daemon.init() < 0)
-        return 1;
+#ifdef _WIN32
+    WSACleanup();
+#endif //_WIN32
 
-    if (daemon.run() < 0)
-        return 1;
-
-    return 0;
+    return ret;
 }

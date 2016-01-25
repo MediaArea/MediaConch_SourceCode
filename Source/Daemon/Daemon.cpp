@@ -18,7 +18,9 @@
 #include "Help.h"
 #include "Config.h"
 
+#ifndef _WIN32
 #include <unistd.h>
+#endif //_WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
 

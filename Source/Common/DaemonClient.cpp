@@ -30,11 +30,21 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 DaemonClient::DaemonClient(MediaConchLib* m) : mcl(m), http_client(NULL)
 {
+#ifdef _WIN32
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData))
+    {
+        printf("WSAStartup failed\n");
+    }
+#endif //_WIN32
 }
 
 //---------------------------------------------------------------------------
 DaemonClient::~DaemonClient()
 {
+#ifdef _WIN32
+    WSACleanup();
+#endif //_WIN32
 }
 
 //---------------------------------------------------------------------------
