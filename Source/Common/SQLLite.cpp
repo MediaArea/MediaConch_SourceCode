@@ -219,23 +219,23 @@ bool SQLLite::file_is_registered(MediaConchLib::report reportKind, MediaConchLib
     const char* end = NULL;
     int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
     if (ret != SQLITE_OK || !stmt || (end && *end))
-        return -1;
+        return false;
 
     ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
-        return -1;
+        return false;
 
     ret = sqlite3_bind_blob(stmt, 2, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
-        return -1;
+        return false;
 
     ret = sqlite3_bind_int(stmt, 3, (int)reportKind);
     if (ret != SQLITE_OK)
-        return -1;
+        return false;
 
     ret = sqlite3_bind_int(stmt, 4, (int)format);
     if (ret != SQLITE_OK)
-        return -1;
+        return false;
 
     if (execute() || !reports.size() || reports.find(key) == reports.end())
         return false;
