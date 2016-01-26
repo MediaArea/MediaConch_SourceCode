@@ -104,6 +104,316 @@ RESTAPI::Clear_Res::~Clear_Res()
 }
 
 //***************************************************************************
+// Request: to_str()
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Analyze_Arg::to_str() const
+{
+    std::stringstream out;
+
+    out << "[file: '" << file << "', id: '" << id << "', force: '";
+    if (!has_force_analyze || !force_analyze)
+        out << "false";
+    else
+        out << "true";
+    out << "]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Analyze_Req::to_str() const
+{
+    std::stringstream out;
+
+    for (size_t i = 0; i < args.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << args[i].to_str();
+    }
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Status_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ids: [";
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ids[i];
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Report_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ids: [";
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ids[i];
+    }
+    out << "], reports: [";
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        RESTAPI api;
+        out << api.get_Report_string(reports[i]);
+    }
+    out << "], policies_names_size: [" << policies_names.size();
+    out << "], policies_contents_size: [" << policies_contents.size();
+    out << "], display_name: [" << display_name;
+    out << "], display_content_length: [" << display_content.size() << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Retry_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ids: [";
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ids[i];
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Clear_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ids: [";
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ids[i];
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//***************************************************************************
+// Result: to_str()
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Analyze_Ok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{inId: " << inId;
+    out << ", outId: " << inId;
+    out << ", create: " << std::boolalpha << create << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Analyze_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    RESTAPI api;
+    out << ", reason: " << api.get_Reason_string(error) << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Analyze_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ok: [";
+    for (size_t i = 0; i < ok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ok[i]->to_str();
+    }
+    out << "], nok: [";
+    for (size_t i = 0; i < nok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << nok[i]->to_str();
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Status_Ok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    out << ", finished: " << std::boolalpha << finished;
+    if (has_percent)
+        out << ", done: " << done;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Status_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    RESTAPI api;
+    out << ", reason: " << api.get_Reason_string(error) << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Status_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ok: [";
+    for (size_t i = 0; i < ok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ok[i]->to_str();
+    }
+    out << "], nok: [";
+    for (size_t i = 0; i < nok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << nok[i]->to_str();
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Report_Ok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{report_length: " << report.length();
+    if (has_valid)
+        out << ", valid: " << std::boolalpha << valid;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Report_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    RESTAPI api;
+    out << ", reason: " << api.get_Reason_string(error) << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Report_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ok: " << ok.to_str() << ", nok: [";
+    for (size_t i = 0; i < nok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << nok[i]->to_str();
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Retry_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    RESTAPI api;
+    out << ", reason: " << api.get_Reason_string(error) << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Retry_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ok: [";
+    for (size_t i = 0; i < ok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ok[i];
+    }
+    out << "], nok: [";
+    for (size_t i = 0; i < nok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << nok[i]->to_str();
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Clear_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    RESTAPI api;
+    out << ", reason: " << api.get_Reason_string(error) << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Clear_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ok: [";
+    for (size_t i = 0; i < ok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ok[i];
+    }
+    out << "], nok: [";
+    for (size_t i = 0; i < nok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << nok[i]->to_str();
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//***************************************************************************
 // Serialize: Request
 //***************************************************************************
 

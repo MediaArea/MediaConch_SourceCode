@@ -23,6 +23,7 @@
 #endif //_WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <ctime>
 
 //****************************************************************************
 // Extern
@@ -39,15 +40,21 @@ namespace MediaConch
     std::string Daemon::version = "0.1.0";
 
     //--------------------------------------------------------------------------
-    Daemon::Daemon() : is_daemon(true), httpd(NULL)
+    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL)
     {
         MCL = new MediaConchLib(true);
+        clog_buffer = std::clog.rdbuf();
     }
 
     //--------------------------------------------------------------------------
     Daemon::~Daemon()
     {
         delete MCL;
+        if (logger)
+        {
+            std::clog.rdbuf(clog_buffer);
+            delete logger;
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -71,7 +78,11 @@ namespace MediaConch
             httpd->set_address(address);
         if (port != -1)
             httpd->set_port(port);
-        httpd->init();
+        if (httpd->init() < 0)
+        {
+            std::clog << httpd->get_error() << std::endl;
+            return -1;
+        }
 
         httpd->commands.analyze_cb = on_analyze_command;
         httpd->commands.status_cb = on_status_command;
@@ -112,7 +123,12 @@ namespace MediaConch
         if (!httpd)
             return -1;
 
-        return httpd->start();
+        if (httpd->start() < 0)
+        {
+            std::clog << httpd->get_error() << std::endl;
+            return -1;
+        }
+        return 0;
     }
 
     //--------------------------------------------------------------------------
@@ -121,6 +137,7 @@ namespace MediaConch
         if (httpd)
             httpd->finish();
         MCL->close();
+        std::clog << "Daemon is stopped" << std::endl;
         return 0;
     }
 
@@ -165,6 +182,11 @@ namespace MediaConch
             last_argument = "--implementationverbosity=";
             return DAEMON_RETURN_NONE;
         }
+        if (argument=="-o")
+        {
+            last_argument = "--outputlog=";
+            return DAEMON_RETURN_NONE;
+        }
 
         // Compression short option
         if (argument=="-cz")
@@ -178,6 +200,7 @@ namespace MediaConch
         OPTION("--compression",             compression)
         OPTION("--implementationschema",    implementationschema)
         OPTION("--implementationverbosity", implementationverbosity)
+        OPTION("--outputlog",               outputlog)
         OPTION("--",                        other)
         else
         {
@@ -293,6 +316,22 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::parse_outputlog(const std::string& argument)
+    {
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+        std::string log_file;
+        log_file.assign(argument, egal_pos + 1 , std::string::npos);
+        logger = new std::ofstream(log_file.c_str());
+        std::clog.rdbuf(logger->rdbuf());
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::parse_other(const std::string& argument)
     {
         std::string report;
@@ -353,6 +392,8 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
+        std::clog << d->get_date() << "Daemon received an analyze command: ";
+        std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->args.size(); ++i)
         {
             bool force = false;
@@ -394,6 +435,7 @@ namespace MediaConch
             ok->create = !registered;
             res.ok.push_back(ok);
         }
+        std::clog << d->get_date() << "Daemon send analyze result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -405,6 +447,8 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
+        std::clog << d->get_date() << "Daemon received a status command: ";
+        std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
@@ -429,6 +473,7 @@ namespace MediaConch
             }
             res.ok.push_back(ok);
         }
+        std::clog << d->get_date() << "Daemon send status result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -440,6 +485,8 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
+        std::clog << d->get_date() << "Daemon received a report command: ";
+        std::clog << req->to_str() << std::endl;
         MediaConchLib::format format = MediaConchLib::format_Xml;
         if (req->display_name == MediaConchLib::display_text_name)
             format = MediaConchLib::format_Text;
@@ -515,6 +562,7 @@ namespace MediaConch
         }
         res.ok.has_valid = has_valid;
         res.ok.valid = valid;
+        std::clog << d->get_date() << "Daemon send report result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -526,6 +574,8 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
+        std::clog << d->get_date() << "Daemon received a retry command: ";
+        std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
@@ -553,6 +603,7 @@ namespace MediaConch
             }
             res.ok.push_back(id);
         }
+        std::clog << d->get_date() << "Daemon send retry result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -564,6 +615,8 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
+        std::clog << d->get_date() << "Daemon received a clear command: ";
+        std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
@@ -583,6 +636,7 @@ namespace MediaConch
             d->current_files[id] = NULL;
             res.ok.push_back(id);
         }
+        std::clog << d->get_date() << "Daemon send clear result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -597,10 +651,24 @@ namespace MediaConch
         return current_files.size() - 1;
     }
 
+    //--------------------------------------------------------------------------
     bool Daemon::id_is_existing(int id) const
     {
         if (id < 0 || id >= (int)current_files.size() || !current_files[id])
             return false;
         return true;
+    }
+
+    //--------------------------------------------------------------------------
+    std::string Daemon::get_date() const
+    {
+        std::stringstream out;
+        time_t            t;
+
+        time(&t);
+        std::string str(ctime(&t));
+        str = str.substr(0, str.length() - 1);
+        out << "[" << str << "]";
+        return out.str();
     }
 }

@@ -49,6 +49,13 @@ int Help()
     TEXTOUT("                    If No, MediaConchd will not fork, default it forks");
     TEXTOUT("-n");
     TEXTOUT("                    Same as --Fork=No");
+
+    TEXTOUT("Daemon Debug:");
+    TEXTOUT("--OutputLog=File");
+    TEXTOUT("                    Log debug information to File");
+    TEXTOUT("-o File");
+    TEXTOUT("                    Same as --OutFile=File");
+
     return DAEMON_RETURN_FINISH;
 }
 

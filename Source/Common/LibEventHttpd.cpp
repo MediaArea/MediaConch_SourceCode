@@ -70,9 +70,8 @@ int LibEventHttpd::start()
         std::stringstream ss;
         ss << "couldn't bind to address " << address << " and port " << port;
         error = ss.str();
-        return 1;
+        return -1;
     }
-
 
     event_base_dispatch(base);
     return 0;
