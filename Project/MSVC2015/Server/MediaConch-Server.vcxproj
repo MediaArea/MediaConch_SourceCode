@@ -116,7 +116,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <SetChecksum>true</SetChecksum>
-      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC14\$(Platform)\$(Configuration);$(Configuration)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>No</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -136,7 +135,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
       <SetChecksum>true</SetChecksum>
-      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2013\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2013\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC14\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>No</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -200,10 +198,10 @@
     <ProjectReference Include="..\..\..\..\libxslt\win32\VC14\libxslt\libxslt.vcxproj">
       <Project>{f8c03828-5050-4e68-a7b4-41131f9049d7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\MediaInfoLib\Project\MSVC2013\Library\MediaInfoLib.vcxproj">
+    <ProjectReference Include="..\..\..\..\MediaInfoLib\Project\MSVC2015\Library\MediaInfoLib.vcxproj">
       <Project>{20e0f8d6-213c-460b-b361-9c725cb375c7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\ZenLib\Project\MSVC2013\Library\ZenLib.vcxproj">
+    <ProjectReference Include="..\..\..\..\ZenLib\Project\MSVC2015\Library\ZenLib.vcxproj">
       <Project>{0da1da7d-f393-4e7c-a7ce-cb5c6a67bc94}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\zlib\contrib\vstudio\vc14\zlibstat.vcxproj">
