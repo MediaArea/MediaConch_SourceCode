@@ -74,6 +74,12 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MediaConch</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MediaConch</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental />
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC14/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -105,6 +111,8 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OmitFramePointers>true</OmitFramePointers>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,6 +130,8 @@
       <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
