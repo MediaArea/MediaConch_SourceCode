@@ -59,13 +59,9 @@ namespace MediaConch
         button_clicked_id = id;
     }
 
-    void WebPage::onDownloadReport(const QString& target, const QString& save_name)
+    void WebPage::onDownloadReport(const QString& report, const QString& save_name)
     {
-        QWebFrame* frame = mainFrame();
-        QWebElement reportDiv = frame->findFirstElement(target);
-
-        QWebElement report = reportDiv.findFirst(".modal-body");
-        if (report.isNull())
+        if (report.isEmpty())
             return;
 
         QString dl_file = QFileDialog::getSaveFileName(view(), "Save report", save_name);
@@ -82,11 +78,12 @@ namespace MediaConch
         {
             out << "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
             out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n";
-            out << report.toInnerXml();
+            out << report;
         }
         else
         {
-            QTextDocument text(report.toPlainText().trimmed());
+            QTextDocument text;
+            text.setHtml(report.toUtf8());
             out << text.toPlainText() << "\n";
         }
     }
