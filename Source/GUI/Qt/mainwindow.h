@@ -114,7 +114,7 @@ private:
 
     // Visual elements
     QVBoxLayout*                Layout;
-    CheckerWindow*              MainView;
+    CheckerWindow*              checkerView;
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
@@ -124,7 +124,7 @@ private:
 
     int                         clearVisualElements();
     void                        clearPoliciesElements();
-    void                        createWebView();
+    void                        createCheckerView();
     void                        createPoliciesView();
     void                        createDisplayView();
     void                        choose_schematron_file();

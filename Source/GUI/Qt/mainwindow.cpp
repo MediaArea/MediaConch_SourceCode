@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
     Layout->setContentsMargins(0, 0, 0, 0);
     MenuView = new MenuMainWindow(this);
-    MainView=NULL;
+    checkerView=NULL;
     policiesView = NULL;
     displayView = NULL;
 
@@ -136,7 +136,7 @@ void MainWindow::Run()
             //TODO: fill the view if file already here
             // if (!files.empty())
             //     C.Run();
-            createWebView();
+            createCheckerView();
             break;
         case RUN_POLICIES_VIEW:
             createPoliciesView();
@@ -148,7 +148,7 @@ void MainWindow::Run()
             //TODO: fill the view if file already here
             // if (!files.empty())
             //     C.Run();
-            createWebView();
+            createCheckerView();
             break;
     }
 }
@@ -168,25 +168,25 @@ int MainWindow::transform_with_xslt_memory(const std::string& report, const std:
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_file(const QString& file, int policy)
 {
-    MainView->checker_add_file(file, policy);
+    checkerView->checker_add_file(file, policy);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_files(QFileInfoList& list, int policy)
 {
-    MainView->checker_add_files(list, policy);
+    checkerView->checker_add_files(list, policy);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_policy_file(const QString& file, QString& policy)
 {
-    MainView->checker_add_policy_file(file, policy);
+    checkerView->checker_add_policy_file(file, policy);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::checker_add_policy_files(QFileInfoList& list, QString& policy)
 {
-    MainView->checker_add_policy_files(list, policy);
+    checkerView->checker_add_policy_files(list, policy);
 }
 
 //---------------------------------------------------------------------------
@@ -339,13 +339,13 @@ void MainWindow::add_default_displays()
 //---------------------------------------------------------------------------
 void MainWindow::add_xslt_display(const QString& display_xslt)
 {
-    MainView->set_display_xslt(display_xslt);
+    checkerView->set_display_xslt(display_xslt);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::remove_xslt_display()
 {
-    MainView->reset_display_xslt();
+    checkerView->reset_display_xslt();
 }
 
 //---------------------------------------------------------------------------
@@ -395,9 +395,9 @@ void MainWindow::on_actionOpen_triggered()
     current_view = RUN_CHECKER_VIEW;
     Run();
 
-    if (!MainView)
+    if (!checkerView)
         return;
-    MainView->change_local_files(list);
+    checkerView->change_local_files(list);
 }
 
 //---------------------------------------------------------------------------
@@ -525,9 +525,9 @@ void MainWindow::on_actionDataFormat_triggered()
 //---------------------------------------------------------------------------
 int MainWindow::clearVisualElements()
 {
-    if (MainView)
+    if (checkerView)
     {
-        if (MainView->is_analyzes_done())
+        if (checkerView->is_analyzes_done())
         {
             int ret = QMessageBox::warning(this, tr("MediaConch"),
                                            tr("All analysis results will be discarded?"),
@@ -535,8 +535,8 @@ int MainWindow::clearVisualElements()
             if (ret == QMessageBox::Cancel)
                 return -1;
         }
-        delete MainView;
-        MainView=NULL;
+        delete checkerView;
+        checkerView=NULL;
     }
 
     if (policiesView)
@@ -555,17 +555,17 @@ int MainWindow::clearVisualElements()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createWebView()
+void MainWindow::createCheckerView()
 {
-    if (MainView)
+    if (checkerView)
         return;
 
     if (clearVisualElements())
         return;
-    MainView = new CheckerWindow(this);
+    checkerView = new CheckerWindow(this);
     QObject::connect(ui->actionCloseAll, SIGNAL(triggered()),
-                     MainView, SLOT(actionCloseAllTriggered()));
-    MainView->create_web_view();
+                     checkerView, SLOT(actionCloseAllTriggered()));
+    checkerView->create_web_view();
 }
 
 //---------------------------------------------------------------------------
