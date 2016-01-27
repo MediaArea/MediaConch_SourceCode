@@ -36,6 +36,8 @@ namespace MediaConch
     {
         if (!name.compare("Checker"))
             mainwindow->checker_selected();
+        else if (!name.compare("Result"))
+            mainwindow->result_selected();
         else if (!name.compare("Policies"))
             mainwindow->policies_selected();
         else if (!name.compare("Display"))

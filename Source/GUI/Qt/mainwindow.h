@@ -27,6 +27,7 @@ namespace MediaConch {
 
 class MenuMainWindow;
 class CheckerWindow;
+class ResultWindow;
 class PoliciesWindow;
 class DisplayWindow;
 
@@ -72,6 +73,7 @@ public:
     QString                     get_mediatrace_jstree(const std::string& file);
     QString                     ask_for_schema_file();
     void                        checker_selected();
+    void                        result_selected();
     void                        policies_selected();
     void                        display_selected();
     void                        add_default_policy();
@@ -115,6 +117,7 @@ private:
     // Visual elements
     QVBoxLayout*                Layout;
     CheckerWindow*              checkerView;
+    ResultWindow*               resultView;
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
@@ -125,6 +128,7 @@ private:
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();
+    void                        createResultView();
     void                        createPoliciesView();
     void                        createDisplayView();
     void                        choose_schematron_file();
@@ -133,6 +137,7 @@ private:
     enum Run_View
     {
         RUN_CHECKER_VIEW,
+        RUN_RESULT_VIEW,
         RUN_POLICIES_VIEW,
         RUN_DISPLAY_VIEW,
     };
@@ -141,6 +146,7 @@ private:
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChecker_triggered();
+    void on_actionResult_triggered();
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionChooseSchema_triggered();

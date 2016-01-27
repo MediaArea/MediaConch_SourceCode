@@ -67,6 +67,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
                     ../../Source/GUI/Qt/displaywindow.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
+                    ../../Source/GUI/Qt/resultwindow.cpp \
                     ../../Source/GUI/Qt/policieswindow.cpp \
                     ../../Source/GUI/Qt/policywindow.cpp \
                     ../../Source/GUI/Qt/schematronwindow.cpp \
@@ -118,6 +119,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \
+                    ../../Source/GUI/Qt/resultwindow.h \
                     ../../Source/GUI/Qt/displaywindow.h \
                     ../../Source/GUI/Qt/policieswindow.h \
                     ../../Source/GUI/Qt/policywindow.h \

@@ -8,6 +8,7 @@
 #include "ui_mainwindow.h"
 #include "menumainwindow.h"
 #include "checkerwindow.h"
+#include "resultwindow.h"
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
@@ -65,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
+    ToolGroup->addAction(ui->actionResult);
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionDisplay);
     
@@ -73,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Layout->setContentsMargins(0, 0, 0, 0);
     MenuView = new MenuMainWindow(this);
     checkerView=NULL;
+    resultView=NULL;
     policiesView = NULL;
     displayView = NULL;
 
@@ -133,10 +136,13 @@ void MainWindow::Run()
     switch (current_view)
     {
         case RUN_CHECKER_VIEW:
+            createCheckerView();
+            break;
+        case RUN_RESULT_VIEW:
             //TODO: fill the view if file already here
             // if (!files.empty())
             //     C.Run();
-            createCheckerView();
+            createResultView();
             break;
         case RUN_POLICIES_VIEW:
             createPoliciesView();
@@ -145,9 +151,6 @@ void MainWindow::Run()
             createDisplayView();
             break;
         default:
-            //TODO: fill the view if file already here
-            // if (!files.empty())
-            //     C.Run();
             createCheckerView();
             break;
     }
@@ -412,6 +415,17 @@ void MainWindow::on_actionChecker_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionResult_triggered()
+{
+    if (!ui->actionResult->isChecked())
+        ui->actionResult->setChecked(true);
+    if (clearVisualElements() < 0)
+        return;
+    current_view = RUN_RESULT_VIEW;
+    Run();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionPolicies_triggered()
 {
     if (!ui->actionPolicies->isChecked())
@@ -539,6 +553,12 @@ int MainWindow::clearVisualElements()
         checkerView=NULL;
     }
 
+    if (resultView)
+    {
+        delete resultView;
+        resultView = NULL;
+    }
+
     if (policiesView)
     {
         delete policiesView;
@@ -566,6 +586,15 @@ void MainWindow::createCheckerView()
     QObject::connect(ui->actionCloseAll, SIGNAL(triggered()),
                      checkerView, SLOT(actionCloseAllTriggered()));
     checkerView->create_web_view();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createResultView()
+{
+    if (clearVisualElements() < 0)
+        return;
+    resultView = new ResultWindow(this);
+    resultView->display_results();
 }
 
 //---------------------------------------------------------------------------
@@ -645,6 +674,12 @@ void MainWindow::remove_widget_from_layout(QWidget* w)
 void MainWindow::checker_selected()
 {
     on_actionChecker_triggered();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::result_selected()
+{
+    on_actionResult_triggered();
 }
 
 //---------------------------------------------------------------------------
