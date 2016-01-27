@@ -43,6 +43,7 @@ public:
     void add_file_to_list(const QString& file);
     void policy_to_delete(int row);
     int  exporting_to_schematron_file(size_t pos);
+    int  exporting_to_unknown_file(size_t pos);
     int  exporting_to_xslt_file(size_t pos);
     void exporting_policy(size_t pos);
 

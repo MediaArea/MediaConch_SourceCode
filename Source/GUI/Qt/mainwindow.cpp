@@ -245,6 +245,32 @@ int MainWindow::exporting_to_schematron_file(size_t pos)
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::exporting_to_unknown_file(size_t pos)
+{
+    QString path = get_local_folder();
+    path += "/policies";
+
+    QDir dir(path);
+    if (!dir.exists())
+        dir.mkpath(dir.absolutePath());
+
+    Policy* p = MCL.get_policy(pos);
+    if (!p)
+        return -1;
+
+    path += "/" + QString().fromStdString(p->filename);
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                              path, tr("XML (*.xml)"));
+
+    if (!filename.length())
+        return -1;
+
+    std::string f = filename.toStdString();
+    MCL.save_policy(pos, &f);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::exporting_to_xslt_file(size_t pos)
 {
     QString path = get_local_folder();

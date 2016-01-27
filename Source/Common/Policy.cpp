@@ -57,7 +57,6 @@ int Policy::import_schema(const std::string& filename)
     }
 
     int ret = import_schema_from_doc(filename, doc);
-    printf("import value in policy: %d\n", ret);
     xmlFreeDoc(doc);
     saved = true;
     return ret;
@@ -93,6 +92,8 @@ int Policy::import_schema_from_memory(const std::string& filename, const char* b
 void Policy::export_schema(const char* filename)
 {
     xmlDocPtr new_doc = create_doc();
+    if (!new_doc)
+        return;
 
     xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);

@@ -19,6 +19,7 @@
 #include <string.h>
 #include "SchematronPolicy.h"
 #include "XsltPolicy.h"
+#include "UnknownPolicy.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/ZtringList.h"
 //---------------------------------------------------------------------------
@@ -71,11 +72,10 @@ int Policies::import_schema(const std::string& filename)
         ret = p->import_schema(filename);
         if (ret < 0)
         {
-            // if (p)
-            //     delete p;
-            //TODO: unknownPolicy
-            // p = new UnknownPolicy;
-            // ret = p->import_schema(filename);
+            if (p)
+                delete p;
+            p = new UnknownPolicy;
+            ret = p->import_schema(filename);
         }
     }
 
@@ -111,10 +111,10 @@ int Policies::import_schema_from_memory(const std::string& filename, const char*
         ret = p->import_schema_from_memory(filename, buffer, len);
         if (ret < 0)
         {
-            // if (p)
-            //     delete p;
-            // p = new UnknownPolicy;
-            // ret = p->import_schema_from_memory(filename, buffer, len);
+            if (p)
+                delete p;
+            p = new UnknownPolicy;
+            ret = p->import_schema_from_memory(filename, buffer, len);
         }
     }
 
