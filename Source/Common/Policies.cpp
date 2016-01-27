@@ -56,30 +56,33 @@ int Policies::import_schema(const std::string& filename)
     }
 
     Policy *p = NULL;
-    int ret = 0;
-    if (!filename.compare(filename.length() - 4, 4, ".xsl"))
+    int ret = -1;
+    if (!filename.compare(filename.length() - 4, 4, ".sch"))
     {
+        p = new SchematronPolicy;
+        ret = p->import_schema(filename);
+    }
+
+    if (ret < 0)
+    {
+        if (p)
+            delete p;
         p = new XsltPolicy;
         ret = p->import_schema(filename);
         if (ret < 0)
         {
-            p = new SchematronPolicy;
-            ret = p->import_schema(filename);
-        }
-    }
-    else
-    {
-        p = new SchematronPolicy;
-        ret = p->import_schema(filename);
-        if (ret < 0)
-        {
-            p = new XsltPolicy;
-            ret = p->import_schema(filename);
+            // if (p)
+            //     delete p;
+            //TODO: unknownPolicy
+            // p = new UnknownPolicy;
+            // ret = p->import_schema(filename);
         }
     }
 
     if (ret >= 0)
         policies.push_back(p);
+    else
+        delete p;
     return ret;
 }
 
@@ -92,30 +95,33 @@ int Policies::import_schema_from_memory(const std::string& filename, const char*
     }
 
     Policy *p = NULL;
-    int ret = 0;
-    if (!filename.compare(filename.length() - 4, 4, ".xsl"))
+    int ret = -1;
+    if (!filename.compare(filename.length() - 4, 4, ".sch"))
     {
+        p = new SchematronPolicy;
+        ret = p->import_schema_from_memory(filename, buffer, len);
+    }
+
+    if (ret < 0)
+    {
+        if (p)
+            delete p;
+
         p = new XsltPolicy;
         ret = p->import_schema_from_memory(filename, buffer, len);
         if (ret < 0)
         {
-            p = new SchematronPolicy;
-            ret = p->import_schema_from_memory(filename, buffer, len);
-        }
-    }
-    else
-    {
-        p = new SchematronPolicy;
-        ret = p->import_schema_from_memory(filename, buffer, len);
-        if (ret < 0)
-        {
-            p = new XsltPolicy;
-            ret = p->import_schema_from_memory(filename, buffer, len);
+            // if (p)
+            //     delete p;
+            // p = new UnknownPolicy;
+            // ret = p->import_schema_from_memory(filename, buffer, len);
         }
     }
 
     if (ret >= 0)
         policies.push_back(p);
+    else
+        delete p;
     return ret;
 }
 

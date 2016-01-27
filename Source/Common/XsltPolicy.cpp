@@ -357,11 +357,23 @@ bool XsltPolicy::find_rule_title_node(xmlNodePtr node, std::string& t)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_check_node(xmlNodePtr node)
+void XsltPolicy::validate_check_node(xmlNodePtr node, bool& valid)
+{
+    if (!node->name)
+        return;
+
+    std::string name((const char *)node->name);
+    if (name == "text")
+        return;
+    valid = false;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_check_node(xmlNodePtr node)
 {
     std::string def("check");
     if (!node->name || def.compare((const char*)node->name))
-        return false;
+        return 1;
 
     bool valid = true;
     XsltRule *r = new XsltRule;
@@ -371,16 +383,19 @@ bool XsltPolicy::find_check_node(xmlNodePtr node)
         if (!find_rule_title_node(child, r->title))
             if (!find_context_node(child, r))
                 if (!find_choose_node(child, r, valid))
-                    find_call_template_free_text_node(child, r, valid);
+                    if (!find_call_template_free_text_node(child, r, valid))
+                        validate_check_node(child, valid);
         if (!valid)
             break;
         child = child->next;
     }
-    if (valid)
-        rules.push_back(r);
-    else
+    if (!valid)
+    {
         delete r;
-    return true;
+        return -1;
+    }
+    rules.push_back(r);
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -410,107 +425,277 @@ bool XsltPolicy::find_policychecks_name_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_policychecks_node(xmlNodePtr node)
+bool XsltPolicy::validate_policychecks_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char *)node->name);
+    if (name == "text")
+        return true;
+    return false;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_policychecks_node(xmlNodePtr node)
 {
     std::string def("policyChecks");
     if (!node->name || def.compare((const char*)node->name))
-        return false;
+        return 1;
 
     xmlNodePtr child = node->children;
+    int ret = 0;
     while (child)
     {
         if (!find_policychecks_name_node(child))
+        {
             if (!find_policychecks_description_node(child))
-                find_check_node(child);
+                ret = find_check_node(child);
+            else
+                ret = 0;
+        }
+        else
+            ret = 0;
+
+        if (ret < 0)
+            break;
+        else if (ret > 0 && !validate_policychecks_node(child))
+        {
+            ret = -1;
+            break;
+        }
+        else
+            ret = 0;
+        
         child = child->next;
     }
-    return true;
+    return ret;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_media_node(xmlNodePtr node)
+bool XsltPolicy::validate_media_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char *)node->name);
+    if (name == "text")
+        return true;
+    if (name == "attribute")
+        return true;
+    return false;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_media_node(xmlNodePtr node)
 {
     std::string def("media");
     if (!node->name || def.compare((const char*)node->name))
-        return false;
+        return 1;
 
     xmlNodePtr child = node->children;
+    int ret = 0;
     while (child)
     {
-        find_policychecks_node(child);
+        ret = find_policychecks_node(child);
+        if (ret < 0)
+            break;
+        else if (ret > 0 && !validate_media_node(child))
+        {
+            ret = -1;
+            break;
+        }
+        else
+            ret = 0;
+
         child = child->next;
     }
-    return true;
+    return ret;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_for_each_node(xmlNodePtr node)
+bool XsltPolicy::validate_for_each_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char *)node->name);
+    if (name == "text")
+        return true;
+    return false;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_for_each_node(xmlNodePtr node)
 {
     std::string def("for-each");
     if (!node->name || def.compare((const char*)node->name))
-        return false;
+        return 1;
 
     xmlNodePtr child = node->children;
+    int ret = 0;
     while (child)
     {
-        find_media_node(child);
+        ret = find_media_node(child);
+        if (ret < 0)
+            break;
+        else if (ret > 0 && !validate_for_each_node(child))
+        {
+            ret = -1;
+            break;
+        }
+        else
+            ret = 0;
         child = child->next;
     }
-    return true;
+    return ret;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_mediaconch_node(xmlNodePtr node)
+bool XsltPolicy::validate_mediaconch_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char *)node->name);
+    if (name == "text")
+        return true;
+    if (name == "attribute")
+        return true;
+    return false;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_mediaconch_node(xmlNodePtr node)
 {
     std::string def("MediaConch");
     if (!node->name || def.compare((const char*)node->name))
-        return false;
+        return 1;
 
     xmlNodePtr child = node->children;
+    int ret = 0;
     while (child)
     {
-        find_for_each_node(child);
+        ret = find_for_each_node(child);
+        if (ret < 0)
+            break;
+        else if (ret > 0 && !validate_mediaconch_node(child))
+        {
+            ret = -1;
+            break;
+        }
+        else
+            ret = 0;
         child = child->next;
     }
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::validate_template_match_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char *)node->name);
+    if (name != "text")
+        return false;
     return true;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_template_match_node(xmlNodePtr node)
+int XsltPolicy::find_template_match_node(xmlNodePtr node)
 {
-    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"match");
-    if (name == NULL)
-        return false;
+    xmlChar *match = xmlGetNoNsProp(node, (const unsigned char*)"match");
+    
+    if (match == NULL || std::string((const char*)match) != "ma:MediaArea")
+        return 1;
 
     xmlNodePtr child = node->children;
+    int ret = 0;
     while (child)
     {
-        find_mediaconch_node(child);
+        ret = find_mediaconch_node(child);
+        if (ret < 0)
+            break;
+        else if (ret > 0 && !validate_template_match_node(child))
+        {
+            ret = -1;
+            break;
+        }
+        else
+            ret = 0;
         child = child->next;
     }
-    return true;
+    return ret;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_template_name_node(xmlNodePtr node)
+int XsltPolicy::validate_template_match_name(xmlNodePtr node)
 {
-    xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
-    if (name == NULL)
-        return false;
-    //TODO: operation
-    return true;
+    xmlChar *name_s = xmlGetNoNsProp(node, (const unsigned char*)"name");
+    if (!name_s)
+        return -1;
+
+    std::string name((const char*)name_s);
+
+    if (name == "is_true")
+        return 0;
+
+    if (name == "is_equal")
+        return 0;
+
+    if (name == "is_not_equal")
+        return 0;
+
+    if (name == "is_greater_than")
+        return 0;
+
+    if (name == "is_less_than")
+        return 0;
+
+    if (name == "is_greater_or_equal_than")
+        return 0;
+
+    if (name == "is_less_or_equal_than")
+        return 0;
+
+    if (name == "exists")
+        return 0;
+
+    if (name == "does_not_exist")
+        return 0;
+
+    if (name == "contains_string")
+        return 0;
+
+    return -1;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_template_node(xmlNodePtr node)
+bool XsltPolicy::valid_root_child_name_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char *)node->name);
+    if (name == "template" || name == "output" || name == "text")
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_template_node(xmlNodePtr node)
 {
     std::string def("template");
     if (!node->name || def.compare((const char*)node->name))
-        return false;
+        return 1;
 
-    if (find_template_match_node(node))
-        return true;
-    return find_template_name_node(node);
+    int ret = find_template_match_node(node);
+    if (ret > 0)
+        ret = validate_template_match_name(node);
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -555,13 +740,24 @@ int XsltPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr do
         if (end_index != std::string::npos)
             title = title.substr(0, end_index);
     }
+
+    int ret = 0;
     while (child)
     {
-        find_template_node(child);
+        ret = find_template_node(child);
+        if (ret < 0)
+            break;
+        else if (ret > 0 && !valid_root_child_name_node(child))
+        {
+            ret = -1;
+            break;
+        }
+        else
+            ret = 0;
         child = child->next;
     }
     xmlSetGenericErrorFunc(NULL, NULL);
-    return 0;
+    return ret;
 }
 
 //---------------------------------------------------------------------------
