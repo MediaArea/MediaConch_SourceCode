@@ -110,6 +110,10 @@ public:
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
 
+    // Get Local Paths
+    static std::string get_local_data_path();
+    static std::string get_local_config_path();
+
 private:
     Core (const Core&);
 
@@ -173,9 +177,6 @@ private:
     std::string get_config_file();
     std::string get_database_path();
     Database *get_db();
-
-    std::string get_local_data_path();
-    std::string get_local_config_path();
 };
 
 }
