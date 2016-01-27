@@ -67,7 +67,7 @@ XsltPolicy::~XsltPolicy()
 //---------------------------------------------------------------------------
 bool XsltPolicy::find_xslt_header(xmlNodePtr node)
 {
-    if (!node || node->type != XML_ELEMENT_NODE || !node->ns)
+    if (!node || node->type != XML_ELEMENT_NODE || !node->ns || !node->ns->prefix)
         return false;
 
     std::string ns("xsl");
