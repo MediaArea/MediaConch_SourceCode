@@ -117,7 +117,7 @@ MainWindow::~MainWindow()
 //---------------------------------------------------------------------------
 void MainWindow::add_file_to_list(const QString& file)
 {
-    files.push_back(file.toStdString());
+    registered_files.push_back(file.toStdString());
 }
 
 void MainWindow::policy_to_delete(int index)
@@ -140,7 +140,7 @@ void MainWindow::Run()
             break;
         case RUN_RESULT_VIEW:
             //TODO: fill the view if file already here
-            // if (!files.empty())
+            // if (!registered_files.empty())
             //     C.Run();
             createResultView();
             break;
@@ -366,7 +366,7 @@ void MainWindow::clear_policy_list()
 //---------------------------------------------------------------------------
 void MainWindow::clear_file_list()
 {
-    files.clear();
+    registered_files.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -393,7 +393,7 @@ void MainWindow::on_actionOpen_triggered()
         return;
 
     for (int pos = 0; pos < list.size(); ++pos)
-        files.push_back(list[pos].toStdString());
+        registered_files.push_back(list[pos].toStdString());
 
     current_view = RUN_CHECKER_VIEW;
     Run();

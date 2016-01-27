@@ -111,7 +111,7 @@ private:
 
     // Internal
     MediaConchLib            MCL;
-    std::vector<std::string> files;
+    std::vector<std::string> registered_files;
     std::vector<std::string> policies;
 
     // Visual elements
