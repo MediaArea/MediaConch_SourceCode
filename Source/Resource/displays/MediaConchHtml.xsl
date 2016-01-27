@@ -4,6 +4,7 @@
   <xsl:template match="/mc:MediaConch">
   <html>
   <head>
+    <title>MediaConch</title>
     <style>
       .mc_header {
         width   : 600px;
