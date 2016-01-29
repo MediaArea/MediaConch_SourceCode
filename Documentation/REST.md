@@ -35,11 +35,11 @@ JSON format for the parameters.
 
 Parameters:
 
-* args:              Array of Arguments
+* args:              Array of arguments
 
 - file:              String: Name of the file to analyze
 - id:                Integer: a unique id for the request
-- force:             Boolean: force to analyze the file even if registered in database (introduce in v1.1)
+- force:             Boolean: force to analyze the file even if registered in database (introduced in v1.1)
 
 ##### Response
 
@@ -76,7 +76,7 @@ Parameters:
 
 - id:                Integer: id given by the request
 - finish:            Boolean: if the file is finished to be analyzed
-- done:              Doule: Percent done by the analysis
+- done:              Double: Percent done by the analysis
 
 * nok:               Array of invalid arguments
 
@@ -91,7 +91,7 @@ JSON format for the parameters.
 
 Parameters:
 
-* args:              Array of Arguments
+* args:              Array of arguments
 
 - id:                Integer: id given by the Analyze command
 - reports:           Array of report kinds
@@ -170,5 +170,5 @@ Parameters:
 
 * NOT\_REASON           0
 * FILE\_NOT\_EXISTING   1
-* ID\_NOT\_EXIsTING     2
+* ID\_NOT\_EXISTING     2
 * NOT\_READY            3
