@@ -47,13 +47,6 @@ int Http::send_request(RESTAPI::Analyze_Req& req)
     return send_request_post(uri_str, cmd);
 }
 
-// //---------------------------------------------------------------------------
-// int Http::send_request(RESTAPI::List_Req& req)
-// {
-//     std::string uri("/list");
-//     return send_request_get(uri);
-// }
-
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Status_Req& req)
 {
@@ -98,6 +91,14 @@ int Http::send_request(RESTAPI::Clear_Req& req)
 
     std::string uri_str = uri.str();
     return send_request_delete(uri_str);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::List_Req& req)
+{
+    std::string uri("/");
+    uri +=  RESTAPI::API_VERSION + "/list";
+    return send_request_get(uri);
 }
 
 //---------------------------------------------------------------------------

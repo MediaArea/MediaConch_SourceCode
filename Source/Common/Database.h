@@ -16,6 +16,7 @@
 //---------------------------------------------------------------------------
 
 #include <map>
+#include <vector>
 #include "MediaConchLib.h"
 //---------------------------------------------------------------------------
 
@@ -45,6 +46,7 @@ public:
                             std::string& report, MediaConchLib::compression&) = 0;
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& file, const std::string& file_last_modification) = 0;
+    virtual void get_elements(std::vector<std::string>& vec) = 0;
 
     void        set_database_directory(const std::string& dirname);
     virtual int init() = 0;
@@ -52,7 +54,7 @@ public:
 protected:
     std::string                        query;
     std::vector<std::string>           errors;
-    std::map<std::string, std::string> reports;
+    std::map<std::string, std::vector<std::string> > reports;
     std::string                        db_file;
 
     //Database dependant

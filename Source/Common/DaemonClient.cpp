@@ -85,6 +85,36 @@ int DaemonClient::close()
 }
 
 //---------------------------------------------------------------------------
+int DaemonClient::list(std::vector<std::string>& vec)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::List_Req req;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::List_Res *res = rest.parse_list_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    for (size_t i = 0; i < res->files.size(); ++i)
+        vec.push_back(res->files[i]->file);
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!http_client)

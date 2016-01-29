@@ -190,9 +190,12 @@ void SQLLite::get_report(MediaConchLib::report reportKind, MediaConchLib::format
     if (execute() || !reports.size() || reports.find("REPORT") == reports.end())
         return;
 
-    if (reports.find("COMPRESS") != reports.end())
+    if (!reports["REPORT"].size())
+        return;
+
+    if (reports.find("COMPRESS") != reports.end() && reports["COMPRESS"].size())
     {
-        const std::string& c = reports["COMPRESS"];
+        const std::string& c = reports["COMPRESS"][0];
         if (c == "0")
             compress = MediaConchLib::compression_None;
         else if (c == "1")
@@ -200,7 +203,7 @@ void SQLLite::get_report(MediaConchLib::report reportKind, MediaConchLib::format
         else
             compress = MediaConchLib::compression_None;
     }
-    report += reports["REPORT"];
+    report += reports["REPORT"][0];
 }
 
 bool SQLLite::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification)
@@ -240,9 +243,31 @@ bool SQLLite::file_is_registered(MediaConchLib::report reportKind, MediaConchLib
     if (execute() || !reports.size() || reports.find(key) == reports.end())
         return false;
 
-    if (reports[key] == "0")
+    if (reports[key].size() && reports[key][0] == "0")
         return false;
     return true;
+}
+
+void SQLLite::get_elements(std::vector<std::string>& vec)
+{
+    std::stringstream create;
+    std::string key("FILENAME");
+
+    reports.clear();
+    create << "SELECT " << key << " FROM " << "Report;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return;
+
+    if (execute() || !reports.size() || reports.find(key) == reports.end())
+        return;
+
+    for (size_t i = 0; i < reports[key].size(); ++i)
+        if (!(i % 3))
+            vec.push_back(reports[key][i]);
 }
 
 //---------------------------------------------------------------------------
@@ -291,7 +316,7 @@ int SQLLite::execute()
 //---------------------------------------------------------------------------
 void SQLLite::add_report(const std::string& key, const std::string& report)
 {
-    reports[key] = report;
+    reports[key].push_back(report);
 }
 
 }

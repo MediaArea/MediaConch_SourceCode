@@ -108,6 +108,8 @@ public:
     int  is_done(const std::vector<std::string>& files, double& percent);
     int  is_done(const std::string& file, double& percent);
 
+    void list(std::vector<std::string>& vec);
+
     // Output
     int  get_report(const std::bitset<report_Max>& Report, format f,
                     const std::vector<std::string>& files,

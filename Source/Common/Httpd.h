@@ -51,6 +51,7 @@ public:
 
     URI_REQ_FUNC(Status);
     URI_REQ_FUNC(Clear);
+    URI_REQ_FUNC(List);
 #undef URI_REQ_FUNC
 
     int send_result();
@@ -72,6 +73,8 @@ public:
                                     RESTAPI::Retry_Res& res, void* arg);
     typedef int (*on_clear_command)(const RESTAPI::Clear_Req* req,
                                     RESTAPI::Clear_Res& res, void* arg);
+    typedef int (*on_list_command)(const RESTAPI::List_Req* req,
+                                   RESTAPI::List_Res& res, void* arg);
 
     struct Commands
     {
@@ -84,6 +87,7 @@ public:
         on_report_command  report_cb;
         on_retry_command   retry_cb;
         on_clear_command   clear_cb;
+        on_list_command    list_cb;
     };
 
     Commands commands;

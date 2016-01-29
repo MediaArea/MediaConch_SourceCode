@@ -102,6 +102,7 @@ public:
     std::vector<QString>&           get_displays();
     const std::vector<std::string>& policy_file_registered();
     QString                         get_local_folder() const;
+    const std::vector<std::string>& get_registered_files();
 
     const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
     const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }

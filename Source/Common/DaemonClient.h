@@ -41,6 +41,9 @@ public:
     int init();
     int close();
 
+    // List
+    int list(std::vector<std::string>& vec);
+
     // Analyze
     int analyze(const std::string& file, bool& registered, bool force_analyze);
 

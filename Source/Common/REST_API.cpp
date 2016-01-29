@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.1";
+const std::string RESTAPI::API_VERSION = "1.2";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -101,6 +101,14 @@ RESTAPI::Clear_Res::~Clear_Res()
     for (size_t i = 0; i < nok.size(); ++i)
         delete nok[i];
     nok.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::List_Res::~List_Res()
+{
+    for (size_t i = 0; i < files.size(); ++i)
+        delete files[i];
+    files.clear();
 }
 
 //***************************************************************************
@@ -413,6 +421,23 @@ std::string RESTAPI::Clear_Res::to_str() const
     return out.str();
 }
 
+//---------------------------------------------------------------------------
+std::string RESTAPI::List_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[files: [";
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << "{file:" << files[i]->file;
+        out << ", id:" << files[i]->id << "}";
+    }
+    out << "] ]";
+    return out.str();
+}
+
 //***************************************************************************
 // Serialize: Request
 //***************************************************************************
@@ -511,6 +536,12 @@ std::string RESTAPI::serialize_clear_req(Clear_Req& req)
         ss << "id=" << req.ids[i];
     }
     return ss.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_list_req(List_Req&)
+{
+    return std::string();
 }
 
 //***************************************************************************
@@ -620,6 +651,27 @@ std::string RESTAPI::serialize_clear_res(Clear_Res& res)
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj.push_back(std::make_pair("CLEAR_RESULT", child));
+
+    std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_list_res(List_Res& res)
+{
+    Container::Value v, child, files;
+
+    files.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < res.files.size(); ++i)
+        files.array.push_back(serialize_list_file(res.files[i]->file, res.files[i]->id));
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    child.obj.push_back(std::make_pair("files", files));
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj.push_back(std::make_pair("LIST_RESULT", child));
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -835,6 +887,24 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::List_Req *RESTAPI::parse_list_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "LIST");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+    List_Req *req = new List_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
 {
     Analyze_Req *req = new Analyze_Req;
@@ -912,6 +982,13 @@ RESTAPI::Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
     }
 
 finish:
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::List_Req *RESTAPI::parse_uri_list_req(const std::string&)
+{
+    List_Req *req = new List_Req;
     return req;
 }
 
@@ -1189,6 +1266,45 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
     return res;
 }
 
+//---------------------------------------------------------------------------
+RESTAPI::List_Res *RESTAPI::parse_list_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "LIST_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *files;
+    files = model->get_value_by_key(*child, "files");
+
+    List_Res *res = new List_Res;
+    if (files->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < files->array.size(); ++i)
+    {
+        List_File *tmp = new List_File;
+
+        if (parse_list_file(&files->array[i], tmp->file, tmp->id))
+        {
+            delete res;
+            return NULL;
+        }
+        res->files.push_back(tmp);
+    }
+    return res;
+}
+
 //***************************************************************************
 // HELPER
 //***************************************************************************
@@ -1406,6 +1522,23 @@ Container::Value RESTAPI::serialize_report_ok(Report_Ok& obj)
 }
 
 //---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_list_file(const std::string& filename, int id)
+{
+    Container::Value file, id_v, filename_v;
+
+    file.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id_v.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id_v.l = id;
+    file.obj.push_back(std::make_pair("id", id_v));
+
+    filename_v.type = Container::Value::CONTAINER_TYPE_STRING;
+    filename_v.s = filename;
+    file.obj.push_back(std::make_pair("file", filename_v));
+    return file;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& args)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
@@ -1592,6 +1725,26 @@ int RESTAPI::parse_report_ok(Container::Value *v, Report_Ok& ok)
         ok.valid = valid->b;
     }
 
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_list_file(Container::Value *v, std::string& file, int& id)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return -1;
+
+    Container::Value *id_v, *file_v;
+
+    file_v = model->get_value_by_key(*v, "file");
+    id_v = model->get_value_by_key(*v, "id");
+
+    if (!id_v || id_v->type != Container::Value::CONTAINER_TYPE_INTEGER ||
+        !file_v || file_v->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+
+    id = id_v->l;
+    file = file_v->s;
     return 0;
 }
 

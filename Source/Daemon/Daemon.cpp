@@ -89,6 +89,7 @@ namespace MediaConch
         httpd->commands.report_cb = on_report_command;
         httpd->commands.retry_cb = on_retry_command;
         httpd->commands.clear_cb = on_clear_command;
+        httpd->commands.list_cb = on_list_command;
         return 0;
     }
 
@@ -641,6 +642,36 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_list_command(const RESTAPI::List_Req* req, RESTAPI::List_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a list command" << std::endl;
+        std::vector<std::string> vec;
+        d->MCL->list(vec);
+        for (size_t i = 0; i < vec.size(); ++i)
+        {
+            RESTAPI::List_File *file = new RESTAPI::List_File;
+            file->file = vec[i];
+
+            size_t id = 0;
+            if (!d->file_is_registered(vec[i], id))
+            {
+                id = d->get_first_free_slot();
+                d->current_files[id] = new std::string(vec[i]);
+            }
+
+            file->id = id;
+            res.files.push_back(file);
+        }
+        std::clog << d->get_date() << "Daemon send list result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     size_t Daemon::get_first_free_slot()
     {
         size_t i = 0;
@@ -670,5 +701,17 @@ namespace MediaConch
         str = str.substr(0, str.length() - 1);
         out << "[" << str << "]";
         return out.str();
+    }
+
+    //--------------------------------------------------------------------------
+    bool Daemon::file_is_registered(const std::string& file, size_t& id)
+    {
+        for (size_t i = 0; i < current_files.size(); ++i)
+            if (current_files[i] && !current_files[i]->compare(file))
+            {
+                id = i;
+                return true;
+            }
+        return false;
     }
 }

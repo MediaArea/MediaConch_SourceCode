@@ -103,6 +103,12 @@ MainWindow::MainWindow(QWidget *parent) :
     status_msg->setReadOnly(true);
     statusBar()->addWidget(status_msg, 2);
     clear_msg_in_status_bar();
+
+    //Get the filename registered
+    std::vector<std::string> vec;
+    MCL.list(vec);
+    for (size_t i = 0; i < vec.size(); ++i)
+        registered_files.push_back(vec[i].c_str());
 }
 
 MainWindow::~MainWindow()
@@ -196,6 +202,12 @@ void MainWindow::checker_add_policy_files(QFileInfoList& list, QString& policy)
 const std::vector<std::string>& MainWindow::policy_file_registered()
 {
     return policies;
+}
+
+//---------------------------------------------------------------------------
+const std::vector<std::string>& MainWindow::get_registered_files()
+{
+    return registered_files;
 }
 
 //---------------------------------------------------------------------------

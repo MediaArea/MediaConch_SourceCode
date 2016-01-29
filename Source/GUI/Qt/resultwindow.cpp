@@ -47,6 +47,15 @@ void ResultWindow::create_web_view_finished(bool ok)
 }
 
 //---------------------------------------------------------------------------
+void ResultWindow::update_html_with_results(QString& html)
+{
+    const std::vector<std::string>& vec = mainwindow->get_registered_files();
+
+    for (size_t i = 0; i< vec.size(); ++i)
+        html += QString("<h2>File number:%1: %2</h2>").arg(i).arg(vec[i].c_str());
+}
+
+//---------------------------------------------------------------------------
 void ResultWindow::set_web_view_content(QString& html)
 {
     view = new WebView(mainwindow);
@@ -78,6 +87,7 @@ void ResultWindow::display_results()
     progressBar->show();
 
     QString html("<h1>RESULT PAGE</h1>");
+    update_html_with_results(html);
     set_web_view_content(html);
 }
 

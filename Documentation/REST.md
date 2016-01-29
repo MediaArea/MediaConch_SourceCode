@@ -8,6 +8,10 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.2
+
+* Add the List command
+
 #### Version 1.1
 
 * Add the force parameter in the Analyze request.
@@ -26,6 +30,7 @@ It is used above an HTTP connection.
 * Report:  HTTP POST
 * Retry:   HTTP PUT
 * Clear:   HTTP DELETE
+* List:    HTTP GET
 
 #### Analyze
 
@@ -157,6 +162,23 @@ Parameters:
 
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
+
+#### List
+
+No Parameter
+
+##### Request
+
+Parameters:
+
+##### Response
+
+Parameters:
+
+* files:             Array of files registered
+
+- file:              Filename of the file
+- id:                Internal id, id to be used by other request
 
 #### Report kinds
 

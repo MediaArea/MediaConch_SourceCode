@@ -39,10 +39,10 @@ public:
 
     int send_request(RESTAPI::Analyze_Req& req);
     int send_request(RESTAPI::Status_Req& req);
-    /* int send_request(RESTAPI::List_Req& req); */
     int send_request(RESTAPI::Report_Req& req);
     int send_request(RESTAPI::Retry_Req& req);
     int send_request(RESTAPI::Clear_Req& req);
+    int send_request(RESTAPI::List_Req& req);
 
     void set_port(int port);
     void set_address(std::string& address);

@@ -265,6 +265,13 @@ bool Core::is_done(const std::string& file, double& percent_done)
 }
 
 //---------------------------------------------------------------------------
+void Core::list(std::vector<std::string>& vec)
+{
+    scheduler->get_elements(vec);
+    get_db()->get_elements(vec);
+}
+
+//---------------------------------------------------------------------------
 int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
                      const std::vector<std::string>& files,
                      const std::vector<std::string>& policies_names,

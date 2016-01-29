@@ -81,6 +81,7 @@ int Httpd::send_result()
 
     MAKE_URI_REQ_FUNC(status, Status)
     MAKE_URI_REQ_FUNC(clear, Clear)
+    MAKE_URI_REQ_FUNC(list, List)
 
 #undef MAKE_URI_REQ_FUNC
 

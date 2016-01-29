@@ -35,6 +35,7 @@ private:
 
     void          clear_visual_elements();
     void          set_web_view_content(QString& html);
+    void          update_html_with_results(QString& html);
 
 private Q_SLOTS:
     void          create_web_view_finished(bool ok);

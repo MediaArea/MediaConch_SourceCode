@@ -209,6 +209,17 @@ int MediaConchLib::is_done(const std::string& file, double& percent)
     return core->is_done(file, percent);
 }
 
+//---------------------------------------------------------------------------
+void MediaConchLib::list(std::vector<std::string>& vec)
+{
+    if (use_daemon)
+    {
+        daemon_client->list(vec);
+        return;
+    }
+    core->list(vec);
+}
+
 //***************************************************************************
 // Output
 //***************************************************************************

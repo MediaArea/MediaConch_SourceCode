@@ -28,6 +28,7 @@
 #endif
 #include "ZenLib/CriticalSection.h"
 #include <map>
+#include <vector>
 
 using namespace MediaInfoNameSpace;
 using namespace ZenLib;
@@ -56,6 +57,7 @@ public:
     bool element_exists(const std::string& filename);
     bool element_is_finished(const std::string& filename, double& percent_done);
     void set_max_threads(size_t nb) { max_threads = nb; }
+    void get_elements(std::vector<std::string>& vec);
 
 private:
     Scheduler(const Scheduler&);

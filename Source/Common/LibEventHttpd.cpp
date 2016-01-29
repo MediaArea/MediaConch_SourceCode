@@ -150,6 +150,24 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (!result.length())
             error = rest.get_error();
     }
+    else if (!std::string("/list").compare(uri_path))
+    {
+        std::string query;
+        RESTAPI::List_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::List_Res res;
+        if (commands.list_cb && commands.list_cb(r, res, parent) < 0)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        result = rest.serialize_list_res(res);
+        if (!result.length())
+            error = rest.get_error();
+    }
     else
     {
         code = HTTP_NOTFOUND;
