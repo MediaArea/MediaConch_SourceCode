@@ -233,6 +233,18 @@ void Core::set_compression_mode(MediaConchLib::compression compress)
     compression_mode = compress;
 }
 
+//---------------------------------------------------------------------------
+int Core::get_ui_poll_request() const
+{
+    long ui_poll_request = 5000;
+    if (!config->get("UI_Poll_Request", ui_poll_request))
+    {
+        if (ui_poll_request < 500 || ui_poll_request > 10000)
+            ui_poll_request = 1000;
+    }
+    return ui_poll_request;
+}
+
 //***************************************************************************
 // Tools
 //***************************************************************************
@@ -318,6 +330,41 @@ int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, M
         transform_with_xslt_file(result->report, *display_name, result->report);
     else if (display_content)
         transform_with_xslt_memory(result->report, *display_content, result->report);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Core::validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                   const std::vector<std::string>& policies_names,
+                   const std::vector<std::string>& policies_contents,
+                   std::vector<MediaConchLib::ValidateRes*>& result)
+{
+    if (report != MediaConchLib::report_MediaConch && !policies_names.size() && !policies_contents.size())
+        return -1;
+
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        MediaConchLib::ValidateRes* res = new MediaConchLib::ValidateRes;
+        res->file = files[i];
+        if (report == MediaConchLib::report_MediaConch)
+        {
+            std::string report;
+            res->valid = get_implementation_report(files[i], report);
+        }
+        else if (!policies_names.empty() || !policies_contents.empty())
+        {
+            std::vector<std::string> file_tmp;
+            file_tmp.push_back(files[i]);
+
+            MediaConchLib::ReportRes tmp_res;
+            if (policies_check(file_tmp, &tmp_res,
+                               policies_names.size() ? &policies_names : NULL,
+                               policies_contents.size() ? &policies_contents : NULL) < 0)
+                continue;
+            res->valid = tmp_res.has_valid ? tmp_res.valid : true;
+        }
+        result.push_back(res);
+    }
     return 0;
 }
 

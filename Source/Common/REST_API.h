@@ -272,7 +272,7 @@ public:
         std::string             to_str() const;
     };
 
-    // Clear
+    // List
     struct List_Req
     {
     };
@@ -290,6 +290,39 @@ public:
         std::string             to_str() const;
     };
 
+    // Validate
+    struct Validate_Req
+    {
+        std::vector<int>           ids;
+        Report                     report;
+        std::vector<std::string>   policies_names;
+        std::vector<std::string>   policies_contents;
+        std::string                to_str() const;
+    };
+
+    struct Validate_Ok
+    {
+        Validate_Ok() :            valid(false) {}
+        int                        id;
+        bool                       valid;
+        std::string                to_str() const;
+    };
+
+    struct Validate_Nok
+    {
+        int                        id;
+        Reason                     error;
+        std::string                to_str() const;
+    };
+
+    struct Validate_Res
+    {
+        ~Validate_Res();
+        std::vector<Validate_Ok*>  ok;
+        std::vector<Validate_Nok*> nok;
+        std::string                to_str() const;
+    };
+
 public:
     //Constructor/Destructor
     RESTAPI();
@@ -302,6 +335,7 @@ public:
     std::string serialize_retry_req(Retry_Req& req);
     std::string serialize_clear_req(Clear_Req& req);
     std::string serialize_list_req(List_Req& req);
+    std::string serialize_validate_req(Validate_Req& req);
 
     // Serialize: Result
     std::string serialize_analyze_res(Analyze_Res& res);
@@ -310,30 +344,34 @@ public:
     std::string serialize_retry_res(Retry_Res& res);
     std::string serialize_clear_res(Clear_Res& res);
     std::string serialize_list_res(List_Res& res);
+    std::string serialize_validate_res(Validate_Res& res);
 
     // Parse: Request
-    Analyze_Req *parse_analyze_req(std::string data);
-    Status_Req *parse_status_req(std::string data);
-    Report_Req *parse_report_req(std::string data);
-    Retry_Req *parse_retry_req(std::string data);
-    Clear_Req *parse_clear_req(std::string data);
-    List_Req *parse_list_req(std::string data);
+    Analyze_Req  *parse_analyze_req(std::string data);
+    Status_Req   *parse_status_req(std::string data);
+    Report_Req   *parse_report_req(std::string data);
+    Retry_Req    *parse_retry_req(std::string data);
+    Clear_Req    *parse_clear_req(std::string data);
+    List_Req     *parse_list_req(std::string data);
+    Validate_Req *parse_validate_req(std::string data);
 
     // Parse: URI Request
-    Analyze_Req *parse_uri_analyze_req(const std::string& uri);
-    Status_Req  *parse_uri_status_req(const std::string& uri);
-    Report_Req  *parse_uri_report_req(const std::string& uri);
-    Retry_Req   *parse_uri_retry_req(const std::string& uri);
-    Clear_Req   *parse_uri_clear_req(const std::string& uri);
-    List_Req    *parse_uri_list_req(const std::string& uri);
+    Analyze_Req  *parse_uri_analyze_req(const std::string& uri);
+    Status_Req   *parse_uri_status_req(const std::string& uri);
+    Report_Req   *parse_uri_report_req(const std::string& uri);
+    Retry_Req    *parse_uri_retry_req(const std::string& uri);
+    Clear_Req    *parse_uri_clear_req(const std::string& uri);
+    List_Req     *parse_uri_list_req(const std::string& uri);
+    Validate_Req *parse_uri_validate_req(const std::string& uri);
 
     // Parse: Request
-    Analyze_Res *parse_analyze_res(std::string data);
-    Status_Res  *parse_status_res(std::string data);
-    Report_Res  *parse_report_res(std::string data);
-    Retry_Res   *parse_retry_res(std::string data);
-    Clear_Res   *parse_clear_res(std::string data);
-    List_Res    *parse_list_res(std::string data);
+    Analyze_Res  *parse_analyze_res(std::string data);
+    Status_Res   *parse_status_res(std::string data);
+    Report_Res   *parse_report_res(std::string data);
+    Retry_Res    *parse_retry_res(std::string data);
+    Clear_Res    *parse_clear_res(std::string data);
+    List_Res     *parse_list_res(std::string data);
+    Validate_Res *parse_validate_res(std::string data);
 
     std::string get_error() const { return error; }
 
@@ -353,6 +391,7 @@ private:
     Container::Value serialize_status_oks(std::vector<Status_Ok*>& array);
     Container::Value serialize_report_ok(Report_Ok& ok);
     Container::Value serialize_list_file(const std::string& file, int id);
+    Container::Value serialize_validate_ok(Validate_Ok* ok);
 
     int parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& args);
     int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
@@ -361,6 +400,7 @@ private:
     int parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& ok);
     int parse_report_ok(Container::Value *v, Report_Ok& ok);
     int parse_list_file(Container::Value *v, std::string& file, int& id);
+    int parse_validate_ok(Container::Value *v, std::vector<Validate_Ok*>& oks);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

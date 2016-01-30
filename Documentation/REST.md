@@ -11,6 +11,7 @@ It is used above an HTTP connection.
 #### Version 1.2
 
 * Add the List command
+* Add the Validate command
 
 #### Version 1.1
 
@@ -25,12 +26,13 @@ It is used above an HTTP connection.
 
 #### Command
 
-* Analyze: HTTP POST
-* Status:  HTTP GET
-* Report:  HTTP POST
-* Retry:   HTTP PUT
-* Clear:   HTTP DELETE
-* List:    HTTP GET
+* Analyze:  HTTP POST
+* Status:   HTTP GET
+* Report:   HTTP POST
+* Retry:    HTTP PUT
+* Clear:    HTTP DELETE
+* List:     HTTP GET
+* Validate: HTTP POST
 
 #### Analyze
 
@@ -179,6 +181,35 @@ Parameters:
 
 - file:              Filename of the file
 - id:                Internal id, id to be used by other request
+
+#### Validate
+
+JSON format for the parameters.
+
+##### Request
+
+Parameters:
+
+* args:              Array of arguments
+
+- id:                Integer: id given by the Analyze command
+- report:            report kind, only POLICY or IMPLEMENTATION are possible
+- policies_contents: Array of policies contents (Strings)
+- policies_names:    Array of policies names (Strings)
+
+##### Response
+
+Parameters:
+
+* ok:                Structure of the following parameters
+
+- id:                Integer: Id given by the request
+- valid:             Boolean: true if all policies are valid for this file
+
+* nok:               Array of invalid arguments
+
+- id:                Integer: id given by the request
+- error:             Integer: Error code corresponding to the error
 
 #### Report kinds
 

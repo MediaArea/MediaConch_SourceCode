@@ -80,7 +80,11 @@ public:
                                const std::vector<std::string>* policies_names = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
 
-    void list(std::vector<std::string>& vec);
+    void        list(std::vector<std::string>& vec);
+    int         validate(MediaConchLib::report report, const std::vector<std::string>& file,
+                         const std::vector<std::string>& policies_names,
+                         const std::vector<std::string>& policies_contents,
+                         std::vector<MediaConchLib::ValidateRes*>& result);
 
     // Apply display
     int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);
@@ -99,6 +103,7 @@ public:
     void set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
     void set_compression_mode(MediaConchLib::compression compress);
+    int get_ui_poll_request() const;
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;

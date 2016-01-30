@@ -56,84 +56,26 @@ namespace MediaConch {
 CheckerWindow::CheckerWindow(MainWindow *parent) : mainwindow(parent)
 {
     // Visual elements
-    progressBar=NULL;
-    MainView=NULL;
-    analyse=false;
+    progressBar = NULL;
+    MainView = NULL;
     result_index = 0;
 }
 
 CheckerWindow::~CheckerWindow()
 {
-    clearVisualElements();
     if (MainView)
     {
         mainwindow->remove_widget_from_layout(MainView);
+#if defined(WEB_MACHINE_ENGINE)
+        WebPage* page = (WebPage*)MainView->page();
+        QWebChannel *channel = page ? page->webChannel() : NULL;
+        if (channel)
+            channel->deregisterObject(page);
+#endif
         delete MainView;
+        MainView = NULL;
     }
-}
-
-//***************************************************************************
-// Helpers
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void CheckerWindow::checker_add_file(const QString& file, int policy)
-{
-    mainwindow->add_file_to_list(file);
-    update_web_view(file.toStdString(), policy);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::checker_add_files(QFileInfoList& list, int policy)
-{
-    for (int i = 0; i < list.count(); ++i)
-    {
-        QString file = list[i].absoluteFilePath();
-        mainwindow->add_file_to_list(file);
-    }
-    update_web_view(list, policy);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::checker_add_policy_file(const QString& file, QString& policy)
-{
-    mainwindow->add_file_to_list(file);
-
-    mainwindow->add_policy_to_list(policy);
-    update_web_view(file.toStdString(), -1);
-    mainwindow->clear_policy_list();
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::checker_add_policy_files(QFileInfoList& list, QString& policy)
-{
-    for (int i = 0; i < list.count(); ++i)
-    {
-        QString file = list[i].absoluteFilePath();
-        mainwindow->add_file_to_list(file);
-    }
-    mainwindow->add_policy_to_list(policy);
-    update_web_view(list, -1);
-    mainwindow->clear_policy_list();
-}
-
-//---------------------------------------------------------------------------
-bool CheckerWindow::is_analyzes_done()
-{
-    return analyse;
-}
-
-//***************************************************************************
-// Slots
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void CheckerWindow::actionCloseAllTriggered()
-{
-    mainwindow->clear_file_list();
     clearVisualElements();
-    create_web_view();
-    analyse = false;
 }
 
 //***************************************************************************
@@ -150,7 +92,7 @@ void CheckerWindow::clearVisualElements()
     {
         mainwindow->remove_widget_from_layout(progressBar);
         delete progressBar;
-        progressBar=NULL;
+        progressBar = NULL;
     }
 }
 
@@ -158,13 +100,17 @@ void CheckerWindow::clearVisualElements()
 void CheckerWindow::createWebViewFinished(bool ok)
 {
     if (!MainView || !ok)
-        return; //TODO: Error
+    {
+        create_web_view();
+        mainwindow->set_msg_error_to_status_bar("Problem to load the checker page");
+        return;
+    }
 
     if (progressBar)
     {
         mainwindow->remove_widget_from_layout(progressBar);
         delete progressBar;
-        progressBar=NULL;
+        progressBar = NULL;
     }
     mainwindow->set_widget_to_layout(MainView);
 }
@@ -174,12 +120,6 @@ void CheckerWindow::set_web_view_content(QString& html)
 {
     if (!MainView)
         MainView = new WebView(mainwindow);
-    else
-    {
-        clearVisualElements();
-        MainView->show();
-        return;
-    }
 
     WebPage* page = new WebPage(mainwindow, MainView);
     MainView->setPage(page);
@@ -203,7 +143,17 @@ void CheckerWindow::set_web_view_content(QString& html)
 void CheckerWindow::create_web_view()
 {
     if (MainView)
-        return;
+    {
+        mainwindow->remove_widget_from_layout(MainView);
+#if defined(WEB_MACHINE_ENGINE)
+        WebPage* page = (WebPage*)MainView->page();
+        QWebChannel *channel = page ? page->webChannel() : NULL;
+        if (channel)
+            channel->deregisterObject(page);
+#endif
+        delete MainView;
+        MainView = NULL;
+    }
 
     clearVisualElements();
 
@@ -213,154 +163,6 @@ void CheckerWindow::create_web_view()
     progressBar->show();
 
     QString html = create_html();
-    set_web_view_content(html);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::update_web_view(std::string file, int policy)
-{
-    if (!MainView)
-        return;
-
-    QString html;
-#if defined(WEB_MACHINE_KIT)
-    html = MainView->page()->currentFrame()->toHtml();;
-#endif
-    //Load the new page
-    clearVisualElements();
-
-    progressBar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progressBar);
-    progressBar->show();
-    progressBar->get_progress_bar()->setValue(1);
-    progressBar->get_progress_bar()->setMaximum(0);
-    progressBar->get_progress_bar()->setMaximum(100);
-
-    // Analyze
-    std::vector<std::string> files;
-    files.push_back(file);
-    int ret = 0;
-    if ((ret = mainwindow->analyze(files)) < 0)
-    {
-        set_error_http((MediaConchLib::errorHttp)ret);
-        set_web_view_content(html);
-        return;
-    }
-
-    // TODO: do a signal/slot to update percent auto-magically
-    while (1)
-    {
-        double percent_done;
-        ret = mainwindow->is_analyze_finished(files, percent_done);
-        if (ret)
-            break;
-        progressBar->get_progress_bar()->setValue(percent_done);
-        #ifdef WINDOWS
-        ::Sleep((DWORD)50);
-        #else
-        usleep(50000);
-        #endif
-    }
-
-    if (ret < 0)
-    {
-        set_error_http((MediaConchLib::errorHttp)ret);
-        set_web_view_content(html);
-        return;
-    }
-
-    //Add the file detail to the web page
-#if defined(WEB_MACHINE_ENGINE)
-    add_file_detail_to_html(file, policy);
-#endif
-#if defined(WEB_MACHINE_KIT)
-    add_file_detail_to_html(file, policy, html);
-    delete MainView;
-    MainView = NULL;
-#endif
-
-    analyse = true;
-    set_web_view_content(html);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::update_web_view(QList<QFileInfo>& files, int policy)
-{
-    if (!MainView)
-        return;
-
-    QString html;
-#if defined(WEB_MACHINE_KIT)
-    html = MainView->page()->currentFrame()->toHtml();;
-#endif
-
-    //Load the new page
-    clearVisualElements();
-    progressBar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progressBar);
-    progressBar->show();
-    progressBar->get_progress_bar()->setValue(1);
-    progressBar->get_progress_bar()->setMaximum(0);
-
-    // Analyze
-    std::vector<std::string> vfiles;
-    for (int i = 0; i < files.count(); ++i)
-        vfiles.push_back(files[i].absoluteFilePath().toStdString());
-
-    progressBar->get_progress_bar()->setMaximum(100);
-    progressBar->get_progress_bar()->setValue(1);
-
-    int ret = 0;
-    if ((ret = mainwindow->analyze(vfiles)) < 0)
-    {
-        set_error_http((MediaConchLib::errorHttp)ret);
-        set_web_view_content(html);
-        return;
-    }
-
-    while (1)
-    {
-        double percent_done;
-        ret = mainwindow->is_analyze_finished(vfiles, percent_done);
-        if (ret)
-            break;
-        progressBar->get_progress_bar()->setValue(percent_done / 2);
-        #ifdef WINDOWS
-        ::Sleep((DWORD)50);
-        #else
-        usleep(50000);
-        #endif
-    }
-
-    if (ret < 0)
-    {
-        set_error_http((MediaConchLib::errorHttp)ret);
-        set_web_view_content(html);
-        return;
-    }
-
-    //Add the files details to the web page
-    QString displayXsltRetain = display_xslt;
-    for (int i = 0; i < files.count(); ++i)
-    {
-        display_xslt = displayXsltRetain;
-        std::string file = files[i].absoluteFilePath().toStdString();
-#if defined(WEB_MACHINE_ENGINE)
-        add_file_detail_to_html(file, policy);
-#endif
-#if defined(WEB_MACHINE_KIT)
-        add_file_detail_to_html(file, policy, html);
-#endif
-        progressBar->get_progress_bar()->setValue(50 + ((i + 1) * 50) / files.count());
-    }
-    reset_display_xslt();
-    analyse = true;
-
-#if defined(WEB_MACHINE_KIT)
-    delete MainView;
-    MainView = NULL;
-#endif
-
     set_web_view_content(html);
 }
 
@@ -651,15 +453,17 @@ void CheckerWindow::change_body_in_template(QString& body, QString& html)
 
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
-    {
         html.replace(pos, reg.matchedLength(), body);
-    }
 }
 
 //---------------------------------------------------------------------------
 QString CheckerWindow::create_html_base(QString& body)
 {
-    QFile template_html(":/base.html");
+#if defined(WEB_MACHINE_KIT)
+    QFile template_html(":/baseKit.html");
+#elif defined(WEB_MACHINE_ENGINE)
+    QFile template_html(":/baseEngine.html");
+#endif
 
     template_html.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray html = template_html.readAll();
@@ -677,458 +481,6 @@ QString CheckerWindow::create_html()
     QString body = create_html_body();
     QString base = create_html_base(body);
     return base;
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::change_html_file_detail_inform_xml(QString& html, std::string& file)
-{
-    QRegExp reg("data-filename=\"\\{\\{ check\\.getInfo \\}\\}\"");
-    reg.setMinimal(true);
-
-    int pos = 0;
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-filename=\"%1\"").arg(QString().fromUtf8(file.c_str(), file.length())));
-
-    reg = QRegExp("\\{\\{ check\\.getInfo\\.jstree\\|raw \\}\\}");
-    reg.setMinimal(true);
-
-    QString report = mainwindow->get_mediainfo_jstree(file);
-    pos = 0;
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), report);
-
-    reg = QRegExp("data-save-name=\"MediaInfo.xml\"");
-    reg.setMinimal(true);
-
-    while ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.MediaInfo.xml\"")
-                     .arg(QString().fromUtf8(file.c_str(), file.length())));
-
-    reg = QRegExp("<div id=\"infoXml\\d+\" class=\"hidden\">");
-    if ((pos = reg.indexIn(html, 0)) != -1)
-    {
-        reg = QRegExp("<p class=\"modal-body\">");
-        if ((pos = reg.indexIn(html, pos)) != -1)
-        {
-            std::string display_name;
-            std::string display_content;
-            report = mainwindow->get_mediainfo_xml(file, display_name, display_content);
-#if QT_VERSION >= 0x050200
-            report = report.toHtmlEscaped();
-#else
-            report = Qt::escape(report);
-#endif
-            report.replace(' ', "&nbsp;");
-            report.replace('\n', "<br/>");
-            html.insert(pos + reg.matchedLength(), report);
-        }
-    }
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::change_html_file_detail_conformance(QString& html, std::string& file)
-{
-    std::string display_name;
-    std::string display_content;
-    get_displays_use(display_name, display_content);
-
-    bool is_valid = true;
-    QString report = mainwindow->get_implementationreport_xml(file, display_name, display_content, is_valid);
-    bool is_html = report_is_html(report);
-    QString save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-
-    // Apply HTML default display
-    std::string r = report.toStdString();
-
-    if (!is_html)
-    {
-#if QT_VERSION >= 0x050200
-        report = report.toHtmlEscaped();
-#else
-        report = Qt::escape(report);
-#endif
-        report.replace(' ', "&nbsp;");
-        report.replace('\n', "<br/>\n");
-    }
-
-    QRegExp reg("Implementation report");
-    int pos = 0;
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, 0)) != -1)
-    {
-        reg = QRegExp("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
-        reg.setMinimal(true);
-        if ((pos = reg.indexIn(html, pos)) != -1)
-            html.replace(pos, reg.matchedLength(), is_valid ? "success" : "danger");
-        reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
-        reg.setMinimal(true);
-        if ((pos = reg.indexIn(html, pos)) != -1)
-            html.replace(pos, reg.matchedLength(), is_valid ? "" : "not ");
-    }
-
-    reg = QRegExp("\\{\\{ check\\.getConformance\\|replace\\(\\{' ': '\\&nbsp;'\\}\\)\\|raw\\|nl2br \\}\\}");
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), report);
-
-    reg = QRegExp("data-save-name=\"ImplementationReport.txt\"");
-    reg.setMinimal(true);
-
-    while ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.ImplementationReport.%2\"")
-                     .arg(QString().fromUtf8(file.c_str(), file.length())).arg(save_ext));
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::change_html_file_detail_policy_report(QString& html, std::string& file, int policy)
-{
-    if (policy == -1 && !mainwindow->policy_file_registered().size())
-    {
-        remove_html_file_detail_policy_report(html);
-        return;
-    }
-
-    std::string display_name;
-    std::string display_content;
-    get_displays_use(display_name, display_content);
-
-    std::string r;
-    bool valid = mainwindow->validate_policy(file, policy, display_name, display_content, r);
-    QString report = QString().fromUtf8(r.c_str(), r.length());
-
-    bool is_html = report_is_html(report);
-    QString save_ext = is_html ? "html" : report_is_xml(report) ? "xml" : "txt";
-
-    QString policy_name;
-    if (policy >= 0)
-    {
-        const std::string& title = mainwindow->get_all_policies()[policy]->title;
-        policy_name = QString().fromUtf8(title.c_str(), title.length());
-    }
-    else
-    {
-        const std::vector<std::string>& policies_name = mainwindow->policy_file_registered();
-        if (policies_name.size())
-        {
-            const std::string& name = policies_name.front();
-            QFileInfo qfile(QString().fromUtf8(name.c_str(), name.length()));
-            policy_name = qfile.baseName();
-        }
-    }
-
-    if (!is_html)
-    {
-#if QT_VERSION >= 0x050200
-        report = report.toHtmlEscaped();
-#else
-        report = Qt::escape(report);
-#endif
-        report.replace('\n', "<br/>\n");
-    }
-    change_report_policy_save_name(file, save_ext, html);
-
-    QRegExp reg("\\{\\{ check\\.getPolicy \\}\\}");
-    reg.setMinimal(true);
-    int pos = 0;
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), policy_name);
-
-    reg = QRegExp("\\{\\{ check\\.getStatus \\? 'success' : 'danger' \\}\\}");
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) != -1)
-    {
-        if (!valid)
-            html.replace(pos, reg.matchedLength(), "danger");
-        else
-            html.replace(pos, reg.matchedLength(), "success");
-    }
-
-    reg = QRegExp("\\{\\{ check\\.getStatus \\? '' : 'not ' \\}\\}");
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, 0)) != -1)
-    {
-        if (!valid)
-            html.replace(pos, reg.matchedLength(), "not ");
-        else
-            html.replace(pos, reg.matchedLength(), QString());
-    }
-
-    reg = QRegExp("\\{% if check\\.getPolicy\\|length > 0 %\\}");
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), report);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::change_html_file_detail_trace(QString& html, std::string& file)
-{
-    QRegExp reg("data-filename=\"\\{\\{ check\\.getTrace \\}\\}\"");
-    reg.setMinimal(true);
-
-    int pos = 0;
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-filename=\"%1\"").arg(QString().fromUtf8(file.c_str(), file.length())));
-
-    reg = QRegExp("\\{\\{ check\\.getTrace\\.jstree\\|raw \\}\\}");
-    reg.setMinimal(true);
-
-    QString report = mainwindow->get_mediatrace_jstree(file);
-    pos = 0;
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), report);
-
-    reg = QRegExp("data-save-name=\"MediaTrace.xml\"");
-    reg.setMinimal(true);
-
-    while ((pos = reg.indexIn(html, 0)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.MediaTrace.xml\"")
-                     .arg(QString().fromUtf8(file.c_str(), file.length())));
-
-    reg = QRegExp("<div id=\"traceXml\\d+\" class=\"hidden\">");
-    if ((pos = reg.indexIn(html, 0)) != -1)
-    {
-        reg = QRegExp("<p class=\"modal-body\">");
-        if ((pos = reg.indexIn(html, pos)) != -1)
-        {
-            std::string display_name;
-            std::string display_content;
-            report = mainwindow->get_mediatrace_xml(file, display_name, display_content);
-#if QT_VERSION >= 0x050200
-            report = report.toHtmlEscaped();
-#else
-            report = Qt::escape(report);
-#endif
-            report.replace(' ', "&nbsp;");
-            report.replace('\n', "<br/>");
-            html.insert(pos + reg.matchedLength(), report);
-        }
-    }
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::change_html_file_detail(QString& html, std::string& file)
-{
-    QRegExp reg("\\{\\{ check.getSource \\}\\}");
-
-    QFileInfo f(QString().fromUtf8(file.c_str(), file.length()));
-    int pos = 0;
-
-    reg.setMinimal(true);
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), f.fileName());
-
-    reg = QRegExp("\\{\\{ loop\\.index \\}\\}");
-    pos = 0;
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("%1").arg(result_index));
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::remove_html_file_detail_policy_report(QString& html)
-{
-    QRegExp reg("<li class=\"list-group-item report policyResult\">");
-    reg.setMinimal(true);
-    int pos = 0;
-    if ((pos = reg.indexIn(html, pos)) == -1)
-        return;
-    html.insert(pos + 26, " hidden");
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::create_html_file_detail(std::string& file, int policy, QString& base)
-{
-    QFile template_html(":/fileDetailChecker.html");
-
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = template_html.readAll();
-    template_html.close();
-
-    base = QString(html);
-    change_html_file_detail(base, file);
-    change_html_file_detail_conformance(base, file);
-    change_html_file_detail_inform_xml(base, file);
-    // /!\: always has to be after inform_xml (need to be runned one time)
-    change_html_file_detail_policy_report(base, file, policy);
-    change_html_file_detail_trace(base, file);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::add_script_js_tree(std::string& file)
-{
-    QFile f(":/fileDetailChecker.js");
-
-    f.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray content = f.readAll();
-    f.close();
-
-    QString script("var x = document.createElement(\"SCRIPT\");");
-    QString html(content);
-
-    change_html_file_detail(html, file);
-    change_html_file_detail_inform_xml(html, file);
-    change_html_file_detail_trace(html, file);
-
-    html = html.replace("\\", "\\\\");
-    html = html.replace("'", "\\'");
-    html = html.replace("\n", "");
-    html = html.replace("\r", "");
-    script += QString("x.text = '%1';").arg(html);
-
-    script += QString("document.body.appendChild(x);");
-    //update file results
-    script += QString("update_results();");
-    WebPage* page = (WebPage*)(MainView->page());
-    page->use_javascript(script);
-}
-
-#if defined(WEB_MACHINE_ENGINE)
-
-//---------------------------------------------------------------------------
-void CheckerWindow::add_file_detail_to_html(std::string& file, int policy)
-{
-    ++result_index;
-
-    QString new_html;
-    create_html_file_detail(file, policy, new_html);
-
-    new_html = new_html.replace("\\", "\\\\");
-    new_html = new_html.replace("'", "\\'");
-    new_html = new_html.replace("\n", "");
-    new_html = new_html.replace("\r", "");
-    new_html = QString("$('#display_result').prepend('") + new_html + QString("');");
-
-    WebPage* page = (WebPage*)(MainView->page());
-    page->use_javascript(new_html);
-
-    add_script_js_tree(file);
-}
-
-#endif
-#if defined(WEB_MACHINE_KIT)
-
-//---------------------------------------------------------------------------
-void CheckerWindow::add_file_detail_to_html(std::string& file, int policy, QString& html)
-{
-    ++result_index;
-
-    QString new_html;
-    create_html_file_detail(file, policy, new_html);
-
-    QFile f(":/fileDetailChecker.js");
-    f.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray content = f.readAll();
-    f.close();
-    QString js(content);
-
-    js = QString("<script>") + js + QString("</script>");
-    change_html_file_detail(js, file);
-    change_html_file_detail_inform_xml(js, file);
-    change_html_file_detail_trace(js, file);
-
-    new_html += js;
-
-    QRegExp reg("<div class=\"col-md-6\" id=\"display_result\">");
-    reg.setMinimal(true);
-
-    int pos = 0;
-    if ((pos = reg.indexIn(html, pos)) != -1)
-    {
-        pos += reg.matchedLength();
-        html.insert(pos, new_html);
-    }
-}
-
-#endif
-
-//---------------------------------------------------------------------------
-bool CheckerWindow::report_is_html(QString& report)
-{
-    QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
-
-    if (reg.indexIn(report, 0) != -1)
-        return true;
-
-    return false;
-}
-
-//---------------------------------------------------------------------------
-bool CheckerWindow::report_is_xml(QString& report)
-{
-    QRegExp reg("<\\?xml ", Qt::CaseInsensitive);
-
-    if (reg.indexIn(report, 0) != -1)
-        return true;
-
-    return false;
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::change_report_policy_save_name(std::string& file, QString& ext, QString& html)
-{
-    QRegExp reg("data-save-name=\"PolicyReport.txt\"");
-    reg.setMinimal(true);
-
-    int pos = 0;
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("data-save-name=\"%1.MediaConch.%2\"")
-                     .arg(QString().fromUtf8(file.c_str(), file.length())).arg(ext));
-}
-
-//---------------------------------------------------------------------------
-QString CheckerWindow::file_remove_ext(std::string& file)
-{
-    QFileInfo f(QString().fromUtf8(file.c_str(), file.length()));
-
-    QString ret = f.baseName();
-    int pos;
-    if ((pos = ret.lastIndexOf('.')) != -1)
-        ret.chop(ret.length() - pos);
-    return ret;
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::get_displays_use(std::string& display_name, std::string& display_content)
-{
-    if (display_xslt.length())
-    {
-        if (display_xslt.startsWith(":/displays/"))
-        {
-            QFile display_file(display_xslt);
-            if (display_file.open(QIODevice::ReadOnly | QIODevice::Text))
-            {
-                QByteArray data = display_file.readAll();
-                display_file.close();
-                display_content = data.data();
-            }
-        }
-        else
-            display_name = display_xslt.toStdString();
-    }
-    else
-        display_content = implementation_report_display_html_xsl;
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::set_error_http(MediaConchLib::errorHttp code)
-{
-    QString error_msg;
-    switch (code)
-    {
-        case MediaConchLib::errorHttp_INVALID_DATA:
-            error_msg = "Data sent to the daemon is not correct";
-            break;
-        case MediaConchLib::errorHttp_INIT:
-            error_msg = "Cannot initialize the HTTP connection";
-            break;
-        case MediaConchLib::errorHttp_CONNECT:
-            error_msg = "Cannot connect to the daemon";
-            break;
-        default:
-            error_msg = "Error not known";
-            break;
-    }
-    mainwindow->set_msg_error_to_status_bar(error_msg);
 }
 
 }

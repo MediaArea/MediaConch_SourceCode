@@ -33,18 +33,9 @@ public:
 
     // Functions
     void                        create_web_view();
-    void                        update_web_view(std::string file, int policy);
-    void                        update_web_view(QList<QFileInfo>& files, int policy);
     void                        set_display_xslt(const QString& d) { display_xslt = d; }
     void                        reset_display_xslt() { display_xslt.clear(); }
     void                        change_local_files(QStringList& files);
-
-    // Helpers
-    void                        checker_add_file(const QString& file, int policy);
-    void                        checker_add_files(QList<QFileInfo>& file, int policy);
-    void                        checker_add_policy_file(const QString& file, QString& policy);
-    void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
-    bool                        is_analyzes_done();
 
 private:
     // Visual elements
@@ -52,12 +43,10 @@ private:
     WebView*                    MainView;
     ProgressBar*                progressBar;
     QString                     display_xslt;
-    bool                        analyse;
     unsigned int                result_index;
 
     void                        clearVisualElements();
     void                        set_web_view_content(QString& html);
-    void                        set_error_http(MediaConchLib::errorHttp error);
 
 //***************************************************************************
 // HELPER
@@ -87,22 +76,7 @@ private:
 #if defined(WEB_MACHINE_KIT)
     void add_file_detail_to_html(std::string& file, int policy, QString& html);
 #endif
-    void create_html_file_detail(std::string& file, int policy, QString& html);
-    void change_html_file_detail(QString& html, std::string& file);
-    void change_html_file_detail_inform_xml(QString& html, std::string& file);
-    void change_html_file_detail_conformance(QString& html, std::string& file);
-    void change_html_file_detail_policy_report(QString& html, std::string& file, int policy);
-    void change_html_file_detail_trace(QString& html, std::string& file);
-    void remove_html_file_detail_policy_report(QString& html);
-    bool report_is_html(QString &report);
-    bool report_is_xml(QString &report);
-    bool is_policy_html_valid(QString &report);
-    void change_report_policy_save_name(std::string& file, QString& ext, QString& html);
-    QString file_remove_ext(std::string& file);
-    void get_displays_use(std::string& display_name, std::string& display_content);
 
-public Q_SLOTS:
-    void actionCloseAllTriggered();
 private Q_SLOTS:
     void createWebViewFinished(bool ok);
 };

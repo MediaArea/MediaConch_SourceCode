@@ -6,12 +6,21 @@
 
 #include "resultwindow.h"
 #include "mainwindow.h"
-#include <QWebView>
 #include <QString>
 #include <QProgressBar>
+#include <QTimer>
+#include <QDebug>
 
 #include "WebView.h"
 #include "WebPage.h"
+
+#if defined(WEB_MACHINE_ENGINE)
+#include <QWebChannel>
+#endif
+#if defined(WEB_MACHINE_KIT)
+#include <QWebFrame>
+#endif
+
 #include "progressbar.h"
 
 namespace MediaConch {
@@ -21,13 +30,21 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-ResultWindow::ResultWindow(MainWindow* m) : mainwindow(m), view(NULL)
+ResultWindow::ResultWindow(MainWindow* m) : mainwindow(m), view(NULL), default_update_timer(5000)
 {
+    progressBar = NULL;
+    update_timer = NULL;
 }
 
 //---------------------------------------------------------------------------
 ResultWindow::~ResultWindow()
 {
+    if (update_timer)
+    {
+        update_timer->stop();
+        delete update_timer;
+        update_timer = NULL;
+    }
     clear_visual_elements();
 }
 
@@ -44,15 +61,163 @@ void ResultWindow::create_web_view_finished(bool ok)
         progressBar = NULL;
     }
     mainwindow->set_widget_to_layout(view);
+    update_timer = new QTimer(this);
+    update_timer->setSingleShot(true);
+    connect(update_timer, SIGNAL(timeout()), this, SLOT(start_timer_update()));
+    update_timer->start(0);
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::start_timer_update()
+{
+    if (update_timer)
+    {
+        delete update_timer;
+        update_timer = NULL;
+    }
+
+    std::vector<std::string> vec;
+    for (size_t i = 0; i < to_update_files.size(); ++i)
+    {
+        MainWindow::FileRegistered* file = mainwindow->get_file_registered_from_file(to_update_files[i]);
+        if (!file)
+            continue;
+        WebPage* page = (WebPage*)view->page();
+        page->update_status_registered_file(file);
+        if (!file->analyzed)
+            vec.push_back(to_update_files[i]);
+    }
+
+    if (vec.size())
+    {
+        to_update_files = vec;
+        update_timer = new QTimer(this);
+        update_timer->setSingleShot(true);
+        connect(update_timer, SIGNAL(timeout()), this, SLOT(start_timer_update()));
+        update_timer->start(default_update_timer);
+    }
+    else
+        to_update_files.clear();
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::add_displays_file_detail_end(QString& html)
+{
+    QFile template_html(":/fileDetailCheckerTableEnd.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray data = template_html.readAll();
+    template_html.close();
+
+    html += QString(data);
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::add_displays_file_detail_table_end(QString& html)
+{
+    html += "</tbody></table>";
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::add_displays_file_detail_modal(MainWindow::FileRegistered* file, QString& base)
+{
+#if defined(WEB_MACHINE_ENGINE)
+    QFile template_html(":/fileDetailCheckerTableModalEngine.html");
+#elif defined(WEB_MACHINE_KIT)
+    QFile template_html(":/fileDetailCheckerTableModalKit.html");
+#endif
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray data = template_html.readAll();
+    template_html.close();
+
+    QString html(data);
+    change_html_file_detail(file, html);
+
+    base += QString(html);
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::add_displays_file_detail_element(MainWindow::FileRegistered* file, QString& base)
+{
+    QFile template_html(":/fileDetailCheckerTableElement.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray data = template_html.readAll();
+    template_html.close();
+
+    QString html(data);
+    change_html_file_detail(file, html);
+
+    base += QString(html);
 }
 
 //---------------------------------------------------------------------------
 void ResultWindow::update_html_with_results(QString& html)
 {
-    const std::vector<std::string>& vec = mainwindow->get_registered_files();
+    QString bottom;
+    const std::vector<MainWindow::FileRegistered*>& vec = mainwindow->get_registered_files();
 
-    for (size_t i = 0; i< vec.size(); ++i)
-        html += QString("<h2>File number:%1: %2</h2>").arg(i).arg(vec[i].c_str());
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        if (!vec[i])
+            continue;
+
+        std::string filename(vec[i]->filepath + "/" + vec[i]->filename);
+        to_update_files.push_back(filename);
+        vec[i]->index = result_index;
+
+        add_displays_file_detail_element(vec[i], html);
+        add_displays_file_detail_modal(vec[i], bottom);
+        result_index++;
+    }
+
+    add_displays_file_detail_table_end(html);
+    html += bottom;
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::add_displays_file_detail_start(QString& html)
+{
+
+    QFile template_html(":/fileDetailCheckerTableStart.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray data = template_html.readAll();
+    template_html.close();
+
+    html = QString(data);
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::change_body_in_template(QString& body, QString& html)
+{
+    QRegExp reg("\\{% block body %\\}\\{% endblock %\\}");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        QString start = html.left(pos);
+        QString end = html.right(html.length() - pos - reg.matchedLength());
+        html = start + body + end;
+    }
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::create_html_base(QString& html)
+{
+#if defined(WEB_MACHINE_KIT)
+    QFile template_html(":/baseKit.html");
+#elif defined(WEB_MACHINE_ENGINE)
+    QFile template_html(":/baseEngine.html");
+#endif
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray data = template_html.readAll();
+    template_html.close();
+
+    html = QString(data);
+    result_index = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -86,8 +251,16 @@ void ResultWindow::display_results()
     progressBar->get_progress_bar()->setValue(0);
     progressBar->show();
 
-    QString html("<h1>RESULT PAGE</h1>");
-    update_html_with_results(html);
+    QString html;
+    create_html_base(html);
+
+    QString body;
+    add_displays_file_detail_start(body);
+    update_html_with_results(body);
+    add_displays_file_detail_end(body);
+
+    change_body_in_template(body, html);
+
     set_web_view_content(html);
 }
 
@@ -97,6 +270,12 @@ void ResultWindow::clear_visual_elements()
     if (view)
     {
         mainwindow->remove_widget_from_layout(view);
+#if defined(WEB_MACHINE_ENGINE)
+        WebPage* page = (WebPage*)view->page();
+        QWebChannel *channel = page ? page->webChannel() : NULL;
+        if (channel)
+            channel->deregisterObject(page);
+#endif
         delete view;
         view = NULL;
     }
@@ -107,6 +286,68 @@ void ResultWindow::clear_visual_elements()
         delete progressBar;
         progressBar=NULL;
     }
+}
+
+//---------------------------------------------------------------------------
+void ResultWindow::change_html_file_detail(MainWindow::FileRegistered* file, QString& html)
+{
+    std::string full_name = file->filepath;
+    if (full_name.length())
+        full_name += "/";
+    full_name += file->filename;
+
+    QFileInfo f(QString().fromUtf8(full_name.c_str(), full_name.length()));
+    QString policy;
+    Policy *p = mainwindow->get_policy(file->policy);
+    if (p)
+        policy = QString().fromStdString(p->title);
+    else
+        policy = "N/A";
+
+    QRegExp reg("\\{\\{ check.getSource \\}\\}");
+    int pos = 0;
+    reg.setMinimal(true);
+    QString filepath = f.filePath();
+    filepath = filepath.replace("\\", "\\\\");
+    filepath = filepath.replace("'", "\\'");
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), filepath);
+
+    reg = QRegExp("\\{\\{ check.filename \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), f.fileName());
+
+    reg = QRegExp("\\{\\{ check.policyname \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), policy);
+
+    reg = QRegExp("\\{\\{ check.filename \\| truncate\\(20\\) \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    QString fname;
+    if (f.fileName().length() > 20)
+        fname = QString(f.fileName().right(20)) + "...";
+    else
+        fname = QString(f.fileName());
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), fname);
+
+    reg = QRegExp("\\{\\{ check.policyname \\| truncate\\(20\\) \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    fname = QString(policy.left(20));
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), fname);
+
+    reg = QRegExp("\\{\\{ loop\\.index \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("%1").arg(result_index));
 }
 
 }

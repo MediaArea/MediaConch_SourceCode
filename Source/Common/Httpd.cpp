@@ -65,6 +65,7 @@ int Httpd::send_result()
 
     MAKE_REQ_FUNC(analyze, Analyze)
     MAKE_REQ_FUNC(report, Report)
+    MAKE_REQ_FUNC(validate, Validate)
     MAKE_REQ_FUNC(retry, Retry)
 
 #undef MAKE_REQ_FUNC

@@ -39,8 +39,38 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    // Internal
+    struct FileRegistered
+    {
+        FileRegistered() : policy(-1), display(-1), analyze_percent(0), analyzed(false), implementation_valid(false), policy_valid(false) {}
+
+        std::string  filename;
+        std::string  filepath;
+        int          policy;
+        int          display;
+
+        double       analyze_percent;
+        bool         analyzed;
+        bool         implementation_valid;
+        bool         policy_valid;
+
+        unsigned int index;
+    };
+
+    // View selected
+    enum Run_View
+    {
+        RUN_CHECKER_VIEW,
+        RUN_RESULT_VIEW,
+        RUN_POLICIES_VIEW,
+        RUN_DISPLAY_VIEW,
+    };
+    void Run();
+
     // Functions
-    void add_file_to_list(const QString& file);
+    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display);
+    void remove_file_to_list(const QString& file);
+    void clear_file_list();
     void policy_to_delete(int row);
     int  exporting_to_schematron_file(size_t pos);
     int  exporting_to_unknown_file(size_t pos);
@@ -53,17 +83,13 @@ public:
     void                        set_msg_to_status_bar(const QString& message);
     void                        set_msg_error_to_status_bar(const QString& message);
     void                        clear_msg_in_status_bar();
+    void                        set_result_view();
 
     // Helpers
-    void                        Run();
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
     int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
-    void                        checker_add_file(const QString& file, int policy);
-    void                        checker_add_files(QList<QFileInfo>& file, int policy);
-    void                        checker_add_policy_file(const QString& file, QString& policy);
-    void                        checker_add_policy_files(QList<QFileInfo>& file, QString& policy);
     int                         analyze(const std::vector<std::string>& files);
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
     QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content, bool& is_valid);
@@ -79,15 +105,12 @@ public:
     void                        display_selected();
     void                        add_default_policy();
     void                        add_default_displays();
-    bool                        validate_policy(const std::string& file, int policy, const std::string& display_name, const std::string& display_content, std::string& report);
-    bool                        validate_policies(const std::string& file, const std::string& display_name,
-                                                  const std::string& display_content,
-                                                  std::string& report);
+    void                        get_implementation_report(const std::string& file, QString& report);
+    int                         validate_policy(const std::string& file, QString& report, int policy=-1);
     bool                        is_all_policies_saved();
 
     void                        add_policy_to_list(const QString& policy);
     void                        clear_policy_list();
-    void                        clear_file_list();
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
     int                         import_policy(const QString& file, std::string& err);
@@ -97,12 +120,13 @@ public:
     void                        remove_policy(size_t pos);
     void                        clear_policies();
     size_t                      get_policies_count() const;
+    FileRegistered*             get_file_registered_from_file(const std::string& file);
+    void                        remove_file_registered_from_file(const std::string& file);
 
-    const std::vector<Policy *>&    get_all_policies() const;
-    std::vector<QString>&           get_displays();
-    const std::vector<std::string>& policy_file_registered();
-    QString                         get_local_folder() const;
-    const std::vector<std::string>& get_registered_files();
+    const std::vector<Policy *>&        get_all_policies() const;
+    std::vector<QString>&               get_displays();
+    QString                             get_local_folder() const;
+    const std::vector<FileRegistered*>& get_registered_files();
 
     const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
     const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
@@ -112,9 +136,9 @@ private:
     Ui::MainWindow *ui;
 
     // Internal
-    MediaConchLib            MCL;
-    std::vector<std::string> registered_files;
-    std::vector<std::string> policies;
+    MediaConchLib                MCL;
+    std::vector<FileRegistered*> registered_files;
+    std::vector<QString>         displays_list;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -125,8 +149,6 @@ private:
     MenuMainWindow*             MenuView;
     QLineEdit*                  status_msg;
 
-    std::vector<QString>        displays_list;
-
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();
@@ -136,22 +158,25 @@ private:
     void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
 
-    enum Run_View
-    {
-        RUN_CHECKER_VIEW,
-        RUN_RESULT_VIEW,
-        RUN_POLICIES_VIEW,
-        RUN_DISPLAY_VIEW,
-    };
+    void                        fill_display_used(std::string& display_name, std::string& display_content,
+                                                  const std::string*& dname, const std::string*& dcontent,
+                                                  FileRegistered* fr);
+    void                        set_error_http(MediaConchLib::errorHttp code);
+
     Run_View current_view;
+
+Q_SIGNALS:
+    void setResultView();
 
 private Q_SLOTS:
     void on_actionOpen_triggered();
+    void on_actionChooseSchema_triggered();
+
+    // View
     void on_actionChecker_triggered();
     void on_actionResult_triggered();
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
-    void on_actionChooseSchema_triggered();
 
     //Help
     void on_actionAbout_triggered();

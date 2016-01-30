@@ -24,6 +24,7 @@ It should be an array of entries with each entry corresponding to the option wan
 * **Daemon\_Address**: in client and daemon mode, give the address where the daemon should bind, default 0.0.0.0.
 * **Daemon\_Port**: in client and daemon mode, give the port where the daemon should bind, default 80.
 * **Scheduler\_Max\_Threads**: give the number of cores which process files.
+* **UI\_Poll\_Request**: set the value of the timer to refresh the UI in millisecond, default is 5000. It must be more than 500 and less than 10000.
 
 
 #### Example

@@ -248,6 +248,26 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::validate(report report, const std::vector<std::string>& files,
+                            const std::vector<std::string>& policies_names,
+                            const std::vector<std::string>& policies_contents,
+                            std::vector<ValidateRes*>& result)
+{
+    if (!files.size())
+        return errorHttp_INVALID_DATA;
+
+    if (report != report_MediaConch && !policies_names.size() && !policies_contents.size())
+        return errorHttp_INVALID_DATA;
+
+    if (use_daemon)
+        return daemon_client->validate(report, files, policies_names, policies_contents,
+                                       result);
+
+    return core->validate(report, files, policies_names, policies_contents,
+                          result);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::remove_report(const std::vector<std::string>& files)
 {
     if (!files.size())
@@ -333,6 +353,12 @@ void MediaConchLib::set_compression_mode(compression compress)
 {
     if (core)
         core->set_compression_mode(compress);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::get_ui_poll_request() const
+{
+    return core->get_ui_poll_request();
 }
 
 //***************************************************************************

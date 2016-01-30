@@ -257,6 +257,29 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (!result.length())
             error = rest.get_error();
     }
+    else if (!std::string("/validate").compare(uri_path))
+    {
+        RESTAPI::Validate_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Validate_Res res;
+        if (commands.validate_cb && commands.validate_cb(r, res, parent) < 0)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        result = rest.serialize_validate_res(res);
+        if (!result.length())
+            error = rest.get_error();
+    }
     else
     {
         code = HTTP_NOTFOUND;
