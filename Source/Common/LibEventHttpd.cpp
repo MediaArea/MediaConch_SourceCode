@@ -106,10 +106,25 @@ int LibEventHttpd::send_result(int ret_code, std::string& ret_msg, void *arg)
 
     if (evOutBuf)
     {
+        struct evkeyvalq *evOutHeaders;
+        evOutHeaders = evhttp_request_get_output_headers(req);
+        evhttp_add_header(evOutHeaders, "Host", address.c_str());
+        std::stringstream len_str;
+
         if (error.length())
+        {
+            len_str << error.length();
             evbuffer_add_printf(evOutBuf, "%s\n", error.c_str());
+        }
         else if (result.length())
+        {
+            len_str << result.length();
+            evhttp_add_header(evOutHeaders, "Content-Type", "application/json");
             evbuffer_add_printf(evOutBuf, "%s\n", result.c_str());
+        }
+        else
+            len_str << 0;
+        evhttp_add_header(evOutHeaders, "Content-Length", len_str.str().c_str());
     }
     evhttp_send_reply(req, ret_code, ret_msg.c_str(), evOutBuf);
     if (evOutBuf)
