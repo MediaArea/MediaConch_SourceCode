@@ -4,11 +4,19 @@
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                                 <h4 class="modal-title">Policy report</h4>
+                                <label class="control-label" for="fileDetail_policy_policy">Policy:</label>
+                                <select id="fileDetail_policy_selector{{ loop.index }}" name="filedetail[policy][selector]" class="form-control" onchange="webpage.onFillPolicyReport('{{ check.getSource }}', '#modalPolicy{{ loop.index }}', $('#fileDetail_policy_selector{{ loop.index }}').val(), $('#fileDetail_policy_display{{ loop.index }}').val());">
+                                  <option selected="selected" value="-1">Choose a policy</option>
+                                </select>
+                                <label class="control-label" for="fileDetail_policy_display">Display:</label>
+                                <select id="fileDetail_policy_display{{ loop.index }}" name="filedetail[policy][display]" class="form-control" onchange="webpage.onFillPolicyReport('{{ check.getSource }}', '#modalPolicy{{ loop.index }}', $('#fileDetail_policy_selector{{ loop.index }}').val(), $('#fileDetail_policy_display{{ loop.index }}').val());">
+                                  <option selected="selected" value="-1">Choose a Display</option>
+                                </select>
                             </div>
                             <div class="modal-body">
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary report-dld" data-target="#policyDld{{ loop.index }}" data-save-name="{{ check.filename }}_MediaConch.txt" onclick="webpage.onSavePolicyReport('{{ check.getSource }}', $(this).data('save-name'));">Download report</button>
+                                <button type="button" class="btn btn-primary report-dld" data-target="#policyDld{{ loop.index }}" data-save-name="{{ check.filename }}_MediaConch.{{ check.filename }}" onclick="webpage.onSavePolicyReport('{{ check.getSource }}', $(this).data('save-name'), $('#fileDetail_policy_selector{{ loop.index }}').val(), $('#fileDetail_policy_display{{ loop.index }}').val());">Download report</button>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -21,11 +29,15 @@
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                                 <h4 class="modal-title">Implementation report</h4>
+                                <label class="control-label" for="fileDetail_implementation_display">Display:</label>
+                                <select id="fileDetail_implementation_display{{ loop.index }}" name="filedetail[implementation][display]" class="form-control" onchange="webpage.onFillImplementationReport('{{ check.getSource }}', '#modalConformance{{ loop.index }}', $('#fileDetail_implementation_display{{ loop.index }}').val());">
+                                  <option selected="selected" value="-1">Choose a Display</option>
+                                </select>
                             </div>
                             <div class="modal-body">
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="{{ check.filename }}_ImplementationReport.txt" onclick="webpage.onSaveImplementationReport('{{ check.getSource }}', $(this).data('save-name'));">Download report</button>
+                                <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="{{ check.filename }}_ImplementationReport.txt" onclick="webpage.onSaveImplementationReport('{{ check.getSource }}', $(this).data('save-name'), $('#fileDetail_implementation_display{{ loop.index }}').val());">Download report</button>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>

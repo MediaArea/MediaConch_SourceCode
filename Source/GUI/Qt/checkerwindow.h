@@ -66,10 +66,6 @@ private:
     void remove_form_online(int pos, QString& html);
     void change_collapse_form(QString& html);
     void change_body_in_template(QString& body, QString& html);
-    void add_policy_to_form_selection(QString& policies, QString& form, const char *selector);
-    void create_policy_options(QString& policies);
-    void add_display_to_form_selection(QString& displays, QString& form, const char *selector);
-    void create_displays_options(QString& displays);
 #if defined(WEB_MACHINE_ENGINE)
     void add_file_detail_to_html(std::string& file, int policy);
 #endif

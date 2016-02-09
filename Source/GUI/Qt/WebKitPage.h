@@ -47,14 +47,14 @@ public Q_SLOTS:
     void onButtonClicked(const QString& id);
 
     void onDownloadReport(const QString& target, const QString& save_name);
-    void onSaveImplementationReport(const QString& file, const QString& save_name);
-    void onSavePolicyReport(const QString& file, const QString& save_name);
+    void onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display = "-1");
+    void onSavePolicyReport(const QString& file, const QString& save_name, const QString& policy = "-1", const QString& display = "-1");
     void onSaveInfo(const QString& target, const QString& save_name);
     void onSaveTrace(const QString& target, const QString& save_name);
 
     void menu_link_checker(const QString& name);
-    void onFillImplementationReport(const QString& name, const QString& target);
-    void onFillPolicyReport(const QString& file, const QString& target);
+    void onFillImplementationReport(const QString& name, const QString& target, const QString& display);
+    void onFillPolicyReport(const QString& file, const QString& target, const QString& policy, const QString& display);
     QString onFillMediaInfoReport(const QString& file);
     QString onFillMediaTraceReport(const QString& file);
 

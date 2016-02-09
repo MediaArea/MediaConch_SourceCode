@@ -68,11 +68,12 @@ namespace MediaConch
             onFileRepositorySelected(button.parent().parent());
     }
 
-    void WebPage::onFillImplementationReport(const QString& file, const QString& target)
+    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display)
     {
         std::string file_s = file.toStdString();
         QString report;
-        mainwindow->get_implementation_report(file_s, report);
+        int display_i = display.toInt();
+        mainwindow->get_implementation_report(file_s, report, &display_i);
         QWebElement form = mainFrame()->findFirstElement(target + " .modal-body");
 
         if (report_is_html(report))
@@ -81,11 +82,16 @@ namespace MediaConch
             form.setPlainText(report);
     }
 
-    void WebPage::onFillPolicyReport(const QString& file, const QString& target)
+    void WebPage::onFillPolicyReport(const QString& file, const QString& target, const QString& policy, const QString& display)
     {
-        std::string file_s = file.toStdString();
+        int policy_i = policy.toInt();
         QString report;
-        mainwindow->validate_policy(file_s, report);
+        if (policy_i != -1)
+        {
+            std::string file_s = file.toStdString();
+            int display_i = display.toInt();
+            mainwindow->validate_policy(file_s, report, policy_i, &display_i);
+        }
         QWebElement form = mainFrame()->findFirstElement(target + " .modal-body");
 
         if (report_is_html(report))
@@ -138,19 +144,22 @@ namespace MediaConch
         out << report;
     }
 
-    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name)
+    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display)
     {
         std::string file_s = file.toStdString();
         QString report;
-        mainwindow->get_implementation_report(file_s, report);
+        int display_i = display.toInt();
+        mainwindow->get_implementation_report(file_s, report, &display_i);
         onDownloadReport(report, save_name);
     }
 
-    void WebPage::onSavePolicyReport(const QString& file, const QString& save_name)
+    void WebPage::onSavePolicyReport(const QString& file, const QString& save_name, const QString& policy, const QString& display)
     {
         std::string file_s = file.toStdString();
         QString report;
-        mainwindow->validate_policy(file_s, report);
+        int policy_i = policy.toInt();
+        int display_i = display.toInt();
+        mainwindow->validate_policy(file_s, report, policy_i, &display_i);
         onDownloadReport(report, save_name);
     }
 

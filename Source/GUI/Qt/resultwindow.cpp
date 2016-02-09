@@ -119,6 +119,28 @@ void ResultWindow::add_displays_file_detail_table_end(QString& html)
 }
 
 //---------------------------------------------------------------------------
+void ResultWindow::select_the_correct_value(const QString& value, const QString& selector, QString& html)
+{
+    int pos = html.indexOf(selector);
+    if (pos == -1)
+        return;
+
+    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose");
+    reg.setMinimal(true);
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        html.replace(pos, reg.matchedLength(), "<option value=\"-1\">Choose");
+        reg = QRegExp(QString("value=\"%1\"").arg(value));
+        if ((pos = reg.indexIn(html, pos)) != -1)
+        {
+            pos += reg.matchedLength();
+            html.insert(pos, " selected=\"selected\"");
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
 void ResultWindow::add_displays_file_detail_modal(MainWindow::FileRegistered* file, QString& base)
 {
 #if defined(WEB_MACHINE_ENGINE)
@@ -131,6 +153,21 @@ void ResultWindow::add_displays_file_detail_modal(MainWindow::FileRegistered* fi
     template_html.close();
 
     QString html(data);
+
+    QString policies;
+    mainwindow->create_policy_options(policies);
+    mainwindow->add_policy_to_html_selection(policies, html, "fileDetail_policy_selector");
+    QString policy_value = QString("%1").arg(file->policy);
+    select_the_correct_value(policy_value, "fileDetail_policy_selector", html);
+
+    QString displays;
+    mainwindow->create_displays_options(displays);
+    mainwindow->add_display_to_html_selection(displays, html, "fileDetail_policy_display");
+    mainwindow->add_display_to_html_selection(displays, html, "fileDetail_implementation_display");
+    QString display_value = QString("%1").arg(file->display);
+    select_the_correct_value(display_value, "fileDetail_policy_display", html);
+    select_the_correct_value(display_value, "fileDetail_implementation_display", html);
+
     change_html_file_detail(file, html);
 
     base += QString(html);
@@ -324,6 +361,18 @@ void ResultWindow::change_html_file_detail(MainWindow::FileRegistered* file, QSt
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), policy);
+
+    reg = QRegExp("\\{\\{ check.policyvalue \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("%1").arg(file->policy));
+
+    reg = QRegExp("\\{\\{ check.displayvalue \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("%1").arg(file->display));
 
     reg = QRegExp("\\{\\{ check.filename \\| truncate\\(20\\) \\}\\}");
     pos = 0;

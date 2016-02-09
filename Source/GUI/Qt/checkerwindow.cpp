@@ -208,10 +208,7 @@ void CheckerWindow::remove_element_in_template(QString& html)
 
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
-    {
-        QString value = reg.cap(1);
         html.replace(pos, reg.matchedLength(), "");
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -221,9 +218,7 @@ void CheckerWindow::change_collapse_form(QString& html)
     int pos = 0;
 
     while ((pos = reg.indexIn(html, pos)) != -1)
-    {
         html.replace(pos, reg.matchedLength(), "class=\"panel-collapse collapse\"");
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -253,94 +248,6 @@ void CheckerWindow::load_form_in_template(QString& html)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::create_policy_options(QString& policies)
-{
-    const std::vector<Policy *>& list = mainwindow->get_all_policies();
-
-    QString system_policy;
-    QString user_policy;
-    for (size_t i = 0; i < list.size(); ++i)
-    {
-        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
-            system_policy += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
-        else
-            user_policy += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
-    }
-
-    // Create default policy opt-group
-    if (system_policy.length())
-        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
-
-    // Create default policy opt-group
-    if (user_policy.length())
-        policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::create_displays_options(QString& displays)
-{
-    std::vector<QString>& list = mainwindow->get_displays();
-
-    QString system_display;
-    QString user_display;
-    for (size_t i = 0; i < list.size(); ++i)
-    {
-        QFileInfo file(list[i]);
-        if (list[i].startsWith(":/"))
-            system_display += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(file.baseName());
-        else
-            user_display += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(file.baseName());
-    }
-
-    // Create default display opt-group
-    if (system_display.length())
-        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
-
-    // Create user display opt-group
-    if (user_display.length())
-        displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::add_policy_to_form_selection(QString& policies, QString& form, const char *selector)
-{
-    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a policy[\\n\\r\\t\\s]*</option>");
-    int pos = form.indexOf(selector);
-
-    reg.setMinimal(true);
-
-    if (pos == -1)
-        return;
-
-    if ((pos = reg.indexIn(form, pos)) != -1)
-    {
-        pos += reg.matchedLength();
-        form.insert(pos, policies);
-    }
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::add_display_to_form_selection(QString& displays, QString& form, const char *selector)
-{
-    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a Display[\\n\\r\\t\\s]*</option>");
-    reg.setMinimal(true);
-
-    int pos = form.indexOf(selector);
-    if (pos == -1)
-        return;
-
-    if ((pos = reg.indexIn(form, pos)) != -1)
-    {
-        pos += reg.matchedLength();
-        form.insert(pos, displays);
-    }
-}
-
-//---------------------------------------------------------------------------
 QString CheckerWindow::create_form_upload()
 {
     QFile template_html(":/formUpload.html");
@@ -351,12 +258,12 @@ QString CheckerWindow::create_form_upload()
 
     QString ret(html);
     QString policies;
-    create_policy_options(policies);
-    add_policy_to_form_selection(policies, ret, "checkerUpload_step1_policy");
+    mainwindow->create_policy_options(policies);
+    mainwindow->add_policy_to_html_selection(policies, ret, "checkerUpload_step1_policy");
 
     QString displays;
-    create_displays_options(displays);
-    add_display_to_form_selection(displays, ret, "checkerUpload_step1_display_selector");
+    mainwindow->create_displays_options(displays);
+    mainwindow->add_display_to_html_selection(displays, ret, "checkerUpload_step1_display_selector");
     return ret;
 }
 
@@ -371,12 +278,12 @@ QString CheckerWindow::create_form_online()
 
     QString ret(html);
     QString policies;
-    create_policy_options(policies);
-    add_policy_to_form_selection(policies, ret, "checkerOnline_step1_policy");
+    mainwindow->create_policy_options(policies);
+    mainwindow->add_policy_to_html_selection(policies, ret, "checkerOnline_step1_policy");
 
     QString displays;
-    create_displays_options(displays);
-    add_display_to_form_selection(displays, ret, "checkerOnline_step1_display_selector");
+    mainwindow->create_displays_options(displays);
+    mainwindow->add_display_to_html_selection(displays, ret, "checkerOnline_step1_display_selector");
     return ret;
 }
 
@@ -414,12 +321,12 @@ QString CheckerWindow::create_form_repository()
 
     QString ret(html);
     QString policies;
-    create_policy_options(policies);
-    add_policy_to_form_selection(policies, ret, "checkerRepository_step1_policy");
+    mainwindow->create_policy_options(policies);
+    mainwindow->add_policy_to_html_selection(policies, ret, "checkerRepository_step1_policy");
 
     QString displays;
-    create_displays_options(displays);
-    add_display_to_form_selection(displays, ret, "checkerRepository_step1_display_selector");
+    mainwindow->create_displays_options(displays);
+    mainwindow->add_display_to_html_selection(displays, ret, "checkerRepository_step1_display_selector");
     return ret;
 }
 
