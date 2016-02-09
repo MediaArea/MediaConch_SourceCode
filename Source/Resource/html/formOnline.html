@@ -12,10 +12,6 @@
           <select id="checkerOnline_step1_policy" name="checkerOnline[step1][policy]" class="form-control">
             <option selected="selected" value="-1">Choose a policy</option>
           </select>
-          <label class="control-label" for="checkerOnline_step1_xslt">
-            Or a policy file
-          </label>
-          <input id="checkerOnline_step1_xslt" name="checkerOnline[step1][xslt]" type="file" onclick="webpage.onInputChanged(this.name);">
         </div>
       </div>
     </div>
@@ -31,10 +27,6 @@
           <select id="checkerOnline_step1_display_selector" name="checkerOnline[step1][display_selector]" class="form-control">
             <option selected="selected" value="-1">Choose a Display</option>
           </select>
-          <label class="control-label" for="checkerOnline_step1_display_xslt">
-            Or a display file
-          </label>
-          <input id="checkerOnline_step1_display_xslt" name="checkerOnline[step1][display_xslt]" type="file" onclick="webpage.onInputChanged(this.name);">
         </div>
       </div>
     </div>
@@ -45,7 +37,7 @@
       <input id="checkerOnline_file" name="checkerOnline[file]" required="required"  maxlength="512" class="form-control" type="url" onclick="webpage.onInputChanged(this.name);">
     </div>
     <div class="form-group">
-      <button type="submit" id="checkerOnline_Check file" name="checkerOnline[Check file]" class="btn-warning btn" onclick="webpage.onButtonClicked(this.id);">
+      <button type="submit" id="checkerOnline_Check file" name="checkerOnline[Check file]" class="btn-warning btn" onclick="event.preventDefault();webpage.onButtonClicked(this.id);">
         Check file
       </button>
     </div>

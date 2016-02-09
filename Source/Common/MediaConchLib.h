@@ -89,6 +89,13 @@ public:
         ReportRes() :     has_valid(false), valid(true) {}
     };
 
+    struct ValidateRes
+    {
+        std::string     file;
+        bool            valid;
+        ValidateRes() : valid(true) {}
+    };
+
     static const std::string display_xml_name;
     static const std::string display_maxml_name;
     static const std::string display_text_name;
@@ -108,6 +115,8 @@ public:
     int  is_done(const std::vector<std::string>& files, double& percent);
     int  is_done(const std::string& file, double& percent);
 
+    void list(std::vector<std::string>& vec);
+
     // Output
     int  get_report(const std::bitset<report_Max>& Report, format f,
                     const std::vector<std::string>& files,
@@ -116,7 +125,13 @@ public:
                     MediaConchLib::ReportRes* result,
                     const std::string* display_name = NULL,
                     const std::string* display_content = NULL);
-    int  remove_report(const std::vector<std::string>& files);
+    int validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                 const std::vector<std::string>& policies_names,
+                 const std::vector<std::string>& policies_contents,
+                 std::vector<ValidateRes*>& result);
+
+    //Clear
+    int remove_report(const std::vector<std::string>& files);
 
     // Implementation checker arguments
     void               set_implementation_schema_file(const std::string& file);
@@ -136,6 +151,7 @@ public:
     void               set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
     void               set_compression_mode(compression compress);
+    int                get_ui_poll_request() const;
 
     bool ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
                                             const std::bitset<MediaConchLib::report_Max>& reports,

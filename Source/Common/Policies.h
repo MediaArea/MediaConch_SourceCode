@@ -51,6 +51,7 @@ public:
     {
         POLICY_SCHEMATRON,
         POLICY_XSLT,
+        POLICY_UNKNOWN,
     };
 
     //Constructor/Destructor

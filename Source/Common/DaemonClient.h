@@ -41,6 +41,9 @@ public:
     int init();
     int close();
 
+    // List
+    int list(std::vector<std::string>& vec);
+
     // Analyze
     int analyze(const std::string& file, bool& registered, bool force_analyze);
 
@@ -55,10 +58,10 @@ public:
                    MediaConchLib::ReportRes* result,
                    const std::string* display_name = NULL,
                    const std::string* display_content = NULL);
-    bool validate_policy(const std::string& file, const std::string& policy,
-                         MediaConchLib::ReportRes* result,
-                         const std::string* display_name = NULL,
-                         const std::string* display_content = NULL);
+    int validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                 const std::vector<std::string>& policies_names,
+                 const std::vector<std::string>& policies_contents,
+                 std::vector<MediaConchLib::ValidateRes*>& result);
 
 private:
     MediaConchLib *mcl;

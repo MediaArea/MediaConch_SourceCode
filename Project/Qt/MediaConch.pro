@@ -47,6 +47,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/Policy.cpp \
                     ../../Source/Common/SchematronPolicy.cpp \
                     ../../Source/Common/XsltPolicy.cpp \
+                    ../../Source/Common/UnknownPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/Common/Database.cpp \
                     ../../Source/Common/NoDatabase.cpp \
@@ -67,10 +68,12 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
                     ../../Source/GUI/Qt/displaywindow.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
+                    ../../Source/GUI/Qt/resultwindow.cpp \
                     ../../Source/GUI/Qt/policieswindow.cpp \
                     ../../Source/GUI/Qt/policywindow.cpp \
                     ../../Source/GUI/Qt/schematronwindow.cpp \
                     ../../Source/GUI/Qt/xsltwindow.cpp \
+                    ../../Source/GUI/Qt/unknownwindow.cpp \
                     ../../Source/GUI/Qt/policiestree.cpp \
                     ../../Source/GUI/Qt/policiesmenu.cpp \
                     ../../Source/GUI/Qt/policymenu.cpp \
@@ -78,6 +81,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/rulemenu.cpp \
                     ../../Source/GUI/Qt/ruleedit.cpp \
                     ../../Source/GUI/Qt/xsltpolicymenu.cpp \
+                    ../../Source/GUI/Qt/unknownpolicymenu.cpp \
                     ../../Source/GUI/Qt/xsltruleedit.cpp \
                     ../../Source/GUI/Qt/displaymenu.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp
@@ -92,6 +96,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Policy.h \
                     ../../Source/Common/SchematronPolicy.h \
                     ../../Source/Common/XsltPolicy.h \
+                    ../../Source/Common/UnknownPolicy.h \
                     ../../Source/Common/ImplementationReportXsl.h \
                     ../../Source/Common/ImplementationReportDisplayTextUnicodeXsl.h \
                     ../../Source/Common/ImplementationReportDisplayTextXsl.h \
@@ -118,11 +123,13 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \
+                    ../../Source/GUI/Qt/resultwindow.h \
                     ../../Source/GUI/Qt/displaywindow.h \
                     ../../Source/GUI/Qt/policieswindow.h \
                     ../../Source/GUI/Qt/policywindow.h \
                     ../../Source/GUI/Qt/schematronwindow.h \
                     ../../Source/GUI/Qt/xsltwindow.h \
+                    ../../Source/GUI/Qt/unknownwindow.h \
                     ../../Source/GUI/Qt/policiestree.h \
                     ../../Source/GUI/Qt/policiesmenu.h \
                     ../../Source/GUI/Qt/policymenu.h \
@@ -130,6 +137,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/rulemenu.h \
                     ../../Source/GUI/Qt/ruleedit.h \
                     ../../Source/GUI/Qt/xsltpolicymenu.h \
+                    ../../Source/GUI/Qt/unknownpolicymenu.h \
                     ../../Source/GUI/Qt/xsltruleedit.h \
                     ../../Source/GUI/Qt/displaymenu.h \
                     ../../Source/GUI/Qt/progressbar.h
@@ -142,6 +150,7 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/rulemenu.ui \
                     ../../Source/GUI/Qt/ruleedit.ui \
                     ../../Source/GUI/Qt/xsltpolicymenu.ui \
+                    ../../Source/GUI/Qt/unknownpolicymenu.ui \
                     ../../Source/GUI/Qt/xsltruleedit.ui \
                     ../../Source/GUI/Qt/displaymenu.ui \
                     ../../Source/GUI/Qt/progressbar.ui

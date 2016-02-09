@@ -16,6 +16,7 @@ mediaconchd_SOURCES = \
     ../../../Source/Common/Policy.cpp \
     ../../../Source/Common/SchematronPolicy.cpp \
     ../../../Source/Common/XsltPolicy.cpp \
+    ../../../Source/Common/UnknownPolicy.cpp \
     ../../../Source/Common/Database.cpp \
     ../../../Source/Common/NoDatabase.cpp \
     ../../../Source/Common/SQLLite.cpp \

@@ -9,6 +9,7 @@
 
 #include "Common/Core.h"
 #include "Common/SchematronPolicy.h"
+#include "Common/UnknownPolicy.h"
 #include "Common/XsltPolicy.h"
 
 #include <QFileInfo>
@@ -75,6 +76,7 @@ private:
     void                        createPoliciesMenu();
     void                        updatePoliciesTree();
     void                        updatePoliciesTreeSchematronPolicy(SchematronPolicy* p, QTreeWidgetItem *parent);
+    void                        updatePoliciesTreeUnknownPolicy(UnknownPolicy* p, QTreeWidgetItem *parent);
     void                        updatePoliciesTreeXsltPolicy(XsltPolicy* p, QTreeWidgetItem *parent);
 
 //***************************************************************************

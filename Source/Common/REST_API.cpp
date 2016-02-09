@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.1";
+const std::string RESTAPI::API_VERSION = "1.2";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -98,6 +98,25 @@ RESTAPI::Retry_Res::~Retry_Res()
 //---------------------------------------------------------------------------
 RESTAPI::Clear_Res::~Clear_Res()
 {
+    for (size_t i = 0; i < nok.size(); ++i)
+        delete nok[i];
+    nok.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::List_Res::~List_Res()
+{
+    for (size_t i = 0; i < files.size(); ++i)
+        delete files[i];
+    files.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Validate_Res::~Validate_Res()
+{
+    for (size_t i = 0; i < ok.size(); ++i)
+        delete ok[i];
+    ok.clear();
     for (size_t i = 0; i < nok.size(); ++i)
         delete nok[i];
     nok.clear();
@@ -207,6 +226,25 @@ std::string RESTAPI::Clear_Req::to_str() const
         out << ids[i];
     }
     out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Validate_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ids: [";
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ids[i];
+    }
+    RESTAPI api;
+    out << "], report: " << api.get_Report_string(report);
+    out << ", policies_names_size: [" << policies_names.size();
+    out << "], policies_contents_size: [" << policies_contents.size() << "] ]";
     return out.str();
 }
 
@@ -413,6 +451,66 @@ std::string RESTAPI::Clear_Res::to_str() const
     return out.str();
 }
 
+//---------------------------------------------------------------------------
+std::string RESTAPI::List_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[files: [";
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << "{file:" << files[i]->file;
+        out << ", id:" << files[i]->id << "}";
+    }
+    out << "] ]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Validate_Ok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id << ", valid: " << std::boolalpha << valid << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Validate_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    RESTAPI api;
+    out << ", reason: " << api.get_Reason_string(error) << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Validate_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[ok: [";
+    for (size_t i = 0; i < ok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << ok[i]->to_str();
+    }
+    out <<  "], nok: [";
+    for (size_t i = 0; i < nok.size(); ++i)
+    {
+        if (i)
+            out << ", ";
+        out << nok[i]->to_str();
+    }
+    out << "] ]";
+    return out.str();
+}
+
 //***************************************************************************
 // Serialize: Request
 //***************************************************************************
@@ -511,6 +609,38 @@ std::string RESTAPI::serialize_clear_req(Clear_Req& req)
         ss << "id=" << req.ids[i];
     }
     return ss.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_list_req(List_Req&)
+{
+    return std::string();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_validate_req(Validate_Req& req)
+{
+    Container::Value v, child, report;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
+
+    report.type = Container::Value::CONTAINER_TYPE_STRING;
+    report.s = get_Report_string(req.report);
+    child.obj.push_back(std::make_pair("report", report));
+
+    if (req.policies_names.size())
+        child.obj.push_back(std::make_pair("policies_names", serialize_report_arr_str(req.policies_names)));
+    if (req.policies_contents.size())
+        child.obj.push_back(std::make_pair("policies_contents", serialize_report_arr_str(req.policies_contents)));
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj.push_back(std::make_pair("VALIDATE", child));
+
+    std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
+    return ret;
 }
 
 //***************************************************************************
@@ -620,6 +750,53 @@ std::string RESTAPI::serialize_clear_res(Clear_Res& res)
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj.push_back(std::make_pair("CLEAR_RESULT", child));
+
+    std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_list_res(List_Res& res)
+{
+    Container::Value v, child, files;
+
+    files.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < res.files.size(); ++i)
+        files.array.push_back(serialize_list_file(res.files[i]->file, res.files[i]->id));
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    child.obj.push_back(std::make_pair("files", files));
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj.push_back(std::make_pair("LIST_RESULT", child));
+
+    std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_validate_res(Validate_Res& res)
+{
+    Container::Value v, child, ok, nok;
+
+    ok.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < res.ok.size(); ++i)
+        ok.array.push_back(serialize_validate_ok(res.ok[i]));
+
+    nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < res.nok.size(); ++i)
+        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    child.obj.push_back(std::make_pair("ok", ok));
+    child.obj.push_back(std::make_pair("nok", nok));
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj.push_back(std::make_pair("VALIDATE_RESULT", child));
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -835,6 +1012,84 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::List_Req *RESTAPI::parse_list_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "LIST");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+    List_Req *req = new List_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Validate_Req *RESTAPI::parse_validate_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "VALIDATE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ids, *report, *policies_names, *policies_contents;
+    ids = model->get_value_by_key(*child, "ids");
+    report = model->get_value_by_key(*child, "report");
+    policies_names = model->get_value_by_key(*child, "policies_names");
+    policies_contents = model->get_value_by_key(*child, "policies_contents");
+
+    if (!ids || !report || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return NULL;
+
+    Validate_Req *req = new Validate_Req;
+    for (size_t i = 0; i < ids->array.size(); ++i)
+    {
+        Container::Value *id = &ids->array[i];
+
+        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            delete req;
+            return NULL;
+        }
+        req->ids.push_back(id->l);
+    }
+
+    if (report->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        delete req;
+        return NULL;
+    }
+    req->report = string_to_Report(report->s);
+
+    if (policies_names && policies_names->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < policies_names->array.size(); ++i)
+            if (policies_names->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->policies_names.push_back(policies_names->array[i].s);
+    }
+    if (policies_contents && policies_contents->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < policies_contents->array.size(); ++i)
+            if (policies_contents->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->policies_contents.push_back(policies_contents->array[i].s);
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
 {
     Analyze_Req *req = new Analyze_Req;
@@ -912,6 +1167,20 @@ RESTAPI::Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
     }
 
 finish:
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::List_Req *RESTAPI::parse_uri_list_req(const std::string&)
+{
+    List_Req *req = new List_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Validate_Req *RESTAPI::parse_uri_validate_req(const std::string&)
+{
+    Validate_Req *req = new Validate_Req;
     return req;
 }
 
@@ -1189,6 +1458,94 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
     return res;
 }
 
+//---------------------------------------------------------------------------
+RESTAPI::List_Res *RESTAPI::parse_list_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "LIST_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *files;
+    files = model->get_value_by_key(*child, "files");
+
+    List_Res *res = new List_Res;
+    if (files->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < files->array.size(); ++i)
+    {
+        List_File *tmp = new List_File;
+
+        if (parse_list_file(&files->array[i], tmp->file, tmp->id))
+        {
+            delete res;
+            return NULL;
+        }
+        res->files.push_back(tmp);
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Validate_Res *RESTAPI::parse_validate_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "VALIDATE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *ok, *nok;
+    ok = model->get_value_by_key(*child, "ok");
+    nok = model->get_value_by_key(*child, "nok");
+
+    Validate_Res *res = new Validate_Res;
+    if (ok && parse_validate_ok(ok, res->ok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    if (!nok)
+        return res;
+
+    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        delete res;
+        return NULL;
+    }
+
+    for (size_t i = 0; i < nok->array.size(); ++i)
+    {
+        Validate_Nok *tmp = new Validate_Nok;
+
+        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
+        {
+            delete res;
+            return NULL;
+        }
+        res->nok.push_back(tmp);
+    }
+    return res;
+}
+
 //***************************************************************************
 // HELPER
 //***************************************************************************
@@ -1406,6 +1763,45 @@ Container::Value RESTAPI::serialize_report_ok(Report_Ok& obj)
 }
 
 //---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_list_file(const std::string& filename, int id)
+{
+    Container::Value file, id_v, filename_v;
+
+    file.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id_v.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id_v.l = id;
+    file.obj.push_back(std::make_pair("id", id_v));
+
+    filename_v.type = Container::Value::CONTAINER_TYPE_STRING;
+    filename_v.s = filename;
+    file.obj.push_back(std::make_pair("file", filename_v));
+    return file;
+}
+
+//---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_validate_ok(Validate_Ok* obj)
+{
+    Container::Value ok;
+    ok.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (!obj)
+        return ok;
+
+    Container::Value id, valid;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = obj->id;
+    ok.obj.push_back(std::make_pair("id", id));
+
+    valid.type = Container::Value::CONTAINER_TYPE_BOOL;
+    valid.b = obj->valid;
+    ok.obj.push_back(std::make_pair("valid", valid));
+
+    return ok;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& args)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
@@ -1590,6 +1986,58 @@ int RESTAPI::parse_report_ok(Container::Value *v, Report_Ok& ok)
             return -1;
         ok.has_valid = true;
         ok.valid = valid->b;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_list_file(Container::Value *v, std::string& file, int& id)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return -1;
+
+    Container::Value *id_v, *file_v;
+
+    file_v = model->get_value_by_key(*v, "file");
+    id_v = model->get_value_by_key(*v, "id");
+
+    if (!id_v || id_v->type != Container::Value::CONTAINER_TYPE_INTEGER ||
+        !file_v || file_v->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+
+    id = id_v->l;
+    file = file_v->s;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_validate_ok(Container::Value *v, std::vector<Validate_Ok*>& oks)
+{
+    if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < v->array.size(); ++i)
+    {
+        Validate_Ok* ok = new Validate_Ok;
+        Container::Value *id, *valid;
+        id = model->get_value_by_key(v->array[i], "id");
+        valid = model->get_value_by_key(v->array[i], "valid");
+
+        if (id)
+        {
+            if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+                return -1;
+            ok->id = id->l;
+        }
+
+        if (valid)
+        {
+            if (valid->type != Container::Value::CONTAINER_TYPE_BOOL)
+                return -1;
+            ok->valid = valid->b;
+        }
+        oks.push_back(ok);
     }
 
     return 0;

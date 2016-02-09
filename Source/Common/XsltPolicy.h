@@ -83,16 +83,23 @@ private:
 
     bool       find_xslt_header(xmlNodePtr node);
     bool       find_title_node(xmlNodePtr node, std::string& title);
-    bool       find_template_node(xmlNodePtr node);
-    bool       find_template_match_node(xmlNodePtr node);
-    bool       find_template_name_node(xmlNodePtr node);
-    bool       find_mediaconch_node(xmlNodePtr node);
-    bool       find_policychecks_node(xmlNodePtr node);
+    int        find_template_node(xmlNodePtr node);
+    int        find_template_match_node(xmlNodePtr node);
+    bool       valid_root_child_name_node(xmlNodePtr node);
+    int        validate_template_match_name(xmlNodePtr node);
+    bool       validate_template_match_node(xmlNodePtr node);
+    int        find_mediaconch_node(xmlNodePtr node);
+    bool       validate_mediaconch_node(xmlNodePtr node);
+    int        find_for_each_node(xmlNodePtr node);
+    bool       validate_for_each_node(xmlNodePtr node);
+    int        find_media_node(xmlNodePtr node);
+    bool       validate_media_node(xmlNodePtr node);
+    int        find_policychecks_node(xmlNodePtr node);
+    bool       validate_policychecks_node(xmlNodePtr node);
     bool       find_policychecks_name_node(xmlNodePtr node);
     bool       find_policychecks_description_node(xmlNodePtr node);
-    bool       find_for_each_node(xmlNodePtr node);
-    bool       find_media_node(xmlNodePtr node);
-    bool       find_check_node(xmlNodePtr node);
+    int        find_check_node(xmlNodePtr node);
+    void       validate_check_node(xmlNodePtr node, bool& valid);
 
     bool       find_rule_title_node(xmlNodePtr node, std::string& title);
     bool       find_context_node(xmlNodePtr node, XsltRule* rule);

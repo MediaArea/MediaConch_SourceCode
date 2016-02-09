@@ -85,6 +85,36 @@ int DaemonClient::close()
 }
 
 //---------------------------------------------------------------------------
+int DaemonClient::list(std::vector<std::string>& vec)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::List_Req req;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::List_Res *res = rest.parse_list_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    for (size_t i = 0; i < res->files.size(); ++i)
+        vec.push_back(res->files[i]->file);
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!http_client)
@@ -255,28 +285,71 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
 }
 
 //---------------------------------------------------------------------------
-bool DaemonClient::validate_policy(const std::string& file, const std::string& policy,
-                                   MediaConchLib::ReportRes* result,
-                                   const std::string* display_name, const std::string* display_content)
+int DaemonClient::validate(MediaConchLib::report report,
+                           const std::vector<std::string>& files,
+                           const std::vector<std::string>& policies_names,
+                           const std::vector<std::string>& policies_contents,
+                           std::vector<MediaConchLib::ValidateRes*>& result)
 {
     if (!http_client)
-        return false;
+        return -1;
 
-    std::bitset<MediaConchLib::report_Max> report_set;
+    // FILE
+    RESTAPI::Validate_Req req;
+    std::map<int, std::string> saved_ids;
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        std::map<std::string, int>::iterator it = file_ids.find(files[i]);
+        if (it == file_ids.end())
+            continue;
+        req.ids.push_back(it->second);
+        saved_ids[it->second] = files[i];
+    }
 
-    std::vector<std::string> files;
-    files.push_back(file);
+    // REPORT KIND
+    if (report == MediaConchLib::report_MediaConch)
+        req.report = RESTAPI::IMPLEMENTATION;
+    else if (policies_names.size())
+    {
+        // POLICY
+        req.report = RESTAPI::POLICY;
+        for (size_t i = 0; i < policies_names.size(); ++i)
+            req.policies_names.push_back(policies_names[i]);
+    }
+    else if (policies_contents.size())
+    {
+        // POLICY
+        req.report = RESTAPI::POLICY;
+        for (size_t i = 0; i < policies_contents.size(); ++i)
+            req.policies_contents.push_back(policies_contents[i]);
+    }
+    else
+        return -1;
 
-    std::vector<std::string> policies_names;
-    std::vector<std::string> policies_contents;
-    policies_contents.push_back(policy);
+    http_client->start();
+    if (http_client->send_request(req) < 0)
+        return -1;
 
-    if (get_report(report_set, MediaConchLib::format_Xml, files,
-                   policies_names, policies_contents,
-                   result,
-                   display_name, display_content) < 0)
-        return false;
-    return true;
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return -1;
+
+    RESTAPI rest;
+    RESTAPI::Validate_Res *res = rest.parse_validate_res(data);
+    if (!res || !res->ok.size())
+        return -1;
+
+    for (size_t i = 0; i < res->ok.size(); ++i)
+    {
+        MediaConchLib::ValidateRes* v = new MediaConchLib::ValidateRes;
+        v->file = saved_ids[res->ok[i]->id];
+        v->valid = res->ok[i]->valid;
+        result.push_back(v);
+    }
+
+    delete res;
+    return 0;
 }
 
 }

@@ -1,0 +1,21 @@
+                <tr>
+                    <th><span title="{{ check.getSource }}">{{ check.filename | truncate(20) }}</span></th>
+                    <td id="implementationStatus{{ loop.index }}">
+                      <p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalConformance{{ loop.index }}" title="View report" onclick="webpage.onFillImplementationReport('{{ check.getSource }}', $(this).data('target'));"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a><a href="#" class="results-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="{{ check.filename }}_ImplementationReport.txt" title="Download report" onclick="webpage.onSaveImplementationReport('{{ check.getSource }}', $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>
+                    </td>
+                    <td id="policyStatus{{ loop.index }}">
+                      <span title="{{ check.policyname }}">{{ check.policyname | truncate(20) }}</span>
+                      <p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalPolicy{{ loop.index }}" title="View report" onclick="webpage.onFillPolicyReport('{{ check.getSource }}', $(this).data('target'));"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a><a href="#" class="results-dld" data-target="#policyDld{{ loop.index }}" data-save-name="{{ check.filename }}_MediaConch.txt" title="Download report" onclick="webpage.onSavePolicyReport('{{ check.getSource }}', $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>
+                    </td>
+                    <td class="text-center">
+                      <a href="#" data-toggle="modal" data-target="#modalInfo{{ loop.index }}" title="View MediaInfo report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a><a href="#" class="results-dld-info-ajax" data-target="#infoXml{{ loop.index }}" data-save-name="{{ check.filename }}_MediaInfo.xml" title="Download MediaInfo report" onclick="webpage.onSaveInfo('{{ check.getSource }}', $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                    </td>
+                    <td class="text-center">
+                      <a href="#" data-toggle="modal" data-target="#modalTrace{{ loop.index }}" title="View trace report"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a><a href="#" class="results-dld-trace-ajax" data-target="#traceXml{{ loop.index }}" data-save-name="{{ check.filename }}_MediaTrace.xml" title="Download trace report" onclick="webpage.onSaveTrace('{{ check.getSource }}', $(this).data('save-name'));"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+                    </td>
+                    <td id="analyzeStatus{{ loop.index }}">
+                        <span id="analyzePercent{{ loop.index }}"></span>
+                        <button type="button" class="btn btn-link result-close" title="Close result" onclick="webpage.close_element('{{ check.getSource }}')"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                        <button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+                    </td>
+                </tr>

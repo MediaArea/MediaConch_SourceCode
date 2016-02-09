@@ -11,6 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include <algorithm>
+#include <map>
 #include <ZenLib/Ztring.h>
 #include "Common/Httpd.h"
 #include "Common/LibEventHttpd.h"
@@ -89,6 +90,8 @@ namespace MediaConch
         httpd->commands.report_cb = on_report_command;
         httpd->commands.retry_cb = on_retry_command;
         httpd->commands.clear_cb = on_clear_command;
+        httpd->commands.list_cb = on_list_command;
+        httpd->commands.validate_cb = on_validate_command;
         return 0;
     }
 
@@ -641,6 +644,102 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_list_command(const RESTAPI::List_Req* req, RESTAPI::List_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a list command" << std::endl;
+        std::vector<std::string> vec;
+        d->MCL->list(vec);
+        for (size_t i = 0; i < vec.size(); ++i)
+        {
+            RESTAPI::List_File *file = new RESTAPI::List_File;
+            file->file = vec[i];
+
+            size_t id = 0;
+            if (!d->file_is_registered(vec[i], id))
+            {
+                id = d->get_first_free_slot();
+                d->current_files[id] = new std::string(vec[i]);
+            }
+
+            file->id = id;
+            res.files.push_back(file);
+        }
+        std::clog << d->get_date() << "Daemon send list result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_validate_command(const RESTAPI::Validate_Req* req, RESTAPI::Validate_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a validate command: ";
+        std::clog << req->to_str() << std::endl;
+
+        MediaConchLib::report report;
+        bool has_policy = false;
+        if (req->report == RESTAPI::IMPLEMENTATION)
+            report = MediaConchLib::report_MediaConch;
+        else if (req->report == RESTAPI::POLICY)
+            has_policy = true;
+        else
+            return -1;
+
+        std::map<std::string, int> saved_ids;
+        std::vector<std::string> files;
+        for (size_t i = 0; i < req->ids.size(); ++i)
+        {
+            int id = req->ids[i];
+            if (!d->id_is_existing(id))
+            {
+                RESTAPI::Validate_Nok *nok = new RESTAPI::Validate_Nok;
+                nok->id = id;
+                nok->error = RESTAPI::ID_NOT_EXISTING;
+                res.nok.push_back(nok);
+                continue;
+            }
+
+            double percent_done = 0.0;
+            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
+            if (!is_done)
+            {
+                RESTAPI::Validate_Nok *nok = new RESTAPI::Validate_Nok;
+                nok->id = id;
+                nok->error = RESTAPI::NOT_READY;
+                res.nok.push_back(nok);
+                continue;
+            }
+
+            // Output
+            files.push_back(*d->current_files[id]);
+            saved_ids[*d->current_files[id]] = id;
+        }
+
+        std::vector<MediaConchLib::ValidateRes*> result;
+        if (d->MCL->validate(report, files, req->policies_names, req->policies_contents,
+                             result))
+            return -1;
+
+        for (size_t i = 0; i < result.size(); ++i)
+        {
+            RESTAPI::Validate_Ok* ok = new RESTAPI::Validate_Ok;
+            ok->id = saved_ids[result[i]->file];
+            ok->valid = result[i]->valid;
+            res.ok.push_back(ok);
+        }
+        std::clog << d->get_date() << "Daemon send validate result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     size_t Daemon::get_first_free_slot()
     {
         size_t i = 0;
@@ -670,5 +769,17 @@ namespace MediaConch
         str = str.substr(0, str.length() - 1);
         out << "[" << str << "]";
         return out.str();
+    }
+
+    //--------------------------------------------------------------------------
+    bool Daemon::file_is_registered(const std::string& file, size_t& id)
+    {
+        for (size_t i = 0; i < current_files.size(); ++i)
+            if (current_files[i] && !current_files[i]->compare(file))
+            {
+                id = i;
+                return true;
+            }
+        return false;
     }
 }

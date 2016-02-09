@@ -106,10 +106,25 @@ int LibEventHttpd::send_result(int ret_code, std::string& ret_msg, void *arg)
 
     if (evOutBuf)
     {
+        struct evkeyvalq *evOutHeaders;
+        evOutHeaders = evhttp_request_get_output_headers(req);
+        evhttp_add_header(evOutHeaders, "Host", address.c_str());
+        std::stringstream len_str;
+
         if (error.length())
+        {
+            len_str << error.length();
             evbuffer_add_printf(evOutBuf, "%s\n", error.c_str());
+        }
         else if (result.length())
+        {
+            len_str << result.length();
+            evhttp_add_header(evOutHeaders, "Content-Type", "application/json");
             evbuffer_add_printf(evOutBuf, "%s\n", result.c_str());
+        }
+        else
+            len_str << 0;
+        evhttp_add_header(evOutHeaders, "Content-Length", len_str.str().c_str());
     }
     evhttp_send_reply(req, ret_code, ret_msg.c_str(), evOutBuf);
     if (evOutBuf)
@@ -147,6 +162,24 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         result = rest.serialize_status_res(res);
+        if (!result.length())
+            error = rest.get_error();
+    }
+    else if (!std::string("/list").compare(uri_path))
+    {
+        std::string query;
+        RESTAPI::List_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::List_Res res;
+        if (commands.list_cb && commands.list_cb(r, res, parent) < 0)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        result = rest.serialize_list_res(res);
         if (!result.length())
             error = rest.get_error();
     }
@@ -221,6 +254,29 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         result = rest.serialize_report_res(res);
+        if (!result.length())
+            error = rest.get_error();
+    }
+    else if (!std::string("/validate").compare(uri_path))
+    {
+        RESTAPI::Validate_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Validate_Res res;
+        if (commands.validate_cb && commands.validate_cb(r, res, parent) < 0)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        result = rest.serialize_validate_res(res);
         if (!result.length())
             error = rest.get_error();
     }

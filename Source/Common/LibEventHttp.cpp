@@ -145,6 +145,7 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
         std::stringstream len_str;
         len_str << str.length();
         evhttp_add_header(evOutHeaders, "Content-Length", len_str.str().c_str());
+        evhttp_add_header(evOutHeaders, "Content-Type", "application/json");
     }
 
     int r = evhttp_make_request(connection, req, type, uri.c_str());

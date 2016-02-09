@@ -70,6 +70,7 @@
      <string>Tool</string>
     </property>
     <addaction name="actionChecker"/>
+    <addaction name="actionResult"/>
     <addaction name="actionPolicies"/>
     <addaction name="actionDisplay"/>
    </widget>
@@ -116,6 +117,14 @@
    </property>
    <property name="text">
     <string>Checker</string>
+   </property>
+  </action>
+  <action name="actionResult">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Result</string>
    </property>
   </action>
   <action name="actionPolicies">

@@ -59,6 +59,8 @@ public:
     void    Menu_Option_Preferences_Inform  (const MediaInfoNameSpace::String &Inform);
     String  Menu_Option_Preferences_Option  (const MediaInfoNameSpace::String &Param, const MediaInfoNameSpace::String &Value);
 
+
+//---------------------------------------------------------------------------
     bool        is_done(const std::string& file, double& percent_done);
     int         open_file(const std::string& filename, bool& registered, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
@@ -78,6 +80,12 @@ public:
                                const std::vector<std::string>* policies_names = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
 
+    void        list(std::vector<std::string>& vec);
+    int         validate(MediaConchLib::report report, const std::vector<std::string>& file,
+                         const std::vector<std::string>& policies_names,
+                         const std::vector<std::string>& policies_contents,
+                         std::vector<MediaConchLib::ValidateRes*>& result);
+
     // Apply display
     int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);
     int  transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
@@ -95,6 +103,7 @@ public:
     void set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
     void set_compression_mode(MediaConchLib::compression compress);
+    int get_ui_poll_request() const;
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
@@ -109,6 +118,10 @@ public:
 
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
+
+    // Get Local Paths
+    static std::string get_local_data_path();
+    static std::string get_local_config_path();
 
 private:
     Core (const Core&);
@@ -173,9 +186,6 @@ private:
     std::string get_config_file();
     std::string get_database_path();
     Database *get_db();
-
-    std::string get_local_data_path();
-    std::string get_local_config_path();
 };
 
 }

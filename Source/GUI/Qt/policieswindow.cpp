@@ -7,6 +7,7 @@
 #include "policieswindow.h"
 #include "policywindow.h"
 #include "schematronwindow.h"
+#include "unknownwindow.h"
 #include "xsltwindow.h"
 #include "mainwindow.h"
 #include "policiestree.h"
@@ -115,6 +116,8 @@ int PoliciesWindow::save_policy_to(Policies::PolicyType type)
     int ret = 0;
     if (type == Policies::POLICY_SCHEMATRON)
         ret = mainwindow->exporting_to_schematron_file(row);
+    else if (type == Policies::POLICY_UNKNOWN)
+        ret = mainwindow->exporting_to_unknown_file(row);
     else
         ret = mainwindow->exporting_to_xslt_file(row);
 
@@ -355,6 +358,8 @@ void PoliciesWindow::policiesTree_selectionChanged()
     clearPoliciesElements();
     if (row < 0 || mainwindow->get_policy(row)->type == Policies::POLICY_SCHEMATRON)
         policywindow = new SchematronWindow(this, mainwindow);
+    else if (mainwindow->get_policy(row)->type == Policies::POLICY_UNKNOWN)
+        policywindow = new UnknownWindow(this, mainwindow);
     else
         policywindow = new XsltWindow(this, mainwindow);
     policywindow->display_selection(level, item);
@@ -492,6 +497,14 @@ void PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy
 }
 
 //---------------------------------------------------------------------------
+void PoliciesWindow::updatePoliciesTreeUnknownPolicy(UnknownPolicy* policy, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+    QString title = QString().fromStdString(policy->filename);
+    item->setText(0, title);
+}
+
+//---------------------------------------------------------------------------
 void PoliciesWindow::updatePoliciesTreeXsltRule(XsltRule* rule, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
@@ -544,6 +557,8 @@ void PoliciesWindow::updatePoliciesTree()
             continue;
         if (policy->type == Policies::POLICY_SCHEMATRON)
             updatePoliciesTreeSchematronPolicy((SchematronPolicy*)policy, policies);
+        else if (policy->type == Policies::POLICY_UNKNOWN)
+            updatePoliciesTreeUnknownPolicy((UnknownPolicy*)policy, policies);
         else if (policy->type == Policies::POLICY_XSLT)
             updatePoliciesTreeXsltPolicy((XsltPolicy*)policy, policies);
     }

@@ -40,6 +40,7 @@ public:
                             const std::string& filename, const std::string& file_last_modification,
                             std::string& report, MediaConchLib::compression&);
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
+    virtual void get_elements(std::vector<std::string>& vec);
 
 protected:
     virtual int execute();

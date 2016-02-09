@@ -209,6 +209,17 @@ int MediaConchLib::is_done(const std::string& file, double& percent)
     return core->is_done(file, percent);
 }
 
+//---------------------------------------------------------------------------
+void MediaConchLib::list(std::vector<std::string>& vec)
+{
+    if (use_daemon)
+    {
+        daemon_client->list(vec);
+        return;
+    }
+    core->list(vec);
+}
+
 //***************************************************************************
 // Output
 //***************************************************************************
@@ -234,6 +245,26 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
                             policies_names, policies_contents,
                             result,
                             display_name, display_content);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::validate(report report, const std::vector<std::string>& files,
+                            const std::vector<std::string>& policies_names,
+                            const std::vector<std::string>& policies_contents,
+                            std::vector<ValidateRes*>& result)
+{
+    if (!files.size())
+        return errorHttp_INVALID_DATA;
+
+    if (report != report_MediaConch && !policies_names.size() && !policies_contents.size())
+        return errorHttp_INVALID_DATA;
+
+    if (use_daemon)
+        return daemon_client->validate(report, files, policies_names, policies_contents,
+                                       result);
+
+    return core->validate(report, files, policies_names, policies_contents,
+                          result);
 }
 
 //---------------------------------------------------------------------------
@@ -322,6 +353,12 @@ void MediaConchLib::set_compression_mode(compression compress)
 {
     if (core)
         core->set_compression_mode(compress);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::get_ui_poll_request() const
+{
+    return core->get_ui_poll_request();
 }
 
 //***************************************************************************

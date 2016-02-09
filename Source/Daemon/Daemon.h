@@ -72,9 +72,14 @@ namespace MediaConch
                                     RESTAPI::Retry_Res& res, void *arg);
         static int on_clear_command(const RESTAPI::Clear_Req* req,
                                     RESTAPI::Clear_Res& res, void *arg);
+        static int on_list_command(const RESTAPI::List_Req* req,
+                                   RESTAPI::List_Res& res, void *arg);
+        static int on_validate_command(const RESTAPI::Validate_Req* req,
+                                       RESTAPI::Validate_Res& res, void *arg);
 
         size_t get_first_free_slot();
         bool id_is_existing(int id) const;
+        bool file_is_registered(const std::string& file, size_t& id);
         std::string get_date() const;
 
         std::vector<std::string*> current_files;

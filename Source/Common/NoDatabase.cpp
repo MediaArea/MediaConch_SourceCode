@@ -144,5 +144,12 @@ bool NoDatabase::file_is_registered(MediaConchLib::report reportKind, MediaConch
     }
     return false;
 }
+void NoDatabase::get_elements(std::vector<std::string>& vec)
+{
+    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.begin();
+
+    for (; it != reports_saved.end(); ++it)
+        vec.push_back(it->first);
+}
 
 }

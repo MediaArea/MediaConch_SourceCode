@@ -92,6 +92,8 @@ int Policy::import_schema_from_memory(const std::string& filename, const char* b
 void Policy::export_schema(const char* filename)
 {
     xmlDocPtr new_doc = create_doc();
+    if (!new_doc)
+        return;
 
     xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);

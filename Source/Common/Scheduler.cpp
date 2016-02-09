@@ -87,6 +87,16 @@ namespace MediaConch {
         return size == 0;
     }
 
+    void Scheduler::get_elements(std::vector<std::string>& vec)
+    {
+        CS.Enter();
+        std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
+        for (; it != working.end(); ++it)
+            if (it->first)
+                vec.push_back(it->first->filename);
+        CS.Leave();
+    }
+
     bool Scheduler::element_is_finished(const std::string& filename, double& percent_done)
     {
         bool ret = true;
