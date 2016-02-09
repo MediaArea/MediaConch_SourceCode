@@ -1069,7 +1069,10 @@ MainWindow::FileRegistered* MainWindow::get_file_registered_from_file(const std:
     FileRegistered* fr = NULL;
     for (size_t i = 0; i < registered_files.size(); ++i)
     {
-        std::string f = registered_files[i]->filepath + "/" + registered_files[i]->filename;
+        std::string f = registered_files[i]->filepath;
+        if (f.length())
+            f += "/";
+        f += registered_files[i]->filename;
         if (f == file)
         {
             fr = registered_files[i];

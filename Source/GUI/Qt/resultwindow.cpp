@@ -199,7 +199,10 @@ void ResultWindow::update_html_with_results(QString& html)
         if (!vec[i])
             continue;
 
-        std::string filename(vec[i]->filepath + "/" + vec[i]->filename);
+        std::string filename = vec[i]->filepath;
+        if (filename.length())
+            filename += "/";
+        filename += vec[i]->filename;
         to_update_files.push_back(filename);
         vec[i]->index = result_index;
 
