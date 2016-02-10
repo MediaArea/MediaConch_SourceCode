@@ -169,6 +169,7 @@
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
@@ -183,6 +184,7 @@
     <ClInclude Include="..\..\..\Source\Common\Policy.h" />
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h" />
+    <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
   </ItemGroup>
