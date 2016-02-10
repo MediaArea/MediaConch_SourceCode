@@ -190,6 +190,7 @@
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
@@ -206,9 +207,12 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\resultwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\unknownwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
@@ -230,9 +234,12 @@
     <ClCompile Include="_Automated\moc_policymenu.cpp" />
     <ClCompile Include="_Automated\moc_policywindow.cpp" />
     <ClCompile Include="_Automated\moc_progressbar.cpp" />
+    <ClCompile Include="_Automated\moc_resultwindow.cpp" />
     <ClCompile Include="_Automated\moc_ruleedit.cpp" />
     <ClCompile Include="_Automated\moc_rulemenu.cpp" />
     <ClCompile Include="_Automated\moc_schematronwindow.cpp" />
+    <ClCompile Include="_Automated\moc_unknownpolicymenu.cpp" />
+    <ClCompile Include="_Automated\moc_unknownwindow.cpp" />
     <ClCompile Include="_Automated\moc_WebEnginePage.cpp" />
     <ClCompile Include="_Automated\moc_WebEngineView.cpp" />
     <ClCompile Include="_Automated\moc_WebKitPage.cpp">
@@ -259,6 +266,7 @@
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h" />
     <ClInclude Include="..\..\..\Source\Common\SQLLite.h" />
+    <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h" />
@@ -271,9 +279,12 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\policymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\resultwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\unknownwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebChoose.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h" />
@@ -291,6 +302,7 @@
     <ClInclude Include="_Automated\ui_progressbar.h" />
     <ClInclude Include="_Automated\ui_ruleedit.h" />
     <ClInclude Include="_Automated\ui_rulemenu.h" />
+    <ClInclude Include="_Automated\ui_unknownpolicymenu.h" />
     <ClInclude Include="_Automated\ui_xsltpolicymenu.h" />
     <ClInclude Include="_Automated\ui_xsltruleedit.h" />
   </ItemGroup>

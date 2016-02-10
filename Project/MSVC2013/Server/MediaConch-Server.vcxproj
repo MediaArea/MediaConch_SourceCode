@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Daemon\Daemon_Main.cpp" />
     <ClCompile Include="..\..\..\Source\Daemon\Daemon.cpp" />
     <ClCompile Include="..\..\..\Source\Daemon\Help.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h" />
     <ClInclude Include="..\..\..\Source\Daemon\Daemon_Main.h" />
     <ClInclude Include="..\..\..\Source\Daemon\Daemon.h" />
     <ClInclude Include="..\..\..\Source\Daemon\Help.h" />
