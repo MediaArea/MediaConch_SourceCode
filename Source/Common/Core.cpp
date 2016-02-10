@@ -63,6 +63,7 @@ using namespace std;
 
 namespace MediaConch {
 
+const std::string Core::database_name = "MediaConch.db";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -139,10 +140,11 @@ void Core::load_database()
     db = new SQLLite;
 
     db->set_database_directory(db_path);
-    db->init();
+    db->set_database_filename(database_name);
+    db->init_report();
 #else
     db = new NoDatabase;
-    db->init();
+    db->init_report();
 #endif
 }
 
@@ -243,6 +245,12 @@ int Core::get_ui_poll_request() const
             ui_poll_request = 1000;
     }
     return ui_poll_request;
+}
+
+//---------------------------------------------------------------------------
+int Core::get_ui_database_path(std::string& path) const
+{
+    return config->get("UI_Database_Path", path);
 }
 
 //***************************************************************************

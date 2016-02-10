@@ -104,6 +104,7 @@ public:
     const std::string& get_implementation_verbosity();
     void set_compression_mode(MediaConchLib::compression compress);
     int get_ui_poll_request() const;
+    int get_ui_database_path(std::string& path) const;
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
@@ -128,6 +129,7 @@ private:
 
     MediaInfoNameSpace::MediaInfoList* MI;
     Database*                          db;
+    static const std::string           database_name;
     Configuration*                     config;
     std::string                        configuration_file;
     std::map<std::string, std::string> implementation_options;

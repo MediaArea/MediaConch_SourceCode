@@ -14,6 +14,10 @@
 #include "helpwindow.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 
+#include "Common/Database.h"
+#include "Common/NoDatabase.h"
+#include "Common/SQLLite.h"
+
 #include <QStringList>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -46,17 +50,24 @@
 
 namespace MediaConch {
 
+const std::string MainWindow::database_filename = std::string("MediaConchUi.db");
+
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    db(NULL)
 {
     ui->setupUi(this);
 
     MCL.init();
+
+    // Local database
+    create_and_configure_database();
+
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
@@ -107,11 +118,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Connect the signal 
     connect(this, SIGNAL(setResultView()), this, SLOT(on_actionResult_triggered()));
+    fill_registered_file_from_db();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    if (db)
+        delete db;
 }
 
 //***************************************************************************
@@ -139,12 +153,16 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path, cons
     fr->display = display.toInt();
 
     if (exists)
+    {
+        update_registered_file_in_db(fr);
         return;
+    }
 
     registered_files.push_back(fr);
     std::vector<std::string> vec;
     vec.push_back(full_file);
     analyze(vec);
+    add_registered_file_to_db(fr);
 }
 
 //---------------------------------------------------------------------------
@@ -173,9 +191,6 @@ void MainWindow::Run()
             createCheckerView();
             break;
         case RUN_RESULT_VIEW:
-            //TODO: fill the view if file already here
-            // if (!registered_files.empty())
-            //     C.Run();
             createResultView();
             break;
         case RUN_POLICIES_VIEW:
@@ -391,7 +406,13 @@ void MainWindow::remove_xslt_display()
 void MainWindow::clear_file_list()
 {
     for (size_t i = 0; i < registered_files.size(); ++i)
+    {
+        if (!registered_files[i])
+            continue;
+
+        remove_registered_file_from_db(registered_files[i]);
         delete registered_files[i];
+    }
     registered_files.clear();
 }
 
@@ -405,6 +426,119 @@ const std::vector<Policy *>& MainWindow::get_all_policies() const
 std::vector<QString>& MainWindow::get_displays()
 {
     return displays_list;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::load_database()
+{
+#ifdef HAVE_SQLITE
+    std::string db_path;
+    if (MCL.get_ui_database_path(db_path) < 0)
+    {
+        db_path = Core::get_local_data_path();
+        QDir f(QString().fromStdString(db_path));
+        if (!f.exists())
+            db_path = ".";
+    }
+
+    db = new SQLLite;
+
+    db->set_database_directory(db_path);
+    db->set_database_filename(database_filename);
+    if (db->init_ui() < 0)
+    {
+        const std::vector<std::string>& errors = db->get_errors();
+        std::string error;
+        for (size_t i = 0; i < errors.size(); ++i)
+        {
+            if (i)
+                error += " ";
+            error += errors[i];
+        }
+        QString msg = QString().fromStdString(error);
+        set_msg_error_to_status_bar(msg);
+    }
+#else
+    db = new NoDatabase;
+    db->init_ui();
+#endif
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::add_registered_file_to_db(const FileRegistered* file)
+{
+    if (!db)
+        return;
+
+    db->ui_add_file(file->filename, file->filepath,
+                    file->policy, file->display, file->analyzed,
+                    file->implementation_valid, file->policy_valid);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::update_registered_file_in_db(const FileRegistered* file)
+{
+    if (!db)
+        return;
+
+    db->ui_update_file(file->filename, file->filepath,
+                       file->policy, file->display, file->analyzed,
+                       file->implementation_valid, file->policy_valid);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::remove_registered_file_from_db(const FileRegistered* file)
+{
+    if (!db)
+        return;
+
+    db->ui_remove_file(file->filename, file->filepath);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::get_registered_file_from_db(FileRegistered* file)
+{
+    if (!db || !file)
+        return;
+
+    db->ui_get_file(file->filename, file->filepath,
+                    file->policy, file->display, file->analyzed,
+                    file->implementation_valid, file->policy_valid);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::create_and_configure_database()
+{
+    load_database();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::fill_registered_file_from_db()
+{
+    if (!db)
+        return;
+
+    std::vector<std::pair<std::string, std::string> > vec;
+    db->ui_get_elements(vec);
+
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        FileRegistered *fr = new FileRegistered;
+
+        fr->filename = vec[i].first;
+        fr->filepath = vec[i].second;
+        get_registered_file_from_db(fr);
+        registered_files.push_back(fr);
+
+        std::string full_file(fr->filepath);
+        if (full_file.length())
+            full_file += "/";
+        full_file += fr->filename;
+
+        std::vector<std::string> files;
+        files.push_back(full_file);
+        analyze(files);
+    }
 }
 
 //***************************************************************************
@@ -421,10 +555,10 @@ void MainWindow::on_actionOpen_triggered()
     for (int pos = 0; pos < list.size(); ++pos)
     {
         QFileInfo file(list[pos]);
-        FileRegistered *fr = new FileRegistered;
-        fr->filename = file.fileName().toStdString();
-        fr->filepath = file.absolutePath().toStdString();
-        registered_files.push_back(fr);
+        QString filename = file.fileName();
+        QString filepath = file.absolutePath();
+
+        add_file_to_list(filename, filepath, "-1", "-1");
     }
 
     current_view = RUN_CHECKER_VIEW;
@@ -1123,6 +1257,7 @@ MainWindow::FileRegistered* MainWindow::get_file_registered_from_file(const std:
                 delete res[i];
             res.clear();
         }
+        update_registered_file_in_db(fr);
     }
 
     return fr;
@@ -1152,6 +1287,7 @@ void MainWindow::remove_file_registered_from_file(const std::string& file)
         return;
 
     registered_files[pos] = NULL;
+    remove_registered_file_from_db(fr);
     delete fr;
     registered_files.erase(registered_files.begin() + pos);
 }

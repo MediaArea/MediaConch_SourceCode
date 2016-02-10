@@ -141,9 +141,11 @@ private:
     Ui::MainWindow *ui;
 
     // Internal
-    MediaConchLib                MCL;
-    std::vector<FileRegistered*> registered_files;
-    std::vector<QString>         displays_list;
+    MediaConchLib                 MCL;
+    Database                     *db;
+    static const std::string      database_filename;
+    std::vector<FileRegistered*>  registered_files;
+    std::vector<QString>          displays_list;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -162,6 +164,14 @@ private:
     void                        createDisplayView();
     void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
+
+    void                        create_and_configure_database();
+    void                        load_database();
+    void                        add_registered_file_to_db(const FileRegistered* file);
+    void                        update_registered_file_in_db(const FileRegistered* file);
+    void                        get_registered_file_from_db(FileRegistered* file);
+    void                        remove_registered_file_from_db(const FileRegistered* file);
+    void                        fill_registered_file_from_db();
 
     void                        fill_display_used(int *policy_i,
                                                   std::string& display_name, std::string& display_content,

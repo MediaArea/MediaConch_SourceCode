@@ -26,8 +26,6 @@ namespace MediaConch {
 // Class Database
 //***************************************************************************
 
-const std::string databaseName = "MediaConch.db";
-
 class Database
 {
 public:
@@ -49,18 +47,40 @@ public:
     virtual void get_elements(std::vector<std::string>& vec) = 0;
 
     void        set_database_directory(const std::string& dirname);
+    void        set_database_filename(const std::string& name);
+
+    // UI
+    virtual int ui_add_file(const std::string& filename, const std::string& filepath,
+                            int policy, int display, bool analyzed,
+                            bool implementation_valid, bool policy_valid) = 0;
+    virtual int ui_update_file(const std::string& filename, const std::string& filepath,
+                               int policy, int display, bool analyzed,
+                               bool implementation_valid, bool policy_valid) = 0;
+    virtual int ui_get_file(const std::string& filename, const std::string& filepath,
+                            int& policy, int& display, bool& analyzed,
+                            bool& implementation_valid, bool& policy_valid) = 0;
+    virtual int ui_remove_file(const std::string& filename, const std::string& filepath) = 0;
+    virtual void ui_get_elements(std::vector<std::pair<std::string, std::string> >& vec) = 0;
+
     virtual int init() = 0;
+    virtual int init_report() = 0;
+    virtual int init_ui() = 0;
+
+    const std::vector<std::string>& get_errors() const { return errors; }
 
 protected:
     std::string                        query;
     std::vector<std::string>           errors;
-    std::map<std::string, std::vector<std::string> > reports;
-    std::string                        db_file;
+    std::vector<std::map<std::string, std::string> > reports;
+    std::string                        db_filename;
+    std::string                        db_dirname;
 
     //Database dependant
     virtual int execute() = 0;
     void        get_sql_query_for_create_report_table(std::string& q);
     void        get_sql_query_for_update_report_table(std::string& q);
+    void        get_sql_query_for_create_ui_table(std::string& q);
+    void        get_sql_query_for_update_ui_table(std::string& q);
 
 private:
     Database (const Database&);

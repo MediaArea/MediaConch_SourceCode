@@ -32,6 +32,10 @@ public:
     virtual ~NoDatabase();
 
     virtual int init();
+    virtual int init_report();
+    virtual int init_ui();
+
+    // Report
     virtual int create_report_table();
     virtual int update_report_table();
     virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report, MediaConchLib::compression);
@@ -41,6 +45,19 @@ public:
                             std::string& report, MediaConchLib::compression&);
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
     virtual void get_elements(std::vector<std::string>& vec);
+
+    // UI
+    virtual int ui_add_file(const std::string& filename, const std::string& filepath,
+                            int policy, int display, bool analyzed,
+                            bool implementation_valid, bool policy_valid);
+    virtual int ui_update_file(const std::string& filename, const std::string& filepath,
+                               int policy, int display, bool analyzed,
+                               bool implementation_valid, bool policy_valid);
+    virtual int ui_get_file(const std::string& filename, const std::string& filepath,
+                            int& policy, int& display, bool& analyzed,
+                            bool& implementation_valid, bool& policy_valid);
+    virtual int ui_remove_file(const std::string& filename, const std::string& filepath);
+    virtual void ui_get_elements(std::vector<std::pair<std::string, std::string> >& vec);
 
 protected:
     virtual int execute();
@@ -56,6 +73,8 @@ private:
         std::string file_last_modification;
         std::string report;
     };
+
+    //TODO UI
 
     std::map<std::string, std::vector<Report*> > reports_saved;
 };

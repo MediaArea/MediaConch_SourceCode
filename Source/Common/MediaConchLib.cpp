@@ -176,7 +176,7 @@ int MediaConchLib::analyze(const std::string& file, bool& registered, bool force
 int MediaConchLib::is_done(const std::vector<std::string>& files, double& percent)
 {
     if (!files.size())
-        return true;
+        return errorHttp_TRUE;
 
     int done = errorHttp_TRUE;
     percent = 0.0;
@@ -359,6 +359,12 @@ void MediaConchLib::set_compression_mode(compression compress)
 int MediaConchLib::get_ui_poll_request() const
 {
     return core->get_ui_poll_request();
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::get_ui_database_path(std::string& path) const
+{
+    return core->get_ui_database_path(path);
 }
 
 //***************************************************************************
