@@ -685,6 +685,92 @@ void MainWindow::update_status_bar()
     clear_msg_in_status_bar();
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::create_policy_options(QString& policies)
+{
+    const std::vector<Policy *>& list = get_all_policies();
+
+    QString system_policy;
+    QString user_policy;
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
+            system_policy += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+        else
+            user_policy += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+    }
+
+    // Create default policy opt-group
+    if (system_policy.length())
+        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
+
+    // Create default policy opt-group
+    if (user_policy.length())
+        policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::create_displays_options(QString& displays)
+{
+    QString system_display;
+    QString user_display;
+    for (size_t i = 0; i < displays_list.size(); ++i)
+    {
+        QFileInfo file(displays_list[i]);
+        if (displays_list[i].startsWith(":/"))
+            system_display += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(file.baseName());
+        else
+            user_display += QString("<option value=\"%1\">%2</option>")
+                .arg((int)i).arg(file.baseName());
+    }
+
+    // Create default display opt-group
+    if (system_display.length())
+        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
+
+    // Create user display opt-group
+    if (user_display.length())
+        displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
+{
+    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a policy[\\n\\r\\t\\s]*</option>");
+    int pos = html.indexOf(selector);
+
+    reg.setMinimal(true);
+
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, policies);
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::add_display_to_html_selection(QString& displays, QString& html, const QString& selector)
+{
+    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a Display[\\n\\r\\t\\s]*</option>");
+    reg.setMinimal(true);
+
+    int pos = html.indexOf(selector);
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, displays);
+    }
+}
+
 //***************************************************************************
 // HELPER
 //***************************************************************************
@@ -898,7 +984,7 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::get_implementation_report(const std::string& file, QString& report)
+void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p)
 {
     FileRegistered *fr = get_file_registered_from_file(file);
     if (!fr || !fr->analyzed)
@@ -908,7 +994,7 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
     std::string display_name;
     const std::string* dname = NULL;
     const std::string* dcontent = NULL;
-    fill_display_used(display_name, display_content, dname, dcontent, fr);
+    fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
 
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(MediaConchLib::report_MediaConch);
@@ -926,7 +1012,7 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::validate_policy(const std::string& file, QString& report, int policy)
+int MainWindow::validate_policy(const std::string& file, QString& report, int policy, int *display_p)
 {
     FileRegistered* fr = get_file_registered_from_file(file);
     if (!fr || !fr->analyzed)
@@ -952,7 +1038,7 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     std::string display_name;
     const std::string* dname = NULL;
     const std::string* dcontent = NULL;
-    fill_display_used(display_name, display_content, dname, dcontent, fr);
+    fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
     std::vector<std::string> files;
     files.push_back(file);
 
@@ -983,7 +1069,10 @@ MainWindow::FileRegistered* MainWindow::get_file_registered_from_file(const std:
     FileRegistered* fr = NULL;
     for (size_t i = 0; i < registered_files.size(); ++i)
     {
-        std::string f = registered_files[i]->filepath + "/" + registered_files[i]->filename;
+        std::string f = registered_files[i]->filepath;
+        if (f.length())
+            f += "/";
+        f += registered_files[i]->filename;
         if (f == file)
         {
             fr = registered_files[i];
@@ -1068,11 +1157,24 @@ void MainWindow::remove_file_registered_from_file(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::fill_display_used(std::string&, std::string& display_content,
+void MainWindow::fill_display_used(int *display_p, std::string&, std::string& display_content,
                                    const std::string*& dname, const std::string*& dcontent,
                                    FileRegistered* fr)
 {
-    if (fr && fr->display > 0 && (size_t)fr->display < displays_list.size())
+    if (display_p)
+    {
+        if (*display_p >= 0 && (size_t)*display_p < displays_list.size())
+        {
+            QFile display_xsl(displays_list[*display_p]);
+            display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);
+            QByteArray xsl = display_xsl.readAll();
+            display_xsl.close();
+            display_content = QString(xsl).toStdString();
+        }
+        else
+            display_content = std::string(implementation_report_display_html_xsl);
+    }
+    else if (fr && fr->display > 0 && (size_t)fr->display < displays_list.size())
     {
         QFile display_xsl(displays_list[fr->display]);
         display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);

@@ -85,6 +85,11 @@ public:
     void                        clear_msg_in_status_bar();
     void                        set_result_view();
 
+    void                        add_policy_to_html_selection(QString& policies, QString& html, const QString& selector);
+    void                        create_policy_options(QString& policies);
+    void                        add_display_to_html_selection(QString& displays, QString& html, const QString& selector);
+    void                        create_displays_options(QString& displays);
+
     // Helpers
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
@@ -105,8 +110,8 @@ public:
     void                        display_selected();
     void                        add_default_policy();
     void                        add_default_displays();
-    void                        get_implementation_report(const std::string& file, QString& report);
-    int                         validate_policy(const std::string& file, QString& report, int policy=-1);
+    void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL);
+    int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);
     bool                        is_all_policies_saved();
 
     void                        add_policy_to_list(const QString& policy);
@@ -158,7 +163,8 @@ private:
     void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
 
-    void                        fill_display_used(std::string& display_name, std::string& display_content,
+    void                        fill_display_used(int *policy_i,
+                                                  std::string& display_name, std::string& display_content,
                                                   const std::string*& dname, const std::string*& dcontent,
                                                   FileRegistered* fr);
     void                        set_error_http(MediaConchLib::errorHttp code);

@@ -61,18 +61,19 @@ namespace MediaConch
             onFileOnlineSelected();
     }
 
-    void WebPage::onFillImplementationReport(const QString& file, const QString& target)
+    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display)
     {
         std::string file_s = file.toStdString();
         QString report;
-        mainwindow->get_implementation_report(file_s, report);
+        int display_i = display.toInt();
+        mainwindow->get_implementation_report(file_s, report, &display_i);
         QString script = QString("$('%1 .modal-body')").arg(target);
 
+        report = report.replace("\r", "");
         if (report_is_html(report))
         {
             report = report.replace("\\", "\\\\");
             report = report.replace("'", "\\'");
-            report = report.replace("\r", "");
             report = report.replace("\n", "");
             script += QString(".html('%1');").arg(report);
         }
@@ -89,18 +90,23 @@ namespace MediaConch
         runJavaScript(script);
     }
 
-    void WebPage::onFillPolicyReport(const QString& file, const QString& target)
+    void WebPage::onFillPolicyReport(const QString& file, const QString& target, const QString& policy, const QString& display)
     {
-        std::string file_s = file.toStdString();
+        int policy_i = policy.toInt();
         QString report;
-        mainwindow->validate_policy(file_s, report);
+        if (policy_i != -1)
+        {
+            std::string file_s = file.toStdString();
+            int display_i = display.toInt();
+            mainwindow->validate_policy(file_s, report, policy_i, &display_i);
+        }
         QString script = QString("$('%1 .modal-body')").arg(target);
 
+        report = report.replace("\r", "");
         if (report_is_html(report))
         {
-            report = report.replace("'", "\\'");
             report = report.replace("\\", "\\\\");
-            report = report.replace("\r", "");
+            report = report.replace("'", "\\'");
             report = report.replace("\n", "");
             script += QString(".html('%1');").arg(report);
         }
@@ -112,6 +118,7 @@ namespace MediaConch
             report = Qt::escape(report);
 #endif
             report = report.replace("\n", "<br/>");
+            report = report.replace("'", "\\'");
             script += QString(".html('%1');").arg(report);
         }
         runJavaScript(script);
@@ -161,19 +168,22 @@ namespace MediaConch
         out << report;
     }
 
-    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name)
+    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display)
     {
         std::string file_s = file.toStdString();
         QString report;
-        mainwindow->get_implementation_report(file_s, report);
+        int display_i = display.toInt();
+        mainwindow->get_implementation_report(file_s, report, &display_i);
         onDownloadReport(report, save_name);
     }
 
-    void WebPage::onSavePolicyReport(const QString& file, const QString& save_name)
+    void WebPage::onSavePolicyReport(const QString& file, const QString& save_name, const QString& policy, const QString& display)
     {
         std::string file_s = file.toStdString();
         QString report;
-        mainwindow->validate_policy(file_s, report);
+        int policy_i = policy.toInt();
+        int display_i = display.toInt();
+        mainwindow->validate_policy(file_s, report, policy_i, &display_i);
         onDownloadReport(report, save_name);
     }
 
