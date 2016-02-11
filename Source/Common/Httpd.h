@@ -33,6 +33,7 @@ public:
     virtual ~Httpd();
 
     virtual int init() = 0;
+    virtual int bind() = 0;
     virtual int start() = 0;
     virtual int finish() = 0;
 
@@ -59,7 +60,9 @@ public:
     int send_result();
 
     void set_port(int port);
+    int  get_port() const;
     void set_address(std::string& address);
+    const std::string& get_address() const;
 
     std::string get_error() const;
     std::string get_result() const;

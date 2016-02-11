@@ -43,6 +43,7 @@ public:
     virtual ~LibEventHttpd();
 
     int init();
+    int bind();
     int start();
     int finish();
 

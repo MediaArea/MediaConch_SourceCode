@@ -62,7 +62,7 @@ int LibEventHttpd::init()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttpd::start()
+int LibEventHttpd::bind()
 {
     handle = evhttp_bind_socket_with_handle(http, address.c_str(), port);
     if (!handle)
@@ -72,9 +72,13 @@ int LibEventHttpd::start()
         error = ss.str();
         return -1;
     }
-
-    event_base_dispatch(base);
     return 0;
+}
+
+//---------------------------------------------------------------------------
+int LibEventHttpd::start()
+{
+    return event_base_dispatch(base);
 }
 
 //---------------------------------------------------------------------------

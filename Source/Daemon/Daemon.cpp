@@ -127,6 +127,13 @@ namespace MediaConch
         if (!httpd)
             return -1;
 
+        if (httpd->bind() < 0)
+        {
+            std::clog << httpd->get_error() << std::endl;
+            return -1;
+        }
+
+        std::clog << get_date() << "Daemon is running on " << httpd->get_address() << ":" << httpd->get_port() << std::endl;
         if (httpd->start() < 0)
         {
             std::clog << httpd->get_error() << std::endl;
@@ -141,7 +148,7 @@ namespace MediaConch
         if (httpd)
             httpd->finish();
         MCL->close();
-        std::clog << "Daemon is stopped" << std::endl;
+        std::clog << get_date() << "Daemon is stopped" << std::endl;
         return 0;
     }
 
