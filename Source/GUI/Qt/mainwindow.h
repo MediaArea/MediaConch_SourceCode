@@ -194,13 +194,14 @@ private Q_SLOTS:
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
 
+    void update_status_bar();
+
+public Q_SLOTS:
     //Help
     void on_actionAbout_triggered();
     void on_actionGettingStarted_triggered();
     void on_actionHowToUse_triggered();
     void on_actionDataFormat_triggered();
-
-    void update_status_bar();
 };
 
 }
