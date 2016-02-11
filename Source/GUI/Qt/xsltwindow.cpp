@@ -420,6 +420,13 @@ void XsltWindow::edit_rule_type()
         policieswindow->emphasis_policy_name_in_tree(item);
         r->type = ruleEdit->get_type_select()->currentText().toStdString();
         ruleEdit->change_values_of_field_selector();
+        if (r->type == "General")
+        {
+            ruleEdit->get_occurrence_box()->setValue(-1);
+            ruleEdit->get_occurrence_box()->setReadOnly(true);
+        }
+        else
+            ruleEdit->get_occurrence_box()->setReadOnly(false);
     }
 }
 

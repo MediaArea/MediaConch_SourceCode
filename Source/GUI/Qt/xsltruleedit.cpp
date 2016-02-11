@@ -16,6 +16,34 @@
 namespace MediaConch {
 
 //***************************************************************************
+// CustomSpinBox
+//***************************************************************************
+
+XsltRuleEdit::CustomSpinBox::CustomSpinBox(QWidget *parent) : QSpinBox(parent)
+{
+}
+
+XsltRuleEdit::CustomSpinBox::~CustomSpinBox()
+{
+}
+
+//---------------------------------------------------------------------------
+QString XsltRuleEdit::CustomSpinBox::textFromValue(int value) const
+{
+    if (value == -1)
+        return "All";
+    return QSpinBox::textFromValue(value);
+}
+
+//---------------------------------------------------------------------------
+int XsltRuleEdit::CustomSpinBox::valueFromText(QString& text) const
+{
+    if (text == "all" || text == "All")
+        return -1;
+    return QSpinBox::valueFromText(text);
+}
+
+//***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
@@ -29,6 +57,7 @@ XsltRuleEdit::XsltRuleEdit(QWidget *parent) :
     ui->freeText->setText(QString());
     ui->freeText->hide();
     add_values_to_selector();
+    change_occurence_spin_box();
 }
 
 //---------------------------------------------------------------------------
@@ -84,6 +113,11 @@ void XsltRuleEdit::fill_editor_fields(XsltRule *r)
     if (pos != -1)
         ui->field->setCurrentIndex(pos);
 
+    if (r->type == "General")
+    {
+        r->occurrence = -1;
+        ui->occurrence->setReadOnly(true);
+    }
     ui->occurrence->setValue(r->occurrence);
     pos = ui->ope->findText(QString().fromStdString(r->ope));
     if (pos != -1)
@@ -208,6 +242,18 @@ void XsltRuleEdit::change_values_of_field_selector()
     }
 
     ui->field->model()->sort(0);
+}
+
+//---------------------------------------------------------------------------
+void XsltRuleEdit::change_occurence_spin_box()
+{
+    delete ui->occurrence;
+    ui->occurrence = new CustomSpinBox(ui->editorFrame);
+    ui->occurrence->setObjectName("occurrence");
+    ui->occurrence->setMinimum(-1);
+    ui->occurrence->setMaximum(16777215);
+    ui->occurrence->setValue(1);
+    ui->gridLayout_2->addWidget(ui->occurrence, 3, 2, 1, 1);
 }
 
 }
