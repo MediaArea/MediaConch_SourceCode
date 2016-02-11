@@ -20,6 +20,7 @@
 #endif
 #include <QFrame>
 #include <QStandardItem>
+#include <QSpinBox>
 #include <list>
 using namespace MediaInfoNameSpace;
 using namespace std;
@@ -31,7 +32,6 @@ namespace Ui {
 class QPushButton;
 class QLineEdit;
 class QComboBox;
-class QSpinBox;
 class QDialogButtonBox;
 class QTableWidgetItem;
 class QRadioButton;
@@ -44,6 +44,15 @@ class MainWindow;
 
 class XsltRuleEdit : public QFrame
 {
+    class CustomSpinBox : public QSpinBox
+    {
+    public:
+        explicit CustomSpinBox(QWidget *parent = 0);
+        ~CustomSpinBox();
+        QString textFromValue(int value) const;
+        int valueFromText(QString& text) const;
+    };
+
     Q_OBJECT
 
 public:
@@ -74,6 +83,7 @@ private:
     Ui::XsltRuleEdit *ui;
 
     void               add_values_to_selector();
+    void               change_occurence_spin_box();
 };
 
 }
