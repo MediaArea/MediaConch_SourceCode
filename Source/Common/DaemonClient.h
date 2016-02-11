@@ -44,6 +44,9 @@ public:
     // List
     int list(std::vector<std::string>& vec);
 
+    // file_from_id
+    int file_from_id(int id, std::string& filename);
+
     // Analyze
     int analyze(const std::string& file, bool& registered, bool force_analyze);
 

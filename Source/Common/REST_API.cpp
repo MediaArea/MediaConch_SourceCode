@@ -248,6 +248,15 @@ std::string RESTAPI::Validate_Req::to_str() const
     return out.str();
 }
 
+//---------------------------------------------------------------------------
+std::string RESTAPI::File_From_Id_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[id: '" << id << "']";
+    return out.str();
+}
+
 //***************************************************************************
 // Result: to_str()
 //***************************************************************************
@@ -511,6 +520,15 @@ std::string RESTAPI::Validate_Res::to_str() const
     return out.str();
 }
 
+//---------------------------------------------------------------------------
+std::string RESTAPI::File_From_Id_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[file: '" << file << "']";
+    return out.str();
+}
+
 //***************************************************************************
 // Serialize: Request
 //***************************************************************************
@@ -636,6 +654,27 @@ std::string RESTAPI::serialize_validate_req(Validate_Req& req)
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj.push_back(std::make_pair("VALIDATE", child));
+
+    std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_file_from_id_req(File_From_Id_Req& req)
+{
+    Container::Value v, child, id;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = req.id;
+
+    child.obj.push_back(std::make_pair("id", id));
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj.push_back(std::make_pair("FILE_FROM_ID", child));
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -797,6 +836,26 @@ std::string RESTAPI::serialize_validate_res(Validate_Res& res)
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj.push_back(std::make_pair("VALIDATE_RESULT", child));
+
+    std::string ret = model->serialize(v);
+    if (!ret.length())
+        error = model->get_error();
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::serialize_file_from_id_res(File_From_Id_Res& res)
+{
+    Container::Value v, child, file;
+
+    file.type = Container::Value::CONTAINER_TYPE_STRING;
+    file.s = res.file;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    child.obj.push_back(std::make_pair("file", file));
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj.push_back(std::make_pair("FILE_FROM_ID_RESULT", child));
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -1090,6 +1149,31 @@ RESTAPI::Validate_Req *RESTAPI::parse_validate_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::File_From_Id_Req *RESTAPI::parse_file_from_id_req(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "FILE_FROM_ID");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    File_From_Id_Req *req = new File_From_Id_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
 {
     Analyze_Req *req = new Analyze_Req;
@@ -1181,6 +1265,13 @@ RESTAPI::List_Req *RESTAPI::parse_uri_list_req(const std::string&)
 RESTAPI::Validate_Req *RESTAPI::parse_uri_validate_req(const std::string&)
 {
     Validate_Req *req = new Validate_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::File_From_Id_Req *RESTAPI::parse_uri_file_from_id_req(const std::string&)
+{
+    File_From_Id_Req *req = new File_From_Id_Req;
     return req;
 }
 
@@ -1543,6 +1634,33 @@ RESTAPI::Validate_Res *RESTAPI::parse_validate_res(std::string data)
         }
         res->nok.push_back(tmp);
     }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::File_From_Id_Res *RESTAPI::parse_file_from_id_res(std::string data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "FILE_FROM_ID_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *file;
+    file = model->get_value_by_key(*child, "file");
+
+    if (!file || file->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    File_From_Id_Res *res = new File_From_Id_Res;
+    res->file = file->s;
+
     return res;
 }
 

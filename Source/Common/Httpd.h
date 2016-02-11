@@ -44,6 +44,7 @@ public:
     REQ_FUNC(Analyze);
     REQ_FUNC(Report);
     REQ_FUNC(Validate);
+    REQ_FUNC(File_From_Id);
     REQ_FUNC(Retry);
 #undef REQ_FUNC
 
@@ -78,21 +79,24 @@ public:
                                    RESTAPI::List_Res& res, void* arg);
     typedef int (*on_validate_command)(const RESTAPI::Validate_Req* req,
                                        RESTAPI::Validate_Res& res, void* arg);
+    typedef int (*on_file_from_id_command)(const RESTAPI::File_From_Id_Req* req,
+                                           RESTAPI::File_From_Id_Res& res, void* arg);
 
     struct Commands
     {
         Commands() : analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
                      retry_cb(NULL), clear_cb(NULL), list_cb(NULL),
-                     validate_cb(NULL)
+                     validate_cb(NULL), file_from_id_cb(NULL)
             {
             }
-        on_analyze_command  analyze_cb;
-        on_status_command   status_cb;
-        on_report_command   report_cb;
-        on_retry_command    retry_cb;
-        on_clear_command    clear_cb;
-        on_list_command     list_cb;
-        on_validate_command validate_cb;
+        on_analyze_command      analyze_cb;
+        on_status_command       status_cb;
+        on_report_command       report_cb;
+        on_retry_command        retry_cb;
+        on_clear_command        clear_cb;
+        on_list_command         list_cb;
+        on_validate_command     validate_cb;
+        on_file_from_id_command file_from_id_cb;
     };
 
     Commands commands;

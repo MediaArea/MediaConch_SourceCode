@@ -81,6 +81,7 @@ public:
                                const std::vector<std::string>* policies_contents = NULL);
 
     void        list(std::vector<std::string>& vec);
+
     int         validate(MediaConchLib::report report, const std::vector<std::string>& file,
                          const std::vector<std::string>& policies_names,
                          const std::vector<std::string>& policies_contents,

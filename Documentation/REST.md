@@ -12,6 +12,7 @@ It is used above an HTTP connection.
 
 * Add the List command
 * Add the Validate command
+* Add the File_From_Id command
 
 #### Version 1.1
 
@@ -24,19 +25,23 @@ It is used above an HTTP connection.
 
 ### API
 
+Current API version: $API_VERSION = 1.2
+
 #### Command
 
-* Analyze:  HTTP POST
-* Status:   HTTP GET
-* Report:   HTTP POST
-* Retry:    HTTP PUT
-* Clear:    HTTP DELETE
-* List:     HTTP GET
-* Validate: HTTP POST
+* Analyze:      HTTP POST
+* Status:       HTTP GET
+* Report:       HTTP POST
+* Retry:        HTTP PUT
+* Clear:        HTTP DELETE
+* List:         HTTP GET
+* Validate:     HTTP POST
+* File_From_Id: HTTP POST
 
 #### Analyze
 
 JSON format for the parameters.
+URL: /$API_VERSION/analyze
 
 ##### Request
 
@@ -66,6 +71,7 @@ Parameters:
 #### Status
 
 URI format for the parameters.
+URL: /$API_VERSION/status
 
 ##### Request
 
@@ -93,6 +99,7 @@ Parameters:
 #### Report
 
 JSON format for the parameters.
+URL: /$API_VERSION/report
 
 ##### Request
 
@@ -124,6 +131,7 @@ Parameters:
 #### Retry
 
 JSON format for the parameters.
+URL: /$API_VERSION/retry
 
 ##### Request
 
@@ -145,6 +153,7 @@ Parameters:
 #### Clear
 
 URI format for the parameters.
+URL: /$API_VERSION/clear
 
 ##### Request
 
@@ -185,6 +194,7 @@ Parameters:
 #### Validate
 
 JSON format for the parameters.
+URL: /$API_VERSION/validate
 
 ##### Request
 
@@ -210,6 +220,23 @@ Parameters:
 
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
+
+#### File_From_Id
+
+JSON format for the parameters.
+URL: /$API_VERSION/file_from_id
+
+##### Request
+
+Parameters:
+
+- id:                Integer: id given by the Analyze command
+
+##### Response
+
+Parameter:
+
+* file:              String: File corresponding to the id, left empty if id not matching
 
 #### Report kinds
 
