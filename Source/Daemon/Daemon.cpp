@@ -92,6 +92,7 @@ namespace MediaConch
         httpd->commands.clear_cb = on_clear_command;
         httpd->commands.list_cb = on_list_command;
         httpd->commands.validate_cb = on_validate_command;
+        httpd->commands.file_from_id_cb = on_file_from_id_command;
         return 0;
     }
 
@@ -685,12 +686,9 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         MediaConchLib::report report;
-        bool has_policy = false;
         if (req->report == RESTAPI::IMPLEMENTATION)
             report = MediaConchLib::report_MediaConch;
-        else if (req->report == RESTAPI::POLICY)
-            has_policy = true;
-        else
+        else if (req->report != RESTAPI::POLICY)
             return -1;
 
         std::map<std::string, int> saved_ids;
@@ -736,6 +734,24 @@ namespace MediaConch
             res.ok.push_back(ok);
         }
         std::clog << d->get_date() << "Daemon send validate result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_file_from_id_command(const RESTAPI::File_From_Id_Req* req, RESTAPI::File_From_Id_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a file_from_id command" << std::endl;
+        std::clog << req->to_str() << std::endl;
+
+        if (d->id_is_existing(req->id))
+            res.file = *d->current_files[req->id];
+
+        std::clog << d->get_date() << "Daemon send file_from_id result: " << res.to_str() << std::endl;
         return 0;
     }
 

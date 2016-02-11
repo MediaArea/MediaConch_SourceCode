@@ -220,6 +220,16 @@ void MediaConchLib::list(std::vector<std::string>& vec)
     core->list(vec);
 }
 
+//---------------------------------------------------------------------------
+void MediaConchLib::file_from_id(int id, std::string& filename)
+{
+    if (use_daemon)
+    {
+        daemon_client->file_from_id(id, filename);
+        return;
+    }
+}
+
 //***************************************************************************
 // Output
 //***************************************************************************

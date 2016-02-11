@@ -76,6 +76,8 @@ namespace MediaConch
                                    RESTAPI::List_Res& res, void *arg);
         static int on_validate_command(const RESTAPI::Validate_Req* req,
                                        RESTAPI::Validate_Res& res, void *arg);
+        static int on_file_from_id_command(const RESTAPI::File_From_Id_Req* req,
+                                           RESTAPI::File_From_Id_Res& res, void *arg);
 
         size_t get_first_free_slot();
         bool id_is_existing(int id) const;

@@ -280,6 +280,29 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (!result.length())
             error = rest.get_error();
     }
+    else if (!std::string("/file_from_id").compare(uri_path))
+    {
+        RESTAPI::File_From_Id_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::File_From_Id_Res res;
+        if (commands.file_from_id_cb && commands.file_from_id_cb(r, res, parent) < 0)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        result = rest.serialize_file_from_id_res(res);
+        if (!result.length())
+            error = rest.get_error();
+    }
     else
     {
         code = HTTP_NOTFOUND;

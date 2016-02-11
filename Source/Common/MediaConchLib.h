@@ -116,6 +116,7 @@ public:
     int  is_done(const std::string& file, double& percent);
 
     void list(std::vector<std::string>& vec);
+    void file_from_id(int id, std::string& filename);
 
     // Output
     int  get_report(const std::bitset<report_Max>& Report, format f,

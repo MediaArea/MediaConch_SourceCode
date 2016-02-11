@@ -113,6 +113,17 @@ int Http::send_request(RESTAPI::Validate_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::File_From_Id_Req& req)
+{
+    std::string cmd = rest.serialize_file_from_id_req(req);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/file_from_id";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
 void Http::set_port(int port)
 {
     this->port = port;

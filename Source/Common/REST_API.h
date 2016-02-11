@@ -323,6 +323,18 @@ public:
         std::string                to_str() const;
     };
 
+    struct File_From_Id_Req
+    {
+        int          id;
+        std::string  to_str() const;
+    };
+
+    struct File_From_Id_Res
+    {
+        std::string  file;
+        std::string  to_str() const;
+    };
+
 public:
     //Constructor/Destructor
     RESTAPI();
@@ -336,6 +348,7 @@ public:
     std::string serialize_clear_req(Clear_Req& req);
     std::string serialize_list_req(List_Req& req);
     std::string serialize_validate_req(Validate_Req& req);
+    std::string serialize_file_from_id_req(File_From_Id_Req& req);
 
     // Serialize: Result
     std::string serialize_analyze_res(Analyze_Res& res);
@@ -345,33 +358,37 @@ public:
     std::string serialize_clear_res(Clear_Res& res);
     std::string serialize_list_res(List_Res& res);
     std::string serialize_validate_res(Validate_Res& res);
+    std::string serialize_file_from_id_res(File_From_Id_Res& res);
 
     // Parse: Request
-    Analyze_Req  *parse_analyze_req(std::string data);
-    Status_Req   *parse_status_req(std::string data);
-    Report_Req   *parse_report_req(std::string data);
-    Retry_Req    *parse_retry_req(std::string data);
-    Clear_Req    *parse_clear_req(std::string data);
-    List_Req     *parse_list_req(std::string data);
-    Validate_Req *parse_validate_req(std::string data);
+    Analyze_Req      *parse_analyze_req(std::string data);
+    Status_Req       *parse_status_req(std::string data);
+    Report_Req       *parse_report_req(std::string data);
+    Retry_Req        *parse_retry_req(std::string data);
+    Clear_Req        *parse_clear_req(std::string data);
+    List_Req         *parse_list_req(std::string data);
+    Validate_Req     *parse_validate_req(std::string data);
+    File_From_Id_Req *parse_file_from_id_req(std::string data);
 
     // Parse: URI Request
-    Analyze_Req  *parse_uri_analyze_req(const std::string& uri);
-    Status_Req   *parse_uri_status_req(const std::string& uri);
-    Report_Req   *parse_uri_report_req(const std::string& uri);
-    Retry_Req    *parse_uri_retry_req(const std::string& uri);
-    Clear_Req    *parse_uri_clear_req(const std::string& uri);
-    List_Req     *parse_uri_list_req(const std::string& uri);
-    Validate_Req *parse_uri_validate_req(const std::string& uri);
+    Analyze_Req      *parse_uri_analyze_req(const std::string& uri);
+    Status_Req       *parse_uri_status_req(const std::string& uri);
+    Report_Req       *parse_uri_report_req(const std::string& uri);
+    Retry_Req        *parse_uri_retry_req(const std::string& uri);
+    Clear_Req        *parse_uri_clear_req(const std::string& uri);
+    List_Req         *parse_uri_list_req(const std::string& uri);
+    Validate_Req     *parse_uri_validate_req(const std::string& uri);
+    File_From_Id_Req *parse_uri_file_from_id_req(const std::string& uri);
 
     // Parse: Request
-    Analyze_Res  *parse_analyze_res(std::string data);
-    Status_Res   *parse_status_res(std::string data);
-    Report_Res   *parse_report_res(std::string data);
-    Retry_Res    *parse_retry_res(std::string data);
-    Clear_Res    *parse_clear_res(std::string data);
-    List_Res     *parse_list_res(std::string data);
-    Validate_Res *parse_validate_res(std::string data);
+    Analyze_Res      *parse_analyze_res(std::string data);
+    Status_Res       *parse_status_res(std::string data);
+    Report_Res       *parse_report_res(std::string data);
+    Retry_Res        *parse_retry_res(std::string data);
+    Clear_Res        *parse_clear_res(std::string data);
+    List_Res         *parse_list_res(std::string data);
+    Validate_Res     *parse_validate_res(std::string data);
+    File_From_Id_Res *parse_file_from_id_res(std::string data);
 
     std::string get_error() const { return error; }
 
