@@ -124,6 +124,10 @@ static void change_short_options_to_long(std::string& argument)
     // Compression short options
     if (argument=="-cz")
         argument = "--compression=zlib";
+
+    // Asynchronous mode
+    if (argument=="-as")
+        argument = "--async=yes";
 }
 
 int Parse(MediaConch::CLI* cli, std::string& argument)
@@ -162,6 +166,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--implementationverbosity",                     ImplementationVerbosity)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
+    OPTION("--async",                                       Asynchronous)
     //Default
     OPTION("--",                                            Default)
     else
@@ -357,6 +362,26 @@ CL_OPTION(Force)
 {
     (void)argument;
     cli->set_force_analyze(true);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(Asynchronous)
+{
+    //Form : --Compression=Mode
+    size_t egal_pos = argument.find('=');
+    std::string async;
+    if (egal_pos != std::string::npos)
+        async.assign(argument, egal_pos + 1 , std::string::npos);
+    else
+        async = "yes";
+    transform(async.begin(), async.end(), async.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+
+    bool is_async = false;
+    if (async == "yes")
+        is_async = true;
+
+    cli->set_asynchronous(is_async);
     return CLI_RETURN_NONE;
 }
 

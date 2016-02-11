@@ -44,6 +44,7 @@ CL_OPTION(ImplementationSchema);
 CL_OPTION(ImplementationVerbosity);
 CL_OPTION(Compression);
 CL_OPTION(Force);
+CL_OPTION(Asynchronous);
 CL_OPTION(Default);
 
 //***************************************************************************
