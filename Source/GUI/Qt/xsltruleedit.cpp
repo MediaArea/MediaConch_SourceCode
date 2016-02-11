@@ -113,6 +113,11 @@ void XsltRuleEdit::fill_editor_fields(XsltRule *r)
     if (pos != -1)
         ui->field->setCurrentIndex(pos);
 
+    if (r->type == "General")
+    {
+        r->occurrence = -1;
+        ui->occurrence->setReadOnly(true);
+    }
     ui->occurrence->setValue(r->occurrence);
     pos = ui->ope->findText(QString().fromStdString(r->ope));
     if (pos != -1)
@@ -244,7 +249,7 @@ void XsltRuleEdit::change_occurence_spin_box()
 {
     delete ui->occurrence;
     ui->occurrence = new CustomSpinBox(ui->editorFrame);
-    ui->occurrence->setObjectName(QStringLiteral("occurrence"));
+    ui->occurrence->setObjectName("occurrence");
     ui->occurrence->setMinimum(-1);
     ui->occurrence->setMaximum(16777215);
     ui->occurrence->setValue(1);
