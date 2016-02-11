@@ -152,6 +152,7 @@ public:
     const std::string& get_configuration_file() const;
     void               set_compression_mode(compression compress);
     int                get_ui_poll_request() const;
+    int                get_ui_database_path(std::string& path) const;
 
     bool ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
                                             const std::bitset<MediaConchLib::report_Max>& reports,

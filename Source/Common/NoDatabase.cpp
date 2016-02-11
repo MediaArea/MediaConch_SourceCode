@@ -50,6 +50,18 @@ int NoDatabase::init()
 }
 
 //---------------------------------------------------------------------------
+int NoDatabase::init_report()
+{
+    return init();
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::init_ui()
+{
+    return init();
+}
+
+//---------------------------------------------------------------------------
 int NoDatabase::execute()
 {
     return 0;
@@ -144,12 +156,46 @@ bool NoDatabase::file_is_registered(MediaConchLib::report reportKind, MediaConch
     }
     return false;
 }
+
+//---------------------------------------------------------------------------
 void NoDatabase::get_elements(std::vector<std::string>& vec)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.begin();
 
     for (; it != reports_saved.end(); ++it)
         vec.push_back(it->first);
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_add_file(const std::string&, const std::string&,
+                            int, int, bool, bool, bool)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_update_file(const std::string&, const std::string&,
+                            int, int, bool, bool, bool)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_get_file(const std::string&, const std::string&,
+                            int&, int&, bool&, bool&, bool&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_remove_file(const std::string&, const std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+void NoDatabase::ui_get_elements(std::vector<std::pair<std::string, std::string> >& vec)
+{
 }
 
 }
