@@ -43,6 +43,7 @@ namespace MediaConch
         void set_implementation_verbosity(const std::string& verbosity);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
+        void set_asynchronous(bool async);
 
         void print_error(MediaConchLib::errorHttp code);
 
@@ -60,6 +61,7 @@ namespace MediaConch
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format format;
         bool use_daemon;
+        bool asynchronous;
         bool force_analyze;
     };
 

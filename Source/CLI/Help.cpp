@@ -111,6 +111,8 @@ int Help_Advanced()
     TEXTOUT("");
     TEXTOUT("--Force");
     TEXTOUT("                    Force to parse the file if registered in database");
+    TEXTOUT("--Async=yes, -as");
+    TEXTOUT("                    Analyze asynchronously the files, need to launch again the command to have the result");
     TEXTOUT("--Help=Ssl");
     TEXTOUT("                    More details about SSL specific options (e.g. for HTTPS or FTPS)");
     TEXTOUT("--Help=Ssh");

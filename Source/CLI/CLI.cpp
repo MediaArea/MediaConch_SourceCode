@@ -34,7 +34,7 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : use_daemon(false), force_analyze(false)
+    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -115,7 +115,7 @@ namespace MediaConch
             if (ret < 0)
                 return ret;
 
-            if (use_daemon && !registered)
+            if (use_daemon && asynchronous && !registered)
             {
                 std::stringstream str;
                 str << "Registering ";
@@ -264,7 +264,7 @@ namespace MediaConch
         double percent_done = 0;
 
         int ret = MCL.is_done(files[i], percent_done);
-        if (use_daemon)
+        if (use_daemon && asynchronous)
         {
             if (ret == MediaConchLib::errorHttp_NONE)
             {
@@ -296,6 +296,12 @@ namespace MediaConch
     void CLI::set_force_analyze(bool force)
     {
         force_analyze = force;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_asynchronous(bool async)
+    {
+        asynchronous = async;
     }
 
     //--------------------------------------------------------------------------
