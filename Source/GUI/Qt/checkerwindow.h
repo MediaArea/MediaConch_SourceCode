@@ -36,6 +36,7 @@ public:
     void                        set_display_xslt(const QString& d) { display_xslt = d; }
     void                        reset_display_xslt() { display_xslt.clear(); }
     void                        change_local_files(QStringList& files);
+    void                        hide();
 
 private:
     // Visual elements

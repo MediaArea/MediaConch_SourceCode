@@ -126,6 +126,8 @@ MainWindow::~MainWindow()
     delete ui;
     if (db)
         delete db;
+    if (checkerView)
+        delete checkerView;
 }
 
 //***************************************************************************
@@ -633,9 +635,7 @@ void MainWindow::on_actionChooseSchema_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::set_result_view()
 {
-#if defined(WEB_MACHINE_KIT)
-    // Q_EMIT setResultView();
-#endif
+    Q_EMIT setResultView();
 }
 
 //---------------------------------------------------------------------------
@@ -714,10 +714,7 @@ void MainWindow::on_actionDataFormat_triggered()
 int MainWindow::clearVisualElements()
 {
     if (checkerView)
-    {
-        delete checkerView;
-        checkerView = NULL;
-    }
+        checkerView->hide();
 
     if (resultView)
     {
@@ -744,7 +741,7 @@ int MainWindow::clearVisualElements()
 void MainWindow::createCheckerView()
 {
     if (checkerView)
-        return;
+        delete checkerView;
 
     if (clearVisualElements() < 0)
         return;
