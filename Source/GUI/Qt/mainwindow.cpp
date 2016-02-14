@@ -741,7 +741,10 @@ int MainWindow::clearVisualElements()
 void MainWindow::createCheckerView()
 {
     if (checkerView)
+    {
         delete checkerView;
+        checkerView = NULL;
+    }
 
     if (clearVisualElements() < 0)
         return;
