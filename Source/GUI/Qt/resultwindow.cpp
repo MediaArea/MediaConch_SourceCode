@@ -382,7 +382,7 @@ void ResultWindow::change_html_file_detail(MainWindow::FileRegistered* file, QSt
     reg.setMinimal(true);
     QString fname;
     if (f.fileName().length() > 20)
-        fname = QString(f.fileName().right(20)) + "...";
+        fname = QString(f.fileName().left(20)) + "...";
     else
         fname = QString(f.fileName());
     while ((pos = reg.indexIn(html, pos)) != -1)
@@ -391,7 +391,10 @@ void ResultWindow::change_html_file_detail(MainWindow::FileRegistered* file, QSt
     reg = QRegExp("\\{\\{ check.policyname \\| truncate\\(20\\) \\}\\}");
     pos = 0;
     reg.setMinimal(true);
-    fname = QString(policy.left(20));
+    if (policy.length() > 20)
+        fname = QString(policy.left(20)) + "...";
+    else
+        fname = QString(policy);
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), fname);
 
