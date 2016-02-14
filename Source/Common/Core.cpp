@@ -178,7 +178,7 @@ void Core::set_implementation_schema_file(const std::string& file)
         if (pos == std::string::npos)
           break;
 
-        f[pos]='/'; // Windows path separators are replaced by / else it is reected by libxml2
+        f[pos]='/'; // Windows path separators are replaced by / else it is rejected by libxml2
     }
     #endif //WIN32
     implementation_options["schema"] = f;
@@ -1231,7 +1231,7 @@ std::string Core::get_local_config_path()
     std::string user_name(wuser.begin(), wuser.end());
     std::stringstream path;
 
-    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
+    path << "C:/Users/" << user_name << "/AppData/Roaming/MediaConch/";
     local_path = path.str();
 #elif defined(UNIX)
     const char* home = NULL;
@@ -1277,7 +1277,7 @@ std::string Core::get_local_data_path()
     std::string user_name(wuser.begin(), wuser.end());
     std::stringstream path;
 
-    path << "C:\\Users\\" << user_name << "\\AppData\\Roaming\\MediaConch\\";
+    path << "C:/Users/" << user_name << "/AppData/Roaming/MediaConch/";
     local_path = path.str();
 #elif defined(UNIX)
     const char* home;
