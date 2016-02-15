@@ -267,7 +267,7 @@ std::string RESTAPI::Analyze_Ok::to_str() const
     std::stringstream out;
 
     out << "{inId: " << inId;
-    out << ", outId: " << inId;
+    out << ", outId: " << outId;
     out << ", create: " << std::boolalpha << create << "}";
     return out.str();
 }

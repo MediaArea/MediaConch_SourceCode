@@ -697,6 +697,8 @@ namespace MediaConch
             report = MediaConchLib::report_MediaConch;
         else if (req->report != RESTAPI::POLICY)
             return -1;
+        else
+            report = MediaConchLib::report_Max;
 
         std::map<std::string, int> saved_ids;
         std::vector<std::string> files;
