@@ -117,6 +117,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Scheduler.h \
                     ../../Source/Common/Queue.h \
                     ../../Source/Common/DaemonClient.h \
+                    ../../Source/Common/FileRegistered.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \

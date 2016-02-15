@@ -14,6 +14,8 @@
 
 namespace MediaConch {
 
+class FileRegistered;
+
 class WebPage : public QWebEnginePage
 {
     Q_OBJECT
@@ -23,7 +25,7 @@ public:
 
     void changeLocalFiles(QStringList& files);
     void use_javascript(const QString& js);
-    void emit_update_registered_file(MainWindow::FileRegistered* file);
+    void emit_update_registered_file(FileRegistered* file);
 
 protected:
     virtual bool acceptNavigationRequest(const QUrl& url, QWebEnginePage::NavigationType type, bool isMainFrame);
@@ -35,9 +37,9 @@ protected:
 
     void clean_forms();
 
-    void set_analyzed_status(MainWindow::FileRegistered* file);
-    void set_implementation_status(MainWindow::FileRegistered* file);
-    void set_policy_status(MainWindow::FileRegistered* file);
+    void set_analyzed_status(FileRegistered* file);
+    void set_implementation_status(FileRegistered* file);
+    void set_policy_status(FileRegistered* file);
 
     bool report_is_html(const QString& report);
     bool report_is_xml(const QString& report);
@@ -67,10 +69,10 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void onLoadFinished(bool ok);
-    void update_status_registered_file(MainWindow::FileRegistered* file);
+    void update_status_registered_file(FileRegistered* file);
 
 Q_SIGNALS:
-    void update_registered_file(MainWindow::FileRegistered* file);
+    void update_registered_file(FileRegistered* file);
 
 protected:
     MainWindow                 *mainwindow;

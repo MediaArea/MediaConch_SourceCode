@@ -30,6 +30,7 @@ class CheckerWindow;
 class ResultWindow;
 class PoliciesWindow;
 class DisplayWindow;
+class FileRegistered;
 
 class MainWindow : public QMainWindow
 {
@@ -38,24 +39,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-    // Internal
-    struct FileRegistered
-    {
-        FileRegistered() : policy(-1), display(-1), analyze_percent(0), analyzed(false), implementation_valid(false), policy_valid(false) {}
-
-        std::string  filename;
-        std::string  filepath;
-        int          policy;
-        int          display;
-
-        double       analyze_percent;
-        bool         analyzed;
-        bool         implementation_valid;
-        bool         policy_valid;
-
-        unsigned int index;
-    };
 
     // View selected
     enum Run_View

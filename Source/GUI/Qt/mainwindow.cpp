@@ -13,6 +13,7 @@
 #include "displaywindow.h"
 #include "helpwindow.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/FileRegistered.h"
 
 #include "Common/Database.h"
 #include "Common/NoDatabase.h"
@@ -220,7 +221,7 @@ int MainWindow::transform_with_xslt_memory(const std::string& report, const std:
 }
 
 //---------------------------------------------------------------------------
-const std::vector<MainWindow::FileRegistered*>& MainWindow::get_registered_files()
+const std::vector<FileRegistered*>& MainWindow::get_registered_files()
 {
     return registered_files;
 }
@@ -1198,7 +1199,7 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
 }
 
 //---------------------------------------------------------------------------
-MainWindow::FileRegistered* MainWindow::get_file_registered_from_file(const std::string& file)
+FileRegistered* MainWindow::get_file_registered_from_file(const std::string& file)
 {
     FileRegistered* fr = NULL;
     for (size_t i = 0; i < registered_files.size(); ++i)

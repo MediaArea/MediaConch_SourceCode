@@ -6,6 +6,7 @@
 
 #include "resultwindow.h"
 #include "mainwindow.h"
+#include "Common/FileRegistered.h"
 #include <QString>
 #include <QProgressBar>
 #include <QTimer>
@@ -53,7 +54,7 @@ void UpdateResultWindow::run()
     std::vector<std::string> vec;
     for (size_t i = 0; i < files.size(); ++i)
     {
-        MainWindow::FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
+        FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
         if (!file)
             continue;
         mainwindow->update_file_registered(files[i], file);
@@ -89,7 +90,7 @@ void UpdateResultWindow::restart_timer()
     std::vector<std::string> vec;
     for (size_t i = 0; i < files.size(); ++i)
     {
-        MainWindow::FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
+        FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
         if (!file)
             continue;
         mainwindow->update_file_registered(files[i], file);
@@ -205,7 +206,7 @@ void ResultWindow::select_the_correct_value(const QString& value, const QString&
 }
 
 //---------------------------------------------------------------------------
-void ResultWindow::add_displays_file_detail_modal(MainWindow::FileRegistered* file, QString& base)
+void ResultWindow::add_displays_file_detail_modal(FileRegistered* file, QString& base)
 {
 #if defined(WEB_MACHINE_ENGINE)
     QFile template_html(":/fileDetailCheckerTableModalEngine.html");
@@ -238,7 +239,7 @@ void ResultWindow::add_displays_file_detail_modal(MainWindow::FileRegistered* fi
 }
 
 //---------------------------------------------------------------------------
-void ResultWindow::add_displays_file_detail_element(MainWindow::FileRegistered* file, QString& base)
+void ResultWindow::add_displays_file_detail_element(FileRegistered* file, QString& base)
 {
     QFile template_html(":/fileDetailCheckerTableElement.html");
 
@@ -256,7 +257,7 @@ void ResultWindow::add_displays_file_detail_element(MainWindow::FileRegistered* 
 void ResultWindow::update_html_with_results(QString& html)
 {
     QString bottom;
-    const std::vector<MainWindow::FileRegistered*>& vec = mainwindow->get_registered_files();
+    const std::vector<FileRegistered*>& vec = mainwindow->get_registered_files();
 
     for (size_t i = 0; i < vec.size(); ++i)
     {
@@ -393,7 +394,7 @@ void ResultWindow::clear_visual_elements()
 }
 
 //---------------------------------------------------------------------------
-void ResultWindow::change_html_file_detail(MainWindow::FileRegistered* file, QString& html)
+void ResultWindow::change_html_file_detail(FileRegistered* file, QString& html)
 {
     std::string full_name = file->filepath;
     if (full_name.length())
