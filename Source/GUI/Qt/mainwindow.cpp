@@ -150,12 +150,17 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path, cons
     else
         exists = true;
 
+    int policy_i = policy.toInt();
+    if (policy_i != fr->policy)
+        fr->need_update = true;
+    else
+        fr->need_update = false;
     fr->filename = file.toStdString();
     fr->filepath = path.toStdString();
-    fr->policy = policy.toInt();
+    fr->policy = policy_i;
     fr->display = display.toInt();
 
-    if (exists)
+    if (exists && fr->need_update)
     {
         update_registered_file_in_db(fr);
         return;
@@ -1254,6 +1259,7 @@ void MainWindow::update_file_registered(const std::string& file, FileRegistered*
             res.clear();
         }
         update_registered_file_in_db(fr);
+        fr->need_update = false;
     }
 }
 

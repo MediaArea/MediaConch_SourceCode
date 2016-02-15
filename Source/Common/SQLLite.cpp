@@ -591,6 +591,8 @@ void SQLLite::ui_get_elements(std::vector<FileRegistered*>& vec)
                 file->implementation_valid = std_string_to_int(reports[i][i_v]);
             if (reports[i].find(p_v) != reports[i].end())
                 file->policy_valid = std_string_to_int(reports[i][p_v]);
+            if (file->analyzed)
+                file->need_update = false;
             vec.push_back(file);
         }
     }

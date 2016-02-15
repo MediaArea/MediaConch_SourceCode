@@ -26,7 +26,10 @@ namespace MediaConch {
 class FileRegistered
 {
 public:
-    FileRegistered() : policy(-1), display(-1), analyze_percent(0), analyzed(false), implementation_valid(false), policy_valid(false) {}
+    FileRegistered() : policy(-1), display(-1), analyze_percent(0), analyzed(false),
+        implementation_valid(false), policy_valid(false), need_update(true)
+    {
+    }
 
     std::string  filename;
     std::string  filepath;
@@ -39,6 +42,7 @@ public:
     bool         policy_valid;
 
     unsigned int index;
+    bool need_update;
 };
 
 }

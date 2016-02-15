@@ -57,7 +57,8 @@ void UpdateResultWindow::run()
         FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
         if (!file)
             continue;
-        mainwindow->update_file_registered(files[i], file);
+        if (file->analyzed && file->need_update)
+            mainwindow->update_file_registered(files[i], file);
 
         if (!file->analyzed)
             vec.push_back(files[i]);
