@@ -126,6 +126,7 @@ public:
     void                        clear_policies();
     size_t                      get_policies_count() const;
     FileRegistered*             get_file_registered_from_file(const std::string& file);
+    void                        update_file_registered(const std::string& file, FileRegistered* fr);
     void                        remove_file_registered_from_file(const std::string& file);
 
     const std::vector<Policy *>&        get_all_policies() const;

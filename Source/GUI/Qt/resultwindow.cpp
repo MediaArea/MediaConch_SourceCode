@@ -19,11 +19,102 @@
 #endif
 #if defined(WEB_MACHINE_KIT)
 #include <QWebFrame>
+#include <QWebElement>
 #endif
 
 #include "progressbar.h"
 
 namespace MediaConch {
+
+//***************************************************************************
+// UpdateResultWindow
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+UpdateResultWindow::UpdateResultWindow(MainWindow* m, const std::vector<std::string>& to_update_files, WebPage* p, int t) : QThread(), mainwindow(m), page(p), update_timer(NULL), timer(t)
+{
+    files = to_update_files;
+}
+
+//---------------------------------------------------------------------------
+UpdateResultWindow::~UpdateResultWindow()
+{
+    if (update_timer)
+    {
+        update_timer->stop();
+        delete update_timer;
+        update_timer = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+void UpdateResultWindow::run()
+{
+    std::vector<std::string> vec;
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        MainWindow::FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
+        if (!file)
+            continue;
+        mainwindow->update_file_registered(files[i], file);
+
+        if (!file->analyzed)
+            vec.push_back(files[i]);
+        page->emit_update_registered_file(file);
+    }
+
+    if (!vec.size())
+    {
+        files.clear();
+        return;
+    }
+
+    update_timer = new QTimer(0);
+    update_timer->setSingleShot(true);
+    update_timer->moveToThread(this);
+    connect(update_timer, SIGNAL(timeout()), this, SLOT(restart_timer()), Qt::DirectConnection);
+    update_timer->start(timer);
+    exec();
+}
+
+//---------------------------------------------------------------------------
+void UpdateResultWindow::restart_timer()
+{
+    if (update_timer)
+    {
+        delete update_timer;
+        update_timer = NULL;
+    }
+
+    std::vector<std::string> vec;
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        MainWindow::FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
+        if (!file)
+            continue;
+        mainwindow->update_file_registered(files[i], file);
+
+        if (!file->analyzed)
+            vec.push_back(files[i]);
+        else
+            page->emit_update_registered_file(file);
+    }
+
+    if (vec.size())
+    {
+        files = vec;
+        update_timer = new QTimer(0);
+        update_timer->setSingleShot(true);
+        update_timer->moveToThread(this);
+        connect(update_timer, SIGNAL(timeout()), this, SLOT(restart_timer()), Qt::DirectConnection);
+        update_timer->start(timer);
+    }
+    else
+    {
+        files.clear();
+        quit();
+    }
+}
 
 //***************************************************************************
 // Constructor / Desructor
@@ -33,19 +124,14 @@ namespace MediaConch {
 ResultWindow::ResultWindow(MainWindow* m) : mainwindow(m), view(NULL), default_update_timer(5000)
 {
     progressBar = NULL;
-    update_timer = NULL;
+    updater = NULL;
 }
 
 //---------------------------------------------------------------------------
 ResultWindow::~ResultWindow()
 {
-    if (update_timer)
-    {
-        update_timer->stop();
-        delete update_timer;
-        update_timer = NULL;
-    }
     clear_visual_elements();
+    stop_thread();
 }
 
 //---------------------------------------------------------------------------
@@ -61,43 +147,21 @@ void ResultWindow::create_web_view_finished(bool ok)
         progressBar = NULL;
     }
     mainwindow->set_widget_to_layout(view);
-    update_timer = new QTimer(this);
-    update_timer->setSingleShot(true);
-    connect(update_timer, SIGNAL(timeout()), this, SLOT(start_timer_update()));
-    update_timer->start(0);
+    updater = new UpdateResultWindow(mainwindow, to_update_files, (WebPage*)view->page(),
+                                     default_update_timer);
+    updater->start();
 }
 
 //---------------------------------------------------------------------------
-void ResultWindow::start_timer_update()
+void ResultWindow::stop_thread()
 {
-    if (update_timer)
+    if (updater)
     {
-        delete update_timer;
-        update_timer = NULL;
+        updater->terminate();
+        updater->wait();
+        delete updater;
+        updater = NULL;
     }
-
-    std::vector<std::string> vec;
-    for (size_t i = 0; i < to_update_files.size(); ++i)
-    {
-        MainWindow::FileRegistered* file = mainwindow->get_file_registered_from_file(to_update_files[i]);
-        if (!file)
-            continue;
-        WebPage* page = (WebPage*)view->page();
-        page->update_status_registered_file(file);
-        if (!file->analyzed)
-            vec.push_back(to_update_files[i]);
-    }
-
-    if (vec.size())
-    {
-        to_update_files = vec;
-        update_timer = new QTimer(this);
-        update_timer->setSingleShot(true);
-        connect(update_timer, SIGNAL(timeout()), this, SLOT(start_timer_update()));
-        update_timer->start(default_update_timer);
-    }
-    else
-        to_update_files.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -340,7 +404,7 @@ void ResultWindow::change_html_file_detail(MainWindow::FileRegistered* file, QSt
     QString policy;
     Policy *p = mainwindow->get_policy(file->policy);
     if (p)
-        policy = QString().fromStdString(p->title);
+        policy = QString().fromUtf8(p->title.c_str());
     else
         policy = "N/A";
 

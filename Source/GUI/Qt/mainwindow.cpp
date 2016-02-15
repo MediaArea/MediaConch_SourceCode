@@ -1213,9 +1213,14 @@ MainWindow::FileRegistered* MainWindow::get_file_registered_from_file(const std:
             break;
         }
     }
+    return fr;
+}
 
+//---------------------------------------------------------------------------
+void MainWindow::update_file_registered(const std::string& file, FileRegistered* fr)
+{
     if (!fr)
-        return fr;
+        return;
 
     double percent;
     std::vector<std::string> files;
@@ -1224,7 +1229,7 @@ MainWindow::FileRegistered* MainWindow::get_file_registered_from_file(const std:
     if (ret < 0)
     {
         set_error_http((MediaConchLib::errorHttp)ret);
-        return fr;
+        return;
     }
     fr->analyzed = false;
     if (ret == MediaConchLib::errorHttp_TRUE)
@@ -1259,8 +1264,6 @@ MainWindow::FileRegistered* MainWindow::get_file_registered_from_file(const std:
         }
         update_registered_file_in_db(fr);
     }
-
-    return fr;
 }
 
 //---------------------------------------------------------------------------

@@ -35,6 +35,8 @@ namespace MediaConch
 
         QWebFrame* frame = mainFrame();
         frame->addToJavaScriptWindowObject("webpage", this);
+        connect(this, SIGNAL(update_registered_file(MainWindow::FileRegistered*)),
+                this, SLOT(update_status_registered_file(MainWindow::FileRegistered*)));
     }
 
     void WebPage::menu_link_checker(const QString& name)
@@ -384,6 +386,12 @@ namespace MediaConch
         set_analyzed_status(file);
         set_implementation_status(file);
         set_policy_status(file);
+    }
+
+    //---------------------------------------------------------------------------
+    void WebPage::emit_update_registered_file(MainWindow::FileRegistered* file)
+    {
+        Q_EMIT update_registered_file(file);
     }
 
     //---------------------------------------------------------------------------
