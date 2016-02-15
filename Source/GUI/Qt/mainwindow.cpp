@@ -473,9 +473,7 @@ void MainWindow::add_registered_file_to_db(const FileRegistered* file)
     if (!db)
         return;
 
-    db->ui_add_file(file->filename, file->filepath,
-                    file->policy, file->display, file->analyzed,
-                    file->implementation_valid, file->policy_valid);
+    db->ui_add_file(file);
 }
 
 //---------------------------------------------------------------------------
@@ -484,9 +482,7 @@ void MainWindow::update_registered_file_in_db(const FileRegistered* file)
     if (!db)
         return;
 
-    db->ui_update_file(file->filename, file->filepath,
-                       file->policy, file->display, file->analyzed,
-                       file->implementation_valid, file->policy_valid);
+    db->ui_update_file(file);
 }
 
 //---------------------------------------------------------------------------
@@ -495,7 +491,7 @@ void MainWindow::remove_registered_file_from_db(const FileRegistered* file)
     if (!db)
         return;
 
-    db->ui_remove_file(file->filename, file->filepath);
+    db->ui_remove_file(file);
 }
 
 //---------------------------------------------------------------------------
@@ -504,9 +500,7 @@ void MainWindow::get_registered_file_from_db(FileRegistered* file)
     if (!db || !file)
         return;
 
-    db->ui_get_file(file->filename, file->filepath,
-                    file->policy, file->display, file->analyzed,
-                    file->implementation_valid, file->policy_valid);
+    db->ui_get_file(file);
 }
 
 //---------------------------------------------------------------------------
@@ -521,16 +515,12 @@ void MainWindow::fill_registered_file_from_db()
     if (!db)
         return;
 
-    std::vector<std::pair<std::string, std::string> > vec;
+    std::vector<FileRegistered*> vec;
     db->ui_get_elements(vec);
 
     for (size_t i = 0; i < vec.size(); ++i)
     {
-        FileRegistered *fr = new FileRegistered;
-
-        fr->filename = vec[i].first;
-        fr->filepath = vec[i].second;
-        get_registered_file_from_db(fr);
+        FileRegistered *fr = vec[i];
         registered_files.push_back(fr);
 
         std::string full_file(fr->filepath);

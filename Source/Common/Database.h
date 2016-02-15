@@ -22,6 +22,8 @@
 
 namespace MediaConch {
 
+class FileRegistered;
+
 //***************************************************************************
 // Class Database
 //***************************************************************************
@@ -50,17 +52,11 @@ public:
     void        set_database_filename(const std::string& name);
 
     // UI
-    virtual int ui_add_file(const std::string& filename, const std::string& filepath,
-                            int policy, int display, bool analyzed,
-                            bool implementation_valid, bool policy_valid) = 0;
-    virtual int ui_update_file(const std::string& filename, const std::string& filepath,
-                               int policy, int display, bool analyzed,
-                               bool implementation_valid, bool policy_valid) = 0;
-    virtual int ui_get_file(const std::string& filename, const std::string& filepath,
-                            int& policy, int& display, bool& analyzed,
-                            bool& implementation_valid, bool& policy_valid) = 0;
-    virtual int ui_remove_file(const std::string& filename, const std::string& filepath) = 0;
-    virtual void ui_get_elements(std::vector<std::pair<std::string, std::string> >& vec) = 0;
+    virtual int ui_add_file(const FileRegistered* file) = 0;
+    virtual int ui_update_file(const FileRegistered* file) = 0;
+    virtual int ui_get_file(FileRegistered* file) = 0;
+    virtual int ui_remove_file(const FileRegistered* file) = 0;
+    virtual void ui_get_elements(std::vector<FileRegistered*>& vec) = 0;
 
     virtual int init() = 0;
     virtual int init_report() = 0;
