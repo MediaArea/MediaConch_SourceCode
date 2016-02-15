@@ -23,7 +23,7 @@ public:
 
     void changeLocalFiles(QStringList& files);
     void use_javascript(const QString& js);
-    void update_status_registered_file(MainWindow::FileRegistered* file);
+    void emit_update_registered_file(MainWindow::FileRegistered* file);
 
 protected:
     virtual bool acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request, QWebPage::NavigationType type);
@@ -63,6 +63,10 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void onLoadFinished(bool ok);
+    void update_status_registered_file(MainWindow::FileRegistered* file);
+
+Q_SIGNALS:
+    void update_registered_file(MainWindow::FileRegistered* file);
 
 protected:
     MainWindow                 *mainwindow;

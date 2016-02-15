@@ -8,6 +8,7 @@
 #define RESULTWINDOW_H
 
 #include <QObject>
+#include <QThread>
 #include "mainwindow.h"
 
 class QProgressBar;
@@ -17,6 +18,28 @@ namespace MediaConch {
 
 class WebView;
 class ProgressBar;
+class WebPage;
+
+class UpdateResultWindow : public QThread
+{
+    Q_OBJECT
+
+public:
+    UpdateResultWindow(MainWindow* m, const std::vector<std::string>& to_update_files,
+                       WebPage *p, int t);
+    ~UpdateResultWindow();
+    void                      run();
+
+private Q_SLOTS:
+    void                      restart_timer();
+
+private:
+    MainWindow               *mainwindow;
+    std::vector<std::string>  files;
+    WebPage                  *page;
+    QTimer                   *update_timer;
+    int                       timer;
+};
 
 class ResultWindow : public QObject
 {
@@ -37,7 +60,7 @@ private:
     ProgressBar              *progressBar;
     unsigned int              result_index;
     std::vector<std::string> to_update_files;
-    QTimer                   *update_timer;
+    UpdateResultWindow       *updater;
     int                       default_update_timer;
 
     void          clear_visual_elements();
@@ -56,7 +79,7 @@ private:
 
 private Q_SLOTS:
     void          create_web_view_finished(bool ok);
-    void          start_timer_update();
+    void          stop_thread();
 };
 
 }
