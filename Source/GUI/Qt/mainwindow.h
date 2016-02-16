@@ -8,6 +8,7 @@
 #define MAINWINDOW_H
 
 #include "Common/Core.h"
+#include "workerfiles.h"
 
 #include <QMainWindow>
 #include <QFileInfo>
@@ -80,6 +81,11 @@ public:
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
     int                         analyze(const std::vector<std::string>& files);
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
+    int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                                         const std::vector<std::string>& policies_names,
+                                         const std::vector<std::string>& policies_contents,
+                                         std::vector<MediaConchLib::ValidateRes*>& result);
+
     QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content, bool& is_valid);
     QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
@@ -108,14 +114,18 @@ public:
     void                        remove_policy(size_t pos);
     void                        clear_policies();
     size_t                      get_policies_count() const;
+
     FileRegistered*             get_file_registered_from_file(const std::string& file);
     void                        update_file_registered(const std::string& file, FileRegistered* fr);
     void                        remove_file_registered_from_file(const std::string& file);
 
+    int                         get_ui_database_path(std::string& path);
+    void                        set_error_http(MediaConchLib::errorHttp code);
+
     const std::vector<Policy *>&        get_all_policies() const;
     std::vector<QString>&               get_displays();
     QString                             get_local_folder() const;
-    const std::vector<FileRegistered*>& get_registered_files();
+    const std::map<std::string, FileRegistered*>& get_registered_files() const;
 
     const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
     const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
@@ -126,10 +136,8 @@ private:
 
     // Internal
     MediaConchLib                 MCL;
-    Database                     *db;
-    static const std::string      database_filename;
-    std::vector<FileRegistered*>  registered_files;
     std::vector<QString>          displays_list;
+    WorkerFiles                   workerfiles;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -149,19 +157,10 @@ private:
     void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
 
-    void                        create_and_configure_database();
-    void                        load_database();
-    void                        add_registered_file_to_db(const FileRegistered* file);
-    void                        update_registered_file_in_db(const FileRegistered* file);
-    void                        get_registered_file_from_db(FileRegistered* file);
-    void                        remove_registered_file_from_db(const FileRegistered* file);
-    void                        fill_registered_file_from_db();
-
     void                        fill_display_used(int *policy_i,
                                                   std::string& display_name, std::string& display_content,
                                                   const std::string*& dname, const std::string*& dcontent,
                                                   FileRegistered* fr);
-    void                        set_error_http(MediaConchLib::errorHttp code);
 
     Run_View current_view;
 

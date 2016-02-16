@@ -15,10 +15,6 @@
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 
-#include "Common/Database.h"
-#include "Common/NoDatabase.h"
-#include "Common/SQLLite.h"
-
 #include <QStringList>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -51,8 +47,6 @@
 
 namespace MediaConch {
 
-const std::string MainWindow::database_filename = std::string("MediaConchUi.db");
-
 //***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
@@ -60,14 +54,14 @@ const std::string MainWindow::database_filename = std::string("MediaConchUi.db")
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    db(NULL)
+    workerfiles(this)
 {
     ui->setupUi(this);
 
     MCL.init();
 
     // Local database
-    create_and_configure_database();
+    workerfiles.create_and_configure_database();
 
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
@@ -119,14 +113,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Connect the signal 
     connect(this, SIGNAL(setResultView()), this, SLOT(on_actionResult_triggered()));
-    fill_registered_file_from_db();
+    workerfiles.fill_registered_files_from_db();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    if (db)
-        delete db;
     if (checkerView)
         delete checkerView;
 }
@@ -136,48 +128,21 @@ MainWindow::~MainWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void MainWindow::add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display)
+void MainWindow::add_file_to_list(const QString& file, const QString& path,
+                                  const QString& policy, const QString& display)
 {
-    std::string full_file(path.toStdString());
-    if (path.length())
-        full_file += "/";
-    full_file += file.toStdString();
-
-    bool exists = false;
-    FileRegistered *fr = get_file_registered_from_file(full_file);
-    if (!fr)
-        fr = new FileRegistered;
-    else
-        exists = true;
-
+    std::string filename = file.toStdString();
+    std::string filepath = path.toStdString();
     int policy_i = policy.toInt();
-    if (policy_i != fr->policy)
-        fr->need_update = true;
-    else
-        fr->need_update = false;
-    fr->filename = file.toStdString();
-    fr->filepath = path.toStdString();
-    fr->policy = policy_i;
-    fr->display = display.toInt();
-
-    if (exists && fr->need_update)
-    {
-        update_registered_file_in_db(fr);
-        return;
-    }
-
-    registered_files.push_back(fr);
-    std::vector<std::string> vec;
-    vec.push_back(full_file);
-    analyze(vec);
-    add_registered_file_to_db(fr);
+    int display_i = display.toInt();
+    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::remove_file_to_list(const QString& file)
 {
     std::string filename = file.toStdString();
-    remove_file_registered_from_file(filename);
+    workerfiles.remove_file_registered_from_file(filename);
 }
 
 void MainWindow::policy_to_delete(int index)
@@ -226,9 +191,9 @@ int MainWindow::transform_with_xslt_memory(const std::string& report, const std:
 }
 
 //---------------------------------------------------------------------------
-const std::vector<FileRegistered*>& MainWindow::get_registered_files()
+const std::map<std::string, FileRegistered*>& MainWindow::get_registered_files() const
 {
-    return registered_files;
+    return workerfiles.get_registered_files();
 }
 
 //---------------------------------------------------------------------------
@@ -413,15 +378,7 @@ void MainWindow::remove_xslt_display()
 //---------------------------------------------------------------------------
 void MainWindow::clear_file_list()
 {
-    for (size_t i = 0; i < registered_files.size(); ++i)
-    {
-        if (!registered_files[i])
-            continue;
-
-        remove_registered_file_from_db(registered_files[i]);
-        delete registered_files[i];
-    }
-    registered_files.clear();
+    workerfiles.clear_files();
 }
 
 //---------------------------------------------------------------------------
@@ -434,109 +391,6 @@ const std::vector<Policy *>& MainWindow::get_all_policies() const
 std::vector<QString>& MainWindow::get_displays()
 {
     return displays_list;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::load_database()
-{
-#ifdef HAVE_SQLITE
-    std::string db_path;
-    if (MCL.get_ui_database_path(db_path) < 0)
-    {
-        db_path = Core::get_local_data_path();
-        QDir f(QString().fromStdString(db_path));
-        if (!f.exists())
-            db_path = ".";
-    }
-
-    db = new SQLLite;
-
-    db->set_database_directory(db_path);
-    db->set_database_filename(database_filename);
-    if (db->init_ui() < 0)
-    {
-        const std::vector<std::string>& errors = db->get_errors();
-        std::string error;
-        for (size_t i = 0; i < errors.size(); ++i)
-        {
-            if (i)
-                error += " ";
-            error += errors[i];
-        }
-        QString msg = QString().fromStdString(error);
-        set_msg_error_to_status_bar(msg);
-    }
-#else
-    db = new NoDatabase;
-    db->init_ui();
-#endif
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::add_registered_file_to_db(const FileRegistered* file)
-{
-    if (!db)
-        return;
-
-    db->ui_add_file(file);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::update_registered_file_in_db(const FileRegistered* file)
-{
-    if (!db)
-        return;
-
-    db->ui_update_file(file);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::remove_registered_file_from_db(const FileRegistered* file)
-{
-    if (!db)
-        return;
-
-    db->ui_remove_file(file);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::get_registered_file_from_db(FileRegistered* file)
-{
-    if (!db || !file)
-        return;
-
-    db->ui_get_file(file);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::create_and_configure_database()
-{
-    load_database();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::fill_registered_file_from_db()
-{
-    if (!db)
-        return;
-
-    std::vector<FileRegistered*> vec;
-    db->ui_get_elements(vec);
-
-    for (size_t i = 0; i < vec.size(); ++i)
-    {
-        FileRegistered *fr = vec[i];
-        registered_files.push_back(fr);
-
-        std::string full_file(fr->filepath);
-        if (full_file.length())
-            full_file += "/";
-        full_file += fr->filename;
-
-        std::vector<std::string> files;
-        files.push_back(full_file);
-        analyze(files);
-    }
 }
 
 //***************************************************************************
@@ -996,6 +850,15 @@ int MainWindow::is_analyze_finished(const std::vector<std::string>& files, doubl
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                         const std::vector<std::string>& policies_names,
+                         const std::vector<std::string>& policies_contents,
+                         std::vector<MediaConchLib::ValidateRes*>& result)
+{
+    return MCL.validate(report, files, policies_names, policies_contents, result);
+}
+
+//---------------------------------------------------------------------------
 QString MainWindow::get_implementationreport_xml(const std::string& file,
                                                  const std::string& display_name,
                                                  const std::string& display_content,
@@ -1196,100 +1059,19 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
 //---------------------------------------------------------------------------
 FileRegistered* MainWindow::get_file_registered_from_file(const std::string& file)
 {
-    FileRegistered* fr = NULL;
-    for (size_t i = 0; i < registered_files.size(); ++i)
-    {
-        std::string f = registered_files[i]->filepath;
-        if (f.length())
-            f += "/";
-        f += registered_files[i]->filename;
-        if (f == file)
-        {
-            fr = registered_files[i];
-            break;
-        }
-    }
-    return fr;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::update_file_registered(const std::string& file, FileRegistered* fr)
-{
-    if (!fr)
-        return;
-
-    double percent;
-    std::vector<std::string> files;
-    files.push_back(file);
-    int ret = is_analyze_finished(files, percent);
-    if (ret < 0)
-    {
-        set_error_http((MediaConchLib::errorHttp)ret);
-        return;
-    }
-    fr->analyzed = false;
-    if (ret == MediaConchLib::errorHttp_TRUE)
-    {
-        fr->analyzed = true;
-        std::vector<std::string> policies_names, policies_contents;
-        std::vector<MediaConchLib::ValidateRes*> res;
-
-        if (MCL.validate(MediaConchLib::report_MediaConch, files,
-                     policies_names, policies_contents, res) == 0 && res.size() == 1)
-            fr->implementation_valid = res[0]->valid;
-
-        for (size_t i = 0; i < res.size() ; ++i)
-            delete res[i];
-        res.clear();
-        if (fr->policy >= 0)
-        {
-            Policy *p = get_policy((size_t)fr->policy);
-            if (p)
-            {
-                std::string policy_content;
-                p->dump_schema(policy_content);
-                policies_contents.push_back(policy_content);
-            }
-
-            if (p && MCL.validate(MediaConchLib::report_Max, files,
-                         policies_names, policies_contents, res) == 0 && res.size() == 1)
-                fr->policy_valid = res[0]->valid;
-            for (size_t i = 0; i < res.size() ; ++i)
-                delete res[i];
-            res.clear();
-        }
-        update_registered_file_in_db(fr);
-        fr->need_update = false;
-    }
+    return workerfiles.get_file_registered_from_file(file);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::remove_file_registered_from_file(const std::string& file)
 {
-    FileRegistered* fr = NULL;
-    size_t pos = 0;
-    for (size_t i = 0; i < registered_files.size(); ++i)
-    {
-        std::string f = registered_files[i]->filepath;
-        if (f.length())
-            f += "/";
-        f += registered_files[i]->filename;
+    workerfiles.remove_file_registered_from_file(file);
+}
 
-        if (f == file)
-        {
-            fr = registered_files[i];
-            pos = i;
-            break;
-        }
-    }
-
-    if (!fr)
-        return;
-
-    registered_files[pos] = NULL;
-    remove_registered_file_from_db(fr);
-    delete fr;
-    registered_files.erase(registered_files.begin() + pos);
+//---------------------------------------------------------------------------
+void MainWindow::update_file_registered(const std::string& file, FileRegistered* fr)
+{
+    workerfiles.update_file_registered(file, fr);
 }
 
 //---------------------------------------------------------------------------
@@ -1344,6 +1126,12 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
             break;
     }
     set_msg_error_to_status_bar(error_msg);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::get_ui_database_path(std::string& path)
+{
+    return MCL.get_ui_database_path(path);
 }
 
 }

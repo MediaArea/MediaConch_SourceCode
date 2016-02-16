@@ -71,12 +71,19 @@ void UpdateResultWindow::run()
         return;
     }
 
+    files = vec;
     update_timer = new QTimer(0);
     update_timer->setSingleShot(true);
     update_timer->moveToThread(this);
     connect(update_timer, SIGNAL(timeout()), this, SLOT(restart_timer()), Qt::DirectConnection);
     update_timer->start(timer);
     exec();
+    if (update_timer)
+    {
+        update_timer->stop();
+        delete update_timer;
+        update_timer = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -159,7 +166,7 @@ void ResultWindow::stop_thread()
 {
     if (updater)
     {
-        updater->terminate();
+        updater->quit();
         updater->wait();
         delete updater;
         updater = NULL;
@@ -258,22 +265,19 @@ void ResultWindow::add_displays_file_detail_element(FileRegistered* file, QStrin
 void ResultWindow::update_html_with_results(QString& html)
 {
     QString bottom;
-    const std::vector<FileRegistered*>& vec = mainwindow->get_registered_files();
+    const std::map<std::string, FileRegistered*>& files = mainwindow->get_registered_files();
+    std::map<std::string, FileRegistered*>::const_iterator it = files.begin();
 
-    for (size_t i = 0; i < vec.size(); ++i)
+    for (; it != files.end(); ++it)
     {
-        if (!vec[i])
+        if (!it->second)
             continue;
 
-        std::string filename = vec[i]->filepath;
-        if (filename.length())
-            filename += "/";
-        filename += vec[i]->filename;
-        to_update_files.push_back(filename);
-        vec[i]->index = result_index;
+        to_update_files.push_back(it->first);
+        it->second->index = result_index;
 
-        add_displays_file_detail_element(vec[i], html);
-        add_displays_file_detail_modal(vec[i], bottom);
+        add_displays_file_detail_element(it->second, html);
+        add_displays_file_detail_modal(it->second, bottom);
         result_index++;
     }
 
