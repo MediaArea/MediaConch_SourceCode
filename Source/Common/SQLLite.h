@@ -54,9 +54,13 @@ public:
     virtual int create_ui_table();
     virtual int update_ui_table();
     virtual int ui_add_file(const FileRegistered* file);
+    virtual int ui_add_files(const std::vector<FileRegistered*>& files);
     virtual int ui_update_file(const FileRegistered* file);
+    virtual int ui_update_files(const std::vector<FileRegistered*>& files);
     virtual int ui_get_file(FileRegistered* file);
     virtual int ui_remove_file(const FileRegistered* file);
+    virtual int ui_remove_files(const std::vector<FileRegistered*>& files);
+    virtual int ui_remove_all_files();
     virtual void ui_get_elements(std::vector<FileRegistered*>& vec);
 
 protected:

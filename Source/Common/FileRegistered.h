@@ -31,6 +31,22 @@ public:
     {
     }
 
+    FileRegistered(const FileRegistered& f)
+    {
+        if (&f == this)
+            return;
+        this->filename = f.filename;
+        this->filepath = f.filepath;
+        this->policy = f.policy;
+        this->display = f.display;
+        this->analyze_percent = f.analyze_percent;
+        this->analyzed = f.analyzed;
+        this->implementation_valid = f.implementation_valid;
+        this->policy_valid = f.policy_valid;
+        this->index = f.index;
+        this->need_update = f.need_update;
+    }
+
     std::string  filename;
     std::string  filepath;
     int          policy;

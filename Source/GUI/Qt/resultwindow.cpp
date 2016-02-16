@@ -56,9 +56,10 @@ void UpdateResultWindow::run()
     {
         FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
         if (!file)
+        {
+            vec.push_back(files[i]);
             continue;
-        if (file->analyzed && file->need_update)
-            mainwindow->update_file_registered(files[i], file);
+        }
 
         if (!file->analyzed)
             vec.push_back(files[i]);
@@ -100,11 +101,16 @@ void UpdateResultWindow::restart_timer()
     {
         FileRegistered* file = mainwindow->get_file_registered_from_file(files[i]);
         if (!file)
+        {
+            vec.push_back(files[i]);
             continue;
-        mainwindow->update_file_registered(files[i], file);
+        }
 
         if (!file->analyzed)
+        {
             vec.push_back(files[i]);
+            delete file;
+        }
         else
             page->emit_update_registered_file(file);
     }
@@ -214,7 +220,7 @@ void ResultWindow::select_the_correct_value(const QString& value, const QString&
 }
 
 //---------------------------------------------------------------------------
-void ResultWindow::add_displays_file_detail_modal(FileRegistered* file, QString& base)
+void ResultWindow::add_displays_file_detail_modal(const FileRegistered* file, QString& base)
 {
 #if defined(WEB_MACHINE_ENGINE)
     QFile template_html(":/fileDetailCheckerTableModalEngine.html");
@@ -247,7 +253,7 @@ void ResultWindow::add_displays_file_detail_modal(FileRegistered* file, QString&
 }
 
 //---------------------------------------------------------------------------
-void ResultWindow::add_displays_file_detail_element(FileRegistered* file, QString& base)
+void ResultWindow::add_displays_file_detail_element(const FileRegistered* file, QString& base)
 {
     QFile template_html(":/fileDetailCheckerTableElement.html");
 
@@ -265,20 +271,16 @@ void ResultWindow::add_displays_file_detail_element(FileRegistered* file, QStrin
 void ResultWindow::update_html_with_results(QString& html)
 {
     QString bottom;
-    const std::map<std::string, FileRegistered*>& files = mainwindow->get_registered_files();
-    std::map<std::string, FileRegistered*>::const_iterator it = files.begin();
+    std::map<std::string, FileRegistered> files;
+    mainwindow->get_registered_files(files);
+    std::map<std::string, FileRegistered>::iterator it = files.begin();
 
     for (; it != files.end(); ++it)
     {
-        if (!it->second)
-            continue;
-
         to_update_files.push_back(it->first);
-        it->second->index = result_index;
 
-        add_displays_file_detail_element(it->second, html);
-        add_displays_file_detail_modal(it->second, bottom);
-        result_index++;
+        add_displays_file_detail_element(&it->second, html);
+        add_displays_file_detail_modal(&it->second, bottom);
     }
 
     add_displays_file_detail_table_end(html);
@@ -327,7 +329,6 @@ void ResultWindow::create_html_base(QString& html)
     template_html.close();
 
     html = QString(data);
-    result_index = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -399,7 +400,7 @@ void ResultWindow::clear_visual_elements()
 }
 
 //---------------------------------------------------------------------------
-void ResultWindow::change_html_file_detail(FileRegistered* file, QString& html)
+void ResultWindow::change_html_file_detail(const FileRegistered* file, QString& html)
 {
     std::string full_name = file->filepath;
     if (full_name.length())
@@ -472,7 +473,7 @@ void ResultWindow::change_html_file_detail(FileRegistered* file, QString& html)
     pos = 0;
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), QString("%1").arg(result_index));
+        html.replace(pos, reg.matchedLength(), QString("%1").arg(file->index));
 }
 
 }

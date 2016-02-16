@@ -387,6 +387,7 @@ namespace MediaConch
         set_analyzed_status(file);
         set_implementation_status(file);
         set_policy_status(file);
+        delete file;
     }
 
     //---------------------------------------------------------------------------
@@ -419,15 +420,16 @@ namespace MediaConch
         QWebElement status = currentFrame()->findFirstElement(QString("#implementationStatus%1").arg(file->index));
         if (file->analyzed)
         {
-            status.setAttribute("class", "success");
             QString html = status.toInnerXml();
             if (file->implementation_valid)
             {
+                status.setAttribute("class", "success");
                 QString newHtml("<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> Valid");
                 status.setInnerXml(newHtml + html);
             }
             else
             {
+                status.setAttribute("class", "danger");
                 QString newHtml("<span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span> Not Valid");
                 status.setInnerXml(newHtml + html);
             }

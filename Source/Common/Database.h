@@ -53,9 +53,13 @@ public:
 
     // UI
     virtual int ui_add_file(const FileRegistered* file) = 0;
+    virtual int ui_add_files(const std::vector<FileRegistered*>& files) = 0;
     virtual int ui_update_file(const FileRegistered* file) = 0;
+    virtual int ui_update_files(const std::vector<FileRegistered*>& files) = 0;
     virtual int ui_get_file(FileRegistered* file) = 0;
     virtual int ui_remove_file(const FileRegistered* file) = 0;
+    virtual int ui_remove_files(const std::vector<FileRegistered*>& files) = 0;
+    virtual int ui_remove_all_files() = 0;
     virtual void ui_get_elements(std::vector<FileRegistered*>& vec) = 0;
 
     virtual int init() = 0;

@@ -114,10 +114,13 @@ MainWindow::MainWindow(QWidget *parent) :
     // Connect the signal 
     connect(this, SIGNAL(setResultView()), this, SLOT(on_actionResult_triggered()));
     workerfiles.fill_registered_files_from_db();
+    workerfiles.start();
 }
 
 MainWindow::~MainWindow()
 {
+    workerfiles.quit();
+    workerfiles.wait();
     delete ui;
     if (checkerView)
         delete checkerView;
@@ -191,9 +194,9 @@ int MainWindow::transform_with_xslt_memory(const std::string& report, const std:
 }
 
 //---------------------------------------------------------------------------
-const std::map<std::string, FileRegistered*>& MainWindow::get_registered_files() const
+void MainWindow::get_registered_files(std::map<std::string, FileRegistered>& files)
 {
-    return workerfiles.get_registered_files();
+    workerfiles.get_registered_files(files);
 }
 
 //---------------------------------------------------------------------------
@@ -850,11 +853,29 @@ int MainWindow::is_analyze_finished(const std::vector<std::string>& files, doubl
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::is_analyze_finished(const std::string& file, double& percent_done)
+{
+    return MCL.is_done(file, percent_done);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::validate(MediaConchLib::report report, const std::vector<std::string>& files,
                          const std::vector<std::string>& policies_names,
                          const std::vector<std::string>& policies_contents,
                          std::vector<MediaConchLib::ValidateRes*>& result)
 {
+    return MCL.validate(report, files, policies_names, policies_contents, result);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::validate(MediaConchLib::report report, const std::string& file,
+                         const std::vector<std::string>& policies_names,
+                         const std::vector<std::string>& policies_contents,
+                         std::vector<MediaConchLib::ValidateRes*>& result)
+{
+    std::vector<std::string> files;
+    files.push_back(file);
+
     return MCL.validate(report, files, policies_names, policies_contents, result);
 }
 
@@ -980,8 +1001,14 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
 void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p)
 {
     FileRegistered *fr = get_file_registered_from_file(file);
-    if (!fr || !fr->analyzed)
+    if (!fr)
         return;
+
+    if (!fr->analyzed)
+    {
+        delete fr;
+        return;
+    }
 
     std::string display_content;
     std::string display_name;
@@ -1002,19 +1029,29 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
                    &result, dname, dcontent);
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
+    delete fr;
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::validate_policy(const std::string& file, QString& report, int policy, int *display_p)
 {
     FileRegistered* fr = get_file_registered_from_file(file);
-    if (!fr || !fr->analyzed)
+    if (!fr)
         return -1;
+
+    if (!fr->analyzed)
+    {
+        delete fr;
+        return -1;
+    }
 
     if (policy == -1)
     {
         if (fr->policy == -1)
+        {
+            delete fr;
             return -1;
+        }
         policy = fr->policy;
     }
 
@@ -1022,6 +1059,7 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     if (!p)
     {
         report = QString("Policy not found");
+        delete fr;
         return 1;
     }
     std::string policy_content;
@@ -1034,6 +1072,7 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
     std::vector<std::string> files;
     files.push_back(file);
+    delete fr;
 
     MediaConchLib::ReportRes result;
     std::bitset<MediaConchLib::report_Max> report_set;
@@ -1066,12 +1105,6 @@ FileRegistered* MainWindow::get_file_registered_from_file(const std::string& fil
 void MainWindow::remove_file_registered_from_file(const std::string& file)
 {
     workerfiles.remove_file_registered_from_file(file);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::update_file_registered(const std::string& file, FileRegistered* fr)
-{
-    workerfiles.update_file_registered(file, fr);
 }
 
 //---------------------------------------------------------------------------

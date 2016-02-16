@@ -32,6 +32,19 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     Scheduler::~Scheduler()
     {
+        queue->clear();
+        CS.Enter();
+        std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
+        for (; it != working.end(); ++it)
+        {
+            if (it->first)
+            {
+                it->first->stop();
+                delete it->first;
+            }
+        }
+        working.clear();
+        CS.Leave();
     }
 
     //---------------------------------------------------------------------------

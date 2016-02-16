@@ -69,14 +69,14 @@ private:
     void          add_displays_file_detail_start(QString& html);
     void          update_html_with_results(QString& html);
     void          create_html_base(QString& html);
-    void          add_displays_file_detail_element(FileRegistered* file, QString& html);
-    void          add_displays_file_detail_modal(FileRegistered* file, QString& html);
+    void          add_displays_file_detail_element(const FileRegistered* file, QString& html);
+    void          add_displays_file_detail_modal(const FileRegistered* file, QString& html);
     void          add_displays_file_detail_table_end(QString& html);
     void          add_displays_file_detail_end(QString& html);
     void          change_body_in_template(QString& body, QString& html);
     void          select_the_correct_value(const QString& value, const QString& selector, QString& html);
 
-    void          change_html_file_detail(FileRegistered* file, QString& html);
+    void          change_html_file_detail(const FileRegistered* file, QString& html);
 
 private Q_SLOTS:
     void          create_web_view_finished(bool ok);

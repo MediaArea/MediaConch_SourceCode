@@ -81,7 +81,12 @@ public:
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
     int                         analyze(const std::vector<std::string>& files);
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
+    int                         is_analyze_finished(const std::string& file, double& percent_done);
     int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                                         const std::vector<std::string>& policies_names,
+                                         const std::vector<std::string>& policies_contents,
+                                         std::vector<MediaConchLib::ValidateRes*>& result);
+    int                         validate(MediaConchLib::report report, const std::string& file,
                                          const std::vector<std::string>& policies_names,
                                          const std::vector<std::string>& policies_contents,
                                          std::vector<MediaConchLib::ValidateRes*>& result);
@@ -116,16 +121,15 @@ public:
     size_t                      get_policies_count() const;
 
     FileRegistered*             get_file_registered_from_file(const std::string& file);
-    void                        update_file_registered(const std::string& file, FileRegistered* fr);
     void                        remove_file_registered_from_file(const std::string& file);
 
     int                         get_ui_database_path(std::string& path);
     void                        set_error_http(MediaConchLib::errorHttp code);
 
-    const std::vector<Policy *>&        get_all_policies() const;
-    std::vector<QString>&               get_displays();
-    QString                             get_local_folder() const;
-    const std::map<std::string, FileRegistered*>& get_registered_files() const;
+    const std::vector<Policy *>&  get_all_policies() const;
+    std::vector<QString>&         get_displays();
+    QString                       get_local_folder() const;
+    void                          get_registered_files(std::map<std::string, FileRegistered>& files);
 
     const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
     const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }

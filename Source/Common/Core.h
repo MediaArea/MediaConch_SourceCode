@@ -26,6 +26,7 @@
     #include "MediaInfo/MediaInfoList.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
+#include <ZenLib/CriticalSection.h>
 #include <map>
 #include <bitset>
 #include <vector>
@@ -130,6 +131,7 @@ private:
 
     MediaInfoNameSpace::MediaInfoList* MI;
     Database*                          db;
+    CriticalSection                    db_mutex;
     static const std::string           database_name;
     Configuration*                     config;
     std::string                        configuration_file;

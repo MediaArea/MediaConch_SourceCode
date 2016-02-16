@@ -174,7 +174,19 @@ int NoDatabase::ui_add_file(const FileRegistered*)
 }
 
 //---------------------------------------------------------------------------
+int NoDatabase::ui_add_files(const std::vector<FileRegistered*>&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int NoDatabase::ui_update_file(const FileRegistered*)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_update_files(const std::vector<FileRegistered*>&)
 {
     return 0;
 }
@@ -187,6 +199,18 @@ int NoDatabase::ui_get_file(FileRegistered*)
 
 //---------------------------------------------------------------------------
 int NoDatabase::ui_remove_file(const FileRegistered*)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_remove_files(const std::vector<FileRegistered*>&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_remove_all_files()
 {
     return 0;
 }
