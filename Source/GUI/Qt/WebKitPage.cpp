@@ -17,6 +17,7 @@
 #include <QTextDocument>
 #include <QTextStream>
 
+#include "Common/FileRegistered.h"
 #include "mainwindow.h"
 #include "WebPage.h"
 #include <QtGlobal>
@@ -35,8 +36,8 @@ namespace MediaConch
 
         QWebFrame* frame = mainFrame();
         frame->addToJavaScriptWindowObject("webpage", this);
-        connect(this, SIGNAL(update_registered_file(MainWindow::FileRegistered*)),
-                this, SLOT(update_status_registered_file(MainWindow::FileRegistered*)));
+        connect(this, SIGNAL(update_registered_file(FileRegistered*)),
+                this, SLOT(update_status_registered_file(FileRegistered*)));
     }
 
     void WebPage::menu_link_checker(const QString& name)
@@ -381,21 +382,22 @@ namespace MediaConch
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::update_status_registered_file(MainWindow::FileRegistered* file)
+    void WebPage::update_status_registered_file(FileRegistered* file)
     {
         set_analyzed_status(file);
         set_implementation_status(file);
         set_policy_status(file);
+        delete file;
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::emit_update_registered_file(MainWindow::FileRegistered* file)
+    void WebPage::emit_update_registered_file(FileRegistered* file)
     {
         Q_EMIT update_registered_file(file);
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::set_analyzed_status(MainWindow::FileRegistered* file)
+    void WebPage::set_analyzed_status(FileRegistered* file)
     {
         QWebElement status = currentFrame()->findFirstElement(QString("#analyzeStatus%1").arg(file->index));
         QWebElement percent = currentFrame()->findFirstElement(QString("#analyzePercent%1").arg(file->index));
@@ -413,20 +415,21 @@ namespace MediaConch
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::set_implementation_status(MainWindow::FileRegistered* file)
+    void WebPage::set_implementation_status(FileRegistered* file)
     {
         QWebElement status = currentFrame()->findFirstElement(QString("#implementationStatus%1").arg(file->index));
         if (file->analyzed)
         {
-            status.setAttribute("class", "success");
             QString html = status.toInnerXml();
             if (file->implementation_valid)
             {
+                status.setAttribute("class", "success");
                 QString newHtml("<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> Valid");
                 status.setInnerXml(newHtml + html);
             }
             else
             {
+                status.setAttribute("class", "danger");
                 QString newHtml("<span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span> Not Valid");
                 status.setInnerXml(newHtml + html);
             }
@@ -436,7 +439,7 @@ namespace MediaConch
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::set_policy_status(MainWindow::FileRegistered* file)
+    void WebPage::set_policy_status(FileRegistered* file)
     {
         QString state("info");
         QWebElement status = currentFrame()->findFirstElement(QString("#policyStatus%1").arg(file->index));

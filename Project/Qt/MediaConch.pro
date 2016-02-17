@@ -84,7 +84,8 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/unknownpolicymenu.cpp \
                     ../../Source/GUI/Qt/xsltruleedit.cpp \
                     ../../Source/GUI/Qt/displaymenu.cpp \
-                    ../../Source/GUI/Qt/progressbar.cpp
+                    ../../Source/GUI/Qt/progressbar.cpp \
+                    ../../Source/GUI/Qt/workerfiles.cpp
 
 HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Core.h \
@@ -117,6 +118,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Scheduler.h \
                     ../../Source/Common/Queue.h \
                     ../../Source/Common/DaemonClient.h \
+                    ../../Source/Common/FileRegistered.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \
@@ -140,7 +142,8 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/unknownpolicymenu.h \
                     ../../Source/GUI/Qt/xsltruleedit.h \
                     ../../Source/GUI/Qt/displaymenu.h \
-                    ../../Source/GUI/Qt/progressbar.h
+                    ../../Source/GUI/Qt/progressbar.h \
+                    ../../Source/GUI/Qt/workerfiles.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policiestree.ui \

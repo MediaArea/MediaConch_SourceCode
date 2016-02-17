@@ -20,6 +20,8 @@
 //---------------------------------------------------------------------------
 namespace MediaConch {
 
+class FileRegistered;
+
 //***************************************************************************
 // Class NoDatabase
 //***************************************************************************
@@ -47,17 +49,15 @@ public:
     virtual void get_elements(std::vector<std::string>& vec);
 
     // UI
-    virtual int ui_add_file(const std::string& filename, const std::string& filepath,
-                            int policy, int display, bool analyzed,
-                            bool implementation_valid, bool policy_valid);
-    virtual int ui_update_file(const std::string& filename, const std::string& filepath,
-                               int policy, int display, bool analyzed,
-                               bool implementation_valid, bool policy_valid);
-    virtual int ui_get_file(const std::string& filename, const std::string& filepath,
-                            int& policy, int& display, bool& analyzed,
-                            bool& implementation_valid, bool& policy_valid);
-    virtual int ui_remove_file(const std::string& filename, const std::string& filepath);
-    virtual void ui_get_elements(std::vector<std::pair<std::string, std::string> >& vec);
+    virtual int ui_add_file(const FileRegistered* file);
+    virtual int ui_add_files(const std::vector<FileRegistered*>& files);
+    virtual int ui_update_file(const FileRegistered* file);
+    virtual int ui_update_files(const std::vector<FileRegistered*>& files);
+    virtual int ui_get_file(FileRegistered* file);
+    virtual int ui_remove_file(const FileRegistered* file);
+    virtual int ui_remove_files(const std::vector<FileRegistered*>& files);
+    virtual int ui_remove_all_files();
+    virtual void ui_get_elements(std::vector<FileRegistered*>& vec);
 
 protected:
     virtual int execute();

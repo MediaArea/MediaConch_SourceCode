@@ -288,7 +288,9 @@ bool Core::is_done(const std::string& file, double& percent_done)
 void Core::list(std::vector<std::string>& vec)
 {
     scheduler->get_elements(vec);
+    db_mutex.Enter();
     get_db()->get_elements(vec);
+    db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
@@ -382,8 +384,11 @@ int Core::remove_report(const std::vector<std::string>& files)
     if (!get_db())
         return false;
 
+    db_mutex.Enter();
     for (size_t i = 0; i < files.size(); ++i)
         db->remove_report(files[i]);
+    db_mutex.Leave();
+
     return 0;
 }
 
@@ -936,9 +941,12 @@ void Core::register_report_mediainfo_text_to_database(std::string& file, const s
 
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
+
+    db_mutex.Enter();
     db->save_report(MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
                     file, time,
                     report, mode);
+    db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
@@ -950,9 +958,11 @@ void Core::register_report_mediainfo_xml_to_database(std::string& file, const st
     std::string report = Ztring(curMI->Inform()).To_UTF8();
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
+    db_mutex.Enter();
     db->save_report(MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
                     file, time,
                     report, mode);
+    db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
@@ -964,9 +974,11 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, const s
     std::string report = Ztring(curMI->Inform()).To_UTF8();
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
+    db_mutex.Enter();
     db->save_report(MediaConchLib::report_MediaTrace, MediaConchLib::format_Xml,
                     file, time,
                     report, mode);
+    db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
@@ -1113,7 +1125,9 @@ void Core::get_report_saved(const std::string& filename,
 
     MediaConchLib::compression compress;
     std::string time = get_last_modification_file(filename);
+    db_mutex.Enter();
     db->get_report(reportKind, f, filename, time, raw, compress);
+    db_mutex.Leave();
     uncompress_report(raw, compress);
     report += raw;
 }
@@ -1198,7 +1212,11 @@ bool Core::file_is_registered_in_db(const std::string& filename)
 
     std::string time = get_last_modification_file(filename);
 
-    return db->file_is_registered(MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, filename, time);
+    db_mutex.Enter();
+    bool res = db->file_is_registered(MediaConchLib::report_MediaInfo,
+                                      MediaConchLib::format_Xml, filename, time);
+    db_mutex.Leave();
+    return res;
 }
 
 //---------------------------------------------------------------------------

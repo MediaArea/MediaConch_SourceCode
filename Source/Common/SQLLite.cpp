@@ -15,6 +15,7 @@
 
 //---------------------------------------------------------------------------
 #include "SQLLite.h"
+#include "Common/FileRegistered.h"
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -373,9 +374,7 @@ int SQLLite::init_ui()
 }
 
 //---------------------------------------------------------------------------
-int SQLLite::ui_add_file(const std::string& filename, const std::string& filepath,
-                         int policy, int display, bool analyzed,
-                         bool implementation_valid, bool policy_valid)
+int SQLLite::ui_add_file(const FileRegistered* file)
 {
     std::stringstream create;
 
@@ -390,31 +389,31 @@ int SQLLite::ui_add_file(const std::string& filename, const std::string& filepat
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 2, filepath.c_str(), filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 3, policy);
+    ret = sqlite3_bind_int(stmt, 3, file->policy);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 4, display);
+    ret = sqlite3_bind_int(stmt, 4, file->display);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 5, analyzed);
+    ret = sqlite3_bind_int(stmt, 5, file->analyzed);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 6, implementation_valid);
+    ret = sqlite3_bind_int(stmt, 6, file->implementation_valid);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 7, policy_valid);
+    ret = sqlite3_bind_int(stmt, 7, file->policy_valid);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -422,9 +421,65 @@ int SQLLite::ui_add_file(const std::string& filename, const std::string& filepat
 }
 
 //---------------------------------------------------------------------------
-int SQLLite::ui_update_file(const std::string& filename, const std::string& filepath,
-                            int policy, int display, bool analyzed,
-                            bool implementation_valid, bool policy_valid)
+int SQLLite::ui_add_files(const std::vector<FileRegistered*>& files)
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "INSERT INTO UI ";
+    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID) VALUES";
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        if (i)
+            create << ",";
+        create << " (?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    create << ";";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        FileRegistered* file = files[i];
+        ret = sqlite3_bind_blob(stmt, i * 7 + 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_blob(stmt, i * 7 + 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 3, file->policy);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 4, file->display);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 5, file->analyzed);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 6, file->implementation_valid);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 7, file->policy_valid);
+        if (ret != SQLITE_OK)
+            return -1;
+    }
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLite::ui_update_file(const FileRegistered* file)
 {
     std::stringstream create;
 
@@ -445,31 +500,31 @@ int SQLLite::ui_update_file(const std::string& filename, const std::string& file
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 1, policy);
+    ret = sqlite3_bind_int(stmt, 1, file->policy);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 2, display);
+    ret = sqlite3_bind_int(stmt, 2, file->display);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 3, analyzed);
+    ret = sqlite3_bind_int(stmt, 3, file->analyzed);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 4, implementation_valid);
+    ret = sqlite3_bind_int(stmt, 4, file->implementation_valid);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 5, policy_valid);
+    ret = sqlite3_bind_int(stmt, 5, file->policy_valid);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 6, filename.c_str(), filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 6, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 7, filepath.c_str(), filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 7, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -477,9 +532,76 @@ int SQLLite::ui_update_file(const std::string& filename, const std::string& file
 }
 
 //---------------------------------------------------------------------------
-int SQLLite::ui_get_file(const std::string& filename, const std::string& filepath,
-                         int& policy, int& display, bool& analyzed,
-                         bool& implementation_valid, bool& policy_valid)
+int SQLLite::ui_update_files(const std::vector<FileRegistered*>& files)
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "WITH Tmp(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID)";
+    create << "AS (VALUES";
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        if (i)
+            create << ", ";
+        create << "(?, ?, ?, ?, ?, ?, ?)";
+    }
+    create << ") ";
+
+    create << "UPDATE UI SET ";
+    create << "POLICY = (SELECT POLICY FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "DISPLAY = (SELECT DISPLAY FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "ANALYZED = (SELECT ANALYZED FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "IMPLEMENTATION_VALID = (SELECT IMPLEMENTATION_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "POLICY_VALID = (SELECT POLICY_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH) ";
+
+    create << " WHERE FILENAME IN (SELECT FILENAME FROM Tmp) AND  FILEPATH IN (SELECT FILEPATH FROM Tmp)";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        FileRegistered* file = files[i];
+
+        ret = sqlite3_bind_blob(stmt, i * 7 + 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_blob(stmt, i * 7 + 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 3, file->policy);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 4, file->display);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 5, file->analyzed);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 6, file->implementation_valid);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * 7 + 7, file->policy_valid);
+        if (ret != SQLITE_OK)
+            return -1;
+    }
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLite::ui_get_file(FileRegistered* file)
 {
     std::stringstream create;
 
@@ -499,11 +621,11 @@ int SQLLite::ui_get_file(const std::string& filename, const std::string& filepat
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 2, filepath.c_str(), filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -513,21 +635,21 @@ int SQLLite::ui_get_file(const std::string& filename, const std::string& filepat
     std::map<std::string, std::string> r = reports[0];
 
     if (r.find(p) != r.end())
-        policy = std_string_to_int(r[p]);
+        file->policy = std_string_to_int(r[p]);
     if (r.find(d) != r.end())
-        display = std_string_to_int(r[d]);
+        file->display = std_string_to_int(r[d]);
     if (r.find(a) != r.end())
-        analyzed = std_string_to_int(r[a]);
+        file->analyzed = std_string_to_int(r[a]);
     if (r.find(i_v) != r.end())
-        implementation_valid = std_string_to_int(r[i_v]);
+        file->implementation_valid = std_string_to_int(r[i_v]);
     if (r.find(p_v) != r.end())
-        policy_valid = std_string_to_int(r[p_v]);
+        file->policy_valid = std_string_to_int(r[p_v]);
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int SQLLite::ui_remove_file(const std::string& filename, const std::string& filepath)
+int SQLLite::ui_remove_file(const FileRegistered* file)
 {
     std::stringstream create;
 
@@ -541,11 +663,11 @@ int SQLLite::ui_remove_file(const std::string& filename, const std::string& file
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 2, filepath.c_str(), filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -553,14 +675,74 @@ int SQLLite::ui_remove_file(const std::string& filename, const std::string& file
 }
 
 //---------------------------------------------------------------------------
-void SQLLite::ui_get_elements(std::vector<std::pair<std::string, std::string> >& vec)
+int SQLLite::ui_remove_files(const std::vector<FileRegistered*>& files)
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "DELETE FROM UI WHERE";
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        if (i)
+            create << " OR ";
+        create << " FILENAME = ? AND FILEPATH = ?";
+    }
+    create << ";";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        FileRegistered* file = files[i];
+        ret = sqlite3_bind_blob(stmt, i * 2 + 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_blob(stmt, i * 2 + 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+        if (ret != SQLITE_OK)
+            return -1;
+    }
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLite::ui_remove_all_files()
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "DELETE FROM UI ";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+void SQLLite::ui_get_elements(std::vector<FileRegistered*>& vec)
 {
     std::stringstream create;
     std::string name("FILENAME");
     std::string path("FILEPATH");
+    std::string p("POLICY");
+    std::string d("DISPLAY");
+    std::string a("ANALYZED");
+    std::string i_v("IMPLEMENTATION_VALID");
+    std::string p_v("POLICY_VALID");
 
     reports.clear();
-    create << "SELECT " << name << ", " << path << " FROM UI;";
+    create << "SELECT " << name << ", " << path << ", " << p << ", " << d;
+    create << ", " << a << ", " << i_v << ", " << p_v;
+    create << " FROM UI;";
     query = create.str();
 
     const char* end = NULL;
@@ -573,8 +755,26 @@ void SQLLite::ui_get_elements(std::vector<std::pair<std::string, std::string> >&
 
     for (size_t i = 0; i < reports.size(); ++i)
     {
-        if (reports[i].find(name) != reports[i].end() && reports[i].find(path) != reports[i].end())
-            vec.push_back(std::make_pair(reports[i][name], reports[i][path]));
+        if (reports[i].find(name) != reports[i].end())
+        {
+            FileRegistered* file = new FileRegistered;
+            file->filename = reports[i][name];
+            if (reports[i].find(path) != reports[i].end())
+                file->filepath = reports[i][path];
+            if (reports[i].find(p) != reports[i].end())
+                file->policy = std_string_to_int(reports[i][p]);
+            if (reports[i].find(d) != reports[i].end())
+                file->display = std_string_to_int(reports[i][d]);
+            if (reports[i].find(a) != reports[i].end())
+                file->analyzed = std_string_to_int(reports[i][a]);
+            if (reports[i].find(i_v) != reports[i].end())
+                file->implementation_valid = std_string_to_int(reports[i][i_v]);
+            if (reports[i].find(p_v) != reports[i].end())
+                file->policy_valid = std_string_to_int(reports[i][p_v]);
+            if (file->analyzed)
+                file->need_update = false;
+            vec.push_back(file);
+        }
     }
 }
 

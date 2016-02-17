@@ -16,6 +16,7 @@
 #include <QtGlobal>
 #include <QWebChannel>
 
+#include "Common/FileRegistered.h"
 #include "mainwindow.h"
 #include "WebPage.h"
 
@@ -30,8 +31,8 @@ namespace MediaConch
     {
         if (!ok)
             return;
-        connect(this, SIGNAL(update_registered_file(MainWindow::FileRegistered*)),
-                this, SLOT(update_status_registered_file(MainWindow::FileRegistered*)));
+        connect(this, SIGNAL(update_registered_file(FileRegistered*)),
+                this, SLOT(update_status_registered_file(FileRegistered*)));
     }
 
     void WebPage::menu_link_checker(const QString& name)
@@ -403,7 +404,7 @@ namespace MediaConch
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::update_status_registered_file(MainWindow::FileRegistered* file)
+    void WebPage::update_status_registered_file(FileRegistered* file)
     {
         set_analyzed_status(file);
         set_implementation_status(file);
@@ -411,13 +412,13 @@ namespace MediaConch
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::emit_update_registered_file(MainWindow::FileRegistered* file)
+    void WebPage::emit_update_registered_file(FileRegistered* file)
     {
         Q_EMIT update_registered_file(file);
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::set_analyzed_status(MainWindow::FileRegistered* file)
+    void WebPage::set_analyzed_status(FileRegistered* file)
     {
         QString percent_str = QString("%1%").arg(file->analyze_percent);
         QString script = QString("$('#analyzeStatus%1').prop('class', '%2');").arg(file->index).arg(file->analyzed ? "success" : "info");
@@ -426,7 +427,7 @@ namespace MediaConch
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::set_implementation_status(MainWindow::FileRegistered* file)
+    void WebPage::set_implementation_status(FileRegistered* file)
     {
         QString status("info");
         if (file->analyzed)
@@ -441,7 +442,7 @@ namespace MediaConch
     }
 
     //---------------------------------------------------------------------------
-    void WebPage::set_policy_status(MainWindow::FileRegistered* file)
+    void WebPage::set_policy_status(FileRegistered* file)
     {
         QString status("info");
         if (file->analyzed && file->policy != -1)

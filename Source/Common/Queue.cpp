@@ -11,6 +11,9 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#ifndef WINDOWS
+#include <unistd.h>
+#endif //!WINDOWS
 #include "ZenLib/Ztring.h"
 #include "Queue.h"
 #include "Scheduler.h"
@@ -28,8 +31,20 @@ QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s)
 //---------------------------------------------------------------------------
 QueueElement::~QueueElement()
 {
-    if (MI)
-        delete MI;
+}
+
+//---------------------------------------------------------------------------
+void QueueElement::stop()
+{
+    RequestTerminate();
+    while (!IsExited())
+    {
+#ifdef WINDOWS
+        Sleep(0);
+#else //WINDOWS
+        sleep(0);
+#endif //WINDOWS
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -48,6 +63,8 @@ void QueueElement::Entry()
     MI->Open(ZenLib::Ztring().From_UTF8(filename));
     scheduler->work_finished(this, MI);
     MI->Close();
+    delete MI;
+    MI = NULL;
 }
 
 //---------------------------------------------------------------------------

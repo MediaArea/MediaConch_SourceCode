@@ -12,6 +12,7 @@
 
 //---------------------------------------------------------------------------
 #include "NoDatabase.h"
+#include "Common/FileRegistered.h"
 #include <sstream>
 //---------------------------------------------------------------------------
 
@@ -167,34 +168,55 @@ void NoDatabase::get_elements(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::ui_add_file(const std::string&, const std::string&,
-                            int, int, bool, bool, bool)
+int NoDatabase::ui_add_file(const FileRegistered*)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::ui_update_file(const std::string&, const std::string&,
-                            int, int, bool, bool, bool)
+int NoDatabase::ui_add_files(const std::vector<FileRegistered*>&)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::ui_get_file(const std::string&, const std::string&,
-                            int&, int&, bool&, bool&, bool&)
+int NoDatabase::ui_update_file(const FileRegistered*)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::ui_remove_file(const std::string&, const std::string&)
+int NoDatabase::ui_update_files(const std::vector<FileRegistered*>&)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabase::ui_get_elements(std::vector<std::pair<std::string, std::string> >& vec)
+int NoDatabase::ui_get_file(FileRegistered*)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_remove_file(const FileRegistered*)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_remove_files(const std::vector<FileRegistered*>&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabase::ui_remove_all_files()
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+void NoDatabase::ui_get_elements(std::vector<FileRegistered*>&)
 {
 }
 

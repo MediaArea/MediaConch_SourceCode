@@ -50,6 +50,7 @@ namespace MediaConch
         std::string  filename;
 
         void         Entry();
+        void         stop();
         double       percent_done();
 
     private:
