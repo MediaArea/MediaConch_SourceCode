@@ -988,7 +988,10 @@ void Core::get_content_of_media_in_xml(std::string& report)
     size_t start = report.find(media_start);
 
     if (start == std::string::npos)
+    {
+        report = std::string();
         return;
+    }
 
     start += media_start.length();
     media_start = std::string(">");
