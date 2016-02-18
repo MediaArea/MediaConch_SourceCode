@@ -450,7 +450,7 @@ size_t MediaConchLib::get_policies_count() const
 //---------------------------------------------------------------------------
 Policy* MediaConchLib::get_policy(size_t pos)
 {
-    if (pos > core->policies.policies.size())
+    if (pos >= core->policies.policies.size())
         return NULL;
     return core->policies.policies[pos];
 }
