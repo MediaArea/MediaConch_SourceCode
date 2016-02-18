@@ -16,7 +16,12 @@
 #include "LibEventHttp.h"
 #include "REST_API.h"
 #ifdef _WIN32
+#include <ZenLib/Ztring.h>
 #include <Winsock2.h>
+#endif //_WIN32
+#ifdef _WIN32
+#else
+#include <stdlib.h>
 #endif //_WIN32
 
 //---------------------------------------------------------------------------
@@ -155,7 +160,29 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
     RESTAPI::Analyze_Arg arg;
 
     arg.id = 0;
-    arg.file = file;
+
+    std::string real_file(file);
+#ifdef _WIN32
+    ZenLib::Ztring path = ZenLib::Ztring().From_UTF8(real_file);
+
+    DWORD path_size = GetFullPathName(path.c_str(), 0, NULL, NULL);
+    Char* tmp = new Char[path_size + 1];
+    if (GetFullPathName(path.c_str(), path_size + 1, tmp, NULL))
+    {
+        path = ZenLib::ZTring(tmp);
+        real_file = path.To_UTF8();
+    }
+    delete [] tmp;
+#else
+    char *path = realpath(file.c_str(), NULL);
+    if (path)
+    {
+        real_file = std::string(path);
+        free(path);
+    }
+#endif //_WIN32
+
+    arg.file = real_file;
     if (force_analyze)
     {
         arg.has_force_analyze = true;
