@@ -112,7 +112,7 @@ int MediaConchLib::add_option(const std::string& option, std::string& report)
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
+bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::string>&,
                                                        const std::bitset<MediaConchLib::report_Max>& reports,
                                                        const std::string& display, MediaConchLib::format& Format,
                                                        std::string& reason)
