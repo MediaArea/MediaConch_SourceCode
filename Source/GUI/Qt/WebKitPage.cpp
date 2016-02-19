@@ -401,7 +401,7 @@ namespace MediaConch
     {
         QWebElement status = currentFrame()->findFirstElement(QString("#analyzeStatus%1").arg(file->index));
         QWebElement percent = currentFrame()->findFirstElement(QString("#analyzePercent%1").arg(file->index));
-        QString percent_str = QString("%1%").arg(file->analyze_percent);
+
         if (file->analyzed)
         {
             status.setAttribute("class", "success");
@@ -410,6 +410,11 @@ namespace MediaConch
         else
         {
             status.setAttribute("class", "info");
+            QString percent_str;
+            if (file->analyze_percent == 0)
+                percent_str = "In queue";
+            else
+                percent_str = "Analyzing";
             percent.setPlainText(percent_str);
         }
     }

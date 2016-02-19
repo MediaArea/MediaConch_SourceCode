@@ -420,7 +420,8 @@ namespace MediaConch
     //---------------------------------------------------------------------------
     void WebPage::set_analyzed_status(FileRegistered* file)
     {
-        QString percent_str = QString("%1%").arg(file->analyze_percent);
+        QString percent_str;
+        percent_str = QString("%1").arg(file->analyze_percent == 0 ? "In queue" : "Analyzing");
         QString script = QString("$('#analyzeStatus%1').prop('class', '%2');").arg(file->index).arg(file->analyzed ? "success" : "info");
         script += QString("$('#analyzePercent%1').text('%2');").arg(file->index).arg(file->analyzed ? "Analyzed" : percent_str);
         use_javascript(script);
