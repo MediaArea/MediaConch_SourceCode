@@ -327,7 +327,10 @@ void WorkerFiles::update_unfinished_files()
             }
         }
         else
+        {
+            fr->analyze_percent = percent;
             vec.push_back(files[i]);
+        }
 
         to_update_files_mutex.lock();
         if (to_update_files.find(files[i]) != to_update_files.end())

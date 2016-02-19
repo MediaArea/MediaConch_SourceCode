@@ -109,10 +109,8 @@ void UpdateResultWindow::restart_timer()
         if (!file->analyzed)
         {
             vec.push_back(files[i]);
-            delete file;
         }
-        else
-            page->emit_update_registered_file(file);
+        page->emit_update_registered_file(file);
     }
 
     if (vec.size())
