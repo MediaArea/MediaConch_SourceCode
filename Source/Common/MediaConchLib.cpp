@@ -127,9 +127,6 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
         return false;
     }
 
-    if (files.size() > 1 && Format == MediaConchLib::format_Xml)
-        Format = format_MaXml;
-
     if (reports.count() > 1 && Format == MediaConchLib::format_Xml)
         Format = MediaConchLib::format_MaXml;
     
