@@ -75,7 +75,7 @@ namespace MediaConch
 
     void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int display_i = display.toInt();
         mainwindow->get_implementation_report(file_s, report, &display_i);
@@ -93,7 +93,7 @@ namespace MediaConch
         QString report;
         if (policy_i != -1)
         {
-            std::string file_s = file.toStdString();
+            std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
             int display_i = display.toInt();
             mainwindow->validate_policy(file_s, report, policy_i, &display_i);
         }
@@ -107,13 +107,13 @@ namespace MediaConch
 
     QString WebPage::onFillMediaInfoReport(const QString& file)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         return mainwindow->get_mediainfo_jstree(file_s);
     }
 
     QString WebPage::onFillMediaTraceReport(const QString& file)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         return mainwindow->get_mediatrace_jstree(file_s);
     }
 
@@ -151,7 +151,7 @@ namespace MediaConch
 
     void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int display_i = display.toInt();
         mainwindow->get_implementation_report(file_s, report, &display_i);
@@ -160,7 +160,7 @@ namespace MediaConch
 
     void WebPage::onSavePolicyReport(const QString& file, const QString& save_name, const QString& policy, const QString& display)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int policy_i = policy.toInt();
         int display_i = display.toInt();
@@ -170,7 +170,7 @@ namespace MediaConch
 
     void WebPage::onSaveInfo(const QString& file, const QString& save_name)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         std::string display_name, display_content;
         QString report = mainwindow->get_mediainfo_xml(file_s, display_name, display_content);
         onDownloadReport(report, save_name);
@@ -178,7 +178,7 @@ namespace MediaConch
 
     void WebPage::onSaveTrace(const QString& file, const QString& save_name)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         std::string display_name, display_content;
         QString report = mainwindow->get_mediatrace_xml(file_s, display_name, display_content);
         onDownloadReport(report, save_name);
