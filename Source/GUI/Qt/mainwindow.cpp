@@ -134,8 +134,8 @@ MainWindow::~MainWindow()
 void MainWindow::add_file_to_list(const QString& file, const QString& path,
                                   const QString& policy, const QString& display)
 {
-    std::string filename = file.toStdString();
-    std::string filepath = path.toStdString();
+    std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
+    std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
     int policy_i = policy.toInt();
     int display_i = display.toInt();
     workerfiles.add_file_to_list(filename, filepath, policy_i, display_i);
@@ -144,7 +144,7 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
 //---------------------------------------------------------------------------
 void MainWindow::remove_file_to_list(const QString& file)
 {
-    std::string filename = file.toStdString();
+    std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     workerfiles.remove_file_registered_from_file(filename);
 }
 

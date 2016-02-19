@@ -348,8 +348,10 @@ void ResultWindow::set_web_view_content(QString& html)
     QWebChannel *channel = new QWebChannel(page);
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
-#endif
+    view->setHtml(html.toUtf8(), url);
+#else
     view->setContent(html.toUtf8(), "text/html", url);
+#endif
 }
 
 //---------------------------------------------------------------------------

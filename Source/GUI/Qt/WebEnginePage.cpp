@@ -303,8 +303,8 @@ namespace MediaConch
         mainwindow->remove_file_to_list(file);
     }
 
-    bool WebPage::acceptNavigationRequest(const QUrl& url, QWebEnginePage::NavigationType type,
-                                          bool isMainFrame)
+    bool WebPage::acceptNavigationRequest(const QUrl&, QWebEnginePage::NavigationType,
+                                          bool)
     {
         return false;
     }
