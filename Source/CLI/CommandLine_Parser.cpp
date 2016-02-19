@@ -256,8 +256,6 @@ CL_OPTION(PolicyOption)
     file.assign(argument, egal_pos + 1, std::string::npos);
     cli->add_policy(file);
 
-    std::string report = "MediaConch";
-    cli->set_report_set(report);
     return CLI_RETURN_NONE;
 }
 

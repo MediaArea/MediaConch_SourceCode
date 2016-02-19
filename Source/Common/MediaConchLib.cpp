@@ -112,7 +112,7 @@ int MediaConchLib::add_option(const std::string& option, std::string& report)
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::string>& files,
+bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::string>&,
                                                        const std::bitset<MediaConchLib::report_Max>& reports,
                                                        const std::string& display, MediaConchLib::format& Format,
                                                        std::string& reason)
@@ -126,9 +126,6 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
         reason = "If a display is used, no other output format can be used";
         return false;
     }
-
-    if (files.size() > 1 && Format == MediaConchLib::format_Xml)
-        Format = format_MaXml;
 
     if (reports.count() > 1 && Format == MediaConchLib::format_Xml)
         Format = MediaConchLib::format_MaXml;
@@ -450,7 +447,7 @@ size_t MediaConchLib::get_policies_count() const
 //---------------------------------------------------------------------------
 Policy* MediaConchLib::get_policy(size_t pos)
 {
-    if (pos > core->policies.policies.size())
+    if (pos >= core->policies.policies.size())
         return NULL;
     return core->policies.policies[pos];
 }

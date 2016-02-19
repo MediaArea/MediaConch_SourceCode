@@ -52,7 +52,7 @@ namespace MediaConch
             return Help_Nothing();
 
         // If no report selected, use Implementation by default
-        if (!report_set.count())
+        if (!report_set.count() && !policies.size())
             report_set.set(MediaConchLib::report_MediaConch);
 
         // If no Implementation Schema registered, use one by default

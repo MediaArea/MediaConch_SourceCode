@@ -532,6 +532,7 @@ namespace MediaConch
 
         bool has_valid = false;
         bool valid = true;
+        std::vector<std::string> files;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
@@ -555,21 +556,20 @@ namespace MediaConch
                 continue;
             }
 
-            // Output
-            std::vector<std::string> files;
             files.push_back(*d->current_files[id]);
+        }
 
-            MediaConchLib::ReportRes result;
-            d->MCL->get_report(report_set, format, files,
-                              req->policies_names, req->policies_contents,
-                              &result, display_name, display_content);
-            res.ok.report = result.report;
-            if (result.has_valid)
-            {
-                has_valid = true;
-                if (!result.valid)
-                    valid = false;
-            }
+        // Output
+        MediaConchLib::ReportRes result;
+        d->MCL->get_report(report_set, format, files,
+                           req->policies_names, req->policies_contents,
+                           &result, display_name, display_content);
+        res.ok.report = result.report;
+        if (result.has_valid)
+        {
+            has_valid = true;
+            if (!result.valid)
+                valid = false;
         }
         res.ok.has_valid = has_valid;
         res.ok.valid = valid;
