@@ -94,7 +94,7 @@ int Http::send_request(RESTAPI::Clear_Req& req)
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::List_Req& req)
+int Http::send_request(RESTAPI::List_Req&)
 {
     std::string uri("/");
     uri +=  RESTAPI::API_VERSION + "/list";
