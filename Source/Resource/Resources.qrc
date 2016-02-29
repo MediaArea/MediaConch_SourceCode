@@ -34,7 +34,9 @@
         <file alias="glyphicons-halflings-regular.woff2">html/fonts/glyphicons-halflings-regular.woff2</file>
     </qresource>
     <qresource prefix="/policies">
-        <file alias="General_Conformance.xsl">policies/General_Conformance.xsl</file>
+        <file alias="Policy_Set_Example.xsl">policies/Policy_Set_Example.xsl</file>
+        <file alias="CAVPP_Access_Video_Files.xsl">policies/CAVPP_Access_Video_Files.xsl</file>
+        <file alias="CAVPP_Preservation_Video_Files.xsl">policies/CAVPP_Preservation_Video_Files.xsl</file>
         <file alias="NYULibraries_MKVFFV1.xsl">policies/NYULibraries_MKVFFV1.xsl</file>
         <file alias="NYULibraries_QTv210.xsl">policies/NYULibraries_QTv210.xsl</file>
         <file alias="QTv210_to_MKVffv1.xsl">policies/QTv210_to_MKVffv1.xsl</file>
