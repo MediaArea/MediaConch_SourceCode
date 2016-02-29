@@ -285,6 +285,7 @@ LIBS             += -lz
 
 RESOURCES        += ../../Source/Resource/Resources.qrc
 
+OBJECTS_DIR      =  _Automated
 MOC_DIR          =  _Automated
 UI_HEADERS_DIR   =  _Automated
 UI_SOURCES_DIR   =  _Automated
