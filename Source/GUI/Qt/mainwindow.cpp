@@ -66,9 +66,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
-    // Verbosity option
-    if (!MCL.get_implementation_verbosity().length())
-        MCL.set_implementation_verbosity("5");
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
@@ -895,8 +892,10 @@ QString MainWindow::get_implementationreport_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, dname, dcontent);
     if (result.has_valid)
         is_valid = result.valid;
@@ -920,8 +919,10 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromStdString(result.report);
 }
@@ -939,8 +940,10 @@ QString MainWindow::get_mediainfo_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
@@ -956,8 +959,9 @@ QString MainWindow::get_mediainfo_jstree(const std::string& file)
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
-                   vec, vec, &result);
+                   vec, vec, options, &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
@@ -974,8 +978,10 @@ QString MainWindow::get_mediatrace_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
@@ -991,8 +997,10 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
                    vec, vec,
+                   options,
                    &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
@@ -1024,8 +1032,10 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, dname, dcontent);
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1080,9 +1090,11 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     policies_contents.push_back(policy_content);
 
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
 
     if (MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                        vec, policies_contents,
+                       options,
                        &result, dname, dcontent) < 0)
         return 0;
 

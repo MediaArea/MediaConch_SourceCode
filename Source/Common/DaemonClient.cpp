@@ -260,6 +260,7 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
                              MediaConchLib::format f, const std::vector<std::string>& files,
                              const std::vector<std::string>& policies_names,
                              const std::vector<std::string>& policies_contents,
+                             const std::map<std::string, std::string>& options,
                              MediaConchLib::ReportRes* result,
                              const std::string* display_name,
                              const std::string* display_content)
@@ -318,6 +319,13 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
 
     if (display_content)
         req.display_content = *display_content;
+
+    if (options.find("verbosity") != options.end() && options.at("verbosity").length())
+    {
+        req.has_verbosity = true;
+        const std::string& verbosity = options.at("verbosity");
+        req.verbosity = strtol(verbosity.c_str(), NULL, 10);
+    }
 
     http_client->start();
     if (http_client->send_request(req) < 0)

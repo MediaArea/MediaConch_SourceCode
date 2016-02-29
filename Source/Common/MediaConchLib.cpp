@@ -236,6 +236,7 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
                               const std::vector<std::string>& files,
                               const std::vector<std::string>& policies_names,
                               const std::vector<std::string>& policies_contents,
+                              const std::map<std::string, std::string>& options,
                               MediaConchLib::ReportRes* result,
                               const std::string* display_name,
                               const std::string* display_content)
@@ -246,11 +247,11 @@ int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format 
     if (use_daemon)
         return daemon_client->get_report(report_set, f, files,
                                          policies_names, policies_contents,
-                                         result,
+                                         options, result,
                                          display_name, display_content);
     return core->get_report(report_set, f, files,
                             policies_names, policies_contents,
-                            result,
+                            options, result,
                             display_name, display_content);
 }
 

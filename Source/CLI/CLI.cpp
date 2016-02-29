@@ -59,10 +59,6 @@ namespace MediaConch
         if (!MCL.get_implementation_schema_file().length())
             MCL.create_default_implementation_schema();
 
-        // If no Implementation verbosity registered, use one by default
-        if (!MCL.get_implementation_verbosity().length())
-            MCL.set_implementation_verbosity("5");
-
         std::string reason;
         if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
                                                     format, reason))
@@ -136,8 +132,10 @@ namespace MediaConch
         //Output
         MediaConchLib::ReportRes result;
         std::vector<std::string> policies_contents;
+        std::map<std::string, std::string> options;
+        options["verbosity"] = MCL.get_implementation_verbosity();
         MCL.get_report(report_set, format, file_to_report, policies,
-                       policies_contents, &result, &display_file, NULL);
+                       policies_contents, options, &result, &display_file, NULL);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
         STRINGOUT(report_mi);
