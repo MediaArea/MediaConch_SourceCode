@@ -115,7 +115,7 @@ Section "SectionPrincipale" SEC01
   SetOutPath "$SMPROGRAMS"
   CreateShortCut "$SMPROGRAMS\MediaConch.lnk" "$INSTDIR\MediaConch.exe" "" "" "" "" "" "Convenient unified display of the most relevant technical and tag data for video and audio files"
   SetOutPath "$INSTDIR"
-  File "/oname=MediaConch.exe" "..\..\Project\MSVC2013\Win32\Release\MediaConch_GUI.exe"
+  File "/oname=MediaConch.exe" "..\..\Project\MSVC2013\Win32\Release\MediaConch-GUI.exe"
   File "/oname=History.txt" "..\..\History_GUI.txt"
   File "..\..\License.html"
   File "/oname=ReadMe.txt" "..\..\Release\ReadMe_GUI_Windows.txt"
@@ -143,7 +143,7 @@ Section "SectionPrincipale" SEC01
   File "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x86\Microsoft.VC120.CRT\msvcr120.dll"
   File "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x86\Microsoft.VC120.CRT\vccorlib120.dll"
   SetOutPath "$INSTDIR\platforms"
-  File "..\..\Project\MSVC2013\Win32\Release\qwindows.dll"
+  File "..\..\Project\MSVC2013\Win32\Release\platforms\qwindows.dll"
 
   # Create files
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"

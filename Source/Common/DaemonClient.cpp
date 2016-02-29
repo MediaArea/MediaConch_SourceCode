@@ -166,10 +166,10 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
     ZenLib::Ztring path = ZenLib::Ztring().From_UTF8(real_file);
 
     DWORD path_size = GetFullPathName(path.c_str(), 0, NULL, NULL);
-    Char* tmp = new Char[path_size + 1];
+    ZenLib::Char* tmp = new ZenLib::Char[path_size + 1];
     if (GetFullPathName(path.c_str(), path_size + 1, tmp, NULL))
     {
-        path = ZenLib::ZTring(tmp);
+        path = ZenLib::Ztring(tmp);
         real_file = path.To_UTF8();
     }
     delete [] tmp;
