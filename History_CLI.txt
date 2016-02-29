@@ -8,6 +8,12 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.02, 2016-02-29
+-------------
+CLI is synchronous by default even if the server is active 
+Update of implementation checker tests, including some FFV1 checks
+Expanded REST API of the server
+
 Version 16.01, 2016-01-27
 -------------
 More Matroska validation tests

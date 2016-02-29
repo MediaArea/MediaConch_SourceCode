@@ -8,6 +8,16 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.02, 2016-02-29
+-------------
+New page for the results (analyze and update in background, delete/add jobs during the processing of the queue)
+GUI usage is saved and restored when it is restarted
+Dynamic selection of the policy and the display format in the policy viewer
+Dynamic selection of the display format in the implementation viewer
+CAVPP access and preservation policy sets
+Update of implementation checker tests, including some FFV1 checks
+Expanded REST API of the server
+
 Version 16.01, 2016-01-27
 -------------
 More Matroska validation tests
