@@ -210,11 +210,13 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QWebElement displayElement = form.findFirst("#checkerUpload_step1_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+        QWebElement verbosityElement = form.findFirst("#checkerUpload_step1_verbosity_selector");
+        QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         for (int i = 0; i < files.size(); ++i)
         {
             QFileInfo f = QFileInfo(files[i]);
-            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt);
+            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt, verbosity);
         }
 
         mainwindow->set_result_view();
@@ -233,8 +235,10 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QWebElement displayElement = form.findFirst("#checkerOnline_step1_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+        QWebElement verbosityElement = form.findFirst("#checkerOnline_step1_display_selector");
+        QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
-        mainwindow->add_file_to_list(url, "", policy, display_xslt);
+        mainwindow->add_file_to_list(url, "", policy, display_xslt, verbosity);
         mainwindow->set_result_view();
         return 0;
     }
@@ -255,9 +259,11 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QWebElement displayElement = form.findFirst("#checkerRepository_step1_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+        QWebElement verbosityElement = form.findFirst("#checkerRepository_step1_verbosity_selector");
+        QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         for (int i = 0; i < list.size(); ++i)
-            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt);
+            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt, verbosity);
         mainwindow->set_result_view();
         return 0;
     }

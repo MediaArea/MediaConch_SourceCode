@@ -137,13 +137,17 @@ MainWindow::~MainWindow()
 
 //---------------------------------------------------------------------------
 void MainWindow::add_file_to_list(const QString& file, const QString& path,
-                                  const QString& policy, const QString& display)
+                                  const QString& policy, const QString& display,
+                                  const QString& v)
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
     int policy_i = policy.toInt();
     int display_i = display.toInt();
-    QString verbosity = QString().fromStdString(MCL.get_implementation_verbosity());
+
+    QString verbosity(v);
+    if (verbosity == "-1")
+        verbosity = QString().fromStdString(MCL.get_implementation_verbosity());
     int verbosity_i = -1;
     if (verbosity.length())
         verbosity_i = verbosity.toInt();
@@ -423,7 +427,7 @@ void MainWindow::on_actionOpen_triggered()
         QString filename = file.fileName();
         QString filepath = file.absolutePath();
 
-        add_file_to_list(filename, filepath, "-1", "-1");
+        add_file_to_list(filename, filepath, "-1", "-1", "-1");
     }
 
     current_view = RUN_CHECKER_VIEW;

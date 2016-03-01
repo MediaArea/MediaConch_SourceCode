@@ -53,7 +53,7 @@ public:
     void Run();
 
     // Functions
-    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display);
+    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display, const QString& verbosity);
     void remove_file_to_list(const QString& file);
     void clear_file_list();
     void policy_to_delete(int row);

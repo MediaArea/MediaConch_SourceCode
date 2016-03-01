@@ -45,16 +45,16 @@ protected:
     bool report_is_xml(const QString& report);
 
 public Q_SLOTS:
-    void onFileUploadSelected(const QString& display_xslt, const QString& policy);
-    void onFileOnlineSelected(const QString& url, const QString& display_xslt, const QString& policy);
-    void onFileRepositorySelected(const QString& display_xslt, const QString& policy);
+    void onFileUploadSelected(const QString& display_xslt, const QString& policy, const QString& verbosity);
+    void onFileOnlineSelected(const QString& url, const QString& display_xslt, const QString& policy, const QString& verbosity);
+    void onFileRepositorySelected(const QString& display_xslt, const QString& policy, const QString& verbosity);
     void onInputChanged(const QString& inputName);
     void onButtonClicked(const QString& id);
 
     void menu_link_checker(const QString& name);
 
     void onDownloadReport(const QString& target, const QString& save_name);
-    void onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display = "-1", const QString& verbosity);
+    void onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display = "-1", const QString& verbosity="");
     void onSavePolicyReport(const QString& file, const QString& save_name, const QString& policy = "-1", const QString& display = "-1");
     void onSaveInfo(const QString& target, const QString& save_name);
     void onSaveTrace(const QString& target, const QString& save_name);
