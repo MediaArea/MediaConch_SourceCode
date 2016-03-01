@@ -30,14 +30,23 @@
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                                 <h4 class="modal-title">Implementation report</h4>
                                 <label class="control-label" for="fileDetail_implementation_display">Display:</label>
-                                <select id="fileDetail_implementation_display{{ loop.index }}" name="filedetail[implementation][display]" class="form-control" onchange="webpage.onFillImplementationReport('{{ check.getSource }}', '#modalConformance{{ loop.index }}', $('#fileDetail_implementation_display{{ loop.index }}').val());">
+                                <select id="fileDetail_implementation_display{{ loop.index }}" name="filedetail[implementation][display]" class="form-control" onchange="webpage.onFillImplementationReport('{{ check.getSource }}', '#modalConformance{{ loop.index }}', $('#fileDetail_implementation_display{{ loop.index }}').val(), $('#fileDetail_implementation_verbosity{{ loop.index }}').val());">
                                   <option selected="selected" value="-1">Choose a Display</option>
+                                </select>
+                                <select id="fileDetail_implementation_verbosity{{ loop.index }}" name="filedetail[implementation][verbosity]" class="form-control" onchange="webpage.onFillImplementationReport('{{ check.getSource }}', '#modalConformance{{ loop.index }}', $('#fileDetail_implementation_display{{ loop.index }}').val(), $('#fileDetail_implementation_verbosity{{ loop.index }}').val());">
+                                  <option selected="selected" value="-1">Default (5)</option>
+                                  <option value="0">0</option>
+                                  <option value="1">1</option>
+                                  <option value="2">2</option>
+                                  <option value="3">3</option>
+                                  <option value="4">4</option>
+                                  <option value="5">5</option>
                                 </select>
                             </div>
                             <div class="modal-body">
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="{{ check.filename }}_ImplementationReport.txt" onclick="webpage.onSaveImplementationReport('{{ check.getSource }}', $(this).data('save-name'), $('#fileDetail_implementation_display{{ loop.index }}').val());">Download report</button>
+                                <button type="button" class="btn btn-primary report-dld" data-target="#modalConformance{{ loop.index }}" data-save-name="{{ check.filename }}_ImplementationReport.txt" onclick="webpage.onSaveImplementationReport('{{ check.getSource }}', $(this).data('save-name'), $('#fileDetail_implementation_display{{ loop.index }}').val(), $('#fileDetail_implementation_verbosity{{ loop.index }}').val());">Download report</button>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>

@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.2";
+const std::string RESTAPI::API_VERSION = "1.3";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -193,7 +193,11 @@ std::string RESTAPI::Report_Req::to_str() const
     out << "], policies_names_size: [" << policies_names.size();
     out << "], policies_contents_size: [" << policies_contents.size();
     out << "], display_name: [" << display_name;
-    out << "], display_content_length: [" << display_content.size() << "] ]";
+    out << "], display_content_length: [" << display_content.size();
+    out << "]";
+    if (has_verbosity)
+        out << ", verbosity: " << verbosity;
+    out << " ]";
     return out.str();
 }
 
@@ -586,6 +590,9 @@ std::string RESTAPI::serialize_report_req(Report_Req& req)
     if (req.display_content.length())
         child.obj.push_back(std::make_pair("display_content", serialize_report_string(req.display_content)));
 
+    if (req.has_verbosity)
+        child.obj.push_back(std::make_pair("verbosity", serialize_report_int(req.verbosity)));
+
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj.push_back(std::make_pair("REPORT", child));
 
@@ -949,13 +956,14 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *reports, *policies_names, *policies_contents, *display_name, *display_content;
+    Container::Value *ids, *reports, *policies_names, *policies_contents, *display_name, *display_content, *verbosity;
     ids = model->get_value_by_key(*child, "ids");
     reports = model->get_value_by_key(*child, "reports");
     policies_names = model->get_value_by_key(*child, "policies_names");
     policies_contents = model->get_value_by_key(*child, "policies_contents");
     display_name = model->get_value_by_key(*child, "display_name");
     display_content = model->get_value_by_key(*child, "display_content");
+    verbosity = model->get_value_by_key(*child, "verbosity");
 
     if (!ids || !reports || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
@@ -994,6 +1002,12 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
         req->display_name = display_name->s;
     if (display_content && display_content->type == Container::Value::CONTAINER_TYPE_STRING)
         req->display_content = display_content->s;
+
+    if (verbosity && verbosity->type == Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        req->has_verbosity = true;
+        req->verbosity = verbosity->l;
+    }
 
     return req;
 }
@@ -1748,6 +1762,17 @@ Container::Value RESTAPI::serialize_report_string(const std::string& reports)
     str_val.s = reports;
 
     return str_val;
+}
+
+//---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_report_int(int val)
+{
+    Container::Value int_val;
+
+    int_val.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    int_val.l = val;
+
+    return int_val;
 }
 
 //---------------------------------------------------------------------------

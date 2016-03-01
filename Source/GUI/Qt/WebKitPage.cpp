@@ -73,12 +73,20 @@ namespace MediaConch
             onFileRepositorySelected(button.parent().parent());
     }
 
-    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display)
+    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display, const QString& verbosity)
     {
         std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i);
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
         QWebElement form = mainFrame()->findFirstElement(target + " .modal-body");
 
         if (report_is_html(report))
@@ -149,12 +157,19 @@ namespace MediaConch
         out << report;
     }
 
-    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display)
+    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display, const QString& verbosity)
     {
         std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i);
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
         onDownloadReport(report, save_name);
     }
 
@@ -195,11 +210,13 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QWebElement displayElement = form.findFirst("#checkerUpload_step1_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+        QWebElement verbosityElement = form.findFirst("#checkerUpload_step1_verbosity_selector");
+        QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         for (int i = 0; i < files.size(); ++i)
         {
             QFileInfo f = QFileInfo(files[i]);
-            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt);
+            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt, verbosity);
         }
 
         mainwindow->set_result_view();
@@ -218,8 +235,10 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QWebElement displayElement = form.findFirst("#checkerOnline_step1_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+        QWebElement verbosityElement = form.findFirst("#checkerOnline_step1_display_selector");
+        QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
-        mainwindow->add_file_to_list(url, "", policy, display_xslt);
+        mainwindow->add_file_to_list(url, "", policy, display_xslt, verbosity);
         mainwindow->set_result_view();
         return 0;
     }
@@ -240,9 +259,11 @@ namespace MediaConch
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
         QWebElement displayElement = form.findFirst("#checkerRepository_step1_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
+        QWebElement verbosityElement = form.findFirst("#checkerRepository_step1_verbosity_selector");
+        QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         for (int i = 0; i < list.size(); ++i)
-            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt);
+            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt, verbosity);
         mainwindow->set_result_view();
         return 0;
     }

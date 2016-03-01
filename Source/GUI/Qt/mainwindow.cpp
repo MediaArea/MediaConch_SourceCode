@@ -12,6 +12,7 @@
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
+#include "verbosityspinbox.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 
@@ -19,6 +20,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QActionGroup>
+#include <QSpinBox>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QFileDialog>
@@ -66,9 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
-    // Verbosity option
+
     if (!MCL.get_implementation_verbosity().length())
-        MCL.set_implementation_verbosity("5");
+        MCL.set_implementation_verbosity("-1");
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
@@ -85,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resultView=NULL;
     policiesView = NULL;
     displayView = NULL;
+    verbosity = NULL;
 
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
@@ -121,6 +124,8 @@ MainWindow::~MainWindow()
 {
     workerfiles.quit();
     workerfiles.wait();
+    if (verbosity)
+        delete verbosity;
     delete ui;
     if (checkerView)
         delete checkerView;
@@ -132,13 +137,22 @@ MainWindow::~MainWindow()
 
 //---------------------------------------------------------------------------
 void MainWindow::add_file_to_list(const QString& file, const QString& path,
-                                  const QString& policy, const QString& display)
+                                  const QString& policy, const QString& display,
+                                  const QString& v)
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
     int policy_i = policy.toInt();
     int display_i = display.toInt();
-    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i);
+
+    QString verbosity(v);
+    if (verbosity == "-1")
+        verbosity = QString().fromStdString(MCL.get_implementation_verbosity());
+    int verbosity_i = -1;
+    if (verbosity.length())
+        verbosity_i = verbosity.toInt();
+
+    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i, verbosity_i);
 }
 
 //---------------------------------------------------------------------------
@@ -413,7 +427,7 @@ void MainWindow::on_actionOpen_triggered()
         QString filename = file.fileName();
         QString filepath = file.absolutePath();
 
-        add_file_to_list(filename, filepath, "-1", "-1");
+        add_file_to_list(filename, filepath, "-1", "-1", "-1");
     }
 
     current_view = RUN_CHECKER_VIEW;
@@ -483,6 +497,72 @@ void MainWindow::on_actionChooseSchema_triggered()
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
     Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionVerbosity_triggered()
+{
+    if (!verbosity)
+    {
+        verbosity = new VerbositySpinbox(NULL);
+        int w = width();
+        int left = 0;
+        if (w < 220)
+            w = 220;
+        else
+        {
+            w -= 220;
+            left = w / 3;
+            w = left + 220;
+        }
+
+        int h = height();
+        int up = 0;
+        if (h < 85)
+            h = 85;
+        else
+        {
+            h -= 85;
+            up = h / 3;
+            h = up + 85;
+        }
+        verbosity->move(left + x(), up + y());
+        verbosity->resize(w, h);
+    }
+    QString value;
+    if (MCL.get_implementation_verbosity().length())
+        value = QString().fromStdString(MCL.get_implementation_verbosity());
+    else
+        value = "-1";
+
+    verbosity->get_verbosity_spin()->setValue(value.toInt());
+    connect(verbosity->get_buttons_box(), SIGNAL(accepted()), this, SLOT(verbosity_accepted()));
+    connect(verbosity->get_buttons_box(), SIGNAL(rejected()), this, SLOT(verbosity_rejected()));
+    verbosity->show();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::verbosity_accepted()
+{
+    if (!verbosity)
+        return;
+
+    QString value;
+    value.setNum(verbosity->get_verbosity_spin()->value());
+    MCL.set_implementation_verbosity(value.toStdString());
+
+    delete verbosity;
+    verbosity = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::verbosity_rejected()
+{
+    if (!verbosity)
+        return;
+
+    delete verbosity;
+    verbosity = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -880,33 +960,6 @@ int MainWindow::validate(MediaConchLib::report report, const std::string& file,
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_implementationreport_xml(const std::string& file,
-                                                 const std::string& display_name,
-                                                 const std::string& display_content,
-                                                 bool& is_valid)
-{
-    const std::string* dname = display_name.length() ? &display_name : NULL;
-    const std::string* dcontent = display_content.length() ? &display_content : NULL;
-
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaConch);
-    std::vector<std::string> files;
-    files.push_back(file);
-
-    MediaConchLib::ReportRes result;
-    std::vector<std::string> vec;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                   vec, vec,
-                   &result, dname, dcontent);
-    if (result.has_valid)
-        is_valid = result.valid;
-    else
-        is_valid = false;
-
-    return QString().fromUtf8(result.report.c_str(), result.report.length());
-}
-
-//---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
                                                      const std::string& display_name,
                                                      const std::string& display_content)
@@ -920,8 +973,10 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromStdString(result.report);
 }
@@ -939,8 +994,10 @@ QString MainWindow::get_mediainfo_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
@@ -956,8 +1013,9 @@ QString MainWindow::get_mediainfo_jstree(const std::string& file)
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
-                   vec, vec, &result);
+                   vec, vec, options, &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
@@ -974,8 +1032,10 @@ QString MainWindow::get_mediatrace_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
@@ -991,14 +1051,16 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
                    vec, vec,
+                   options,
                    &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p)
+void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p, int *verbosity)
 {
     FileRegistered *fr = get_file_registered_from_file(file);
     if (!fr)
@@ -1024,8 +1086,11 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
+    fill_options_for_report(options, verbosity);
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, dname, dcontent);
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1080,9 +1145,11 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     policies_contents.push_back(policy_content);
 
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
 
     if (MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                        vec, policies_contents,
+                       options,
                        &result, dname, dcontent) < 0)
         return 0;
 
@@ -1165,6 +1232,26 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
 int MainWindow::get_ui_database_path(std::string& path)
 {
     return MCL.get_ui_database_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p)
+{
+    std::string verbosity = MCL.get_implementation_verbosity();
+
+    if (verbosity_p)
+    {
+        QString value = QString().setNum(*verbosity_p);
+        verbosity = value.toStdString();
+    }
+
+    if (verbosity.length())
+    {
+        if (verbosity == "-1")
+            opts["verbosity"] = "5";
+        else
+            opts["verbosity"] = verbosity;
+    }
 }
 
 }

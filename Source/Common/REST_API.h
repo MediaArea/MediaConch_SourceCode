@@ -195,12 +195,15 @@ public:
     // Report
     struct Report_Req
     {
+        Report_Req() :           has_verbosity(false) {}
         std::vector<int>         ids;
         std::vector<Report>      reports;
         std::vector<std::string> policies_names;
         std::vector<std::string> policies_contents;
         std::string              display_name;
         std::string              display_content;
+        bool                     has_verbosity;
+        int                      verbosity;
         std::string              to_str() const;
     };
 
@@ -402,6 +405,7 @@ private:
     Container::Value serialize_ids(std::vector<int>& ids);
     Container::Value serialize_report_reports(std::vector<Report>& args);
     Container::Value serialize_report_string(const std::string& args);
+    Container::Value serialize_report_int(int val);
     Container::Value serialize_report_arr_str(const std::vector<std::string>& reports);
     Container::Value serialize_generic_nok(int id, Reason error);
     Container::Value serialize_analyze_oks(std::vector<Analyze_Ok*>& array);

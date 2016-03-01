@@ -67,10 +67,6 @@ namespace MediaConch
         if (!MCL->get_implementation_schema_file().length())
             MCL->create_default_implementation_schema();
 
-        // If no Implementation verbosity registered, use one by default
-        if (!MCL->get_implementation_verbosity().length())
-            MCL->set_implementation_verbosity("5");
-
         httpd = new LibEventHttpd(this);
         int port = -1;
         std::string address;
@@ -559,11 +555,20 @@ namespace MediaConch
             files.push_back(*d->current_files[id]);
         }
 
+        std::stringstream verbosity;
+        if (req->has_verbosity && req->verbosity != -1)
+            verbosity << req->verbosity;
+        else
+            verbosity << d->MCL->get_implementation_verbosity();
+
+        std::map<std::string, std::string> options;
+        options["verbosity"] = verbosity.str();
+
         // Output
         MediaConchLib::ReportRes result;
         d->MCL->get_report(report_set, format, files,
                            req->policies_names, req->policies_contents,
-                           &result, display_name, display_content);
+                           options, &result, display_name, display_content);
         res.ok.report = result.report;
         if (result.has_valid)
         {

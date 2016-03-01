@@ -66,12 +66,19 @@ namespace MediaConch
             onFileOnlineSelected();
     }
 
-    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display)
+    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display, const QString& verbosity)
     {
         std::string file_s = file.toStdString();
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i);
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
         QString script = QString("$('%1 .modal-body')").arg(target);
 
         report = report.replace("\r", "");
@@ -173,12 +180,19 @@ namespace MediaConch
         out << report;
     }
 
-    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display)
+    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display, const QString& verbosity)
     {
         std::string file_s = file.toStdString();
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i);
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
         onDownloadReport(report, save_name);
     }
 
@@ -235,7 +249,7 @@ namespace MediaConch
         runJavaScript("document.getElementById('checkerRepository_directory').value = \"\";");
     }
 
-    void WebPage::onFileUploadSelected(const QString& display_xslt, const QString& policy)
+    void WebPage::onFileUploadSelected(const QString& display_xslt, const QString& policy, const QString& verbosity)
     {
         QStringList files = file_selector.value("checkerUpload[file]", QStringList());
 
@@ -245,22 +259,23 @@ namespace MediaConch
         for (int i = 0; i < files.size(); ++i)
         {
             QFileInfo f = QFileInfo(files[i]);
-            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt);
+            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt, verbosity);
         }
         mainwindow->set_result_view();
     }
 
     void WebPage::onFileUploadSelected()
     {
-        runJavaScript("webpage.onFileUploadSelected($('#checkerUpload_step1_display_selector').val(), $('#checkerUpload_step1_policy').val());");
+        runJavaScript("webpage.onFileUploadSelected($('#checkerUpload_step1_display_selector').val(), $('#checkerUpload_step1_policy').val(),"
+                      " $('#checkerUpload_step1_verbosity_selector').val());");
     }
 
-    void WebPage::onFileOnlineSelected(const QString& url, const QString& display_xslt, const QString& policy)
+    void WebPage::onFileOnlineSelected(const QString& url, const QString& display_xslt, const QString& policy, const QString& verbosity)
     {
         if (!url.length())
             return;
 
-        mainwindow->add_file_to_list(url, "", policy, display_xslt);
+        mainwindow->add_file_to_list(url, "", policy, display_xslt, verbosity);
         mainwindow->set_result_view();
     }
 
@@ -268,10 +283,11 @@ namespace MediaConch
     {
         runJavaScript("webpage.onFileOnlineSelected($('#checkerOnline_file').val(), "
                                                    "$('#checkerOnline_step1_display_selector').val(), "
-                                                   "$('#checkerOnline_step1_policy').val());");
+                                                   "$('#checkerOnline_step1_policy').val(), "
+                                                   "$('#checkerOnline_step1_verbosity_selector').val());");
     }
 
-    void WebPage::onFileRepositorySelected(const QString& display_xslt, const QString& policy)
+    void WebPage::onFileRepositorySelected(const QString& display_xslt, const QString& policy, const QString& verbosity)
     {
         QStringList dirname = file_selector.value("checkerRepository[directory]", QStringList());
         if (dirname.empty())
@@ -283,14 +299,15 @@ namespace MediaConch
             return;
 
         for (int i = 0; i < list.size(); ++i)
-            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt);
+            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt, verbosity);
         mainwindow->set_result_view();
     }
 
     void WebPage::onFileRepositorySelected()
     {
         runJavaScript("webpage.onFileRepositorySelected($('#checkerRepository_step1_display_selector').val(), "
-                                                       "$('#checkerRepository_step1_policy').val());");
+                                                       "$('#checkerRepository_step1_policy').val(), "
+                                                       "$('#checkerRepository_step1_verbosity_selector').val());");
     }
 
     void WebPage::close_all()

@@ -346,7 +346,8 @@ int SQLLite::create_ui_table()
     if (ret < 0)
         return -1;
 
-    return update_report_table();
+    ret = update_ui_table();
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -380,8 +381,8 @@ int SQLLite::ui_add_file(const FileRegistered* file)
 
     reports.clear();
     create << "INSERT INTO UI ";
-    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID)";
-    create << " VALUES (?, ?, ?, ?, ?, ?, ?);";
+    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY)";
+    create << " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
     query = create.str();
 
     const char* end = NULL;
@@ -417,6 +418,10 @@ int SQLLite::ui_add_file(const FileRegistered* file)
     if (ret != SQLITE_OK)
         return -1;
 
+    ret = sqlite3_bind_int(stmt, 8, file->verbosity);
+    if (ret != SQLITE_OK)
+        return -1;
+
     return execute();
 }
 
@@ -427,12 +432,12 @@ int SQLLite::ui_add_files(const std::vector<FileRegistered*>& files)
 
     reports.clear();
     create << "INSERT INTO UI ";
-    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID) VALUES";
+    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY) VALUES";
     for (size_t i = 0; i < files.size(); ++i)
     {
         if (i)
             create << ",";
-        create << " (?, ?, ?, ?, ?, ?, ?)";
+        create << " (?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     create << ";";
@@ -443,34 +448,39 @@ int SQLLite::ui_add_files(const std::vector<FileRegistered*>& files)
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
+    int nb_column = 8;
     for (size_t i = 0; i < files.size(); ++i)
     {
         FileRegistered* file = files[i];
-        ret = sqlite3_bind_blob(stmt, i * 7 + 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+        ret = sqlite3_bind_blob(stmt, i * nb_column + 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_blob(stmt, i * 7 + 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+        ret = sqlite3_bind_blob(stmt, i * nb_column + 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 3, file->policy);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 3, file->policy);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 4, file->display);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 4, file->display);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 5, file->analyzed);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 5, file->analyzed);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 6, file->implementation_valid);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 6, file->implementation_valid);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 7, file->policy_valid);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 7, file->policy_valid);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * nb_column + 8, file->verbosity);
         if (ret != SQLITE_OK)
             return -1;
     }
@@ -489,7 +499,8 @@ int SQLLite::ui_update_file(const FileRegistered* file)
     create << "DISPLAY              = ?, ";
     create << "ANALYZED             = ?, ";
     create << "IMPLEMENTATION_VALID = ?, ";
-    create << "POLICY_VALID         = ?  ";
+    create << "POLICY_VALID         = ?, ";
+    create << "VERBOSITY            = ?  ";
     create << "WHERE FILENAME       = ?  ";
     create << "AND   FILEPATH       = ? ;";
 
@@ -520,11 +531,15 @@ int SQLLite::ui_update_file(const FileRegistered* file)
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 6, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int(stmt, 6, file->verbosity);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 7, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 7, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 8, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -537,13 +552,13 @@ int SQLLite::ui_update_files(const std::vector<FileRegistered*>& files)
     std::stringstream create;
 
     reports.clear();
-    create << "WITH Tmp(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID)";
+    create << "WITH Tmp(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY)";
     create << "AS (VALUES";
     for (size_t i = 0; i < files.size(); ++i)
     {
         if (i)
             create << ", ";
-        create << "(?, ?, ?, ?, ?, ?, ?)";
+        create << "(?, ?, ?, ?, ?, ?, ?, ?)";
     }
     create << ") ";
 
@@ -552,7 +567,8 @@ int SQLLite::ui_update_files(const std::vector<FileRegistered*>& files)
     create << "DISPLAY = (SELECT DISPLAY FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "ANALYZED = (SELECT ANALYZED FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "IMPLEMENTATION_VALID = (SELECT IMPLEMENTATION_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
-    create << "POLICY_VALID = (SELECT POLICY_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH) ";
+    create << "POLICY_VALID = (SELECT POLICY_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "VERBOSITY = (SELECT VERBOSITY FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH) ";
 
     create << " WHERE FILENAME IN (SELECT FILENAME FROM Tmp) AND  FILEPATH IN (SELECT FILEPATH FROM Tmp)";
 
@@ -564,35 +580,40 @@ int SQLLite::ui_update_files(const std::vector<FileRegistered*>& files)
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
+    int nb_column = 8;
     for (size_t i = 0; i < files.size(); ++i)
     {
         FileRegistered* file = files[i];
 
-        ret = sqlite3_bind_blob(stmt, i * 7 + 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+        ret = sqlite3_bind_blob(stmt, i * nb_column + 1, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_blob(stmt, i * 7 + 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+        ret = sqlite3_bind_blob(stmt, i * nb_column + 2, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 3, file->policy);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 3, file->policy);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 4, file->display);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 4, file->display);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 5, file->analyzed);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 5, file->analyzed);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 6, file->implementation_valid);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 6, file->implementation_valid);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * 7 + 7, file->policy_valid);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 7, file->policy_valid);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * nb_column + 8, file->verbosity);
         if (ret != SQLITE_OK)
             return -1;
     }
@@ -610,9 +631,10 @@ int SQLLite::ui_get_file(FileRegistered* file)
     std::string a("ANALYZED");
     std::string i_v("IMPLEMENTATION_VALID");
     std::string p_v("POLICY_VALID");
+    std::string v("VERBOSITY");
 
     reports.clear();
-    create << "SELECT " << p << ", " << d << ", " << a << ", " << i_v << ", " << p_v << " FROM UI ";
+    create << "SELECT " << p << ", " << d << ", " << a << ", " << i_v << ", " << p_v << ", " << v << " FROM UI ";
     create << "WHERE FILENAME = ? AND FILEPATH = ?;";
     query = create.str();
 
@@ -644,6 +666,8 @@ int SQLLite::ui_get_file(FileRegistered* file)
         file->implementation_valid = std_string_to_int(r[i_v]);
     if (r.find(p_v) != r.end())
         file->policy_valid = std_string_to_int(r[p_v]);
+    if (r.find(v) != r.end())
+        file->verbosity = std_string_to_int(r[v]);
 
     return 0;
 }
@@ -738,10 +762,11 @@ void SQLLite::ui_get_elements(std::vector<FileRegistered*>& vec)
     std::string a("ANALYZED");
     std::string i_v("IMPLEMENTATION_VALID");
     std::string p_v("POLICY_VALID");
+    std::string v("VERBOSITY");
 
     reports.clear();
     create << "SELECT " << name << ", " << path << ", " << p << ", " << d;
-    create << ", " << a << ", " << i_v << ", " << p_v;
+    create << ", " << a << ", " << i_v << ", " << p_v << ", " << v;
     create << " FROM UI;";
     query = create.str();
 
@@ -771,6 +796,8 @@ void SQLLite::ui_get_elements(std::vector<FileRegistered*>& vec)
                 file->implementation_valid = std_string_to_int(reports[i][i_v]);
             if (reports[i].find(p_v) != reports[i].end())
                 file->policy_valid = std_string_to_int(reports[i][p_v]);
+            if (reports[i].find(v) != reports[i].end())
+                file->verbosity = std_string_to_int(reports[i][v]);
             if (file->analyzed)
                 file->need_update = false;
             vec.push_back(file);

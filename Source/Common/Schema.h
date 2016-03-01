@@ -45,6 +45,7 @@ public:
     std::vector<std::string> get_errors() const { return errors; }
 
     void set_options(const std::map<std::string, std::string>& opt) { options = opt; }
+    const std::map<std::string, std::string>& get_options() const { return options; }
 
 protected:
     std::string                        schema;

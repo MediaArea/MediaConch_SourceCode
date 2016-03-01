@@ -31,6 +31,7 @@ class CheckerWindow;
 class ResultWindow;
 class PoliciesWindow;
 class DisplayWindow;
+class VerbositySpinbox;
 class FileRegistered;
 
 class MainWindow : public QMainWindow
@@ -52,7 +53,7 @@ public:
     void Run();
 
     // Functions
-    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display);
+    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display, const QString& verbosity);
     void remove_file_to_list(const QString& file);
     void clear_file_list();
     void policy_to_delete(int row);
@@ -91,7 +92,6 @@ public:
                                          const std::vector<std::string>& policies_contents,
                                          std::vector<MediaConchLib::ValidateRes*>& result);
 
-    QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content, bool& is_valid);
     QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_jstree(const std::string& file);
@@ -104,7 +104,7 @@ public:
     void                        display_selected();
     void                        add_default_policy();
     void                        add_default_displays();
-    void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL);
+    void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);
     bool                        is_all_policies_saved();
 
@@ -151,6 +151,7 @@ private:
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
     QLineEdit*                  status_msg;
+    VerbositySpinbox*           verbosity;
 
     int                         clearVisualElements();
     void                        clearPoliciesElements();
@@ -165,6 +166,7 @@ private:
                                                   std::string& display_name, std::string& display_content,
                                                   const std::string*& dname, const std::string*& dcontent,
                                                   FileRegistered* fr);
+    void                        fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p);
 
     Run_View current_view;
 
@@ -174,6 +176,11 @@ Q_SIGNALS:
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChooseSchema_triggered();
+    void on_actionVerbosity_triggered();
+
+    // verbosity
+    void verbosity_accepted();
+    void verbosity_rejected();
 
     // View
     void on_actionChecker_triggered();

@@ -38,7 +38,7 @@ public:
     void load_database();
 
     // functions
-    void add_file_to_list(const std::string& file, const std::string& path, int policy, int display);
+    void add_file_to_list(const std::string& file, const std::string& path, int policy, int display, int verbosity);
     void clear_files();
     FileRegistered* get_file_registered_from_file(const std::string& file);
     void remove_file_registered_from_file(const std::string& file);
