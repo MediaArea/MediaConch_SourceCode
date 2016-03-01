@@ -85,6 +85,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/xsltruleedit.cpp \
                     ../../Source/GUI/Qt/displaymenu.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp \
+                    ../../Source/GUI/Qt/verbosityspinbox.cpp \
                     ../../Source/GUI/Qt/workerfiles.cpp
 
 HEADERS          += ../../Source/Common/MediaConchLib.h \
@@ -143,6 +144,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/xsltruleedit.h \
                     ../../Source/GUI/Qt/displaymenu.h \
                     ../../Source/GUI/Qt/progressbar.h \
+                    ../../Source/GUI/Qt/verbosityspinbox.h \
                     ../../Source/GUI/Qt/workerfiles.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
@@ -156,7 +158,8 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/unknownpolicymenu.ui \
                     ../../Source/GUI/Qt/xsltruleedit.ui \
                     ../../Source/GUI/Qt/displaymenu.ui \
-                    ../../Source/GUI/Qt/progressbar.ui
+                    ../../Source/GUI/Qt/progressbar.ui \
+                    ../../Source/GUI/Qt/verbosityspinbox.ui
 
 
 equals(WEB_MACHINE, webengine) {

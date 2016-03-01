@@ -31,6 +31,7 @@ class CheckerWindow;
 class ResultWindow;
 class PoliciesWindow;
 class DisplayWindow;
+class VerbositySpinbox;
 class FileRegistered;
 
 class MainWindow : public QMainWindow
@@ -151,6 +152,7 @@ private:
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
     QLineEdit*                  status_msg;
+    VerbositySpinbox*           verbosity;
 
     int                         clearVisualElements();
     void                        clearPoliciesElements();
@@ -165,6 +167,7 @@ private:
                                                   std::string& display_name, std::string& display_content,
                                                   const std::string*& dname, const std::string*& dcontent,
                                                   FileRegistered* fr);
+    void                        fill_options_for_report(std::map<std::string, std::string>& opts);
 
     Run_View current_view;
 
@@ -174,6 +177,11 @@ Q_SIGNALS:
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChooseSchema_triggered();
+    void on_actionVerbosity_triggered();
+
+    // verbosity
+    void verbosity_accepted();
+    void verbosity_rejected();
 
     // View
     void on_actionChecker_triggered();

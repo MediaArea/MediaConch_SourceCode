@@ -27,7 +27,16 @@
     <property name="sizeConstraint">
      <enum>QLayout::SetDefaultConstraint</enum>
     </property>
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item>
@@ -38,7 +47,16 @@
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
      </layout>
@@ -51,12 +69,12 @@
      <x>0</x>
      <y>0</y>
      <width>884</width>
-     <height>27</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Fi&amp;le</string>
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionCloseAll"/>
@@ -67,7 +85,7 @@
    </widget>
    <widget class="QMenu" name="menuTool">
     <property name="title">
-     <string>Tool</string>
+     <string>&amp;Tool</string>
     </property>
     <addaction name="actionChecker"/>
     <addaction name="actionResult"/>
@@ -84,23 +102,30 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Setti&amp;ngs</string>
+    </property>
+    <addaction name="actionVerbosity"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
-    <string>Open</string>
+    <string>&amp;Open</string>
    </property>
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
   </action>
   <action name="actionChooseSchema">
    <property name="text">
-    <string>Import policy set...</string>
+    <string>&amp;Import policy set...</string>
    </property>
   </action>
   <action name="actionSavePolicies">
@@ -116,7 +141,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Checker</string>
+    <string>&amp;Checker</string>
    </property>
   </action>
   <action name="actionResult">
@@ -124,7 +149,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Result</string>
+    <string>&amp;Result</string>
    </property>
   </action>
   <action name="actionPolicies">
@@ -132,7 +157,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Policies</string>
+    <string>&amp;Policies</string>
    </property>
   </action>
   <action name="actionDisplay">
@@ -140,32 +165,37 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Display</string>
+    <string>&amp;Display</string>
    </property>
   </action>
   <action name="actionCloseAll">
    <property name="text">
-    <string>Close all</string>
+    <string>&amp;Close all</string>
    </property>
   </action>
   <action name="actionGettingStarted">
    <property name="text">
-    <string>Getting started</string>
+    <string>&amp;Getting started</string>
    </property>
   </action>
   <action name="actionHowToUse">
    <property name="text">
-    <string>How To Use</string>
+    <string>&amp;How To Use</string>
    </property>
   </action>
   <action name="actionDataFormat">
    <property name="text">
-    <string>Data Format</string>
+    <string>&amp;Data Format</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionVerbosity">
+   <property name="text">
+    <string>Verbosity</string>
    </property>
   </action>
  </widget>

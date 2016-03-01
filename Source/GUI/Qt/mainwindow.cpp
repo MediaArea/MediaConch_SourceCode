@@ -12,6 +12,7 @@
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
+#include "verbosityspinbox.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 
@@ -19,6 +20,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QActionGroup>
+#include <QSpinBox>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QFileDialog>
@@ -67,6 +69,9 @@ MainWindow::MainWindow(QWidget *parent) :
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
 
+    if (!MCL.get_implementation_verbosity().length())
+        MCL.set_implementation_verbosity("-1");
+
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
@@ -82,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resultView=NULL;
     policiesView = NULL;
     displayView = NULL;
+    verbosity = NULL;
 
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
@@ -118,6 +124,8 @@ MainWindow::~MainWindow()
 {
     workerfiles.quit();
     workerfiles.wait();
+    if (verbosity)
+        delete verbosity;
     delete ui;
     if (checkerView)
         delete checkerView;
@@ -480,6 +488,72 @@ void MainWindow::on_actionChooseSchema_triggered()
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
     Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionVerbosity_triggered()
+{
+    if (!verbosity)
+    {
+        verbosity = new VerbositySpinbox(NULL);
+        int w = width();
+        int left = 0;
+        if (w < 220)
+            w = 220;
+        else
+        {
+            w -= 220;
+            left = w / 3;
+            w = left + 220;
+        }
+
+        int h = height();
+        int up = 0;
+        if (h < 85)
+            h = 85;
+        else
+        {
+            h -= 85;
+            up = h / 3;
+            h = up + 85;
+        }
+        verbosity->move(left + x(), up + y());
+        verbosity->resize(w, h);
+    }
+    QString value;
+    if (MCL.get_implementation_verbosity().length())
+        value = QString().fromStdString(MCL.get_implementation_verbosity());
+    else
+        value = "-1";
+
+    verbosity->get_verbosity_spin()->setValue(value.toInt());
+    connect(verbosity->get_buttons_box(), SIGNAL(accepted()), this, SLOT(verbosity_accepted()));
+    connect(verbosity->get_buttons_box(), SIGNAL(rejected()), this, SLOT(verbosity_rejected()));
+    verbosity->show();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::verbosity_accepted()
+{
+    if (!verbosity)
+        return;
+
+    QString value;
+    value.setNum(verbosity->get_verbosity_spin()->value());
+    MCL.set_implementation_verbosity(value.toStdString());
+
+    delete verbosity;
+    verbosity = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::verbosity_rejected()
+{
+    if (!verbosity)
+        return;
+
+    delete verbosity;
+    verbosity = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -893,6 +967,7 @@ QString MainWindow::get_implementationreport_xml(const std::string& file,
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
+    fill_options_for_report(options);
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
                    options,
@@ -1033,6 +1108,7 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
+    fill_options_for_report(options);
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
                    options,
@@ -1177,6 +1253,19 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
 int MainWindow::get_ui_database_path(std::string& path)
 {
     return MCL.get_ui_database_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::fill_options_for_report(std::map<std::string, std::string>& opts)
+{
+    const std::string& verbosity = MCL.get_implementation_verbosity();
+    if (verbosity.length())
+    {
+        if (verbosity == "-1")
+            opts["verbosity"] = "5";
+        else
+            opts["verbosity"] = verbosity;
+    }
 }
 
 }
