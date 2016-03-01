@@ -185,7 +185,14 @@ namespace MediaConch
         std::string file_s = file.toStdString();
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity);
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
         onDownloadReport(report, save_name);
     }
 

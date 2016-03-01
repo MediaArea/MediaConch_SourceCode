@@ -229,7 +229,7 @@ void ResultWindow::select_the_correct_verbosity(const QString& value, const QStr
 
     if ((pos = reg.indexIn(html, pos)) != -1)
     {
-        html.replace(pos, reg.matchedLength(), "<option value=\"-1\">Choose");
+        html.replace(pos, reg.matchedLength(), "<option value=\"-1\">Default");
         reg = QRegExp(QString("value=\"%1\"").arg(value));
         if ((pos = reg.indexIn(html, pos)) != -1)
         {
@@ -267,7 +267,7 @@ void ResultWindow::add_displays_file_detail_modal(const FileRegistered* file, QS
     select_the_correct_value(display_value, "fileDetail_policy_display", html);
     select_the_correct_value(display_value, "fileDetail_implementation_display", html);
 
-    QString verbosity_value = QString("%1").arg(5);
+    QString verbosity_value = QString("%1").arg(file->verbosity);
     select_the_correct_verbosity(verbosity_value, "fileDetail_implementation_verbosity", html);
 
     change_html_file_detail(file, html);
@@ -472,6 +472,12 @@ void ResultWindow::change_html_file_detail(const FileRegistered* file, QString& 
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), QString("%1").arg(file->display));
+
+    reg = QRegExp("\\{\\{ check.verbosityvalue \\}\\}");
+    pos = 0;
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), QString("%1").arg(file->verbosity));
 
     reg = QRegExp("\\{\\{ check.filename \\| truncate\\(20\\) \\}\\}");
     pos = 0;

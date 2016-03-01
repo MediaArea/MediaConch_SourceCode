@@ -92,7 +92,6 @@ public:
                                          const std::vector<std::string>& policies_contents,
                                          std::vector<MediaConchLib::ValidateRes*>& result);
 
-    QString                     get_implementationreport_xml(const std::string& file, const std::string& display_name, const std::string& display_content, bool& is_valid);
     QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_jstree(const std::string& file);

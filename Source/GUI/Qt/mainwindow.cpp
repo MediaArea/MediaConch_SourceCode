@@ -143,7 +143,12 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
     int policy_i = policy.toInt();
     int display_i = display.toInt();
-    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i);
+    QString verbosity = QString().fromStdString(MCL.get_implementation_verbosity());
+    int verbosity_i = -1;
+    if (verbosity.length())
+        verbosity_i = verbosity.toInt();
+
+    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i, verbosity_i);
 }
 
 //---------------------------------------------------------------------------
@@ -948,36 +953,6 @@ int MainWindow::validate(MediaConchLib::report report, const std::string& file,
     files.push_back(file);
 
     return MCL.validate(report, files, policies_names, policies_contents, result);
-}
-
-//---------------------------------------------------------------------------
-QString MainWindow::get_implementationreport_xml(const std::string& file,
-                                                 const std::string& display_name,
-                                                 const std::string& display_content,
-                                                 bool& is_valid)
-{
-    const std::string* dname = display_name.length() ? &display_name : NULL;
-    const std::string* dcontent = display_content.length() ? &display_content : NULL;
-
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaConch);
-    std::vector<std::string> files;
-    files.push_back(file);
-
-    MediaConchLib::ReportRes result;
-    std::vector<std::string> vec;
-    std::map<std::string, std::string> options;
-    fill_options_for_report(options, NULL);
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                   vec, vec,
-                   options,
-                   &result, dname, dcontent);
-    if (result.has_valid)
-        is_valid = result.valid;
-    else
-        is_valid = false;
-
-    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------

@@ -73,7 +73,7 @@ namespace MediaConch
             onFileRepositorySelected(button.parent().parent());
     }
 
-    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display, const QString&  verbosity)
+    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display, const QString& verbosity)
     {
         std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
@@ -157,12 +157,19 @@ namespace MediaConch
         out << report;
     }
 
-    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display)
+    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display, const QString& verbosity)
     {
         std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i);
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
         onDownloadReport(report, save_name);
     }
 

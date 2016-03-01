@@ -91,6 +91,8 @@ void Database::get_sql_query_for_create_ui_table(std::string& q)
 void Database::get_sql_query_for_update_ui_table(std::string& q)
 {
     std::stringstream create;
+    create << "ALTER TABLE UI "; // Table name
+    create << "ADD VERBOSITY INT DEFAULT -1 NOT NULL;";
     q = create.str();
 }
 

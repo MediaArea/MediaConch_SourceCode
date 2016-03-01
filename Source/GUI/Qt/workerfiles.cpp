@@ -96,7 +96,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
 
 //---------------------------------------------------------------------------
 void WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
-                                   int policy, int display)
+                                   int policy, int display, int verbosity)
 {
     std::string full_file(path);
     if (path.length())
@@ -110,7 +110,8 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     {
         exists = true;
         // nothing to do
-        if (policy == working_files[full_file]->policy && display == working_files[full_file]->display)
+        if (policy == working_files[full_file]->policy && display == working_files[full_file]->display
+            && verbosity == working_files[full_file]->verbosity)
         {
             working_files_mutex.unlock();
             return;
@@ -126,6 +127,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     fr->filepath = path;
     fr->policy = policy;
     fr->display = display;
+    fr->verbosity = verbosity;
     fr->index = file_index++;
 
     working_files_mutex.lock();
