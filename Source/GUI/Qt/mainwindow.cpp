@@ -967,7 +967,7 @@ QString MainWindow::get_implementationreport_xml(const std::string& file,
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
-    fill_options_for_report(options);
+    fill_options_for_report(options, NULL);
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
                    options,
@@ -1081,7 +1081,7 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p)
+void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p, int *verbosity)
 {
     FileRegistered *fr = get_file_registered_from_file(file);
     if (!fr)
@@ -1108,7 +1108,7 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
-    fill_options_for_report(options);
+    fill_options_for_report(options, verbosity);
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
                    options,
@@ -1256,9 +1256,16 @@ int MainWindow::get_ui_database_path(std::string& path)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::fill_options_for_report(std::map<std::string, std::string>& opts)
+void MainWindow::fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p)
 {
-    const std::string& verbosity = MCL.get_implementation_verbosity();
+    std::string verbosity = MCL.get_implementation_verbosity();
+
+    if (verbosity_p)
+    {
+        QString value = QString().setNum(*verbosity_p);
+        verbosity = value.toStdString();
+    }
+
     if (verbosity.length())
     {
         if (verbosity == "-1")

@@ -66,12 +66,19 @@ namespace MediaConch
             onFileOnlineSelected();
     }
 
-    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display)
+    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display, const QString& verbosity)
     {
         std::string file_s = file.toStdString();
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i);
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
         QString script = QString("$('%1 .modal-body')").arg(target);
 
         report = report.replace("\r", "");
@@ -173,12 +180,12 @@ namespace MediaConch
         out << report;
     }
 
-    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display)
+    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display, const QString& verbosity)
     {
         std::string file_s = file.toStdString();
         QString report;
         int display_i = display.toInt();
-        mainwindow->get_implementation_report(file_s, report, &display_i);
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity);
         onDownloadReport(report, save_name);
     }
 

@@ -55,7 +55,7 @@ public Q_SLOTS:
     void onSaveTrace(const QString& target, const QString& save_name);
 
     void menu_link_checker(const QString& name);
-    void onFillImplementationReport(const QString& name, const QString& target, const QString& display);
+    void onFillImplementationReport(const QString& name, const QString& target, const QString& display, const QString& verbosity);
     void onFillPolicyReport(const QString& file, const QString& target, const QString& policy, const QString& display);
     QString onFillMediaInfoReport(const QString& file);
     QString onFillMediaTraceReport(const QString& file);

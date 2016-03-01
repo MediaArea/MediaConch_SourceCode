@@ -75,6 +75,7 @@ private:
     void          add_displays_file_detail_end(QString& html);
     void          change_body_in_template(QString& body, QString& html);
     void          select_the_correct_value(const QString& value, const QString& selector, QString& html);
+    void          select_the_correct_verbosity(const QString& value, const QString& selector, QString& html);
 
     void          change_html_file_detail(const FileRegistered* file, QString& html);
 

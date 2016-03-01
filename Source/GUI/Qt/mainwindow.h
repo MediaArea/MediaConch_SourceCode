@@ -105,7 +105,7 @@ public:
     void                        display_selected();
     void                        add_default_policy();
     void                        add_default_displays();
-    void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL);
+    void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);
     bool                        is_all_policies_saved();
 
@@ -167,7 +167,7 @@ private:
                                                   std::string& display_name, std::string& display_content,
                                                   const std::string*& dname, const std::string*& dcontent,
                                                   FileRegistered* fr);
-    void                        fill_options_for_report(std::map<std::string, std::string>& opts);
+    void                        fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p);
 
     Run_View current_view;
 

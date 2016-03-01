@@ -218,6 +218,28 @@ void ResultWindow::select_the_correct_value(const QString& value, const QString&
 }
 
 //---------------------------------------------------------------------------
+void ResultWindow::select_the_correct_verbosity(const QString& value, const QString& selector, QString& html)
+{
+    int pos = html.indexOf(selector);
+    if (pos == -1)
+        return;
+
+    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Default");
+    reg.setMinimal(true);
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        html.replace(pos, reg.matchedLength(), "<option value=\"-1\">Choose");
+        reg = QRegExp(QString("value=\"%1\"").arg(value));
+        if ((pos = reg.indexIn(html, pos)) != -1)
+        {
+            pos += reg.matchedLength();
+            html.insert(pos, " selected=\"selected\"");
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
 void ResultWindow::add_displays_file_detail_modal(const FileRegistered* file, QString& base)
 {
 #if defined(WEB_MACHINE_ENGINE)
@@ -244,6 +266,9 @@ void ResultWindow::add_displays_file_detail_modal(const FileRegistered* file, QS
     QString display_value = QString("%1").arg(file->display);
     select_the_correct_value(display_value, "fileDetail_policy_display", html);
     select_the_correct_value(display_value, "fileDetail_implementation_display", html);
+
+    QString verbosity_value = QString("%1").arg(5);
+    select_the_correct_verbosity(verbosity_value, "fileDetail_implementation_verbosity", html);
 
     change_html_file_detail(file, html);
 
