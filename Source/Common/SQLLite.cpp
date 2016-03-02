@@ -28,6 +28,9 @@ namespace MediaConch {
 // SQLLite
 //***************************************************************************
 
+int SQLLite::current_report_version = 1;
+int SQLLite::current_ui_version     = 1;
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -69,6 +72,8 @@ int SQLLite::init_report()
 {
     if (init() < 0)
         return -1;
+    if (get_db_version(report_version) < 0)
+        return -1;
     create_report_table();
     return 0;
 }
@@ -92,13 +97,31 @@ int SQLLite::create_report_table()
 //---------------------------------------------------------------------------
 int SQLLite::update_report_table()
 {
-    get_sql_query_for_update_report_table(query);
-
     const char* end = NULL;
-    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
-    if (ret != SQLITE_OK || !stmt || (end && *end))
-        return -1;
-    return execute();
+    int ret = 0;
+
+#define UPDATE_REPORT_TABLE_FOR_VERSION(version)                                      \
+    do                                                                                \
+    {                                                                                 \
+        end = NULL;                                                                   \
+        if (report_version > version)                                                 \
+            continue;                                                                 \
+        get_sql_query_for_update_report_table_v##version(query);                      \
+                                                                                      \
+        ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end); \
+        if (version != 0 && (ret != SQLITE_OK || !stmt || (end && *end)))             \
+            return -1;                                                                \
+        ret = execute();                                                              \
+                                                                                      \
+        if (version != 0 && ret < 0)                                                  \
+            return ret;                                                               \
+    } while(0);
+
+    UPDATE_REPORT_TABLE_FOR_VERSION(0);
+
+#undef UPDATE_REPORT_TABLE_FOR_VERSION
+
+    return set_db_version(current_report_version);
 }
 
 int SQLLite::save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification,
@@ -353,22 +376,39 @@ int SQLLite::create_ui_table()
 //---------------------------------------------------------------------------
 int SQLLite::update_ui_table()
 {
-    get_sql_query_for_update_ui_table(query);
-
-    if (!query.length())
-        return 0;
-
     const char* end = NULL;
-    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
-    if (ret != SQLITE_OK || !stmt || (end && *end))
-        return -1;
-    return execute();
+    int ret = 0;
+
+#define UPDATE_UI_TABLE_FOR_VERSION(version)                                          \
+    do                                                                                \
+    {                                                                                 \
+        end = NULL;                                                                   \
+        if (ui_version > version)                                                     \
+            continue;                                                                 \
+        get_sql_query_for_update_ui_table_v##version(query);                          \
+                                                                                      \
+        ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end); \
+        if (version != 0 && (ret != SQLITE_OK || !stmt || (end && *end)))             \
+            return -1;                                                                \
+        ret = execute();                                                              \
+                                                                                      \
+        if (version != 0 && ret < 0)                                                  \
+            return ret;                                                               \
+    } while(0);
+
+    UPDATE_UI_TABLE_FOR_VERSION(0);
+
+#undef UPDATE_UI_TABLE_FOR_VERSION
+
+    return set_db_version(current_ui_version);
 }
 
 //---------------------------------------------------------------------------
 int SQLLite::init_ui()
 {
     if (init() < 0)
+        return -1;
+    if (get_db_version(ui_version) < 0)
         return -1;
     create_ui_table();
     return 0;
@@ -815,6 +855,44 @@ int SQLLite::std_string_to_int(const std::string& str)
     // if (!end || *end != '\0')
     //     error;
     return val;
+}
+
+//---------------------------------------------------------------------------
+int SQLLite::get_db_version(int& version)
+{
+    reports.clear();
+    query = std::string("PRAGMA user_version;");
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    if (execute() < 0 || reports.size() != 1 || reports[0].find("user_version") == reports[0].end())
+        return -1;
+
+    version = std_string_to_int(reports[0]["user_version"]);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLite::set_db_version(int version)
+{
+    reports.clear();
+
+    std::stringstream create;
+    create << "PRAGMA user_version=" << version << ";";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    if (execute() < 0)
+        return -1;
+
+    return 0;
 }
 
 }

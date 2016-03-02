@@ -78,9 +78,9 @@ protected:
     //Database dependant
     virtual int execute() = 0;
     void        get_sql_query_for_create_report_table(std::string& q);
-    void        get_sql_query_for_update_report_table(std::string& q);
+    void        get_sql_query_for_update_report_table_v0(std::string& q);
     void        get_sql_query_for_create_ui_table(std::string& q);
-    void        get_sql_query_for_update_ui_table(std::string& q);
+    void        get_sql_query_for_update_ui_table_v0(std::string& q);
 
 private:
     Database (const Database&);

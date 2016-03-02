@@ -64,7 +64,7 @@ void Database::get_sql_query_for_create_report_table(std::string& q)
 }
 
 //---------------------------------------------------------------------------
-void Database::get_sql_query_for_update_report_table(std::string& q)
+void Database::get_sql_query_for_update_report_table_v0(std::string& q)
 {
     std::stringstream create;
     create << "ALTER TABLE Report "; // Table name
@@ -88,7 +88,7 @@ void Database::get_sql_query_for_create_ui_table(std::string& q)
 }
 
 //---------------------------------------------------------------------------
-void Database::get_sql_query_for_update_ui_table(std::string& q)
+void Database::get_sql_query_for_update_ui_table_v0(std::string& q)
 {
     std::stringstream create;
     create << "ALTER TABLE UI "; // Table name

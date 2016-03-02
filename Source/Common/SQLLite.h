@@ -73,8 +73,16 @@ private:
     sqlite3      *db;
     sqlite3_stmt *stmt; // Statement handler
 
+    int           report_version;
+    int           ui_version;
+
+    static int    current_report_version;
+    static int    current_ui_version;
+
     // Helper
     int std_string_to_int(const std::string& str);
+    int get_db_version(int& version);
+    int set_db_version(int version);
 
     SQLLite (const SQLLite&);
     SQLLite& operator=(const SQLLite&);
