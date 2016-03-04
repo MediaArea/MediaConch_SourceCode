@@ -16,6 +16,7 @@
 //---------------------------------------------------------------------------
 
 #include <string>
+#include <map>
 #include <vector>
 
 namespace MediaConch {
@@ -47,7 +48,7 @@ public:
         bool                                        b;
         std::string                                 s;
         std::vector<Value>                          array;
-        std::vector<std::pair<std::string, Value> > obj;
+        std::map<std::string, Value>                obj;
     };
 
 public:

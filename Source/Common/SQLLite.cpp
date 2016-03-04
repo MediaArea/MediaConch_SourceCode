@@ -312,6 +312,38 @@ void SQLLite::get_elements(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
+void SQLLite::get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind)
+{
+    report_kind = MediaConchLib::report_MediaConch;
+    reports.clear();
+    query = "SELECT TOOL FROM Report WHERE FILENAME = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return;
+
+    ret = sqlite3_bind_blob(stmt, 1, file.c_str(), file.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return;
+
+    if (execute() || !reports.size())
+        return;
+
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        if (reports[i].find("TOOL") != reports[i].end())
+        {
+            MediaConchLib::report tool_i = (MediaConchLib::report)std_string_to_int(reports[i]["TOOL"]);
+
+            if (tool_i == MediaConchLib::report_MediaInfo || tool_i == MediaConchLib::report_MediaTrace)
+                tool_i = MediaConchLib::report_MediaConch;
+            report_kind = tool_i;
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
 int SQLLite::execute()
 {
     if (!db || !stmt)

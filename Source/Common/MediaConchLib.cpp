@@ -175,13 +175,14 @@ int MediaConchLib::is_done(const std::vector<std::string>& files, double& percen
     if (!files.size())
         return errorHttp_TRUE;
 
+    MediaConchLib::report report_kind;
     int done = errorHttp_TRUE;
     percent = 0.0;
     double unit_percent = (1.0 / files.size()) * 100.0;
     for (size_t i = 0; i < files.size(); ++i)
     {
         double percent_done;
-        int ret = is_done(files[i], percent_done);
+        int ret = is_done(files[i], percent_done, report_kind);
         if (ret == errorHttp_TRUE)
             percent += unit_percent;
         else if (ret == errorHttp_NONE)
@@ -196,14 +197,14 @@ int MediaConchLib::is_done(const std::vector<std::string>& files, double& percen
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::is_done(const std::string& file, double& percent)
+int MediaConchLib::is_done(const std::string& file, double& percent, MediaConchLib::report& report_kind)
 {
     if (!file.length())
         return errorHttp_NONE;
 
     if (use_daemon)
-        return daemon_client->is_done(file, percent);
-    return core->is_done(file, percent);
+        return daemon_client->is_done(file, percent, report_kind);
+    return core->is_done(file, percent, report_kind);
 }
 
 //---------------------------------------------------------------------------
@@ -264,7 +265,8 @@ int MediaConchLib::validate(report report, const std::vector<std::string>& files
     if (!files.size())
         return errorHttp_INVALID_DATA;
 
-    if (report != report_MediaConch && !policies_names.size() && !policies_contents.size())
+    if (report != report_MediaConch && !policies_names.size() && !policies_contents.size() &&
+        report != report_MediaVeraPdf && report != report_MediaDpfManager)
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)

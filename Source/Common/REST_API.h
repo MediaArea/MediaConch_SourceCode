@@ -37,7 +37,7 @@ public:
 
     enum Reason
     {
-        NO_REASON,
+        NO_REASON = 0,
         FILE_NOT_EXISTING,
         ID_NOT_EXISTING,
         NOT_READY,
@@ -45,11 +45,13 @@ public:
 
     enum Report
     {
-        NO_REPORT,
+        NO_REPORT = 0,
         POLICY,
         IMPLEMENTATION,
         MEDIAINFO,
         MEDIATRACE,
+        VERAPDF,
+        DPFMANAGER,
     };
 
     std::string get_Report_string(Report r)
@@ -64,6 +66,8 @@ public:
             ReportString(IMPLEMENTATION);
             ReportString(MEDIAINFO);
             ReportString(MEDIATRACE);
+            ReportString(VERAPDF);
+            ReportString(DPFMANAGER);
             default:
                 break;
         }
@@ -81,6 +85,8 @@ public:
         ReportString(IMPLEMENTATION);
         ReportString(MEDIAINFO);
         ReportString(MEDIATRACE);
+        ReportString(VERAPDF);
+        ReportString(DPFMANAGER);
 
 #undef ReportString
 
@@ -169,11 +175,13 @@ public:
 
     struct Status_Ok
     {
-        Status_Ok() : has_percent(false) {}
+        Status_Ok() : finished(false), has_percent(false), has_tool(false) {}
         int                     id;
         bool                    finished;
         bool                    has_percent;
         double                  done;
+        bool                    has_tool;
+        Report                  tool;
         std::string             to_str() const;
     };
 

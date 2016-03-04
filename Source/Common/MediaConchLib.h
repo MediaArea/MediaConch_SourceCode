@@ -49,15 +49,17 @@ public:
     //Config
     enum report
     {
-        report_MediaConch,
+        report_MediaConch = 0,
         report_MediaInfo,
         report_MediaTrace,
-        report_Max
+        report_MediaVeraPdf,
+        report_MediaDpfManager,
+        report_Max,
     };
 
     enum format
     {
-        format_Text,
+        format_Text = 0,
         format_Xml,         // XML corresponding to only one of MediaConch, MediaInfo, MediaTrace
         format_MaXml,       // MAXML, can contain one or more of MediaConch, MediaInfo, MediaTrace
         format_JsTree,
@@ -80,6 +82,12 @@ public:
         errorHttp_INIT         = -2,
         errorHttp_CONNECT      = -3,
         errorHttp_MAX          = -4,
+    };
+
+    enum PluginType
+    {
+        PLUGIN_FORMAT = 0,
+        PLUGIN_MAX,
     };
 
     struct ReportRes
@@ -114,7 +122,7 @@ public:
     int  analyze(const std::vector<std::string>& files, bool force_analyze = false);
     int  analyze(const std::string& file, bool& registered, bool force_analyze = false);
     int  is_done(const std::vector<std::string>& files, double& percent);
-    int  is_done(const std::string& file, double& percent);
+    int  is_done(const std::string& file, double& percent, report& report_kind);
 
     void list(std::vector<std::string>& vec);
     void file_from_id(int id, std::string& filename);

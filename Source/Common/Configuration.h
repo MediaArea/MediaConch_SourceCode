@@ -43,7 +43,7 @@ public:
     int get(const std::string& key, bool &val);
     int get(const std::string& key);
     int get(const std::string& key, std::vector<Container::Value>& val);
-    int get(const std::string& key, std::vector<std::pair<std::string, Container::Value> >& val);
+    int get(const std::string& key, std::map<std::string, Container::Value>& val);
 
     std::string get_error() const;
 private:

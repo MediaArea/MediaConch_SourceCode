@@ -319,6 +319,11 @@ std::string RESTAPI::Status_Ok::to_str() const
     out << ", finished: " << std::boolalpha << finished;
     if (has_percent)
         out << ", done: " << done;
+    if (finished && has_tool)
+    {
+        RESTAPI api;
+        out << ", tool: " << api.get_Report_string(tool);
+    }
     out << "}";
     return out.str();
 }
@@ -543,10 +548,10 @@ std::string RESTAPI::serialize_analyze_req(Analyze_Req& req)
     Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("args", serialize_analyze_args(req.args)));
+    child.obj["args"] = serialize_analyze_args(req.args);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("ANALYZE", child));
+    v.obj["ANALYZE"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -577,24 +582,24 @@ std::string RESTAPI::serialize_report_req(Report_Req& req)
     Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
-    child.obj.push_back(std::make_pair("reports", serialize_report_reports(req.reports)));
+    child.obj["ids"] = serialize_ids(req.ids);
+    child.obj["reports"] = serialize_report_reports(req.reports);
 
     if (req.policies_names.size())
-        child.obj.push_back(std::make_pair("policies_names", serialize_report_arr_str(req.policies_names)));
+        child.obj["policies_names"] = serialize_report_arr_str(req.policies_names);
     if (req.policies_contents.size())
-        child.obj.push_back(std::make_pair("policies_contents", serialize_report_arr_str(req.policies_contents)));
+        child.obj["policies_contents"] = serialize_report_arr_str(req.policies_contents);
 
     if (req.display_name.length())
-        child.obj.push_back(std::make_pair("display_name", serialize_report_string(req.display_name)));
+        child.obj["display_name"] = serialize_report_string(req.display_name);
     if (req.display_content.length())
-        child.obj.push_back(std::make_pair("display_content", serialize_report_string(req.display_content)));
+        child.obj["display_content"] = serialize_report_string(req.display_content);
 
     if (req.has_verbosity)
-        child.obj.push_back(std::make_pair("verbosity", serialize_report_int(req.verbosity)));
+        child.obj["verbosity"] = serialize_report_int(req.verbosity);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("REPORT", child));
+    v.obj["REPORT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -608,10 +613,10 @@ std::string RESTAPI::serialize_retry_req(Retry_Req& req)
     Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
+    child.obj["ids"] = serialize_ids(req.ids);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("RETRY", child));
+    v.obj["RETRY"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -648,19 +653,19 @@ std::string RESTAPI::serialize_validate_req(Validate_Req& req)
     Container::Value v, child, report;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ids", serialize_ids(req.ids)));
+    child.obj["ids"] = serialize_ids(req.ids);
 
     report.type = Container::Value::CONTAINER_TYPE_STRING;
     report.s = get_Report_string(req.report);
-    child.obj.push_back(std::make_pair("report", report));
+    child.obj["report"] = report;
 
     if (req.policies_names.size())
-        child.obj.push_back(std::make_pair("policies_names", serialize_report_arr_str(req.policies_names)));
+        child.obj["policies_names"] = serialize_report_arr_str(req.policies_names);
     if (req.policies_contents.size())
-        child.obj.push_back(std::make_pair("policies_contents", serialize_report_arr_str(req.policies_contents)));
+        child.obj["policies_contents"] = serialize_report_arr_str(req.policies_contents);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("VALIDATE", child));
+    v.obj["VALIDATE"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -678,10 +683,10 @@ std::string RESTAPI::serialize_file_from_id_req(File_From_Id_Req& req)
     id.type = Container::Value::CONTAINER_TYPE_INTEGER;
     id.l = req.id;
 
-    child.obj.push_back(std::make_pair("id", id));
+    child.obj["id"] = id;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("FILE_FROM_ID", child));
+    v.obj["FILE_FROM_ID"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -703,11 +708,11 @@ std::string RESTAPI::serialize_analyze_res(Analyze_Res& res)
         nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_analyze_oks(res.ok)));
-    child.obj.push_back(std::make_pair("nok", nok));
+    child.obj["ok"] = serialize_analyze_oks(res.ok);
+    child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("ANALYZE_RESULT", child));
+    v.obj["ANALYZE_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -725,11 +730,11 @@ std::string RESTAPI::serialize_status_res(Status_Res& res)
         nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_status_oks(res.ok)));
-    child.obj.push_back(std::make_pair("nok", nok));
+    child.obj["ok"] = serialize_status_oks(res.ok);
+    child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("STATUS_RESULT", child));
+    v.obj["STATUS_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -747,11 +752,11 @@ std::string RESTAPI::serialize_report_res(Report_Res& res)
         nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_report_ok(res.ok)));
-    child.obj.push_back(std::make_pair("nok", nok));
+    child.obj["ok"] = serialize_report_ok(res.ok);
+    child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("REPORT_RESULT", child));
+    v.obj["REPORT_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -769,11 +774,11 @@ std::string RESTAPI::serialize_retry_res(Retry_Res& res)
         nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_ids(res.ok)));
-    child.obj.push_back(std::make_pair("nok", nok));
+    child.obj["ok"] = serialize_ids(res.ok);
+    child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("RETRY_RESULT", child));
+    v.obj["RETRY_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -791,11 +796,11 @@ std::string RESTAPI::serialize_clear_res(Clear_Res& res)
         nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", serialize_ids(res.ok)));
-    child.obj.push_back(std::make_pair("nok", nok));
+    child.obj["ok"] = serialize_ids(res.ok);
+    child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("CLEAR_RESULT", child));
+    v.obj["CLEAR_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -813,10 +818,10 @@ std::string RESTAPI::serialize_list_res(List_Res& res)
         files.array.push_back(serialize_list_file(res.files[i]->file, res.files[i]->id));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("files", files));
+    child.obj["files"] = files;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("LIST_RESULT", child));
+    v.obj["LIST_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -838,11 +843,11 @@ std::string RESTAPI::serialize_validate_res(Validate_Res& res)
         nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("ok", ok));
-    child.obj.push_back(std::make_pair("nok", nok));
+    child.obj["ok"] = ok;
+    child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("VALIDATE_RESULT", child));
+    v.obj["VALIDATE_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -859,10 +864,10 @@ std::string RESTAPI::serialize_file_from_id_res(File_From_Id_Res& res)
     file.s = res.file;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj.push_back(std::make_pair("file", file));
+    child.obj["file"] = file;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj.push_back(std::make_pair("FILE_FROM_ID_RESULT", child));
+    v.obj["FILE_FROM_ID_RESULT"] = child;
 
     std::string ret = model->serialize(v);
     if (!ret.length())
@@ -1696,17 +1701,17 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Analyze_Arg>& args)
 
         file.type = Container::Value::CONTAINER_TYPE_STRING;
         file.s = args[i].file;
-        arg.obj.push_back(std::make_pair("file", file));
+        arg.obj["file"] = file;
 
         id.type = Container::Value::CONTAINER_TYPE_INTEGER;
         id.l = args[i].id;
-        arg.obj.push_back(std::make_pair("id", id));
+        arg.obj["id"] = id;
 
         if (args[i].has_force_analyze)
         {
             force.type = Container::Value::CONTAINER_TYPE_BOOL;
             force.b = args[i].force_analyze;
-            arg.obj.push_back(std::make_pair("force", force));
+            arg.obj["force"] = force;
         }
 
         args_val.array.push_back(arg);
@@ -1802,11 +1807,11 @@ Container::Value RESTAPI::serialize_generic_nok(int id, Reason error)
 
     id_v.type = Container::Value::CONTAINER_TYPE_INTEGER;
     id_v.l = id;
-    nok.obj.push_back(std::make_pair("id", id_v));
+    nok.obj["id"] = id_v;
 
     error_v.type = Container::Value::CONTAINER_TYPE_STRING;
     error_v.s = get_Reason_string(error);
-    nok.obj.push_back(std::make_pair("error", error_v));
+    nok.obj["error"] = error_v;
     return nok;
 }
 
@@ -1828,15 +1833,15 @@ Container::Value RESTAPI::serialize_analyze_oks(std::vector<Analyze_Ok*>& array)
 
         in.type = Container::Value::CONTAINER_TYPE_INTEGER;
         in.l = array[i]->inId;
-        v.obj.push_back(std::make_pair("inId", in));
+        v.obj["inId"] = in;
 
         out.type = Container::Value::CONTAINER_TYPE_INTEGER;
         out.l = array[i]->outId;
-        v.obj.push_back(std::make_pair("outId", out));
+        v.obj["outId"] = out;
 
         create.type = Container::Value::CONTAINER_TYPE_BOOL;
         create.b = array[i]->create;
-        v.obj.push_back(std::make_pair("create", create));
+        v.obj["create"] = create;
 
         ok.array.push_back(v);
     }
@@ -1856,23 +1861,30 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok*>& array)
         if (!array[i])
             continue;
 
-        Container::Value v, id, finished, done;
+        Container::Value v, id, finished, done, tool;
 
         v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         id.type = Container::Value::CONTAINER_TYPE_INTEGER;
         id.l = array[i]->id;
-        v.obj.push_back(std::make_pair("id", id));
+        v.obj["id"] = id;
 
         finished.type = Container::Value::CONTAINER_TYPE_BOOL;
         finished.b = array[i]->finished;
-        v.obj.push_back(std::make_pair("finished", finished));
+        v.obj["finished"] = finished;
 
         if (array[i]->has_percent)
         {
             done.type = Container::Value::CONTAINER_TYPE_REAL;
             done.d = array[i]->done;
-            v.obj.push_back(std::make_pair("done", done));
+            v.obj["done"] = done;
+        }
+
+        if (array[i]->finished && array[i]->has_tool)
+        {
+            tool.type = Container::Value::CONTAINER_TYPE_INTEGER;
+            tool.l = array[i]->tool;
+            v.obj["tool"] = tool;
         }
 
         ok.array.push_back(v);
@@ -1893,14 +1905,14 @@ Container::Value RESTAPI::serialize_report_ok(Report_Ok& obj)
     {
         report.type = Container::Value::CONTAINER_TYPE_STRING;
         report.s = obj.report;
-        ok.obj.push_back(std::make_pair("report", report));
+        ok.obj["report"] = report;
     }
 
     if (obj.has_valid)
     {
         valid.type = Container::Value::CONTAINER_TYPE_BOOL;
         valid.b = obj.valid;
-        ok.obj.push_back(std::make_pair("valid", valid));
+        ok.obj["valid"] = valid;
     }
     return ok;
 }
@@ -1914,11 +1926,11 @@ Container::Value RESTAPI::serialize_list_file(const std::string& filename, int i
 
     id_v.type = Container::Value::CONTAINER_TYPE_INTEGER;
     id_v.l = id;
-    file.obj.push_back(std::make_pair("id", id_v));
+    file.obj["id"] = id_v;
 
     filename_v.type = Container::Value::CONTAINER_TYPE_STRING;
     filename_v.s = filename;
-    file.obj.push_back(std::make_pair("file", filename_v));
+    file.obj["file"] = filename_v;
     return file;
 }
 
@@ -1935,11 +1947,11 @@ Container::Value RESTAPI::serialize_validate_ok(Validate_Ok* obj)
 
     id.type = Container::Value::CONTAINER_TYPE_INTEGER;
     id.l = obj->id;
-    ok.obj.push_back(std::make_pair("id", id));
+    ok.obj["id"] = id;
 
     valid.type = Container::Value::CONTAINER_TYPE_BOOL;
     valid.b = obj->valid;
-    ok.obj.push_back(std::make_pair("valid", valid));
+    ok.obj["valid"] = valid;
 
     return ok;
 }
@@ -2070,11 +2082,12 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& oks)
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *id, *finished, *done;
+        Container::Value *id, *finished, *done, *tool;
 
         id = model->get_value_by_key(*obj, "id");
         finished = model->get_value_by_key(*obj, "finished");
         done = model->get_value_by_key(*obj, "done");
+        tool = model->get_value_by_key(*obj, "tool");
 
         if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !finished || finished->type != Container::Value::CONTAINER_TYPE_BOOL)
@@ -2098,6 +2111,14 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& oks)
         }
         else
             return -1;
+
+        if (tool && tool->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            ok->has_tool = true;
+            ok->tool = (Report)tool->l;
+        }
+        else
+            ok->has_tool = false;
 
         oks.push_back(ok);
     }

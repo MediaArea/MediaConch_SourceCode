@@ -88,11 +88,9 @@ Container::Value* Json::get_value_by_key(Value& v, const std::string& key)
 {
     if (v.type != Value::CONTAINER_TYPE_OBJECT)
         return NULL;
-    for (size_t i = 0; i < v.obj.size(); ++i)
-    {
-        if (!key.compare(v.obj[i].first))
-            return &v.obj[i].second;
-    }
+
+    if (v.obj.find(key) != v.obj.end())
+        return &v.obj[key];
     return NULL;
 }
 
@@ -168,7 +166,7 @@ int Json::parse_node(Value &v)
             if (parse_node(new_node))
                 return -1;
 
-            v.obj.push_back(std::make_pair(std::string(key), new_node));
+            v.obj[std::string(key)] = new_node;
             current_node = tmp;
         }
         return 0;
@@ -227,12 +225,14 @@ json_t *Json::serialize_node(Value &v)
     if (v.type == Value::CONTAINER_TYPE_OBJECT)
     {
         tmp = json_object();
-        for (size_t i = 0; i < v.obj.size(); ++i)
+        std::map<std::string, Container::Value>::iterator it = v.obj.begin();
+        for (; it != v.obj.end(); ++it)
         {
-            json_t *node = serialize_node(v.obj[i].second);
+            json_t *node = serialize_node(it->second);
             if (!node)
                 return NULL;
-            if (json_object_set_new(tmp, v.obj[i].first.c_str(), node))
+
+            if (json_object_set_new(tmp, it->first.c_str(), node))
                 return NULL;
         }
         return tmp;

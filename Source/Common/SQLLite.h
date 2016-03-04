@@ -49,6 +49,7 @@ public:
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& filename, const std::string& file_last_modification);
     virtual void get_elements(std::vector<std::string>& vec);
+    virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind);
 
     // UI
     virtual int create_ui_table();

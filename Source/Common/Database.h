@@ -47,6 +47,7 @@ public:
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& file, const std::string& file_last_modification) = 0;
     virtual void get_elements(std::vector<std::string>& vec) = 0;
+    virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind) = 0;
 
     void        set_database_directory(const std::string& dirname);
     void        set_database_filename(const std::string& name);

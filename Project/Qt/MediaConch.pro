@@ -62,6 +62,11 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/Scheduler.cpp \
                     ../../Source/Common/Queue.cpp \
                     ../../Source/Common/DaemonClient.cpp \
+                    ../../Source/Common/PluginsManager.cpp \
+                    ../../Source/Common/PluginsConfig.cpp \
+                    ../../Source/Common/Plugin.cpp \
+                    ../../Source/Common/VeraPDF.cpp \
+                    ../../Source/Common/DpfManager.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
@@ -120,6 +125,12 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Queue.h \
                     ../../Source/Common/DaemonClient.h \
                     ../../Source/Common/FileRegistered.h \
+                    ../../Source/Common/PluginsManager.h \
+                    ../../Source/Common/PluginsConfig.h \
+                    ../../Source/Common/Plugin.h \
+                    ../../Source/Common/PluginFormat.h \
+                    ../../Source/Common/VeraPDF.h \
+                    ../../Source/Common/DpfManager.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \

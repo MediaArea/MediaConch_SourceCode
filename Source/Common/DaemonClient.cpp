@@ -214,7 +214,7 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::is_done(const std::string& file, double& done)
+int DaemonClient::is_done(const std::string& file, double& done, MediaConchLib::report& report_kind)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -246,12 +246,24 @@ int DaemonClient::is_done(const std::string& file, double& done)
     RESTAPI::Status_Ok *ok = res->ok[0];
 
     if (ok->finished)
+    {
+        if (ok->has_tool)
+        {
+            if (ok->tool == RESTAPI::VERAPDF)
+                report_kind = MediaConchLib::report_MediaVeraPdf;
+            else if (ok->tool == RESTAPI::DPFMANAGER)
+                report_kind = MediaConchLib::report_MediaDpfManager;
+        }
         return MediaConchLib::errorHttp_TRUE;
+    }
 
     if (ok->has_percent)
         done = ok->done;
     else
         done = 0.0;
+
+    report_kind = MediaConchLib::report_MediaConch;
+
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -285,6 +297,10 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
         req.reports.push_back(RESTAPI::MEDIAINFO);
     if (report_set[MediaConchLib::report_MediaTrace])
         req.reports.push_back(RESTAPI::MEDIATRACE);
+    if (report_set[MediaConchLib::report_MediaVeraPdf])
+        req.reports.push_back(RESTAPI::VERAPDF);
+    if (report_set[MediaConchLib::report_MediaDpfManager])
+        req.reports.push_back(RESTAPI::DPFMANAGER);
 
     // POLICY
     if (policies_names.size())
@@ -375,6 +391,10 @@ int DaemonClient::validate(MediaConchLib::report report,
     // REPORT KIND
     if (report == MediaConchLib::report_MediaConch)
         req.report = RESTAPI::IMPLEMENTATION;
+    else if (report == MediaConchLib::report_MediaVeraPdf)
+        req.report = RESTAPI::VERAPDF;
+    else if (report == MediaConchLib::report_MediaDpfManager)
+        req.report = RESTAPI::DPFMANAGER;
     else if (policies_names.size())
     {
         // POLICY

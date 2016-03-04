@@ -170,6 +170,26 @@ void NoDatabase::get_elements(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
+void NoDatabase::get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind)
+{
+    report_kind = MediaConchLib::report_MediaConch;
+    if (reports_saved.find(file) != reports_saved.end() && reports_saved[file].size())
+    {
+        for (size_t i = 0; i < reports_saved[file].size(); ++i)
+        {
+            if (!reports_saved[file][i])
+                continue;
+
+            MediaConchLib::report tool_i = reports_saved[file][i]->reportKind;
+            if (tool_i == MediaConchLib::report_MediaInfo || tool_i == MediaConchLib::report_MediaTrace)
+                tool_i = MediaConchLib::report_MediaConch;
+
+            report_kind = tool_i;
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
 int NoDatabase::ui_add_file(const FileRegistered*)
 {
     return 0;

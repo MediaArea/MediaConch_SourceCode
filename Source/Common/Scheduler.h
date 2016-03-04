@@ -58,6 +58,7 @@ public:
     bool element_is_finished(const std::string& filename, double& percent_done);
     void set_max_threads(size_t nb) { max_threads = nb; }
     void get_elements(std::vector<std::string>& vec);
+    int another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfoList* MI);
 
 private:
     Scheduler(const Scheduler&);
