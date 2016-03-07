@@ -123,9 +123,14 @@ http://download.qt.io/archive/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg
 *Build tools and CLI/GUI dependencies*
 
 ```sh
-apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
+apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev liblzma-dev libgcrypt20-dev libsqlite3-dev libevent-dev libjansson-dev
 ```
- 
+
+Or (less advisable) install the packages contained in buildenv09.zip with
+```sh
+dpkg -i *
+```
+
 *MediaArea tools*
 
 Go to https://mediaarea.net/MediaConch/downloads/ubuntu.html and download the libmediainfo0, libmediainfo-dev, libzen0 and libzen-dev packages corresponding to your Ubuntu version. Then install them with :
@@ -151,7 +156,12 @@ apt-get install libcurl4-gnutls-dev
 *Build tools and CLI/GUI dependencies*
 
 ```sh
-sudo yum install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
+sudo yum install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel sqlite-devel libevent-devel jansson-devel
+```
+
+Or (less advisable) install the packages contained in buildenv13.zip with
+```sh
+dnf --allowerasing install *
 ```
 
 *MediaArea tools*
@@ -179,7 +189,12 @@ sudo yum install libcurl-devel
 *Build tools and CLI/GUI dependencies*
 
 ```sh
-apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev
+apt-get install git automake autoconf libtool pkg-config make g++ zlib1g-dev libxml2-dev libxslt1-dev liblzma-dev libgcrypt20-dev libsqlite3-dev libevent-dev libjansson-dev
+```
+
+Or (less advisable) install the packages contained in buildenv17.zip with
+```sh
+dpkg -i *
 ```
 
 *MediaArea tools*
@@ -207,7 +222,12 @@ apt-get install libcurl4-gnutls-dev
 *Build tools and CLI/GUI dependencies*
 
 ```sh
-zypper install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel
+zypper install git automake autoconf libtool pkgconfig make gcc-c++ zlib-devel libxml2-devel libxslt-devel sqlite3-devel libevent-devel libjansson-devel
+```
+
+Or (less advisable) install the packages contained in buildenv21.zip with
+```sh
+zypper install *
 ```
 
 *MediaArea tools*
@@ -231,6 +251,20 @@ zypper install libcurl-devel
 ```
 
 ### Build MediaConch CLI
+
+#### Use the srcXX.zip and their compile.sh scripts
+
+Unzip the corresponding srcXX.zip, and then launch
+
+```sh
+./CLI_compile.sh
+./Server_compile.sh
+./GUI_compile.sh
+```
+
+in order to compile, respectively, the CLI, the server and the GUI.
+
+#### Build manually from github
 
 When you have done all the prerequisite for you configuration, you can build MediaConch. We start with the CLI.
 
