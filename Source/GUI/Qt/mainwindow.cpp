@@ -56,7 +56,8 @@ namespace MediaConch {
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    workerfiles(this)
+    workerfiles(this),
+    status_msg(NULL)
 {
     ui->setupUi(this);
 
@@ -129,6 +130,8 @@ MainWindow::~MainWindow()
     delete ui;
     if (checkerView)
         delete checkerView;
+    if (!status_msg)
+        delete status_msg;
 }
 
 //***************************************************************************
@@ -715,6 +718,9 @@ void MainWindow::createDisplayView()
 
 void MainWindow::set_msg_to_status_bar(const QString& message)
 {
+    if (!status_msg)
+        return;
+
     statusBar()->clearMessage();
     status_msg->setText(message);
     QTimer::singleShot(5000, this, SLOT(update_status_bar()));
@@ -722,6 +728,9 @@ void MainWindow::set_msg_to_status_bar(const QString& message)
 
 void MainWindow::set_msg_error_to_status_bar(const QString& message)
 {
+    if (!status_msg)
+        return;
+
     statusBar()->clearMessage();
 
     QPalette pal = status_msg->palette();
@@ -735,6 +744,9 @@ void MainWindow::set_msg_error_to_status_bar(const QString& message)
 
 void MainWindow::clear_msg_in_status_bar()
 {
+    if (!status_msg)
+        return;
+
     statusBar()->clearMessage();
     QPalette pal = status_msg->palette();
     pal.setColor(QPalette::WindowText, Qt::black);
