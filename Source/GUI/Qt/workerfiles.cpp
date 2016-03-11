@@ -424,10 +424,13 @@ void WorkerFiles::load_database()
         QString msg = QString().fromStdString(error);
         mainwindow->set_msg_error_to_status_bar(msg);
     }
-#else
-    db = new NoDatabase;
-    db->init_ui();
 #endif
+
+    if (!db)
+    {
+        db = new NoDatabase;
+        db->init_ui();
+    }
 }
 
 //---------------------------------------------------------------------------
