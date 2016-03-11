@@ -82,13 +82,14 @@ int NoDatabase::update_report_table()
 
 //---------------------------------------------------------------------------
 int NoDatabase::save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification,
-                          const std::string& report, MediaConchLib::compression)
+                          const std::string& report, MediaConchLib::compression c)
 {
     Report* r = new Report;
     r->reportKind = reportKind;
     r->format = format;
     r->file_last_modification = file_last_modification;
     r->report = report;
+    r->compression = c;
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it != reports_saved.end())
     {
@@ -110,7 +111,7 @@ int NoDatabase::save_report(MediaConchLib::report reportKind, MediaConchLib::for
 //---------------------------------------------------------------------------
 void NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                                    const std::string& filename, const std::string& file_last_modification,
-                                   std::string& report, MediaConchLib::compression&)
+                                   std::string& report, MediaConchLib::compression& c)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it == reports_saved.end())
@@ -123,6 +124,7 @@ void NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchLib::for
             continue;
 
         report = r->report;
+        c = r->compression;
         return;
     }
 }

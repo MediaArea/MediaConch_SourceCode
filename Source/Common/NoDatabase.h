@@ -70,6 +70,7 @@ private:
     {
         MediaConchLib::report reportKind;
         MediaConchLib::format format;
+        MediaConchLib::compression compression;
         std::string file_last_modification;
         std::string report;
     };
