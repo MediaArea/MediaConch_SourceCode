@@ -120,11 +120,7 @@ if test -e MediaConch/Project/Qt/prepare; then
     cd MediaConch/Project/Qt
     test -e Makefile && rm Makefile
     chmod +x prepare
-    if [ "$OS" = "mac" ]; then
-        ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" NO_SQLITE=1 NO_LIBEVENT=1
-    else
-        ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
-    fi
+    ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
     if test -e Makefile; then
         make clean
         Parallel_Make
