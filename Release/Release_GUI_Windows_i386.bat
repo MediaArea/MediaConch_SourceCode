@@ -1,6 +1,6 @@
 @rem Copyright (c) MediaArea.net SARL. All Rights Reserved.
 @rem
-@rem Use of this source code is governed by a BSD-style license that can
+@rem Use of this source code is governed by a GPL v3+ and MPL v2+ license that can
 @rem be found in the License.html file in the root of the source tree.
 @rem
 
