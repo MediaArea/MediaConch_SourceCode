@@ -101,6 +101,8 @@ public:
     void load_configuration();
     void set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
+    void load_plugins_configuration();
+    void set_plugins_configuration_file(const std::string& file);
     void set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void create_default_implementation_schema();
@@ -141,6 +143,7 @@ private:
     static const std::string           database_name;
     Configuration*                     config;
     std::string                        configuration_file;
+    std::string                        plugins_configuration_file;
     std::map<std::string, std::string> implementation_options;
     //TODO: remove with the daemon
     Scheduler                         *scheduler;

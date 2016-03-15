@@ -39,6 +39,9 @@ int Help()
     TEXTOUT("--Configuration=ConfigurationFile, -c ConfigurationFile");
     TEXTOUT("                    Use ConfigurationFile as configuration file");
     TEXTOUT("                    Default, it uses the one in the user data application file");
+    TEXTOUT("--PluginsConfiguration=PluginsConfigurationFile, -pc PluginsConfigurationFile");
+    TEXTOUT("                    Use PluginsConfigurationFile as plugins configuration file");
+    TEXTOUT("                    Default, it uses the struct in the configuration file or no plugins configured if not inside.");
     TEXTOUT("");
 
     TEXTOUT("Reporting Elements:");

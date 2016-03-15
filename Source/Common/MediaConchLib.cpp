@@ -69,6 +69,7 @@ int MediaConchLib::init()
             }
         }
     }
+    load_plugins_configuration();
     return 0;
 }
 
@@ -350,6 +351,18 @@ void MediaConchLib::load_configuration()
 void MediaConchLib::set_configuration_file(const std::string& file)
 {
     core->set_configuration_file(file);
+}
+
+//---------------------------------------------------------------------------
+void MediaConchLib::load_plugins_configuration()
+{
+    core->load_plugins_configuration();
+}
+
+//---------------------------------------------------------------------------
+void MediaConchLib::set_plugins_configuration_file(const std::string& file)
+{
+    core->set_plugins_configuration_file(file);
 }
 
 //---------------------------------------------------------------------------

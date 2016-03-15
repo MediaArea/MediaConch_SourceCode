@@ -161,6 +161,8 @@ public:
     void               load_configuration();
     void               set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
+    void               load_plugins_configuration();
+    void               set_plugins_configuration_file(const std::string& file);
     void               set_compression_mode(compression compress);
     int                get_ui_poll_request() const;
     int                get_ui_database_path(std::string& path) const;

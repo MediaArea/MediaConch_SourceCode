@@ -143,6 +143,14 @@ void Core::load_configuration()
 }
 
 //---------------------------------------------------------------------------
+void Core::load_plugins_configuration()
+{
+    std::string error;
+    PluginsConfig pc(pluginsManager);
+    pc.load_file(plugins_configuration_file, error);
+}
+
+//---------------------------------------------------------------------------
 void Core::load_database()
 {
 #ifdef HAVE_SQLITE
@@ -1577,6 +1585,12 @@ void Core::set_configuration_file(const std::string& file)
 const std::string& Core::get_configuration_file() const
 {
     return configuration_file;
+}
+
+//---------------------------------------------------------------------------
+void Core::set_plugins_configuration_file(const std::string& file)
+{
+    plugins_configuration_file = file;
 }
 
 //---------------------------------------------------------------------------

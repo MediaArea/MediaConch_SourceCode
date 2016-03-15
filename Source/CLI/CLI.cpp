@@ -68,6 +68,7 @@ namespace MediaConch
         }
 
         MCL.set_configuration_file(configuration_file);
+        MCL.set_plugins_configuration_file(plugins_configuration_file);
         MCL.init();
         use_daemon = MCL.get_use_daemon();
         return 0;
@@ -217,6 +218,12 @@ namespace MediaConch
     void CLI::set_configuration_file(const std::string& file)
     {
         configuration_file = file;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_plugins_configuration_file(const std::string& file)
+    {
+        plugins_configuration_file = file;
     }
 
     //--------------------------------------------------------------------------
