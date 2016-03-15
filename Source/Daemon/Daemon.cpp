@@ -179,6 +179,11 @@ namespace MediaConch
             last_argument="--configuration=";
             return DAEMON_RETURN_NONE;
         }
+        if (argument=="-pc")
+        {
+            last_argument="--pluginsconfiguration=";
+            return DAEMON_RETURN_NONE;
+        }
         if (argument=="-i")
         {
             last_argument = "--implementationschema=";
@@ -204,6 +209,7 @@ namespace MediaConch
         OPTION("--version",                 version)
         OPTION("--fork",                    fork)
         OPTION("--configuration",           configuration)
+        OPTION("--pluginsconfiguration",    plugins_configuration)
         OPTION("--compression",             compression)
         OPTION("--implementationschema",    implementationschema)
         OPTION("--implementationverbosity", implementationverbosity)
@@ -256,6 +262,21 @@ namespace MediaConch
 
         std::string file = argument.substr(equal_pos + 1);
         MCL->set_configuration_file(file);
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_plugins_configuration(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string file = argument.substr(equal_pos + 1);
+        MCL->set_plugins_configuration_file(file);
         return DAEMON_RETURN_NONE;
     }
 
