@@ -10,7 +10,9 @@ It is used above an HTTP connection.
 
 #### Version 1.3
 
-* Add verbosity in report
+* Add verbosity in report request
+* Add tool in status ok
+* Add VERAPDF and DPFMANAGER report kinds
 
 #### Version 1.2
 
@@ -94,6 +96,7 @@ Parameters:
 - id:                Integer: id given by the request
 - finished:          Boolean: if the file is finished to be analyzed
 - done:              Double: Percent done by the analysis
+- tool:              REPORT: give the report tool used to analyze, when it is finished, optionnal (Default is IMPLEMENTATION) (since API v1.3)
 
 * nok:               Array of invalid arguments
 
@@ -250,6 +253,8 @@ Parameter:
 * IMPLEMENTATION: 2
 * MEDIAINFO:      3
 * MEDIATRACE:     4
+* VERAPDF:        5
+* DPFMANAGER:     6
 
 #### Error reason
 
