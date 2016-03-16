@@ -88,7 +88,7 @@ Parameters:
 * ok:                Array of valid arguments
 
 - id:                Integer: id given by the request
-- finish:            Boolean: if the file is finished to be analyzed
+- finished:          Boolean: if the file is finished to be analyzed
 - done:              Double: Percent done by the analysis
 
 * nok:               Array of invalid arguments
@@ -121,7 +121,7 @@ Parameters:
 * ok:                Structure of the following parameters
 
 - report:            String: Contain the report corresponding to all requested parameters
-- valid:             Boolean: true if all policies are valid
+- valid:             Boolean: true if all policies are valid (optionnal, depending on reports kind)
 
 * nok:               Array of invalid arguments
 
@@ -240,7 +240,7 @@ Parameter:
 
 #### Report kinds
 
-* NO\REPORT:      0
+* NO\_REPORT:      0
 * POLICY:         1
 * IMPLEMENTATION: 2
 * MEDIAINFO:      3
@@ -248,7 +248,7 @@ Parameter:
 
 #### Error reason
 
-* NOT\_REASON           0
+* NO\_REASON           0
 * FILE\_NOT\_EXISTING   1
 * ID\_NOT\_EXISTING     2
 * NOT\_READY            3
