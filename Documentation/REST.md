@@ -8,6 +8,10 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.3
+
+* Add verbosity in report
+
 #### Version 1.2
 
 * Add the List command
@@ -113,6 +117,7 @@ Parameters:
 - policies_names:    Array of policies names (Strings)
 - display_content:   String:  display content
 - display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE)
+- verbosity:         Integer: verbosity of the implementation report wanted, optionnal. Value between -1 and 5. If -1 or not given, takes the one from the server (since API v1.3)
 
 ##### Response
 
