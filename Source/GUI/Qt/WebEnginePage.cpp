@@ -450,7 +450,20 @@ namespace MediaConch
         QString status("info");
         if (file->analyzed)
             status = file->implementation_valid ? "success" : "danger";
+
         QString script = QString("$('#implementationStatus%1').prop('class', '%2');").arg(file->index).arg(status);
+        if (file->analyzed && file->report_kind != MediaConchLib::report_MediaConch)
+        {
+            script += QString("$('#fileDetail_implementation_displays_list%1').prop('class', 'hidden');").arg(file->index);
+            script += QString("$('#fileDetail_implementation_verbosity_list%1').prop('class', 'hidden');").arg(file->index);
+        }
+        else
+        {
+            script += QString("$('#fileDetail_implementation_displays_list%1').prop('class', '');").arg(file->index);
+            script += QString("$('#fileDetail_implementation_verbosity_list%1').prop('class', '');").arg(file->index);
+        }
+
+
         if (file->analyzed && file->implementation_valid)
             script += QString("var old = $('#implementationStatus%1').html(); $('#implementationStatus%1').html('<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> Valid' + old);").arg(file->index);
         else if (file->analyzed && !file->implementation_valid)
@@ -463,10 +476,28 @@ namespace MediaConch
     void WebPage::set_policy_status(FileRegistered* file)
     {
         QString status("info");
-        if (file->analyzed && file->policy != -1)
+        if (file->analyzed && file->policy != -1 && file->report_kind == MediaConchLib::report_MediaConch)
             status = file->policy_valid ? "success" : "danger";
 
         QString script = QString("$('#policyStatus%1').prop('class', '%2');").arg(file->index).arg(status);
+
+        if (file->analyzed && file->report_kind != MediaConchLib::report_MediaConch)
+        {
+            script += QString("$('#fileDetail_policy_displays_list%1').prop('class', 'hidden');").arg(file->index);
+            script += QString("$('#fileDetail_policy_policies_list%1').prop('class', 'hidden');").arg(file->index);
+            script += QString("$('#policyElementName%1').text('N/A');").arg(file->index);
+        }
+
+        if (!file->analyzed || file->report_kind != MediaConchLib::report_MediaConch)
+        {
+            script += QString("$('#policyStatusViewIcon%1').prop('class', 'hidden');").arg(file->index);
+            script += QString("$('#policyStatusDownloadIcon%1').prop('class', 'hidden');").arg(file->index);
+            use_javascript(script);
+            return;
+        }
+
+        script += QString("$('#policyStatusViewIcon%1').prop('class', 'glyphicon glyphicon-eye-open');").arg(file->index);
+        script += QString("$('#policyStatusDownloadIcon%1').prop('class', 'glyphicon glyphicon-download');").arg(file->index);
         if (file->analyzed && file->policy != -1 && file->policy_valid)
             script += QString("var old = $('#policyStatus%1').html(); $('#policyStatus%1').html('<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> ' + old);").arg(file->index);
         else if (file->analyzed && file->policy != -1 && !file->policy_valid)

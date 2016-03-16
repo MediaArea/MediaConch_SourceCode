@@ -446,6 +446,9 @@ namespace MediaConch
         QWebElement status = currentFrame()->findFirstElement(QString("#implementationStatus%1").arg(file->index));
         QWebElement viewIcon = currentFrame()->findFirstElement(QString("#implementationStatusViewIcon%1").arg(file->index));
         QWebElement downloadIcon = currentFrame()->findFirstElement(QString("#implementationStatusDownloadIcon%1").arg(file->index));
+        QWebElement verbosity_list = currentFrame()->findFirstElement(QString("#fileDetail_implementation_verbosity_list%1").arg(file->index));
+        QWebElement displays_list = currentFrame()->findFirstElement(QString("#fileDetail_implementation_displays_list%1").arg(file->index));
+
         if (file->analyzed)
         {
             downloadIcon.setAttribute("class", "glyphicon glyphicon-download");
@@ -463,12 +466,25 @@ namespace MediaConch
                 QString newHtml("<span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span> Not Valid");
                 status.setInnerXml(newHtml + html);
             }
+
+            if (file->report_kind != MediaConchLib::report_MediaConch)
+            {
+                verbosity_list.setAttribute("class", "hidden");
+                displays_list.setAttribute("class", "hidden");
+            }
+            else
+            {
+                verbosity_list.setAttribute("class", "");
+                displays_list.setAttribute("class", "");
+            }
         }
         else
         {
             status.setAttribute("class", "info");
             downloadIcon.setAttribute("class", "hidden");
             viewIcon.setAttribute("class", "hidden");
+            verbosity_list.setAttribute("class", "hidden");
+            displays_list.setAttribute("class", "hidden");
         }
     }
 
@@ -479,11 +495,15 @@ namespace MediaConch
         QWebElement status = currentFrame()->findFirstElement(QString("#policyStatus%1").arg(file->index));
         QWebElement viewIcon = currentFrame()->findFirstElement(QString("#policyStatusViewIcon%1").arg(file->index));
         QWebElement downloadIcon = currentFrame()->findFirstElement(QString("#policyStatusDownloadIcon%1").arg(file->index));
+        QWebElement policies_list = currentFrame()->findFirstElement(QString("#fileDetail_policy_policies_list%1").arg(file->index));
+        QWebElement displays_list = currentFrame()->findFirstElement(QString("#fileDetail_policy_displays_list%1").arg(file->index));
+        QWebElement policy_name = currentFrame()->findFirstElement(QString("#policyElementName%1").arg(file->index));
 
         if (file->analyzed && file->policy != -1 && file->report_kind == MediaConchLib::report_MediaConch)
         {
             downloadIcon.setAttribute("class", "glyphicon glyphicon-download");
             viewIcon.setAttribute("class", "glyphicon glyphicon-eye-open");
+
             state = file->policy_valid ? "success" : "danger";
             status.setAttribute("class", state);
             QString html = status.toInnerXml();
@@ -503,6 +523,13 @@ namespace MediaConch
             status.setAttribute("class", state);
             downloadIcon.setAttribute("class", "hidden");
             viewIcon.setAttribute("class", "hidden");
+        }
+
+        if (file->analyzed && file->report_kind != MediaConchLib::report_MediaConch)
+        {
+            policies_list.setAttribute("class", "hidden");
+            displays_list.setAttribute("class", "hidden");
+            policy_name.setInnerXml("N/A");
         }
     }
 
