@@ -444,8 +444,12 @@ namespace MediaConch
     void WebPage::set_implementation_status(FileRegistered* file)
     {
         QWebElement status = currentFrame()->findFirstElement(QString("#implementationStatus%1").arg(file->index));
+        QWebElement viewIcon = currentFrame()->findFirstElement(QString("#implementationStatusViewIcon%1").arg(file->index));
+        QWebElement downloadIcon = currentFrame()->findFirstElement(QString("#implementationStatusDownloadIcon%1").arg(file->index));
         if (file->analyzed)
         {
+            downloadIcon.setAttribute("class", "glyphicon glyphicon-download");
+            viewIcon.setAttribute("class", "glyphicon glyphicon-eye-open");
             QString html = status.toInnerXml();
             if (file->implementation_valid)
             {
@@ -461,7 +465,11 @@ namespace MediaConch
             }
         }
         else
+        {
             status.setAttribute("class", "info");
+            downloadIcon.setAttribute("class", "hidden");
+            viewIcon.setAttribute("class", "hidden");
+        }
     }
 
     //---------------------------------------------------------------------------
@@ -469,9 +477,13 @@ namespace MediaConch
     {
         QString state("info");
         QWebElement status = currentFrame()->findFirstElement(QString("#policyStatus%1").arg(file->index));
+        QWebElement viewIcon = currentFrame()->findFirstElement(QString("#policyStatusViewIcon%1").arg(file->index));
+        QWebElement downloadIcon = currentFrame()->findFirstElement(QString("#policyStatusDownloadIcon%1").arg(file->index));
 
-        if (file->analyzed && file->policy != -1)
+        if (file->analyzed && file->policy != -1 && file->report_kind == MediaConchLib::report_MediaConch)
         {
+            downloadIcon.setAttribute("class", "glyphicon glyphicon-download");
+            viewIcon.setAttribute("class", "glyphicon glyphicon-eye-open");
             state = file->policy_valid ? "success" : "danger";
             status.setAttribute("class", state);
             QString html = status.toInnerXml();
@@ -487,7 +499,11 @@ namespace MediaConch
             }
         }
         else
+        {
             status.setAttribute("class", state);
+            downloadIcon.setAttribute("class", "hidden");
+            viewIcon.setAttribute("class", "hidden");
+        }
     }
 
 }
