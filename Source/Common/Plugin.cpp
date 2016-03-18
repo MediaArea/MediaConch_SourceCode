@@ -48,7 +48,11 @@ namespace MediaConch {
                 cmd += params[i];
         }
 
+#if defined(_WIN32)
+        FILE* pipe = _popen(cmd.c_str(), "r");
+#else
         FILE* pipe = popen(cmd.c_str(), "r");
+#endif
 
         if (!pipe)
         {
@@ -62,7 +66,11 @@ namespace MediaConch {
             if (fgets(buffer, 4096, pipe) != NULL)
                 report += buffer;
         }
+#if defined(_WIN32)
+        _pclose(pipe);
+#else
         pclose(pipe);
+#endif
         return 0;
     }
 

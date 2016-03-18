@@ -217,13 +217,9 @@ namespace MediaConch {
             ZenLib::Ztring full_path(z_path);
             full_path += find_file_data.cFileName;
             if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            {
-                delete_report_dir(full_path.c_str()):
-            }
+                delete_report_dir(full_path.To_UTF8());
             else
-            {
                 DeleteFile(full_path.c_str());
-            }
         } while (FindNextFile(handler, &find_file_data));
         FindClose(handler);
 
@@ -243,9 +239,7 @@ namespace MediaConch {
 
             full_path = report_dir + full_path;
             if (entry->d_type & DT_DIR)
-            {
                 delete_report_dir(full_path.c_str());
-            }
             else
                 unlink(full_path.c_str());
         }
