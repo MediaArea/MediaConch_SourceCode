@@ -189,6 +189,7 @@ void Policies::create_values_from_csv()
         "exists",
         "does_not_exist",
         "contains_string",
+        "is_true",
     };
 
     for (size_t i=0; i < (sizeof(xsltOperators) / sizeof(*xsltOperators)); i++)
