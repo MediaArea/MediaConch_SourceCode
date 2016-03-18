@@ -42,7 +42,10 @@ namespace MediaConch {
         {
             if (i)
                 cmd += " ";
-            cmd += params[i];
+            if (params[i].length() && params[i][0] != '\'')
+                cmd += "'" + params[i] + "'";
+            else
+                cmd += params[i];
         }
 
         FILE* pipe = popen(cmd.c_str(), "r");
