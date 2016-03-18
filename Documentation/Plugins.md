@@ -43,13 +43,13 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "name": "VeraPDF",
                 "format": "PDF",
                 "bin": "$PATH_TO_VERA_PDF",
-                "params": "--format xml"
+                "params": ["--format", "xml"]
             },
             {
                 "name": "DPFManager",
                 "format": "TIFF",
                 "bin": "$PATH_TO_DPF_MANAGER",
-                "params": "-s"
+                "params": ["-s"]
             }
         ]
     }

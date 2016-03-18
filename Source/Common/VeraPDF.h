@@ -40,8 +40,8 @@ private:
     VeraPDF(const VeraPDF&);
     VeraPDF&    operator=(const VeraPDF&);
 
-    std::string           bin;
-    std::string           params;
+    std::string               bin;
+    std::vector<std::string>  params;
 };
 
 }

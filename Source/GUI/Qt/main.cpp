@@ -16,7 +16,7 @@
     #include <ApplicationServices/ApplicationServices.h>
 #endif //__MACOSX__
 
-        int main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationName("MediaConch");

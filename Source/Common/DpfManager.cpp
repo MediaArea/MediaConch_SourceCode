@@ -70,8 +70,15 @@ namespace MediaConch {
         }
         bin = obj.at("bin").s;
 
-        if (obj.find("params") != obj.end() && obj.at("params").type == Container::Value::CONTAINER_TYPE_STRING)
-            params = obj.at("params").s;
+        if (obj.find("params") != obj.end() && obj.at("params").type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t i = 0; i < obj.at("params").array.size(); ++i)
+            {
+                const Container::Value& val = obj.at("params").array[i];
+                if (val.type == Container::Value::CONTAINER_TYPE_STRING)
+                    params.push_back(val.s);
+            }
+        }
 
         return 0;
     }
@@ -83,8 +90,8 @@ namespace MediaConch {
 
         exec_params.push_back(bin);
 
-        if (params.length())
-            exec_params.push_back(params);
+        for (size_t i = 0; i < params.size(); ++i)
+            exec_params.push_back(params[i]);
 
         std::string report_dir;
         if (create_report_dir(report_dir) < 0)
@@ -98,15 +105,18 @@ namespace MediaConch {
         exec_params.push_back(config_file);
 
         std::string file(filename);
-        unified_string(file);
+        //unified_string(file);
         exec_params.push_back(file);
 
         report.clear();
         int ret =  exec_bin(exec_params, error);
 
-        report.clear();
-        std::string report_file = report_dir + "summary.xml";
-        read_report(report_file, report);
+        if (ret >= 0)
+        {
+            report.clear();
+            std::string report_file = report_dir + "summary.xml";
+            read_report(report_file, report);
+        }
 
         delete_configuration_file(config_file);
         delete_report_dir(report_dir);

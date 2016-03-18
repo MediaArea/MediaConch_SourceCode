@@ -17,6 +17,9 @@
 
 //---------------------------------------------------------------------------
 #include <map>
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 #include "MediaConchLib.h"
 #include "Container.h"
 
@@ -39,13 +42,21 @@ public:
     MediaConchLib::PluginType get_type() const { return type; }
     const std::string&        get_name() const { return name; }
     const std::string&        get_report() const { return report; }
+    const std::string&        get_error() const { return error; }
 
 protected:
     MediaConchLib::PluginType type;
     std::string               name;
     std::string               report;
+    std::string               error;
     int                       exec_bin(const std::vector<std::string>& params, std::string& error);
     int                       read_report(const std::string& file, std::string& report);
+
+#if defined(_WIN32)
+    int                       create_pipe(HANDLE* handler_out_rd, HANDLE* handler_out_wr);
+    int                       execute_the_command(std::string& cmd, HANDLE handler_out_wr);
+    int                       read_the_stdout(HANDLE handler_out_wr, HANDLE handler_out_rd);
+#endif
 
     void                      unified_string(std::string& str);
 

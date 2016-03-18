@@ -57,8 +57,15 @@ namespace MediaConch {
         }
         bin = obj.at("bin").s;
 
-        if (obj.find("params") != obj.end() && obj.at("params").type == Container::Value::CONTAINER_TYPE_STRING)
-            params = obj.at("params").s;
+        if (obj.find("params") != obj.end() && obj.at("params").type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t i = 0; i < obj.at("params").array.size(); ++i)
+            {
+                const Container::Value& val = obj.at("params").array[i];
+                if (val.type == Container::Value::CONTAINER_TYPE_STRING)
+                    params.push_back(val.s);
+            }
+        }
 
         return 0;
     }
@@ -69,11 +76,11 @@ namespace MediaConch {
         std::vector<std::string> exec_params;
 
         exec_params.push_back(bin);
-        if (params.length())
-            exec_params.push_back(params);
+        for (size_t i = 0; i < params.size(); ++i)
+            exec_params.push_back(params[i]);
 
         std::string file(filename);
-        unified_string(file);
+        //unified_string(file);
         exec_params.push_back(file);
 
         report.clear();

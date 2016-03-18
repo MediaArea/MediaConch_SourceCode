@@ -152,6 +152,7 @@
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Common\DaemonClient.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Database.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\DpfManager.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Http.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Httpd.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Json.cpp" />
@@ -160,6 +161,9 @@
     <ClCompile Include="..\..\..\Source\Common\LibEventHttpd.cpp" />
     <ClCompile Include="..\..\..\Source\Common\MediaConchLib.cpp" />
     <ClCompile Include="..\..\..\Source\Common\NoDatabase.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Plugin.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\PluginsConfig.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\PluginsManager.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Queue.cpp" />
@@ -170,6 +174,7 @@
     <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
     <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\VeraPDF.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
@@ -180,11 +185,17 @@
     <ClInclude Include="..\..\..\Source\CLI\Config.h" />
     <ClInclude Include="..\..\..\Source\CLI\Help.h" />
     <ClInclude Include="..\..\..\Source\Common\Core.h" />
+    <ClInclude Include="..\..\..\Source\Common\DpfManager.h" />
+    <ClInclude Include="..\..\..\Source\Common\Plugin.h" />
+    <ClInclude Include="..\..\..\Source\Common\PluginFormat.h" />
+    <ClInclude Include="..\..\..\Source\Common\PluginsConfig.h" />
+    <ClInclude Include="..\..\..\Source\Common\PluginsManager.h" />
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
     <ClInclude Include="..\..\..\Source\Common\Policy.h" />
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h" />
     <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h" />
+    <ClInclude Include="..\..\..\Source\Common\VeraPDF.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
   </ItemGroup>

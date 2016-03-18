@@ -40,13 +40,13 @@ private:
     DPFManager(const DPFManager&);
     DPFManager&    operator=(const DPFManager&);
 
-    int                   create_report_dir(std::string& report_dir);
-    int                   create_configuration_file(const std::string& report_dir, std::string& file);
-    int                   delete_configuration_file(const std::string& file);
-    int                   delete_report_dir(const std::string& report_dir);
+    int                       create_report_dir(std::string& report_dir);
+    int                       create_configuration_file(const std::string& report_dir, std::string& file);
+    int                       delete_configuration_file(const std::string& file);
+    int                       delete_report_dir(const std::string& report_dir);
 
-    std::string           bin;
-    std::string           params;
+    std::string               bin;
+    std::vector<std::string>  params;
 };
 
 }
