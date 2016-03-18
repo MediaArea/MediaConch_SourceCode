@@ -8,6 +8,7 @@
 #include "xsltruleedit.h"
 #include "ui_xsltruleedit.h"
 #include "mainwindow.h"
+#include <QSizePolicy>
 
 #if QT_VERSION >= 0x050200
     #include <QFontDatabase>
@@ -54,8 +55,7 @@ XsltRuleEdit::XsltRuleEdit(QWidget *parent) :
     ui(new Ui::XsltRuleEdit)
 {
     ui->setupUi(this);
-    ui->freeText->setText(QString());
-    ui->freeText->hide();
+    ui->test->setText(QString());
     add_values_to_selector();
     change_occurence_spin_box();
 }
@@ -77,51 +77,148 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
         return;
 
     ui->name->setText(QString().fromStdString(r->title));
-    if (r->use_free_text)
-    {
-        ui->freeText->setText(QString().fromStdString(r->text));
-        ui->freeTextSelector->setChecked(true);
-        ui->freeText->show();
-        ui->editorFrame->hide();
-        return;
-    }
-    if (r->type == "")
-        r->type = ui->type->currentText().toStdString();
+
+    // Set validator (operation to do)
     if (r->ope == "")
         r->ope = ui->ope->currentText().toStdString();
+    int pos = ui->ope->findText(QString().fromStdString(r->ope));
+    if (pos != -1)
+        ui->ope->setCurrentIndex(pos);
 
-    fill_editor_fields(r);
+    // Set mode
+    if (r->use_free_text)
+        ui->freeTextSelector->setChecked(true);
+    else
+        ui->editorSelector->setChecked(true);
 
-    ui->editorSelector->setChecked(true);
-    ui->freeText->hide();
-    ui->editorFrame->show();
+    // Set fields corresponding to the mode
+    fill_mode_frame_fields(r);
+    ui->modeFrame->show();
 }
 
 //---------------------------------------------------------------------------
-void XsltRuleEdit::fill_editor_fields(XsltRule *r)
+void XsltRuleEdit::fill_mode_frame_fields(XsltRule *r)
 {
-    int pos = ui->type->findText(QString().fromStdString(r->type));
-    if (pos != -1)
-        ui->type->setCurrentIndex(pos);
+    if (r->ope == "exists" || r->ope == "does_not_exists")
+        fill_mode_frame_exists_fields(r);
+    else if (r->ope == "is_true" || r->ope == "is_not_true")
+        fill_mode_frame_is_true_fields(r);
+    else
+        fill_mode_frame_common_fields(r);
+}
+
+//---------------------------------------------------------------------------
+void XsltRuleEdit::fill_mode_frame_exists_fields(XsltRule *r)
+{
+    int pos;
+
+    // Hide everything
+    ui->frameType->hide();
+    ui->frameOccurrence->hide();
+    ui->frameTest->hide();
+    ui->frameValue->hide();
+
+    if (r->use_free_text)
+    {
+        // Display Free Text test
+        ui->frameTest->show();
+        ui->test->setText(QString().fromStdString(r->text));
+    }
+    else
+    {
+        // Display type
+        ui->frameType->show();
+
+        // Set type
+        if (r->type == "")
+            r->type = ui->type->currentText().toStdString();
+        pos = ui->type->findText(QString().fromStdString(r->type));
+        if (pos != -1)
+            ui->type->setCurrentIndex(pos);
+
+        if (r->type == "General")
+        {
+            r->occurrence = -1;
+            ui->occurrence->setReadOnly(true);
+        }
+        ui->occurrence->setValue(r->occurrence);
+    }
 
     //Updating field selector makes r->field reseting
     std::string remain(r->field);
-    change_values_of_field_selector();
+    change_values_of_field_selector(r->use_free_text);
     r->field = remain;
 
     pos = ui->field->findText(QString().fromStdString(r->field));
     if (pos != -1)
         ui->field->setCurrentIndex(pos);
+}
 
-    if (r->type == "General")
+//---------------------------------------------------------------------------
+void XsltRuleEdit::fill_mode_frame_is_true_fields(XsltRule *r)
+{
+    // Should not happen
+    if (!r->use_free_text)
+        return;
+
+    // Hide everything
+    ui->frameType->hide();
+    ui->frameField->hide();
+    ui->frameOccurrence->hide();
+    ui->frameValue->hide();
+
+    // Except Value
+    ui->frameTest->show();
+    ui->test->setText(QString().fromStdString(r->text));
+}
+
+//---------------------------------------------------------------------------
+void XsltRuleEdit::fill_mode_frame_common_fields(XsltRule *r)
+{
+    int pos;
+
+    // Hide everything
+    ui->frameType->hide();
+    ui->frameField->show();
+    ui->frameOccurrence->hide();
+    ui->frameTest->hide();
+    ui->frameValue->show();
+
+    if (r->use_free_text)
     {
-        r->occurrence = -1;
-        ui->occurrence->setReadOnly(true);
+        // Display Free Text test
+        ui->frameTest->show();
+        ui->test->setText(QString().fromStdString(r->text));
     }
-    ui->occurrence->setValue(r->occurrence);
-    pos = ui->ope->findText(QString().fromStdString(r->ope));
+    else
+    {
+        // Display type && occurrence
+        ui->frameType->show();
+        ui->frameOccurrence->show();
+
+        // Set type
+        if (r->type == "")
+            r->type = ui->type->currentText().toStdString();
+        pos = ui->type->findText(QString().fromStdString(r->type));
+        if (pos != -1)
+            ui->type->setCurrentIndex(pos);
+
+        if (r->type == "General")
+        {
+            r->occurrence = -1;
+            ui->occurrence->setReadOnly(true);
+        }
+        ui->occurrence->setValue(r->occurrence);
+    }
+
+    //Updating field selector makes r->field reseting
+    std::string remain(r->field);
+    change_values_of_field_selector(r->use_free_text);
+    r->field = remain;
+
+    pos = ui->field->findText(QString().fromStdString(r->field));
     if (pos != -1)
-        ui->ope->setCurrentIndex(pos);
+        ui->field->setCurrentIndex(pos);
 
     string value = r->value;
     if (value.length() >= 2 && value[0] == '\'')
@@ -180,13 +277,13 @@ QSpinBox *XsltRuleEdit::get_occurrence_box()
 //---------------------------------------------------------------------------
 QTextEdit *XsltRuleEdit::get_freeText_text()
 {
-    return ui->freeText;
+    return ui->test;
 }
 
 //---------------------------------------------------------------------------
 QFrame *XsltRuleEdit::get_editor_frame()
 {
-    return ui->editorFrame;
+    return ui->modeFrame;
 }
 
 QRadioButton *XsltRuleEdit::get_freeTextSelector_radio()
@@ -212,7 +309,7 @@ void XsltRuleEdit::add_values_to_selector()
     for (; itType != iteType; ++itType)
         ui->type->addItem(QString().fromStdString(itType->first));
     ui->type->model()->sort(0);
-    change_values_of_field_selector();
+    change_values_of_field_selector(true);
 
     const list<string> *existing_operator = mainwindow->providePolicyExistingXsltOperator();
     list<string>::const_iterator itOperator = existing_operator->begin();
@@ -222,11 +319,13 @@ void XsltRuleEdit::add_values_to_selector()
 }
 
 //---------------------------------------------------------------------------
-void XsltRuleEdit::change_values_of_field_selector()
+void XsltRuleEdit::change_values_of_field_selector(bool is_free_text)
 {
-    std::string type = ui->type->currentText().toStdString();
     ui->field->clear();
+    if (is_free_text)
+        return;
 
+    std::string type = ui->type->currentText().toStdString();
     const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
     map<string, list<string> >::const_iterator itType = existing_type->begin();
     map<string, list<string> >::const_iterator iteType = existing_type->end();
@@ -248,12 +347,17 @@ void XsltRuleEdit::change_values_of_field_selector()
 void XsltRuleEdit::change_occurence_spin_box()
 {
     delete ui->occurrence;
-    ui->occurrence = new CustomSpinBox(ui->editorFrame);
+    ui->occurrence = new CustomSpinBox(ui->frameOccurrence);
     ui->occurrence->setObjectName("occurrence");
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(ui->occurrence->sizePolicy().hasHeightForWidth());
+    ui->occurrence->setSizePolicy(sizePolicy);
     ui->occurrence->setMinimum(-1);
     ui->occurrence->setMaximum(16777215);
     ui->occurrence->setValue(1);
-    ui->gridLayout_2->addWidget(ui->occurrence, 3, 2, 1, 1);
+    ui->horizontalLayout_3->addWidget(ui->occurrence);
 }
 
 }

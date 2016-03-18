@@ -62,8 +62,12 @@ public:
 //***************************************************************************
 // Visual element
 //***************************************************************************
-    void rule_clicked(XsltRule *r);
-    void fill_editor_fields(XsltRule *r);
+    void               rule_clicked(XsltRule *r);
+    void               fill_mode_frame_fields(XsltRule *r);
+    void               fill_mode_frame_exists_fields(XsltRule *r);
+    void               fill_mode_frame_is_true_fields(XsltRule *r);
+    void               fill_mode_frame_common_fields(XsltRule *r);
+
     const QPushButton *get_delRule_button();
     const QPushButton *get_duplicateRule_button();
     const QLineEdit   *get_name_line();
@@ -76,7 +80,7 @@ public:
     QTextEdit         *get_freeText_text();
     QRadioButton      *get_freeTextSelector_radio();
     QRadioButton      *get_editorSelector_radio();
-    void               change_values_of_field_selector();
+    void               change_values_of_field_selector(bool is_free_text);
 
 private:
     MainWindow *mainwindow;
