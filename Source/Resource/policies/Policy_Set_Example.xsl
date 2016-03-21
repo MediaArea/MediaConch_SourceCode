@@ -93,8 +93,8 @@
                 <xsl:attribute name="value">48000</xsl:attribute>
               </context>
               <xsl:choose>
-                <xsl:when test="mi:MediaInfo/mi:track[@type='Audio'][1]/mi:SamplingRate">
-                  <xsl:for-each select="mi:MediaInfo/mi:track[@type='Audio'][1]/mi:SamplingRate">
+                <xsl:when test="mi:MediaInfo/mi:trac[@type='Audio'][1]/mi:SamplingRate">
+                  <xsl:for-each select="mi:MediaInfo/mi:trac[@type='Audio'][1]/mi:SamplingRate">
                     <xsl:call-template name="is_equal">
                       <xsl:with-param name="xpath" select="."/>
                       <xsl:with-param name="value">48000</xsl:with-param>

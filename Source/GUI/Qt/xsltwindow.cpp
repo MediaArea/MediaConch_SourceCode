@@ -419,7 +419,7 @@ void XsltWindow::edit_rule_type()
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
         r->type = ruleEdit->get_type_select()->currentText().toStdString();
-        ruleEdit->change_values_of_field_selector(r->use_free_text);
+        ruleEdit->change_values_of_field_selector(r->use_free_text, r->field);
         if (r->type == "General")
         {
             ruleEdit->get_occurrence_box()->setValue(-1);
@@ -427,6 +427,7 @@ void XsltWindow::edit_rule_type()
         }
         else
             ruleEdit->get_occurrence_box()->setReadOnly(false);
+        ruleEdit->check_editor_is_possible(r);
     }
 }
 
@@ -449,6 +450,7 @@ void XsltWindow::edit_rule_field()
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
         r->field = ruleEdit->get_field_select()->currentText().toStdString();
+        ruleEdit->check_editor_is_possible(r);
     }
 }
 
@@ -471,6 +473,7 @@ void XsltWindow::edit_rule_operator()
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
         r->ope = ruleEdit->get_operator_select()->currentText().toStdString();
+        ruleEdit->rule_clicked(r);
     }
 }
 
@@ -493,6 +496,7 @@ void XsltWindow::edit_rule_value()
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
         r->value = ruleEdit->get_value_line()->text().toStdString();
+        ruleEdit->check_editor_is_possible(r);
     }
 }
 
@@ -515,6 +519,7 @@ void XsltWindow::edit_rule_occurrence()
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
         r->occurrence = ruleEdit->get_occurrence_box()->value();
+        ruleEdit->check_editor_is_possible(r);
     }
 }
 
@@ -532,12 +537,13 @@ void XsltWindow::edit_rule_freeText()
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
-    if (r->text != ruleEdit->get_freeText_text()->toPlainText().toStdString())
+    if (r->test != ruleEdit->get_freeText_text()->toPlainText().toStdString())
     {
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
-        r->text = ruleEdit->get_freeText_text()->toPlainText().toStdString();
+        r->test = ruleEdit->get_freeText_text()->toPlainText().toStdString();
         r->use_free_text = true;
+        ruleEdit->check_editor_is_possible(r);
     }
 }
 
@@ -558,7 +564,10 @@ void XsltWindow::rule_free_text_selected(bool checked)
 
     policieswindow->emphasis_policy_name_in_tree(item);
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
+    XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(rowPolicy);
+    XsltRule *r = p->rules[row];
+
+    p->create_test_from_rule(r, r->test);
     r->use_free_text = true;
     ruleEdit->rule_clicked(r);
 }
@@ -580,8 +589,12 @@ void XsltWindow::rule_editor_selected(bool checked)
 
     policieswindow->emphasis_policy_name_in_tree(item);
 
-    XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
-    r->use_free_text = false;
+    XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(rowPolicy);
+    XsltRule *r = p->rules[row];
+    p->parse_test_for_rule(r->test, r);
+    if (r->use_free_text)
+        r->use_free_text = false;
+
     ruleEdit->rule_clicked(r);
 }
 
@@ -603,6 +616,8 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
                      this, SLOT(edit_rule_type()));
     QObject::connect(ruleEdit->get_field_select(), SIGNAL(currentIndexChanged(int)),
                      this, SLOT(edit_rule_field()));
+    QObject::connect(ruleEdit->get_field_select(), SIGNAL(editTextChanged(const QString&)),
+                     this, SLOT(edit_rule_field()));
     QObject::connect(ruleEdit->get_operator_select(), SIGNAL(currentIndexChanged(int)),
                      this, SLOT(edit_rule_operator()));
     QObject::connect(ruleEdit->get_value_line(), SIGNAL(textEdited(QString)),
@@ -615,7 +630,6 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
                      this, SLOT(rule_free_text_selected(bool)));
     QObject::connect(ruleEdit->get_freeText_text(), SIGNAL(textChanged()),
                      this, SLOT(edit_rule_freeText()));
-    ruleEdit->get_editorSelector_radio()->setEnabled(true);
 }
 
 }

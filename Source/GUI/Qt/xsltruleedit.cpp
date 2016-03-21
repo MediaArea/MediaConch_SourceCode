@@ -94,6 +94,7 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
     // Set fields corresponding to the mode
     fill_mode_frame_fields(r);
     ui->modeFrame->show();
+    check_editor_is_possible(r);
 }
 
 //---------------------------------------------------------------------------
@@ -122,12 +123,13 @@ void XsltRuleEdit::fill_mode_frame_exists_fields(XsltRule *r)
     {
         // Display Free Text test
         ui->frameTest->show();
-        ui->test->setText(QString().fromStdString(r->text));
+        ui->test->setText(QString().fromStdString(r->test));
     }
     else
     {
-        // Display type
+        // Display type && Occurrence
         ui->frameType->show();
+        ui->frameOccurrence->show();
 
         // Set type
         if (r->type == "")
@@ -146,30 +148,31 @@ void XsltRuleEdit::fill_mode_frame_exists_fields(XsltRule *r)
 
     //Updating field selector makes r->field reseting
     std::string remain(r->field);
-    change_values_of_field_selector(r->use_free_text);
+    change_values_of_field_selector(r->use_free_text, r->field);
     r->field = remain;
-
-    pos = ui->field->findText(QString().fromStdString(r->field));
-    if (pos != -1)
-        ui->field->setCurrentIndex(pos);
 }
 
 //---------------------------------------------------------------------------
 void XsltRuleEdit::fill_mode_frame_is_true_fields(XsltRule *r)
 {
-    // Should not happen
+    // Force to free text
     if (!r->use_free_text)
-        return;
+    {
+        r->use_free_text = true;
+        ui->freeTextSelector->setChecked(true);
+    }
 
     // Hide everything
     ui->frameType->hide();
-    ui->frameField->hide();
     ui->frameOccurrence->hide();
     ui->frameValue->hide();
 
-    // Except Value
+    // Except Value && Field
     ui->frameTest->show();
-    ui->test->setText(QString().fromStdString(r->text));
+    ui->test->setText(QString().fromStdString(r->test));
+    ui->frameField->show();
+
+    change_values_of_field_selector(r->use_free_text, r->field);
 }
 
 //---------------------------------------------------------------------------
@@ -188,7 +191,7 @@ void XsltRuleEdit::fill_mode_frame_common_fields(XsltRule *r)
     {
         // Display Free Text test
         ui->frameTest->show();
-        ui->test->setText(QString().fromStdString(r->text));
+        ui->test->setText(QString().fromStdString(r->test));
     }
     else
     {
@@ -213,12 +216,8 @@ void XsltRuleEdit::fill_mode_frame_common_fields(XsltRule *r)
 
     //Updating field selector makes r->field reseting
     std::string remain(r->field);
-    change_values_of_field_selector(r->use_free_text);
+    change_values_of_field_selector(r->use_free_text, r->field);
     r->field = remain;
-
-    pos = ui->field->findText(QString().fromStdString(r->field));
-    if (pos != -1)
-        ui->field->setCurrentIndex(pos);
 
     string value = r->value;
     if (value.length() >= 2 && value[0] == '\'')
@@ -309,7 +308,7 @@ void XsltRuleEdit::add_values_to_selector()
     for (; itType != iteType; ++itType)
         ui->type->addItem(QString().fromStdString(itType->first));
     ui->type->model()->sort(0);
-    change_values_of_field_selector(true);
+    change_values_of_field_selector(true, "");
 
     const list<string> *existing_operator = mainwindow->providePolicyExistingXsltOperator();
     list<string>::const_iterator itOperator = existing_operator->begin();
@@ -319,28 +318,41 @@ void XsltRuleEdit::add_values_to_selector()
 }
 
 //---------------------------------------------------------------------------
-void XsltRuleEdit::change_values_of_field_selector(bool is_free_text)
+void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std::string new_field)
 {
     ui->field->clear();
-    if (is_free_text)
+    if (!is_free_text)
+    {
+        std::string type = ui->type->currentText().toStdString();
+        const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
+        map<string, list<string> >::const_iterator itType = existing_type->begin();
+        map<string, list<string> >::const_iterator iteType = existing_type->end();
+        for (; itType != iteType; ++itType)
+        {
+            if (itType->first.compare(type))
+                continue;
+
+            list<string>::const_iterator it = itType->second.begin();
+            list<string>::const_iterator ite = itType->second.end();
+            for (; it != ite; ++it)
+                ui->field->addItem(QString().fromStdString(*it));
+        }
+    }
+    ui->field->model()->sort(0);
+
+    if (!new_field.length())
         return;
 
-    std::string type = ui->type->currentText().toStdString();
-    const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
-    map<string, list<string> >::const_iterator itType = existing_type->begin();
-    map<string, list<string> >::const_iterator iteType = existing_type->end();
-    for (; itType != iteType; ++itType)
+    int pos = ui->field->findText(QString().fromStdString(new_field));
+    if (pos != -1)
+        ui->field->setCurrentIndex(pos);
+    else
     {
-        if (itType->first.compare(type))
-            continue;
-
-        list<string>::const_iterator it = itType->second.begin();
-        list<string>::const_iterator ite = itType->second.end();
-        for (; it != ite; ++it)
-            ui->field->addItem(QString().fromStdString(*it));
+        ui->field->addItem(QString().fromStdString(new_field));
+        int pos = ui->field->findText(QString().fromStdString(new_field));
+        if (pos != -1)
+            ui->field->setCurrentIndex(pos);
     }
-
-    ui->field->model()->sort(0);
 }
 
 //---------------------------------------------------------------------------
@@ -358,6 +370,26 @@ void XsltRuleEdit::change_occurence_spin_box()
     ui->occurrence->setMaximum(16777215);
     ui->occurrence->setValue(1);
     ui->horizontalLayout_3->addWidget(ui->occurrence);
+}
+
+//---------------------------------------------------------------------------
+void XsltRuleEdit::check_editor_is_possible(XsltRule* r)
+{
+    if (!r->use_free_text)
+    {
+        ui->editorSelector->setEnabled(true);
+        return;
+    }
+
+    XsltPolicy p;
+    XsltRule* rule = new XsltRule(*r);
+    rule->use_free_text = false;
+    if (!p.parse_test_for_rule(r->test, rule) || rule->use_free_text)
+        ui->editorSelector->setDisabled(true);
+    else
+        ui->editorSelector->setEnabled(true);
+
+    delete rule;
 }
 
 }

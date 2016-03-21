@@ -63,6 +63,7 @@ public:
 // Visual element
 //***************************************************************************
     void               rule_clicked(XsltRule *r);
+    void               check_editor_is_possible(XsltRule* r);
     void               fill_mode_frame_fields(XsltRule *r);
     void               fill_mode_frame_exists_fields(XsltRule *r);
     void               fill_mode_frame_is_true_fields(XsltRule *r);
@@ -80,7 +81,7 @@ public:
     QTextEdit         *get_freeText_text();
     QRadioButton      *get_freeTextSelector_radio();
     QRadioButton      *get_editorSelector_radio();
-    void               change_values_of_field_selector(bool is_free_text);
+    void               change_values_of_field_selector(bool is_free_text, const std::string);
 
 private:
     MainWindow *mainwindow;
