@@ -1048,11 +1048,16 @@ void Core::get_content_of_media_in_xml(std::string& report)
 }
 
 //---------------------------------------------------------------------------
-void Core::register_file_to_database(std::string& filename, const std::string& report, MediaConchLib::report report_kind)
+void Core::register_file_to_database(std::string& filename, const std::string& report,
+                                     MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfoList* curMI)
 {
     const std::string& time = get_last_modification_file(filename);
 
+    // Implementation
     register_report_xml_to_database(filename, time, report, report_kind);
+
+    //MI and MT
+    register_file_to_database(filename, curMI);
 }
 
 //---------------------------------------------------------------------------

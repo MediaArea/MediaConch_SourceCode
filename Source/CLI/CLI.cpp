@@ -130,7 +130,9 @@ namespace MediaConch
                 //TODO: PROBLEM
                 return ready;
 
-            if (report_kind != MediaConchLib::report_MediaConch && report_kind != MediaConchLib::report_Max && files.size() == 1)
+            if (report_set[MediaConchLib::report_MediaConch] &&
+                report_kind > MediaConchLib::report_MediaTrace && report_kind != MediaConchLib::report_Max &&
+                files.size() == 1)
             {
                 set_report_reset();
                 report_set.set(report_kind);

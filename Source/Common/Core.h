@@ -120,7 +120,7 @@ public:
     void load_database();
     bool database_is_enabled() const;
     void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
-    void register_file_to_database(std::string& file, const std::string& report, MediaConchLib::report report_kind);
+    void register_file_to_database(std::string& file, const std::string& report, MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfoList* curMI);
     void create_report_mi_xml(const std::vector<std::string>& filename, std::string& report);
     void create_report_mt_xml(const std::vector<std::string>& filename, std::string& report);
     void create_report_ma_xml(const std::vector<std::string>& files, const std::map<std::string, std::string>& options, std::string& report, bitset<MediaConchLib::report_Max> reports);

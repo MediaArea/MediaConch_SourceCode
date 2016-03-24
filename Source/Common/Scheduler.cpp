@@ -174,7 +174,7 @@ namespace MediaConch {
             plugins[format_str]->run(error);
             const std::string& report = plugins[format_str]->get_report();
             MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
-            core->register_file_to_database(el->filename, report, report_kind);
+            core->register_file_to_database(el->filename, report, report_kind, MI);
         }
         else
             return 1;
