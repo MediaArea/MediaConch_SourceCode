@@ -29,7 +29,12 @@ mediaconch_SOURCES = \
     ../../../Source/Common/Http.cpp \
     ../../../Source/Common/LibEventHttp.cpp \
     ../../../Source/Common/Queue.cpp \
-    ../../../Source/Common/Scheduler.cpp
+    ../../../Source/Common/Scheduler.cpp \
+    ../../../Source/Common/PluginsConfig.cpp \
+    ../../../Source/Common/PluginsManager.cpp \
+    ../../../Source/Common/Plugin.cpp \
+    ../../../Source/Common/VeraPDF.cpp \
+    ../../../Source/Common/DpfManager.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)

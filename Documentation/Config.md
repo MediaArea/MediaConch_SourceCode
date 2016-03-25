@@ -26,7 +26,7 @@ It should be an array of entries with each entry corresponding to the option wan
 * **Scheduler\_Max\_Threads**: give the number of cores which process files.
 * **UI\_Poll\_Request**: set the value of the timer to refresh the UI in millisecond, default is 5000. It must be more than 500 and less than 10000.
 * **UI\_Database\_Path**: give the path where the database for the GUI is, default is the data application path.
-
+* **Plugins**: refers to the plugins section, see Plugins.md.
 
 #### Example
 
@@ -34,7 +34,8 @@ It should be an array of entries with each entry corresponding to the option wan
 [
     {"Use_Daemon": false}, # Do not use the daemon
     {"SQLite_Path": "/tmp"}, # Put the Database into the /tmp directory
-    {"Scheduler_Max_Threads": 2} # Use 2 cores to analyze files
+    {"Scheduler_Max_Threads": 2}, # Use 2 cores to analyze files
+    {"Plugins": []} # No plugins registered
 ]
 ```
 

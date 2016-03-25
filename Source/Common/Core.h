@@ -44,6 +44,8 @@ namespace MediaConch {
 
 class Schema;
 class Database;
+class PluginsManager;
+class Plugin;
 
 //***************************************************************************
 // Class Core
@@ -62,7 +64,7 @@ public:
 
 
 //---------------------------------------------------------------------------
-    bool        is_done(const std::string& file, double& percent_done);
+    bool        is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
     int         open_file(const std::string& filename, bool& registered, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
     int         get_report(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
@@ -99,6 +101,8 @@ public:
     void load_configuration();
     void set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
+    void load_plugins_configuration();
+    void set_plugins_configuration_file(const std::string& file);
     void set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void create_default_implementation_schema();
@@ -107,6 +111,7 @@ public:
     void set_compression_mode(MediaConchLib::compression compress);
     int get_ui_poll_request() const;
     int get_ui_database_path(std::string& path) const;
+    const std::map<std::string, Plugin*>& get_format_plugins() const;
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
@@ -115,9 +120,12 @@ public:
     void load_database();
     bool database_is_enabled() const;
     void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
+    void register_file_to_database(std::string& file, const std::string& report, MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfoList* curMI);
     void create_report_mi_xml(const std::vector<std::string>& filename, std::string& report);
     void create_report_mt_xml(const std::vector<std::string>& filename, std::string& report);
     void create_report_ma_xml(const std::vector<std::string>& files, const std::map<std::string, std::string>& options, std::string& report, bitset<MediaConchLib::report_Max> reports);
+    void create_report_verapdf_xml(const std::vector<std::string>& files, std::string& report);
+    void create_report_dpfmanager_xml(const std::vector<std::string>& files, std::string& report);
 
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
@@ -135,9 +143,11 @@ private:
     static const std::string           database_name;
     Configuration*                     config;
     std::string                        configuration_file;
+    std::string                        plugins_configuration_file;
     std::map<std::string, std::string> implementation_options;
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
+    PluginsManager                    *pluginsManager;
     MediaConchLib::compression         compression_mode;
 
     bool policies_check_contents(const std::vector<std::string>& files,
@@ -149,6 +159,8 @@ private:
                               const std::vector<std::string>& policies_names,
                               std::stringstream& Out);
     bool policy_is_valid(const std::string& report);
+    bool verapdf_report_is_valid(const std::string& report);
+    bool dpfmanager_report_is_valid(const std::string& report);
 
     //Helper
     bool validation(const std::vector<std::string>& files, Schema* S, std::string& report);
@@ -177,8 +189,13 @@ private:
                             std::bitset<MediaConchLib::report_Max> report_set,
                             MediaConchLib::ReportRes* result);
     bool get_implementation_report(const std::vector<std::string>& file, const std::map<std::string, std::string>& options, std::string& report);
+    bool get_verapdf_report(const std::string& file, std::string& report);
+    bool get_dpfmanager_report(const std::string& file, std::string& report);
 
     void register_file_to_database(std::string& file);
+    void register_report_xml_to_database(std::string& file, const std::string& time,
+                                         const std::string& report,
+                                         MediaConchLib::report report_kind);
     void register_report_mediainfo_text_to_database(std::string& file, const std::string& time,
                                                     MediaInfoNameSpace::MediaInfoList* MI);
     void register_report_mediainfo_xml_to_database(std::string& file, const std::string& time,

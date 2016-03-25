@@ -42,13 +42,19 @@ public:
     virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& filename, const std::string& file_last_modification,
                             const std::string& report, MediaConchLib::compression);
+    virtual int update_report(MediaConchLib::report reportKind, MediaConchLib::format format,
+                              const std::string& filename, const std::string& file_last_modification,
+                              const std::string& report, MediaConchLib::compression);
     virtual int remove_report(const std::string& filename);
     virtual void get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& filename, const std::string& file_last_modification,
                             std::string& report, MediaConchLib::compression&);
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& filename, const std::string& file_last_modification);
+    virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
+                                    const std::string& filename);
     virtual void get_elements(std::vector<std::string>& vec);
+    virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind);
 
     // UI
     virtual int create_ui_table();
@@ -73,8 +79,16 @@ private:
     sqlite3      *db;
     sqlite3_stmt *stmt; // Statement handler
 
+    int           report_version;
+    int           ui_version;
+
+    static int    current_report_version;
+    static int    current_ui_version;
+
     // Helper
     int std_string_to_int(const std::string& str);
+    int get_db_version(int& version);
+    int set_db_version(int version);
 
     SQLLite (const SQLLite&);
     SQLLite& operator=(const SQLLite&);

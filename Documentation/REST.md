@@ -8,6 +8,12 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.3
+
+* Add verbosity in report request
+* Add tool in status ok
+* Add VERAPDF and DPFMANAGER report kinds
+
 #### Version 1.2
 
 * Add the List command
@@ -90,6 +96,7 @@ Parameters:
 - id:                Integer: id given by the request
 - finished:          Boolean: if the file is finished to be analyzed
 - done:              Double: Percent done by the analysis
+- tool:              REPORT: give the report tool used to analyze, when it is finished, optionnal (Default is IMPLEMENTATION) (since API v1.3)
 
 * nok:               Array of invalid arguments
 
@@ -113,6 +120,7 @@ Parameters:
 - policies_names:    Array of policies names (Strings)
 - display_content:   String:  display content
 - display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE)
+- verbosity:         Integer: verbosity of the implementation report wanted, optionnal. Value between -1 and 5. If -1 or not given, takes the one from the server (since API v1.3)
 
 ##### Response
 
@@ -245,6 +253,8 @@ Parameter:
 * IMPLEMENTATION: 2
 * MEDIAINFO:      3
 * MEDIATRACE:     4
+* VERAPDF:        5
+* DPFMANAGER:     6
 
 #### Error reason
 

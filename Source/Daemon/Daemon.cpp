@@ -179,6 +179,11 @@ namespace MediaConch
             last_argument="--configuration=";
             return DAEMON_RETURN_NONE;
         }
+        if (argument=="-pc")
+        {
+            last_argument="--pluginsconfiguration=";
+            return DAEMON_RETURN_NONE;
+        }
         if (argument=="-i")
         {
             last_argument = "--implementationschema=";
@@ -204,6 +209,7 @@ namespace MediaConch
         OPTION("--version",                 version)
         OPTION("--fork",                    fork)
         OPTION("--configuration",           configuration)
+        OPTION("--pluginsconfiguration",    plugins_configuration)
         OPTION("--compression",             compression)
         OPTION("--implementationschema",    implementationschema)
         OPTION("--implementationverbosity", implementationverbosity)
@@ -256,6 +262,21 @@ namespace MediaConch
 
         std::string file = argument.substr(equal_pos + 1);
         MCL->set_configuration_file(file);
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_plugins_configuration(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string file = argument.substr(equal_pos + 1);
+        MCL->set_plugins_configuration_file(file);
         return DAEMON_RETURN_NONE;
     }
 
@@ -468,13 +489,39 @@ namespace MediaConch
                 continue;
             }
 
-            RESTAPI::Status_Ok *ok = new RESTAPI::Status_Ok;
+            MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
-            ok->id = id;
-            ok->finished = is_done;
-            if (!is_done)
+            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+
+            if (is_done < 0)
             {
+                RESTAPI::Status_Nok *nok = new RESTAPI::Status_Nok;
+                nok->id = id;
+                nok->error = RESTAPI::NO_REASON;
+                res.nok.push_back(nok);
+                continue;
+            }
+            RESTAPI::Status_Ok *ok = new RESTAPI::Status_Ok;
+
+            ok->id = id;
+            if (is_done == MediaConchLib::errorHttp_TRUE)
+            {
+                ok->finished = true;
+                ok->has_tool = false;
+                if (report_kind == MediaConchLib::report_MediaVeraPdf)
+                {
+                    ok->has_tool = true;
+                    ok->tool = RESTAPI::VERAPDF;
+                }
+                else if (report_kind == MediaConchLib::report_MediaDpfManager)
+                {
+                    ok->has_tool = true;
+                    ok->tool = RESTAPI::DPFMANAGER;
+                }
+            }
+            else
+            {
+                ok->finished = false;
                 ok->has_percent = true;
                 ok->done = percent_done;
             }
@@ -521,6 +568,10 @@ namespace MediaConch
                 report_set.set(MediaConchLib::report_MediaConch);
             if (req->reports[j] == RESTAPI::POLICY)
                 has_policy = true;
+            if (req->reports[j] == RESTAPI::VERAPDF)
+                report_set.set(MediaConchLib::report_MediaVeraPdf);
+            if (req->reports[j] == RESTAPI::DPFMANAGER)
+                report_set.set(MediaConchLib::report_MediaDpfManager);
         }
 
         if (!report_set.count() && !has_policy)
@@ -541,9 +592,10 @@ namespace MediaConch
                 continue;
             }
 
+            MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
-            if (!is_done)
+            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+            if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Report_Nok *nok = new RESTAPI::Report_Nok;
                 nok->id = id;
@@ -700,6 +752,10 @@ namespace MediaConch
         MediaConchLib::report report;
         if (req->report == RESTAPI::IMPLEMENTATION)
             report = MediaConchLib::report_MediaConch;
+        else if (req->report == RESTAPI::VERAPDF)
+            report = MediaConchLib::report_MediaVeraPdf;
+        else if (req->report == RESTAPI::DPFMANAGER)
+            report = MediaConchLib::report_MediaDpfManager;
         else if (req->report != RESTAPI::POLICY)
             return -1;
         else
@@ -719,9 +775,10 @@ namespace MediaConch
                 continue;
             }
 
+            MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
-            if (!is_done)
+            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+            if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Validate_Nok *nok = new RESTAPI::Validate_Nok;
                 nok->id = id;

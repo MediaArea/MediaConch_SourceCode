@@ -51,7 +51,7 @@ public:
     int analyze(const std::string& file, bool& registered, bool force_analyze);
 
     // Status
-    int is_done(const std::string& file, double& done);
+    int is_done(const std::string& file, double& done, MediaConchLib::report& report_kind);
 
     // Report
     int get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,

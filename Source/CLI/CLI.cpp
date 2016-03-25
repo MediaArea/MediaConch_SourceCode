@@ -68,6 +68,7 @@ namespace MediaConch
         }
 
         MCL.set_configuration_file(configuration_file);
+        MCL.set_plugins_configuration_file(plugins_configuration_file);
         MCL.init();
         use_daemon = MCL.get_use_daemon();
         return 0;
@@ -104,6 +105,8 @@ namespace MediaConch
     int CLI::run()
     {
         std::vector<std::string> file_to_report;
+        MediaConchLib::report report_kind;
+
         for (size_t i = 0; i < files.size(); ++i)
         {
             bool registered = false;
@@ -120,12 +123,20 @@ namespace MediaConch
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
             }
 
-            int ready = is_ready(i);
+            int ready = is_ready(i, report_kind);
             if (ready == MediaConchLib::errorHttp_NONE)
                 continue;
             else if (ready < 0)
                 //TODO: PROBLEM
                 return ready;
+
+            if (report_set[MediaConchLib::report_MediaConch] &&
+                report_kind > MediaConchLib::report_MediaTrace && report_kind != MediaConchLib::report_Max &&
+                files.size() == 1)
+            {
+                set_report_reset();
+                report_set.set(report_kind);
+            }
             file_to_report.push_back(files[i]);
         }
 
@@ -212,6 +223,12 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    void CLI::set_plugins_configuration_file(const std::string& file)
+    {
+        plugins_configuration_file = file;
+    }
+
+    //--------------------------------------------------------------------------
     void CLI::set_implementation_schema_file(const std::string& file)
     {
         MCL.set_implementation_schema_file(file);
@@ -255,13 +272,11 @@ namespace MediaConch
     }
     
     //--------------------------------------------------------------------------
-    int CLI::is_ready(size_t i)
+    int CLI::is_ready(size_t i, MediaConchLib::report& report_kind)
     {
-        std::vector<std::string> vec;
-        vec.push_back(files[i]);
         double percent_done = 0;
 
-        int ret = MCL.is_done(files[i], percent_done);
+        int ret = MCL.is_done(files[i], percent_done, report_kind);
         if (use_daemon && asynchronous)
         {
             if (ret == MediaConchLib::errorHttp_NONE)
@@ -282,9 +297,9 @@ namespace MediaConch
                 #ifdef WINDOWS
                 ::Sleep((DWORD)5);
                 #else
-                usleep(5000);
+                usleep(500000);
                 #endif
-                ret = MCL.is_done(files[i], percent_done);
+                ret = MCL.is_done(files[i], percent_done, report_kind);
             }
         }
         return MediaConchLib::errorHttp_TRUE;

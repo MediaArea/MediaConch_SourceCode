@@ -21,6 +21,8 @@
 #include "Common/Schematron.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
+#include "Common/PluginsManager.h"
+#include "Common/PluginsConfig.h"
 #include "Common/ImplementationReportXsl.h"
 #if defined(_WIN32) || defined(WIN32)
 #include "Common/ImplementationReportDisplayTextXsl.h"
@@ -77,6 +79,7 @@ Core::Core() : policies(this)
     config = NULL;
     db = NULL;
     scheduler = new Scheduler(this);
+    pluginsManager = new PluginsManager(this);
     policies.create_values_from_csv();
     compression_mode = MediaConchLib::compression_ZLib;
 }
@@ -85,6 +88,8 @@ Core::~Core()
 {
     if (scheduler)
         delete scheduler;
+    if (pluginsManager)
+        delete pluginsManager;
     if (db)
         delete db;
     delete MI;
@@ -127,6 +132,22 @@ void Core::load_configuration()
             scheduler_max_threads = 1;
         scheduler->set_max_threads((size_t)scheduler_max_threads);
     }
+
+    std::vector<Container::Value> plugins;
+    if (!config->get("Plugins", plugins))
+    {
+        std::string error;
+        PluginsConfig pc(pluginsManager);
+        pc.parse_struct(plugins, error);
+    }
+}
+
+//---------------------------------------------------------------------------
+void Core::load_plugins_configuration()
+{
+    std::string error;
+    PluginsConfig pc(pluginsManager);
+    pc.load_file(plugins_configuration_file, error);
 }
 
 //---------------------------------------------------------------------------
@@ -244,6 +265,12 @@ int Core::get_ui_database_path(std::string& path) const
     return config->get("UI_Database_Path", path);
 }
 
+//---------------------------------------------------------------------------
+const std::map<std::string, Plugin*>& Core::get_format_plugins() const
+{
+    return pluginsManager->get_format_plugins();
+}
+
 //***************************************************************************
 // Tools
 //***************************************************************************
@@ -270,9 +297,21 @@ int Core::open_file(const std::string& file, bool& registered, bool force_analyz
 }
 
 //---------------------------------------------------------------------------
-bool Core::is_done(const std::string& file, double& percent_done)
+bool Core::is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
 {
-    return scheduler->element_is_finished(file, percent_done);
+    bool is_done = scheduler->element_is_finished(file, percent_done);
+    int ret = MediaConchLib::errorHttp_NONE;
+
+    if (is_done)
+    {
+        report_kind = MediaConchLib::report_MediaConch;
+        ret = MediaConchLib::errorHttp_TRUE;
+
+        db_mutex.Enter();
+        get_db()->get_element_report_kind(file, report_kind);
+        db_mutex.Leave();
+    }
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -336,7 +375,8 @@ int Core::validate(MediaConchLib::report report, const std::vector<std::string>&
                    const std::vector<std::string>& policies_contents,
                    std::vector<MediaConchLib::ValidateRes*>& result)
 {
-    if (report != MediaConchLib::report_MediaConch && !policies_names.size() && !policies_contents.size())
+    if (report != MediaConchLib::report_MediaConch && !policies_names.size() && !policies_contents.size() &&
+        report != MediaConchLib::report_MediaVeraPdf && report != MediaConchLib::report_MediaDpfManager)
         return -1;
 
     std::vector<std::string> file_tmp;
@@ -353,6 +393,16 @@ int Core::validate(MediaConchLib::report report, const std::vector<std::string>&
             std::map<std::string, std::string> options;
             std::string report;
             res->valid = get_implementation_report(file_tmp, options, report);
+        }
+        else if (report == MediaConchLib::report_MediaVeraPdf)
+        {
+            std::string report;
+            res->valid = get_verapdf_report(files[i], report);
+        }
+        else if (report == MediaConchLib::report_MediaDpfManager)
+        {
+            std::string report;
+            res->valid = get_dpfmanager_report(files[i], report);
         }
         else if (!policies_names.empty() || !policies_contents.empty())
         {
@@ -909,6 +959,20 @@ std::string Core::get_last_modification_file(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
+void Core::register_report_xml_to_database(std::string& file, const std::string& time,
+                                           const std::string& report,
+                                           MediaConchLib::report report_kind)
+{
+    MediaConchLib::compression mode = compression_mode;
+    std::string new_report(report);
+    compress_report(new_report, mode);
+
+    db_mutex.Enter();
+    db->save_report(report_kind, MediaConchLib::format_Xml, file, time, new_report, mode);
+    db_mutex.Leave();
+}
+
+//---------------------------------------------------------------------------
 void Core::register_report_mediainfo_text_to_database(std::string& file, const std::string& time,
                                                       MediaInfoNameSpace::MediaInfoList* curMI)
 {
@@ -981,6 +1045,19 @@ void Core::get_content_of_media_in_xml(std::string& report)
     }
 
     report = report.substr(start + media_start.length(), end - start - media_start.length());
+}
+
+//---------------------------------------------------------------------------
+void Core::register_file_to_database(std::string& filename, const std::string& report,
+                                     MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfoList* curMI)
+{
+    const std::string& time = get_last_modification_file(filename);
+
+    // Implementation
+    register_report_xml_to_database(filename, time, report, report_kind);
+
+    //MI and MT
+    register_file_to_database(filename, curMI);
 }
 
 //---------------------------------------------------------------------------
@@ -1166,6 +1243,28 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
+void Core::create_report_verapdf_xml(const std::vector<std::string>& files, std::string& report)
+{
+    if (files.size() == 1)
+    {
+        get_report_saved(files, MediaConchLib::report_MediaVeraPdf, MediaConchLib::format_Xml, report);
+        return;
+    }
+    report = "Not implemented";
+}
+
+//---------------------------------------------------------------------------
+void Core::create_report_dpfmanager_xml(const std::vector<std::string>& files, std::string& report)
+{
+    if (files.size() == 1)
+    {
+        get_report_saved(files, MediaConchLib::report_MediaDpfManager, MediaConchLib::format_Xml, report);
+        return;
+    }
+    report = "Not implemented";
+}
+
+//---------------------------------------------------------------------------
 void Core::get_report_saved(const std::vector<std::string>& files,
                             MediaConchLib::report reportKind, MediaConchLib::format f,
                             std::string& report)
@@ -1177,7 +1276,8 @@ void Core::get_report_saved(const std::vector<std::string>& files,
         return;
     }
 
-    if (reportKind != MediaConchLib::report_MediaInfo && reportKind != MediaConchLib::report_MediaTrace)
+    if (reportKind != MediaConchLib::report_MediaInfo && reportKind != MediaConchLib::report_MediaTrace
+        && reportKind != MediaConchLib::report_MediaVeraPdf && reportKind != MediaConchLib::report_MediaDpfManager)
         return;
 
     if (!get_db())
@@ -1268,6 +1368,20 @@ void Core::get_reports_output(const std::vector<std::string>& files,
                 result->valid = false;
             result->report += "\r\n";
         }
+
+        if (report_set[MediaConchLib::report_MediaVeraPdf])
+        {
+            if (f == MediaConchLib::format_Xml)
+                create_report_verapdf_xml(files, result->report);
+            result->report += "\r\n";
+        }
+
+        if (report_set[MediaConchLib::report_MediaDpfManager])
+        {
+            if (f == MediaConchLib::format_Xml)
+                create_report_dpfmanager_xml(files, result->report);
+            result->report += "\r\n";
+        }
     }
 }
 
@@ -1284,6 +1398,30 @@ bool Core::get_implementation_report(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
+bool Core::get_verapdf_report(const std::string& file, std::string& report)
+{
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    get_report_saved(files, MediaConchLib::report_MediaVeraPdf, MediaConchLib::format_Xml,
+                     report);
+
+    return verapdf_report_is_valid(report);
+}
+
+//---------------------------------------------------------------------------
+bool Core::get_dpfmanager_report(const std::string& file, std::string& report)
+{
+    std::vector<std::string> files;
+    files.push_back(file);
+
+    get_report_saved(files, MediaConchLib::report_MediaDpfManager, MediaConchLib::format_Xml,
+                     report);
+
+    return dpfmanager_report_is_valid(report);
+}
+
+//---------------------------------------------------------------------------
 bool Core::file_is_registered_in_db(const std::string& filename)
 {
     if (!get_db())
@@ -1294,6 +1432,15 @@ bool Core::file_is_registered_in_db(const std::string& filename)
     db_mutex.Enter();
     bool res = db->file_is_registered(MediaConchLib::report_MediaInfo,
                                       MediaConchLib::format_Xml, filename, time);
+
+    if (!res)
+    {
+        MediaConchLib::report report_kind;
+        db->get_element_report_kind(filename, report_kind);
+        if (report_kind != MediaConchLib::report_MediaConch)
+            res = db->file_is_registered(report_kind, MediaConchLib::format_Xml, filename, time);
+    }
+
     db_mutex.Leave();
     return res;
 }
@@ -1446,6 +1593,12 @@ const std::string& Core::get_configuration_file() const
 }
 
 //---------------------------------------------------------------------------
+void Core::set_plugins_configuration_file(const std::string& file)
+{
+    plugins_configuration_file = file;
+}
+
+//---------------------------------------------------------------------------
 bool Core::database_is_enabled() const
 {
     if (!config)
@@ -1511,6 +1664,24 @@ void Core::get_daemon_address(std::string& addr, int& port) const
 bool Core::policy_is_valid(const std::string& report)
 {
     size_t pos = report.find(" outcome=\"fail\"");
+    if (pos != std::string::npos)
+        return false;
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool Core::verapdf_report_is_valid(const std::string& report)
+{
+    size_t pos = report.find(" isCompliant=\"false\"");
+    if (pos != std::string::npos)
+        return false;
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool Core::dpfmanager_report_is_valid(const std::string& report)
+{
+    size_t pos = report.find("<invalid_files>1</invalid_files>");
     if (pos != std::string::npos)
         return false;
     return true;

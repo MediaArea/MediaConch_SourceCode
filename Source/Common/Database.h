@@ -47,6 +47,7 @@ public:
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& file, const std::string& file_last_modification) = 0;
     virtual void get_elements(std::vector<std::string>& vec) = 0;
+    virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind) = 0;
 
     void        set_database_directory(const std::string& dirname);
     void        set_database_filename(const std::string& name);
@@ -78,9 +79,9 @@ protected:
     //Database dependant
     virtual int execute() = 0;
     void        get_sql_query_for_create_report_table(std::string& q);
-    void        get_sql_query_for_update_report_table(std::string& q);
+    void        get_sql_query_for_update_report_table_v0(std::string& q);
     void        get_sql_query_for_create_ui_table(std::string& q);
-    void        get_sql_query_for_update_ui_table(std::string& q);
+    void        get_sql_query_for_update_ui_table_v0(std::string& q);
 
 private:
     Database (const Database&);

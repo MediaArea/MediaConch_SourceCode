@@ -47,6 +47,11 @@ bool Separator = false;
 
 static bool wait_for_another_argument(std::string& argument)
 {
+    if (argument=="-pc")
+    {
+        Last_Argument = "--pluginsconfiguration=";
+        return true;
+    }
     if (argument=="-p")
     {
         Last_Argument = "--policy=";
@@ -167,6 +172,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
     OPTION("--async",                                       Asynchronous)
+    OPTION("--pluginsconfiguration",                        PluginsConfiguration)
     //Default
     OPTION("--",                                            Default)
     else
@@ -380,6 +386,23 @@ CL_OPTION(Asynchronous)
         is_async = true;
 
     cli->set_asynchronous(is_async);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(PluginsConfiguration)
+{
+    //Form : --PluginsConfiguration=File
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string file;
+    file.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_plugins_configuration_file(file);
     return CLI_RETURN_NONE;
 }
 

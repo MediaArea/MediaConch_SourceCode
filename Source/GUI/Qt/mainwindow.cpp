@@ -945,9 +945,9 @@ int MainWindow::is_analyze_finished(const std::vector<std::string>& files, doubl
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::is_analyze_finished(const std::string& file, double& percent_done)
+int MainWindow::is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
 {
-    return MCL.is_done(file, percent_done);
+    return MCL.is_done(file, percent_done, report_kind);
 }
 
 //---------------------------------------------------------------------------
@@ -1091,7 +1091,7 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
     fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
 
     std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaConch);
+    report_set.set(fr->report_kind);
 
     std::vector<std::string> files;
     files.push_back(file);
@@ -1191,6 +1191,14 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
                                    const std::string*& dname, const std::string*& dcontent,
                                    FileRegistered* fr)
 {
+    if (fr && (fr->report_kind == MediaConchLib::report_MediaVeraPdf ||
+               fr->report_kind == MediaConchLib::report_MediaDpfManager))
+    {
+        dname = NULL;
+        dcontent = NULL;
+        return;
+    }
+
     if (display_p)
     {
         if (*display_p >= 0 && (size_t)*display_p < displays_list.size())
