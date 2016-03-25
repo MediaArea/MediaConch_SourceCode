@@ -17,34 +17,34 @@
         text-align: center;
       }
 
-      #mc_implementation {
+      .mc_implementation {
         width   : 600px;
         background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
-      #mc_implementation h1  {
+      .mc_implementation h1  {
         background-color: #64A8DD;
       }
 
-      #mc_implementation table {
+      .mc_implementation table {
         border: 1px black solid;
         width   : 600px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
-      #mc_implementation th {
+      .mc_implementation th {
         border-bottom: 1px black solid;
         text-align:left;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
-      #mc_implementation td .reason {
+      .mc_implementation td .reason {
         border-bottom: thin solid black;
         padding-top: 8px;
       }
 
-      #mc_implementation p {
+      .mc_implementation p {
         background-color: #64A8DD;
         font-size: 18px;
         font-weight: 700;
@@ -104,7 +104,7 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
-        <table id="mc_implementation">
+        <table class="mc_implementation">
             <xsl:for-each select="mc:check">
               <tr>
                 <td>
