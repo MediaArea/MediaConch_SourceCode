@@ -105,7 +105,14 @@ namespace MediaConch {
         exec_params.push_back(config_file);
 
         std::string file(filename);
-        //unified_string(file);
+#if !defined(_WIN32)
+        char *path = realpath(filename.c_str(), NULL);
+        if (path)
+        {
+            file = std::string(path);
+            free(path);
+        }
+#endif //!_WIN32
         exec_params.push_back(file);
 
         report.clear();
