@@ -79,6 +79,7 @@ public:
     struct validatorType
     {
         std::string value;
+        std::string name;
         std::string pretty_name;
     };
 
