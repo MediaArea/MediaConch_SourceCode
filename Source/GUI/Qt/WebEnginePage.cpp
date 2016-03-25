@@ -97,6 +97,8 @@ namespace MediaConch
             report = Qt::escape(report);
 #endif
             report = report.replace("\n", "<br/>");
+            report = report.replace("\\", "\\\\");
+            report = report.replace(" ", "&nbsp;");
             script += QString(".html('%1');").arg(report);
         }
         runJavaScript(script);
@@ -131,6 +133,7 @@ namespace MediaConch
 #endif
             report = report.replace("\n", "<br/>");
             report = report.replace("'", "\\'");
+            report = report.replace("\\", "\\\\");
             script += QString(".html('%1');").arg(report);
         }
         runJavaScript(script);
