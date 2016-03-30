@@ -98,9 +98,9 @@
 
 <p>A MediaConch XML can be generated using the following tools and associated commands:</p>
 
-<p>-With MediaConch (CLI): <code>mediaconch -mi -fx file.mov</code></p>
+<p>-With MediaConch (CLI): <code>mediaconch -mc -fx file.mov</code></p>
 
-<p>Note: The command mediaconch <code>-fx file.mov</code>will automatically default to <code>-mc</code>and produce equivalent results.</p>
+<p>Note: The command <code>mediaconch -fx file.mov</code> will automatically default to <code>-mc</code> and produce equivalent results.</p>
 
 <p>-With MediaConch (GUI): Select View Mode in the <code>Policy Report</code> tab from the resulting file Checker reports</p>
 
@@ -110,7 +110,7 @@
 
 <h3><a name="structure-of-a-mediatrace-xml">Structure of a MediaTrace XML</a></h3>
 
-<p>The root element of the MediaTrace XML exists as <MediaTrace>. This root element contains a <code>&lt;creatingLibrary&gt;</code> sub-element denoting the version of MediaInfo’s library used in generating the trace report:</p>
+<p>The root element of the MediaTrace XML exists as <code>&lt;MediaTrace&gt;</code>. This root element contains a <code>&lt;creatingLibrary&gt;</code> sub-element denoting the version of MediaInfo’s library used in generating the trace report:</p>
 
 <pre><code>    &lt;MediaTrace
     xmlns="https://mediaarea.net/mediatrace"
