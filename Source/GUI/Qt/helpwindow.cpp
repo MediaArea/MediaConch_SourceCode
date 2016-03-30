@@ -41,8 +41,8 @@ Help::Help(QWidget *parent) : QDialog(parent)
     QTextBrowser* Text1=new QTextBrowser(this);
     Text1->setReadOnly(true);
     Text1->setOpenExternalLinks(true);
-    Text1->setSource(QUrl("qrc:/Help/Getting Started/Getting Started.html"));
-    Central->addTab(Text1, tr("Getting Started"));
+    Text1->setSource(QUrl("qrc:/Help/FAQ/FAQ.html"));
+    Central->addTab(Text1, tr("FAQ"));
 
     QTextBrowser* Text2=new QTextBrowser(this);
     Text2->setReadOnly(true);

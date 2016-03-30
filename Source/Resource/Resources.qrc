@@ -53,7 +53,7 @@
     <qresource prefix="/Help">
         <file alias="/About/About.html">../../License.html</file>
         <file alias="/Data Format/Data Format.html">html/Help/Data Format/Data Format.html</file>
-        <file alias="/Getting Started/Getting Started.html">html/Help/Getting Started/Getting Started.html</file>
+        <file alias="/FAQ/FAQ.html">html/Help/FAQ/FAQ.html</file>
         <file alias="/How To Use/How To Use.html">html/Help/How To Use/How To Use.html</file>
     </qresource>
 </RCC>
