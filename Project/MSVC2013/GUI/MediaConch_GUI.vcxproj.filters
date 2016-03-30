@@ -37,6 +37,12 @@
     <Filter Include="ThirdParty\sqlite">
       <UniqueIdentifier>{92bd129a-a825-4860-8967-4c4af26d195b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\HTML">
+      <UniqueIdentifier>{baf09673-486b-4234-9ffe-987d6b99e130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\UI">
+      <UniqueIdentifier>{7ec6a6e9-679b-49f4-bf60-6d1a8f2b2209}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MediaConch_GUI.rc">
@@ -287,6 +293,27 @@
     <ClCompile Include="_Automated\moc_workerfiles.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\PluginsManager.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\VeraPDF.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\DpfManager.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Plugin.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\PluginsConfig.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_verbosityspinbox.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\verbosityspinbox.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -430,43 +457,79 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\workerfiles.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Plugin.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\PluginFormat.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\PluginsConfig.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\PluginsManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\VeraPDF.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\DpfManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="_Automated\ui_verbosityspinbox.h">
+      <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\verbosityspinbox.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
-      <Filter>Resource Files</Filter>
+    <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html">
+      <Filter>Resource Files\HTML</Filter>
     </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
-      <Filter>Resource Files</Filter>
+    <Xml Include="..\..\..\License.html">
+      <Filter>Resource Files\HTML</Filter>
     </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\mainwindow.ui">
-      <Filter>Resource Files</Filter>
+    <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html">
+      <Filter>Resource Files\HTML</Filter>
     </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policiesmenu.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policiestree.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policymenu.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\progressbar.ui">
-      <Filter>Resource Files</Filter>
+    <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html">
+      <Filter>Resource Files\HTML</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\Resource\Resources.qrc">
       <Filter>Resource Files</Filter>
     </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\xsltruleedit.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\mainwindow.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policiesmenu.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policiestree.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policymenu.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\progressbar.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\ruleedit.ui">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\rulemenu.ui">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\xsltruleedit.ui">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\UI</Filter>
     </Xml>
   </ItemGroup>
 </Project>
