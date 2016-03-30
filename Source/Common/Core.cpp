@@ -931,7 +931,7 @@ int Core::uncompress_report(std::string& report, MediaConchLib::compression comp
                     delete [] dst;
                     if (ret == Z_BUF_ERROR)
                     {
-                        dst_len += 4096;
+                        dst_len <<= 1;
                         continue;
                     }
                     return -1;
