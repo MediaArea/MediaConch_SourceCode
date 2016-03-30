@@ -464,10 +464,10 @@ void SchematronWindow::edit_policy_title()
     QString qtitle = policyMenu->get_title_line()->text();
     if (!qtitle.length())
     {
-        policieswindow->get_error_bar()->showMessage(QString("Policy must have a title"));
+        policieswindow->set_message_to_status_bar("Policy must have a title");
         return;
     }
-    policieswindow->get_error_bar()->clearMessage();
+    policieswindow->clear_message_in_status_bar();
 
     QTreeWidgetItem* item = policieswindow->get_item_in_tree();
     if (!item)
@@ -494,10 +494,10 @@ void SchematronWindow::edit_gor_title()
     QString qname = groupOfRules->get_title_line()->text();
     if (!qname.length())
     {
-        policieswindow->get_error_bar()->showMessage(QString("Group of rules must have a title"));
+        policieswindow->set_message_to_status_bar("Group of rules must have a title");
         return;
     }
-    policieswindow->get_error_bar()->clearMessage();
+    policieswindow->clear_message_in_status_bar();
 
     QTreeWidgetItem* item = policieswindow->get_item_in_tree();
     if (!item || !item->parent())
@@ -525,10 +525,10 @@ void SchematronWindow::edit_assert_name(QString new_name)
 {
     if (!new_name.length())
     {
-        policieswindow->get_error_bar()->showMessage(QString("Assert must have a name"));
+        policieswindow->set_message_to_status_bar("Assert must have a name");
         return;
     }
-    policieswindow->get_error_bar()->clearMessage();
+    policieswindow->clear_message_in_status_bar();
 
     QTreeWidgetItem* item = policieswindow->get_item_in_tree();
     if (!item || !item->parent())

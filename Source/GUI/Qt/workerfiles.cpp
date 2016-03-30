@@ -424,7 +424,7 @@ void WorkerFiles::load_database()
             error += errors[i];
         }
         QString msg = QString().fromStdString(error);
-        mainwindow->set_msg_error_to_status_bar(msg);
+        mainwindow->set_msg_to_status_bar(msg);
     }
 #endif
 

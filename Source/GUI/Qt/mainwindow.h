@@ -64,9 +64,7 @@ public:
 
     // UI
     void                        Ui_Init();
-    QStatusBar                 *get_status_bar();
     void                        set_msg_to_status_bar(const QString& message);
-    void                        set_msg_error_to_status_bar(const QString& message);
     void                        clear_msg_in_status_bar();
     void                        set_result_view();
 
@@ -150,7 +148,6 @@ private:
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
-    QLineEdit*                  status_msg;
     VerbositySpinbox*           verbosity;
 
     int                         clearVisualElements();
@@ -172,6 +169,8 @@ private:
 
 Q_SIGNALS:
     void setResultView();
+    void status_bar_clear_message();
+    void status_bar_show_message(const QString& message, int timeout);
 
 private Q_SLOTS:
     void on_actionOpen_triggered();
@@ -187,8 +186,6 @@ private Q_SLOTS:
     void on_actionResult_triggered();
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
-
-    void update_status_bar();
 
 public Q_SLOTS:
     //Help

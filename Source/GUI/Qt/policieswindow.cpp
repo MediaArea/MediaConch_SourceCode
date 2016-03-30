@@ -595,11 +595,19 @@ void PoliciesWindow::displayPoliciesMenu()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-QStatusBar* PoliciesWindow::get_error_bar()
+void PoliciesWindow::set_message_to_status_bar(const QString& message)
 {
     if (!mainwindow)
-        return NULL;
-    return mainwindow->get_status_bar();
+        return;
+    return mainwindow->set_msg_to_status_bar(message);
+}
+
+//---------------------------------------------------------------------------
+void PoliciesWindow::clear_message_in_status_bar()
+{
+    if (!mainwindow)
+        return;
+    return mainwindow->clear_msg_in_status_bar();
 }
 
 //---------------------------------------------------------------------------
