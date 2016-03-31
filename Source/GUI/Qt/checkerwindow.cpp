@@ -102,7 +102,7 @@ void CheckerWindow::createWebViewFinished(bool ok)
     if (!MainView || !ok)
     {
         create_web_view();
-        mainwindow->set_msg_error_to_status_bar("Problem to load the checker page");
+        mainwindow->set_msg_to_status_bar("Problem to load the checker page");
         return;
     }
 

@@ -56,8 +56,7 @@ namespace MediaConch {
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    workerfiles(this),
-    status_msg(NULL)
+    workerfiles(this)
 {
     ui->setupUi(this);
 
@@ -110,13 +109,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Status bar
     statusBar()->show();
-    status_msg = new QLineEdit(statusBar());
-    status_msg->setReadOnly(true);
-    statusBar()->addWidget(status_msg, 2);
     clear_msg_in_status_bar();
 
-    // Connect the signal 
+    // Connect the signal
     connect(this, SIGNAL(setResultView()), this, SLOT(on_actionResult_triggered()));
+    connect(this, SIGNAL(status_bar_show_message(const QString&, int)), statusBar(), SLOT(showMessage(const QString&, int)));
     workerfiles.fill_registered_files_from_db();
     workerfiles.start();
 }
@@ -130,8 +127,6 @@ MainWindow::~MainWindow()
     delete ui;
     if (checkerView)
         delete checkerView;
-    if (!status_msg)
-        delete status_msg;
 }
 
 //***************************************************************************
@@ -494,7 +489,7 @@ void MainWindow::on_actionChooseSchema_triggered()
 
     std::string err;
     if (MCL.import_policy_from_file(file.toStdString(), err) < 0)
-        set_msg_error_to_status_bar("Policy not valid");
+        set_msg_to_status_bar("Policy not valid");
 
     if (!ui->actionPolicies->isChecked())
         ui->actionPolicies->setChecked(true);
@@ -718,50 +713,12 @@ void MainWindow::createDisplayView()
 
 void MainWindow::set_msg_to_status_bar(const QString& message)
 {
-    if (!status_msg)
-        return;
-
-    statusBar()->clearMessage();
-    status_msg->setText(message);
-    QTimer::singleShot(5000, this, SLOT(update_status_bar()));
-}
-
-void MainWindow::set_msg_error_to_status_bar(const QString& message)
-{
-    if (!status_msg)
-        return;
-
-    statusBar()->clearMessage();
-
-    QPalette pal = status_msg->palette();
-    pal.setColor(QPalette::WindowText, Qt::red);
-    pal.setColor(QPalette::Text, Qt::red);
-    status_msg->setPalette(pal);
-    status_msg->setText(message);
-
-    QTimer::singleShot(5000, this, SLOT(update_status_bar()));
+    Q_EMIT status_bar_show_message(message, 5000);
 }
 
 void MainWindow::clear_msg_in_status_bar()
 {
-    if (!status_msg)
-        return;
-
-    statusBar()->clearMessage();
-    QPalette pal = status_msg->palette();
-    pal.setColor(QPalette::WindowText, Qt::black);
-    status_msg->setPalette(pal);
-    status_msg->setText(QString());
-}
-
-QStatusBar *MainWindow::get_status_bar()
-{
-    return statusBar();
-}
-
-void MainWindow::update_status_bar()
-{
-    clear_msg_in_status_bar();
+    Q_EMIT status_bar_clear_message();
 }
 
 //---------------------------------------------------------------------------
@@ -1245,7 +1202,7 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
             error_msg = "Error not known";
             break;
     }
-    set_msg_error_to_status_bar(error_msg);
+    set_msg_to_status_bar(error_msg);
 }
 
 //---------------------------------------------------------------------------

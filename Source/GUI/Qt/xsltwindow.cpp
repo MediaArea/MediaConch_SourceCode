@@ -25,7 +25,6 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QRadioButton>
-#include <QStatusBar>
 #include <QMessageBox>
 #include <QSpinBox>
 #if QT_VERSION >= 0x050000
@@ -247,10 +246,10 @@ void XsltWindow::edit_policy_title()
     QString qtitle = policyMenu->get_title_line()->text();
     if (!qtitle.length())
     {
-        policieswindow->get_error_bar()->showMessage(QString("Policy must have a title"));
+        policieswindow->set_message_to_status_bar("Policy must have a title");
         return;
     }
-    policieswindow->get_error_bar()->clearMessage();
+    policieswindow->clear_message_in_status_bar();
 
     QTreeWidgetItem* item = policieswindow->get_item_in_tree();
     if (!item)
@@ -375,10 +374,10 @@ void XsltWindow::edit_rule_name(QString new_name)
 {
     if (!new_name.length())
     {
-        policieswindow->get_error_bar()->showMessage(QString("Rule must have a name"));
+        policieswindow->set_message_to_status_bar("Rule must have a name");
         return;
     }
-    policieswindow->get_error_bar()->clearMessage();
+    policieswindow->clear_message_in_status_bar();
 
     QTreeWidgetItem* item = policieswindow->get_item_in_tree();
     if (!item || !item->parent())

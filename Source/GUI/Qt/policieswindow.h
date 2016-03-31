@@ -16,7 +16,6 @@
 #include <QString>
 
 class QVBoxLayout;
-class QStatusBar;
 class QLabel;
 class QTreeWidgetItem;
 class QFile;
@@ -55,7 +54,8 @@ public:
     void                        updatePoliciesTreeSchematronRule(SchematronRule *rule, QTreeWidgetItem *parent);
     void                        updatePoliciesTreeXsltRule(XsltRule* p, QTreeWidgetItem *parent);
     void                        removeTreeChildren(QTreeWidgetItem* item);
-    QStatusBar*                 get_error_bar();
+    void                        set_message_to_status_bar(const QString&);
+    void                        clear_message_in_status_bar();
     void                        set_widget_to_tree_layout(QWidget* w);
     void                        remove_widget_from_tree_layout(QWidget* w);
     QFrame*                     policyFrame();
