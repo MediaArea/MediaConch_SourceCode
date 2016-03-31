@@ -8,6 +8,10 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.03, 2016-03-31
+-------------
+Support of plugins (VeraPDF and DPF Manager)
+
 Version 16.02, 2016-02-29
 -------------
 CLI is synchronous by default even if the server is active 
