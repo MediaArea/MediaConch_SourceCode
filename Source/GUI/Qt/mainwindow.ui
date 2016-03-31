@@ -175,7 +175,7 @@
   </action>
   <action name="actionGettingStarted">
    <property name="text">
-    <string>&amp;Getting started</string>
+    <string>&amp;FAQ</string>
    </property>
   </action>
   <action name="actionHowToUse">
