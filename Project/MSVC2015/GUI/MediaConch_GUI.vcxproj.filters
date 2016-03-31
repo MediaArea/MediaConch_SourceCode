@@ -37,6 +37,12 @@
     <Filter Include="ThirdParty\sqlite">
       <UniqueIdentifier>{92bd129a-a825-4860-8967-4c4af26d195b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\HTML">
+      <UniqueIdentifier>{bff903fc-cea8-42d5-be92-5b64b7dec2dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\UI">
+      <UniqueIdentifier>{5b729284-5077-4411-b45a-98a762cd40c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MediaConch_GUI.rc">
@@ -474,47 +480,59 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\mainwindow.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policiesmenu.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policiestree.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policymenu.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\progressbar.ui">
-      <Filter>Resource Files</Filter>
-    </Xml>
     <Xml Include="..\..\..\Source\Resource\Resources.qrc">
       <Filter>Resource Files</Filter>
     </Xml>
+    <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html">
+      <Filter>Resource Files\HTML</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html">
+      <Filter>Resource Files\HTML</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\mainwindow.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policiesmenu.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policiestree.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\policymenu.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
+    <Xml Include="..\..\..\Source\GUI\Qt\progressbar.ui">
+      <Filter>Resource Files\UI</Filter>
+    </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\ruleedit.ui">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\rulemenu.ui">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.ui">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\xsltruleedit.ui">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\UI</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Source\GUI\Qt\verbosityspinbox.ui">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="ClassDiagram.cd" />
+    <None Include="..\..\..\License.html">
+      <Filter>Resource Files\HTML</Filter>
+    </None>
+    <None Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html">
+      <Filter>Resource Files\HTML</Filter>
+    </None>
+    <None Include="..\..\..\Source\GUI\Qt\verbosityspinbox.ui">
+      <Filter>Resource Files\UI</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -22,7 +22,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxslt", "..\..\..\libxslt
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libexslt", "..\..\..\libxslt\win32\VC14\libexslt\libexslt.vcxproj", "{C66B92E2-E917-4556-84D9-6D32C10C3185}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MediaInfoLib", "MediaInfoLib", "{363ECBF5-3630-4FFB-B713-6C4F708FC425}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MediaInfo", "MediaInfo", "{363ECBF5-3630-4FFB-B713-6C4F708FC425}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event", "..\..\..\libevent\Contrib\VC14\event\event.vcxproj", "{F687C268-C5D7-36DF-80C4-641ED9C82BC8}"
 EndProject
