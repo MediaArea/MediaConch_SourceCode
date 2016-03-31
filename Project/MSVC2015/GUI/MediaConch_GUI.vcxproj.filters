@@ -522,15 +522,14 @@
     <Xml Include="..\..\..\Source\GUI\Qt\xsltruleedit.ui">
       <Filter>Resource Files\UI</Filter>
     </Xml>
+    <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html">
+      <Filter>Resource Files\HTML</Filter>
+    </Xml>
+    <Xml Include="..\..\..\License.html">
+      <Filter>Resource Files\HTML</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-    <None Include="..\..\..\License.html">
-      <Filter>Resource Files\HTML</Filter>
-    </None>
-    <None Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html">
-      <Filter>Resource Files\HTML</Filter>
-    </None>
     <None Include="..\..\..\Source\GUI\Qt\verbosityspinbox.ui">
       <Filter>Resource Files\UI</Filter>
     </None>
