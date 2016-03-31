@@ -8,6 +8,13 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.03, 2016-03-31
+-------------
+Verbosity selection
+Improved free text editor
+Support of plugins (VeraPDF and DPF Manager)
+Bugfixes
+
 Version 16.02, 2016-02-29
 -------------
 New page for the results (analyze and update in background, delete/add jobs during the processing of the queue)

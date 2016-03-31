@@ -394,7 +394,6 @@
     <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html" />
     <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html" />
     <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html" />
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
