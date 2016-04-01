@@ -499,23 +499,26 @@ namespace MediaConch
         QWebElement displays_list = currentFrame()->findFirstElement(QString("#fileDetail_policy_displays_list%1").arg(file->index));
         QWebElement policy_name = currentFrame()->findFirstElement(QString("#policyElementName%1").arg(file->index));
 
-        if (file->analyzed && file->policy != -1 && file->report_kind == MediaConchLib::report_MediaConch)
+        if (file->analyzed && file->report_kind == MediaConchLib::report_MediaConch)
         {
             downloadIcon.setAttribute("class", "glyphicon glyphicon-download");
             viewIcon.setAttribute("class", "glyphicon glyphicon-eye-open");
 
-            state = file->policy_valid ? "success" : "danger";
-            status.setAttribute("class", state);
-            QString html = status.toInnerXml();
-            if (file->policy_valid)
+            if (file->policy != -1)
             {
-                QString newHtml("<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> ");
-                status.setInnerXml(newHtml + html);
-            }
-            else
-            {
-                QString newHtml("<span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span> ");
-                status.setInnerXml(newHtml + html);
+                state = file->policy_valid ? "success" : "danger";
+                status.setAttribute("class", state);
+                QString html = status.toInnerXml();
+                if (file->policy_valid)
+                {
+                    QString newHtml("<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> ");
+                    status.setInnerXml(newHtml + html);
+                }
+                else
+                {
+                    QString newHtml("<span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span> ");
+                    status.setInnerXml(newHtml + html);
+                }
             }
         }
         else
