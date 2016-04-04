@@ -276,7 +276,8 @@ const std::map<std::string, Plugin*>& Core::get_format_plugins() const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int Core::open_file(const std::string& file, bool& registered, bool force_analyze)
+int Core::open_file(const std::string& file, bool& registered,
+                    const std::vector<std::string>& options, bool force_analyze)
 {
     //TODO: When ZenLib will manage network files
     // if (!ZenLib::File::Exists(Ztring().From_UTF8(file)))
@@ -289,7 +290,7 @@ int Core::open_file(const std::string& file, bool& registered, bool force_analyz
     if (!registered)
     {
         if (get_db())
-            scheduler->add_element_to_queue(file);
+            scheduler->add_element_to_queue(file, options);
         else
             MI->Open(Ztring().From_UTF8(file));
     }

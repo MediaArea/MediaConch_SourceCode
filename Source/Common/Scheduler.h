@@ -51,7 +51,7 @@ public:
     Scheduler(Core *c);
     virtual ~Scheduler();
 
-    int add_element_to_queue(const std::string& filename);
+    int add_element_to_queue(const std::string& filename, const std::vector<std::string>& options);
     void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfoList* MI);
     bool is_finished();
     bool element_exists(const std::string& filename);

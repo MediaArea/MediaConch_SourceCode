@@ -52,11 +52,11 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int Scheduler::add_element_to_queue(const std::string& filename)
+    int Scheduler::add_element_to_queue(const std::string& filename, const std::vector<std::string>& options)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, filename);
+        queue->add_element(PRIORITY_NONE, index++, filename, options);
         run_element();
         return index - 1;
     }

@@ -31,6 +31,7 @@
 //---------------------------------------------------------------------------
 #include <map>
 #include <list>
+#include <vector>
 
 namespace MediaConch
 {
@@ -46,12 +47,13 @@ namespace MediaConch
     public:
         QueueElement(Scheduler *s);
         virtual ~QueueElement();
-        int          id;
-        std::string  filename;
+        int                                id;
+        std::string                        filename;
+        std::map<std::string, std::string> options;
 
-        void         Entry();
-        void         stop();
-        double       percent_done();
+        void                               Entry();
+        void                               stop();
+        double                             percent_done();
 
     private:
         Scheduler*                         scheduler;
@@ -80,7 +82,7 @@ namespace MediaConch
         Queue(Scheduler *s) : scheduler(s){}
         ~Queue();
 
-        int add_element(QueuePriority priority, int id, const std::string& filename);
+        int add_element(QueuePriority priority, int id, const std::string& filename, const std::vector<std::string>& options);
         bool has_element(const std::string& filename);
         int remove_element(int id);
         int remove_elements(const std::string& filename);
