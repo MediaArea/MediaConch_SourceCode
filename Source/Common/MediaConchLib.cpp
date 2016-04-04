@@ -165,9 +165,10 @@ int MediaConchLib::analyze(const std::string& file, bool& registered, bool force
     if (!file.length())
         return errorHttp_INVALID_DATA;
 
+    // Send Options by API
     if (use_daemon)
         return daemon_client->analyze(file, registered, force_analyze);
-    return core->open_file(file, registered, force_analyze);
+    return core->open_file(file, registered, Options, force_analyze);
 }
 
 //---------------------------------------------------------------------------
