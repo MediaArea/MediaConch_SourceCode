@@ -8,7 +8,6 @@
 #include "ui_mainwindow.h"
 #include "menumainwindow.h"
 #include "checkerwindow.h"
-#include "resultwindow.h"
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
@@ -75,7 +74,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
-    ToolGroup->addAction(ui->actionResult);
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionDisplay);
     
@@ -84,7 +82,6 @@ MainWindow::MainWindow(QWidget *parent) :
     Layout->setContentsMargins(0, 0, 0, 0);
     MenuView = new MenuMainWindow(this);
     checkerView=NULL;
-    resultView=NULL;
     policiesView = NULL;
     displayView = NULL;
     verbosity = NULL;
@@ -112,7 +109,6 @@ MainWindow::MainWindow(QWidget *parent) :
     clear_msg_in_status_bar();
 
     // Connect the signal
-    connect(this, SIGNAL(setResultView()), this, SLOT(on_actionResult_triggered()));
     connect(this, SIGNAL(status_bar_show_message(const QString&, int)), statusBar(), SLOT(showMessage(const QString&, int)));
     workerfiles.fill_registered_files_from_db();
     workerfiles.start();
@@ -177,9 +173,6 @@ void MainWindow::Run()
     {
         case RUN_CHECKER_VIEW:
             createCheckerView();
-            break;
-        case RUN_RESULT_VIEW:
-            createResultView();
             break;
         case RUN_POLICIES_VIEW:
             createPoliciesView();
@@ -448,17 +441,6 @@ void MainWindow::on_actionChecker_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionResult_triggered()
-{
-    if (!ui->actionResult->isChecked())
-        ui->actionResult->setChecked(true);
-    if (clearVisualElements() < 0)
-        return;
-    current_view = RUN_RESULT_VIEW;
-    Run();
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::on_actionPolicies_triggered()
 {
     if (!ui->actionPolicies->isChecked())
@@ -564,12 +546,6 @@ void MainWindow::verbosity_rejected()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::set_result_view()
-{
-    Q_EMIT setResultView();
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (!is_all_policies_saved())
@@ -647,12 +623,6 @@ int MainWindow::clearVisualElements()
     if (checkerView)
         checkerView->hide();
 
-    if (resultView)
-    {
-        delete resultView;
-        resultView = NULL;
-    }
-
     if (policiesView)
     {
         delete policiesView;
@@ -681,16 +651,6 @@ void MainWindow::createCheckerView()
         return;
     checkerView = new CheckerWindow(this);
     checkerView->create_web_view();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::createResultView()
-{
-    if (clearVisualElements() < 0)
-        return;
-    resultView = new ResultWindow(this);
-    resultView->set_default_update_timer(MCL.get_ui_poll_request());
-    resultView->display_results();
 }
 
 //---------------------------------------------------------------------------
@@ -827,12 +787,6 @@ void MainWindow::remove_widget_from_layout(QWidget* w)
 void MainWindow::checker_selected()
 {
     on_actionChecker_triggered();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::result_selected()
-{
-    on_actionResult_triggered();
 }
 
 //---------------------------------------------------------------------------

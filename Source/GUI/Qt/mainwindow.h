@@ -28,7 +28,6 @@ namespace MediaConch {
 
 class MenuMainWindow;
 class CheckerWindow;
-class ResultWindow;
 class PoliciesWindow;
 class DisplayWindow;
 class VerbositySpinbox;
@@ -46,7 +45,6 @@ public:
     enum Run_View
     {
         RUN_CHECKER_VIEW,
-        RUN_RESULT_VIEW,
         RUN_POLICIES_VIEW,
         RUN_DISPLAY_VIEW,
     };
@@ -66,7 +64,6 @@ public:
     void                        Ui_Init();
     void                        set_msg_to_status_bar(const QString& message);
     void                        clear_msg_in_status_bar();
-    void                        set_result_view();
 
     void                        add_policy_to_html_selection(QString& policies, QString& html, const QString& selector);
     void                        create_policy_options(QString& policies);
@@ -97,7 +94,6 @@ public:
     QString                     get_mediatrace_jstree(const std::string& file);
     QString                     ask_for_schema_file();
     void                        checker_selected();
-    void                        result_selected();
     void                        policies_selected();
     void                        display_selected();
     void                        add_default_policy();
@@ -144,7 +140,6 @@ private:
     // Visual elements
     QVBoxLayout*                Layout;
     CheckerWindow*              checkerView;
-    ResultWindow*               resultView;
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
@@ -153,7 +148,6 @@ private:
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();
-    void                        createResultView();
     void                        createPoliciesView();
     void                        createDisplayView();
     void                        choose_schematron_file();
@@ -168,7 +162,6 @@ private:
     Run_View current_view;
 
 Q_SIGNALS:
-    void setResultView();
     void status_bar_clear_message();
     void status_bar_show_message(const QString& message, int timeout);
 
@@ -183,7 +176,6 @@ private Q_SLOTS:
 
     // View
     void on_actionChecker_triggered();
-    void on_actionResult_triggered();
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
 

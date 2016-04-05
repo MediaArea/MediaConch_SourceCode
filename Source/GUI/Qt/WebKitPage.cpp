@@ -44,8 +44,6 @@ namespace MediaConch
     {
         if (!name.compare("Checker"))
             mainwindow->checker_selected();
-        else if (!name.compare("Result"))
-            mainwindow->result_selected();
         else if (!name.compare("Policies"))
             mainwindow->policies_selected();
         else if (!name.compare("Display"))
@@ -219,7 +217,6 @@ namespace MediaConch
             mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt, verbosity);
         }
 
-        mainwindow->set_result_view();
         return 0;
     }
 
@@ -239,7 +236,6 @@ namespace MediaConch
         QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         mainwindow->add_file_to_list(url, "", policy, display_xslt, verbosity);
-        mainwindow->set_result_view();
         return 0;
     }
 
@@ -264,7 +260,6 @@ namespace MediaConch
 
         for (int i = 0; i < list.size(); ++i)
             mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt, verbosity);
-        mainwindow->set_result_view();
         return 0;
     }
 
