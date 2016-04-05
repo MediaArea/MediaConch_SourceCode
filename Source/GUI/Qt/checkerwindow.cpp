@@ -56,26 +56,26 @@ namespace MediaConch {
 CheckerWindow::CheckerWindow(MainWindow *parent) : mainwindow(parent)
 {
     // Visual elements
-    progressBar = NULL;
-    MainView = NULL;
+    progress_bar = NULL;
+    main_view = NULL;
     result_index = 0;
 }
 
 CheckerWindow::~CheckerWindow()
 {
-    if (MainView)
+    if (main_view)
     {
-        mainwindow->remove_widget_from_layout(MainView);
+        mainwindow->remove_widget_from_layout(main_view);
 #if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)MainView->page();
+        WebPage* page = (WebPage*)main_view->page();
         QWebChannel *channel = page ? page->webChannel() : NULL;
         if (channel)
             channel->deregisterObject(page);
 #endif
-        delete MainView;
-        MainView = NULL;
+        delete main_view;
+        main_view = NULL;
     }
-    clearVisualElements();
+    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -83,49 +83,49 @@ CheckerWindow::~CheckerWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void CheckerWindow::clearVisualElements()
+void CheckerWindow::clear_visual_elements()
 {
-    if (MainView)
-        MainView->hide();
+    if (main_view)
+        main_view->hide();
 
-    if (progressBar)
+    if (progress_bar)
     {
-        mainwindow->remove_widget_from_layout(progressBar);
-        delete progressBar;
-        progressBar = NULL;
+        mainwindow->remove_widget_from_layout(progress_bar);
+        delete progress_bar;
+        progress_bar = NULL;
     }
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::createWebViewFinished(bool ok)
+void CheckerWindow::create_web_view_finished(bool ok)
 {
-    if (!MainView || !ok)
+    if (!main_view || !ok)
     {
         create_web_view();
         mainwindow->set_msg_to_status_bar("Problem to load the checker page");
         return;
     }
 
-    if (progressBar)
+    if (progress_bar)
     {
-        mainwindow->remove_widget_from_layout(progressBar);
-        delete progressBar;
-        progressBar = NULL;
+        mainwindow->remove_widget_from_layout(progress_bar);
+        delete progress_bar;
+        progress_bar = NULL;
     }
-    mainwindow->set_widget_to_layout(MainView);
+    mainwindow->set_widget_to_layout(main_view);
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::set_web_view_content(QString& html)
 {
-    if (!MainView)
-        MainView = new WebView(mainwindow);
+    if (!main_view)
+        main_view = new WebView(mainwindow);
 
-    WebPage* page = new WebPage(mainwindow, MainView);
-    MainView->setPage(page);
+    WebPage* page = new WebPage(mainwindow, main_view);
+    main_view->setPage(page);
 
-    QObject::connect(MainView, SIGNAL(loadProgress(int)), progressBar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(MainView, SIGNAL(loadFinished(bool)), this, SLOT(createWebViewFinished(bool)));
+    QObject::connect(main_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
+    QObject::connect(main_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
 
     QUrl url = QUrl("qrc:/html");
     if (!url.isValid())
@@ -136,31 +136,31 @@ void CheckerWindow::set_web_view_content(QString& html)
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
 #endif
-    MainView->setContent(html.toUtf8(), "text/html", url);
+    main_view->setContent(html.toUtf8(), "text/html", url);
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::create_web_view()
 {
-    if (MainView)
+    if (main_view)
     {
-        mainwindow->remove_widget_from_layout(MainView);
+        mainwindow->remove_widget_from_layout(main_view);
 #if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)MainView->page();
+        WebPage* page = (WebPage*)main_view->page();
         QWebChannel *channel = page ? page->webChannel() : NULL;
         if (channel)
             channel->deregisterObject(page);
 #endif
-        delete MainView;
-        MainView = NULL;
+        delete main_view;
+        main_view = NULL;
     }
 
-    clearVisualElements();
+    clear_visual_elements();
 
-    progressBar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progressBar);
-    progressBar->get_progress_bar()->setValue(0);
-    progressBar->show();
+    progress_bar = new ProgressBar(mainwindow);
+    mainwindow->set_widget_to_layout(progress_bar);
+    progress_bar->get_progress_bar()->setValue(0);
+    progress_bar->show();
 
     QString html = create_html();
     set_web_view_content(html);
@@ -169,17 +169,17 @@ void CheckerWindow::create_web_view()
 //---------------------------------------------------------------------------
 void CheckerWindow::change_local_files(QStringList& files)
 {
-    if (!MainView || !MainView->page())
+    if (!main_view || !main_view->page())
         return;
 
-    WebPage* p = (WebPage*)MainView->page();
+    WebPage* p = (WebPage*)main_view->page();
     p->changeLocalFiles(files);
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::hide()
 {
-    clearVisualElements();
+    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -370,20 +370,42 @@ void CheckerWindow::change_body_in_template(QString& body, QString& html)
 }
 
 //---------------------------------------------------------------------------
+void CheckerWindow::change_body_script_in_template(QString& html)
+{
+    QRegExp reg("\\{% block bodyScript %\\}\\{% endblock %\\}");
+    QString script;
+    int     pos = 0;
+
+    reg.setMinimal(true);
+#if defined(WEB_MACHINE_KIT)
+    script = "";
+#elif defined(WEB_MACHINE_ENGINE)
+    script = "<script>\n"
+        "var webpage;\n"
+        "$(document).ready(function()\n"
+        "{\n"
+        "// Register Qt WebPage object\n"
+        "new QWebChannel(qt.webChannelTransport, function (channel) {\n"
+        "webpage = channel.objects.webpage;\n"
+        "});\n"
+        "});\n"
+        "</script>";
+#endif
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), script);
+}
+
+//---------------------------------------------------------------------------
 QString CheckerWindow::create_html_base(QString& body)
 {
-#if defined(WEB_MACHINE_KIT)
-    QFile template_html(":/baseKit.html");
-#elif defined(WEB_MACHINE_ENGINE)
-    QFile template_html(":/baseEngine.html");
-#endif
-
+    QFile template_html(":/base.html");
     template_html.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray html = template_html.readAll();
     template_html.close();
 
     QString base(html);
 
+    change_body_script_in_template(base);
     change_body_in_template(body, base);
     return base;
 }

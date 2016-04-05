@@ -23,15 +23,6 @@
                 </div>
             </div>
     </div> <!-- ends container -->
-
-        <script>
-            var webpage;
-            $(document).ready(function() {
-                // Register Qt WebPage object
-                new QWebChannel(qt.webChannelTransport, function (channel) {
-                    webpage = channel.objects.webpage;
-                });
-            });
-        </script>
+        {% block bodyScript %}{% endblock %}
     </body>
 </html>

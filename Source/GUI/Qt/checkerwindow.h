@@ -41,12 +41,12 @@ public:
 private:
     // Visual elements
     MainWindow*                 mainwindow;
-    WebView*                    MainView;
-    ProgressBar*                progressBar;
+    WebView*                    main_view;
+    ProgressBar*                progress_bar;
     QString                     display_xslt;
     unsigned int                result_index;
 
-    void                        clearVisualElements();
+    void                        clear_visual_elements();
     void                        set_web_view_content(QString& html);
 
 //***************************************************************************
@@ -67,6 +67,7 @@ private:
     void remove_form_online(int pos, QString& html);
     void change_collapse_form(QString& html);
     void change_body_in_template(QString& body, QString& html);
+    void change_body_script_in_template(QString& html);
 #if defined(WEB_MACHINE_ENGINE)
     void add_file_detail_to_html(std::string& file, int policy);
 #endif
@@ -75,7 +76,7 @@ private:
 #endif
 
 private Q_SLOTS:
-    void createWebViewFinished(bool ok);
+    void create_web_view_finished(bool ok);
 };
 
 }
