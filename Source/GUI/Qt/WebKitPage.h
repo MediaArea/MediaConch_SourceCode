@@ -33,9 +33,9 @@ protected:
     bool extension(Extension extension, const ExtensionOption * option = 0, ExtensionReturn * output = 0);
     bool supportsExtension(Extension extension) const;
 
-    int  onFileUploadSelected(QWebElement form);
-    int  onFileOnlineSelected(QWebElement form);
-    int  onFileRepositorySelected(QWebElement form);
+    int  onFileUploadSelected(QWebElement& form);
+    int  onFileOnlineSelected(QWebElement& form);
+    int  onFileRepositorySelected(QWebElement& form);
 
     void set_analyzed_status(FileRegistered* file);
     void set_implementation_status(FileRegistered* file);

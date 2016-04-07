@@ -21,6 +21,7 @@
 #include "mainwindow.h"
 #include "WebPage.h"
 #include <QtGlobal>
+#include <QDebug>
 
 namespace MediaConch
 {
@@ -61,14 +62,13 @@ namespace MediaConch
 
     void WebPage::onButtonClicked(const QString& id)
     {
-        QWebElement button = currentFrame()->documentElement().findFirst(QString("button[id=\"%1\"]").arg(id));
-        QString form_id = button.parent().parent().attribute("id");
-        if (form_id == "checkerUpload")
-            onFileUploadSelected(button.parent().parent());
-        else if (form_id == "checkerOnline")
-            onFileOnlineSelected(button.parent().parent());
-        else if (form_id == "checkerRepository")
-            onFileRepositorySelected(button.parent().parent());
+        QWebElement button = mainFrame()->findFirstElement(id);
+        if (id == "#file")
+            onFileUploadSelected(button);
+        else if (id == "#url")
+            onFileOnlineSelected(button);
+        else if (id == "#repository")
+            onFileRepositorySelected(button);
     }
 
     void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display, const QString& verbosity)
@@ -197,18 +197,19 @@ namespace MediaConch
         onDownloadReport(report, save_name);
     }
 
-    int WebPage::onFileUploadSelected(QWebElement form)
+    int WebPage::onFileUploadSelected(QWebElement& form)
     {
-        QStringList files = file_selector.value("checkerUpload[file]", QStringList());
-
+        QStringList files = file_selector.value("checkerUpload_file", QStringList());
         if (!files.size())
             return 1;
 
-        QWebElement policyElement = form.findFirst("#checkerUpload_step1_policy");
+        QWebElement policyElement = form.findFirst("#checkerUpload_policy");
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
-        QWebElement displayElement = form.findFirst("#checkerUpload_step1_display_selector");
+
+        QWebElement displayElement = form.findFirst("#checkerUpload_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
-        QWebElement verbosityElement = form.findFirst("#checkerUpload_step1_verbosity_selector");
+
+        QWebElement verbosityElement = form.findFirst("#checkerUpload_verbosity_selector");
         QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         for (int i = 0; i < files.size(); ++i)
@@ -220,7 +221,7 @@ namespace MediaConch
         return 0;
     }
 
-    int WebPage::onFileOnlineSelected(QWebElement form)
+    int WebPage::onFileOnlineSelected(QWebElement& form)
     {
         QWebElement urlElement = form.findFirst("#checkerOnline_file");
         QString url = urlElement.evaluateJavaScript("this.value").toString();
@@ -228,21 +229,20 @@ namespace MediaConch
         if (!url.length())
             return 1;
 
-        QWebElement policyElement = form.findFirst("#checkerOnline_step1_policy");
+        QWebElement policyElement = form.findFirst("#checkerOnline_policy");
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
-        QWebElement displayElement = form.findFirst("#checkerOnline_step1_display_selector");
+        QWebElement displayElement = form.findFirst("#checkerOnline_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
-        QWebElement verbosityElement = form.findFirst("#checkerOnline_step1_display_selector");
+        QWebElement verbosityElement = form.findFirst("#checkerOnline_display_selector");
         QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         mainwindow->add_file_to_list(url, "", policy, display_xslt, verbosity);
         return 0;
     }
 
-    int WebPage::onFileRepositorySelected(QWebElement form)
+    int WebPage::onFileRepositorySelected(QWebElement& form)
     {
-        QStringList dirname = file_selector.value("checkerRepository[directory]", QStringList());
-
+        QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
         if (dirname.empty())
             return 1;
 
@@ -251,11 +251,11 @@ namespace MediaConch
         if (!list.count())
             return 1;
 
-        QWebElement policyElement = form.findFirst("#checkerRepository_step1_policy");
+        QWebElement policyElement = form.findFirst("#checkerRepository_policy");
         QString policy = policyElement.evaluateJavaScript("this.value").toString();
-        QWebElement displayElement = form.findFirst("#checkerRepository_step1_display_selector");
+        QWebElement displayElement = form.findFirst("#checkerRepository_display_selector");
         QString display_xslt = displayElement.evaluateJavaScript("this.value").toString();
-        QWebElement verbosityElement = form.findFirst("#checkerRepository_step1_verbosity_selector");
+        QWebElement verbosityElement = form.findFirst("#checkerRepository_verbosity_selector");
         QString verbosity = verbosityElement.evaluateJavaScript("this.value").toString();
 
         for (int i = 0; i < list.size(); ++i)
@@ -284,7 +284,7 @@ namespace MediaConch
     QString WebPage::chooseFile(QWebFrame *, const QString& suggested)
     {
         QString value_input;
-        if (select_file_name == "checkerRepository[directory]")
+        if (select_file_name == "checkerRepository_directory")
             value_input = QFileDialog::getExistingDirectory(view(), NULL, suggested);
         else
             value_input = QFileDialog::getOpenFileName(view(), NULL, suggested);
@@ -312,11 +312,11 @@ namespace MediaConch
             QStringList suggested = ((const ChooseMultipleFilesExtensionOption*)option)->suggestedFileNames;
             QStringList names = QFileDialog::getOpenFileNames(view(), QString::null);
             ((ChooseMultipleFilesExtensionReturn*)output)->fileNames = names;
-            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload[file]");
+            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
             if (it != file_selector.end())
-                file_selector["checkerUpload[file]"] << names;
+                file_selector["checkerUpload_file"] << names;
             else
-                file_selector.insert("checkerUpload[file]", names);
+                file_selector.insert("checkerUpload_file", names);
             return true;
         }
         return false;
@@ -328,32 +328,44 @@ namespace MediaConch
             return true;
         return false;
     }
-    
+
+    // TODO
     void WebPage::changeLocalFiles(QStringList& files)
     {
         QWebFrame* frame = mainFrame();
+        QString active(" active");
 
-        QWebElement form = frame->findFirstElement("#collapseOnline");
+        QWebElement form = frame->findFirstElement("#url");
         if (!form.isNull())
         {
-            form.setAttribute("class", "panel-collapse collapse");
-            form.setAttribute("aria-expanded", "false");
-            form.setAttribute("style", "\"height: 20px\"");
-        }
-        form = frame->findFirstElement("#collapseRepository");
-        if (!form.isNull())
-        {
-            form.setAttribute("aria-expanded", "false");
-            form.setAttribute("class", "panel-collapse collapse");
-            form.setAttribute("style", "\"height: 20px\"");
+            QString attr = form.attribute("class");
+            int pos = -1;
+            if ((pos = attr.indexOf(active)) != -1)
+            {
+                attr.replace(pos, active.length(), "");
+                form.setAttribute("class", attr);
+            }
         }
 
-        form = frame->findFirstElement("#collapseUpload");
+        form = frame->findFirstElement("#repository");
+        if (!form.isNull())
+        {
+            QString attr = form.attribute("class");
+            int pos = -1;
+            if ((pos = attr.indexOf(active)) != -1)
+            {
+                attr.replace(pos, active.length(), "");
+                form.setAttribute("class", attr);
+            }
+        }
+
+        form = frame->findFirstElement("#file");
         if (form.isNull())
             return;
-        form.setAttribute("aria-expanded", "true");
-        form.setAttribute("class", "panel-collapse in");
-        form.setAttribute("style", "");
+
+        QString attr = form.attribute("class");
+        if (attr.indexOf(active) == -1)
+            form.setAttribute("class", attr + active);
 
         QWebElement input = form.findFirst("#checkerUpload_file");
         if (input.isNull())
@@ -361,11 +373,11 @@ namespace MediaConch
 
         QString file = files[0];
         input.setAttribute("value", file);
-        QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload[file]");
+        QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
         if (it != file_selector.end())
-            file_selector["checkerUpload[file]"] << files;
+            file_selector["checkerUpload_file"] << files;
         else
-            file_selector.insert("checkerUpload[file]", files);
+            file_selector.insert("checkerUpload_file", files);
 
         onFileUploadSelected(form);
     }

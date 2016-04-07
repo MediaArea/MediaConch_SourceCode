@@ -11,6 +11,8 @@
         <script src="qrc:/bootstrap.js"></script>
         <script src="qrc:/jstree.js"></script>
         <script src="qrc:/jstreegrid.js"></script>
+        <script src="qrc:/checker.js"></script>
+        <script type="text/javascript" src="qrc:/datatables.js"></script>
         <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     </head>
     <body id="body">
@@ -18,7 +20,8 @@
             <div class="content">
                 <div class="row">
                     <div class="col-lg-10 col-lg-offset-1">
-                        {% block body %}{% endblock %}
+                        {% block checker %}{% endblock %}
+                        {% block result %}{% endblock %}
                     </div>
                 </div>
             </div>

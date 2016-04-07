@@ -58,15 +58,17 @@ private:
     void remove_element_in_template(QString& html);
     void load_form_in_template(QString& html);
     QString create_html();
-    QString create_html_base(QString& body);
-    QString create_html_body();
+    void create_html_base(const QString& checker, const QString& result, QString& base);
+    void create_html_checker(QString&);
+    void create_html_result(QString&);
     QString create_form_upload();
     QString create_form_online();
     QString create_form_repository();
     void add_script_js_tree(std::string& file);
     void remove_form_online(int pos, QString& html);
     void change_collapse_form(QString& html);
-    void change_body_in_template(QString& body, QString& html);
+    void change_checker_in_template(const QString& checker, QString& html);
+    void change_result_in_template(const QString& result, QString& html);
     void change_body_script_in_template(QString& html);
 #if defined(WEB_MACHINE_ENGINE)
     void add_file_detail_to_html(std::string& file, int policy);

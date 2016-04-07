@@ -265,11 +265,11 @@ QString CheckerWindow::create_form_upload()
     QString ret(html);
     QString policies;
     mainwindow->create_policy_options(policies);
-    mainwindow->add_policy_to_html_selection(policies, ret, "checkerUpload_step1_policy");
+    mainwindow->add_policy_to_html_selection(policies, ret, "checkerUpload_policy");
 
     QString displays;
     mainwindow->create_displays_options(displays);
-    mainwindow->add_display_to_html_selection(displays, ret, "checkerUpload_step1_display_selector");
+    mainwindow->add_display_to_html_selection(displays, ret, "checkerUpload_display_selector");
     return ret;
 }
 
@@ -285,11 +285,11 @@ QString CheckerWindow::create_form_online()
     QString ret(html);
     QString policies;
     mainwindow->create_policy_options(policies);
-    mainwindow->add_policy_to_html_selection(policies, ret, "checkerOnline_step1_policy");
+    mainwindow->add_policy_to_html_selection(policies, ret, "checkerOnline_policy");
 
     QString displays;
     mainwindow->create_displays_options(displays);
-    mainwindow->add_display_to_html_selection(displays, ret, "checkerOnline_step1_display_selector");
+    mainwindow->add_display_to_html_selection(displays, ret, "checkerOnline_display_selector");
     return ret;
 }
 
@@ -328,11 +328,11 @@ QString CheckerWindow::create_form_repository()
     QString ret(html);
     QString policies;
     mainwindow->create_policy_options(policies);
-    mainwindow->add_policy_to_html_selection(policies, ret, "checkerRepository_step1_policy");
+    mainwindow->add_policy_to_html_selection(policies, ret, "checkerRepository_policy");
 
     QString displays;
     mainwindow->create_displays_options(displays);
-    mainwindow->add_display_to_html_selection(displays, ret, "checkerRepository_step1_display_selector");
+    mainwindow->add_display_to_html_selection(displays, ret, "checkerRepository_display_selector");
     return ret;
 }
 
@@ -345,7 +345,7 @@ void CheckerWindow::remove_template_tags(QString& data)
 }
 
 //---------------------------------------------------------------------------
-QString CheckerWindow::create_html_body()
+void CheckerWindow::create_html_checker(QString& checker)
 {
     QFile template_html(":/checker.html");
 
@@ -353,20 +353,43 @@ QString CheckerWindow::create_html_body()
     QByteArray html = template_html.readAll();
     template_html.close();
 
-    QString data(html);
-    remove_template_tags(data);
-    return data;
+    checker = QString(html);
+    remove_template_tags(checker);
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::change_body_in_template(QString& body, QString& html)
+void CheckerWindow::create_html_result(QString& result)
 {
-    QRegExp reg("\\{% block body %\\}\\{% endblock %\\}");
+    QFile template_html(":/result.html");
+
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray html = template_html.readAll();
+    template_html.close();
+
+    result = QString(html);
+    remove_template_tags(result);
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::change_checker_in_template(const QString& checker, QString& html)
+{
+    QRegExp reg("\\{% block checker %\\}\\{% endblock %\\}");
     int pos = 0;
 
     reg.setMinimal(true);
     while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), body);
+        html.replace(pos, reg.matchedLength(), checker);
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::change_result_in_template(const QString& result, QString& html)
+{
+    QRegExp reg("\\{% block result %\\}\\{% endblock %\\}");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), result);
 }
 
 //---------------------------------------------------------------------------
@@ -396,25 +419,29 @@ void CheckerWindow::change_body_script_in_template(QString& html)
 }
 
 //---------------------------------------------------------------------------
-QString CheckerWindow::create_html_base(QString& body)
+void CheckerWindow::create_html_base(const QString& checker, const QString& result, QString& base)
 {
     QFile template_html(":/base.html");
     template_html.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray html = template_html.readAll();
     template_html.close();
 
-    QString base(html);
+    base = QString(html);
 
     change_body_script_in_template(base);
-    change_body_in_template(body, base);
-    return base;
+    change_checker_in_template(checker, base);
+    change_result_in_template(result, base);
 }
 
 //---------------------------------------------------------------------------
 QString CheckerWindow::create_html()
 {
-    QString body = create_html_body();
-    QString base = create_html_base(body);
+    QString checker;
+    create_html_checker(checker);
+    QString result;
+    create_html_result(result);
+    QString base;
+    create_html_base(checker, result, base);
     return base;
 }
 

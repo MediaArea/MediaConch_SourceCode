@@ -3,41 +3,28 @@
   <button type="button" class="close hidden">&times; Close all results</button>
 </div>
 
-<div class="col-md-6">
-    <div class="panel-group" id="accordion">
-        <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingUpload">
-            <h4 class="panel-title" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseUpload" aria-expanded="true" aria-controls="collapseUpload">
-                Check local file
-            </h4>
-            </div>
-            <div id="collapseUpload" class="panel-collapse collapse{% if selectForm == 'upload' %} in{% endif %}" role="tabpanel" aria-labelledby="headingUpload">
-                {{ form(formUpload) }}
-            </div>
-        </div>
+<div class="col-md-12">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#file" aria-controls="file" role="tab" data-toggle="tab">Check local file</a></li>
+    <li role="presentation" class=""><a href="#url" aria-controls="url" role="tab" data-toggle="tab">Check online file</a></li>
+    <li role="presentation" class=""><a href="#repository" aria-controls="repository" role="tab" data-toggle="tab">Check local folder</a></li>
+  </ul>
 
-        <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingOnline">
-            <h4 class="panel-title" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOnline" aria-expanded="true" aria-controls="collapseOnline">
-                Check online file
-            </h4>
-            </div>
-            <div id="collapseOnline" class="panel-collapse collapse{% if selectForm == 'online' %} in{% endif %}" role="tabpanel" aria-labelledby="headingOnline">
-                {{ form(formOnline) }}
-            </div>
-        </div>
-
-        <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingRepository">
-            <h4 class="panel-title" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseRepository" aria-expanded="true" aria-controls="collapseRepository">
-                Check local folder
-            </h4>
-            </div>
-            <div id="collapseRepository" class="panel-collapse collapse{% if selectForm == 'repository' or not selectForm %} in{% endif %}" role="tabpanel" aria-labelledby="headingRepository">
-                {{ form(formRepository) }}
-            </div>
-        </div>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane panel col-md-12 active" id="file">
+      {{ form(formUpload) }}
     </div>
+    <div role="tabpanel" class="tab-pane panel col-md-12" id="url">
+      {{ form(formOnline) }}
+    </div>
+    <div role="tabpanel" class="tab-pane panel col-md-12" id="repository">
+      {{ form(formRepository) }}
+    </div>
+  </div>
 </div>
-<div class="col-md-6" id="display_result">
+
+<div class="col-md-12" id="checkerInfo">
+  <div></div>
 </div>

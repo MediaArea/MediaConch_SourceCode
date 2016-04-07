@@ -1,67 +1,58 @@
-<form name="checkerUpload" method="post" action="" enctype="multipart/form-data">
-  <div id="checkerUpload">
+<form name="checkerUpload" method="post" action="" class="form-horizontal" enctype="multipart/form-data">
+  <div class="col-md-4">
     <div class="form-group">
-      <label class="control-label required">
-        Policy
-        </label>
-      <div id="checkerUpload_step1">
-        <div class="form-group">
-          <label class="control-label" for="checkerUpload_step1_policy">
-            Choose a policy
-            </label>
-          <select id="checkerUpload_step1_policy" name="checkerUpload[step1][policy]" class="form-control">
+      <label class=" col-sm-2 control-label" for="checkerUpload_policy_selector">Policy</label>
+      <div class="col-sm-10">
+        <select id="checkerUpload_policy" name="checkerUpload_policy" class="policyList form-control">
             <option selected="selected" value="-1">Choose a policy</option>
-          </select>
-        </div>
+        </select>
       </div>
     </div>
+  </div>
+
+  <div class="col-md-4">
     <div class="form-group">
-      <label class="control-label required">
-        Display
-        </label>
-      <div id="checkerUpload_display_step1">
-        <div class="form-group">
-          <label class="control-label" for="checkerUpload_step1_display_selector">
-            Choose a display
-          </label>
-          <select id="checkerUpload_step1_display_selector" name="checkerUpload[step1][display_selector]" class="form-control">
-            <option selected="selected" value="-1">Choose a Display</option>
-          </select>
-        </div>
+      <label class="col-sm-2 control-label" for="checkerUpload_display_selector">Display</label>
+      <div class="col-sm-10">
+        <select id="checkerUpload_display_selector" name="checkerUpload_display_selector" class="displayList form-control">
+          <option selected="selected" value="-1">Choose a Display</option>
+        </select>
       </div>
     </div>
+  </div>
+
+  <div class="col-md-4">
     <div class="form-group">
-      <label class="control-label required">
-        Verbosity
-        </label>
-      <div id="checkerUpload_verbosity_step1">
-        <div class="form-group">
-          <label class="control-label" for="checkerUpload_step1_verbosity_selector">
-            Level
-          </label>
-          <select  id="checkerUpload_step1_verbosity_selector" name="checkerUpload[step1][verbosity_selector]" class="form-control">
-            <option selected="selected" value="-1">Default</option>
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-        </div>
+      <label class="col-sm-2 control-label" for="checkerUpload_verbosity_selector">Verbosity</label>
+      <div class="col-sm-10">
+        <select  id="checkerUpload_verbosity_selector" name="checkerUpload_verbosity_selector" class="verbosityList form-control">
+          <option selected="selected" value="-1">Default</option>
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
       </div>
     </div>
+  </div>
+
+  <div class="col-md-10">
     <div class="form-group">
-      <label class="control-label required" for="checkerUpload_file">
-        Select files
-        </label>
-      <input id="checkerUpload_file" name="checkerUpload[file]" required="required" type="file" multiple onclick="webpage.onInputChanged(this.name);">
+      <label class="col-sm-2 control-label required" for="checkerUpload_file">Select files</label>
+      <div class="col-sm-10">
+        <input id="checkerUpload_file" name="checkerUpload_file" required="required" type="file" multiple onclick="webpage.onInputChanged(this.name);">
       </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
     <div class="form-group">
-      <button type="submit" id="checkerUpload_Check file" name="checkerUpload[Check file]" class="btn-warning btn" onclick="event.preventDefault();webpage.onButtonClicked(this.id);">
-        Check files
-        </button>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-10">
+        <button type="submit" id="checkerUpload_Check file" name="checkerUpload_Check file" class="btn-warning btn">Check files</button>
       </div>
-    <input id="checkerUpload__token" name="checkerUpload[_token]" class="form-control" value="S9eZwOSY4f7x_w29AcjlWoFD9LqOKvhfuggIeESe5_o" type="hidden">
+    </div>
   </div>
 </form>

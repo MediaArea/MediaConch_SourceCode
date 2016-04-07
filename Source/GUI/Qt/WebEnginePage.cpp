@@ -56,11 +56,11 @@ namespace MediaConch
 
     void WebPage::onButtonClicked(const QString& id)
     {
-        if (id == "checkerUpload_Check file")
+        if (id == "#file")
             onFileUploadSelected();
-        else if (id == "checkerRepository_Check files")
+        else if (id == "#repository")
             onFileRepositorySelected();
-        else if (id == "checkerOnline_Check file")
+        else if (id == "#url")
             onFileOnlineSelected();
     }
 
@@ -227,32 +227,32 @@ namespace MediaConch
     {
         file_selector.clear();
 
-        runJavaScript("document.getElementById('checkerUpload_step1_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerUpload_step1_xslt').value = '';");
-        runJavaScript("document.getElementById('checkerUpload_step1_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerUpload_step1_display_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerUpload_policy').value = -1;");
+        runJavaScript("document.getElementById('checkerUpload_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerUpload_display_selector').value = -1;");
+        runJavaScript("document.getElementById('checkerUpload_display_xslt').value = '';");
         runJavaScript("document.getElementById('checkerUpload_file').value = \"\";");
 
 #if defined(MEDIAINFO_LIBCURL_YES)
 
-        runJavaScript("document.getElementById('checkerOnline_step1_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerOnline_step1_xslt').value = '';");
-        runJavaScript("document.getElementById('checkerOnline_step1_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerOnline_step1_display_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerOnline_policy').value = -1;");
+        runJavaScript("document.getElementById('checkerOnline_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerOnline_display_selector').value = -1;");
+        runJavaScript("document.getElementById('checkerOnline_display_xslt').value = '';");
         runJavaScript("document.getElementById('checkerOnline_file').value = \"\";");
 
 #endif
 
-        runJavaScript("document.getElementById('checkerRepository_step1_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerRepository_step1_xslt').value = '';");
-        runJavaScript("document.getElementById('checkerRepository_step1_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerRepository_step1_display_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerRepository_policy').value = -1;");
+        runJavaScript("document.getElementById('checkerRepository_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerRepository_display_selector').value = -1;");
+        runJavaScript("document.getElementById('checkerRepository_display_xslt').value = '';");
         runJavaScript("document.getElementById('checkerRepository_directory').value = \"\";");
     }
 
     void WebPage::onFileUploadSelected(const QString& display_xslt, const QString& policy, const QString& verbosity)
     {
-        QStringList files = file_selector.value("checkerUpload[file]", QStringList());
+        QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
         if (!files.size())
             return;
@@ -266,8 +266,8 @@ namespace MediaConch
 
     void WebPage::onFileUploadSelected()
     {
-        runJavaScript("webpage.onFileUploadSelected($('#checkerUpload_step1_display_selector').val(), $('#checkerUpload_step1_policy').val(),"
-                      " $('#checkerUpload_step1_verbosity_selector').val());");
+        runJavaScript("webpage.onFileUploadSelected($('#checkerUpload_display_selector').val(), $('#checkerUpload_policy').val(),"
+                      " $('#checkerUpload_verbosity_selector').val());");
     }
 
     void WebPage::onFileOnlineSelected(const QString& url, const QString& display_xslt, const QString& policy, const QString& verbosity)
@@ -281,14 +281,14 @@ namespace MediaConch
     void WebPage::onFileOnlineSelected()
     {
         runJavaScript("webpage.onFileOnlineSelected($('#checkerOnline_file').val(), "
-                                                   "$('#checkerOnline_step1_display_selector').val(), "
-                                                   "$('#checkerOnline_step1_policy').val(), "
-                                                   "$('#checkerOnline_step1_verbosity_selector').val());");
+                                                   "$('#checkerOnline_display_selector').val(), "
+                                                   "$('#checkerOnline_policy').val(), "
+                                                   "$('#checkerOnline_verbosity_selector').val());");
     }
 
     void WebPage::onFileRepositorySelected(const QString& display_xslt, const QString& policy, const QString& verbosity)
     {
-        QStringList dirname = file_selector.value("checkerRepository[directory]", QStringList());
+        QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
         if (dirname.empty())
             return;
 
@@ -303,9 +303,9 @@ namespace MediaConch
 
     void WebPage::onFileRepositorySelected()
     {
-        runJavaScript("webpage.onFileRepositorySelected($('#checkerRepository_step1_display_selector').val(), "
-                                                       "$('#checkerRepository_step1_policy').val(), "
-                                                       "$('#checkerRepository_step1_verbosity_selector').val());");
+        runJavaScript("webpage.onFileRepositorySelected($('#checkerRepository_display_selector').val(), "
+                                                       "$('#checkerRepository_policy').val(), "
+                                                       "$('#checkerRepository_verbosity_selector').val());");
     }
 
     void WebPage::close_all()
@@ -331,7 +331,7 @@ namespace MediaConch
         {
             QString value_input;
             QString suggested = oldFiles.first();
-            if (select_file_name == "checkerRepository[directory]")
+            if (select_file_name == "checkerRepository_directory")
                 value_input = QFileDialog::getExistingDirectory(view(), NULL, suggested);
             else
                 value_input = QFileDialog::getOpenFileName(view(), NULL, suggested);
@@ -356,37 +356,30 @@ namespace MediaConch
             QStringList names = QFileDialog::getOpenFileNames(view(), QString::null);
 
             list = names;
-            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload[file]");
+            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
             if (it != file_selector.end())
-                file_selector["checkerUpload[file]"] = names;
+                file_selector["checkerUpload_file"] = names;
             else
-                file_selector.insert("checkerUpload[file]", names);
+                file_selector.insert("checkerUpload_file", names);
         }
 
         return list;
     }
 
+    //TODO
     void WebPage::changeLocalFiles(QStringList& files)
     {
         QString query;
-        query += ("document.getElementById('collapseOnline').setAttribute('class', 'panel-collapse collapse'); ");
-        query += ("document.getElementById('collapseOnline').setAttribute('aria-expanded', 'false'); ");
-        query += ("document.getElementById('collapseOnline').setAttribute('style', '\"height: 20px\"'); ");
-
-        query += ("document.getElementById('collapseRepository').setAttribute('class', 'panel-collapse collapse'); ");
-        query += ("document.getElementById('collapseRepository').setAttribute('aria-expanded', 'false'); ");
-        query += ("document.getElementById('collapseRepository').setAttribute('style', '\"height: 20px\"'); ");
-
-        query += ("document.getElementById('collapseUpload').setAttribute('class', 'panel-collapse in'); ");
-        query += ("document.getElementById('collapseUpload').setAttribute('aria-expanded', 'true'); ");
-        query += ("document.getElementById('collapseUpload').setAttribute('style', ''); ");
-
+        query += ("document.getElementById('#url').setAttribute('class', 'tab-pane panel col-md-12'); ");
+        query += ("document.getElementById('#repository').setAttribute('class', 'tab-pane panel col-md-12'); ");
+        query += ("document.getElementById('#file').setAttribute('class', 'tab-pane panel col-md-12 active'); ");
         runJavaScript(query);
-        QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload[file]");
+
+        QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
         if (it != file_selector.end())
-            file_selector["checkerUpload[file]"] << files;
+            file_selector["checkerUpload_file"] << files;
         else
-            file_selector.insert("checkerUpload[file]", files);
+            file_selector.insert("checkerUpload_file", files);
 
         onFileUploadSelected();
     }

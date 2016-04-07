@@ -7,6 +7,7 @@
         <file alias="base.html">html/base.html</file>
         <file alias="menu.html">html/menu.html</file>
         <file alias="checker.html">html/checker.html</file>
+        <file alias="result.html">html/result.html</file>
         <file alias="formUpload.html">html/formUpload.html</file>
         <file alias="formOnline.html">html/formOnline.html</file>
         <file alias="formRepository.html">html/formRepository.html</file>
@@ -21,6 +22,8 @@
         <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
         <file alias="jstree.js">html/js/jstree.min.js</file>
         <file alias="jstreegrid.js">html/js/jstreegrid.js</file>
+        <file alias="datatables.js">html/js/datatables.js</file>
+        <file alias="checker.js">html/js/checker.js</file>
         <file alias="main.css">html/css/main.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
         <file alias="jstree.css">html/css/jstree.min.css</file>
