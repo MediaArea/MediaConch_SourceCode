@@ -8,16 +8,10 @@
         <file alias="menu.html">html/menu.html</file>
         <file alias="checker.html">html/checker.html</file>
         <file alias="result.html">html/result.html</file>
+        <file alias="resultTableRow.html">html/resultTableRow.html</file>
         <file alias="formUpload.html">html/formUpload.html</file>
         <file alias="formOnline.html">html/formOnline.html</file>
         <file alias="formRepository.html">html/formRepository.html</file>
-        <file alias="fileDetailChecker.html">html/fileDetailChecker.html</file>
-        <file alias="fileDetailChecker.js">html/js/fileDetailChecker.js</file>
-        <file alias="fileDetailCheckerTableStart.html">html/fileDetailCheckerTableStart.html</file>
-        <file alias="fileDetailCheckerTableElement.html">html/fileDetailCheckerTableElement.html</file>
-        <file alias="fileDetailCheckerTableModalEngine.html">html/fileDetailCheckerTableModalEngine.html</file>
-        <file alias="fileDetailCheckerTableModalKit.html">html/fileDetailCheckerTableModalKit.html</file>
-        <file alias="fileDetailCheckerTableEnd.html">html/fileDetailCheckerTableEnd.html</file>
         <file alias="jquery.js">html/js/jquery-1.11.2.min.js</file>
         <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
         <file alias="jstree.js">html/js/jstree.min.js</file>

@@ -36,7 +36,7 @@ namespace MediaConch
             QStringList files;
             for (int i = 0; i < urls.size(); ++i)
                 files << urls[i].toLocalFile();
-            p->changeLocalFiles(files);
+            p->change_local_files(files);
         }
     }
 }

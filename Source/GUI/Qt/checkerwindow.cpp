@@ -19,6 +19,7 @@
 #include "WebView.h"
 #include "progressbar.h"
 #include "WebView.h"
+#include "resulttable.h"
 
 #include <QTextEdit>
 #include <QProgressBar>
@@ -53,16 +54,22 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-CheckerWindow::CheckerWindow(MainWindow *parent) : mainwindow(parent)
+CheckerWindow::CheckerWindow(MainWindow *parent) : mainwindow(parent), result_table(NULL)
 {
     // Visual elements
     progress_bar = NULL;
     main_view = NULL;
     result_index = 0;
+    is_finished = false;
 }
 
 CheckerWindow::~CheckerWindow()
 {
+    if (result_table)
+    {
+        delete result_table;
+        result_table = NULL;
+    }
     if (main_view)
     {
         mainwindow->remove_widget_from_layout(main_view);
@@ -106,12 +113,25 @@ void CheckerWindow::create_web_view_finished(bool ok)
         return;
     }
 
+    if (result_table)
+    {
+        delete result_table;
+        result_table = NULL;
+    }
+    is_finished = true;
+
+    result_table = new ResultTable(mainwindow, (WebPage*)main_view->page());
+    for (size_t i = 0; i < files.size(); ++i)
+        result_table->add_file_to_result_table(files[i]);
+    files.clear();
+
     if (progress_bar)
     {
         mainwindow->remove_widget_from_layout(progress_bar);
         delete progress_bar;
         progress_bar = NULL;
     }
+
     mainwindow->set_widget_to_layout(main_view);
 }
 
@@ -173,7 +193,7 @@ void CheckerWindow::change_local_files(QStringList& files)
         return;
 
     WebPage* p = (WebPage*)main_view->page();
-    p->changeLocalFiles(files);
+    p->change_local_files(files);
 }
 
 //---------------------------------------------------------------------------
@@ -419,6 +439,23 @@ void CheckerWindow::change_body_script_in_template(QString& html)
 }
 
 //---------------------------------------------------------------------------
+void CheckerWindow::set_webmachine_script_in_template(QString& html)
+{
+    QRegExp reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}");
+    QString machine;
+    int     pos = 0;
+
+    reg.setMinimal(true);
+#if defined(WEB_MACHINE_KIT)
+    machine = "WEB_MACHINE_KIT";
+#elif defined(WEB_MACHINE_ENGINE)
+    machine = "WEB_MACHINE_ENGINE";
+#endif
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), machine);
+}
+
+//---------------------------------------------------------------------------
 void CheckerWindow::create_html_base(const QString& checker, const QString& result, QString& base)
 {
     QFile template_html(":/base.html");
@@ -428,6 +465,7 @@ void CheckerWindow::create_html_base(const QString& checker, const QString& resu
 
     base = QString(html);
 
+    set_webmachine_script_in_template(base);
     change_body_script_in_template(base);
     change_checker_in_template(checker, base);
     change_result_in_template(result, base);
@@ -443,6 +481,18 @@ QString CheckerWindow::create_html()
     QString base;
     create_html_base(checker, result, base);
     return base;
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::add_file_to_result_table(const std::string& full_path)
+{
+    if (!result_table || !is_finished)
+    {
+        files.push_back(full_path);
+        return;
+    }
+
+    result_table->add_file_to_result_table(full_path);
 }
 
 }

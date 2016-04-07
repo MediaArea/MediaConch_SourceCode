@@ -99,19 +99,20 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
     setAcceptDrops(false);
 
+    // Status bar
+    statusBar()->show();
+    clear_msg_in_status_bar();
+    connect(this, SIGNAL(status_bar_show_message(const QString&, int)),
+            statusBar(), SLOT(showMessage(const QString&, int)));
+
+    // worker load existing files
+    workerfiles.fill_registered_files_from_db();
+    workerfiles.start();
+
     // Default
     add_default_policy();
     add_default_displays();
     on_actionChecker_triggered();
-
-    // Status bar
-    statusBar()->show();
-    clear_msg_in_status_bar();
-
-    // Connect the signal
-    connect(this, SIGNAL(status_bar_show_message(const QString&, int)), statusBar(), SLOT(showMessage(const QString&, int)));
-    workerfiles.fill_registered_files_from_db();
-    workerfiles.start();
 }
 
 MainWindow::~MainWindow()
@@ -146,7 +147,13 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
     if (verbosity.length())
         verbosity_i = verbosity.toInt();
 
+    std::string full_path = filepath;
+    if (full_path.length())
+        full_path += "/";
+    full_path += filename;
+
     workerfiles.add_file_to_list(filename, filepath, policy_i, display_i, verbosity_i);
+    checkerView->add_file_to_result_table(full_path);
 }
 
 //---------------------------------------------------------------------------
@@ -621,18 +628,21 @@ void MainWindow::on_actionDataFormat_triggered()
 int MainWindow::clearVisualElements()
 {
     if (checkerView)
-        checkerView->hide();
+    {
+        delete checkerView;
+        checkerView = NULL;
+    }
 
     if (policiesView)
     {
         delete policiesView;
-        policiesView=NULL;
+        policiesView = NULL;
     }
 
     if (displayView)
     {
         delete displayView;
-        displayView=NULL;
+        displayView = NULL;
     }
 
     return 0;
@@ -641,16 +651,17 @@ int MainWindow::clearVisualElements()
 //---------------------------------------------------------------------------
 void MainWindow::createCheckerView()
 {
-    if (checkerView)
-    {
-        delete checkerView;
-        checkerView = NULL;
-    }
-
     if (clearVisualElements() < 0)
         return;
+
     checkerView = new CheckerWindow(this);
     checkerView->create_web_view();
+    std::map<std::string, FileRegistered> files;
+    workerfiles.get_registered_files(files);
+
+    std::map<std::string, FileRegistered>::iterator it = files.begin();
+    for (; it != files.end(); ++it)
+        checkerView->add_file_to_result_table(it->first);
 }
 
 //---------------------------------------------------------------------------

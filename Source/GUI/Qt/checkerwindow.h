@@ -22,6 +22,7 @@ namespace MediaConch {
 class MainWindow;
 class WebView;
 class ProgressBar;
+class ResultTable;
 
 class CheckerWindow : public QObject
 {
@@ -37,6 +38,7 @@ public:
     void                        reset_display_xslt() { display_xslt.clear(); }
     void                        change_local_files(QStringList& files);
     void                        hide();
+    void                        add_file_to_result_table(const std::string& full_path);
 
 private:
     // Visual elements
@@ -45,6 +47,9 @@ private:
     ProgressBar*                progress_bar;
     QString                     display_xslt;
     unsigned int                result_index;
+    ResultTable                *result_table;
+    bool                        is_finished;
+    std::vector<std::string>    files;
 
     void                        clear_visual_elements();
     void                        set_web_view_content(QString& html);
@@ -70,6 +75,7 @@ private:
     void change_checker_in_template(const QString& checker, QString& html);
     void change_result_in_template(const QString& result, QString& html);
     void change_body_script_in_template(QString& html);
+    void set_webmachine_script_in_template(QString& html);
 #if defined(WEB_MACHINE_ENGINE)
     void add_file_detail_to_html(std::string& file, int policy);
 #endif
