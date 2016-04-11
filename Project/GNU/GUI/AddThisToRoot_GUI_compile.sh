@@ -120,7 +120,7 @@ if test -e MediaConch/Project/Qt/prepare; then
     cd MediaConch/Project/Qt
     test -e Makefile && rm Makefile
     chmod +x prepare
-    ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+    ./prepare
     if test -e Makefile; then
         make clean
         Parallel_Make
