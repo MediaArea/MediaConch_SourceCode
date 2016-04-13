@@ -23,3 +23,14 @@ libtool
 
 # make generated
 *.o
+
+# test
+test-driver
+test-suite.log
+SampleFiles
+
+# tests output
+simple.sh.log
+simple.sh.trs
+test_ffv1.sh.log
+test_ffv1.sh.trs

@@ -41,3 +41,14 @@ mediaconch_CPPFLAGS = $(XML_CFLAGS)
 mediaconch_LDFLAGS= $(XML_LIBS)
 
 INCLUDES = -I../../../Source -I../../../../MediaInfoLib/Source -I../../../../ZenLib/Source
+
+TESTS = \
+    test/simple.sh \
+    test/test_ffv1.sh
+
+SAMPLES_DIR = test/SampleFiles
+
+clone_sample_files: $(SAMPLES_DIR)
+
+$(SAMPLES_DIR):
+	git clone https://github.com/MediaArea/MediaConch_SampleFiles test/SampleFiles
