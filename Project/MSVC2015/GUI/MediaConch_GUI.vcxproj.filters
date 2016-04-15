@@ -269,17 +269,11 @@
     <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\resultwindow.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\unknownwindow.cpp">
       <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_resultwindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_unknownpolicymenu.cpp">
       <Filter>Source Files\_Automated</Filter>
@@ -313,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="_Automated\moc_verbosityspinbox.cpp">
       <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -439,9 +436,6 @@
     <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\resultwindow.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
@@ -477,6 +471,9 @@
     </ClInclude>
     <ClInclude Include="_Automated\ui_verbosityspinbox.h">
       <Filter>Header Files\_Automated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

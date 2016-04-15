@@ -212,7 +212,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\resultwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp" />
@@ -241,7 +241,6 @@
     <ClCompile Include="_Automated\moc_policymenu.cpp" />
     <ClCompile Include="_Automated\moc_policywindow.cpp" />
     <ClCompile Include="_Automated\moc_progressbar.cpp" />
-    <ClCompile Include="_Automated\moc_resultwindow.cpp" />
     <ClCompile Include="_Automated\moc_ruleedit.cpp" />
     <ClCompile Include="_Automated\moc_rulemenu.cpp" />
     <ClCompile Include="_Automated\moc_schematronwindow.cpp" />
@@ -294,7 +293,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\policymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\resultwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h" />

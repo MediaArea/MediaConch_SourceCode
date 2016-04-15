@@ -21,17 +21,13 @@ class WebPage;
 class ResultTable;
 class FileRegistered;
 
-class ResultTable : public QObject
+class ResultTable
 {
-    Q_OBJECT
-
 public:
     explicit ResultTable(MainWindow* m, WebPage *p);
     ~ResultTable();
 
     void add_file_to_result_table(const std::string&);
-    /* void remove_file_from_result_table(); */
-    /* void remove_all_files_from_result_table(); */
 
 private:
     // Visual elements
