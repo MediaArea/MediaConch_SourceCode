@@ -123,14 +123,19 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
         fr = new FileRegistered;
     working_files_mutex.unlock();
 
+    // Keep the old index for the same file
+    if (exists)
+        fr->index = working_files[full_file]->index;
+    else
+        fr->index = file_index++;
     fr->filename = file;
     fr->filepath = path;
     fr->policy = policy;
     fr->display = display;
     fr->verbosity = verbosity;
-    fr->index = file_index++;
 
     working_files_mutex.lock();
+
     if (exists)
         delete working_files[full_file];
     working_files[full_file] = fr;

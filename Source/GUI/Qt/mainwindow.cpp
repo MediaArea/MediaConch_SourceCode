@@ -8,7 +8,6 @@
 #include "ui_mainwindow.h"
 #include "menumainwindow.h"
 #include "checkerwindow.h"
-#include "resultwindow.h"
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
@@ -75,7 +74,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
-    ToolGroup->addAction(ui->actionResult);
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionDisplay);
     
@@ -84,7 +82,6 @@ MainWindow::MainWindow(QWidget *parent) :
     Layout->setContentsMargins(0, 0, 0, 0);
     MenuView = new MenuMainWindow(this);
     checkerView=NULL;
-    resultView=NULL;
     policiesView = NULL;
     displayView = NULL;
     verbosity = NULL;
@@ -102,20 +99,20 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
     setAcceptDrops(false);
 
+    // Status bar
+    statusBar()->show();
+    clear_msg_in_status_bar();
+    connect(this, SIGNAL(status_bar_show_message(const QString&, int)),
+            statusBar(), SLOT(showMessage(const QString&, int)));
+
+    // worker load existing files
+    workerfiles.fill_registered_files_from_db();
+    workerfiles.start();
+
     // Default
     add_default_policy();
     add_default_displays();
     on_actionChecker_triggered();
-
-    // Status bar
-    statusBar()->show();
-    clear_msg_in_status_bar();
-
-    // Connect the signal
-    connect(this, SIGNAL(setResultView()), this, SLOT(on_actionResult_triggered()));
-    connect(this, SIGNAL(status_bar_show_message(const QString&, int)), statusBar(), SLOT(showMessage(const QString&, int)));
-    workerfiles.fill_registered_files_from_db();
-    workerfiles.start();
 }
 
 MainWindow::~MainWindow()
@@ -150,7 +147,13 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
     if (verbosity.length())
         verbosity_i = verbosity.toInt();
 
+    std::string full_path = filepath;
+    if (full_path.length())
+        full_path += "/";
+    full_path += filename;
+
     workerfiles.add_file_to_list(filename, filepath, policy_i, display_i, verbosity_i);
+    checkerView->add_file_to_result_table(full_path);
 }
 
 //---------------------------------------------------------------------------
@@ -177,9 +180,6 @@ void MainWindow::Run()
     {
         case RUN_CHECKER_VIEW:
             createCheckerView();
-            break;
-        case RUN_RESULT_VIEW:
-            createResultView();
             break;
         case RUN_POLICIES_VIEW:
             createPoliciesView();
@@ -448,17 +448,6 @@ void MainWindow::on_actionChecker_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_actionResult_triggered()
-{
-    if (!ui->actionResult->isChecked())
-        ui->actionResult->setChecked(true);
-    if (clearVisualElements() < 0)
-        return;
-    current_view = RUN_RESULT_VIEW;
-    Run();
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::on_actionPolicies_triggered()
 {
     if (!ui->actionPolicies->isChecked())
@@ -564,12 +553,6 @@ void MainWindow::verbosity_rejected()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::set_result_view()
-{
-    Q_EMIT setResultView();
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (!is_all_policies_saved())
@@ -645,24 +628,21 @@ void MainWindow::on_actionDataFormat_triggered()
 int MainWindow::clearVisualElements()
 {
     if (checkerView)
-        checkerView->hide();
-
-    if (resultView)
     {
-        delete resultView;
-        resultView = NULL;
+        delete checkerView;
+        checkerView = NULL;
     }
 
     if (policiesView)
     {
         delete policiesView;
-        policiesView=NULL;
+        policiesView = NULL;
     }
 
     if (displayView)
     {
         delete displayView;
-        displayView=NULL;
+        displayView = NULL;
     }
 
     return 0;
@@ -671,26 +651,17 @@ int MainWindow::clearVisualElements()
 //---------------------------------------------------------------------------
 void MainWindow::createCheckerView()
 {
-    if (checkerView)
-    {
-        delete checkerView;
-        checkerView = NULL;
-    }
-
     if (clearVisualElements() < 0)
         return;
+
     checkerView = new CheckerWindow(this);
     checkerView->create_web_view();
-}
+    std::map<std::string, FileRegistered> files;
+    workerfiles.get_registered_files(files);
 
-//---------------------------------------------------------------------------
-void MainWindow::createResultView()
-{
-    if (clearVisualElements() < 0)
-        return;
-    resultView = new ResultWindow(this);
-    resultView->set_default_update_timer(MCL.get_ui_poll_request());
-    resultView->display_results();
+    std::map<std::string, FileRegistered>::iterator it = files.begin();
+    for (; it != files.end(); ++it)
+        checkerView->add_file_to_result_table(it->first);
 }
 
 //---------------------------------------------------------------------------
@@ -827,12 +798,6 @@ void MainWindow::remove_widget_from_layout(QWidget* w)
 void MainWindow::checker_selected()
 {
     on_actionChecker_triggered();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::result_selected()
-{
-    on_actionResult_triggered();
 }
 
 //---------------------------------------------------------------------------

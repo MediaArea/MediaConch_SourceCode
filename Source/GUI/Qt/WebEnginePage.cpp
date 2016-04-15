@@ -24,23 +24,17 @@ namespace MediaConch
 {
     WebPage::WebPage(MainWindow *m, QWidget *parent) : QWebEnginePage(parent), mainwindow(m)
     {
-        connect(this, SIGNAL(loadFinished(bool)), this, SLOT(onLoadFinished(bool)));
+        connect(this, SIGNAL(loadFinished(bool)), this, SLOT(on_load_finished(bool)));
     }
 
-    void WebPage::onLoadFinished(bool ok)
+    void WebPage::on_load_finished(bool)
     {
-        if (!ok)
-            return;
-        connect(this, SIGNAL(update_registered_file(FileRegistered*)),
-                this, SLOT(update_status_registered_file(FileRegistered*)));
     }
 
     void WebPage::menu_link_checker(const QString& name)
     {
         if (!name.compare("Checker"))
             mainwindow->checker_selected();
-        else if (!name.compare("Result"))
-            mainwindow->result_selected();
         else if (!name.compare("Policies"))
             mainwindow->policies_selected();
         else if (!name.compare("Display"))
@@ -51,112 +45,17 @@ namespace MediaConch
             mainwindow->checker_selected();
     }
 
-    void WebPage::onInputChanged(const QString& inputName)
+    void WebPage::on_input_changed(const QString& inputName)
     {
         select_file_name = inputName;
     }
 
-    void WebPage::onButtonClicked(const QString& id)
-    {
-        if (id == "checkerUpload_Check file")
-            onFileUploadSelected();
-        else if (id == "checkerRepository_Check files")
-            onFileRepositorySelected();
-        else if (id == "checkerOnline_Check file")
-            onFileOnlineSelected();
-    }
-
-    void WebPage::onFillImplementationReport(const QString& file, const QString& target, const QString& display, const QString& verbosity)
-    {
-        std::string file_s = file.toStdString();
-        QString report;
-        int display_i = display.toInt();
-        int *verbosity_p = NULL;
-        int verbosity_i;
-        if (verbosity.length())
-        {
-            verbosity_i = verbosity.toInt();
-            verbosity_p = &verbosity_i;
-        }
-        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
-        QString script = QString("$('%1 .modal-body')").arg(target);
-
-        report = report.replace("\r", "");
-        if (report_is_html(report))
-        {
-            report = report.replace("\\", "\\\\");
-            report = report.replace("'", "\\'");
-            report = report.replace("\n", "");
-            script += QString(".html('%1');").arg(report);
-        }
-        else
-        {
-#if QT_VERSION >= 0x050200
-            report = report.toHtmlEscaped();
-#else
-            report = Qt::escape(report);
-#endif
-            report = report.replace("\n", "<br/>");
-            report = report.replace("\\", "\\\\");
-            report = report.replace(" ", "&nbsp;");
-            script += QString(".html('%1');").arg(report);
-        }
-        runJavaScript(script);
-    }
-
-    void WebPage::onFillPolicyReport(const QString& file, const QString& target, const QString& policy, const QString& display)
-    {
-        int policy_i = policy.toInt();
-        QString report;
-        if (policy_i != -1)
-        {
-            std::string file_s = file.toStdString();
-            int display_i = display.toInt();
-            mainwindow->validate_policy(file_s, report, policy_i, &display_i);
-        }
-        QString script = QString("$('%1 .modal-body')").arg(target);
-
-        report = report.replace("\r", "");
-        if (report_is_html(report))
-        {
-            report = report.replace("\\", "\\\\");
-            report = report.replace("'", "\\'");
-            report = report.replace("\n", "");
-            script += QString(".html('%1');").arg(report);
-        }
-        else
-        {
-#if QT_VERSION >= 0x050200
-            report = report.toHtmlEscaped();
-#else
-            report = Qt::escape(report);
-#endif
-            report = report.replace("\n", "<br/>");
-            report = report.replace("'", "\\'");
-            report = report.replace("\\", "\\\\");
-            script += QString(".html('%1');").arg(report);
-        }
-        runJavaScript(script);
-    }
-
-    QString WebPage::onFillMediaInfoReport(const QString& file)
-    {
-        std::string file_s = file.toStdString();
-        return mainwindow->get_mediainfo_jstree(file_s);
-    }
-
-    QString WebPage::onFillMediaTraceReport(const QString& file)
-    {
-        std::string file_s = file.toStdString();
-        return mainwindow->get_mediatrace_jstree(file_s);
-    }
-
-    void WebPage::onDownloadReport(const QString& report, const QString& save_name)
+    void WebPage::on_download_report(const QString& report, const QString& filename, const QString& report_name)
     {
         if (report.isEmpty())
             return;
 
-        QString proposed = save_name;
+        QString proposed = filename + "_" + report_name + ".txt";
         bool is_html = report_is_html(report);
         bool is_xml = false;
         if (is_html)
@@ -183,7 +82,7 @@ namespace MediaConch
         out << report;
     }
 
-    void WebPage::onSaveImplementationReport(const QString& file, const QString& save_name, const QString& display, const QString& verbosity)
+    QString WebPage::on_fill_implementation_report(const QString& file, const QString& display, const QString& verbosity)
     {
         std::string file_s = file.toStdString();
         QString report;
@@ -196,65 +95,103 @@ namespace MediaConch
             verbosity_p = &verbosity_i;
         }
         mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
-        onDownloadReport(report, save_name);
+        return report;
     }
 
-    void WebPage::onSavePolicyReport(const QString& file, const QString& save_name, const QString& policy, const QString& display)
+    void WebPage::on_save_implementation_report(const QString& file, const QString& display, const QString& verbosity)
+    {
+        std::string file_s = file.toStdString();
+        QString report;
+        int display_i = display.toInt();
+        int *verbosity_p = NULL;
+        int verbosity_i;
+        if (verbosity.length())
+        {
+            verbosity_i = verbosity.toInt();
+            verbosity_p = &verbosity_i;
+        }
+        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
+        on_download_report(report, file, "ImplementationReport");
+    }
+
+    QString WebPage::on_fill_policy_report(const QString& file, const QString& policy, const QString& display)
+    {
+        int policy_i = policy.toInt();
+        QString report;
+        if (policy_i != -1)
+        {
+            std::string file_s = file.toStdString();
+            int display_i = display.toInt();
+            mainwindow->validate_policy(file_s, report, policy_i, &display_i);
+        }
+        return report;
+    }
+
+    void WebPage::on_save_policy_report(const QString& file, const QString& policy, const QString& display)
     {
         std::string file_s = file.toStdString();
         QString report;
         int policy_i = policy.toInt();
         int display_i = display.toInt();
         mainwindow->validate_policy(file_s, report, policy_i, &display_i);
-        onDownloadReport(report, save_name);
+        on_download_report(report, file, "MediaConchReport");
     }
 
-    void WebPage::onSaveInfo(const QString& file, const QString& save_name)
+    QString WebPage::on_fill_mediainfo_report(const QString& file)
+    {
+        std::string file_s = file.toStdString();
+        return mainwindow->get_mediainfo_jstree(file_s);
+    }
+
+    void WebPage::on_save_mediainfo_report(const QString& file)
     {
         std::string file_s = file.toStdString();
         std::string display_name, display_content;
         QString report = mainwindow->get_mediainfo_xml(file_s, display_name, display_content);
-        onDownloadReport(report, save_name);
+        on_download_report(report, file, "MediaInfo");
     }
 
-    void WebPage::onSaveTrace(const QString& file, const QString& save_name)
+    QString WebPage::on_fill_mediatrace_report(const QString& file)
+    {
+        std::string file_s = file.toStdString();
+        return mainwindow->get_mediatrace_jstree(file_s);
+    }
+
+    void WebPage::on_save_mediatrace_report(const QString& file)
     {
         std::string file_s = file.toStdString();
         std::string display_name, display_content;
         QString report = mainwindow->get_mediatrace_xml(file_s, display_name, display_content);
-        onDownloadReport(report, save_name);
+        on_download_report(report, file, "MediaTrace");
     }
 
     void WebPage::clean_forms()
     {
         file_selector.clear();
 
-        runJavaScript("document.getElementById('checkerUpload_step1_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerUpload_step1_xslt').value = '';");
-        runJavaScript("document.getElementById('checkerUpload_step1_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerUpload_step1_display_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerUpload_policy').value = -1;");
+        runJavaScript("document.getElementById('checkerUpload_display_selector').value = -1;");
+        runJavaScript("document.getElementById('checkerUpload_verbosity_selector').value = -1;");
         runJavaScript("document.getElementById('checkerUpload_file').value = \"\";");
 
 #if defined(MEDIAINFO_LIBCURL_YES)
 
-        runJavaScript("document.getElementById('checkerOnline_step1_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerOnline_step1_xslt').value = '';");
-        runJavaScript("document.getElementById('checkerOnline_step1_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerOnline_step1_display_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerOnline_policy').value = -1;");
+        runJavaScript("document.getElementById('checkerOnline_display_selector').value = -1;");
+        runJavaScript("document.getElementById('checkerOnline_verbosity_selector').value = -1;");
         runJavaScript("document.getElementById('checkerOnline_file').value = \"\";");
 
 #endif
 
-        runJavaScript("document.getElementById('checkerRepository_step1_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerRepository_step1_xslt').value = '';");
-        runJavaScript("document.getElementById('checkerRepository_step1_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerRepository_step1_display_xslt').value = '';");
+        runJavaScript("document.getElementById('checkerRepository_policy').value = -1;");
+        runJavaScript("document.getElementById('checkerRepository_display_selector').value = -1;");
+        runJavaScript("document.getElementById('checkerRepository_verbosity_selector').value = -1;");
         runJavaScript("document.getElementById('checkerRepository_directory').value = \"\";");
     }
 
-    void WebPage::onFileUploadSelected(const QString& display_xslt, const QString& policy, const QString& verbosity)
+    void WebPage::on_file_upload_selected(const QString& policy, const QString& display_xslt, const QString& verbosity)
     {
-        QStringList files = file_selector.value("checkerUpload[file]", QStringList());
+        QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
         if (!files.size())
             return;
@@ -264,35 +201,23 @@ namespace MediaConch
             QFileInfo f = QFileInfo(files[i]);
             mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display_xslt, verbosity);
         }
-        mainwindow->set_result_view();
+        file_selector.clear();
+        clean_forms();
     }
 
-    void WebPage::onFileUploadSelected()
-    {
-        runJavaScript("webpage.onFileUploadSelected($('#checkerUpload_step1_display_selector').val(), $('#checkerUpload_step1_policy').val(),"
-                      " $('#checkerUpload_step1_verbosity_selector').val());");
-    }
-
-    void WebPage::onFileOnlineSelected(const QString& url, const QString& display_xslt, const QString& policy, const QString& verbosity)
+    void WebPage::on_file_online_selected(const QString& url, const QString& policy, const QString& display_xslt, const QString& verbosity)
     {
         if (!url.length())
             return;
 
         mainwindow->add_file_to_list(url, "", policy, display_xslt, verbosity);
-        mainwindow->set_result_view();
+        file_selector.clear();
+        clean_forms();
     }
 
-    void WebPage::onFileOnlineSelected()
+    void WebPage::on_file_repository_selected(const QString& policy, const QString& display_xslt, const QString& verbosity)
     {
-        runJavaScript("webpage.onFileOnlineSelected($('#checkerOnline_file').val(), "
-                                                   "$('#checkerOnline_step1_display_selector').val(), "
-                                                   "$('#checkerOnline_step1_policy').val(), "
-                                                   "$('#checkerOnline_step1_verbosity_selector').val());");
-    }
-
-    void WebPage::onFileRepositorySelected(const QString& display_xslt, const QString& policy, const QString& verbosity)
-    {
-        QStringList dirname = file_selector.value("checkerRepository[directory]", QStringList());
+        QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
         if (dirname.empty())
             return;
 
@@ -303,14 +228,8 @@ namespace MediaConch
 
         for (int i = 0; i < list.size(); ++i)
             mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt, verbosity);
-        mainwindow->set_result_view();
-    }
-
-    void WebPage::onFileRepositorySelected()
-    {
-        runJavaScript("webpage.onFileRepositorySelected($('#checkerRepository_step1_display_selector').val(), "
-                                                       "$('#checkerRepository_step1_policy').val(), "
-                                                       "$('#checkerRepository_step1_verbosity_selector').val());");
+        file_selector.clear();
+        clean_forms();
     }
 
     void WebPage::close_all()
@@ -336,7 +255,7 @@ namespace MediaConch
         {
             QString value_input;
             QString suggested = oldFiles.first();
-            if (select_file_name == "checkerRepository[directory]")
+            if (select_file_name == "checkerRepository_directory")
                 value_input = QFileDialog::getExistingDirectory(view(), NULL, suggested);
             else
                 value_input = QFileDialog::getOpenFileName(view(), NULL, suggested);
@@ -361,39 +280,25 @@ namespace MediaConch
             QStringList names = QFileDialog::getOpenFileNames(view(), QString::null);
 
             list = names;
-            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload[file]");
+            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
             if (it != file_selector.end())
-                file_selector["checkerUpload[file]"] = names;
+                file_selector["checkerUpload_file"] = names;
             else
-                file_selector.insert("checkerUpload[file]", names);
+                file_selector.insert("checkerUpload_file", names);
         }
 
         return list;
     }
 
-    void WebPage::changeLocalFiles(QStringList& files)
+    void WebPage::change_local_files(QStringList& files)
     {
-        QString query;
-        query += ("document.getElementById('collapseOnline').setAttribute('class', 'panel-collapse collapse'); ");
-        query += ("document.getElementById('collapseOnline').setAttribute('aria-expanded', 'false'); ");
-        query += ("document.getElementById('collapseOnline').setAttribute('style', '\"height: 20px\"'); ");
-
-        query += ("document.getElementById('collapseRepository').setAttribute('class', 'panel-collapse collapse'); ");
-        query += ("document.getElementById('collapseRepository').setAttribute('aria-expanded', 'false'); ");
-        query += ("document.getElementById('collapseRepository').setAttribute('style', '\"height: 20px\"'); ");
-
-        query += ("document.getElementById('collapseUpload').setAttribute('class', 'panel-collapse in'); ");
-        query += ("document.getElementById('collapseUpload').setAttribute('aria-expanded', 'true'); ");
-        query += ("document.getElementById('collapseUpload').setAttribute('style', ''); ");
-
-        runJavaScript(query);
-        QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload[file]");
+        QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
         if (it != file_selector.end())
-            file_selector["checkerUpload[file]"] << files;
+            file_selector["checkerUpload_file"] << files;
         else
-            file_selector.insert("checkerUpload[file]", files);
+            file_selector.insert("checkerUpload_file", files);
 
-        onFileUploadSelected();
+        on_file_upload_selected("-1", "-1", "-1");
     }
 
     void WebPage::use_javascript(const QString& js)
@@ -423,90 +328,96 @@ namespace MediaConch
         return false;
     }
 
-    //---------------------------------------------------------------------------
-    void WebPage::update_status_registered_file(FileRegistered* file)
+    QString WebPage::get_file_tool(const QString& file)
     {
-        set_analyzed_status(file);
-        set_implementation_status(file);
-        set_policy_status(file);
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        if (!fr)
+            return "-1";
+
+        int report_kind = fr->report_kind;
+        delete fr;
+        return QString().setNum(report_kind);
     }
 
-    //---------------------------------------------------------------------------
-    void WebPage::emit_update_registered_file(FileRegistered* file)
+    QString WebPage::get_file_policy_id(const QString& file)
     {
-        Q_EMIT update_registered_file(file);
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        if (!fr)
+            return "-1";
+
+        int policy = fr->policy;
+        delete fr;
+        return QString().setNum(policy);
     }
 
-    //---------------------------------------------------------------------------
-    void WebPage::set_analyzed_status(FileRegistered* file)
+    QString WebPage::get_file_display_id(const QString& file)
     {
-        QString percent_str;
-        percent_str = QString("%1").arg(file->analyze_percent == 0 ? "In queue" : "Analyzing");
-        QString script = QString("$('#analyzeStatus%1').prop('class', '%2');").arg(file->index).arg(file->analyzed ? "success" : "info");
-        script += QString("$('#analyzePercent%1').text('%2');").arg(file->index).arg(file->analyzed ? "Analyzed" : percent_str);
-        use_javascript(script);
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        if (!fr)
+            return "-1";
+
+        int display = fr->display;
+        delete fr;
+        return QString().setNum(display);
     }
 
-    //---------------------------------------------------------------------------
-    void WebPage::set_implementation_status(FileRegistered* file)
+    QString WebPage::get_file_verbosity_id(const QString& file)
     {
-        QString status("info");
-        if (file->analyzed)
-            status = file->implementation_valid ? "success" : "danger";
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        if (!fr)
+            return "-1";
 
-        QString script = QString("$('#implementationStatus%1').prop('class', '%2');").arg(file->index).arg(status);
-        if (file->analyzed && file->report_kind != MediaConchLib::report_MediaConch)
-        {
-            script += QString("$('#fileDetail_implementation_displays_list%1').prop('class', 'hidden');").arg(file->index);
-            script += QString("$('#fileDetail_implementation_verbosity_list%1').prop('class', 'hidden');").arg(file->index);
-        }
-        else
-        {
-            script += QString("$('#fileDetail_implementation_displays_list%1').prop('class', '');").arg(file->index);
-            script += QString("$('#fileDetail_implementation_verbosity_list%1').prop('class', '');").arg(file->index);
-        }
-
-
-        if (file->analyzed && file->implementation_valid)
-            script += QString("var old = $('#implementationStatus%1').html(); $('#implementationStatus%1').html('<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> Valid' + old);").arg(file->index);
-        else if (file->analyzed && !file->implementation_valid)
-            script += QString("var old = $('#implementationStatus%1').html(); $('#implementationStatus%1').html('<span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span> Not Valid' + old);").arg(file->index);
-
-        use_javascript(script);
+        int verbosity = fr->verbosity;
+        delete fr;
+        return QString().setNum(verbosity);
     }
 
-    //---------------------------------------------------------------------------
-    void WebPage::set_policy_status(FileRegistered* file)
+    bool WebPage::policy_is_valid(const QString& file)
     {
-        QString status("info");
-        if (file->analyzed && file->policy != -1 && file->report_kind == MediaConchLib::report_MediaConch)
-            status = file->policy_valid ? "success" : "danger";
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        if (!fr)
+            return false;
 
-        QString script = QString("$('#policyStatus%1').prop('class', '%2');").arg(file->index).arg(status);
-
-        if (file->analyzed && file->report_kind != MediaConchLib::report_MediaConch)
+        if (!fr->analyzed)
         {
-            script += QString("$('#fileDetail_policy_displays_list%1').prop('class', 'hidden');").arg(file->index);
-            script += QString("$('#fileDetail_policy_policies_list%1').prop('class', 'hidden');").arg(file->index);
-            script += QString("$('#policyElementName%1').text('N/A');").arg(file->index);
+            delete fr;
+            return false;
         }
 
-        if (!file->analyzed || file->report_kind != MediaConchLib::report_MediaConch)
+        bool policy_valid = fr->policy_valid;
+        delete fr;
+
+        return policy_valid;
+    }
+
+    bool WebPage::implementation_is_valid(const QString& file)
+    {
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        if (!fr)
+            return false;
+
+        if (!fr->analyzed)
         {
-            script += QString("$('#policyStatusViewIcon%1').prop('class', 'hidden');").arg(file->index);
-            script += QString("$('#policyStatusDownloadIcon%1').prop('class', 'hidden');").arg(file->index);
-            use_javascript(script);
-            return;
+            delete fr;
+            return false;
         }
 
-        script += QString("$('#policyStatusViewIcon%1').prop('class', 'glyphicon glyphicon-eye-open');").arg(file->index);
-        script += QString("$('#policyStatusDownloadIcon%1').prop('class', 'glyphicon glyphicon-download');").arg(file->index);
-        if (file->analyzed && file->policy != -1 && file->policy_valid)
-            script += QString("var old = $('#policyStatus%1').html(); $('#policyStatus%1').html('<span class=\"glyphicon glyphicon-ok text-success\" aria-hidden=\"true\"></span> ' + old);").arg(file->index);
-        else if (file->analyzed && file->policy != -1 && !file->policy_valid)
-            script += QString("var old = $('#policyStatus%1').html(); $('#policyStatus%1').html('<span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span> ' + old);").arg(file->index);
+        bool implementation_valid = fr->implementation_valid;
+        delete fr;
 
-        use_javascript(script);
+        return implementation_valid;
+    }
+
+    bool WebPage::file_is_analyzed(const QString& file)
+    {
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        if (!fr)
+            return false;
+
+        bool analyzed = fr->analyzed;
+        delete fr;
+
+        return analyzed;
     }
 
 }
