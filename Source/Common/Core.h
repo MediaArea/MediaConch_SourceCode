@@ -43,7 +43,7 @@ using namespace std;
 namespace MediaConch {
 
 class Schema;
-class Database;
+class DatabaseReport;
 class PluginsManager;
 class Plugin;
 
@@ -116,7 +116,7 @@ public:
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
 
-    //General Database
+    //General Report Database
     void load_database();
     bool database_is_enabled() const;
     void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
@@ -138,7 +138,7 @@ private:
     Core (const Core&);
 
     MediaInfoNameSpace::MediaInfoList* MI;
-    Database*                          db;
+    DatabaseReport*                    db;
     CriticalSection                    db_mutex;
     static const std::string           database_name;
     Configuration*                     config;
@@ -212,7 +212,7 @@ private:
 
     std::string get_config_file();
     std::string get_database_path();
-    Database *get_db();
+    DatabaseReport *get_db();
 };
 
 }

@@ -19,8 +19,10 @@ mediaconch_SOURCES = \
     ../../../Source/Common/XsltPolicy.cpp \
     ../../../Source/Common/UnknownPolicy.cpp \
     ../../../Source/Common/Database.cpp \
-    ../../../Source/Common/NoDatabase.cpp \
+    ../../../Source/Common/DatabaseReport.cpp \
+    ../../../Source/Common/NoDatabaseReport.cpp \
     ../../../Source/Common/SQLLite.cpp \
+    ../../../Source/Common/SQLLiteReport.cpp \
     ../../../Source/Common/Json.cpp \
     ../../../Source/Common/Configuration.cpp \
     ../../../Source/Common/REST_API.cpp \

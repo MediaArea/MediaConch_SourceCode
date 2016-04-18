@@ -8,9 +8,8 @@
 #include "mainwindow.h"
 #include "Common/FileRegistered.h"
 
-#include "Common/Database.h"
-#include "Common/NoDatabase.h"
-#include "Common/SQLLite.h"
+#include "Common/NoDatabaseUi.h"
+#include "Common/SQLLiteUi.h"
 
 #include <QString>
 #include <QDir>
@@ -414,7 +413,7 @@ void WorkerFiles::load_database()
             db_path = ".";
     }
 
-    db = new SQLLite;
+    db = new SQLLiteUi;
 
     db->set_database_directory(db_path);
     db->set_database_filename(database_filename);
@@ -435,7 +434,7 @@ void WorkerFiles::load_database()
 
     if (!db)
     {
-        db = new NoDatabase;
+        db = new NoDatabaseUi;
         db->init_ui();
     }
 }

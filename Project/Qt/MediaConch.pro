@@ -50,8 +50,13 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/UnknownPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/Common/Database.cpp \
-                    ../../Source/Common/NoDatabase.cpp \
+                    ../../Source/Common/DatabaseReport.cpp \
+                    ../../Source/Common/DatabaseUi.cpp \
+                    ../../Source/Common/NoDatabaseReport.cpp \
+                    ../../Source/Common/NoDatabaseUi.cpp \
                     ../../Source/Common/SQLLite.cpp \
+                    ../../Source/Common/SQLLiteReport.cpp \
+                    ../../Source/Common/SQLLiteUi.cpp \
                     ../../Source/Common/Json.cpp \
                     ../../Source/Common/Configuration.cpp \
                     ../../Source/Common/REST_API.cpp \
@@ -110,8 +115,13 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
                     ../../Source/Common/ImplementationReportMatroskaSchema.h \
                     ../../Source/Common/Database.h \
-                    ../../Source/Common/NoDatabase.h \
+                    ../../Source/Common/DatabaseReport.h \
+                    ../../Source/Common/DatabaseUi.h \
+                    ../../Source/Common/NoDatabaseReport.h \
+                    ../../Source/Common/NoDatabaseUi.h \
                     ../../Source/Common/SQLLite.h \
+                    ../../Source/Common/SQLLiteReport.h \
+                    ../../Source/Common/SQLLiteUi.h \
                     ../../Source/Common/Json.h \
                     ../../Source/Common/Container.h \
                     ../../Source/Common/NoContainer.h \

@@ -11,11 +11,11 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef NODATABASEH
-#define NODATABASEH
+#ifndef NODATABASEUIH
+#define NODATABASEUIH
 
 //---------------------------------------------------------------------------
-#include "Database.h"
+#include "DatabaseUi.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -26,28 +26,15 @@ class FileRegistered;
 // Class NoDatabase
 //***************************************************************************
 
-class NoDatabase : public Database
+class NoDatabaseUi : public DatabaseUi
 {
 public:
     //Constructor/Destructor
-    NoDatabase();
-    virtual ~NoDatabase();
+    NoDatabaseUi();
+    virtual ~NoDatabaseUi();
 
     virtual int init();
-    virtual int init_report();
     virtual int init_ui();
-
-    // Report
-    virtual int create_report_table();
-    virtual int update_report_table();
-    virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification, const std::string& report, MediaConchLib::compression);
-    virtual int remove_report(const std::string& filename);
-    virtual void get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
-                            const std::string& filename, const std::string& file_last_modification,
-                            std::string& report, MediaConchLib::compression&);
-    virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification);
-    virtual void get_elements(std::vector<std::string>& vec);
-    virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind);
 
     // UI
     virtual int ui_add_file(const FileRegistered* file);
@@ -64,23 +51,10 @@ protected:
     virtual int execute();
 
 private:
-    NoDatabase (const NoDatabase&);
-    NoDatabase& operator=(const NoDatabase&);
-
-    struct Report
-    {
-        MediaConchLib::report reportKind;
-        MediaConchLib::format format;
-        MediaConchLib::compression compression;
-        std::string file_last_modification;
-        std::string report;
-    };
-
-    //TODO UI
-
-    std::map<std::string, std::vector<Report*> > reports_saved;
+    NoDatabaseUi (const NoDatabaseUi&);
+    NoDatabaseUi& operator=(const NoDatabaseUi&);
 };
 
 }
 
-#endif /* !NODATABASEH */
+#endif /* !NODATABASEUIH */

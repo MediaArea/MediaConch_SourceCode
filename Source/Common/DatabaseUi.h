@@ -11,12 +11,13 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef DatabaseH
-#define DatabaseH
+#ifndef DatabaseUiH
+#define DatabaseUiH
 //---------------------------------------------------------------------------
 
 #include <map>
 #include <vector>
+#include "Database.h"
 #include "MediaConchLib.h"
 //---------------------------------------------------------------------------
 
@@ -28,28 +29,37 @@ class FileRegistered;
 // Class Database
 //***************************************************************************
 
-class Database
+class DatabaseUi : public Database
 {
 public:
     //Constructor/Destructor
-    Database();
-    virtual ~Database();
+    DatabaseUi();
+    virtual ~DatabaseUi();
 
     void        set_database_directory(const std::string& dirname);
     void        set_database_filename(const std::string& name);
 
-    virtual int init() = 0;
+    // UI
+    virtual int ui_add_file(const FileRegistered* file) = 0;
+    virtual int ui_add_files(const std::vector<FileRegistered*>& files) = 0;
+    virtual int ui_update_file(const FileRegistered* file) = 0;
+    virtual int ui_update_files(const std::vector<FileRegistered*>& files) = 0;
+    virtual int ui_get_file(FileRegistered* file) = 0;
+    virtual int ui_remove_file(const FileRegistered* file) = 0;
+    virtual int ui_remove_files(const std::vector<FileRegistered*>& files) = 0;
+    virtual int ui_remove_all_files() = 0;
+    virtual void ui_get_elements(std::vector<FileRegistered*>& vec) = 0;
 
-    const std::vector<std::string>& get_errors() const { return errors; }
+    virtual int init_ui() = 0;
 
 protected:
-    std::vector<std::string>           errors;
-    std::string                        db_filename;
-    std::string                        db_dirname;
+    //Database dependant
+    void        get_sql_query_for_create_ui_table(std::string& q);
+    void        get_sql_query_for_update_ui_table_v0(std::string& q);
 
 private:
-    Database (const Database&);
-    Database& operator=(const Database&);
+    DatabaseUi (const DatabaseUi&);
+    DatabaseUi& operator=(const DatabaseUi&);
 };
 
 }
