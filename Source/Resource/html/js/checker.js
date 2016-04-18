@@ -300,7 +300,7 @@ $(document).ready(function() {
                                         <div class="form-group"><label class="col-sm-2 control-label">Display</label><div class="col-sm-10"><select id="modalConformanceDisplay' + resultId + '"></select></div></div> \
                                     </div> \
                                     <div class="col-md-6"> \
-                                        <div class="form-group"><label class="col-sm-2 control-label">Verbosity</label><div class="col-sm-10"><select id="modalConformanceVerbosity' + resultId + '"></select></div></div> \
+                                        <div class="form-group"><label class="col-sm-3 control-label">Verbosity</label><div class="col-sm-9"><select id="modalConformanceVerbosity' + resultId + '"></select></div></div> \
                                     </div> \
                                 </div> \
                                 <div class="modal-body"></div> \
