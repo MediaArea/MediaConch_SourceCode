@@ -710,12 +710,12 @@ void MainWindow::create_policy_options(QString& policies)
     }
 
     // Create default policy opt-group
-    if (system_policy.length())
-        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
-
-    // Create default policy opt-group
     if (user_policy.length())
         policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
+
+    // Create default policy opt-group
+    if (system_policy.length())
+        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
 }
 
 //---------------------------------------------------------------------------
@@ -734,13 +734,13 @@ void MainWindow::create_displays_options(QString& displays)
                 .arg((int)i).arg(file.baseName());
     }
 
-    // Create default display opt-group
-    if (system_display.length())
-        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
-
     // Create user display opt-group
     if (user_display.length())
         displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
+
+    // Create default display opt-group
+    if (system_display.length())
+        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
 }
 
 //---------------------------------------------------------------------------
