@@ -54,7 +54,7 @@ $(document).ready(function() {
             return;
         }
 
-        node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 35) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).draw(false).node();
+        node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 27) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).draw(false).node();
 
         // Add id
         resultId = 'result-' + index;
@@ -300,7 +300,7 @@ $(document).ready(function() {
                                         <div class="form-group"><label class="col-sm-2 control-label">Display</label><div class="col-sm-10"><select id="modalConformanceDisplay' + resultId + '"></select></div></div> \
                                     </div> \
                                     <div class="col-md-6"> \
-                                        <div class="form-group"><label class="col-sm-2 control-label">Verbosity</label><div class="col-sm-10"><select id="modalConformanceVerbosity' + resultId + '"></select></div></div> \
+                                        <div class="form-group"><label class="col-sm-3 control-label">Verbosity</label><div class="col-sm-9"><select id="modalConformanceVerbosity' + resultId + '"></select></div></div> \
                                     </div> \
                                 </div> \
                                 <div class="modal-body"></div> \
@@ -416,7 +416,7 @@ $(document).ready(function() {
             nodePolicy.addClass('danger');
             policyResultText = '<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> ';
         }
-        policyResultText += '<span title="' + $(node).data('policyName') + '">' + truncateString($(node).data('policyName'), 25) + '</span>';
+        policyResultText += '<span title="' + $(node).data('policyName') + '">' + truncateString($(node).data('policyName'), 20) + '</span>';
 
         result.cell('#' + resultId, 2).data(policyResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalPolicy' + resultId + '" title="View policy report"><span class="glyphicon glyphicon-eye-open policy-view" aria-hidden="true"></span></a><a href="#" class="policy-dld" data-target="#modalPolicy' + resultId + '" data-save-name="' + resultId + '_PolicyReport.txt" title="Download policy report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>');
 
