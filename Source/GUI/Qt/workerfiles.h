@@ -35,7 +35,6 @@ public:
     // Configuration
     void fill_registered_files_from_db();
     void create_and_configure_database();
-    void load_database();
 
     // functions
     void add_file_to_list(const std::string& file, const std::string& path, int policy, int display, int verbosity);

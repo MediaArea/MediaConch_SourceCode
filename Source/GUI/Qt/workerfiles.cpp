@@ -401,7 +401,7 @@ void WorkerFiles::remove_file_registered_from_file(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-void WorkerFiles::load_database()
+void WorkerFiles::create_and_configure_database()
 {
 #ifdef HAVE_SQLITE
     std::string db_path;
@@ -437,12 +437,6 @@ void WorkerFiles::load_database()
         db = new NoDatabaseUi;
         db->init_ui();
     }
-}
-
-//---------------------------------------------------------------------------
-void WorkerFiles::create_and_configure_database()
-{
-    load_database();
 }
 
 //---------------------------------------------------------------------------
