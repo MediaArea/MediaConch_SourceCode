@@ -143,7 +143,7 @@ private:
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
-    VerbositySpinbox*           verbosity;
+    VerbositySpinbox*           verbosity_box;
 
     int                         clearVisualElements();
     void                        clearPoliciesElements();

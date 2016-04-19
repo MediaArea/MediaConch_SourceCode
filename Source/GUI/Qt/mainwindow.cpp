@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     checkerView=NULL;
     policiesView = NULL;
     displayView = NULL;
-    verbosity = NULL;
+    verbosity_box = NULL;
 
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
@@ -119,8 +119,8 @@ MainWindow::~MainWindow()
 {
     workerfiles.quit();
     workerfiles.wait();
-    if (verbosity)
-        delete verbosity;
+    if (verbosity_box)
+        delete verbosity_box;
     delete ui;
     if (checkerView)
         delete checkerView;
@@ -489,9 +489,9 @@ void MainWindow::on_actionChooseSchema_triggered()
 //---------------------------------------------------------------------------
 void MainWindow::on_actionVerbosity_triggered()
 {
-    if (!verbosity)
+    if (!verbosity_box)
     {
-        verbosity = new VerbositySpinbox(NULL);
+        verbosity_box = new VerbositySpinbox(NULL);
         int w = width();
         int left = 0;
         if (w < 220)
@@ -513,8 +513,8 @@ void MainWindow::on_actionVerbosity_triggered()
             up = h / 3;
             h = up + 85;
         }
-        verbosity->move(left + x(), up + y());
-        verbosity->resize(w, h);
+        verbosity_box->move(left + x(), up + y());
+        verbosity_box->resize(w, h);
     }
     QString value;
     if (MCL.get_implementation_verbosity().length())
@@ -522,34 +522,34 @@ void MainWindow::on_actionVerbosity_triggered()
     else
         value = "-1";
 
-    verbosity->get_verbosity_spin()->setValue(value.toInt());
-    connect(verbosity->get_buttons_box(), SIGNAL(accepted()), this, SLOT(verbosity_accepted()));
-    connect(verbosity->get_buttons_box(), SIGNAL(rejected()), this, SLOT(verbosity_rejected()));
-    verbosity->show();
+    verbosity_box->get_verbosity_spin()->setValue(value.toInt());
+    connect(verbosity_box->get_buttons_box(), SIGNAL(accepted()), this, SLOT(verbosity_accepted()));
+    connect(verbosity_box->get_buttons_box(), SIGNAL(rejected()), this, SLOT(verbosity_rejected()));
+    verbosity_box->show();
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::verbosity_accepted()
 {
-    if (!verbosity)
+    if (!verbosity_box)
         return;
 
     QString value;
-    value.setNum(verbosity->get_verbosity_spin()->value());
+    value.setNum(verbosity_box->get_verbosity_spin()->value());
     MCL.set_implementation_verbosity(value.toStdString());
 
-    delete verbosity;
-    verbosity = NULL;
+    delete verbosity_box;
+    verbosity_box = NULL;
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::verbosity_rejected()
 {
-    if (!verbosity)
+    if (!verbosity_box)
         return;
 
-    delete verbosity;
-    verbosity = NULL;
+    delete verbosity_box;
+    verbosity_box = NULL;
 }
 
 //---------------------------------------------------------------------------
