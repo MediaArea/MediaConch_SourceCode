@@ -17,8 +17,8 @@
 
 #include <map>
 #include <vector>
-#include "Database.h"
-#include "MediaConchLib.h"
+#include "Common/Database.h"
+#include "Common/MediaConchLib.h"
 //---------------------------------------------------------------------------
 
 namespace MediaConch {

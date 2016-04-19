@@ -8,8 +8,8 @@
 #include "mainwindow.h"
 #include "Common/FileRegistered.h"
 
-#include "Common/NoDatabaseUi.h"
-#include "Common/SQLLiteUi.h"
+#include "NoDatabaseUi.h"
+#include "SQLLiteUi.h"
 
 #include <QString>
 #include <QDir>
