@@ -9,6 +9,8 @@
 
 #include "Common/Core.h"
 #include "workerfiles.h"
+#include "uisettings.h"
+#include "DatabaseUi.h"
 
 #include <QMainWindow>
 #include <QFileInfo>
@@ -133,9 +135,12 @@ private:
     Ui::MainWindow *ui;
 
     // Internal
+    DatabaseUi                   *db;
+    static const std::string      database_filename;
     MediaConchLib                 MCL;
     std::vector<QString>          displays_list;
     WorkerFiles                   workerfiles;
+    UiSettings                    uisettings;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -145,6 +150,7 @@ private:
     MenuMainWindow*             MenuView;
     VerbositySpinbox*           verbosity_box;
 
+    void                        create_and_configure_ui_database();
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();

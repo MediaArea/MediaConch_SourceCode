@@ -17,14 +17,15 @@ class DatabaseUi;
 class UiSettings
 {
 public:
-    UiSettings(DatabaseUi* db);
+    UiSettings();
     ~UiSettings();
     
 //***************************************************************************
 // Functions
 //***************************************************************************
     //General
-    void         init();
+    int          init();
+    void         set_database(DatabaseUi* db);
 
     // Default
     std::string  get_default_policy() const;
@@ -32,7 +33,7 @@ public:
     std::string  get_default_display() const;
     void         change_default_display(const std::string& display);
     int          get_default_verbosity() const;
-    void         change_default_verbosity(int& verbosity);
+    void         change_default_verbosity(int verbosity);
 
 private:
     std::string  default_policy;

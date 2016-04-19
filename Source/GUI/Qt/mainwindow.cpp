@@ -14,6 +14,9 @@
 #include "verbosityspinbox.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
+#include "DatabaseUi.h"
+#include "SQLLiteUi.h"
+#include "NoDatabaseUi.h"
 
 #include <QStringList>
 #include <QTextEdit>
@@ -49,6 +52,12 @@
 namespace MediaConch {
 
 //***************************************************************************
+// Constant
+//***************************************************************************
+
+const std::string MainWindow::database_filename = std::string("MediaConchUi.db");
+
+//***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
@@ -61,15 +70,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     MCL.init();
 
-    // Local database
-    workerfiles.create_and_configure_database();
+    // GUI database
+    create_and_configure_ui_database();
+    workerfiles.set_database(db);
+    uisettings.set_database(db);
+    uisettings.init();
 
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
-
-    if (!MCL.get_implementation_verbosity().length())
-        MCL.set_implementation_verbosity("-1");
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
@@ -142,7 +151,7 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
 
     QString verbosity(v);
     if (verbosity == "-1")
-        verbosity = QString().fromStdString(MCL.get_implementation_verbosity());
+        verbosity = QString("%d").arg(uisettings.get_default_verbosity());
     int verbosity_i = -1;
     if (verbosity.length())
         verbosity_i = verbosity.toInt();
@@ -516,11 +525,7 @@ void MainWindow::on_actionVerbosity_triggered()
         verbosity_box->move(left + x(), up + y());
         verbosity_box->resize(w, h);
     }
-    QString value;
-    if (MCL.get_implementation_verbosity().length())
-        value = QString().fromStdString(MCL.get_implementation_verbosity());
-    else
-        value = "-1";
+    QString value = QString("%1").arg(uisettings.get_default_verbosity());
 
     verbosity_box->get_verbosity_spin()->setValue(value.toInt());
     connect(verbosity_box->get_buttons_box(), SIGNAL(accepted()), this, SLOT(verbosity_accepted()));
@@ -534,9 +539,7 @@ void MainWindow::verbosity_accepted()
     if (!verbosity_box)
         return;
 
-    QString value;
-    value.setNum(verbosity_box->get_verbosity_spin()->value());
-    MCL.set_implementation_verbosity(value.toStdString());
+    uisettings.change_default_verbosity(verbosity_box->get_verbosity_spin()->value());
 
     delete verbosity_box;
     verbosity_box = NULL;
@@ -1174,6 +1177,47 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
 int MainWindow::get_ui_database_path(std::string& path)
 {
     return MCL.get_ui_database_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::create_and_configure_ui_database()
+{
+#ifdef HAVE_SQLITE
+    std::string db_path;
+    if (get_ui_database_path(db_path) < 0)
+    {
+        db_path = Core::get_local_data_path();
+        QDir f(QString().fromStdString(db_path));
+        if (!f.exists())
+            db_path = ".";
+    }
+
+    db = new SQLLiteUi;
+
+    db->set_database_directory(db_path);
+    db->set_database_filename(database_filename);
+    if (db->init_ui() < 0)
+    {
+        const std::vector<std::string>& errors = db->get_errors();
+        std::string error;
+        for (size_t i = 0; i < errors.size(); ++i)
+        {
+            if (i)
+                error += " ";
+            error += errors[i];
+        }
+        QString msg = QString().fromStdString(error);
+        set_msg_to_status_bar(msg);
+        delete db;
+        db = NULL;
+    }
+#endif
+
+    if (!db)
+    {
+        db = new NoDatabaseUi;
+        db->init_ui();
+    }
 }
 
 //---------------------------------------------------------------------------

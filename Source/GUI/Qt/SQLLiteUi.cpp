@@ -626,8 +626,8 @@ int SQLLiteUi::ui_settings_save_default_policy(const std::string& policy, int us
 
     reports.clear();
     create << "UPDATE UI_SETTINGS ";
-    create << "SET   DEFAULT_POLICY = ?, ";
-    create << "WHERE USER_ID        = ?; ";
+    create << "SET   DEFAULT_POLICY = ? ";
+    create << "WHERE USER_ID        = ?;";
 
     query = create.str();
 
@@ -683,8 +683,8 @@ int SQLLiteUi::ui_settings_save_default_display(const std::string& display, int 
 
     reports.clear();
     create << "UPDATE UI_SETTINGS ";
-    create << "SET   DEFAULT_DISPLAY = ?, ";
-    create << "WHERE USER_ID        = ?; ";
+    create << "SET   DEFAULT_DISPLAY = ? ";
+    create << "WHERE USER_ID         = ?;";
 
     query = create.str();
 
@@ -741,8 +741,8 @@ int SQLLiteUi::ui_settings_save_default_verbosity(int verbosity, int user_id)
 
     reports.clear();
     create << "UPDATE UI_SETTINGS ";
-    create << "SET   DEFAULT_VERBOSITY = ?, ";
-    create << "WHERE USER_ID        = ?; ";
+    create << "SET   DEFAULT_VERBOSITY = ? ";
+    create << "WHERE USER_ID           = ?;";
 
     query = create.str();
 

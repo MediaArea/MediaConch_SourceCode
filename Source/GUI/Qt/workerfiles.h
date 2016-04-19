@@ -34,7 +34,7 @@ public:
 
     // Configuration
     void fill_registered_files_from_db();
-    void create_and_configure_database();
+    void set_database(DatabaseUi* database);
 
     // functions
     void add_file_to_list(const std::string& file, const std::string& path, int policy, int display, int verbosity);
@@ -64,7 +64,6 @@ private Q_SLOTS:
 private:
     MainWindow                             *mainwindow;
     DatabaseUi                             *db;
-    static const std::string                database_filename;
     QTimer                                 *timer;
     size_t                                  file_index;
 
