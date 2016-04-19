@@ -108,4 +108,40 @@ void NoDatabaseUi::ui_get_elements(std::vector<FileRegistered*>&)
 {
 }
 
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_save_default_policy(const std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_get_default_policy(std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_save_default_display(const std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_get_default_display(std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_save_default_verbosity(int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_get_default_verbosity(int&)
+{
+    return 0;
+}
+
 }

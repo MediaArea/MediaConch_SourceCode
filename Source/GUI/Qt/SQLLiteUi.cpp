@@ -104,6 +104,7 @@ int SQLLiteUi::init_ui()
         return -1;
     if (get_db_version(ui_version) < 0)
         return -1;
+    create_ui_settings_table();
     create_ui_table();
     return 0;
 }
@@ -537,6 +538,58 @@ void SQLLiteUi::ui_get_elements(std::vector<FileRegistered*>& vec)
             vec.push_back(file);
         }
     }
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::create_ui_settings_table()
+{
+    get_sql_query_for_create_ui_settings_table(query);
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+    ret = execute();
+    if (ret < 0)
+        return -1;
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_save_default_policy(const std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_get_default_policy(std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_save_default_display(const std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_get_default_display(std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_save_default_verbosity(int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_get_default_verbosity(int&)
+{
+    return 0;
 }
 
 }

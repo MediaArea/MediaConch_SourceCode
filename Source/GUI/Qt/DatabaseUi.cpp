@@ -72,4 +72,15 @@ void DatabaseUi::get_sql_query_for_update_ui_table_v0(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_create_ui_settings_table(std::string& q)
+{
+    std::stringstream create;
+    create << "CREATE TABLE IF NOT EXISTS UI_SETTINGS "; // Table name
+    create << "(DEFAULT_POLICY        TEXT  NOT NULL,";
+    create << " DEFAULT_DISPLAY       TEXT  NOT NULL,";
+    create << " DEFAULT_VERBOSITY     INT   NOT NULL);";
+    q = create.str();
+}
+
 }

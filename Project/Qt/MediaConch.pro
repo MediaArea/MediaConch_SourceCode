@@ -96,7 +96,8 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/workerfiles.cpp \
                     ../../Source/GUI/Qt/DatabaseUi.cpp \
                     ../../Source/GUI/Qt/NoDatabaseUi.cpp \
-                    ../../Source/GUI/Qt/SQLLiteUi.cpp
+                    ../../Source/GUI/Qt/SQLLiteUi.cpp \
+                    ../../Source/GUI/Qt/uisettings.cpp
 
 HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Core.h \
@@ -166,7 +167,8 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/workerfiles.h \
                     ../../Source/GUI/Qt/DatabaseUi.h \
                     ../../Source/GUI/Qt/NoDatabaseUi.h \
-                    ../../Source/GUI/Qt/SQLLiteUi.h
+                    ../../Source/GUI/Qt/SQLLiteUi.h \
+                    ../../Source/GUI/Qt/uisettings.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policiestree.ui \
