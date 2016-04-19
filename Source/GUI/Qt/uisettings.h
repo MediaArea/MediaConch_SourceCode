@@ -7,18 +7,38 @@
 #ifndef UISETTINGS_H
 #define UISETTINGS_H
 
+#include <string>
+
 //---------------------------------------------------------------------------
 namespace MediaConch {
+
+class DatabaseUi;
 
 class UiSettings
 {
 public:
-    UiSettings();
+    UiSettings(DatabaseUi* db);
     ~UiSettings();
     
 //***************************************************************************
 // Functions
 //***************************************************************************
+    //General
+    void         init();
+
+    // Default
+    std::string  get_default_policy() const;
+    void         change_default_policy(const std::string& policy);
+    std::string  get_default_display() const;
+    void         change_default_display(const std::string& display);
+    int          get_default_verbosity() const;
+    void         change_default_verbosity(int& verbosity);
+
+private:
+    std::string  default_policy;
+    std::string  default_display;
+    int          default_verbosity;
+    DatabaseUi  *database;
 };
 
 }

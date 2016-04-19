@@ -54,14 +54,14 @@ public:
     virtual void ui_get_elements(std::vector<FileRegistered*>& vec) = 0;
 
     // UI Settings
-    virtual int ui_save_default_policy(const std::string&) = 0;
-    virtual int ui_get_default_policy(std::string&) = 0;
+    virtual int ui_settings_save_default_policy(const std::string&, int user_id) = 0;
+    virtual int ui_settings_get_default_policy(std::string&, int user_id) = 0;
 
-    virtual int ui_save_default_display(const std::string&) = 0;
-    virtual int ui_get_default_display(std::string&) = 0;
+    virtual int ui_settings_save_default_display(const std::string&, int user_id) = 0;
+    virtual int ui_settings_get_default_display(std::string&, int user_id) = 0;
 
-    virtual int ui_save_default_verbosity(int) = 0;
-    virtual int ui_get_default_verbosity(int&) = 0;
+    virtual int ui_settings_save_default_verbosity(int, int user_id) = 0;
+    virtual int ui_settings_get_default_verbosity(int&, int user_id) = 0;
 
 protected:
     //Database dependant

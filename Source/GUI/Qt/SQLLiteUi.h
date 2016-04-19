@@ -42,19 +42,22 @@ public:
     virtual int init_ui();
 
     // UI Settings
-    virtual int create_ui_settings_table();
+    int         ui_settings_create_table();
+    int         ui_settings_has_user_id(int user_id, bool& has_row);
+    int         ui_settings_add_default_values_for_user(int user_id);
+    int         ui_settings_check_user_id(int user_id);
 
-    virtual int ui_save_default_policy(const std::string&);
-    virtual int ui_get_default_policy(std::string&);
+    virtual int ui_settings_save_default_policy(const std::string&, int user_id=-1);
+    virtual int ui_settings_get_default_policy(std::string&, int user_id = -1);
 
-    virtual int ui_save_default_display(const std::string&);
-    virtual int ui_get_default_display(std::string&);
+    virtual int ui_settings_save_default_display(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_default_display(std::string&, int user_id = -1);
 
-    virtual int ui_save_default_verbosity(int);
-    virtual int ui_get_default_verbosity(int&);
+    virtual int ui_settings_save_default_verbosity(int, int user_id = -1);
+    virtual int ui_settings_get_default_verbosity(int&, int user_id = -1);
 
     // UI
-    virtual int create_ui_table();
+    int         ui_create_table();
     virtual int update_ui_table();
     virtual int ui_add_file(const FileRegistered* file);
     virtual int ui_add_files(const std::vector<FileRegistered*>& files);

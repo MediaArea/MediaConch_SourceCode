@@ -109,37 +109,37 @@ void NoDatabaseUi::ui_get_elements(std::vector<FileRegistered*>&)
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_save_default_policy(const std::string&)
+int NoDatabaseUi::ui_settings_save_default_policy(const std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_get_default_policy(std::string&)
+int NoDatabaseUi::ui_settings_get_default_policy(std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_save_default_display(const std::string&)
+int NoDatabaseUi::ui_settings_save_default_display(const std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_get_default_display(std::string&)
+int NoDatabaseUi::ui_settings_get_default_display(std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_save_default_verbosity(int)
+int NoDatabaseUi::ui_settings_save_default_verbosity(int, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_get_default_verbosity(int&)
+int NoDatabaseUi::ui_settings_get_default_verbosity(int&, int)
 {
     return 0;
 }

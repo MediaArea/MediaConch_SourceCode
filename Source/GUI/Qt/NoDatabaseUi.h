@@ -38,14 +38,14 @@ public:
     virtual int init_ui();
 
     // UI Settings
-    virtual int ui_save_default_policy(const std::string&);
-    virtual int ui_get_default_policy(std::string&);
+    virtual int ui_settings_save_default_policy(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_default_policy(std::string&, int user_id = -1);
 
-    virtual int ui_save_default_display(const std::string&);
-    virtual int ui_get_default_display(std::string&);
+    virtual int ui_settings_save_default_display(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_default_display(std::string&, int user_id = -1);
 
-    virtual int ui_save_default_verbosity(int);
-    virtual int ui_get_default_verbosity(int&);
+    virtual int ui_settings_save_default_verbosity(int, int user_id = -1);
+    virtual int ui_settings_get_default_verbosity(int&, int user_id = -1);
 
     // UI
     virtual int ui_add_file(const FileRegistered* file);

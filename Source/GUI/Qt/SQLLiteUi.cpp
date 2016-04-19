@@ -51,7 +51,7 @@ int SQLLiteUi::init()
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::create_ui_table()
+int SQLLiteUi::ui_create_table()
 {
     get_sql_query_for_create_ui_table(query);
 
@@ -104,8 +104,8 @@ int SQLLiteUi::init_ui()
         return -1;
     if (get_db_version(ui_version) < 0)
         return -1;
-    create_ui_settings_table();
-    create_ui_table();
+    ui_settings_create_table();
+    ui_create_table();
     return 0;
 }
 
@@ -541,7 +541,7 @@ void SQLLiteUi::ui_get_elements(std::vector<FileRegistered*>& vec)
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::create_ui_settings_table()
+int SQLLiteUi::ui_settings_create_table()
 {
     get_sql_query_for_create_ui_settings_table(query);
 
@@ -557,38 +557,234 @@ int SQLLiteUi::create_ui_settings_table()
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::ui_save_default_policy(const std::string&)
+int SQLLiteUi::ui_settings_add_default_values_for_user(int user_id)
 {
+
+    reports.clear();
+    std::stringstream create;
+    create << "INSERT INTO UI_SETTINGS ";
+    create << "(USER_ID, DEFAULT_POLICY, DEFAULT_DISPLAY, DEFAULT_VERBOSITY) VALUES";
+    create << " (?, '', '', -1);";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = execute();
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_has_user_id(int user_id, bool& has_row)
+{
+    reports.clear();
+    query = "SELECT USER_ID FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() < 0)
+        return -1;
+
+    if (reports.size() != 1 || reports[0].find("USER_ID") == reports[0].end())
+        has_row = false;
+    else
+        has_row = true;
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::ui_get_default_policy(std::string&)
+int SQLLiteUi::ui_settings_check_user_id(int user_id)
 {
+    bool has_row = false;
+    if (ui_settings_has_user_id(user_id, has_row))
+        return -1;
+    if (!has_row)
+        ui_settings_add_default_values_for_user(user_id);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::ui_save_default_display(const std::string&)
+int SQLLiteUi::ui_settings_save_default_policy(const std::string& policy, int user_id)
 {
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   DEFAULT_POLICY = ?, ";
+    create << "WHERE USER_ID        = ?; ";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, policy.c_str(), policy.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_default_policy(std::string& policy, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT DEFAULT_POLICY FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("DEFAULT_POLICY") != reports[0].end())
+        policy = reports[0]["DEFAULT_POLICY"];
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::ui_get_default_display(std::string&)
+int SQLLiteUi::ui_settings_save_default_display(const std::string& display, int user_id)
 {
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   DEFAULT_DISPLAY = ?, ";
+    create << "WHERE USER_ID        = ?; ";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, display.c_str(), display.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::ui_save_default_verbosity(int)
+int SQLLiteUi::ui_settings_get_default_display(std::string& display, int user_id)
 {
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT DEFAULT_DISPLAY FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("DEFAULT_DISPLAY") != reports[0].end())
+        display = reports[0]["DEFAULT_DISPLAY"];
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::ui_get_default_verbosity(int&)
+int SQLLiteUi::ui_settings_save_default_verbosity(int verbosity, int user_id)
 {
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   DEFAULT_VERBOSITY = ?, ";
+    create << "WHERE USER_ID        = ?; ";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, verbosity);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_default_verbosity(int& verbosity, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT DEFAULT_VERBOSITY FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("DEFAULT_VERBOSITY") != reports[0].end())
+        verbosity = std_string_to_int(reports[0]["DEFAULT_VERBOSITY"]);
     return 0;
 }
 
