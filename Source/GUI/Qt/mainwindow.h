@@ -33,6 +33,8 @@ class CheckerWindow;
 class PoliciesWindow;
 class DisplayWindow;
 class VerbositySpinbox;
+class PolicyCombobox;
+class DisplayCombobox;
 class FileRegistered;
 
 class MainWindow : public QMainWindow
@@ -111,6 +113,7 @@ public:
     int                         import_policy(const QString& file, std::string& err);
     bool                        policy_exists(const std::string& title);
     Policy                     *get_policy(size_t pos);
+    int                         get_policy_index_by_filename(const std::string& filename);
     void                        add_policy(Policy* policy);
     void                        remove_policy(size_t pos);
     void                        clear_policies();
@@ -123,7 +126,9 @@ public:
     void                        set_error_http(MediaConchLib::errorHttp code);
 
     const std::vector<Policy *>&  get_all_policies() const;
+    void                          get_policies(std::vector<std::pair<QString, QString> >&);
     std::vector<QString>&         get_displays();
+    int                           get_display_index_by_filename(const std::string& filename);
     QString                       get_local_folder() const;
     void                          get_registered_files(std::map<std::string, FileRegistered>& files);
 
@@ -148,7 +153,9 @@ private:
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
-    VerbositySpinbox*           verbosity_box;
+    PolicyCombobox*             default_policy_box;
+    DisplayCombobox*            default_display_box;
+    VerbositySpinbox*           default_verbosity_box;
 
     void                        create_and_configure_ui_database();
     int                         clearVisualElements();
@@ -174,11 +181,17 @@ Q_SIGNALS:
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChooseSchema_triggered();
-    void on_actionVerbosity_triggered();
+    void on_actionDefaultPolicy_triggered();
+    void on_actionDefaultDisplay_triggered();
+    void on_actionDefaultVerbosity_triggered();
 
-    // verbosity
-    void verbosity_accepted();
-    void verbosity_rejected();
+    // Default
+    void default_policy_accepted();
+    void default_policy_rejected();
+    void default_display_accepted();
+    void default_display_rejected();
+    void default_verbosity_accepted();
+    void default_verbosity_rejected();
 
     // View
     void on_actionChecker_triggered();
