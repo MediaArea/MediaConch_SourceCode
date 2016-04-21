@@ -169,23 +169,27 @@ namespace MediaConch
     {
         file_selector.clear();
 
-        runJavaScript("document.getElementById('checkerUpload_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerUpload_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerUpload_verbosity_selector').value = -1;");
+        int policy_i = mainwindow->select_correct_policy();
+        int display_i = mainwindow->select_correct_display();
+        int verbosity_i = mainwindow->select_correct_verbosity();
+
+        runJavaScript(QString("document.getElementById('checkerUpload_policy').value = %1;").arg(policy_i));
+        runJavaScript(QString("document.getElementById('checkerUpload_display_selector').value = %1;").arg(display_i));
+        runJavaScript(QString("document.getElementById('checkerUpload_verbosity_selector').value = %1;").arg(verbosity_i));
         runJavaScript("document.getElementById('checkerUpload_file').value = \"\";");
 
 #if defined(MEDIAINFO_LIBCURL_YES)
 
-        runJavaScript("document.getElementById('checkerOnline_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerOnline_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerOnline_verbosity_selector').value = -1;");
+        runJavaScript(QString("document.getElementById('checkerOnline_policy').value = %1;").arg(policy_i));
+        runJavaScript(QString("document.getElementById('checkerOnline_display_selector').value = %1;").arg(display_i));
+        runJavaScript(QString("document.getElementById('checkerOnline_verbosity_selector').value = %1;").arg(verbosity_i));
         runJavaScript("document.getElementById('checkerOnline_file').value = \"\";");
 
 #endif
 
-        runJavaScript("document.getElementById('checkerRepository_policy').value = -1;");
-        runJavaScript("document.getElementById('checkerRepository_display_selector').value = -1;");
-        runJavaScript("document.getElementById('checkerRepository_verbosity_selector').value = -1;");
+        runJavaScript(QString("document.getElementById('checkerRepository_policy').value = %1;").arg(policy_i));
+        runJavaScript(QString("document.getElementById('checkerRepository_display_selector').value = %1;").arg(display_i));
+        runJavaScript(QString("document.getElementById('checkerRepository_verbosity_selector').value = %1;").arg(verbosity_i));
         runJavaScript("document.getElementById('checkerRepository_directory').value = \"\";");
     }
 

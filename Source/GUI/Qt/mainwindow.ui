@@ -88,9 +88,9 @@
     <property name="title">
      <string>Setti&amp;ngs</string>
     </property>
-    <addaction name="actionDefaultVerbosity"/>
     <addaction name="actionDefaultPolicy"/>
     <addaction name="actionDefaultDisplay"/>
+    <addaction name="actionDefaultVerbosity"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>

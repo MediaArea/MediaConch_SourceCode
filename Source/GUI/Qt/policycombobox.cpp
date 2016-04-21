@@ -35,6 +35,7 @@ PolicyCombobox::~PolicyCombobox()
 //---------------------------------------------------------------------------
 void PolicyCombobox::fill_policy_box(const std::vector<std::pair<QString, QString> >& list)
 {
+    ui->policy->addItem("Last used policy", QVariant("last"));
     ui->policy->addItem("No policy", QVariant(""));
     for (size_t i = 0; i < list.size(); ++i)
         ui->policy->addItem(list[i].second, QVariant(list[i].first));

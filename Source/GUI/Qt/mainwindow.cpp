@@ -155,31 +155,20 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
     int policy_i = policy.toInt();
-    if (policy_i == -2)
-    {
-        std::string policy_str = uisettings.get_default_policy();
-        if (policy_str.length())
-            policy_i = get_policy_index_by_filename(policy_str);
-        else
-            policy_i = -1;
-    }
-
     int display_i = display.toInt();
-    if (display_i == -2)
-    {
-        std::string display_str = uisettings.get_default_display();
-        if (display_str.length())
-            display_i = get_display_index_by_filename(display_str);
-        else
-            display_i = -1;
-    }
+    int verbosity_i = v.toInt();
 
-    QString verbosity(v);
-    if (verbosity == "-1")
-        verbosity = QString("%1").arg(uisettings.get_default_verbosity());
-    int verbosity_i = -1;
-    if (verbosity.length())
-        verbosity_i = verbosity.toInt();
+    // Save configuration used
+    std::string policy_str;
+    if (policy_i >= 0)
+    {
+        Policy *p = get_policy(policy_i);
+        if (p)
+            policy_str = p->filename;
+    }
+    uisettings.change_last_policy(policy_str);
+    uisettings.change_last_display(displays_list[display_i].toUtf8().data());
+    uisettings.change_last_verbosity(verbosity_i);
 
     std::string full_path = filepath;
     if (full_path.length())
@@ -882,92 +871,6 @@ void MainWindow::clear_msg_in_status_bar()
     Q_EMIT status_bar_clear_message();
 }
 
-//---------------------------------------------------------------------------
-void MainWindow::create_policy_options(QString& policies)
-{
-    const std::vector<Policy *>& list = get_all_policies();
-
-    QString system_policy;
-    QString user_policy;
-    for (size_t i = 0; i < list.size(); ++i)
-    {
-        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
-            system_policy += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
-        else
-            user_policy += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
-    }
-
-    // Create default policy opt-group
-    if (user_policy.length())
-        policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
-
-    // Create default policy opt-group
-    if (system_policy.length())
-        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::create_displays_options(QString& displays)
-{
-    QString system_display;
-    QString user_display;
-    for (size_t i = 0; i < displays_list.size(); ++i)
-    {
-        QFileInfo file(displays_list[i]);
-        if (displays_list[i].startsWith(":/"))
-            system_display += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(file.baseName());
-        else
-            user_display += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(file.baseName());
-    }
-
-    // Create user display opt-group
-    if (user_display.length())
-        displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
-
-    // Create default display opt-group
-    if (system_display.length())
-        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
-{
-    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a policy[\\n\\r\\t\\s]*</option>");
-    int pos = html.indexOf(selector);
-
-    reg.setMinimal(true);
-
-    if (pos == -1)
-        return;
-
-    if ((pos = reg.indexIn(html, pos)) != -1)
-    {
-        pos += reg.matchedLength();
-        html.insert(pos, policies);
-    }
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::add_display_to_html_selection(QString& displays, QString& html, const QString& selector)
-{
-    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a Display[\\n\\r\\t\\s]*</option>");
-    reg.setMinimal(true);
-
-    int pos = html.indexOf(selector);
-    if (pos == -1)
-        return;
-
-    if ((pos = reg.indexIn(html, pos)) != -1)
-    {
-        pos += reg.matchedLength();
-        html.insert(pos, displays);
-    }
-}
-
 //***************************************************************************
 // HELPER
 //***************************************************************************
@@ -1056,6 +959,39 @@ void MainWindow::clear_policies()
 size_t MainWindow::get_policies_count() const
 {
     return MCL.get_policies_count();
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::select_correct_policy()
+{
+    // Policy
+    std::string policy = uisettings.get_default_policy();
+    if (policy == "last")
+        policy = uisettings.get_last_policy();
+
+    if (!policy.length())
+        return -1;
+    return get_policy_index_by_filename(policy);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::select_correct_display()
+{
+    // Display
+    std::string display = uisettings.get_default_display();
+    if (display == "last")
+        display = uisettings.get_last_display();
+    return get_display_index_by_filename(display);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::select_correct_verbosity()
+{
+    // Verbosity
+    int verbosity = uisettings.get_default_verbosity();
+    if (verbosity == -1)
+        verbosity = uisettings.get_last_verbosity();
+    return verbosity;
 }
 
 //---------------------------------------------------------------------------
@@ -1248,15 +1184,6 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
         return -1;
     }
 
-    if (policy == -2)
-    {
-        std::string policy_name = uisettings.get_default_policy();
-        if (policy_name.length())
-            policy = get_policy_index_by_filename(policy_name);
-        else
-            policy = -1;
-    }
-
     if (policy == -1)
     {
         if (fr->policy == -1)
@@ -1336,15 +1263,6 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
 
     if (display_p)
     {
-        if (*display_p == -2)
-        {
-            std::string display_name = uisettings.get_default_display();
-            if (display_name.length())
-                *display_p = get_display_index_by_filename(display_name);
-            else
-                *display_p = -1;
-        }
-
         if (*display_p >= 0 && (size_t)*display_p < displays_list.size())
         {
             QFile display_xsl(displays_list[*display_p]);

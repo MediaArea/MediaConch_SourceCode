@@ -28,7 +28,7 @@ namespace MediaConch {
 // SQLLiteUi
 //***************************************************************************
 
-int SQLLiteUi::current_ui_version     = 1;
+int SQLLiteUi::ui_current_version          = 4;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -63,12 +63,11 @@ int SQLLiteUi::ui_create_table()
     if (ret < 0)
         return -1;
 
-    ret = update_ui_table();
-    return ret;
+    return ui_update_table();
 }
 
 //---------------------------------------------------------------------------
-int SQLLiteUi::update_ui_table()
+int SQLLiteUi::ui_update_table()
 {
     const char* end = NULL;
     int ret = 0;
@@ -80,6 +79,8 @@ int SQLLiteUi::update_ui_table()
         if (ui_version > version)                                                     \
             continue;                                                                 \
         get_sql_query_for_update_ui_table_v##version(query);                          \
+        if (!query.length())                                                          \
+            continue;                                                                 \
                                                                                       \
         ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end); \
         if (version != 0 && (ret != SQLITE_OK || !stmt || (end && *end)))             \
@@ -91,10 +92,13 @@ int SQLLiteUi::update_ui_table()
     } while(0);
 
     UPDATE_UI_TABLE_FOR_VERSION(0);
+    // UPDATE_UI_TABLE_FOR_VERSION(1); nothing to do
+    // UPDATE_UI_TABLE_FOR_VERSION(2); nothing to do
+    // UPDATE_UI_TABLE_FOR_VERSION(3); nothing to do
 
 #undef UPDATE_UI_TABLE_FOR_VERSION
 
-    return set_db_version(current_ui_version);
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -106,6 +110,7 @@ int SQLLiteUi::init_ui()
         return -1;
     ui_settings_create_table();
     ui_create_table();
+    set_db_version(ui_current_version);
     return 0;
 }
 
@@ -553,7 +558,42 @@ int SQLLiteUi::ui_settings_create_table()
     if (ret < 0)
         return -1;
 
-    return ret;
+    return ui_settings_update_table();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_update_table()
+{
+    const char* end = NULL;
+    int ret = 0;
+
+#define UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(version)                                 \
+    do                                                                                \
+    {                                                                                 \
+        if (ui_version > version)                                                     \
+            continue;                                                                 \
+        get_sql_query_for_update_ui_settings_table_v##version(query);                 \
+        if (!query.length())                                                          \
+            continue;                                                                 \
+                                                                                      \
+        end = NULL;                                                                   \
+        ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end); \
+        if (version != 0 && (ret != SQLITE_OK || !stmt || (end && *end)))             \
+            return -1;                                                                \
+        ret = execute();                                                              \
+                                                                                      \
+        if (version != 0 && ret < 0)                                                  \
+            return ret;                                                               \
+    } while(0);
+
+    // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(0); nothing to do
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(1);
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(2);
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(3);
+
+#undef UPDATE_UI_SETTINGS_TABLE_FOR_VERSION
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -564,7 +604,7 @@ int SQLLiteUi::ui_settings_add_default_values_for_user(int user_id)
     std::stringstream create;
     create << "INSERT INTO UI_SETTINGS ";
     create << "(USER_ID, DEFAULT_POLICY, DEFAULT_DISPLAY, DEFAULT_VERBOSITY) VALUES";
-    create << " (?, '', '', -1);";
+    create << " (?, 'last', 'last', -1);";
     query = create.str();
 
     const char* end = NULL;
@@ -785,6 +825,178 @@ int SQLLiteUi::ui_settings_get_default_verbosity(int& verbosity, int user_id)
 
     if (reports[0].find("DEFAULT_VERBOSITY") != reports[0].end())
         verbosity = std_string_to_int(reports[0]["DEFAULT_VERBOSITY"]);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_last_policy(const std::string& policy, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   LAST_POLICY    = ? ";
+    create << "WHERE USER_ID        = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, policy.c_str(), policy.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_last_policy(std::string& policy, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT LAST_POLICY FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("LAST_POLICY") != reports[0].end())
+        policy = reports[0]["LAST_POLICY"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_last_display(const std::string& display, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   LAST_DISPLAY = ? ";
+    create << "WHERE USER_ID         = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, display.c_str(), display.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_last_display(std::string& display, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT LAST_DISPLAY FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("LAST_DISPLAY") != reports[0].end())
+        display = reports[0]["LAST_DISPLAY"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_last_verbosity(int verbosity, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   LAST_VERBOSITY = ? ";
+    create << "WHERE USER_ID           = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, verbosity);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_last_verbosity(int& verbosity, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT LAST_VERBOSITY FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("LAST_VERBOSITY") != reports[0].end())
+        verbosity = std_string_to_int(reports[0]["LAST_VERBOSITY"]);
     return 0;
 }
 

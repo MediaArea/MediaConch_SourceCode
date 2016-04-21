@@ -36,7 +36,7 @@ DisplayCombobox::~DisplayCombobox()
 //---------------------------------------------------------------------------
 void DisplayCombobox::fill_display_box(const std::vector<QString>& list)
 {
-    ui->display->addItem("No display", QVariant(""));
+    ui->display->addItem("Last used display", QVariant("last"));
     for (size_t i = 0; i < list.size(); ++i)
     {
         QFileInfo file(list[i]);

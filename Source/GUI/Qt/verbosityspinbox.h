@@ -29,12 +29,12 @@ class VerbositySpinbox : public QWidget
         explicit VerbosityBox(QWidget *parent = 0) : QSpinBox(parent) {}
         ~VerbosityBox() {}
 
+        static const QString last_used_text;
+        static const int     last_used_value;
+
       protected:
         virtual QString textFromValue(int value) const;
         virtual int valueFromText(const QString & text) const;
-
-        static const QString default_text;
-        static const int     default_value;
     };
 
 public:

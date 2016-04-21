@@ -35,10 +35,21 @@ public:
     int          get_default_verbosity() const;
     void         change_default_verbosity(int verbosity);
 
+    // Last used
+    std::string  get_last_policy() const;
+    void         change_last_policy(const std::string& policy);
+    std::string  get_last_display() const;
+    void         change_last_display(const std::string& display);
+    int          get_last_verbosity() const;
+    void         change_last_verbosity(int verbosity);
+
 private:
     std::string  default_policy;
     std::string  default_display;
     int          default_verbosity;
+    std::string  last_policy;
+    std::string  last_display;
+    int          last_verbosity;
     DatabaseUi  *database;
 };
 

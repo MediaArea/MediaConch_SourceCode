@@ -15,14 +15,14 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const QString VerbositySpinbox::VerbosityBox::default_text = QString("Default (5)");
-const int     VerbositySpinbox::VerbosityBox::default_value = -1;
+const QString VerbositySpinbox::VerbosityBox::last_used_text = QString("Last used verbosity");
+const int     VerbositySpinbox::VerbosityBox::last_used_value = -1;
 
 //---------------------------------------------------------------------------
 QString VerbositySpinbox::VerbosityBox::textFromValue(int value) const
 {
-    if (value == default_value)
-        return default_text;
+    if (value == last_used_value)
+        return last_used_text;
 
     return QSpinBox::textFromValue(value);
 }
@@ -30,8 +30,8 @@ QString VerbositySpinbox::VerbosityBox::textFromValue(int value) const
 //---------------------------------------------------------------------------
 int VerbositySpinbox::VerbosityBox::valueFromText(const QString & text) const
 {
-    if (text == default_text)
-        return default_value;
+    if (text == last_used_text)
+        return last_used_value;
 
     return QSpinBox::valueFromText(text);
 }
@@ -50,7 +50,7 @@ VerbositySpinbox::VerbositySpinbox(QWidget *parent) :
     ui->verbosity = new VerbosityBox(this);
     ui->verbosity->setMinimum(-1);
     ui->verbosity->setMaximum(5);
-    ui->verbosity->setValue(-1);
+    ui->verbosity->setValue(VerbosityBox::last_used_value);
 
     ui->gridLayout->addWidget(ui->verbosity, 0, 0, 1, 1);
 }

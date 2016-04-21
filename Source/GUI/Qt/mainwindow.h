@@ -69,11 +69,6 @@ public:
     void                        set_msg_to_status_bar(const QString& message);
     void                        clear_msg_in_status_bar();
 
-    void                        add_policy_to_html_selection(QString& policies, QString& html, const QString& selector);
-    void                        create_policy_options(QString& policies);
-    void                        add_display_to_html_selection(QString& displays, QString& html, const QString& selector);
-    void                        create_displays_options(QString& displays);
-
     // Helpers
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
@@ -118,6 +113,10 @@ public:
     void                        remove_policy(size_t pos);
     void                        clear_policies();
     size_t                      get_policies_count() const;
+
+    int                         select_correct_policy();
+    int                         select_correct_display();
+    int                         select_correct_verbosity();
 
     FileRegistered*             get_file_registered_from_file(const std::string& file);
     void                        remove_file_registered_from_file(const std::string& file);

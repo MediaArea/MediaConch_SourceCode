@@ -144,4 +144,40 @@ int NoDatabaseUi::ui_settings_get_default_verbosity(int&, int)
     return 0;
 }
 
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_save_last_policy(const std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_get_last_policy(std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_save_last_display(const std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_get_last_display(std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_save_last_verbosity(int, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_get_last_verbosity(int&, int)
+{
+    return 0;
+}
+
 }

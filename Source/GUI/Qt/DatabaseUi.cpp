@@ -84,4 +84,31 @@ void DatabaseUi::get_sql_query_for_create_ui_settings_table(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_settings_table_v1(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI_SETTINGS"; // Table name
+    create << " ADD LAST_POLICY    TEXT DEFAULT NULL;";
+    q = create.str();
+}
+
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_settings_table_v2(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI_SETTINGS"; // Table name
+    create << " ADD LAST_DISPLAY   TEXT DEFAULT NULL;";
+    q = create.str();
+}
+
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_settings_table_v3(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI_SETTINGS"; // Table name
+    create << " ADD LAST_VERBOSITY INT  DEFAULT 5;";
+    q = create.str();
+}
+
 }
