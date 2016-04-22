@@ -464,15 +464,6 @@ void MainWindow::on_actionOpen_triggered()
     if (list.empty())
         return;
 
-    for (int pos = 0; pos < list.size(); ++pos)
-    {
-        QFileInfo file(list[pos]);
-        QString filename = file.fileName();
-        QString filepath = file.absolutePath();
-
-        add_file_to_list(filename, filepath, "-2", "-2", "-1");
-    }
-
     current_view = RUN_CHECKER_VIEW;
     Run();
 

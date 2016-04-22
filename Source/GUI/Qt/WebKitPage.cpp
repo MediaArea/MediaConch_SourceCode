@@ -314,54 +314,15 @@ namespace MediaConch
 
     void WebPage::change_local_files(QStringList& files)
     {
-        QWebFrame* frame = mainFrame();
-        QString active(" active");
-
-        QWebElement form = frame->findFirstElement("#url");
-        if (!form.isNull())
-        {
-            QString attr = form.attribute("class");
-            int pos = -1;
-            if ((pos = attr.indexOf(active)) != -1)
-            {
-                attr.replace(pos, active.length(), "");
-                form.setAttribute("class", attr);
-            }
-        }
-
-        form = frame->findFirstElement("#repository");
-        if (!form.isNull())
-        {
-            QString attr = form.attribute("class");
-            int pos = -1;
-            if ((pos = attr.indexOf(active)) != -1)
-            {
-                attr.replace(pos, active.length(), "");
-                form.setAttribute("class", attr);
-            }
-        }
-
-        form = frame->findFirstElement("#file");
-        if (form.isNull())
-            return;
-
-        QString attr = form.attribute("class");
-        if (attr.indexOf(active) == -1)
-            form.setAttribute("class", attr + active);
-
-        QWebElement input = form.findFirst("#checkerUpload_file");
-        if (input.isNull())
-            return;
-
-        QString file = files[0];
-        input.setAttribute("value", file);
         QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
         if (it != file_selector.end())
             file_selector["checkerUpload_file"] << files;
         else
             file_selector.insert("checkerUpload_file", files);
 
-        on_file_upload_selected("-1", "-1", "-1");
+        on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
+                                QString().setNum(mainwindow->select_correct_display()),
+                                QString().setNum(mainwindow->select_correct_verbosity()));
     }
 
     void WebPage::use_javascript(const QString& js)
