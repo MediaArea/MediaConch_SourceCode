@@ -114,7 +114,9 @@ void NoDatabaseReport::get_report(MediaConchLib::report reportKind, MediaConchLi
     for (size_t i = 0; i < it->second.size(); ++i)
     {
         Report* r = it->second[i];
-        if (r->format != format || r->reportKind != reportKind || r->file_last_modification != file_last_modification)
+        if (r->format != format || r->reportKind != reportKind)
+            continue;
+        if (file_last_modification.length() && r->file_last_modification != file_last_modification)
             continue;
 
         report = r->report;
@@ -149,6 +151,25 @@ bool NoDatabaseReport::file_is_registered(MediaConchLib::report reportKind, Medi
 
         if (r->format == format && r->reportKind == reportKind
             && r->file_last_modification == file_last_modification)
+            return true;
+    }
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool NoDatabaseReport::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
+                                          const std::string& filename)
+{
+    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
+
+    if (it == reports_saved.end())
+        return false;
+
+    for (size_t i = 0; i < it->second.size(); ++i)
+    {
+        Report* r = it->second[i];
+
+        if (r->format == format && r->reportKind == reportKind)
             return true;
     }
     return false;

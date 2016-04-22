@@ -225,9 +225,10 @@ void SQLLiteReport::get_report(MediaConchLib::report reportKind, MediaConchLib::
     reports.clear();
     create << "SELECT REPORT, COMPRESS FROM " << "Report" << " WHERE ";
     create << "FILENAME = ? ";
-    create << "AND FILE_LAST_MODIFICATION = ? ";
     create << "AND TOOL = ? ";
-    create << "AND FORMAT = ?;";
+    create << "AND FORMAT = ? ";
+    if (file_last_modification.length())
+        create << "AND FILE_LAST_MODIFICATION = ?;";
     query = create.str();
 
     const char* end = NULL;
@@ -239,17 +240,20 @@ void SQLLiteReport::get_report(MediaConchLib::report reportKind, MediaConchLib::
     if (ret != SQLITE_OK)
         return;
 
-    ret = sqlite3_bind_blob(stmt, 2, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int(stmt, 2, (int)reportKind);
     if (ret != SQLITE_OK)
         return;
 
-    ret = sqlite3_bind_int(stmt, 3, (int)reportKind);
+    ret = sqlite3_bind_int(stmt, 3, (int)format);
     if (ret != SQLITE_OK)
         return;
 
-    ret = sqlite3_bind_int(stmt, 4, (int)format);
-    if (ret != SQLITE_OK)
-        return;
+    if (file_last_modification.length())
+    {
+        ret = sqlite3_bind_blob(stmt, 4, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
+        if (ret != SQLITE_OK)
+            return;
+    }
 
     if (execute() < 0 || !reports.size())
         return;
