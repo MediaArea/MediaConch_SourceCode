@@ -8,21 +8,13 @@
 #include "mainwindow.h"
 #include "Common/FileRegistered.h"
 
-#include "Common/Database.h"
-#include "Common/NoDatabase.h"
-#include "Common/SQLLite.h"
+#include "DatabaseUi.h"
 
 #include <QString>
 #include <QDir>
 #include <QTimer>
 
 namespace MediaConch {
-
-//***************************************************************************
-// Constant
-//***************************************************************************
-
-const std::string WorkerFiles::database_filename = std::string("MediaConchUi.db");
 
 //***************************************************************************
 // Constructor / Desructor
@@ -43,8 +35,12 @@ WorkerFiles::~WorkerFiles()
         delete timer;
         timer = NULL;
     }
-    if (db)
-        delete db;
+}
+
+//---------------------------------------------------------------------------
+void WorkerFiles::set_database(DatabaseUi* database)
+{
+    db = database;
 }
 
 //---------------------------------------------------------------------------
@@ -399,51 +395,6 @@ void WorkerFiles::remove_file_registered_from_file(const std::string& file)
     to_delete_files_mutex.lock();
     to_delete_files[file] = fr;
     to_delete_files_mutex.unlock();
-}
-
-//---------------------------------------------------------------------------
-void WorkerFiles::load_database()
-{
-#ifdef HAVE_SQLITE
-    std::string db_path;
-    if (mainwindow->get_ui_database_path(db_path) < 0)
-    {
-        db_path = Core::get_local_data_path();
-        QDir f(QString().fromStdString(db_path));
-        if (!f.exists())
-            db_path = ".";
-    }
-
-    db = new SQLLite;
-
-    db->set_database_directory(db_path);
-    db->set_database_filename(database_filename);
-    if (db->init_ui() < 0)
-    {
-        const std::vector<std::string>& errors = db->get_errors();
-        std::string error;
-        for (size_t i = 0; i < errors.size(); ++i)
-        {
-            if (i)
-                error += " ";
-            error += errors[i];
-        }
-        QString msg = QString().fromStdString(error);
-        mainwindow->set_msg_to_status_bar(msg);
-    }
-#endif
-
-    if (!db)
-    {
-        db = new NoDatabase;
-        db->init_ui();
-    }
-}
-
-//---------------------------------------------------------------------------
-void WorkerFiles::create_and_configure_database()
-{
-    load_database();
 }
 
 //---------------------------------------------------------------------------

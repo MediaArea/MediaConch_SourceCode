@@ -11,8 +11,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "NoDatabase.h"
-#include "Common/FileRegistered.h"
+#include "NoDatabaseReport.h"
 #include <sstream>
 //---------------------------------------------------------------------------
 
@@ -20,7 +19,7 @@
 namespace MediaConch {
 
 //***************************************************************************
-// NoDatabase
+// NoDatabaseReport
 //***************************************************************************
 
 //***************************************************************************
@@ -28,12 +27,12 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-NoDatabase::NoDatabase() : Database()
+NoDatabaseReport::NoDatabaseReport() : DatabaseReport()
 {
 }
 
 //---------------------------------------------------------------------------
-NoDatabase::~NoDatabase()
+NoDatabaseReport::~NoDatabaseReport()
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.begin();
     for (; it != reports_saved.end(); ++it)
@@ -45,44 +44,39 @@ NoDatabase::~NoDatabase()
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::init()
+int NoDatabaseReport::init()
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::init_report()
+int NoDatabaseReport::init_report()
 {
     return init();
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::init_ui()
-{
-    return init();
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::execute()
+int NoDatabaseReport::execute()
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::create_report_table()
+int NoDatabaseReport::create_report_table()
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::update_report_table()
+int NoDatabaseReport::update_report_table()
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::save_report(MediaConchLib::report reportKind, MediaConchLib::format format, const std::string& filename, const std::string& file_last_modification,
-                          const std::string& report, MediaConchLib::compression c)
+int NoDatabaseReport::save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
+                                  const std::string& filename, const std::string& file_last_modification,
+                                  const std::string& report, MediaConchLib::compression c)
 {
     Report* r = new Report;
     r->reportKind = reportKind;
@@ -109,9 +103,9 @@ int NoDatabase::save_report(MediaConchLib::report reportKind, MediaConchLib::for
 }
 
 //---------------------------------------------------------------------------
-void NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                   const std::string& filename, const std::string& file_last_modification,
-                                   std::string& report, MediaConchLib::compression& c)
+void NoDatabaseReport::get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
+                                  const std::string& filename, const std::string& file_last_modification,
+                                  std::string& report, MediaConchLib::compression& c)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it == reports_saved.end())
@@ -130,7 +124,7 @@ void NoDatabase::get_report(MediaConchLib::report reportKind, MediaConchLib::for
 }
 
 //---------------------------------------------------------------------------
-int NoDatabase::remove_report(const std::string& filename)
+int NoDatabaseReport::remove_report(const std::string& filename)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it == reports_saved.end())
@@ -141,8 +135,8 @@ int NoDatabase::remove_report(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabase::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                    const std::string& filename, const std::string& file_last_modification)
+bool NoDatabaseReport::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
+                                          const std::string& filename, const std::string& file_last_modification)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
 
@@ -161,7 +155,7 @@ bool NoDatabase::file_is_registered(MediaConchLib::report reportKind, MediaConch
 }
 
 //---------------------------------------------------------------------------
-void NoDatabase::get_elements(std::vector<std::string>& vec)
+void NoDatabaseReport::get_elements(std::vector<std::string>& vec)
 {
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.begin();
 
@@ -170,7 +164,7 @@ void NoDatabase::get_elements(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-void NoDatabase::get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind)
+void NoDatabaseReport::get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind)
 {
     report_kind = MediaConchLib::report_MediaConch;
     if (reports_saved.find(file) != reports_saved.end() && reports_saved[file].size())
@@ -187,59 +181,6 @@ void NoDatabase::get_element_report_kind(const std::string& file, MediaConchLib:
             report_kind = tool_i;
         }
     }
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_add_file(const FileRegistered*)
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_add_files(const std::vector<FileRegistered*>&)
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_update_file(const FileRegistered*)
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_update_files(const std::vector<FileRegistered*>&)
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_get_file(FileRegistered*)
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_remove_file(const FileRegistered*)
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_remove_files(const std::vector<FileRegistered*>&)
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int NoDatabase::ui_remove_all_files()
-{
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-void NoDatabase::ui_get_elements(std::vector<FileRegistered*>&)
-{
 }
 
 }

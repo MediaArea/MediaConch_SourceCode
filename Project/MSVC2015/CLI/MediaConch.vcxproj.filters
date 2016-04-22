@@ -96,9 +96,6 @@
     <ClCompile Include="..\..\..\Source\Common\MediaConchLib.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\NoDatabase.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Queue.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -133,6 +130,15 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\VeraPDF.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\DatabaseReport.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>

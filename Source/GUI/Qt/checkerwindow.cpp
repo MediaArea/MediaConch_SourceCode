@@ -207,6 +207,150 @@ void CheckerWindow::hide()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void CheckerWindow::create_policy_options(QString& policies)
+{
+    const std::vector<Policy *>& list = mainwindow->get_all_policies();
+
+    QString system_policy;
+    QString user_policy;
+    int selected_policy = mainwindow->select_correct_policy();
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
+        {
+            system_policy += QString("<option ");
+            if ((int)i == selected_policy)
+                system_policy += QString("selected=\"selected\" ");
+            system_policy += QString("value=\"%1\">%2</option>")
+                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+        }
+        else
+        {
+            user_policy += QString("<option ");
+            if ((int)i == selected_policy)
+                user_policy += QString("selected=\"selected\" ");
+            user_policy += QString("value=\"%1\">%2</option>")
+                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+        }
+    }
+
+    if (selected_policy == -1)
+        policies += QString("<option selected=\"selected\" value=\"-1\">No policy</optgroup>");
+    else
+        policies += QString("<option value=\"-1\">No policy</optgroup>");
+
+    // Create default policy opt-group
+    if (user_policy.length())
+        policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
+
+    // Create default policy opt-group
+    if (system_policy.length())
+        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::create_displays_options(QString& displays)
+{
+    QString system_display;
+    QString user_display;
+    int selected_display = mainwindow->select_correct_display();
+    const std::vector<QString>& displays_list = mainwindow->get_displays();
+    for (size_t i = 0; i < displays_list.size(); ++i)
+    {
+        QFileInfo file(displays_list[i]);
+        if (displays_list[i].startsWith(":/"))
+        {
+            system_display += QString("<option ");
+            if ((int)i == selected_display)
+                system_display += QString("selected=\"selected\" ");
+            system_display += QString("value=\"%1\">%2</option>")
+                .arg((int)i).arg(file.baseName());
+        }
+        else
+        {
+            user_display += QString("<option ");
+            if ((int)i == selected_display)
+                user_display += QString("selected=\"selected\" ");
+            user_display += QString("value=\"%1\">%2</option>")
+                .arg((int)i).arg(file.baseName());
+        }
+    }
+
+    // Create user display opt-group
+    if (user_display.length())
+        displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
+
+    // Create default display opt-group
+    if (system_display.length())
+        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::create_verbosity_options(QString& verbosity)
+{
+    int selected_verbosity = mainwindow->select_correct_verbosity();
+    for (int i = 0; i < 6; ++i)
+    {
+        verbosity += QString("<option ");
+        if ((int)i == selected_verbosity)
+            verbosity += QString("selected=\"selected\" ");
+        verbosity += QString("value=\"%1\">%1</option>").arg(i);
+    }
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
+{
+    QRegExp reg("class=\"policyList form-control\">");
+    int pos = html.indexOf(selector);
+
+    reg.setMinimal(true);
+
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, policies);
+    }
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::add_display_to_html_selection(QString& displays, QString& html, const QString& selector)
+{
+    QRegExp reg("class=\"displayList form-control\">");
+    reg.setMinimal(true);
+
+    int pos = html.indexOf(selector);
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, displays);
+    }
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::add_verbosity_to_html_selection(QString& verbosity, QString& html, const QString& selector)
+{
+    QRegExp reg("class=\"verbosityList form-control\">");
+    reg.setMinimal(true);
+
+    int pos = html.indexOf(selector);
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, verbosity);
+    }
+}
+
+//---------------------------------------------------------------------------
 void CheckerWindow::load_include_in_template(QString& html)
 {
     QRegExp reg("\\{\\{[\\s]+include\\('AppBundle:(\\w+):(\\w+).html.twig'(,[\\s]*\\{ '\\w+':[\\s]*\\w+[\\s]*\\})?\\)[\\s]\\}\\}");
@@ -284,12 +428,17 @@ QString CheckerWindow::create_form_upload()
 
     QString ret(html);
     QString policies;
-    mainwindow->create_policy_options(policies);
-    mainwindow->add_policy_to_html_selection(policies, ret, "checkerUpload_policy");
+    create_policy_options(policies);
+    add_policy_to_html_selection(policies, ret, "checkerUpload_policy");
 
     QString displays;
-    mainwindow->create_displays_options(displays);
-    mainwindow->add_display_to_html_selection(displays, ret, "checkerUpload_display_selector");
+    create_displays_options(displays);
+    add_display_to_html_selection(displays, ret, "checkerUpload_display_selector");
+
+    QString verbosity;
+    create_verbosity_options(verbosity);
+    add_verbosity_to_html_selection(verbosity, ret, "checkerUpload_verbosity_selector");
+
     return ret;
 }
 
@@ -304,12 +453,17 @@ QString CheckerWindow::create_form_online()
 
     QString ret(html);
     QString policies;
-    mainwindow->create_policy_options(policies);
-    mainwindow->add_policy_to_html_selection(policies, ret, "checkerOnline_policy");
+    create_policy_options(policies);
+    add_policy_to_html_selection(policies, ret, "checkerOnline_policy");
 
     QString displays;
-    mainwindow->create_displays_options(displays);
-    mainwindow->add_display_to_html_selection(displays, ret, "checkerOnline_display_selector");
+    create_displays_options(displays);
+    add_display_to_html_selection(displays, ret, "checkerOnline_display_selector");
+
+    QString verbosity;
+    create_verbosity_options(verbosity);
+    add_verbosity_to_html_selection(verbosity, ret, "checkerOnline_verbosity_selector");
+
     return ret;
 }
 
@@ -347,12 +501,17 @@ QString CheckerWindow::create_form_repository()
 
     QString ret(html);
     QString policies;
-    mainwindow->create_policy_options(policies);
-    mainwindow->add_policy_to_html_selection(policies, ret, "checkerRepository_policy");
+    create_policy_options(policies);
+    add_policy_to_html_selection(policies, ret, "checkerRepository_policy");
 
     QString displays;
-    mainwindow->create_displays_options(displays);
-    mainwindow->add_display_to_html_selection(displays, ret, "checkerRepository_display_selector");
+    create_displays_options(displays);
+    add_display_to_html_selection(displays, ret, "checkerRepository_display_selector");
+
+    QString verbosity;
+    create_verbosity_options(verbosity);
+    add_verbosity_to_html_selection(verbosity, ret, "checkerUpload_repository_selector");
+
     return ret;
 }
 

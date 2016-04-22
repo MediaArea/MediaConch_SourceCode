@@ -50,8 +50,10 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/UnknownPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
                     ../../Source/Common/Database.cpp \
-                    ../../Source/Common/NoDatabase.cpp \
+                    ../../Source/Common/DatabaseReport.cpp \
+                    ../../Source/Common/NoDatabaseReport.cpp \
                     ../../Source/Common/SQLLite.cpp \
+                    ../../Source/Common/SQLLiteReport.cpp \
                     ../../Source/Common/Json.cpp \
                     ../../Source/Common/Configuration.cpp \
                     ../../Source/Common/REST_API.cpp \
@@ -90,8 +92,14 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/xsltruleedit.cpp \
                     ../../Source/GUI/Qt/displaymenu.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp \
+                    ../../Source/GUI/Qt/policycombobox.cpp \
+                    ../../Source/GUI/Qt/displaycombobox.cpp \
                     ../../Source/GUI/Qt/verbosityspinbox.cpp \
-                    ../../Source/GUI/Qt/workerfiles.cpp
+                    ../../Source/GUI/Qt/workerfiles.cpp \
+                    ../../Source/GUI/Qt/DatabaseUi.cpp \
+                    ../../Source/GUI/Qt/NoDatabaseUi.cpp \
+                    ../../Source/GUI/Qt/SQLLiteUi.cpp \
+                    ../../Source/GUI/Qt/uisettings.cpp
 
 HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Core.h \
@@ -110,8 +118,10 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
                     ../../Source/Common/ImplementationReportMatroskaSchema.h \
                     ../../Source/Common/Database.h \
-                    ../../Source/Common/NoDatabase.h \
+                    ../../Source/Common/DatabaseReport.h \
+                    ../../Source/Common/NoDatabaseReport.h \
                     ../../Source/Common/SQLLite.h \
+                    ../../Source/Common/SQLLiteReport.h \
                     ../../Source/Common/Json.h \
                     ../../Source/Common/Container.h \
                     ../../Source/Common/NoContainer.h \
@@ -155,8 +165,14 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/xsltruleedit.h \
                     ../../Source/GUI/Qt/displaymenu.h \
                     ../../Source/GUI/Qt/progressbar.h \
+                    ../../Source/GUI/Qt/policycombobox.h \
+                    ../../Source/GUI/Qt/displaycombobox.h \
                     ../../Source/GUI/Qt/verbosityspinbox.h \
-                    ../../Source/GUI/Qt/workerfiles.h
+                    ../../Source/GUI/Qt/workerfiles.h \
+                    ../../Source/GUI/Qt/DatabaseUi.h \
+                    ../../Source/GUI/Qt/NoDatabaseUi.h \
+                    ../../Source/GUI/Qt/SQLLiteUi.h \
+                    ../../Source/GUI/Qt/uisettings.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/policiestree.ui \
@@ -170,7 +186,9 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/xsltruleedit.ui \
                     ../../Source/GUI/Qt/displaymenu.ui \
                     ../../Source/GUI/Qt/progressbar.ui \
-                    ../../Source/GUI/Qt/verbosityspinbox.ui
+                    ../../Source/GUI/Qt/verbosityspinbox.ui \
+                    ../../Source/GUI/Qt/policycombobox.ui \
+                    ../../Source/GUI/Qt/displaycombobox.ui
 
 
 equals(WEB_MACHINE, webengine) {

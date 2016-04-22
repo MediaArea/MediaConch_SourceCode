@@ -222,23 +222,27 @@ namespace MediaConch
     {
         file_selector.clear();
 
-        use_javascript("document.getElementById('checkerUpload_policy').value = -1;");
-        use_javascript("document.getElementById('checkerUpload_display_selector').value = -1;");
-        use_javascript("document.getElementById('checkerUpload_verbosity_selector').value = -1;");
+        int policy_i = mainwindow->select_correct_policy();
+        int display_i = mainwindow->select_correct_display();
+        int verbosity_i = mainwindow->select_correct_verbosity();
+
+        use_javascript(QString("document.getElementById('checkerUpload_policy').value = %1;").arg(policy_i));
+        use_javascript(QString("document.getElementById('checkerUpload_display_selector').value = %1;").arg(display_i));
+        use_javascript(QString("document.getElementById('checkerUpload_verbosity_selector').value = %1;").arg(verbosity_i));
         use_javascript("document.getElementById('checkerUpload_file').value = \"\";");
 
 #if defined(MEDIAINFO_LIBCURL_YES)
 
-        use_javascript("document.getElementById('checkerOnline_policy').value = -1;");
-        use_javascript("document.getElementById('checkerOnline_display_selector').value = -1;");
-        use_javascript("document.getElementById('checkerOnline_verbosity_selector').value = -1;");
+        use_javascript(QString("document.getElementById('checkerOnline_policy').value = %1;").arg(policy_i));
+        use_javascript(QString("document.getElementById('checkerOnline_display_selector').value = %1;").arg(display_i));
+        use_javascript(QString("document.getElementById('checkerOnline_verbosity_selector').value = %1;").arg(verbosity_i));
         use_javascript("document.getElementById('checkerOnline_file').value = \"\";");
 
 #endif
 
-        use_javascript("document.getElementById('checkerRepository_policy').value = -1;");
-        use_javascript("document.getElementById('checkerRepository_display_selector').value = -1;");
-        use_javascript("document.getElementById('checkerRepository_verbosity_selector').value = -1;");
+        use_javascript(QString("document.getElementById('checkerRepository_policy').value = %1;").arg(policy_i));
+        use_javascript(QString("document.getElementById('checkerRepository_display_selector').value = %1;").arg(display_i));
+        use_javascript(QString("document.getElementById('checkerRepository_verbosity_selector').value = %1;").arg(verbosity_i));
         use_javascript("document.getElementById('checkerRepository_directory').value = \"\";");
     }
 

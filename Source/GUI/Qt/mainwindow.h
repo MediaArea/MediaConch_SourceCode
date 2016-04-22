@@ -9,6 +9,8 @@
 
 #include "Common/Core.h"
 #include "workerfiles.h"
+#include "uisettings.h"
+#include "DatabaseUi.h"
 
 #include <QMainWindow>
 #include <QFileInfo>
@@ -31,6 +33,8 @@ class CheckerWindow;
 class PoliciesWindow;
 class DisplayWindow;
 class VerbositySpinbox;
+class PolicyCombobox;
+class DisplayCombobox;
 class FileRegistered;
 
 class MainWindow : public QMainWindow
@@ -64,11 +68,6 @@ public:
     void                        Ui_Init();
     void                        set_msg_to_status_bar(const QString& message);
     void                        clear_msg_in_status_bar();
-
-    void                        add_policy_to_html_selection(QString& policies, QString& html, const QString& selector);
-    void                        create_policy_options(QString& policies);
-    void                        add_display_to_html_selection(QString& displays, QString& html, const QString& selector);
-    void                        create_displays_options(QString& displays);
 
     // Helpers
     void                        set_widget_to_layout(QWidget* w);
@@ -109,10 +108,15 @@ public:
     int                         import_policy(const QString& file, std::string& err);
     bool                        policy_exists(const std::string& title);
     Policy                     *get_policy(size_t pos);
+    int                         get_policy_index_by_filename(const std::string& filename);
     void                        add_policy(Policy* policy);
     void                        remove_policy(size_t pos);
     void                        clear_policies();
     size_t                      get_policies_count() const;
+
+    int                         select_correct_policy();
+    int                         select_correct_display();
+    int                         select_correct_verbosity();
 
     FileRegistered*             get_file_registered_from_file(const std::string& file);
     void                        remove_file_registered_from_file(const std::string& file);
@@ -121,7 +125,9 @@ public:
     void                        set_error_http(MediaConchLib::errorHttp code);
 
     const std::vector<Policy *>&  get_all_policies() const;
+    void                          get_policies(std::vector<std::pair<QString, QString> >&);
     std::vector<QString>&         get_displays();
+    int                           get_display_index_by_filename(const std::string& filename);
     QString                       get_local_folder() const;
     void                          get_registered_files(std::map<std::string, FileRegistered>& files);
 
@@ -133,9 +139,12 @@ private:
     Ui::MainWindow *ui;
 
     // Internal
+    DatabaseUi                   *db;
+    static const std::string      database_filename;
     MediaConchLib                 MCL;
     std::vector<QString>          displays_list;
     WorkerFiles                   workerfiles;
+    UiSettings                    uisettings;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -143,8 +152,11 @@ private:
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
-    VerbositySpinbox*           verbosity;
+    PolicyCombobox*             default_policy_box;
+    DisplayCombobox*            default_display_box;
+    VerbositySpinbox*           default_verbosity_box;
 
+    void                        create_and_configure_ui_database();
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();
@@ -168,11 +180,17 @@ Q_SIGNALS:
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChooseSchema_triggered();
-    void on_actionVerbosity_triggered();
+    void on_actionDefaultPolicy_triggered();
+    void on_actionDefaultDisplay_triggered();
+    void on_actionDefaultVerbosity_triggered();
 
-    // verbosity
-    void verbosity_accepted();
-    void verbosity_rejected();
+    // Default
+    void default_policy_accepted();
+    void default_policy_rejected();
+    void default_display_accepted();
+    void default_display_rejected();
+    void default_verbosity_accepted();
+    void default_verbosity_rejected();
 
     // View
     void on_actionChecker_triggered();

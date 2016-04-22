@@ -285,6 +285,7 @@ $(document).ready(function() {
             result.cell('#' + resultId, 1).data(implemResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalConformance' + resultId + '" title="View implementation report"><span class="glyphicon glyphicon-eye-open implem-view" aria-hidden="true"></span></a><a href="#" class="implem-dld" data-target="#modalConformance' + resultId + '" data-save-name="' + resultId + '_ImplementationReport.txt" title="Download implementation report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>');
 
             nodeImplem.find('.implem-view').on('click', function(e) {
+                name = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                 e.preventDefault();
                 if (!$('#modalConformance' + resultId).length) {
                     $('.result-container').append(' \
@@ -313,10 +314,10 @@ $(document).ready(function() {
                     </div>');
 
                     if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                        data = webpage.on_fill_implementation_report(sourceName, $(node).data('display'), $(node).data('vebosity'));
+                        data = webpage.on_fill_implementation_report(name, $(node).data('display'), $(node).data('vebosity'));
                         displayReport('#modalConformance' + resultId, data);
                     } else {
-                        webpage.on_fill_implementation_report(sourceName, $(node).data('display'), $(node).data('verbosity'), function (data) {
+                        webpage.on_fill_implementation_report(name, $(node).data('display'), $(node).data('verbosity'), function (data) {
                             displayReport('#modalConformance' + resultId, data);
                         });
                     }
@@ -325,7 +326,7 @@ $(document).ready(function() {
                         e.preventDefault();
                         modalDisplay = $('#modalConformanceDisplay' + resultId).val();
                         modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
-                        webpage.on_save_implementation_report(sourceName, modalDisplay, modalVerbosity);
+                        webpage.on_save_implementation_report(name, modalDisplay, modalVerbosity);
                     });
 
                     // Update report when display is changed
@@ -337,10 +338,10 @@ $(document).ready(function() {
                         modalDisplay = $('#modalConformanceDisplay' + resultId).val();
                         modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
                         if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                            data = webpage.on_fill_implementation_report(sourceName, modalDisplay, modalVerbosity);
+                            data = webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity);
                             displayReport('#modalConformance' + resultId, data);
                         } else {
-                            webpage.on_fill_implementation_report(sourceName, modalDisplay, modalVerbosity, function (data) {
+                            webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity, function (data) {
                                 displayReport('#modalConformance' + resultId, data);
                             });
                         }
@@ -355,10 +356,10 @@ $(document).ready(function() {
                         modalDisplay = $('#modalConformanceDisplay' + resultId).val();
                         modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
                         if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                            data = webpage.on_fill_implementation_report(sourceName, modalDisplay, modalVerbosity);
+                            data = webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity);
                             displayReport('#modalConformance' + resultId, data);
                         } else {
-                            webpage.on_fill_implementation_report(sourceName, modalDisplay, modalVerbosity, function (data) {
+                            webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity, function (data) {
                                 displayReport('#modalConformance' + resultId, data);
                             });
                         }
@@ -378,6 +379,7 @@ $(document).ready(function() {
 
     function policyCell(resultId, fileId) {
         if (2 >= result.$('#' + resultId).data('tool')) {
+            node = result.$('#' + resultId);
             if ($(node).data('policy') && $(node).data('policy') != "-1") {
                 sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
@@ -424,8 +426,8 @@ $(document).ready(function() {
     }
 
     function policyModal(resultId, fileId, nodePolicy) {
-        sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
         nodePolicy.find('.policy-view').on('click', function(e) {
+            sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
             e.preventDefault();
             if (!$('#modalPolicy' + resultId).length) {
                 $('.result-container').append(' \
@@ -515,7 +517,7 @@ $(document).ready(function() {
 
         nodePolicy.find('.policy-dld').on('click', function(e) {
             e.preventDefault();
-            webpage.on_save_policy_report(sourceName, $(node).data('policy'), $(node).data('display'));
+            webpage.on_save_policy_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'), $(node).data('policy'), $(node).data('display'));
         });
     }
 

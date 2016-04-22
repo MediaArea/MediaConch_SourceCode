@@ -11,7 +11,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "Database.h"
+#include "DatabaseReport.h"
 #include <sstream>
 //---------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@
 namespace MediaConch {
 
 //***************************************************************************
-// Database
+// DatabaseReport
 //***************************************************************************
 
 //***************************************************************************
@@ -27,27 +27,47 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Database::Database()
+DatabaseReport::DatabaseReport() : Database()
 {
 }
 
 //---------------------------------------------------------------------------
-Database::~Database()
+DatabaseReport::~DatabaseReport()
 {
 }
 
 //---------------------------------------------------------------------------
-void Database::set_database_directory(const std::string& dirname)
+void DatabaseReport::set_database_directory(const std::string& dirname)
 {
-    db_dirname = dirname;
-    if (db_dirname.length() && db_dirname[db_dirname.length() - 1] != '/')
-        db_dirname += "/";
+    Database::set_database_directory(dirname);
 }
 
 //---------------------------------------------------------------------------
-void Database::set_database_filename(const std::string& filename)
+void DatabaseReport::set_database_filename(const std::string& filename)
 {
-    db_filename = filename;
+    Database::set_database_filename(filename);
+}
+
+//---------------------------------------------------------------------------
+void DatabaseReport::get_sql_query_for_create_report_table(std::string& q)
+{
+    std::stringstream create;
+    create << "CREATE TABLE IF NOT EXISTS Report "; // Table name
+    create << "(FILENAME              TEXT NOT NULL,";
+    create << "FILE_LAST_MODIFICATION INT  NOT NULL,";
+    create << "TOOL                   INT  NOT NULL,";
+    create << "FORMAT                 INT  NOT NULL,";
+    create << "REPORT                 TEXT         );";
+    q = create.str();
+}
+
+//---------------------------------------------------------------------------
+void DatabaseReport::get_sql_query_for_update_report_table_v0(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE Report "; // Table name
+    create << "ADD COMPRESS INT DEFAULT 0 NOT NULL;";
+    q = create.str();
 }
 
 }

@@ -13,9 +13,8 @@
 //---------------------------------------------------------------------------
 #include "Core.h"
 #include "Common/Schema.h"
-#include "Database.h"
-#include "NoDatabase.h"
-#include "SQLLite.h"
+#include "NoDatabaseReport.h"
+#include "SQLLiteReport.h"
 #include "Configuration.h"
 #include "Json.h"
 #include "Common/Schematron.h"
@@ -158,13 +157,13 @@ void Core::load_database()
     if (!config || config->get("SQLite_Path", db_path) < 0)
         db_path = get_database_path();
 
-    db = new SQLLite;
+    db = new SQLLiteReport;
 
-    db->set_database_directory(db_path);
+    ((Database*)db)->set_database_directory(db_path);
     db->set_database_filename(database_name);
     db->init_report();
 #else
-    db = new NoDatabase;
+    db = new NoDatabaseReport;
     db->init_report();
 #endif
 }
@@ -1611,7 +1610,7 @@ bool Core::database_is_enabled() const
 }
 
 //---------------------------------------------------------------------------
-Database *Core::get_db()
+DatabaseReport *Core::get_db()
 {
     if (!db)
         load_database();

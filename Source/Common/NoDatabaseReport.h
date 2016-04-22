@@ -11,31 +11,28 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef NODATABASEH
-#define NODATABASEH
+#ifndef NODATABASEREPORTH
+#define NODATABASEREPORTH
 
 //---------------------------------------------------------------------------
-#include "Database.h"
+#include "DatabaseReport.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
 
-class FileRegistered;
-
 //***************************************************************************
-// Class NoDatabase
+// Class NoDatabaseReport
 //***************************************************************************
 
-class NoDatabase : public Database
+class NoDatabaseReport : public DatabaseReport
 {
 public:
     //Constructor/Destructor
-    NoDatabase();
-    virtual ~NoDatabase();
+    NoDatabaseReport();
+    virtual ~NoDatabaseReport();
 
     virtual int init();
     virtual int init_report();
-    virtual int init_ui();
 
     // Report
     virtual int create_report_table();
@@ -49,23 +46,12 @@ public:
     virtual void get_elements(std::vector<std::string>& vec);
     virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind);
 
-    // UI
-    virtual int ui_add_file(const FileRegistered* file);
-    virtual int ui_add_files(const std::vector<FileRegistered*>& files);
-    virtual int ui_update_file(const FileRegistered* file);
-    virtual int ui_update_files(const std::vector<FileRegistered*>& files);
-    virtual int ui_get_file(FileRegistered* file);
-    virtual int ui_remove_file(const FileRegistered* file);
-    virtual int ui_remove_files(const std::vector<FileRegistered*>& files);
-    virtual int ui_remove_all_files();
-    virtual void ui_get_elements(std::vector<FileRegistered*>& vec);
-
 protected:
     virtual int execute();
 
 private:
-    NoDatabase (const NoDatabase&);
-    NoDatabase& operator=(const NoDatabase&);
+    NoDatabaseReport (const NoDatabaseReport&);
+    NoDatabaseReport& operator=(const NoDatabaseReport&);
 
     struct Report
     {
@@ -76,11 +62,9 @@ private:
         std::string report;
     };
 
-    //TODO UI
-
     std::map<std::string, std::vector<Report*> > reports_saved;
 };
 
 }
 
-#endif /* !NODATABASEH */
+#endif /* !NODATABASEREPORT */

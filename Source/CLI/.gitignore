@@ -1,0 +1,4 @@
+# make generated
+*.o
+.deps
+.dirstamp

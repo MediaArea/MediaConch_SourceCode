@@ -58,6 +58,12 @@ private:
 // HELPER
 //***************************************************************************
 
+    void add_policy_to_html_selection(QString& policies, QString& html, const QString& selector);
+    void create_policy_options(QString& policies);
+    void add_display_to_html_selection(QString& displays, QString& html, const QString& selector);
+    void create_displays_options(QString& displays);
+    void add_verbosity_to_html_selection(QString& verbosity, QString& html, const QString& selector);
+    void create_verbosity_options(QString& verbosity);
     void remove_template_tags(QString& data);
     void load_include_in_template(QString& html);
     void remove_element_in_template(QString& html);
