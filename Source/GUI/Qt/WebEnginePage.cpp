@@ -302,7 +302,9 @@ namespace MediaConch
         else
             file_selector.insert("checkerUpload_file", files);
 
-        on_file_upload_selected("-1", "-1", "-1");
+        on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
+                                QString().setNum(mainwindow->select_correct_display()),
+                                QString().setNum(mainwindow->select_correct_verbosity()));
     }
 
     void WebPage::use_javascript(const QString& js)
