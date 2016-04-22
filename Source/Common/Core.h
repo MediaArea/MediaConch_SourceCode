@@ -180,6 +180,7 @@ private:
     bool   file_is_registered_in_db(const std::string& file);
     bool   file_is_registered_in_queue(const std::string& file);
     std::string get_last_modification_file(const std::string& file);
+    bool        file_is_existing(const std::string& filename);
     void compress_report(std::string& report, MediaConchLib::compression& compress);
     int  uncompress_report(std::string& report, MediaConchLib::compression compress);
     void get_report_saved(const std::vector<std::string>& file, MediaConchLib::report reportKind, MediaConchLib::format f, std::string& report);

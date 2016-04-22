@@ -278,10 +278,6 @@ const std::map<std::string, Plugin*>& Core::get_format_plugins() const
 int Core::open_file(const std::string& file, bool& registered,
                     const std::vector<std::string>& options, bool force_analyze)
 {
-    //TODO: When ZenLib will manage network files
-    // if (!ZenLib::File::Exists(Ztring().From_UTF8(file)))
-    //     return -1;
-
     registered = false;
     if (!force_analyze)
         registered = file_is_registered(file);
@@ -959,6 +955,12 @@ std::string Core::get_last_modification_file(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
+bool Core::file_is_existing(const std::string& filename)
+{
+    return ZenLib::File::Exists(Ztring().From_UTF8(filename));
+}
+
+//---------------------------------------------------------------------------
 void Core::register_report_xml_to_database(std::string& file, const std::string& time,
                                            const std::string& report,
                                            MediaConchLib::report report_kind)
@@ -1428,17 +1430,28 @@ bool Core::file_is_registered_in_db(const std::string& filename)
         return false;
 
     std::string time = get_last_modification_file(filename);
+    bool is_existing = file_is_existing(filename);
 
     db_mutex.Enter();
-    bool res = db->file_is_registered(MediaConchLib::report_MediaInfo,
-                                      MediaConchLib::format_Xml, filename, time);
+    bool res;
+    if (is_existing)
+        res = db->file_is_registered(MediaConchLib::report_MediaInfo,
+                                     MediaConchLib::format_Xml, filename, time);
+    else
+        res = db->file_is_registered(MediaConchLib::report_MediaInfo,
+                                     MediaConchLib::format_Xml, filename);
 
     if (!res)
     {
         MediaConchLib::report report_kind;
         db->get_element_report_kind(filename, report_kind);
         if (report_kind != MediaConchLib::report_MediaConch)
-            res = db->file_is_registered(report_kind, MediaConchLib::format_Xml, filename, time);
+        {
+            if (is_existing)
+                res = db->file_is_registered(report_kind, MediaConchLib::format_Xml, filename, time);
+            else
+                res = db->file_is_registered(report_kind, MediaConchLib::format_Xml, filename);
+        }
     }
 
     db_mutex.Leave();
