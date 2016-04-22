@@ -224,9 +224,6 @@
     <ClCompile Include="..\..\..\Source\Common\LibEventHttpd.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\NoDatabase.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Queue.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -310,6 +307,39 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp">
       <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\DatabaseReport.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\displaycombobox.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\policycombobox.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_displaycombobox.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_policycombobox.cpp">
+      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -475,6 +505,27 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Database.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\SQLLiteReport.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\DatabaseUi.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\displaycombobox.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\policycombobox.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\..\Source\Resource\Resources.qrc">
@@ -528,6 +579,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Source\GUI\Qt\verbosityspinbox.ui">
+      <Filter>Resource Files\UI</Filter>
+    </None>
+    <None Include="..\..\..\Source\GUI\Qt\displaycombobox.ui">
+      <Filter>Resource Files\UI</Filter>
+    </None>
+    <None Include="..\..\..\Source\GUI\Qt\policycombobox.ui">
       <Filter>Resource Files\UI</Filter>
     </None>
   </ItemGroup>
