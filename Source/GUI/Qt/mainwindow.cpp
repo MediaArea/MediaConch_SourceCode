@@ -1057,7 +1057,7 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     Policy* p = get_policy((size_t)policy);
     if (!p)
     {
-        report = QString("Policy not found");
+        report = "Policy not found";
         delete fr;
         return 1;
     }
@@ -1087,7 +1087,7 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
                        &result, dname, dcontent) < 0)
         return 0;
 
-    report = QString().fromStdString(result.report);
+    report = QString().fromUtf8(result.report.c_str(), result.report.length());
 
     if (!result.has_valid)
         return 1;
