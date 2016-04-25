@@ -247,6 +247,7 @@ int DaemonClient::is_done(const std::string& file, double& done, MediaConchLib::
 
     if (ok->finished)
     {
+        report_kind = MediaConchLib::report_MediaConch;
         if (ok->has_tool)
         {
             if (ok->tool == RESTAPI::VERAPDF)
