@@ -33,6 +33,7 @@ protected:
     bool    supportsExtension(Extension extension) const;
 
     void    clean_forms();
+    void    add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list);
 
 public Q_SLOTS:
     void    on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity);

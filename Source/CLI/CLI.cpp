@@ -14,6 +14,8 @@
 #include "CLI.h"
 #include "CommandLine_Parser.h"
 #include "Help.h"
+#include <ZenLib/ZtringList.h>
+#include <ZenLib/Dir.h>
 
 #if !defined(WINDOWS)
     #include <unistd.h>
@@ -96,7 +98,7 @@ namespace MediaConch
                 return ret; //no more tasks to do
 
             if (ret == CLI_RETURN_FILE)
-                files.push_back(args[pos]); //Append the filename to the list of filenames to parse
+                add_files_recursively(args[pos]);
         }
         return CLI_RETURN_NONE;
     }
@@ -315,6 +317,25 @@ namespace MediaConch
     void CLI::set_asynchronous(bool async)
     {
         asynchronous = async;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::add_files_recursively(const std::string& filename)
+    {
+        ZenLib::Ztring dirname = ZenLib::Ztring().From_UTF8(filename);
+        if (!ZenLib::Dir::Exists(dirname))
+        {
+            files.push_back(filename);
+            return;
+        }
+
+        ZenLib::ZtringList list = ZenLib::Dir::GetAllFileNames(dirname,
+                                                               (ZenLib::Dir::dirlist_t)(ZenLib::Dir::Include_Files |
+                                                                                        ZenLib::Dir::Include_Hidden |
+                                                                                        ZenLib::Dir::Parse_SubDirs));
+
+        for (size_t i =0; i < list.size(); ++i)
+            files.push_back(ZenLib::Ztring(list[i]).To_UTF8()); //Append the filename to the list of filenames to parse
     }
 
     //--------------------------------------------------------------------------
