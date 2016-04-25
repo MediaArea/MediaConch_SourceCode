@@ -28,7 +28,7 @@ namespace MediaConch {
 // SQLLiteUi
 //***************************************************************************
 
-int SQLLiteUi::ui_current_version          = 4;
+int SQLLiteUi::ui_current_version          = 8;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -95,6 +95,10 @@ int SQLLiteUi::ui_update_table()
     // UPDATE_UI_TABLE_FOR_VERSION(1); nothing to do
     // UPDATE_UI_TABLE_FOR_VERSION(2); nothing to do
     // UPDATE_UI_TABLE_FOR_VERSION(3); nothing to do
+    // UPDATE_UI_TABLE_FOR_VERSION(4); nothing to do
+    // UPDATE_UI_TABLE_FOR_VERSION(5); nothing to do
+    // UPDATE_UI_TABLE_FOR_VERSION(6); nothing to do
+    // UPDATE_UI_TABLE_FOR_VERSION(7); nothing to do
 
 #undef UPDATE_UI_TABLE_FOR_VERSION
 
@@ -590,6 +594,10 @@ int SQLLiteUi::ui_settings_update_table()
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(1);
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(2);
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(3);
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(4);
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(5);
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(6);
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(7);
 
 #undef UPDATE_UI_SETTINGS_TABLE_FOR_VERSION
 
@@ -997,6 +1005,234 @@ int SQLLiteUi::ui_settings_get_last_verbosity(int& verbosity, int user_id)
 
     if (reports[0].find("LAST_VERBOSITY") != reports[0].end())
         verbosity = std_string_to_int(reports[0]["LAST_VERBOSITY"]);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_default_load_files_path(const std::string& load_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET    DEFAULT_LOAD_FILES_PATH = ? ";
+    create << "WHERE USER_ID        = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, load_path.c_str(), load_path.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_default_load_files_path(std::string& load_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT DEFAULT_LOAD_FILES_PATH FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("DEFAULT_LOAD_FILES_PATH") != reports[0].end())
+        load_path = reports[0]["DEFAULT_LOAD_FILES_PATH"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_last_load_files_path(const std::string& load_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET    LAST_LOAD_FILES_PATH = ? ";
+    create << "WHERE USER_ID        = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, load_path.c_str(), load_path.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_last_load_files_path(std::string& load_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT LAST_LOAD_FILES_PATH FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("LAST_LOAD_FILES_PATH") != reports[0].end())
+        load_path = reports[0]["LAST_LOAD_FILES_PATH"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_default_save_report_path(const std::string& save_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET    DEFAULT_SAVE_REPORT_PATH = ? ";
+    create << "WHERE USER_ID        = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, save_path.c_str(), save_path.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_default_save_report_path(std::string& save_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT DEFAULT_SAVE_REPORT_PATH FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("DEFAULT_SAVE_REPORT_PATH") != reports[0].end())
+        save_path = reports[0]["DEFAULT_SAVE_REPORT_PATH"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_last_save_report_path(const std::string& save_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET    LAST_SAVE_REPORT_PATH = ? ";
+    create << "WHERE USER_ID        = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, save_path.c_str(), save_path.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_last_save_report_path(std::string& save_path, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT LAST_SAVE_REPORT_PATH FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("LAST_SAVE_REPORT_PATH") != reports[0].end())
+        save_path = reports[0]["LAST_SAVE_REPORT_PATH"];
     return 0;
 }
 
