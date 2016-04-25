@@ -20,7 +20,8 @@ public:
     virtual ~WebView();
 
 protected:
-    void dropEvent(QDropEvent *event);
+    virtual void dropEvent(QDropEvent *event);
+    virtual void dragEnterEvent(QDragEnterEvent *event);
 };
 
 }
