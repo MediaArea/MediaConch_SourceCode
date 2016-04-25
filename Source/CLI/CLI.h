@@ -53,6 +53,7 @@ namespace MediaConch
         CLI& operator=(const CLI&);
 
         int is_ready(size_t i, MediaConchLib::report& report_kind);
+        void add_files_recursively(const std::string& filename);
 
         MediaConchLib MCL;
         std::vector<std::string> files;
