@@ -450,7 +450,7 @@ int MainWindow::get_display_index_by_filename(const std::string& filename)
             return i;
     }
 
-    return -1;
+    return 0;
 }
 
 //***************************************************************************
