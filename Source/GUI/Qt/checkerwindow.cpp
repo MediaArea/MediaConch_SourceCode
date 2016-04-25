@@ -510,7 +510,7 @@ QString CheckerWindow::create_form_repository()
 
     QString verbosity;
     create_verbosity_options(verbosity);
-    add_verbosity_to_html_selection(verbosity, ret, "checkerUpload_repository_selector");
+    add_verbosity_to_html_selection(verbosity, ret, "checkerRepository_display_selector");
 
     return ret;
 }
