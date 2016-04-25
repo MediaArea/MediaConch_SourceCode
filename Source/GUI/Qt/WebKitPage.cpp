@@ -21,7 +21,6 @@
 #include "mainwindow.h"
 #include "WebPage.h"
 #include <QtGlobal>
-#include <QDebug>
 
 namespace MediaConch
 {
@@ -208,7 +207,8 @@ namespace MediaConch
             return;
 
         QDir dir(dirname.last());
-        QFileInfoList list = dir.entryInfoList(QDir::Files);
+        QFileInfoList list;
+        add_sub_directory_files_to_list(dir, list);
         if (!list.count())
             return;
 
@@ -444,6 +444,18 @@ namespace MediaConch
         return analyzed;
     }
 
+    void WebPage::add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list)
+    {
+        QFileInfoList tmp = dir.entryInfoList(QDir::Files);
+        list << tmp;
+
+        tmp = dir.entryInfoList(QDir::Dirs | QDir::NoDot | QDir::NoDotDot);
+        for (int i = 0; i < tmp.size(); ++i)
+        {
+            QDir tmp_dir(tmp[i].absoluteFilePath());
+            add_sub_directory_files_to_list(tmp_dir, list);
+        }
+    }
 }
 
 #endif
