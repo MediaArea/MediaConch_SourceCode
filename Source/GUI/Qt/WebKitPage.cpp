@@ -312,13 +312,33 @@ namespace MediaConch
         return false;
     }
 
+    void WebPage::charge_local_dir(const QString& path, QStringList& tmp)
+    {
+        QFileInfo info(path);
+        if (info.isFile())
+        {
+            tmp << path;
+            return;
+        }
+
+        QDir dir(path);
+        QFileInfoList list;
+        add_sub_directory_files_to_list(dir, list);
+        for (int i = 0; i < list.size(); ++i)
+            tmp << list[i].absoluteFilePath();
+    }
+
     void WebPage::change_local_files(QStringList& files)
     {
+        QStringList tmp;
+        for (int i = 0; i < files.size(); ++i)
+            charge_local_dir(files[i], tmp);
+
         QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
         if (it != file_selector.end())
-            file_selector["checkerUpload_file"] << files;
+            file_selector["checkerUpload_file"] << tmp;
         else
-            file_selector.insert("checkerUpload_file", files);
+            file_selector.insert("checkerUpload_file", tmp);
 
         on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
                                 QString().setNum(mainwindow->select_correct_display()),
