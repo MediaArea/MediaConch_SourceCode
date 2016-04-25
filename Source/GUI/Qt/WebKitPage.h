@@ -34,6 +34,7 @@ protected:
 
     void    clean_forms();
     void    add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list);
+    void    charge_local_dir(const QString& directory, QStringList& tmp);
 
 public Q_SLOTS:
     void    on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity);

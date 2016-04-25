@@ -31,6 +31,8 @@ protected:
     QStringList  chooseFiles(FileSelectionMode mode, const QStringList &oldFiles, const QStringList &acceptedMimeTypes);
 
     void         clean_forms();
+    void         add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list);
+    void         charge_local_dir(const QString& directory, QStringList& tmp);
 
 public Q_SLOTS:
     void         on_file_upload_selected(const QString& policy, const QString& display_xslt, const QString& verbosity);
