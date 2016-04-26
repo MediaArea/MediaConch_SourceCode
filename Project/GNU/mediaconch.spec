@@ -206,10 +206,8 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.kde3.desktop %{buildroot}/%{_datad
 %endif
 install -dm 755 %{buildroot}/%{_datadir}/kde4/services/ServiceMenus/
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}/%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop
-%if 1
-# TODO install -dm 755 %{buildroot}/%{_datadir}/appdata/
-# TODO install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}/%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.appdata.xml
-%endif
+install -dm 755 %{buildroot}/%{_datadir}/appdata/
+install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}/%{_datadir}/appdata/mediaconch-gui.appdata.xml
 %if 0%{?suse_version}
   %suse_update_desktop_file -n %{buildroot}/%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %endif
@@ -242,11 +240,8 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}/%{_datad
 %dir %{_datadir}/kde4/services
 %dir %{_datadir}/kde4/services/ServiceMenus
 %{_datadir}/kde4/services/ServiceMenus/*.desktop
-%if 1
-# TODO %dir %{_datadir}/appdata
-# TODO %{_datadir}/appdata/*.xml
-%endif
-
+%dir %{_datadir}/appdata
+%{_datadir}/appdata/*.xml
 
 %changelog
 * Mon May 25 2015 MediaArea.net SARL <info@mediaarea.net> - %{mediaconch_version}
