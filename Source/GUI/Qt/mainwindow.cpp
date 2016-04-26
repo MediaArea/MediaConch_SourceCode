@@ -14,6 +14,8 @@
 #include "policycombobox.h"
 #include "displaycombobox.h"
 #include "verbosityspinbox.h"
+#include "savereportpathbox.h"
+#include "loadfilespathbox.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
@@ -723,6 +725,34 @@ void MainWindow::default_display_rejected()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultSaveReportPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_save_report_path().c_str());
+    SaveReportPathBox* box = new SaveReportPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_save_report_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultLoadFilesPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_load_files_path().c_str());
+    LoadFilesPathBox* box = new LoadFilesPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_load_files_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (!is_all_policies_saved())
@@ -983,6 +1013,40 @@ int MainWindow::select_correct_verbosity()
     if (verbosity == -1)
         verbosity = uisettings.get_last_verbosity();
     return verbosity;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_save_report_path()
+{
+    // Save report path
+    std::string path = uisettings.get_default_save_report_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_save_report_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_load_files_path()
+{
+    // Load files path
+    std::string path = uisettings.get_default_load_files_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_load_files_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_save_report_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_save_report_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_load_files_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_load_files_path(path);
 }
 
 //---------------------------------------------------------------------------

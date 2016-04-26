@@ -34,6 +34,10 @@ public:
     void         change_default_display(const std::string& display);
     int          get_default_verbosity() const;
     void         change_default_verbosity(int verbosity);
+    std::string  get_default_load_files_path() const;
+    void         change_default_load_files_path(const std::string& path);
+    std::string  get_default_save_report_path() const;
+    void         change_default_save_report_path(const std::string& path);
 
     // Last used
     std::string  get_last_policy() const;
@@ -42,14 +46,25 @@ public:
     void         change_last_display(const std::string& display);
     int          get_last_verbosity() const;
     void         change_last_verbosity(int verbosity);
+    std::string  get_last_load_files_path() const;
+    void         change_last_load_files_path(const std::string& path);
+    std::string  get_last_save_report_path() const;
+    void         change_last_save_report_path(const std::string& path);
 
 private:
+    // default
     std::string  default_policy;
     std::string  default_display;
     int          default_verbosity;
+    std::string  default_load_files_path;
+    std::string  default_save_report_path;
+
     std::string  last_policy;
     std::string  last_display;
     int          last_verbosity;
+    std::string  last_load_files_path;
+    std::string  last_save_report_path;
+
     DatabaseUi  *database;
 };
 

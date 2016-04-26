@@ -373,7 +373,7 @@ $(document).ready(function() {
 
             nodeImplem.find('.implem-dld').on('click', function(e) {
                 e.preventDefault();
-                webpage.on_save_implementation_report(sourceName, $(node).data('display'), $(node).data('vebosity'));
+                webpage.on_save_implementation_report(sourceName, $(node).data('display'), $(node).data('verbosity'));
             });
     }
 

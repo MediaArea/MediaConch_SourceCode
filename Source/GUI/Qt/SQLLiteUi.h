@@ -63,6 +63,16 @@ public:
     virtual int  ui_settings_save_last_verbosity(int, int user_id = -1);
     virtual int  ui_settings_get_last_verbosity(int&, int user_id = -1);
 
+    virtual int ui_settings_save_default_load_files_path(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_default_load_files_path(std::string&, int user_id = -1);
+    virtual int ui_settings_save_last_load_files_path(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_last_load_files_path(std::string&, int user_id = -1);
+
+    virtual int ui_settings_save_default_save_report_path(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_default_save_report_path(std::string&, int user_id = -1);
+    virtual int ui_settings_save_last_save_report_path(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_last_save_report_path(std::string&, int user_id = -1);
+
     // UI
     int          ui_create_table();
     virtual int  ui_update_table();

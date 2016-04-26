@@ -55,7 +55,11 @@ namespace MediaConch
         if (report.isEmpty())
             return;
 
-        QString proposed = filename + "_" + report_name + ".txt";
+        std::string proposed_path_str = mainwindow->select_correct_save_report_path();
+        QDir proposed_dir(QString().fromUtf8(proposed_path_str.c_str(), proposed_path_str.length()));
+        QString proposed_filename = QFileInfo(filename).fileName() + "_" + report_name + ".txt";
+
+        QString proposed = proposed_dir.absoluteFilePath(proposed_filename);
         bool is_html = report_is_html(report);
         bool is_xml = false;
         if (is_html)
@@ -73,6 +77,9 @@ namespace MediaConch
 
         if (!dl_file.length())
             return;
+
+        QDir info(QFileInfo(dl_file).absoluteDir());
+        mainwindow->set_last_save_report_path(info.absolutePath().toUtf8().data());
 
         QFile file(dl_file);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -253,13 +260,14 @@ namespace MediaConch
         return false;
     }
 
-    QStringList WebPage::chooseFiles(FileSelectionMode mode, const QStringList &oldFiles, const QStringList&)
+    QStringList WebPage::chooseFiles(FileSelectionMode mode, const QStringList &, const QStringList&)
     {
         QStringList list;
+        std::string suggested_str = mainwindow->select_correct_load_files_path();
+        QString suggested = QString().fromUtf8(suggested_str.c_str(), suggested_str.length());
         if (mode == QWebEnginePage::FileSelectOpen)
         {
             QString value_input;
-            QString suggested = oldFiles.first();
             if (select_file_name == "checkerRepository_directory")
                 value_input = QFileDialog::getExistingDirectory(view(), NULL, suggested);
             else
@@ -273,6 +281,9 @@ namespace MediaConch
                 return QStringList();
             }
 
+            QDir info(QFileInfo(value_input).absoluteDir());
+            mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
+
             if (it != file_selector.end())
                 file_selector[select_file_name] << value_input;
             else
@@ -282,7 +293,13 @@ namespace MediaConch
         }
         else
         {
-            QStringList names = QFileDialog::getOpenFileNames(view(), QString::null);
+            QStringList names = QFileDialog::getOpenFileNames(view(), QString::null, suggested);
+
+            if (names.size())
+            {
+                QDir info(QFileInfo(names[0]).absoluteDir());
+                mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
+            }
 
             list = names;
             QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
@@ -322,6 +339,12 @@ namespace MediaConch
             file_selector["checkerUpload_file"] << tmp;
         else
             file_selector.insert("checkerUpload_file", tmp);
+
+        if (files.size())
+        {
+            QDir info(QFileInfo(files[0]).absoluteDir());
+            mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
+        }
 
         on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
                                 QString().setNum(mainwindow->select_correct_display()),

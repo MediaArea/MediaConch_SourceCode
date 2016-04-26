@@ -69,6 +69,16 @@ public:
     virtual int ui_settings_save_last_verbosity(int, int user_id = -1) = 0;
     virtual int ui_settings_get_last_verbosity(int&, int user_id = -1) = 0;
 
+    virtual int ui_settings_save_default_load_files_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_default_load_files_path(std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_save_last_load_files_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_last_load_files_path(std::string&, int user_id = -1) = 0;
+
+    virtual int ui_settings_save_default_save_report_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_default_save_report_path(std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_save_last_save_report_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_last_save_report_path(std::string&, int user_id = -1) = 0;
+
 protected:
     //Database dependant
     void        get_sql_query_for_create_ui_table(std::string& q);
@@ -77,6 +87,10 @@ protected:
     void        get_sql_query_for_update_ui_settings_table_v1(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v2(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v3(std::string& q);
+    void        get_sql_query_for_update_ui_settings_table_v4(std::string& q);
+    void        get_sql_query_for_update_ui_settings_table_v5(std::string& q);
+    void        get_sql_query_for_update_ui_settings_table_v6(std::string& q);
+    void        get_sql_query_for_update_ui_settings_table_v7(std::string& q);
 
 private:
     DatabaseUi (const DatabaseUi&);

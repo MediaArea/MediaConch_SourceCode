@@ -117,6 +117,10 @@ public:
     int                         select_correct_policy();
     int                         select_correct_display();
     int                         select_correct_verbosity();
+    std::string                 select_correct_save_report_path();
+    std::string                 select_correct_load_files_path();
+    void                        set_last_save_report_path(const std::string& path);
+    void                        set_last_load_files_path(const std::string& path);
 
     FileRegistered*             get_file_registered_from_file(const std::string& file);
     void                        remove_file_registered_from_file(const std::string& file);
@@ -183,6 +187,8 @@ private Q_SLOTS:
     void on_actionDefaultPolicy_triggered();
     void on_actionDefaultDisplay_triggered();
     void on_actionDefaultVerbosity_triggered();
+    void on_actionDefaultSaveReportPath_triggered();
+    void on_actionDefaultLoadFilesPath_triggered();
 
     // Default
     void default_policy_accepted();

@@ -95,6 +95,8 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/policycombobox.cpp \
                     ../../Source/GUI/Qt/displaycombobox.cpp \
                     ../../Source/GUI/Qt/verbosityspinbox.cpp \
+                    ../../Source/GUI/Qt/savereportpathbox.cpp \
+                    ../../Source/GUI/Qt/loadfilespathbox.cpp \
                     ../../Source/GUI/Qt/workerfiles.cpp \
                     ../../Source/GUI/Qt/DatabaseUi.cpp \
                     ../../Source/GUI/Qt/NoDatabaseUi.cpp \
@@ -168,6 +170,8 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/policycombobox.h \
                     ../../Source/GUI/Qt/displaycombobox.h \
                     ../../Source/GUI/Qt/verbosityspinbox.h \
+                    ../../Source/GUI/Qt/savereportpathbox.h \
+                    ../../Source/GUI/Qt/loadfilespathbox.h \
                     ../../Source/GUI/Qt/workerfiles.h \
                     ../../Source/GUI/Qt/DatabaseUi.h \
                     ../../Source/GUI/Qt/NoDatabaseUi.h \

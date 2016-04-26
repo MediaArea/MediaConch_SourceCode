@@ -37,11 +37,20 @@ int UiSettings::init()
         return -1;
     if (database->ui_settings_get_default_verbosity(default_verbosity))
         return -1;
+    if (database->ui_settings_get_default_save_report_path(default_save_report_path))
+        return -1;
+    if (database->ui_settings_get_default_load_files_path(default_load_files_path))
+        return -1;
+
     if (database->ui_settings_get_last_policy(last_policy))
         return -1;
     if (database->ui_settings_get_last_display(last_display))
         return -1;
     if (database->ui_settings_get_last_verbosity(last_verbosity))
+        return -1;
+    if (database->ui_settings_get_last_save_report_path(last_save_report_path))
+        return -1;
+    if (database->ui_settings_get_last_load_files_path(last_load_files_path))
         return -1;
     return 0;
 }
@@ -107,6 +116,42 @@ void UiSettings::change_default_verbosity(int verbosity)
     default_verbosity = verbosity;
 }
 
+//---------------------------------------------------------------------------
+std::string UiSettings::get_default_load_files_path() const
+{
+    return default_load_files_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_default_load_files_path(const std::string& path)
+{
+    if (!database || default_load_files_path == path)
+        return;
+
+    if (database->ui_settings_save_default_load_files_path(path) < 0)
+        return;
+
+    default_load_files_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_default_save_report_path() const
+{
+    return default_save_report_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_default_save_report_path(const std::string& path)
+{
+    if (!database || default_save_report_path == path)
+        return;
+
+    if (database->ui_settings_save_default_save_report_path(path) < 0)
+        return;
+
+    default_save_report_path = path;
+}
+
 // Last used
 //---------------------------------------------------------------------------
 std::string UiSettings::get_last_policy() const
@@ -160,6 +205,42 @@ void UiSettings::change_last_verbosity(int verbosity)
         return;
 
     last_verbosity = verbosity;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_last_load_files_path() const
+{
+    return last_load_files_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_last_load_files_path(const std::string& path)
+{
+    if (!database || last_load_files_path == path)
+        return;
+
+    if (database->ui_settings_save_last_load_files_path(path) < 0)
+        return;
+
+    last_load_files_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_last_save_report_path() const
+{
+    return last_save_report_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_last_save_report_path(const std::string& path)
+{
+    if (!database || last_save_report_path == path)
+        return;
+
+    if (database->ui_settings_save_last_save_report_path(path) < 0)
+        return;
+
+    last_save_report_path = path;
 }
 
 }
