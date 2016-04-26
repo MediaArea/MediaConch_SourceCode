@@ -1,0 +1,12 @@
+[Unit]
+Description=MediaConch Server
+
+[Service]
+Type=forking
+Environment="CONFIG=/etc/mediaconch/MediaConch.rc"
+ExecStart=/usr/bin/mediaconchd --configuration=${CONFIG}
+
+[Install]
+WantedBy=multi-user.target
+
+# Contributor: Vascom, vascom2@gmail.com"
