@@ -14,6 +14,8 @@
 #include "policycombobox.h"
 #include "displaycombobox.h"
 #include "verbosityspinbox.h"
+#include "savereportpathbox.h"
+#include "loadfilespathbox.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
@@ -720,6 +722,34 @@ void MainWindow::default_display_rejected()
 
     delete default_display_box;
     default_display_box = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultSaveReportPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_save_report_path().c_str());
+    SaveReportPathBox* box = new SaveReportPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_save_report_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultLoadFilesPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_load_files_path().c_str());
+    LoadFilesPathBox* box = new LoadFilesPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_load_files_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
 }
 
 //---------------------------------------------------------------------------

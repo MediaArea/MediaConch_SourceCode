@@ -183,6 +183,8 @@ private Q_SLOTS:
     void on_actionDefaultPolicy_triggered();
     void on_actionDefaultDisplay_triggered();
     void on_actionDefaultVerbosity_triggered();
+    void on_actionDefaultSaveReportPath_triggered();
+    void on_actionDefaultLoadFilesPath_triggered();
 
     // Default
     void default_policy_accepted();

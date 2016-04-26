@@ -90,6 +90,8 @@
     <addaction name="actionDefaultPolicy"/>
     <addaction name="actionDefaultDisplay"/>
     <addaction name="actionDefaultVerbosity"/>
+    <addaction name="actionDefaultSaveReportPath"/>
+    <addaction name="actionDefaultLoadFilesPath"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>
@@ -181,6 +183,16 @@
   <action name="actionDefaultDisplay">
    <property name="text">
     <string>Default display</string>
+   </property>
+  </action>
+  <action name="actionDefaultSaveReportPath">
+   <property name="text">
+    <string>Default path to save report</string>
+   </property>
+  </action>
+  <action name="actionDefaultLoadFilesPath">
+   <property name="text">
+    <string>Default path to open files</string>
    </property>
   </action>
  </widget>
