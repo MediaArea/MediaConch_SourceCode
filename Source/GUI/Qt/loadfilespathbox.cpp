@@ -60,7 +60,7 @@ int LoadFilesPathBox::exec()
         }
         else if (clickedButton() == use_last)
         {
-            new_path = "Last used path";
+            new_path = "Last used folder";
             setInformativeText(new_path);
             continue;
         }
@@ -72,7 +72,7 @@ int LoadFilesPathBox::exec()
 //---------------------------------------------------------------------------
 QString LoadFilesPathBox::get_path()
 {
-    if (!path.length() || path == "Last used path")
+    if (!path.length() || path == "Last used folder")
         return QString("last");
     return path;
 }

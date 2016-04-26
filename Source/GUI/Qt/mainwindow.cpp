@@ -1016,6 +1016,40 @@ int MainWindow::select_correct_verbosity()
 }
 
 //---------------------------------------------------------------------------
+std::string MainWindow::select_correct_save_report_path()
+{
+    // Save report path
+    std::string path = uisettings.get_default_save_report_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_save_report_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_load_files_path()
+{
+    // Load files path
+    std::string path = uisettings.get_default_load_files_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_load_files_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_save_report_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_save_report_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_load_files_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_load_files_path(path);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::analyze(const std::vector<std::string>& files)
 {
     return MCL.analyze(files);
