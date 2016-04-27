@@ -10,7 +10,7 @@
 del   MediaConch_GUI_Windows.exe
 
 rem --- Installer ---
-..\..\Shared\Binary\Windows_i386\NSIS\makensis ..\Source\Install\MediaConch_GUI_Windows.nsi
+..\..\..\MediaArea-Utils-Binaries\Windows\NSIS\makensis ..\Source\Install\MediaConch_GUI_Windows.nsi
 
 rem --- Clean up ---
 if "%1"=="SkipCleanUp" goto SkipCleanUp
