@@ -9,60 +9,60 @@ FILES="`ls "$FILES_DIRECTORY"`"
 for i in $FILES
 do
 
-    OUTPUT="`./mediaconch \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_invalid "$OUTPUT"
-    output_has_not_mc_xml "$OUTPUT"
-    output_has_not_mi_xml "$OUTPUT"
-    output_has_not_mt_xml "$OUTPUT"
+    xml_is_invalid
+    output_has_not_mc_xml
+    output_has_not_mi_xml
+    output_has_not_mt_xml
 
-    OUTPUT="`./mediaconch -mc -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch -mc -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_correct "$OUTPUT"
-    output_has_mc_xml "$OUTPUT"
-    output_has_not_mi_xml "$OUTPUT"
-    output_has_not_mt_xml "$OUTPUT"
+    xml_is_correct
+    output_has_mc_xml
+    output_has_not_mi_xml
+    output_has_not_mt_xml
 
-    OUTPUT="`./mediaconch -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_correct "$OUTPUT"
-    output_has_not_mc_xml "$OUTPUT"
-    output_has_mi_xml "$OUTPUT"
-    output_has_not_mt_xml "$OUTPUT"
+    xml_is_correct
+    output_has_not_mc_xml
+    output_has_mi_xml
+    output_has_not_mt_xml
 
-    OUTPUT="`./mediaconch -mt -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch -mt -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_correct "$OUTPUT"
-    output_has_not_mc_xml "$OUTPUT"
-    output_has_not_mi_xml "$OUTPUT"
-    output_has_mt_xml "$OUTPUT"
+    xml_is_correct
+    output_has_not_mc_xml
+    output_has_not_mi_xml
+    output_has_mt_xml
 
-    OUTPUT="`./mediaconch -mt -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch -mt -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_correct "$OUTPUT"
-    output_has_not_mc_xml "$OUTPUT"
-    output_has_mi_xml "$OUTPUT"
-    output_has_mt_xml "$OUTPUT"
+    xml_is_correct
+    output_has_not_mc_xml
+    output_has_mi_xml
+    output_has_mt_xml
 
-    OUTPUT="`./mediaconch -mc -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch -mc -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_correct "$OUTPUT"
-    output_has_mc_xml "$OUTPUT"
-    output_has_mi_xml "$OUTPUT"
-    output_has_not_mt_xml "$OUTPUT"
+    xml_is_correct
+    output_has_mc_xml
+    output_has_mi_xml
+    output_has_not_mt_xml
 
-    OUTPUT="`./mediaconch -mc -mt -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch -mc -mt -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_correct "$OUTPUT"
-    output_has_mc_xml "$OUTPUT"
-    output_has_not_mi_xml "$OUTPUT"
-    output_has_mt_xml "$OUTPUT"
+    xml_is_correct
+    output_has_mc_xml
+    output_has_not_mi_xml
+    output_has_mt_xml
 
-    OUTPUT="`./mediaconch -mt -mi -mc -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
+    DATA="`./mediaconch -mt -mi -mc -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
-    xml_is_correct "$OUTPUT"
-    output_has_mc_xml "$OUTPUT"
-    output_has_mi_xml "$OUTPUT"
-    output_has_mt_xml "$OUTPUT"
+    xml_is_correct
+    output_has_mc_xml
+    output_has_mi_xml
+    output_has_mt_xml
 
 done
