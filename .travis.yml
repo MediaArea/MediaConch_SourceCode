@@ -4,12 +4,12 @@ compiler: gcc
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libqt4-dev libxml2-dev libxslt-dev zlib1g-dev pkg-config libqtwebkit-dev libcurl4-gnutls-dev libmms0 libsqlite3-dev libjansson-dev libevent-dev libxml2-utils
-  - wget http://mediaarea.net/download/binary/libzen0/0.4.32/libzen0_0.4.32-1_amd64.xUbuntu_12.04.deb
-  - sudo dpkg -i libzen0_0.4.32-1_amd64.xUbuntu_12.04.deb
-  - wget http://mediaarea.net/download/binary/libzen0/0.4.32/libzen-dev_0.4.32-1_amd64.xUbuntu_12.04.deb
-  - sudo dpkg -i libzen-dev_0.4.32-1_amd64.xUbuntu_12.04.deb
-  - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.80/libmediainfo0_0.7.80-1_amd64.xUbuntu_12.04.deb
-  - sudo dpkg -i libmediainfo0_0.7.80-1_amd64.xUbuntu_12.04.deb
-  - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.80/libmediainfo-dev_0.7.80-1_amd64.xUbuntu_12.04.deb
-  - sudo dpkg -i libmediainfo-dev_0.7.80-1_amd64.xUbuntu_12.04.deb
+  - wget http://mediaarea.net/download/binary/libzen0/0.4.33/libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
+  - sudo dpkg -i libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
+  - wget http://mediaarea.net/download/binary/libzen0/0.4.33/libzen-dev_0.4.33-1_amd64.xUbuntu_12.04.deb
+  - sudo dpkg -i libzen-dev_0.4.33-1_amd64.xUbuntu_12.04.deb
+  - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.84/libmediainfo0_0.7.84-1_amd64.xUbuntu_12.04.deb
+  - sudo dpkg -i libmediainfo0_0.7.84-1_amd64.xUbuntu_12.04.deb
+  - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.84/libmediainfo-dev_0.7.84-1_amd64.xUbuntu_12.04.deb
+  - sudo dpkg -i libmediainfo-dev_0.7.84-1_amd64.xUbuntu_12.04.deb
 script: cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make check && cd ../../Qt && ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" && make
