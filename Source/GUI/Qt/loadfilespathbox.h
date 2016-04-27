@@ -14,8 +14,6 @@ namespace MediaConch {
 
 class LoadFilesPathBox : public QMessageBox
 {
-    Q_OBJECT
-
 public:
     LoadFilesPathBox(const QString& value);
     ~LoadFilesPathBox();

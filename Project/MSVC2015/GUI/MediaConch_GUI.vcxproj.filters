@@ -341,6 +341,12 @@
     <ClCompile Include="_Automated\moc_policycombobox.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\loadfilespathbox.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\savereportpathbox.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -524,6 +530,12 @@
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\policycombobox.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\loadfilespathbox.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\savereportpathbox.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>

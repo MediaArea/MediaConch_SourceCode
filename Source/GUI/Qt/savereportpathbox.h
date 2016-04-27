@@ -14,8 +14,6 @@ namespace MediaConch {
 
 class SaveReportPathBox : public QMessageBox
 {
-    Q_OBJECT
-
 public:
     SaveReportPathBox(const QString& value);
     ~SaveReportPathBox();
