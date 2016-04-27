@@ -181,49 +181,49 @@ int NoDatabaseUi::ui_settings_get_last_verbosity(int&, int)
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_save_default_load_files_path(const std::string& load_path, int user_id)
+int NoDatabaseUi::ui_settings_save_default_load_files_path(const std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_get_default_load_files_path(std::string& load_path, int user_id)
+int NoDatabaseUi::ui_settings_get_default_load_files_path(std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_save_last_load_files_path(const std::string& load_path, int user_id)
+int NoDatabaseUi::ui_settings_save_last_load_files_path(const std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_get_last_load_files_path(std::string& load_path, int user_id)
+int NoDatabaseUi::ui_settings_get_last_load_files_path(std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_save_default_save_report_path(const std::string& save_path, int user_id)
+int NoDatabaseUi::ui_settings_save_default_save_report_path(const std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_get_default_save_report_path(std::string& save_path, int user_id)
+int NoDatabaseUi::ui_settings_get_default_save_report_path(std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_save_last_save_report_path(const std::string& save_path, int user_id)
+int NoDatabaseUi::ui_settings_save_last_save_report_path(const std::string&, int)
 {
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseUi::ui_settings_get_last_save_report_path(std::string& save_path, int user_id)
+int NoDatabaseUi::ui_settings_get_last_save_report_path(std::string&, int)
 {
     return 0;
 }
