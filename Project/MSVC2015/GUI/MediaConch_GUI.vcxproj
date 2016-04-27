@@ -207,6 +207,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\groupofrules.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\loadfilespathbox.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\menumainwindow.cpp" />
@@ -221,6 +222,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\savereportpathbox.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp" />
@@ -300,6 +302,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\displaycombobox.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\loadfilespathbox.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\menumainwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policiesmenu.h" />
@@ -312,6 +315,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\savereportpathbox.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.h" />
