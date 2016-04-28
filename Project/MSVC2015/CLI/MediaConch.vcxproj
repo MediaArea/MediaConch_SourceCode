@@ -187,6 +187,7 @@
     <ClInclude Include="..\..\..\Source\CLI\Config.h" />
     <ClInclude Include="..\..\..\Source\CLI\Help.h" />
     <ClInclude Include="..\..\..\Source\Common\Core.h" />
+    <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h" />
     <ClInclude Include="..\..\..\Source\Common\DpfManager.h" />
     <ClInclude Include="..\..\..\Source\Common\Plugin.h" />
     <ClInclude Include="..\..\..\Source\Common\PluginFormat.h" />
