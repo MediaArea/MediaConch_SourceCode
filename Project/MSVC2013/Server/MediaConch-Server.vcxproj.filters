@@ -96,9 +96,6 @@
     <ClCompile Include="..\..\..\Source\Common\MediaConchLib.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\NoDatabase.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Queue.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -130,6 +127,15 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\DpfManager.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\DatabaseReport.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -183,6 +189,15 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\VeraPDF.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\SQLLiteReport.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>

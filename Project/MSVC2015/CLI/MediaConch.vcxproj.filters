@@ -197,6 +197,9 @@
     <ClInclude Include="..\..\..\Source\Common\VeraPDF.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MediaConch_CLI.rc">
