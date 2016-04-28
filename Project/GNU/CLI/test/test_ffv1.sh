@@ -4,7 +4,7 @@ PATH_SCRIPT=$(dirname "$0")
 . "$PATH_SCRIPT/utils.sh"
 
 FILES_DIRECTORY="$PATH_SCRIPT/SampleFiles/PolicyTestFiles/FFV1/"
-FILES="`ls "$FILES_DIRECTORY"`"
+FILES="`ls "$FILES_DIRECTORY" | grep -v '\\.txt'`"
 
 for i in $FILES
 do
