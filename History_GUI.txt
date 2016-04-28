@@ -8,6 +8,17 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.04, 2016-04-29
+-------------
+Merge of "Checker" and "Results" pages in one page as in MediaConchOnline
+Checker page new design, based on MediaConchOnline one
+Add some settings (default policy, default display, default path for file open)
+Remember the last policy used, the last display used, the last path used
+FFV1: display of the trace of the slice header
+Check a directory recursively
+Fix: display correctly information even if the file disappeared (renamed / not accessible)
+Minor UI fixes
+
 Version 16.03, 2016-03-31
 -------------
 Verbosity selection
