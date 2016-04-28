@@ -22,6 +22,7 @@ do
     output_has_mc_xml
     output_has_not_mi_xml
     output_has_not_mt_xml
+    # output_xml_is_a_valid_mc
 
     DATA="`./mediaconch -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
@@ -29,6 +30,7 @@ do
     output_has_not_mc_xml
     output_has_mi_xml
     output_has_not_mt_xml
+    output_xml_is_a_valid_mi
 
     DATA="`./mediaconch -mt -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
@@ -36,6 +38,7 @@ do
     output_has_not_mc_xml
     output_has_not_mi_xml
     output_has_mt_xml
+    output_xml_is_a_valid_mt
 
     DATA="`./mediaconch -mt -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
@@ -43,6 +46,7 @@ do
     output_has_not_mc_xml
     output_has_mi_xml
     output_has_mt_xml
+    output_xml_is_a_valid_ma
 
     DATA="`./mediaconch -mc -mi -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
@@ -50,6 +54,7 @@ do
     output_has_mc_xml
     output_has_mi_xml
     output_has_not_mt_xml
+    # output_xml_is_a_valid_ma
 
     DATA="`./mediaconch -mc -mt -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
@@ -57,6 +62,7 @@ do
     output_has_mc_xml
     output_has_not_mi_xml
     output_has_mt_xml
+    # output_xml_is_a_valid_ma
 
     DATA="`./mediaconch -mt -mi -mc -fx \"--implementationschema=$RESOURCE_PATH/schema/MatroskaSchema.xml\" \"$FILES_DIRECTORY/$i\"`"
     cmd_is_ok
@@ -64,5 +70,6 @@ do
     output_has_mc_xml
     output_has_mi_xml
     output_has_mt_xml
+    # output_xml_is_a_valid_ma
 
 done

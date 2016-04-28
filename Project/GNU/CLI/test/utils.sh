@@ -5,6 +5,26 @@ MC_ROOT_PATH=$UTILS_PATH/../../../../
 RESOURCE_PATH=$MC_ROOT_PATH/Source/Resource
 DATA=
 
+if [ ! -f "$UTILS_PATH/mediaconch.xsd" ]
+then
+    wget https://github.com/tribouille/MediaAreaXml/raw/master/mediaconch.xsd -O "$UTILS_PATH/mediaconch.xsd"
+fi
+
+if [ ! -f "$UTILS_PATH/mediainfo.xsd" ]
+then
+    wget https://github.com/tribouille/MediaAreaXml/raw/master/mediainfo.xsd -O "$UTILS_PATH/mediainfo.xsd"
+fi
+
+if [ ! -f "$UTILS_PATH/mediatrace.xsd" ]
+then
+    wget https://github.com/tribouille/MediaAreaXml/raw/master/mediatrace.xsd -O "$UTILS_PATH/mediatrace.xsd"
+fi
+
+if [ ! -f "$UTILS_PATH/mediaarea.xsd" ]
+then
+    wget https://github.com/tribouille/MediaAreaXml/raw/master/mediaarea.xsd -O "$UTILS_PATH/mediaarea.xsd"
+fi
+
 cmd_is_ok()
 {
     if test $? -ne 0
@@ -82,6 +102,42 @@ output_has_mi_xml()
 output_has_not_mi_xml()
 {
     if [ $(echo "$DATA" | grep -oc "<MediaInfo") -ne 0 ]
+    then
+        exit 1;
+    fi
+}
+
+output_xml_is_a_valid_mc()
+{
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediaconch.xsd" - 2> /dev/null)
+    if test $? -ne 0
+    then
+        exit 1;
+    fi
+}
+
+output_xml_is_a_valid_mi()
+{
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediainfo.xsd" - 2> /dev/null)
+    if test $? -ne 0
+    then
+        exit 1;
+    fi
+}
+
+output_xml_is_a_valid_mt()
+{
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediatrace.xsd" - 2> /dev/null)
+    if test $? -ne 0
+    then
+        exit 1;
+    fi
+}
+
+output_xml_is_a_valid_ma()
+{
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediaarea.xsd" - 2> /dev/null)
+    if test $? -ne 0
     then
         exit 1;
     fi
