@@ -15,6 +15,7 @@
 #include <ZenLib/Ztring.h>
 #include "Common/Httpd.h"
 #include "Common/LibEventHttpd.h"
+#include "Common/GeneratedCSVVideos.hpp"
 #include "Daemon.h"
 #include "Help.h"
 #include "Config.h"
@@ -89,6 +90,7 @@ namespace MediaConch
         httpd->commands.list_cb = on_list_command;
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
+        httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
         return 0;
     }
 
@@ -823,6 +825,32 @@ namespace MediaConch
             res.file = *d->current_files[req->id];
 
         std::clog << d->get_date() << "Daemon send file_from_id result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req, RESTAPI::Default_Values_For_Type_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a default_values_for_type command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::map<std::string, std::vector<std::string> > values;
+        if (get_generated_values_from_csv(values) < 0)
+            return 0;
+
+        if (values.find(req->type) != values.end())
+        {
+            for (size_t i = 0; i < values[req->type].size(); ++i)
+                res.values.push_back(values[req->type][i]);
+        }
+
+        std::clog << d->get_date() << "Daemon send default_values_for_type result: " << res.to_str() << std::endl;
+
         return 0;
     }
 

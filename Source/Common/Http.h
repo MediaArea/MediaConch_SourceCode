@@ -45,6 +45,7 @@ public:
     int send_request(RESTAPI::List_Req& req);
     int send_request(RESTAPI::Validate_Req& req);
     int send_request(RESTAPI::File_From_Id_Req& req);
+    int send_request(RESTAPI::Default_Values_For_Type_Req& req);
 
     void set_port(int port);
     void set_address(std::string& address);

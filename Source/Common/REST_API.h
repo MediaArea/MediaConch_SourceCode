@@ -346,6 +346,18 @@ public:
         std::string  to_str() const;
     };
 
+    struct Default_Values_For_Type_Req
+    {
+        std::string  type;
+        std::string  to_str() const;
+    };
+
+    struct Default_Values_For_Type_Res
+    {
+        std::vector<std::string> values;
+        std::string              to_str() const;
+    };
+
 public:
     //Constructor/Destructor
     RESTAPI();
@@ -360,6 +372,7 @@ public:
     std::string serialize_list_req(List_Req& req);
     std::string serialize_validate_req(Validate_Req& req);
     std::string serialize_file_from_id_req(File_From_Id_Req& req);
+    std::string serialize_default_values_for_type_req(Default_Values_For_Type_Req& req);
 
     // Serialize: Result
     std::string serialize_analyze_res(Analyze_Res& res);
@@ -370,36 +383,40 @@ public:
     std::string serialize_list_res(List_Res& res);
     std::string serialize_validate_res(Validate_Res& res);
     std::string serialize_file_from_id_res(File_From_Id_Res& res);
+    std::string serialize_default_values_for_type_res(Default_Values_For_Type_Res& res);
 
     // Parse: Request
-    Analyze_Req      *parse_analyze_req(const std::string& data);
-    Status_Req       *parse_status_req(const std::string& data);
-    Report_Req       *parse_report_req(const std::string& data);
-    Retry_Req        *parse_retry_req(const std::string& data);
-    Clear_Req        *parse_clear_req(const std::string& data);
-    List_Req         *parse_list_req(const std::string& data);
-    Validate_Req     *parse_validate_req(const std::string& data);
-    File_From_Id_Req *parse_file_from_id_req(const std::string& data);
+    Analyze_Req                 *parse_analyze_req(const std::string& data);
+    Status_Req                  *parse_status_req(const std::string& data);
+    Report_Req                  *parse_report_req(const std::string& data);
+    Retry_Req                   *parse_retry_req(const std::string& data);
+    Clear_Req                   *parse_clear_req(const std::string& data);
+    List_Req                    *parse_list_req(const std::string& data);
+    Validate_Req                *parse_validate_req(const std::string& data);
+    File_From_Id_Req            *parse_file_from_id_req(const std::string& data);
+    Default_Values_For_Type_Req *parse_default_values_for_type_req(const std::string& data);
 
     // Parse: URI Request
-    Analyze_Req      *parse_uri_analyze_req(const std::string& uri);
-    Status_Req       *parse_uri_status_req(const std::string& uri);
-    Report_Req       *parse_uri_report_req(const std::string& uri);
-    Retry_Req        *parse_uri_retry_req(const std::string& uri);
-    Clear_Req        *parse_uri_clear_req(const std::string& uri);
-    List_Req         *parse_uri_list_req(const std::string& uri);
-    Validate_Req     *parse_uri_validate_req(const std::string& uri);
-    File_From_Id_Req *parse_uri_file_from_id_req(const std::string& uri);
+    Analyze_Req                 *parse_uri_analyze_req(const std::string& uri);
+    Status_Req                  *parse_uri_status_req(const std::string& uri);
+    Report_Req                  *parse_uri_report_req(const std::string& uri);
+    Retry_Req                   *parse_uri_retry_req(const std::string& uri);
+    Clear_Req                   *parse_uri_clear_req(const std::string& uri);
+    List_Req                    *parse_uri_list_req(const std::string& uri);
+    Validate_Req                *parse_uri_validate_req(const std::string& uri);
+    File_From_Id_Req            *parse_uri_file_from_id_req(const std::string& uri);
+    Default_Values_For_Type_Req *parse_uri_default_values_for_type_req(const std::string& uri);
 
     // Parse: Request
-    Analyze_Res      *parse_analyze_res(const std::string& data);
-    Status_Res       *parse_status_res(const std::string& data);
-    Report_Res       *parse_report_res(const std::string& data);
-    Retry_Res        *parse_retry_res(const std::string& data);
-    Clear_Res        *parse_clear_res(const std::string& data);
-    List_Res         *parse_list_res(const std::string& data);
-    Validate_Res     *parse_validate_res(const std::string& data);
-    File_From_Id_Res *parse_file_from_id_res(const std::string& data);
+    Analyze_Res                 *parse_analyze_res(const std::string& data);
+    Status_Res                  *parse_status_res(const std::string& data);
+    Report_Res                  *parse_report_res(const std::string& data);
+    Retry_Res                   *parse_retry_res(const std::string& data);
+    Clear_Res                   *parse_clear_res(const std::string& data);
+    List_Res                    *parse_list_res(const std::string& data);
+    Validate_Res                *parse_validate_res(const std::string& data);
+    File_From_Id_Res            *parse_file_from_id_res(const std::string& data);
+    Default_Values_For_Type_Res *parse_default_values_for_type_res(const std::string& data);
 
     std::string get_error() const { return error; }
 

@@ -151,6 +151,38 @@ int DaemonClient::file_from_id(int id, std::string& filename)
 }
 
 //---------------------------------------------------------------------------
+int DaemonClient::default_values_for_type(const std::string& type, std::vector<std::string>& values)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Default_Values_For_Type_Req req;
+    req.type = type;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Default_Values_For_Type_Res *res = rest.parse_default_values_for_type_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    for (size_t i = 0; i < res->values.size(); ++i)
+        values.push_back(res->values[i]);
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!http_client)

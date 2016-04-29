@@ -14,6 +14,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include "Common/GeneratedCSVVideos.hpp"
 #include "CommandLine_Parser.h"
 #include "Help.h"
 //---------------------------------------------------------------------------
@@ -173,6 +174,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--force",                                       Force)
     OPTION("--async",                                       Asynchronous)
     OPTION("--pluginsconfiguration",                        PluginsConfiguration)
+    OPTION("--defaultvaluesfortype",                        DefaultValuesForType)
     //Default
     OPTION("--",                                            Default)
     else
@@ -404,6 +406,44 @@ CL_OPTION(PluginsConfiguration)
     file.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_plugins_configuration_file(file);
     return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(DefaultValuesForType)
+{
+    (void)cli;
+    //Form : --PluginsConfiguration=File
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string type;
+    type.assign(argument, egal_pos + 1 , std::string::npos);
+
+    std::map<std::string, std::vector<std::string> > values;
+    if (get_generated_values_from_csv(values) < 0)
+    {
+        return CLI_RETURN_ERROR;
+    }
+
+    if (values.find(type) != values.end())
+    {
+        std::stringstream out;
+        for (size_t i = 0; i < values[type].size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << values[type][i];
+        }
+        ZenLib::Ztring str;
+        str.From_UTF8(out.str());
+        STRINGOUT(str);
+    }
+
+    return CLI_RETURN_FINISH;
 }
 
 //---------------------------------------------------------------------------

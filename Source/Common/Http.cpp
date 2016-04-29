@@ -124,6 +124,18 @@ int Http::send_request(RESTAPI::File_From_Id_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Default_Values_For_Type_Req& req)
+{
+    std::string query = rest.serialize_default_values_for_type_req(req);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/default_values_for_type" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
 void Http::set_port(int port)
 {
     this->port = port;

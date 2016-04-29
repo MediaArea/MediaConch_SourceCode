@@ -120,6 +120,9 @@ int Help_Advanced()
     TEXTOUT("                    More details about SSL specific options (e.g. for HTTPS or FTPS)");
     TEXTOUT("--Help=Ssh");
     TEXTOUT("                    More details about SSH specific options (e.g. for SFTP)");
+    TEXTOUT("");
+    TEXTOUT("--DefaultValuesForType=Type");
+    TEXTOUT("                    Give the default values for the type given");
 
     return CLI_RETURN_FINISH;
 }
