@@ -139,6 +139,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/PluginFormat.h \
                     ../../Source/Common/VeraPDF.h \
                     ../../Source/Common/DpfManager.h \
+                    ../../Source/Common/GeneratedCSVVideos.hpp \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \

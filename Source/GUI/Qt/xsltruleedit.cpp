@@ -5,6 +5,7 @@
  */
 
 #include "Common/XsltPolicy.h"
+#include "Common/GeneratedCSVVideos.hpp"
 #include "xsltruleedit.h"
 #include "ui_xsltruleedit.h"
 #include "mainwindow.h"
@@ -76,12 +77,12 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
     if (!r)
         return;
 
-    ui->name->setText(QString().fromStdString(r->title));
+    ui->name->setText(QString().fromUtf8(r->title.c_str(), r->title.length()));
 
     // Set validator (operation to do)
     if (r->ope == "")
-        r->ope = ui->ope->currentText().toStdString();
-    int pos = ui->ope->findText(QString().fromStdString(r->ope));
+        r->ope = ui->ope->currentText().toUtf8().data();
+    int pos = ui->ope->findText(QString().fromUtf8(r->ope.c_str(), r->ope.length()));
     if (pos != -1)
         ui->ope->setCurrentIndex(pos);
 
@@ -123,7 +124,7 @@ void XsltRuleEdit::fill_mode_frame_exists_fields(XsltRule *r)
     {
         // Display Free Text test
         ui->frameTest->show();
-        ui->test->setText(QString().fromStdString(r->test));
+        ui->test->setText(QString().fromUtf8(r->test.c_str(), r->test.length()));
     }
     else
     {
@@ -133,8 +134,8 @@ void XsltRuleEdit::fill_mode_frame_exists_fields(XsltRule *r)
 
         // Set type
         if (r->type == "")
-            r->type = ui->type->currentText().toStdString();
-        pos = ui->type->findText(QString().fromStdString(r->type));
+            r->type = ui->type->currentText().toUtf8().data();
+        pos = ui->type->findText(QString().fromUtf8(r->type.c_str(), r->type.length()));
         if (pos != -1)
             ui->type->setCurrentIndex(pos);
 
@@ -148,7 +149,7 @@ void XsltRuleEdit::fill_mode_frame_exists_fields(XsltRule *r)
 
     //Updating field selector makes r->field reseting
     std::string remain(r->field);
-    change_values_of_field_selector(r->use_free_text, r->field);
+    change_values_of_field_selector(r->use_free_text, r->field, "");
     r->field = remain;
 }
 
@@ -169,10 +170,10 @@ void XsltRuleEdit::fill_mode_frame_is_true_fields(XsltRule *r)
 
     // Except Value && Field
     ui->frameTest->show();
-    ui->test->setText(QString().fromStdString(r->test));
+    ui->test->setText(QString().fromUtf8(r->test.c_str(), r->test.length()));
     ui->frameField->show();
 
-    change_values_of_field_selector(r->use_free_text, r->field);
+    change_values_of_field_selector(r->use_free_text, r->field, "");
 }
 
 //---------------------------------------------------------------------------
@@ -191,7 +192,7 @@ void XsltRuleEdit::fill_mode_frame_common_fields(XsltRule *r)
     {
         // Display Free Text test
         ui->frameTest->show();
-        ui->test->setText(QString().fromStdString(r->test));
+        ui->test->setText(QString().fromUtf8(r->test.c_str(), r->test.length()));
     }
     else
     {
@@ -201,8 +202,8 @@ void XsltRuleEdit::fill_mode_frame_common_fields(XsltRule *r)
 
         // Set type
         if (r->type == "")
-            r->type = ui->type->currentText().toStdString();
-        pos = ui->type->findText(QString().fromStdString(r->type));
+            r->type = ui->type->currentText().toUtf8().data();
+        pos = ui->type->findText(QString().fromUtf8(r->type.c_str(), r->type.length()));
         if (pos != -1)
             ui->type->setCurrentIndex(pos);
 
@@ -214,15 +215,15 @@ void XsltRuleEdit::fill_mode_frame_common_fields(XsltRule *r)
         ui->occurrence->setValue(r->occurrence);
     }
 
-    //Updating field selector makes r->field reseting
     std::string remain(r->field);
-    change_values_of_field_selector(r->use_free_text, r->field);
-    r->field = remain;
+    std::string rvalue(r->value);
 
-    string value = r->value;
-    if (value.length() >= 2 && value[0] == '\'')
-        value = value.substr(1, value.length() - 2);
-    ui->value->setText(QString().fromStdString(value));
+    change_values_of_field_selector(r->use_free_text, remain, rvalue);
+
+    //Updating field selector makes r->field reseting
+    r->field = remain;
+    //Updating value selector makes r->value reseting
+    r->value = rvalue;
 }
 
 //---------------------------------------------------------------------------
@@ -262,7 +263,7 @@ QComboBox *XsltRuleEdit::get_operator_select()
 }
 
 //---------------------------------------------------------------------------
-QLineEdit *XsltRuleEdit::get_value_line()
+QComboBox *XsltRuleEdit::get_value_select()
 {
     return ui->value;
 }
@@ -306,24 +307,24 @@ void XsltRuleEdit::add_values_to_selector()
     map<string, list<string> >::const_iterator itType = existing_type->begin();
     map<string, list<string> >::const_iterator iteType = existing_type->end();
     for (; itType != iteType; ++itType)
-        ui->type->addItem(QString().fromStdString(itType->first));
+        ui->type->addItem(QString().fromUtf8(itType->first.c_str(), itType->first.length()));
     ui->type->model()->sort(0);
-    change_values_of_field_selector(true, "");
+    change_values_of_field_selector(true, "", "");
 
     const list<string> *existing_operator = mainwindow->providePolicyExistingXsltOperator();
     list<string>::const_iterator itOperator = existing_operator->begin();
     list<string>::const_iterator iteOperator = existing_operator->end();
     for (; itOperator != iteOperator; ++itOperator)
-        ui->ope->addItem(QString().fromStdString(*itOperator));
+        ui->ope->addItem(QString().fromUtf8(itOperator->c_str(), itOperator->length()));
 }
 
 //---------------------------------------------------------------------------
-void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std::string new_field)
+void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std::string& new_field, const std::string& new_value)
 {
     ui->field->clear();
     if (!is_free_text)
     {
-        std::string type = ui->type->currentText().toStdString();
+        std::string type = ui->type->currentText().toUtf8().data();
         const map<string, list<string> > *existing_type = mainwindow->providePolicyExistingType();
         map<string, list<string> >::const_iterator itType = existing_type->begin();
         map<string, list<string> >::const_iterator iteType = existing_type->end();
@@ -335,7 +336,7 @@ void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std:
             list<string>::const_iterator it = itType->second.begin();
             list<string>::const_iterator ite = itType->second.end();
             for (; it != ite; ++it)
-                ui->field->addItem(QString().fromStdString(*it));
+                ui->field->addItem(QString().fromUtf8(it->c_str(), it->length()));
         }
     }
     ui->field->model()->sort(0);
@@ -343,15 +344,50 @@ void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std:
     if (!new_field.length())
         return;
 
-    int pos = ui->field->findText(QString().fromStdString(new_field));
+    int pos = ui->field->findText(QString().fromUtf8(new_field.c_str(), new_field.length()));
     if (pos != -1)
         ui->field->setCurrentIndex(pos);
     else
     {
-        ui->field->addItem(QString().fromStdString(new_field));
-        int pos = ui->field->findText(QString().fromStdString(new_field));
+        ui->field->addItem(QString().fromUtf8(new_field.c_str(), new_field.length()));
+        int pos = ui->field->findText(QString().fromUtf8(new_field.c_str(), new_field.length()));
         if (pos != -1)
             ui->field->setCurrentIndex(pos);
+    }
+    change_values_of_value_selector(ui->field->currentText().toUtf8().data(), new_value);
+}
+
+//---------------------------------------------------------------------------
+void XsltRuleEdit::change_values_of_value_selector(const std::string& field, const std::string& new_value)
+{
+    std::string val(new_value);
+    if (val.length() >= 2 && val[0] == '\'')
+        val = val.substr(1, val.length() - 2);
+
+    ui->value->clear();
+    if (field.length())
+    {
+        std::map<std::string, std::vector<std::string> > values;
+        if (get_generated_values_from_csv(values) < 0)
+            return;
+
+        if (values.find(field) != values.end())
+        {
+            for (size_t i = 0; i < values[field].size(); ++i)
+                ui->value->addItem(QString().fromUtf8(values[field][i].c_str(), values[field][i].length()));
+        }
+    }
+    ui->value->model()->sort(0);
+
+    int pos = ui->value->findText(QString().fromUtf8(val.c_str(), val.length()));
+    if (pos != -1)
+        ui->value->setCurrentIndex(pos);
+    else
+    {
+        ui->value->addItem(QString().fromUtf8(val.c_str(), val.length()));
+        int pos = ui->value->findText(QString().fromUtf8(val.c_str(), val.length()));
+        if (pos != -1)
+            ui->value->setCurrentIndex(pos);
     }
 }
 
