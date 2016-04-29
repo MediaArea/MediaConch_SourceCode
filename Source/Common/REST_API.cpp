@@ -880,7 +880,7 @@ std::string RESTAPI::serialize_file_from_id_res(File_From_Id_Res& res)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-RESTAPI::Analyze_Req *RESTAPI::parse_analyze_req(std::string data)
+RESTAPI::Analyze_Req *RESTAPI::parse_analyze_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -907,7 +907,7 @@ RESTAPI::Analyze_Req *RESTAPI::parse_analyze_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Status_Req *RESTAPI::parse_status_req(std::string data)
+RESTAPI::Status_Req *RESTAPI::parse_status_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -947,7 +947,7 @@ RESTAPI::Status_Req *RESTAPI::parse_status_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
+RESTAPI::Report_Req *RESTAPI::parse_report_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1018,7 +1018,7 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Retry_Req *RESTAPI::parse_retry_req(std::string data)
+RESTAPI::Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1054,7 +1054,7 @@ RESTAPI::Retry_Req *RESTAPI::parse_retry_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
+RESTAPI::Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1090,7 +1090,7 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::List_Req *RESTAPI::parse_list_req(std::string data)
+RESTAPI::List_Req *RESTAPI::parse_list_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1108,7 +1108,7 @@ RESTAPI::List_Req *RESTAPI::parse_list_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Validate_Req *RESTAPI::parse_validate_req(std::string data)
+RESTAPI::Validate_Req *RESTAPI::parse_validate_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1168,7 +1168,7 @@ RESTAPI::Validate_Req *RESTAPI::parse_validate_req(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::File_From_Id_Req *RESTAPI::parse_file_from_id_req(std::string data)
+RESTAPI::File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1295,7 +1295,7 @@ RESTAPI::File_From_Id_Req *RESTAPI::parse_uri_file_from_id_req(const std::string
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(std::string data)
+RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1345,7 +1345,7 @@ RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Status_Res *RESTAPI::parse_status_res(std::string data)
+RESTAPI::Status_Res *RESTAPI::parse_status_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1394,7 +1394,7 @@ RESTAPI::Status_Res *RESTAPI::parse_status_res(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Report_Res *RESTAPI::parse_report_res(std::string data)
+RESTAPI::Report_Res *RESTAPI::parse_report_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1443,7 +1443,7 @@ RESTAPI::Report_Res *RESTAPI::parse_report_res(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Retry_Res *RESTAPI::parse_retry_res(std::string data)
+RESTAPI::Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1506,7 +1506,7 @@ RESTAPI::Retry_Res *RESTAPI::parse_retry_res(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
+RESTAPI::Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1569,7 +1569,7 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::List_Res *RESTAPI::parse_list_res(std::string data)
+RESTAPI::List_Res *RESTAPI::parse_list_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1608,7 +1608,7 @@ RESTAPI::List_Res *RESTAPI::parse_list_res(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Validate_Res *RESTAPI::parse_validate_res(std::string data)
+RESTAPI::Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1657,7 +1657,7 @@ RESTAPI::Validate_Res *RESTAPI::parse_validate_res(std::string data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::File_From_Id_Res *RESTAPI::parse_file_from_id_res(std::string data)
+RESTAPI::File_From_Id_Res *RESTAPI::parse_file_from_id_res(const std::string& data)
 {
     Container::Value v, *child;
 
