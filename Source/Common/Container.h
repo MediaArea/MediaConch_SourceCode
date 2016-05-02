@@ -57,7 +57,7 @@ public:
     virtual ~Container() {}
 
     virtual int parse(const std::string& data, Value &v) = 0;
-    virtual std::string serialize(Value &v) = 0;
+    virtual int serialize(Value &v, std::string&) = 0;
     virtual Value* get_value_by_key(Value& v, const std::string& key) = 0;
     virtual Value* get_value_in_array_by_key(Value& v, const std::string& key) = 0;
 

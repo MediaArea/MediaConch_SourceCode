@@ -64,23 +64,23 @@ int Json::parse(const std::string& data, Value &v)
 }
 
 //---------------------------------------------------------------------------
-std::string Json::serialize(Value &v)
+int Json::serialize(Value &v, std::string& data)
 {
     json_t *j = serialize_node(v);
     if (!j)
     {
         error = std::string("cannot serialize the node");
-        return std::string();
+        return -1;
     }
 
     std::string ret;
     char *json = json_dumps(j, JSON_ENCODE_ANY);
 
-    ret = std::string(json);
+    data = std::string(json);
     free(json);
     json_decref(j);
 
-    return ret;
+    return 0;
 }
 
 //---------------------------------------------------------------------------

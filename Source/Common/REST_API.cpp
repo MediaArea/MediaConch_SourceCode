@@ -578,8 +578,7 @@ int RESTAPI::serialize_analyze_req(Analyze_Req& req, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["ANALYZE"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -632,8 +631,7 @@ int RESTAPI::serialize_report_req(Report_Req& req, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["REPORT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -653,8 +651,7 @@ int RESTAPI::serialize_retry_req(Retry_Req& req, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["RETRY"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -709,8 +706,7 @@ int RESTAPI::serialize_validate_req(Validate_Req& req, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["VALIDATE"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -734,8 +730,7 @@ int RESTAPI::serialize_file_from_id_req(File_From_Id_Req& req, std::string& data
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["FILE_FROM_ID"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -759,8 +754,7 @@ int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["DEFAULT_VALUES_FOR_TYPE"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -789,8 +783,7 @@ int RESTAPI::serialize_analyze_res(Analyze_Res& res, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["ANALYZE_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -814,8 +807,7 @@ int RESTAPI::serialize_status_res(Status_Res& res, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["STATUS_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -840,8 +832,7 @@ int RESTAPI::serialize_report_res(Report_Res& res, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["REPORT_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -866,8 +857,7 @@ int RESTAPI::serialize_retry_res(Retry_Res& res, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["RETRY_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -892,12 +882,12 @@ int RESTAPI::serialize_clear_res(Clear_Res& res, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CLEAR_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
     }
+
     return 0;
 }
 
@@ -916,8 +906,7 @@ int RESTAPI::serialize_list_res(List_Res& res, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["LIST_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -946,8 +935,7 @@ int RESTAPI::serialize_validate_res(Validate_Res& res, std::string& data)
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["VALIDATE_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -970,8 +958,7 @@ int RESTAPI::serialize_file_from_id_res(File_From_Id_Res& res, std::string& data
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["FILE_FROM_ID_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
@@ -1000,8 +987,7 @@ int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["DEFAULT_VALUES_FOR_TYPE_RESULT"] = child;
 
-    data = model->serialize(v);
-    if (!data.length())
+    if (model->serialize(v, data) < 0)
     {
         error = model->get_error();
         return -1;
