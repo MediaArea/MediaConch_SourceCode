@@ -39,7 +39,8 @@ Http::~Http()
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Analyze_Req& req)
 {
-    std::string cmd = rest.serialize_analyze_req(req);
+    std::string cmd;
+    rest.serialize_analyze_req(req, cmd);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/"<< "analyze";
@@ -50,7 +51,8 @@ int Http::send_request(RESTAPI::Analyze_Req& req)
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Status_Req& req)
 {
-    std::string query = rest.serialize_status_req(req);
+    std::string query;
+    rest.serialize_status_req(req, query);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/"<< "status" << query;
@@ -62,7 +64,8 @@ int Http::send_request(RESTAPI::Status_Req& req)
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Report_Req& req)
 {
-    std::string cmd = rest.serialize_report_req(req);
+    std::string cmd;
+    rest.serialize_report_req(req, cmd);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/"<< "report";
@@ -73,7 +76,8 @@ int Http::send_request(RESTAPI::Report_Req& req)
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Retry_Req& req)
 {
-    std::string cmd = rest.serialize_retry_req(req);
+    std::string cmd;
+    rest.serialize_retry_req(req, cmd);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/"<< "retry";
@@ -84,7 +88,8 @@ int Http::send_request(RESTAPI::Retry_Req& req)
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Clear_Req& req)
 {
-    std::string query = rest.serialize_clear_req(req);
+    std::string query;
+    rest.serialize_clear_req(req, query);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/" << "clear" << query;
@@ -104,7 +109,8 @@ int Http::send_request(RESTAPI::List_Req&)
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Validate_Req& req)
 {
-    std::string cmd = rest.serialize_validate_req(req);
+    std::string cmd;
+    rest.serialize_validate_req(req, cmd);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/"<< "validate";
@@ -115,7 +121,8 @@ int Http::send_request(RESTAPI::Validate_Req& req)
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::File_From_Id_Req& req)
 {
-    std::string cmd = rest.serialize_file_from_id_req(req);
+    std::string cmd;
+    rest.serialize_file_from_id_req(req, cmd);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/file_from_id";
@@ -126,7 +133,8 @@ int Http::send_request(RESTAPI::File_From_Id_Req& req)
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Default_Values_For_Type_Req& req)
 {
-    std::string query = rest.serialize_default_values_for_type_req(req);
+    std::string query;
+    rest.serialize_default_values_for_type_req(req, query);
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/default_values_for_type" << query;

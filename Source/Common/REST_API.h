@@ -364,26 +364,26 @@ public:
     virtual ~RESTAPI();
 
     // Serialize: Request
-    std::string serialize_analyze_req(Analyze_Req& req);
-    std::string serialize_status_req(Status_Req& req);
-    std::string serialize_report_req(Report_Req& req);
-    std::string serialize_retry_req(Retry_Req& req);
-    std::string serialize_clear_req(Clear_Req& req);
-    std::string serialize_list_req(List_Req& req);
-    std::string serialize_validate_req(Validate_Req& req);
-    std::string serialize_file_from_id_req(File_From_Id_Req& req);
-    std::string serialize_default_values_for_type_req(Default_Values_For_Type_Req& req);
+    int serialize_analyze_req(Analyze_Req& req, std::string&);
+    int serialize_status_req(Status_Req& req, std::string&);
+    int serialize_report_req(Report_Req& req, std::string&);
+    int serialize_retry_req(Retry_Req& req, std::string&);
+    int serialize_clear_req(Clear_Req& req, std::string&);
+    int serialize_list_req(List_Req& req, std::string&);
+    int serialize_validate_req(Validate_Req& req, std::string&);
+    int serialize_file_from_id_req(File_From_Id_Req& req, std::string&);
+    int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&);
 
     // Serialize: Result
-    std::string serialize_analyze_res(Analyze_Res& res);
-    std::string serialize_status_res(Status_Res& res);
-    std::string serialize_report_res(Report_Res& res);
-    std::string serialize_retry_res(Retry_Res& res);
-    std::string serialize_clear_res(Clear_Res& res);
-    std::string serialize_list_res(List_Res& res);
-    std::string serialize_validate_res(Validate_Res& res);
-    std::string serialize_file_from_id_res(File_From_Id_Res& res);
-    std::string serialize_default_values_for_type_res(Default_Values_For_Type_Res& res);
+    int serialize_analyze_res(Analyze_Res& res, std::string&);
+    int serialize_status_res(Status_Res& res, std::string&);
+    int serialize_report_res(Report_Res& res, std::string&);
+    int serialize_retry_res(Retry_Res& res, std::string&);
+    int serialize_clear_res(Clear_Res& res, std::string&);
+    int serialize_list_res(List_Res& res, std::string&);
+    int serialize_validate_res(Validate_Res& res, std::string&);
+    int serialize_file_from_id_res(File_From_Id_Res& res, std::string&);
+    int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&);
 
     // Parse: Request
     Analyze_Req                 *parse_analyze_req(const std::string& data);

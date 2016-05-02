@@ -165,8 +165,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_status_res(res);
-        if (!result.length())
+        if (rest.serialize_status_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/list").compare(uri_path))
@@ -183,8 +182,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_list_res(res);
-        if (!result.length())
+        if (rest.serialize_list_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/default_values_for_type").compare(uri_path))
@@ -201,8 +199,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_default_values_for_type_res(res);
-        if (!result.length())
+        if (rest.serialize_default_values_for_type_res(res, result) < 0)
             error = rest.get_error();
     }
     else
@@ -252,8 +249,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_analyze_res(res);
-        if (!result.length())
+        if (rest.serialize_analyze_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/report").compare(uri_path))
@@ -275,8 +271,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_report_res(res);
-        if (!result.length())
+        if (rest.serialize_report_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/validate").compare(uri_path))
@@ -298,8 +293,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_validate_res(res);
-        if (!result.length())
+        if (rest.serialize_validate_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/file_from_id").compare(uri_path))
@@ -321,8 +315,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_file_from_id_res(res);
-        if (!result.length())
+        if (rest.serialize_file_from_id_res(res, result) < 0)
             error = rest.get_error();
     }
     else
@@ -371,8 +364,7 @@ void LibEventHttpd::request_put_coming(struct evhttp_request *req)
             code = HTTP_BADREQUEST;
             goto send;
         }
-        result = rest.serialize_retry_res(res);
-        if (!result.length())
+        if (rest.serialize_retry_res(res, result) < 0)
             error = rest.get_error();
     }
     else
@@ -412,8 +404,7 @@ void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
             goto send;
         }
 
-        result = rest.serialize_clear_res(res);
-        if (!result.length())
+        if (rest.serialize_clear_res(res, result) < 0)
             error = rest.get_error();
     }
     else
