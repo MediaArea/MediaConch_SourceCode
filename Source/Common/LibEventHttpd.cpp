@@ -160,11 +160,13 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         RESTAPI::Status_Res res;
         if (commands.status_cb && commands.status_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+        delete r;
         if (rest.serialize_status_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -177,11 +179,13 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         RESTAPI::List_Res res;
         if (commands.list_cb && commands.list_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+        delete r;
         if (rest.serialize_list_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -194,11 +198,13 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         RESTAPI::Default_Values_For_Type_Res res;
         if (commands.list_cb && commands.default_values_for_type_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+        delete r;
         if (rest.serialize_default_values_for_type_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -244,11 +250,13 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::Analyze_Res res;
         if (commands.analyze_cb && commands.analyze_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+            delete r;
         if (rest.serialize_analyze_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -266,11 +274,13 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::Report_Res res;
         if (commands.report_cb && commands.report_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+        delete r;
         if (rest.serialize_report_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -288,11 +298,13 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::Validate_Res res;
         if (commands.validate_cb && commands.validate_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+        delete r;
         if (rest.serialize_validate_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -310,11 +322,13 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::File_From_Id_Res res;
         if (commands.file_from_id_cb && commands.file_from_id_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+        delete r;
         if (rest.serialize_file_from_id_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -360,10 +374,13 @@ void LibEventHttpd::request_put_coming(struct evhttp_request *req)
         RESTAPI::Retry_Res res;
         if (commands.retry_cb && commands.retry_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
+
+        delete r;
         if (rest.serialize_retry_res(res, result) < 0)
             error = rest.get_error();
     }
@@ -399,11 +416,13 @@ void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
         RESTAPI::Clear_Res res;
         if (commands.clear_cb && commands.clear_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
+        delete r;
         if (rest.serialize_clear_res(res, result) < 0)
             error = rest.get_error();
     }

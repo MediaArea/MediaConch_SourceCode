@@ -46,6 +46,11 @@ MediaConchLib::MediaConchLib(bool no_daemon) : use_daemon(false), force_no_daemo
 MediaConchLib::~MediaConchLib()
 {
     delete core;
+    if (daemon_client)
+    {
+        delete daemon_client;
+        daemon_client = NULL;
+    }
 }
 
 //***************************************************************************
@@ -79,6 +84,7 @@ int MediaConchLib::close()
     if (daemon_client)
     {
         daemon_client->close();
+        delete daemon_client;
         daemon_client = NULL;
     }
     return 0;
