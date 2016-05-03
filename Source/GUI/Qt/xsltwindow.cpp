@@ -450,7 +450,7 @@ void XsltWindow::edit_rule_field()
         policieswindow->emphasis_policy_name_in_tree(item);
         r->field = ruleEdit->get_field_select()->currentText().toUtf8().data();
         std::string remain(r->value);
-        ruleEdit->change_values_of_value_selector(r->field, r->value);
+        ruleEdit->change_values_of_value_selector(r->type, r->field, r->value);
         r->value = remain;
         ruleEdit->check_editor_is_possible(r);
     }

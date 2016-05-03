@@ -354,11 +354,17 @@ void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std:
         if (pos != -1)
             ui->field->setCurrentIndex(pos);
     }
-    change_values_of_value_selector(ui->field->currentText().toUtf8().data(), new_value);
+
+    if (!is_free_text)
+        change_values_of_value_selector(ui->type->currentText().toUtf8().data(),
+                                        ui->field->currentText().toUtf8().data(),
+                                        new_value);
 }
 
 //---------------------------------------------------------------------------
-void XsltRuleEdit::change_values_of_value_selector(const std::string& field, const std::string& new_value)
+void XsltRuleEdit::change_values_of_value_selector(const std::string& type,
+                                                   const std::string& field,
+                                                   const std::string& new_value)
 {
     std::string val(new_value);
     if (val.length() >= 2 && val[0] == '\'')
@@ -367,14 +373,17 @@ void XsltRuleEdit::change_values_of_value_selector(const std::string& field, con
     ui->value->clear();
     if (field.length())
     {
-        std::map<std::string, std::vector<std::string> > values;
+        std::map<std::string, std::map<std::string, std::vector<std::string> > > values;
         if (get_generated_values_from_csv(values) < 0)
             return;
 
-        if (values.find(field) != values.end())
+        if (values.find(type) != values.end())
         {
-            for (size_t i = 0; i < values[field].size(); ++i)
-                ui->value->addItem(QString().fromUtf8(values[field][i].c_str(), values[field][i].length()));
+            if (values[type].find(field) != values[type].end())
+            {
+                for (size_t i = 0; i < values[type][field].size(); ++i)
+                    ui->value->addItem(QString().fromUtf8(values[type][field][i].c_str(), values[type][field][i].length()));
+            }
         }
     }
     ui->value->model()->sort(0);

@@ -266,7 +266,8 @@ std::string RESTAPI::Default_Values_For_Type_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{type: '" << type << "'}";
+    out << "{type: '" << type << "'";
+    out << ", field: '" << field << "'}";
     return out.str();
 }
 
@@ -742,7 +743,7 @@ int RESTAPI::serialize_file_from_id_req(File_From_Id_Req& req, std::string& data
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string& data)
 {
-    Container::Value v, child, type;
+    Container::Value v, child, type, field;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -750,6 +751,11 @@ int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& 
     type.s = req.type;
 
     child.obj["type"] = type;
+
+    field.type = Container::Value::CONTAINER_TYPE_STRING;
+    field.s = req.field;
+
+    child.obj["field"] = field;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["DEFAULT_VALUES_FOR_TYPE"] = child;
@@ -1332,8 +1338,13 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req
     if (!type || type->type != Container::Value::CONTAINER_TYPE_STRING)
         return NULL;
 
+    Container::Value *field = model->get_value_by_key(*child, "field");
+    if (!field || field->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
     Default_Values_For_Type_Req *req = new Default_Values_For_Type_Req;
     req->type = type->s;
+    req->field = field->s;
     return req;
 }
 
@@ -1448,15 +1459,26 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type
     end = uri.find("=", start);
     if (end == std::string::npos || uri.substr(start, end - start) != "type")
         return req;
-
     start = end + 1;
-    end = uri.find("&", start);
 
+    end = uri.find("&", start);
     std::string type = uri.substr(start, end - start);
     if (!type.length())
         return req;
+    start = end + 1;
+
+    end = uri.find("=", start);
+    if (end == std::string::npos || uri.substr(start, end - start) != "field")
+        return req;
+    start = end + 1;
+
+    end = uri.find("&", start);
+    std::string field = uri.substr(start, end - start);
+    if (!field.length())
+        return req;
 
     req->type = type;
+    req->field = field;
 
     return req;
 }

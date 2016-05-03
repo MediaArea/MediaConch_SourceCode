@@ -82,7 +82,7 @@ public:
     QRadioButton      *get_freeTextSelector_radio();
     QRadioButton      *get_editorSelector_radio();
     void               change_values_of_field_selector(bool is_free_text, const std::string&, const std::string&);
-    void               change_values_of_value_selector(const std::string&, const std::string&);
+    void               change_values_of_value_selector(const std::string&, const std::string&, const std::string&);
 
 private:
     MainWindow *mainwindow;

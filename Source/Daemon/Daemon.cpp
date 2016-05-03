@@ -839,14 +839,17 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a default_values_for_type command: ";
         std::clog << req->to_str() << std::endl;
 
-        std::map<std::string, std::vector<std::string> > values;
+        std::map<std::string, std::map<std::string, std::vector<std::string> > > values;
         if (get_generated_values_from_csv(values) < 0)
             return 0;
 
         if (values.find(req->type) != values.end())
         {
-            for (size_t i = 0; i < values[req->type].size(); ++i)
-                res.values.push_back(values[req->type][i]);
+            if (values[req->type].find(req->field) != values[req->type].end())
+            {
+                for (size_t i = 0; i < values[req->type][req->field].size(); ++i)
+                    res.values.push_back(values[req->type][req->field][i]);
+            }
         }
 
         std::clog << d->get_date() << "Daemon send default_values_for_type result: " << res.to_str() << std::endl;
