@@ -116,9 +116,12 @@ void DisplayWindow::add_new_file()
     if (!displayMenu)
         return;
 
-    QStringList List = QFileDialog::getOpenFileNames(mainwindow, "Open file", "", "Display files (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QString suggested = QString().fromUtf8(mainwindow->select_correct_load_display_path().c_str());
+    QStringList List = QFileDialog::getOpenFileNames(mainwindow, "Open file", suggested, "Display files (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     if (List.empty())
         return;
+    QDir info(QFileInfo(List[0]).absoluteDir());
+    mainwindow->set_last_load_display_path(info.absolutePath().toUtf8().data());
 
 #if QT_VERSION >= 0x050400
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -195,12 +198,16 @@ void DisplayWindow::export_file()
         }
     }
 
-    QString file = QFileDialog::getSaveFileName(mainwindow, tr("Save display file"), save_file, tr("Display file (*.xsl)"));
+    QString suggested = QString().fromUtf8(mainwindow->select_correct_save_display_path().c_str());
+    QString file = QFileDialog::getSaveFileName(mainwindow, tr("Save display file"), suggested, tr("Display file (*.xsl)"));
     if (!file.length())
         return;
 
     QFile f(save_file);
     f.copy(file);
+
+    QDir info(QFileInfo(save_file).absoluteDir());
+    mainwindow->set_last_load_display_path(info.absolutePath().toUtf8().data());
 }
 
 void DisplayWindow::delete_file()

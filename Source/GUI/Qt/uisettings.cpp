@@ -39,7 +39,15 @@ int UiSettings::init()
         return -1;
     if (database->ui_settings_get_default_save_report_path(default_save_report_path))
         return -1;
+    if (database->ui_settings_get_default_save_policy_path(default_save_policy_path))
+        return -1;
+    if (database->ui_settings_get_default_save_display_path(default_save_display_path))
+        return -1;
     if (database->ui_settings_get_default_load_files_path(default_load_files_path))
+        return -1;
+    if (database->ui_settings_get_default_load_policy_path(default_load_policy_path))
+        return -1;
+    if (database->ui_settings_get_default_load_display_path(default_load_display_path))
         return -1;
 
     if (database->ui_settings_get_last_policy(last_policy))
@@ -50,7 +58,15 @@ int UiSettings::init()
         return -1;
     if (database->ui_settings_get_last_save_report_path(last_save_report_path))
         return -1;
+    if (database->ui_settings_get_last_save_policy_path(last_save_policy_path))
+        return -1;
+    if (database->ui_settings_get_last_save_display_path(last_save_display_path))
+        return -1;
     if (database->ui_settings_get_last_load_files_path(last_load_files_path))
+        return -1;
+    if (database->ui_settings_get_last_load_policy_path(last_load_policy_path))
+        return -1;
+    if (database->ui_settings_get_last_load_display_path(last_load_display_path))
         return -1;
     return 0;
 }
@@ -117,6 +133,60 @@ void UiSettings::change_default_verbosity(int verbosity)
 }
 
 //---------------------------------------------------------------------------
+std::string UiSettings::get_default_save_report_path() const
+{
+    return default_save_report_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_default_save_report_path(const std::string& path)
+{
+    if (!database || default_save_report_path == path)
+        return;
+
+    if (database->ui_settings_save_default_save_report_path(path) < 0)
+        return;
+
+    default_save_report_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_default_save_policy_path() const
+{
+    return default_save_policy_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_default_save_policy_path(const std::string& path)
+{
+    if (!database || default_save_policy_path == path)
+        return;
+
+    if (database->ui_settings_save_default_save_policy_path(path) < 0)
+        return;
+
+    default_save_policy_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_default_save_display_path() const
+{
+    return default_save_display_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_default_save_display_path(const std::string& path)
+{
+    if (!database || default_save_display_path == path)
+        return;
+
+    if (database->ui_settings_save_default_save_display_path(path) < 0)
+        return;
+
+    default_save_display_path = path;
+}
+
+//---------------------------------------------------------------------------
 std::string UiSettings::get_default_load_files_path() const
 {
     return default_load_files_path;
@@ -135,21 +205,39 @@ void UiSettings::change_default_load_files_path(const std::string& path)
 }
 
 //---------------------------------------------------------------------------
-std::string UiSettings::get_default_save_report_path() const
+std::string UiSettings::get_default_load_policy_path() const
 {
-    return default_save_report_path;
+    return default_load_policy_path;
 }
 
 //---------------------------------------------------------------------------
-void UiSettings::change_default_save_report_path(const std::string& path)
+void UiSettings::change_default_load_policy_path(const std::string& path)
 {
-    if (!database || default_save_report_path == path)
+    if (!database || default_load_policy_path == path)
         return;
 
-    if (database->ui_settings_save_default_save_report_path(path) < 0)
+    if (database->ui_settings_save_default_load_policy_path(path) < 0)
         return;
 
-    default_save_report_path = path;
+    default_load_policy_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_default_load_display_path() const
+{
+    return default_load_display_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_default_load_display_path(const std::string& path)
+{
+    if (!database || default_load_display_path == path)
+        return;
+
+    if (database->ui_settings_save_default_load_display_path(path) < 0)
+        return;
+
+    default_load_display_path = path;
 }
 
 // Last used
@@ -208,6 +296,60 @@ void UiSettings::change_last_verbosity(int verbosity)
 }
 
 //---------------------------------------------------------------------------
+std::string UiSettings::get_last_save_report_path() const
+{
+    return last_save_report_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_last_save_report_path(const std::string& path)
+{
+    if (!database || last_save_report_path == path)
+        return;
+
+    if (database->ui_settings_save_last_save_report_path(path) < 0)
+        return;
+
+    last_save_report_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_last_save_policy_path() const
+{
+    return last_save_policy_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_last_save_policy_path(const std::string& path)
+{
+    if (!database || last_save_policy_path == path)
+        return;
+
+    if (database->ui_settings_save_last_save_policy_path(path) < 0)
+        return;
+
+    last_save_policy_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_last_save_display_path() const
+{
+    return last_save_display_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_last_save_display_path(const std::string& path)
+{
+    if (!database || last_save_display_path == path)
+        return;
+
+    if (database->ui_settings_save_last_save_display_path(path) < 0)
+        return;
+
+    last_save_display_path = path;
+}
+
+//---------------------------------------------------------------------------
 std::string UiSettings::get_last_load_files_path() const
 {
     return last_load_files_path;
@@ -226,21 +368,39 @@ void UiSettings::change_last_load_files_path(const std::string& path)
 }
 
 //---------------------------------------------------------------------------
-std::string UiSettings::get_last_save_report_path() const
+std::string UiSettings::get_last_load_policy_path() const
 {
-    return last_save_report_path;
+    return last_load_policy_path;
 }
 
 //---------------------------------------------------------------------------
-void UiSettings::change_last_save_report_path(const std::string& path)
+void UiSettings::change_last_load_policy_path(const std::string& path)
 {
-    if (!database || last_save_report_path == path)
+    if (!database || last_load_policy_path == path)
         return;
 
-    if (database->ui_settings_save_last_save_report_path(path) < 0)
+    if (database->ui_settings_save_last_load_policy_path(path) < 0)
         return;
 
-    last_save_report_path = path;
+    last_load_policy_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_last_load_display_path() const
+{
+    return last_load_display_path;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_last_load_display_path(const std::string& path)
+{
+    if (!database || last_load_display_path == path)
+        return;
+
+    if (database->ui_settings_save_last_load_display_path(path) < 0)
+        return;
+
+    last_load_display_path = path;
 }
 
 }
