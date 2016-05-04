@@ -74,10 +74,30 @@ public:
     virtual int ui_settings_save_last_load_files_path(const std::string&, int user_id = -1) = 0;
     virtual int ui_settings_get_last_load_files_path(std::string&, int user_id = -1) = 0;
 
+    virtual int ui_settings_save_default_load_policy_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_default_load_policy_path(std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_save_last_load_policy_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_last_load_policy_path(std::string&, int user_id = -1) = 0;
+
+    virtual int ui_settings_save_default_load_display_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_default_load_display_path(std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_save_last_load_display_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_last_load_display_path(std::string&, int user_id = -1) = 0;
+
     virtual int ui_settings_save_default_save_report_path(const std::string&, int user_id = -1) = 0;
     virtual int ui_settings_get_default_save_report_path(std::string&, int user_id = -1) = 0;
     virtual int ui_settings_save_last_save_report_path(const std::string&, int user_id = -1) = 0;
     virtual int ui_settings_get_last_save_report_path(std::string&, int user_id = -1) = 0;
+
+    virtual int ui_settings_save_default_save_policy_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_default_save_policy_path(std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_save_last_save_policy_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_last_save_policy_path(std::string&, int user_id = -1) = 0;
+
+    virtual int ui_settings_save_default_save_display_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_default_save_display_path(std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_save_last_save_display_path(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_last_save_display_path(std::string&, int user_id = -1) = 0;
 
 protected:
     //Database dependant
@@ -91,6 +111,7 @@ protected:
     void        get_sql_query_for_update_ui_settings_table_v5(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v6(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v7(std::string& q);
+    void        get_sql_query_for_update_ui_settings_table_v8(std::string& q);
 
 private:
     DatabaseUi (const DatabaseUi&);

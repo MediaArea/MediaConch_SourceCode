@@ -15,7 +15,11 @@
 #include "displaycombobox.h"
 #include "verbosityspinbox.h"
 #include "savereportpathbox.h"
+#include "savepolicypathbox.h"
+#include "savedisplaypathbox.h"
 #include "loadfilespathbox.h"
+#include "loadpolicypathbox.h"
+#include "loaddisplaypathbox.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
@@ -252,7 +256,15 @@ QString MainWindow::get_local_folder() const
 //---------------------------------------------------------------------------
 QString MainWindow::ask_for_schema_file()
 {
-    QString file=QFileDialog::getOpenFileName(this, "Open file", "", "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QString suggested = QString().fromUtf8(select_correct_load_policy_path().c_str());
+    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+
+    if (file.length())
+    {
+        QDir info(QFileInfo(file).absoluteDir());
+        set_last_load_policy_path(info.absolutePath().toUtf8().data());
+    }
+
     return file;
 }
 
@@ -270,14 +282,19 @@ int MainWindow::exporting_to_schematron_file(size_t pos)
     if (!p)
         return -1;
 
-    path += "/" + QString().fromStdString(p->title) + ".sch";
+    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
+    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".sch";
+
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                              path, tr("Schematron (*.sch)"));
+                                                    suggested, tr("Schematron (*.sch)"));
 
     if (!filename.length())
         return -1;
 
-    std::string f = filename.toStdString();
+    QDir info(QFileInfo(filename).absoluteDir());
+    set_last_save_policy_path(info.absolutePath().toUtf8().data());
+
+    std::string f(filename.toUtf8().data());
     MCL.save_policy(pos, &f);
     return 0;
 }
@@ -296,14 +313,19 @@ int MainWindow::exporting_to_unknown_file(size_t pos)
     if (!p)
         return -1;
 
-    path += "/" + QString().fromStdString(p->filename);
+    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
+    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xml";
+
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                              path, tr("XML (*.xml)"));
+                                                    suggested, tr("XML (*.xml)"));
 
     if (!filename.length())
         return -1;
 
-    std::string f = filename.toStdString();
+    QDir info(QFileInfo(filename).absoluteDir());
+    set_last_save_policy_path(info.absolutePath().toUtf8().data());
+
+    std::string f(filename.toUtf8().data());
     MCL.save_policy(pos, &f);
     return 0;
 }
@@ -322,14 +344,19 @@ int MainWindow::exporting_to_xslt_file(size_t pos)
     if (!p)
         return -1;
 
-    path += "/" + QString().fromStdString(p->title) + ".xsl";
+    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
+    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xsl";
+
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                              path, tr("XSLT (*.xsl)"));
+                                                    suggested, tr("XSLT (*.xsl)"));
 
     if (!filename.length())
         return -1;
 
-    std::string f = filename.toStdString();
+    QDir info(QFileInfo(filename).absoluteDir());
+    set_last_save_policy_path(info.absolutePath().toUtf8().data());
+
+    std::string f(filename.toUtf8().data());
     MCL.save_policy(pos, &f);
     return 0;
 }
@@ -739,6 +766,34 @@ void MainWindow::on_actionDefaultSaveReportPath_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultSavePolicyPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_save_policy_path().c_str());
+    SavePolicyPathBox* box = new SavePolicyPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_save_policy_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultSaveDisplayPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_save_display_path().c_str());
+    SaveDisplayPathBox* box = new SaveDisplayPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_save_display_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionDefaultLoadFilesPath_triggered()
 {
     QString value = QString().fromUtf8(uisettings.get_default_load_files_path().c_str());
@@ -748,6 +803,34 @@ void MainWindow::on_actionDefaultLoadFilesPath_triggered()
     const QString& val = box->get_path();
     if (val != value)
         uisettings.change_default_load_files_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultLoadPolicyPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_load_policy_path().c_str());
+    LoadPolicyPathBox* box = new LoadPolicyPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_load_policy_path(val.toUtf8().data());
+    delete box;
+    box = NULL;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionDefaultLoadDisplayPath_triggered()
+{
+    QString value = QString().fromUtf8(uisettings.get_default_load_display_path().c_str());
+    LoadDisplayPathBox* box = new LoadDisplayPathBox(value);
+
+    box->exec();
+    const QString& val = box->get_path();
+    if (val != value)
+        uisettings.change_default_load_display_path(val.toUtf8().data());
     delete box;
     box = NULL;
 }
@@ -1026,12 +1109,52 @@ std::string MainWindow::select_correct_save_report_path()
 }
 
 //---------------------------------------------------------------------------
+std::string MainWindow::select_correct_save_policy_path()
+{
+    // Save policy path
+    std::string path = uisettings.get_default_save_policy_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_save_policy_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_save_display_path()
+{
+    // Save display path
+    std::string path = uisettings.get_default_save_display_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_save_display_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
 std::string MainWindow::select_correct_load_files_path()
 {
     // Load files path
     std::string path = uisettings.get_default_load_files_path();
     if (!path.length() || path == "last")
         path = uisettings.get_last_load_files_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_load_policy_path()
+{
+    // Load policy path
+    std::string path = uisettings.get_default_load_policy_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_load_policy_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_load_display_path()
+{
+    // Load display path
+    std::string path = uisettings.get_default_load_display_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_load_display_path();
     return path;
 }
 
@@ -1043,10 +1166,38 @@ void MainWindow::set_last_save_report_path(const std::string& path)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::set_last_save_policy_path(const std::string& path)
+{
+    // Save policy path
+    uisettings.change_last_save_policy_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_save_display_path(const std::string& path)
+{
+    // Save display path
+    uisettings.change_last_save_display_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_load_policy_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_load_policy_path(path);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::set_last_load_files_path(const std::string& path)
 {
     // Save report path
     uisettings.change_last_load_files_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_load_display_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_load_display_path(path);
 }
 
 //---------------------------------------------------------------------------
