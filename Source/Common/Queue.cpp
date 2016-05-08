@@ -65,7 +65,7 @@ void QueueElement::Entry()
     MI->Option(__T("Language"), __T("raw"));
     MI->Option(__T("Inform"), __T("XML"));
 
-    std::map<std::string, std::string>::iterator it = options.end();
+    std::map<std::string, std::string>::iterator it = options.begin();
     for (; it != options.end(); ++it)
         MI->Option(Ztring().From_UTF8(it->first), Ztring().From_UTF8(it->second));
 
