@@ -2,6 +2,14 @@
 %define libmediainfo_version        0.7.85
 %define libzen_version              0.4.33
 
+%if 0%{?fedora} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
+%define libmediainfo_name libmediainfo
+%define libzen_name libzen
+%else
+%define libmediainfo_name libmediainfo0
+%define libzen_name libzen0
+%endif
+
 Name:           mediaconch
 Version:        %{mediaconch_version}
 Release:        1
@@ -13,8 +21,8 @@ URL:            http://MediaArea.net/MediaConch
 Packager:       MediaArea.net SARL <info@mediaarea.net>
 Source0:        %{name}_%{version}.tar.gz
 
-Requires:       libzen0 >= %{libzen_version}
-Requires:       libmediainfo0 >= %{libmediainfo_version}
+Requires:       %{libzen_name}%{?_isa} >= %{libzen_version}
+Requires:       %{libmediainfo_name}%{?_isa} >= %{libmediainfo_version}
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:  gcc-c++
@@ -68,8 +76,8 @@ This package includes the command line interface.
 %package server
 Summary:    Implementation checker and policy checker for video and audio files (Server)
 Group:      Applications/Multimedia
-Requires:   libzen0 >= %{libzen_version}
-Requires:   libmediainfo0 >= %{libmediainfo_version}
+Requires:   %{libzen_name}%{?_isa} >= %{libzen_version}
+Requires:   %{libmediainfo_name}%{?_isa} >= %{libmediainfo_version}
 %if 0%{?fedora}
 %{?systemd_requires}
 %endif
@@ -77,8 +85,8 @@ Requires:   libmediainfo0 >= %{libmediainfo_version}
 %package gui
 Summary:    Implementation checker and policy checker for video and audio files (GUI)
 Group:      Applications/Multimedia
-Requires:   libzen0 >= %{libzen_version}
-Requires:   libmediainfo0 >= %{libmediainfo_version}
+Requires:   %{libzen_name}%{?_isa} >= %{libzen_version}
+Requires:   %{libmediainfo_name}%{?_isa} >= %{libmediainfo_version}
 
 %description gui
 MediaConch is an implementation checker, policy checker, reporter,
@@ -241,21 +249,21 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir
 
 %files
 %defattr(-,root,root,-)
-%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %doc Release/ReadMe_CLI_Linux.txt History_CLI.txt
+%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %license License.html License.GPLv3.html License.MPLv2.html
 %else
-%doc Release/ReadMe_CLI_Linux.txt History_CLI.txt License.html License.GPLv3.html License.MPLv2.html
+%doc License.html License.GPLv3.html License.MPLv2.html
 %endif
 %{_bindir}/mediaconch
 
 %files server
 %defattr(-,root,root,-)
-%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %doc Documentation/Daemon.md Documentation/Config.md Documentation/REST.md
+%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %license License.html License.GPLv3.html License.MPLv2.html
 %else
-%doc Documentation/Daemon.md Documentation/Config.md Documentation/REST.md License.html License.GPLv3.html License.MPLv2.html
+%doc License.html License.GPLv3.html License.MPLv2.html
 %endif
 %{_bindir}/mediaconchd
 %if 0%{?fedora}
@@ -265,11 +273,11 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir
 
 %files gui
 %defattr(-,root,root,-)
-%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %doc Release/ReadMe_GUI_Linux.txt History_GUI.txt
+%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %license License.html License.GPLv3.html License.MPLv2.html
 %else
-%doc Release/ReadMe_GUI_Linux.txt History_GUI.txt License.html License.GPLv3.html License.MPLv2.html
+%doc License.html License.GPLv3.html License.MPLv2.html
 %endif
 %{_bindir}/mediaconch-gui
 %{_datadir}/applications/*.desktop
