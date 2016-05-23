@@ -84,23 +84,8 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
-    <property name="title">
-     <string>Setti&amp;ngs</string>
-    </property>
-    <addaction name="actionDefaultPolicy"/>
-    <addaction name="actionDefaultDisplay"/>
-    <addaction name="actionDefaultVerbosity"/>
-    <addaction name="actionDefaultSaveReportPath"/>
-    <addaction name="actionDefaultLoadFilesPath"/>
-    <addaction name="actionDefaultSavePolicyPath"/>
-    <addaction name="actionDefaultLoadPolicyPath"/>
-    <addaction name="actionDefaultSaveDisplayPath"/>
-    <addaction name="actionDefaultLoadDisplayPath"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>
-   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpen">

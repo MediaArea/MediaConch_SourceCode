@@ -168,9 +168,6 @@ private:
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
     SettingsWindow*             settingsView;
-    PolicyCombobox*             default_policy_box;
-    DisplayCombobox*            default_display_box;
-    VerbositySpinbox*           default_verbosity_box;
 
     void                        create_and_configure_ui_database();
     int                         clearVisualElements();
@@ -197,23 +194,6 @@ Q_SIGNALS:
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChooseSchema_triggered();
-    void on_actionDefaultPolicy_triggered();
-    void on_actionDefaultDisplay_triggered();
-    void on_actionDefaultVerbosity_triggered();
-    void on_actionDefaultSaveReportPath_triggered();
-    void on_actionDefaultSavePolicyPath_triggered();
-    void on_actionDefaultSaveDisplayPath_triggered();
-    void on_actionDefaultLoadFilesPath_triggered();
-    void on_actionDefaultLoadPolicyPath_triggered();
-    void on_actionDefaultLoadDisplayPath_triggered();
-
-    // Default
-    void default_policy_accepted();
-    void default_policy_rejected();
-    void default_display_accepted();
-    void default_display_rejected();
-    void default_verbosity_accepted();
-    void default_verbosity_rejected();
 
     // View
     void on_actionChecker_triggered();

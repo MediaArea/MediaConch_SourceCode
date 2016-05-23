@@ -93,15 +93,6 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/xsltruleedit.cpp \
                     ../../Source/GUI/Qt/displaymenu.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp \
-                    ../../Source/GUI/Qt/policycombobox.cpp \
-                    ../../Source/GUI/Qt/displaycombobox.cpp \
-                    ../../Source/GUI/Qt/verbosityspinbox.cpp \
-                    ../../Source/GUI/Qt/savereportpathbox.cpp \
-                    ../../Source/GUI/Qt/savepolicypathbox.cpp \
-                    ../../Source/GUI/Qt/savedisplaypathbox.cpp \
-                    ../../Source/GUI/Qt/loadfilespathbox.cpp \
-                    ../../Source/GUI/Qt/loadpolicypathbox.cpp \
-                    ../../Source/GUI/Qt/loaddisplaypathbox.cpp \
                     ../../Source/GUI/Qt/workerfiles.cpp \
                     ../../Source/GUI/Qt/DatabaseUi.cpp \
                     ../../Source/GUI/Qt/NoDatabaseUi.cpp \
@@ -173,15 +164,6 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/xsltruleedit.h \
                     ../../Source/GUI/Qt/displaymenu.h \
                     ../../Source/GUI/Qt/progressbar.h \
-                    ../../Source/GUI/Qt/policycombobox.h \
-                    ../../Source/GUI/Qt/displaycombobox.h \
-                    ../../Source/GUI/Qt/verbosityspinbox.h \
-                    ../../Source/GUI/Qt/savereportpathbox.h \
-                    ../../Source/GUI/Qt/savepolicypathbox.cpp \
-                    ../../Source/GUI/Qt/savedisplaypathbox.cpp \
-                    ../../Source/GUI/Qt/loadfilespathbox.h \
-                    ../../Source/GUI/Qt/loadpolicypathbox.h \
-                    ../../Source/GUI/Qt/loaddisplaypathbox.h \
                     ../../Source/GUI/Qt/workerfiles.h \
                     ../../Source/GUI/Qt/DatabaseUi.h \
                     ../../Source/GUI/Qt/NoDatabaseUi.h \
@@ -199,10 +181,6 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/unknownpolicymenu.ui \
                     ../../Source/GUI/Qt/xsltruleedit.ui \
                     ../../Source/GUI/Qt/displaymenu.ui \
-                    ../../Source/GUI/Qt/progressbar.ui \
-                    ../../Source/GUI/Qt/verbosityspinbox.ui \
-                    ../../Source/GUI/Qt/policycombobox.ui \
-                    ../../Source/GUI/Qt/displaycombobox.ui
 
 
 equals(WEB_MACHINE, webengine) {
