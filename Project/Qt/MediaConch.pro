@@ -73,6 +73,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/menumainwindow.cpp \
+                    ../../Source/GUI/Qt/settingswindow.cpp \
                     ../../Source/GUI/Qt/displaywindow.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
                     ../../Source/GUI/Qt/resulttable.cpp \
@@ -152,6 +153,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
+                    ../../Source/GUI/Qt/settingswindow.h \
                     ../../Source/GUI/Qt/checkerwindow.h \
                     ../../Source/GUI/Qt/resulttable.h \
                     ../../Source/GUI/Qt/displaywindow.h \

@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "menumainwindow.h"
+#include "settingswindow.h"
 #include "checkerwindow.h"
 #include "policieswindow.h"
 #include "displaywindow.h"
@@ -93,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ToolGroup->addAction(ui->actionChecker);
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionDisplay);
+    ToolGroup->addAction(ui->actionSettings);
     
     // Visual elements
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
@@ -101,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent) :
     checkerView=NULL;
     policiesView = NULL;
     displayView = NULL;
+    settingsView = NULL;
     default_policy_box = NULL;
     default_display_box = NULL;
     default_verbosity_box = NULL;
@@ -215,6 +218,9 @@ void MainWindow::Run()
             break;
         case RUN_DISPLAY_VIEW:
             createDisplayView();
+            break;
+        case RUN_SETTINGS_VIEW:
+            createSettingsView();
             break;
         default:
             createCheckerView();
@@ -531,6 +537,17 @@ void MainWindow::on_actionDisplay_triggered()
     if (clearVisualElements() < 0)
         return;
     current_view = RUN_DISPLAY_VIEW;
+    Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_actionSettings_triggered()
+{
+    if (!ui->actionSettings->isChecked())
+        ui->actionSettings->setChecked(true);
+    if (clearVisualElements() < 0)
+        return;
+    current_view = RUN_SETTINGS_VIEW;
     Run();
 }
 
@@ -928,6 +945,12 @@ int MainWindow::clearVisualElements()
         displayView = NULL;
     }
 
+    if (settingsView)
+    {
+        delete settingsView;
+        settingsView = NULL;
+    }
+
     return 0;
 }
 
@@ -963,6 +986,16 @@ void MainWindow::createDisplayView()
         return;
     displayView = new DisplayWindow(this);
     displayView->displayDisplay();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::createSettingsView()
+{
+    if (clearVisualElements() < 0)
+        return;
+
+    settingsView = new SettingsWindow(this);
+    settingsView->display_settings();
 }
 
 void MainWindow::set_msg_to_status_bar(const QString& message)
@@ -1007,6 +1040,12 @@ void MainWindow::policies_selected()
 void MainWindow::display_selected()
 {
     on_actionDisplay_triggered();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::settings_selected()
+{
+    on_actionSettings_triggered();
 }
 
 //---------------------------------------------------------------------------

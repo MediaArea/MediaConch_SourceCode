@@ -72,6 +72,7 @@
     <addaction name="actionChecker"/>
     <addaction name="actionPolicies"/>
     <addaction name="actionDisplay"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -147,6 +148,14 @@
    </property>
    <property name="text">
     <string>&amp;Display</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Settings</string>
    </property>
   </action>
   <action name="actionCloseAll">

@@ -6,6 +6,7 @@
     <qresource>
         <file alias="base.html">html/base.html</file>
         <file alias="menu.html">html/menu.html</file>
+        <file alias="settings.html">html/settings.html</file>
         <file alias="checker.html">html/checker.html</file>
         <file alias="result.html">html/result.html</file>
         <file alias="resultTableRow.html">html/resultTableRow.html</file>

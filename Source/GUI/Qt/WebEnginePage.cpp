@@ -39,6 +39,8 @@ namespace MediaConch
             mainwindow->policies_selected();
         else if (!name.compare("Display"))
             mainwindow->display_selected();
+        else if (!name.compare("Settings"))
+            mainwindow->settings_selected();
         else if (!name.compare("Help"))
             mainwindow->on_actionGettingStarted_triggered();
         else

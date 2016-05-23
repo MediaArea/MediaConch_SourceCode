@@ -29,6 +29,7 @@ class QLineEdit;
 namespace MediaConch {
 
 class MenuMainWindow;
+class SettingsWindow;
 class CheckerWindow;
 class PoliciesWindow;
 class DisplayWindow;
@@ -51,6 +52,7 @@ public:
         RUN_CHECKER_VIEW,
         RUN_POLICIES_VIEW,
         RUN_DISPLAY_VIEW,
+        RUN_SETTINGS_VIEW,
     };
     void Run();
 
@@ -95,6 +97,7 @@ public:
     void                        checker_selected();
     void                        policies_selected();
     void                        display_selected();
+    void                        settings_selected();
     void                        add_default_policy();
     void                        add_default_displays();
     void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
@@ -164,6 +167,7 @@ private:
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
+    SettingsWindow*             settingsView;
     PolicyCombobox*             default_policy_box;
     DisplayCombobox*            default_display_box;
     VerbositySpinbox*           default_verbosity_box;
@@ -174,6 +178,7 @@ private:
     void                        createCheckerView();
     void                        createPoliciesView();
     void                        createDisplayView();
+    void                        createSettingsView();
     void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
 
@@ -214,6 +219,7 @@ private Q_SLOTS:
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
+    void on_actionSettings_triggered();
 
 public Q_SLOTS:
     //Help
