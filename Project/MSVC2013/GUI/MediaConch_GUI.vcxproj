@@ -202,33 +202,29 @@
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaycombobox.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\groupofrules.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\loadfilespathbox.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\menumainwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\settingswindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policiesmenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policiestree.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policieswindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policycombobox.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\savereportpathbox.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\unknownwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\verbosityspinbox.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
@@ -239,17 +235,16 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltwindow.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
     <ClCompile Include="_Automated\moc_checkerwindow.cpp" />
-    <ClCompile Include="_Automated\moc_displaycombobox.cpp" />
     <ClCompile Include="_Automated\moc_displaymenu.cpp" />
     <ClCompile Include="_Automated\moc_displaywindow.cpp" />
     <ClCompile Include="_Automated\moc_groupofrules.cpp" />
     <ClCompile Include="_Automated\moc_helpwindow.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
     <ClCompile Include="_Automated\moc_menumainwindow.cpp" />
+    <ClCompile Include="_Automated\moc_settingswindow.cpp" />
     <ClCompile Include="_Automated\moc_policiesmenu.cpp" />
     <ClCompile Include="_Automated\moc_policiestree.cpp" />
     <ClCompile Include="_Automated\moc_policieswindow.cpp" />
-    <ClCompile Include="_Automated\moc_policycombobox.cpp" />
     <ClCompile Include="_Automated\moc_policymenu.cpp" />
     <ClCompile Include="_Automated\moc_policywindow.cpp" />
     <ClCompile Include="_Automated\moc_progressbar.cpp" />
@@ -258,7 +253,6 @@
     <ClCompile Include="_Automated\moc_schematronwindow.cpp" />
     <ClCompile Include="_Automated\moc_unknownpolicymenu.cpp" />
     <ClCompile Include="_Automated\moc_unknownwindow.cpp" />
-    <ClCompile Include="_Automated\moc_verbosityspinbox.cpp" />
     <ClCompile Include="_Automated\moc_WebEnginePage.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -300,27 +294,24 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\loadfilespathbox.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\menumainwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\settingswindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policiesmenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policiestree.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policycombobox.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\savereportpathbox.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\uisettings.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\unknownwindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\verbosityspinbox.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitPage.h" />
@@ -341,7 +332,6 @@
     <ClInclude Include="_Automated\ui_ruleedit.h" />
     <ClInclude Include="_Automated\ui_rulemenu.h" />
     <ClInclude Include="_Automated\ui_unknownpolicymenu.h" />
-    <ClInclude Include="_Automated\ui_verbosityspinbox.h" />
     <ClInclude Include="_Automated\ui_xsltpolicymenu.h" />
     <ClInclude Include="_Automated\ui_xsltruleedit.h" />
   </ItemGroup>
@@ -414,10 +404,6 @@
     <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html" />
     <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html" />
     <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\Source\GUI\Qt\displaycombobox.ui" />
-    <None Include="..\..\..\Source\GUI\Qt\policycombobox.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
