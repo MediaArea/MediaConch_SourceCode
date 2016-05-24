@@ -19,6 +19,7 @@ namespace MediaConch
     WebView::WebView(QWidget *parent) : QWebView(parent)
     {
         setAcceptDrops(true);
+        setContextMenuPolicy(Qt::CustomContextMenu);
     }
 
     WebView::~WebView()
