@@ -7,19 +7,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "menumainwindow.h"
+#include "settingswindow.h"
 #include "checkerwindow.h"
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
-#include "policycombobox.h"
-#include "displaycombobox.h"
-#include "verbosityspinbox.h"
-#include "savereportpathbox.h"
-#include "savepolicypathbox.h"
-#include "savedisplaypathbox.h"
-#include "loadfilespathbox.h"
-#include "loadpolicypathbox.h"
-#include "loaddisplaypathbox.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
@@ -93,17 +85,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ToolGroup->addAction(ui->actionChecker);
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionDisplay);
+    ToolGroup->addAction(ui->actionSettings);
     
     // Visual elements
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
     Layout->setContentsMargins(0, 0, 0, 0);
+    Layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     MenuView = new MenuMainWindow(this);
     checkerView=NULL;
     policiesView = NULL;
     displayView = NULL;
-    default_policy_box = NULL;
-    default_display_box = NULL;
-    default_verbosity_box = NULL;
+    settingsView = NULL;
 
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
@@ -138,12 +130,6 @@ MainWindow::~MainWindow()
 {
     workerfiles.quit();
     workerfiles.wait();
-    if (default_policy_box)
-        delete default_policy_box;
-    if (default_display_box)
-        delete default_display_box;
-    if (default_verbosity_box)
-        delete default_verbosity_box;
     delete ui;
     if (checkerView)
         delete checkerView;
@@ -215,6 +201,9 @@ void MainWindow::Run()
             break;
         case RUN_DISPLAY_VIEW:
             createDisplayView();
+            break;
+        case RUN_SETTINGS_VIEW:
+            createSettingsView();
             break;
         default:
             createCheckerView();
@@ -482,6 +471,12 @@ int MainWindow::get_display_index_by_filename(const std::string& filename)
     return 0;
 }
 
+//---------------------------------------------------------------------------
+UiSettings& MainWindow::get_settings()
+{
+    return uisettings;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -535,6 +530,17 @@ void MainWindow::on_actionDisplay_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionSettings_triggered()
+{
+    if (!ui->actionSettings->isChecked())
+        ui->actionSettings->setChecked(true);
+    if (clearVisualElements() < 0)
+        return;
+    current_view = RUN_SETTINGS_VIEW;
+    Run();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionChooseSchema_triggered()
 {
     QString file = ask_for_schema_file();
@@ -549,290 +555,6 @@ void MainWindow::on_actionChooseSchema_triggered()
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
     Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultVerbosity_triggered()
-{
-    if (!default_verbosity_box)
-    {
-        default_verbosity_box = new VerbositySpinbox(NULL);
-        int w = width();
-        int left = 0;
-        if (w < 220)
-            w = 220;
-        else
-        {
-            w -= 220;
-            left = w / 3;
-            w = left + 220;
-        }
-
-        int h = height();
-        int up = 0;
-        if (h < 85)
-            h = 85;
-        else
-        {
-            h -= 85;
-            up = h / 3;
-            h = up + 85;
-        }
-        default_verbosity_box->move(left + x(), up + y());
-        default_verbosity_box->resize(w, h);
-    }
-    QString value = QString("%1").arg(uisettings.get_default_verbosity());
-
-    default_verbosity_box->get_verbosity_spin()->setValue(value.toInt());
-    connect(default_verbosity_box->get_buttons_box(), SIGNAL(accepted()), this, SLOT(default_verbosity_accepted()));
-    connect(default_verbosity_box->get_buttons_box(), SIGNAL(rejected()), this, SLOT(default_verbosity_rejected()));
-    default_verbosity_box->show();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::default_verbosity_accepted()
-{
-    if (!default_verbosity_box)
-        return;
-
-    uisettings.change_default_verbosity(default_verbosity_box->get_verbosity_spin()->value());
-
-    delete default_verbosity_box;
-    default_verbosity_box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::default_verbosity_rejected()
-{
-    if (!default_verbosity_box)
-        return;
-
-    delete default_verbosity_box;
-    default_verbosity_box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultPolicy_triggered()
-{
-    if (!default_policy_box)
-    {
-        default_policy_box = new PolicyCombobox(NULL);
-        std::vector<std::pair<QString, QString> > policies;
-        get_policies(policies);
-        default_policy_box->fill_policy_box(policies);
-        int w = width();
-        int left = 0;
-        if (w < 220)
-            w = 220;
-        else
-        {
-            w -= 220;
-            left = w / 3;
-            w = left + 220;
-        }
-
-        int h = height();
-        int up = 0;
-        if (h < 85)
-            h = 85;
-        else
-        {
-            h -= 85;
-            up = h / 3;
-            h = up + 85;
-        }
-        default_policy_box->move(left + x(), up + y());
-        default_policy_box->resize(w, h);
-    }
-    QString value = QString().fromUtf8(uisettings.get_default_policy().c_str());
-
-    QComboBox *box = default_policy_box->get_policy_combo();
-    int pos = box->findData(QVariant(value));
-    if (pos != -1)
-        box->setCurrentIndex(pos);
-    connect(default_policy_box->get_buttons_box(), SIGNAL(accepted()), this, SLOT(default_policy_accepted()));
-    connect(default_policy_box->get_buttons_box(), SIGNAL(rejected()), this, SLOT(default_policy_rejected()));
-    default_policy_box->show();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::default_policy_accepted()
-{
-    if (!default_policy_box)
-        return;
-
-    int pos = default_policy_box->get_policy_combo()->currentIndex();
-    if (pos >= 0)
-    {
-        QString policy_value = default_policy_box->get_policy_combo()->itemData(pos).toString();
-        uisettings.change_default_policy(policy_value.toUtf8().data());
-    }
-
-    delete default_policy_box;
-    default_policy_box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::default_policy_rejected()
-{
-    if (!default_policy_box)
-        return;
-
-    delete default_policy_box;
-    default_policy_box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultDisplay_triggered()
-{
-    if (!default_display_box)
-    {
-        default_display_box = new DisplayCombobox(NULL);
-        default_display_box->fill_display_box(get_displays());
-        int w = width();
-        int left = 0;
-        if (w < 220)
-            w = 220;
-        else
-        {
-            w -= 220;
-            left = w / 3;
-            w = left + 220;
-        }
-
-        int h = height();
-        int up = 0;
-        if (h < 85)
-            h = 85;
-        else
-        {
-            h -= 85;
-            up = h / 3;
-            h = up + 85;
-        }
-        default_display_box->move(left + x(), up + y());
-        default_display_box->resize(w, h);
-    }
-    QString value = QString().fromUtf8(uisettings.get_default_display().c_str());
-
-    QComboBox *box = default_display_box->get_display_combo();
-    int pos = box->findData(QVariant(value));
-    if (pos != -1)
-        box->setCurrentIndex(pos);
-    connect(default_display_box->get_buttons_box(), SIGNAL(accepted()), this, SLOT(default_display_accepted()));
-    connect(default_display_box->get_buttons_box(), SIGNAL(rejected()), this, SLOT(default_display_rejected()));
-    default_display_box->show();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::default_display_accepted()
-{
-    if (!default_display_box)
-        return;
-
-    int pos = default_display_box->get_display_combo()->currentIndex();
-    if (pos >= 0)
-    {
-        QString display_value = default_display_box->get_display_combo()->itemData(pos).toString();
-        uisettings.change_default_display(display_value.toUtf8().data());
-    }
-
-    delete default_display_box;
-    default_display_box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::default_display_rejected()
-{
-    if (!default_display_box)
-        return;
-
-    delete default_display_box;
-    default_display_box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultSaveReportPath_triggered()
-{
-    QString value = QString().fromUtf8(uisettings.get_default_save_report_path().c_str());
-    SaveReportPathBox* box = new SaveReportPathBox(value);
-
-    box->exec();
-    const QString& val = box->get_path();
-    if (val != value)
-        uisettings.change_default_save_report_path(val.toUtf8().data());
-    delete box;
-    box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultSavePolicyPath_triggered()
-{
-    QString value = QString().fromUtf8(uisettings.get_default_save_policy_path().c_str());
-    SavePolicyPathBox* box = new SavePolicyPathBox(value);
-
-    box->exec();
-    const QString& val = box->get_path();
-    if (val != value)
-        uisettings.change_default_save_policy_path(val.toUtf8().data());
-    delete box;
-    box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultSaveDisplayPath_triggered()
-{
-    QString value = QString().fromUtf8(uisettings.get_default_save_display_path().c_str());
-    SaveDisplayPathBox* box = new SaveDisplayPathBox(value);
-
-    box->exec();
-    const QString& val = box->get_path();
-    if (val != value)
-        uisettings.change_default_save_display_path(val.toUtf8().data());
-    delete box;
-    box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultLoadFilesPath_triggered()
-{
-    QString value = QString().fromUtf8(uisettings.get_default_load_files_path().c_str());
-    LoadFilesPathBox* box = new LoadFilesPathBox(value);
-
-    box->exec();
-    const QString& val = box->get_path();
-    if (val != value)
-        uisettings.change_default_load_files_path(val.toUtf8().data());
-    delete box;
-    box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultLoadPolicyPath_triggered()
-{
-    QString value = QString().fromUtf8(uisettings.get_default_load_policy_path().c_str());
-    LoadPolicyPathBox* box = new LoadPolicyPathBox(value);
-
-    box->exec();
-    const QString& val = box->get_path();
-    if (val != value)
-        uisettings.change_default_load_policy_path(val.toUtf8().data());
-    delete box;
-    box = NULL;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionDefaultLoadDisplayPath_triggered()
-{
-    QString value = QString().fromUtf8(uisettings.get_default_load_display_path().c_str());
-    LoadDisplayPathBox* box = new LoadDisplayPathBox(value);
-
-    box->exec();
-    const QString& val = box->get_path();
-    if (val != value)
-        uisettings.change_default_load_display_path(val.toUtf8().data());
-    delete box;
-    box = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -928,6 +650,12 @@ int MainWindow::clearVisualElements()
         displayView = NULL;
     }
 
+    if (settingsView)
+    {
+        delete settingsView;
+        settingsView = NULL;
+    }
+
     return 0;
 }
 
@@ -965,6 +693,16 @@ void MainWindow::createDisplayView()
     displayView->displayDisplay();
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::createSettingsView()
+{
+    if (clearVisualElements() < 0)
+        return;
+
+    settingsView = new SettingsWindow(this);
+    settingsView->display_settings();
+}
+
 void MainWindow::set_msg_to_status_bar(const QString& message)
 {
     Q_EMIT status_bar_show_message(message, 5000);
@@ -982,6 +720,8 @@ void MainWindow::clear_msg_in_status_bar()
 //---------------------------------------------------------------------------
 void MainWindow::set_widget_to_layout(QWidget* w)
 {
+    w->setSizePolicy(QSizePolicy::MinimumExpanding,
+                     QSizePolicy::MinimumExpanding);
     Layout->addWidget(w);
 }
 
@@ -1007,6 +747,12 @@ void MainWindow::policies_selected()
 void MainWindow::display_selected()
 {
     on_actionDisplay_triggered();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::settings_selected()
+{
+    on_actionSettings_triggered();
 }
 
 //---------------------------------------------------------------------------

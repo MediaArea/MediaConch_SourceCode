@@ -6,6 +6,7 @@
     <qresource>
         <file alias="base.html">html/base.html</file>
         <file alias="menu.html">html/menu.html</file>
+        <file alias="settings.html">html/settings.html</file>
         <file alias="checker.html">html/checker.html</file>
         <file alias="result.html">html/result.html</file>
         <file alias="resultTableRow.html">html/resultTableRow.html</file>
@@ -18,6 +19,7 @@
         <file alias="jstreegrid.js">html/js/jstreegrid.js</file>
         <file alias="datatables.js">html/js/datatables.js</file>
         <file alias="checker.js">html/js/checker.js</file>
+        <file alias="settings.js">html/js/settings.js</file>
         <file alias="main.css">html/css/main.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
         <file alias="jstree.css">html/css/jstree.min.css</file>

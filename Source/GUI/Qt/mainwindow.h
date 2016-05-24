@@ -29,6 +29,7 @@ class QLineEdit;
 namespace MediaConch {
 
 class MenuMainWindow;
+class SettingsWindow;
 class CheckerWindow;
 class PoliciesWindow;
 class DisplayWindow;
@@ -51,6 +52,7 @@ public:
         RUN_CHECKER_VIEW,
         RUN_POLICIES_VIEW,
         RUN_DISPLAY_VIEW,
+        RUN_SETTINGS_VIEW,
     };
     void Run();
 
@@ -95,6 +97,7 @@ public:
     void                        checker_selected();
     void                        policies_selected();
     void                        display_selected();
+    void                        settings_selected();
     void                        add_default_policy();
     void                        add_default_displays();
     void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
@@ -143,6 +146,8 @@ public:
     QString                       get_local_folder() const;
     void                          get_registered_files(std::map<std::string, FileRegistered>& files);
 
+    UiSettings&                 get_settings();
+
     const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
     const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
     const list<string>* providePolicyExistingXsltOperator() const { return &Policies::existing_xsltOperator; }
@@ -164,9 +169,7 @@ private:
     PoliciesWindow*             policiesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
-    PolicyCombobox*             default_policy_box;
-    DisplayCombobox*            default_display_box;
-    VerbositySpinbox*           default_verbosity_box;
+    SettingsWindow*             settingsView;
 
     void                        create_and_configure_ui_database();
     int                         clearVisualElements();
@@ -174,6 +177,7 @@ private:
     void                        createCheckerView();
     void                        createPoliciesView();
     void                        createDisplayView();
+    void                        createSettingsView();
     void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
 
@@ -192,28 +196,12 @@ Q_SIGNALS:
 private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChooseSchema_triggered();
-    void on_actionDefaultPolicy_triggered();
-    void on_actionDefaultDisplay_triggered();
-    void on_actionDefaultVerbosity_triggered();
-    void on_actionDefaultSaveReportPath_triggered();
-    void on_actionDefaultSavePolicyPath_triggered();
-    void on_actionDefaultSaveDisplayPath_triggered();
-    void on_actionDefaultLoadFilesPath_triggered();
-    void on_actionDefaultLoadPolicyPath_triggered();
-    void on_actionDefaultLoadDisplayPath_triggered();
-
-    // Default
-    void default_policy_accepted();
-    void default_policy_rejected();
-    void default_display_accepted();
-    void default_display_rejected();
-    void default_verbosity_accepted();
-    void default_verbosity_rejected();
 
     // View
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
+    void on_actionSettings_triggered();
 
 public Q_SLOTS:
     //Help

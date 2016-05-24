@@ -35,11 +35,16 @@ protected:
     void    clean_forms();
     void    add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list);
     void    charge_local_dir(const QString& directory, QStringList& tmp);
+    QString choose_file_settings();
 
 public Q_SLOTS:
     void    on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity);
     void    on_file_online_selected(const QString& url, const QString& policy, const QString& display, const QString& verbosity);
     void    on_file_repository_selected(const QString& policy, const QString& display, const QString& verbosity);
+    void    on_save_settings_selected(const QString& policy, const QString& display, const QString& verbosity,
+                                      const QString& save_report, const QString& load_files,
+                                      const QString& save_policy, const QString& load_policy,
+                                      const QString& save_display, const QString& load_display);
 
     void    menu_link_checker(const QString& name);
     void    on_input_changed(const QString& inputName);

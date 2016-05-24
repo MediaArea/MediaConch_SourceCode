@@ -72,6 +72,7 @@
     <addaction name="actionChecker"/>
     <addaction name="actionPolicies"/>
     <addaction name="actionDisplay"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -83,23 +84,8 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
-    <property name="title">
-     <string>Setti&amp;ngs</string>
-    </property>
-    <addaction name="actionDefaultPolicy"/>
-    <addaction name="actionDefaultDisplay"/>
-    <addaction name="actionDefaultVerbosity"/>
-    <addaction name="actionDefaultSaveReportPath"/>
-    <addaction name="actionDefaultLoadFilesPath"/>
-    <addaction name="actionDefaultSavePolicyPath"/>
-    <addaction name="actionDefaultLoadPolicyPath"/>
-    <addaction name="actionDefaultSaveDisplayPath"/>
-    <addaction name="actionDefaultLoadDisplayPath"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTool"/>
-   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpen">
@@ -147,6 +133,14 @@
    </property>
    <property name="text">
     <string>&amp;Display</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Settings</string>
    </property>
   </action>
   <action name="actionCloseAll">
