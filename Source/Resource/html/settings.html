@@ -10,6 +10,9 @@
         <title>MediaConch settings</title>
         <meta name="msapplication-TileColor" content="#ffffff">
         <meta name="theme-color" content="#ffffff">
+        <script src="qrc:/jquery.js"></script>
+        <script src="qrc:/bootstrap.js"></script>
+        <script src="qrc:/settings.js"></script>
     </head>
 
     <body id="body" class="container">
@@ -21,7 +24,7 @@
                 <h1>Settings</h1>
               </div>
 
-              <div class="col-md-12">
+              <div class="col-md-12" id="settings">
                 <form name="form" method="post" action="" class="form-horizontal" enctype="multipart/form-data">
 
                   <div class="form-group">
@@ -49,29 +52,130 @@
                   </div>
 
                   <div class="form-group">
-                    <label class="col-sm-2 control-label required">Default Path</label>
+                    <label class="col-sm-2 control-label required">Default Save Report Path</label>
                     <div class="col-sm-10">
                       <div class="radio">
                         <label class="required">
-                          <input type="radio" id="settings_path_0" name="settings_path" required="required" value="0" checked="checked"/>Previous path</label>
+                          <input type="radio" id="settings_save_report_path_last" name="settings_save_report_path" required="required" value="last" checked="checked"/>Previous path</label>
                       </div>
                       <div class="radio">
                         <label class="required">
-                          <input type="radio" id="settings_path_1" name="settings_path" required="required" value="1" />Select a path
+                          <input type="radio" id="settings_save_report_path_radio" name="settings_save_report_path" required="required" value="selected" />Select a path
                         </label>
-                        <input type="file" id="settings_selectedPath" name="settings_selectedPath" required="required" style="display: inline;" onclick="webpage.on_input_changed(this.name);"/>
+                        <input type="file" id="settings_save_report_path_input" name="settings_save_report_path_input" style="display: inline;" onclick="webpage.on_input_changed(this.name);"/>
                       </div>
                     </div>
                   </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Current default save report path</label>
+                    <div class="col-sm-10" id="settings_save_report_path_selected"></div>
+                  </div>
 
-                  <div id="settings_selectedPath">
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label required">Default load files Path</label>
+                    <div class="col-sm-10">
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_load_files_path_last" name="settings_load_files_path" required="required" value="last" checked="checked"/>Previous path</label>
+                      </div>
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_load_files_path_radio" name="settings_load_files_path" required="required" value="selected" />Select a path
+                        </label>
+                        <input type="file" id="settings_load_files_path_input" name="settings_load_files_path_input" style="display: inline;" onclick="webpage.on_input_changed(this.name);"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Current default load files path</label>
+                    <div class="col-sm-10" id="settings_load_files_path_selected"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label required">Default save policy Path</label>
+                    <div class="col-sm-10">
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_save_policy_path_last" name="settings_save_policy_path" required="required" value="last" checked="checked"/>Previous path</label>
+                      </div>
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_save_policy_path_radio" name="settings_save_policy_path" required="required" value="selected" />Select a path
+                        </label>
+                        <input type="file" id="settings_save_policy_path_input" name="settings_save_policy_path_input" style="display: inline;" onclick="webpage.on_input_changed(this.name);"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Current default save policy path</label>
+                    <div class="col-sm-10" id="settings_save_policy_path_selected"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label required">Default load policy Path</label>
+                    <div class="col-sm-10">
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_load_policy_path_last" name="settings_load_policy_path" required="required" value="last" checked="checked"/>Previous path</label>
+                      </div>
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_load_policy_path_radio" name="settings_load_policy_path" required="required" value="selected" />Select a path
+                        </label>
+                        <input type="file" id="settings_load_policy_path_input" name="settings_load_policy_path_input" style="display: inline;" onclick="webpage.on_input_changed(this.name);"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Current default load policy path</label>
+                    <div class="col-sm-10" id="settings_load_policy_path_selected"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label required">Default save display Path</label>
+                    <div class="col-sm-10">
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_save_display_path_last" name="settings_save_display_path" required="required" value="last" checked="checked"/>Previous path</label>
+                      </div>
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_save_display_path_radio" name="settings_save_display_path" required="required" value="selected" />Select a path
+                        </label>
+                        <input type="file" id="settings_save_display_path_input" name="settings_save_display_path_input" style="display: inline;" onclick="webpage.on_input_changed(this.name);"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Current default save display path</label>
+                    <div class="col-sm-10" id="settings_save_display_path_selected"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label required">Default load display Path</label>
+                    <div class="col-sm-10">
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_load_display_path_last" name="settings_load_display_path" required="required" value="last" checked="checked"/>Previous path</label>
+                      </div>
+                      <div class="radio">
+                        <label class="required">
+                          <input type="radio" id="settings_load_display_path_radio" name="settings_load_display_path" required="required" value="selected" />Select a path
+                        </label>
+                        <input type="file" id="settings_load_display_path_input" name="settings_load_display_path_input" style="display: inline;" onclick="webpage.on_input_changed(this.name);"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">Current default load display path</label>
+                    <div class="col-sm-10" id="settings_load_display_path_selected"></div>
                   </div>
 
                   <div class="form-group">
                     <div class="col-sm-2">
                     </div>
                     <div class="col-sm-10">
-                      <button type="submit" id="form_save" name="settings_save" class="btn-warning btn">Save settings</button>
+                      <button type="submit" id="settings_save" name="settings_save" class="btn-warning btn">Save settings</button>
                     </div>
                   </div>
                 </form>
@@ -81,8 +185,6 @@
           </div>
         </div>
       </div>
-      <script src="qrc:/jquery.js"></script>
-      <script src="qrc:/bootstrap.js"></script>
       <script>
         var webpage;
         $(document).ready(function() {

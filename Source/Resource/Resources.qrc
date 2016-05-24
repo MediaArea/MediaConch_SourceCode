@@ -19,6 +19,7 @@
         <file alias="jstreegrid.js">html/js/jstreegrid.js</file>
         <file alias="datatables.js">html/js/datatables.js</file>
         <file alias="checker.js">html/js/checker.js</file>
+        <file alias="settings.js">html/js/settings.js</file>
         <file alias="main.css">html/css/main.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
         <file alias="jstree.css">html/css/jstree.min.css</file>

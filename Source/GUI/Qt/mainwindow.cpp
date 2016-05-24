@@ -90,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Visual elements
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
     Layout->setContentsMargins(0, 0, 0, 0);
+    Layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     MenuView = new MenuMainWindow(this);
     checkerView=NULL;
     policiesView = NULL;
@@ -470,6 +471,12 @@ int MainWindow::get_display_index_by_filename(const std::string& filename)
     return 0;
 }
 
+//---------------------------------------------------------------------------
+UiSettings& MainWindow::get_settings()
+{
+    return uisettings;
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************
@@ -713,6 +720,8 @@ void MainWindow::clear_msg_in_status_bar()
 //---------------------------------------------------------------------------
 void MainWindow::set_widget_to_layout(QWidget* w)
 {
+    w->setSizePolicy(QSizePolicy::MinimumExpanding,
+                     QSizePolicy::MinimumExpanding);
     Layout->addWidget(w);
 }
 

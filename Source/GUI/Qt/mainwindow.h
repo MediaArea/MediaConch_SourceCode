@@ -146,6 +146,8 @@ public:
     QString                       get_local_folder() const;
     void                          get_registered_files(std::map<std::string, FileRegistered>& files);
 
+    UiSettings&                 get_settings();
+
     const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
     const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
     const list<string>* providePolicyExistingXsltOperator() const { return &Policies::existing_xsltOperator; }

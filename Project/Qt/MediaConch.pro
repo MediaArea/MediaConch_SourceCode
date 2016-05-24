@@ -181,6 +181,7 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/unknownpolicymenu.ui \
                     ../../Source/GUI/Qt/xsltruleedit.ui \
                     ../../Source/GUI/Qt/displaymenu.ui \
+                    ../../Source/GUI/Qt/progressbar.ui
 
 
 equals(WEB_MACHINE, webengine) {

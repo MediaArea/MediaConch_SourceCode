@@ -42,6 +42,13 @@ void SettingsWindow::create_settings_finished(bool ok)
     if (!settings_view || !ok)
         return;
 
+    add_save_report_path_to_js_input((WebPage *)settings_view->page());
+    add_load_files_path_to_js_input((WebPage *)settings_view->page());
+    add_save_policy_path_to_js_input((WebPage *)settings_view->page());
+    add_load_policy_path_to_js_input((WebPage *)settings_view->page());
+    add_save_display_path_to_js_input((WebPage *)settings_view->page());
+    add_load_display_path_to_js_input((WebPage *)settings_view->page());
+
     if (progress_bar)
     {
         parent->remove_widget_from_layout(progress_bar);
@@ -76,22 +83,7 @@ void SettingsWindow::display_settings()
     QObject::connect(settings_view, SIGNAL(loadFinished(bool)), this, SLOT(create_settings_finished(bool)));
 
     QString html(base);
-
-    QString policies;
-    create_policy_options(policies);
-    add_policy_to_html_selection(policies, html, "settings_policy");
-
-    QString displays;
-    create_displays_options(displays);
-    add_display_to_html_selection(displays, html, "settings_display_selector");
-
-    QString verbosity;
-    create_verbosity_options(verbosity);
-    add_verbosity_to_html_selection(verbosity, html, "settings_verbosity_selector");
-
-
-
-
+    fill_html(html);
 
     QUrl url = QUrl("qrc:/html");
     if (!url.isValid())
@@ -135,13 +127,36 @@ void SettingsWindow::clear_visual_elements()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void SettingsWindow::fill_html(QString& html)
+{
+    QString policies;
+    create_policy_options(policies);
+    add_policy_to_html_selection(policies, html, "settings_policy");
+
+    QString displays;
+    create_displays_options(displays);
+    add_display_to_html_selection(displays, html, "settings_display_selector");
+
+    QString verbosity;
+    create_verbosity_options(verbosity);
+    add_verbosity_to_html_selection(verbosity, html, "settings_verbosity_selector");
+}
+
+//---------------------------------------------------------------------------
 void SettingsWindow::create_policy_options(QString& policies)
 {
     const std::vector<Policy *>& list = parent->get_all_policies();
 
     QString system_policy;
     QString user_policy;
-    int selected_policy = parent->select_correct_policy();
+
+    std::string policy_str = parent->get_settings().get_default_policy();
+    int selected_policy;
+    if (policy_str == "last")
+        selected_policy = -2;
+    else
+        selected_policy = parent->get_policy_index_by_filename(policy_str);
+
     for (size_t i = 0; i < list.size(); ++i)
     {
         if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
@@ -162,10 +177,15 @@ void SettingsWindow::create_policy_options(QString& policies)
         }
     }
 
-    if (selected_policy == -1)
-        policies += QString("<option selected=\"selected\" value=\"-1\">No policy</optgroup>");
+    if (selected_policy == -2)
+        policies += QString("<option selected=\"selected\" value=\"-2\">Last policy used</option>");
     else
-        policies += QString("<option value=\"-1\">No policy</optgroup>");
+        policies += QString("<option value=\"-2\">Last policy used</option>");
+
+    if (selected_policy == -1)
+        policies += QString("<option selected=\"selected\" value=\"-1\">No policy</option>");
+    else
+        policies += QString("<option value=\"-1\">No policy</option>");
 
     // Create default policy opt-group
     if (user_policy.length())
@@ -181,7 +201,14 @@ void SettingsWindow::create_displays_options(QString& displays)
 {
     QString system_display;
     QString user_display;
-    int selected_display = parent->select_correct_display();
+
+    std::string display_str = parent->get_settings().get_default_display();
+    int selected_display;
+    if (display_str == "last")
+        selected_display = -1;
+    else
+        selected_display = parent->get_display_index_by_filename(display_str);
+
     const std::vector<QString>& displays_list = parent->get_displays();
     for (size_t i = 0; i < displays_list.size(); ++i)
     {
@@ -204,6 +231,11 @@ void SettingsWindow::create_displays_options(QString& displays)
         }
     }
 
+    if (selected_display == -1)
+        displays += QString("<option selected=\"selected\" value=\"-1\">Last display used</option>");
+    else
+        displays += QString("<option value=\"-1\">Last display used</option>");
+
     // Create user display opt-group
     if (user_display.length())
         displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
@@ -216,7 +248,13 @@ void SettingsWindow::create_displays_options(QString& displays)
 //---------------------------------------------------------------------------
 void SettingsWindow::create_verbosity_options(QString& verbosity)
 {
-    int selected_verbosity = parent->select_correct_verbosity();
+    int selected_verbosity = parent->get_settings().get_default_verbosity();
+
+    if (selected_verbosity == -1)
+        verbosity += QString("<option selected=\"selected\" value=\"-1\">Last verbosity used</option>");
+    else
+        verbosity += QString("<option value=\"-1\">Last verbosity used</option>");
+
     for (int i = 0; i < 6; ++i)
     {
         verbosity += QString("<option ");
@@ -276,6 +314,54 @@ void SettingsWindow::add_verbosity_to_html_selection(QString& verbosity, QString
         pos += reg.matchedLength();
         html.insert(pos, verbosity);
     }
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_save_report_path_to_js_input(WebPage *page)
+{
+    std::string selected_save_report_str = parent->get_settings().get_default_save_report_path();
+    QString selected_save_report = QString().fromUtf8(selected_save_report_str.c_str(), selected_save_report_str.length());
+    page->use_javascript(QString("set_save_report_selected('%1');").arg(selected_save_report));
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_load_files_path_to_js_input(WebPage *page)
+{
+    std::string selected_load_files_str = parent->get_settings().get_default_load_files_path();
+    QString selected_load_files = QString().fromUtf8(selected_load_files_str.c_str(), selected_load_files_str.length());
+    page->use_javascript(QString("set_load_files_selected('%1');").arg(selected_load_files));
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_save_policy_path_to_js_input(WebPage *page)
+{
+    std::string selected_save_policy_str = parent->get_settings().get_default_save_policy_path();
+    QString selected_save_policy = QString().fromUtf8(selected_save_policy_str.c_str(), selected_save_policy_str.length());
+    page->use_javascript(QString("set_save_policy_selected('%1');").arg(selected_save_policy));
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_load_policy_path_to_js_input(WebPage *page)
+{
+    std::string selected_load_policy_str = parent->get_settings().get_default_load_policy_path();
+    QString selected_load_policy = QString().fromUtf8(selected_load_policy_str.c_str(), selected_load_policy_str.length());
+    page->use_javascript(QString("set_load_policy_selected('%1');").arg(selected_load_policy));
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_save_display_path_to_js_input(WebPage *page)
+{
+    std::string selected_save_display_str = parent->get_settings().get_default_save_display_path();
+    QString selected_save_display = QString().fromUtf8(selected_save_display_str.c_str(), selected_save_display_str.length());
+    page->use_javascript(QString("set_save_display_selected('%1');").arg(selected_save_display));
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_load_display_path_to_js_input(WebPage *page)
+{
+    std::string selected_load_display_str = parent->get_settings().get_default_load_display_path();
+    QString selected_load_display = QString().fromUtf8(selected_load_display_str.c_str(), selected_load_display_str.length());
+    page->use_javascript(QString("set_load_display_selected('%1');").arg(selected_load_display));
 }
 
 }

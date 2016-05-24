@@ -174,6 +174,155 @@ namespace MediaConch
         on_download_report(report, file, "MediaTrace");
     }
 
+    void WebPage::on_save_settings_selected(const QString& policy,
+                                            const QString& display,
+                                            const QString& verbosity,
+                                            const QString& save_report_path, const QString& load_files_path,
+                                            const QString& save_policy_path, const QString& load_policy_path,
+                                            const QString& save_display_path, const QString& load_display_path)
+    {
+        UiSettings& settings = mainwindow->get_settings();
+
+        //policy
+        if (policy == "-2")
+            settings.change_default_policy("last");
+        else if (policy == "-1")
+            settings.change_default_policy("");
+        else
+        {
+            Policy* p = mainwindow->get_policy((size_t)policy.toInt());
+            if (p)
+                settings.change_default_policy(p->filename);
+            else
+                settings.change_default_policy("");
+        }
+
+        //display
+        if (display == "-1")
+            settings.change_default_display("last");
+        else
+        {
+            std::vector<QString>& displays = mainwindow->get_displays();
+            int display_i = display.toInt();
+            if (display_i >= 0 && (size_t)display_i < displays.size())
+                settings.change_default_display(displays[display_i].toUtf8().data());
+            else
+                settings.change_default_display("");
+        }
+
+        //verbosity
+        settings.change_default_verbosity(verbosity.toInt());
+
+        //Save report path
+        std::string r_s_path;
+        if (save_report_path == "last")
+            r_s_path = "last";
+        else
+        {
+            QStringList list = file_selector["settings_save_report_path_input"];
+            if (list.size())
+                r_s_path = list[list.size() - 1].toUtf8().data();
+        }
+        if (r_s_path.length())
+        {
+            settings.change_default_save_report_path(r_s_path);
+            use_javascript(QString("set_save_report_selected('%1');")
+                           .arg(QString().fromUtf8(settings.get_default_save_report_path().c_str())));
+        }
+        use_javascript("document.getElementById('settings_save_report_path_input').value = \"\";");
+
+        //Load files path
+        std::string f_l_path;
+        if (load_files_path == "last")
+            f_l_path = "last";
+        else
+        {
+            QStringList list = file_selector["settings_load_files_path_input"];
+            if (list.size())
+                f_l_path = list[list.size() - 1].toUtf8().data();
+        }
+        if (f_l_path.length())
+        {
+            settings.change_default_load_files_path(f_l_path);
+            use_javascript(QString("set_load_files_selected('%1');")
+                           .arg(QString().fromUtf8(settings.get_default_load_files_path().c_str())));
+        }
+        use_javascript("document.getElementById('settings_load_files_path_input').value = \"\";");
+
+        //Save policy path
+        std::string p_s_path;
+        if (save_policy_path == "last")
+            p_s_path = "last";
+        else
+        {
+            QStringList list = file_selector["settings_save_policy_path_input"];
+            if (list.size())
+                p_s_path = list[list.size() - 1].toUtf8().data();
+        }
+        if (p_s_path.length())
+        {
+            settings.change_default_save_policy_path(p_s_path);
+            use_javascript(QString("set_save_policy_selected('%1');")
+                           .arg(QString().fromUtf8(p_s_path.c_str(), p_s_path.length())));
+        }
+        use_javascript("document.getElementById('settings_save_policy_path_input').value = \"\";");
+
+        //Load policy path
+        std::string p_l_path;
+        if (load_policy_path == "last")
+            p_l_path = "last";
+        else
+        {
+            QStringList list = file_selector["settings_load_policy_path_input"];
+            if (list.size())
+                p_l_path = list[list.size() - 1].toUtf8().data();
+        }
+        if (p_l_path.length())
+        {
+            settings.change_default_load_policy_path(p_l_path);
+            use_javascript(QString("set_load_policy_selected('%1');")
+                           .arg(QString().fromUtf8(p_l_path.c_str(), p_l_path.length())));
+        }
+        use_javascript("document.getElementById('settings_load_policy_path_input').value = \"\";");
+
+        //Save display path
+        std::string d_s_path;
+        if (save_display_path == "last")
+            d_s_path = "last";
+        else
+        {
+            QStringList list = file_selector["settings_save_display_path_input"];
+            if (list.size())
+                d_s_path = list[list.size() - 1].toUtf8().data();
+        }
+        if (d_s_path.length())
+        {
+            settings.change_default_save_display_path(d_s_path);
+            use_javascript(QString("set_save_display_selected('%1');")
+                           .arg(QString().fromUtf8(d_s_path.c_str(), d_s_path.length())));
+        }
+        use_javascript("document.getElementById('settings_save_display_path_input').value = \"\";");
+
+        //Load display path
+        std::string d_l_path;
+        if (load_display_path == "last")
+            d_l_path = "last";
+        else
+        {
+            QStringList list = file_selector["settings_load_display_path_input"];
+            if (list.size())
+                d_l_path = list[list.size() - 1].toUtf8().data();
+        }
+        if (d_l_path.length())
+        {
+            settings.change_default_load_display_path(d_l_path);
+            use_javascript(QString("set_load_display_selected('%1');")
+                           .arg(QString().fromUtf8(d_l_path.c_str(), d_l_path.length())));
+        }
+        use_javascript("document.getElementById('settings_load_display_path_input').value = \"\";");
+        file_selector.clear();
+    }
+
     void WebPage::clean_forms()
     {
         file_selector.clear();
@@ -262,8 +411,47 @@ namespace MediaConch
         return false;
     }
 
+    QStringList WebPage::choose_file_settings()
+    {
+        std::string suggested_str;
+
+        if (select_file_name == "settings_save_report_path_input")
+            suggested_str = mainwindow->get_settings().get_default_save_report_path();
+        else if (select_file_name == "settings_load_files_path_input")
+            suggested_str = mainwindow->get_settings().get_default_load_files_path();
+        else if (select_file_name == "settings_save_policy_path_input")
+            suggested_str = mainwindow->get_settings().get_default_save_policy_path();
+        else if (select_file_name == "settings_load_policy_path_input")
+            suggested_str = mainwindow->get_settings().get_default_load_policy_path();
+        else if (select_file_name == "settings_save_display_path_input")
+            suggested_str = mainwindow->get_settings().get_default_save_display_path();
+        else if (select_file_name == "settings_load_display_path_input")
+            suggested_str = mainwindow->get_settings().get_default_load_display_path();
+        else
+            return QStringList();
+
+        QString suggested = QString().fromUtf8(suggested_str.c_str(), suggested_str.length());
+        QString value_input = QFileDialog::getExistingDirectory(view(), NULL, suggested);
+
+        QMap<QString, QStringList>::iterator it = file_selector.find(select_file_name);
+        if (it != file_selector.end())
+            file_selector.erase(it);
+
+        if (!value_input.length())
+            return QStringList();
+
+        file_selector.insert(select_file_name, QStringList(value_input));
+
+        QStringList list;
+        list = QStringList(value_input);
+        return list;
+    }
+
     QStringList WebPage::chooseFiles(FileSelectionMode mode, const QStringList &, const QStringList&)
     {
+        if (select_file_name.startsWith("settings_"))
+            return choose_file_settings();
+
         QStringList list;
         std::string suggested_str = mainwindow->select_correct_load_files_path();
         QString suggested = QString().fromUtf8(suggested_str.c_str(), suggested_str.length());
