@@ -648,13 +648,27 @@ namespace MediaConch
         return implementation_valid;
     }
 
-    bool WebPage::file_is_analyzed(const QString& file)
+    QString WebPage::change_policy_for_file(const QString& filename, const QString& policy, const QString& fileId)
+    {
+        mainwindow->update_policy_of_file_in_list(filename, policy);
+        return fileId;
+    }
+
+    QString WebPage::file_is_analyzed(const QString& file)
     {
         FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
         if (!fr)
-            return false;
+            return QString();
 
-        bool analyzed = fr->analyzed;
+        int report_kind = fr->report_kind;
+
+        if (report_kind >= 0 && report_kind <= 2)
+            report_kind = 2;
+
+        QString analyzed = QString("{\"finish\":%1,\"tool\":%2,\"percent\":%3}")
+            .arg(fr->analyzed ? "true" : "false") // finish
+            .arg(report_kind)                     // tool
+            .arg(fr->analyze_percent);            // percent
         delete fr;
 
         return analyzed;

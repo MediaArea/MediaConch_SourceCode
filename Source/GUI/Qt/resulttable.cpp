@@ -52,10 +52,23 @@ void ResultTable::add_file_to_result_table(const std::string& full_path)
     QUrl url(QString().fromUtf8(filename.c_str(), filename.length()));
     QFileInfo info(url.path());
 
-    QString script = QString("addFile('%1', '%2', '%3');")
+    Policy *p = mainwindow->get_policy(file->policy);
+    QString policyName;
+    if (p)
+        policyName = QString().fromUtf8(p->title.c_str(), p->title.length());
+    else
+        policyName = "N/A";
+    // Make the javascript structure Arghh!
+    QString formValues = QString("{\"policy\":\"%1\",\"policyText\":\"%2\",\"display\":\"%3\",\"verbosity\":\"%4\"}")
+        .arg(file->policy)     // Policy
+        .arg(policyName)       // PolicyName/PolicyText
+        .arg(file->display)    // Display
+        .arg(file->verbosity); // Verbosity
+    QString script = QString("updateFileOrAddFile('%1', '%2', '%3', '%4');")
         .arg(QString().fromUtf8(full_path.c_str(), full_path.length()))
         .arg(info.fileName())
-        .arg(file->index);
+        .arg(file->index)
+        .arg(formValues);
     page->use_javascript(script);
 }
 

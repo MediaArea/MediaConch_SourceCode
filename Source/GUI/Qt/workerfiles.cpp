@@ -162,6 +162,54 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
 }
 
 //---------------------------------------------------------------------------
+void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& file, int policy)
+{
+    working_files_mutex.lock();
+    if (working_files.find(file) == working_files.end() || !working_files[file])
+    {
+        // file is not existing
+        working_files_mutex.unlock();
+        return;
+    }
+
+    bool policy_valid = false;
+    if (working_files[file]->analyzed && working_files[file]->report_kind == MediaConchLib::report_MediaConch && policy >= 0)
+    {
+        working_files_mutex.unlock();
+
+        Policy *p = mainwindow->get_policy((size_t)policy);
+        if (p)
+        {
+            std::vector<std::string> policies_names, policies_contents;
+            std::vector<MediaConchLib::ValidateRes*> res;
+            std::string policy_content;
+            p->dump_schema(policy_content);
+            policies_contents.push_back(policy_content);
+
+            if (mainwindow->validate(MediaConchLib::report_Max, file,
+                                     policies_names, policies_contents, res) == 0 && res.size() == 1)
+            {
+                policy_valid = res[0]->valid;
+                for (size_t j = 0; j < res.size() ; ++j)
+                    delete res[j];
+                res.clear();
+            }
+        }
+
+        working_files_mutex.lock();
+    }
+
+    working_files[file]->policy = policy;
+    working_files[file]->policy_valid = policy_valid;
+    FileRegistered fr = *working_files[file];
+    working_files_mutex.unlock();
+
+    to_update_files_mutex.lock();
+    to_update_files[file] = new FileRegistered(fr);
+    to_update_files_mutex.unlock();
+}
+
+//---------------------------------------------------------------------------
 void WorkerFiles::clear_files()
 {
     working_files_mutex.lock();

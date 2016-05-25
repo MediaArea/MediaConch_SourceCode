@@ -59,6 +59,7 @@ public:
     // Functions
     void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display, const QString& verbosity);
     void remove_file_to_list(const QString& file);
+    void update_policy_of_file_in_list(const QString& file, const QString& policy);
     void clear_file_list();
     void policy_to_delete(int row);
     int  exporting_to_schematron_file(size_t pos);

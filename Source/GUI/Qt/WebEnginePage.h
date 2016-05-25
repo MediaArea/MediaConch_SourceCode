@@ -69,7 +69,8 @@ public Q_SLOTS:
     QString      get_file_verbosity_id(const QString& file);
     bool         policy_is_valid(const QString& file);
     bool         implementation_is_valid(const QString& file);
-    bool         file_is_analyzed(const QString& file);
+    QString      file_is_analyzed(const QString& file);
+    QString      change_policy_for_file(const QString& file, const QString& policy, const QString& fileId);
 
 private Q_SLOTS:
     void         on_load_finished(bool ok);
