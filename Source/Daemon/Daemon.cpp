@@ -15,7 +15,7 @@
 #include <ZenLib/Ztring.h>
 #include "Common/Httpd.h"
 #include "Common/LibEventHttpd.h"
-#include "Common/GeneratedCSVVideos.hpp"
+#include "Common/GeneratedCSVVideos.h"
 #include "Daemon.h"
 #include "Help.h"
 #include "Config.h"
