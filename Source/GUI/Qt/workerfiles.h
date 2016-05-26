@@ -42,6 +42,7 @@ public:
     FileRegistered* get_file_registered_from_file(const std::string& file);
     void remove_file_registered_from_file(const std::string& file);
     void get_registered_files(std::map<std::string, FileRegistered>& files);
+    void update_policy_of_file_registered_from_file(const std::string& file, int policy);
 
 private:
     void add_registered_file_to_db(const FileRegistered* file);

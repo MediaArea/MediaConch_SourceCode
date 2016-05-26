@@ -178,6 +178,14 @@ void MainWindow::remove_file_to_list(const QString& file)
     workerfiles.remove_file_registered_from_file(filename);
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::update_policy_of_file_in_list(const QString& file, const QString& policy)
+{
+    std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
+    int policy_i = policy.toInt();
+    workerfiles.update_policy_of_file_registered_from_file(filename, policy_i);
+}
+
 void MainWindow::policy_to_delete(int index)
 {
     //Delete policy

@@ -10,13 +10,12 @@
 #include <QWidget>
 #include "WebView.h"
 
-class QProgressBar;
-
 namespace MediaConch
 {
 
 class MainWindow;
 class WebPage;
+class ProgressBar;
 
 class SettingsWindow : QObject
 {
@@ -32,7 +31,7 @@ public:
 private:
     MainWindow*   parent;
     WebView*      settings_view;
-    QProgressBar* progress_bar;
+    ProgressBar*  progress_bar;
 
     void fill_html(QString& html);
     void add_policy_to_html_selection(QString& policies, QString& html, const QString& selector);
