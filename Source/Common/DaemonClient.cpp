@@ -116,6 +116,8 @@ int DaemonClient::list(std::vector<std::string>& vec)
 
     for (size_t i = 0; i < res->files.size(); ++i)
         vec.push_back(res->files[i]->file);
+
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -147,6 +149,40 @@ int DaemonClient::file_from_id(int id, std::string& filename)
         return MediaConchLib::errorHttp_INVALID_DATA;
 
     filename = res->file;
+    delete res;
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::default_values_for_type(const std::string& type, std::vector<std::string>& values)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Default_Values_For_Type_Req req;
+    req.type = type;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Default_Values_For_Type_Res *res = rest.parse_default_values_for_type_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    for (size_t i = 0; i < res->values.size(); ++i)
+        values.push_back(res->values[i]);
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -204,12 +240,19 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
 
     RESTAPI rest;
     RESTAPI::Analyze_Res *res = rest.parse_analyze_res(data);
-    if (!res || res->ok.size() != 1)
+    if (!res)
         return MediaConchLib::errorHttp_INVALID_DATA;
+
+    if (res->ok.size() != 1)
+    {
+        delete res;
+        return MediaConchLib::errorHttp_INVALID_DATA;
+    }
 
     registered = !res->ok[0]->create;
 
     file_ids[file] = res->ok[0]->outId;
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -255,6 +298,7 @@ int DaemonClient::is_done(const std::string& file, double& done, MediaConchLib::
             else if (ok->tool == RESTAPI::DPFMANAGER)
                 report_kind = MediaConchLib::report_MediaDpfManager;
         }
+        delete res;
         return MediaConchLib::errorHttp_TRUE;
     }
 
@@ -265,6 +309,7 @@ int DaemonClient::is_done(const std::string& file, double& done, MediaConchLib::
 
     report_kind = MediaConchLib::report_MediaConch;
 
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -355,8 +400,14 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
 
     RESTAPI rest;
     RESTAPI::Report_Res *res = rest.parse_report_res(data);
-    if (!res || !res->ok.report.length())
+    if (!res)
         return -1;
+
+    if (!res->ok.report.length())
+    {
+        delete res;
+        return -1;
+    }
 
     result->report = res->ok.report;
 
@@ -424,8 +475,14 @@ int DaemonClient::validate(MediaConchLib::report report,
 
     RESTAPI rest;
     RESTAPI::Validate_Res *res = rest.parse_validate_res(data);
-    if (!res || !res->ok.size())
+    if (!res)
         return -1;
+
+    if (!res->ok.size())
+    {
+        delete res;
+        return -1;
+    }
 
     for (size_t i = 0; i < res->ok.size(); ++i)
     {

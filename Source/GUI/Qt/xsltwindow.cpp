@@ -113,7 +113,7 @@ void XsltWindow::delete_policy()
         delete ((XsltPolicy*)p)->rules[i];
     ((XsltPolicy*)p)->rules.clear();
 
-    QFile file(QString().fromStdString(mainwindow->get_policy(row)->filename));
+    QFile file(QString().fromUtf8(mainwindow->get_policy(row)->filename.c_str(), mainwindow->get_policy(row)->filename.length()));
     file.remove();
     mainwindow->remove_policy(row);
 
@@ -144,7 +144,7 @@ void XsltWindow::duplicate_policy()
         return;
 
     QTreeWidgetItem* new_item = new QTreeWidgetItem(parent);
-    QString title = QString().fromStdString(p->title);
+    QString title = QString().fromUtf8(p->title.c_str(), p->title.length());
     new_item->setText(0, title);
     item->setSelected(false);
     for (size_t i = 0; i < ((XsltPolicy*)p)->rules.size(); ++i)
@@ -168,7 +168,7 @@ void XsltWindow::add_new_rule()
     r->title = string("New Rule");
     r->use_free_text = false;
 
-    QString name = QString().fromStdString(r->title);
+    QString name = QString().fromUtf8(r->title.c_str(), r->title.length());
     QTreeWidgetItem* item = new QTreeWidgetItem(parent, QStringList(name));
 
     mainwindow->get_policy(rowPolicy)->saved = false;
@@ -201,7 +201,7 @@ void XsltWindow::duplicate_rule()
     policieswindow->emphasis_policy_name_in_tree(item);
 
     QTreeWidgetItem* new_item = new QTreeWidgetItem(item->parent());
-    new_item->setText(0, QString().fromStdString(r->title));
+    new_item->setText(0, QString().fromUtf8(r->title.c_str(), r->title.length()));
     item->setSelected(false);
     new_item->setSelected(true);
 }
@@ -260,13 +260,13 @@ void XsltWindow::edit_policy_title()
         return;
 
     Policy *p = mainwindow->get_policy(row);
-    if (p->title != qtitle.toStdString())
+    if (p->title != qtitle.toUtf8().data())
     {
-        p->title = qtitle.toStdString();
+        p->title = qtitle.toUtf8().data();
         p->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
 
-        QString title = QString().fromStdString(p->title);
+        QString title = QString().fromUtf8(p->title.c_str(), p->title.length());
         item->setText(0, title);
     }
 }
@@ -285,9 +285,9 @@ void XsltWindow::edit_policy_description()
         return;
 
     Policy *p = mainwindow->get_policy(row);
-    if (p->description != qdescription.toStdString())
+    if (p->description != qdescription.toUtf8().data())
     {
-        p->description = qdescription.toStdString();
+        p->description = qdescription.toUtf8().data();
         p->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
     }
@@ -356,7 +356,7 @@ void XsltWindow::displayPolicyMenu(QString title)
             if (p->filename.length())
                 policyMenu->get_savePolicy_button()->setEnabled(true);
             QLineEdit* descr = policyMenu->get_description_line();
-            descr->setText(QString().fromStdString(p->description));
+            descr->setText(QString().fromUtf8(p->description.c_str(), p->description.length()));
         }
     }
 }
@@ -389,12 +389,12 @@ void XsltWindow::edit_rule_name(QString new_name)
         return;
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
-    if (r->title != new_name.toStdString())
+    if (r->title != new_name.toUtf8().data())
     {
-        r->title = new_name.toStdString();
+        r->title = new_name.toUtf8().data();
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
-        QString name = QString().fromStdString(r->title);
+        QString name = QString().fromUtf8(r->title.c_str(), r->title.length());
         item->setText(0, name);
     }
 }
@@ -413,12 +413,14 @@ void XsltWindow::edit_rule_type()
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
-    if (r->type != ruleEdit->get_type_select()->currentText().toStdString())
+    if (r->type != ruleEdit->get_type_select()->currentText().toUtf8().data())
     {
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
-        r->type = ruleEdit->get_type_select()->currentText().toStdString();
-        ruleEdit->change_values_of_field_selector(r->use_free_text, r->field);
+        r->type = ruleEdit->get_type_select()->currentText().toUtf8().data();
+        std::string remain(r->field);
+        ruleEdit->change_values_of_field_selector(r->use_free_text, r->field, r->value);
+        r->field = remain;
         if (r->type == "General")
         {
             ruleEdit->get_occurrence_box()->setValue(-1);
@@ -444,11 +446,14 @@ void XsltWindow::edit_rule_field()
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
-    if (r->field != ruleEdit->get_field_select()->currentText().toStdString())
+    if (r->field != ruleEdit->get_field_select()->currentText().toUtf8().data())
     {
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
-        r->field = ruleEdit->get_field_select()->currentText().toStdString();
+        r->field = ruleEdit->get_field_select()->currentText().toUtf8().data();
+        std::string remain(r->value);
+        ruleEdit->change_values_of_value_selector(r->type, r->field, r->value);
+        r->value = remain;
         ruleEdit->check_editor_is_possible(r);
     }
 }
@@ -467,11 +472,11 @@ void XsltWindow::edit_rule_operator()
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
-    if (r->ope != ruleEdit->get_operator_select()->currentText().toStdString())
+    if (r->ope != ruleEdit->get_operator_select()->currentText().toUtf8().data())
     {
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
-        r->ope = ruleEdit->get_operator_select()->currentText().toStdString();
+        r->ope = ruleEdit->get_operator_select()->currentText().toUtf8().data();
         ruleEdit->rule_clicked(r);
     }
 }
@@ -490,11 +495,11 @@ void XsltWindow::edit_rule_value()
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
-    if (r->value != ruleEdit->get_value_line()->text().toStdString())
+    if (r->value != ruleEdit->get_value_select()->currentText().toUtf8().data())
     {
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
-        r->value = ruleEdit->get_value_line()->text().toStdString();
+        r->value = ruleEdit->get_value_select()->currentText().toUtf8().data();
         ruleEdit->check_editor_is_possible(r);
     }
 }
@@ -536,11 +541,11 @@ void XsltWindow::edit_rule_freeText()
 
     XsltRule *r = ((XsltPolicy*)mainwindow->get_policy(rowPolicy))->rules[row];
 
-    if (r->test != ruleEdit->get_freeText_text()->toPlainText().toStdString())
+    if (r->test != ruleEdit->get_freeText_text()->toPlainText().toUtf8().data())
     {
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
-        r->test = ruleEdit->get_freeText_text()->toPlainText().toStdString();
+        r->test = ruleEdit->get_freeText_text()->toPlainText().toUtf8().data();
         r->use_free_text = true;
         ruleEdit->check_editor_is_possible(r);
     }
@@ -619,7 +624,7 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
                      this, SLOT(edit_rule_field()));
     QObject::connect(ruleEdit->get_operator_select(), SIGNAL(currentIndexChanged(int)),
                      this, SLOT(edit_rule_operator()));
-    QObject::connect(ruleEdit->get_value_line(), SIGNAL(textEdited(QString)),
+    QObject::connect(ruleEdit->get_value_select(), SIGNAL(currentIndexChanged(int)),
                      this, SLOT(edit_rule_value()));
     QObject::connect(ruleEdit->get_occurrence_box(), SIGNAL(valueChanged(int)),
                      this, SLOT(edit_rule_occurrence()));

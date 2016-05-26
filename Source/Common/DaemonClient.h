@@ -47,6 +47,9 @@ public:
     // file_from_id
     int file_from_id(int id, std::string& filename);
 
+    // default_values_for_type
+    int default_values_for_type(const std::string& type, std::vector<std::string>& values);
+
     // Analyze
     int analyze(const std::string& file, bool& registered, bool force_analyze);
 

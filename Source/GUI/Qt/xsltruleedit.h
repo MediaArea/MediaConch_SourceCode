@@ -75,13 +75,14 @@ public:
     QComboBox         *get_type_select();
     QComboBox         *get_field_select();
     QComboBox         *get_operator_select();
-    QLineEdit         *get_value_line();
+    QComboBox         *get_value_select();
     QSpinBox          *get_occurrence_box();
     QFrame            *get_editor_frame();
     QTextEdit         *get_freeText_text();
     QRadioButton      *get_freeTextSelector_radio();
     QRadioButton      *get_editorSelector_radio();
-    void               change_values_of_field_selector(bool is_free_text, const std::string);
+    void               change_values_of_field_selector(bool is_free_text, const std::string&, const std::string&);
+    void               change_values_of_value_selector(const std::string&, const std::string&, const std::string&);
 
 private:
     MainWindow *mainwindow;

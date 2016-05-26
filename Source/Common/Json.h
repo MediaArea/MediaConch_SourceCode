@@ -41,23 +41,22 @@ namespace MediaConch {
 class Json : public Container
 {
 public:
-public:
     //Constructor/Destructor
     Json();
     ~Json();
 
-    virtual int parse(const std::string& data, Value &v);
-    virtual std::string serialize(Value &v);
-    virtual Value* get_value_by_key(Value& v, const std::string& key);
-    virtual Value* get_value_in_array_by_key(Value& v, const std::string& key);
+    virtual int    parse(const std::string& data, Value &v);
+    virtual int    serialize(Value &v, std::string&);
+    virtual Value *get_value_by_key(Value& v, const std::string& key);
+    virtual Value *get_value_in_array_by_key(Value& v, const std::string& key);
     
 private:
-    json_t       *current_node;
+    json_t        *current_node;
 
-    int parse_node(Value &v);
-    int get_type_node(Value &v);
-    json_t *set_basic_node(Value &v);
-    json_t *serialize_node(Value &v);
+    int            parse_node(Value &v);
+    int            get_type_node(Value &v);
+    json_t        *set_basic_node(Value &v);
+    json_t        *serialize_node(Value &v);
 
     Json(const Json&);
     Json& operator=(const Json&);

@@ -32,6 +32,11 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     PluginsManager::~PluginsManager()
     {
+        format_plugins.clear();
+        for (size_t i = 0; i < plugins.size(); ++i)
+            delete plugins[i];
+
+        plugins.clear();
     }
 
     //---------------------------------------------------------------------------

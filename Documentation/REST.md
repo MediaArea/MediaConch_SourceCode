@@ -8,6 +8,10 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.4
+
+* Add the default values for type command
+
 #### Version 1.3
 
 * Add verbosity in report request
@@ -35,14 +39,15 @@ Current API version: $API_VERSION = 1.2
 
 #### Command
 
-* Analyze:      HTTP POST
-* Status:       HTTP GET
-* Report:       HTTP POST
-* Retry:        HTTP PUT
-* Clear:        HTTP DELETE
-* List:         HTTP GET
-* Validate:     HTTP POST
-* File_From_Id: HTTP POST
+* Analyze:                 HTTP POST
+* Status:                  HTTP GET
+* Report:                  HTTP POST
+* Retry:                   HTTP PUT
+* Clear:                   HTTP DELETE
+* List:                    HTTP GET
+* Validate:                HTTP POST
+* File_From_Id:            HTTP POST
+* Default_Values_For_type: HTTP GET
 
 #### Analyze
 
@@ -245,6 +250,23 @@ Parameters:
 Parameter:
 
 * file:              String: File corresponding to the id, left empty if id not matching
+
+#### Default_Values_For_type
+
+URI format for the parameters.
+URL: /$API_VERSION/default_values_for_type
+
+##### Request
+
+Parameters:
+
+* type:              String: name of the type wanted
+
+##### Response
+
+Parameters:
+
+* values:            Array of values (String)
 
 #### Report kinds
 

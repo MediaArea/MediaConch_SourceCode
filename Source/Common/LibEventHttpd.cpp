@@ -160,13 +160,14 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         RESTAPI::Status_Res res;
         if (commands.status_cb && commands.status_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
-        result = rest.serialize_status_res(res);
-        if (!result.length())
+        delete r;
+        if (rest.serialize_status_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/list").compare(uri_path))
@@ -178,13 +179,33 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         RESTAPI::List_Res res;
         if (commands.list_cb && commands.list_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
-        result = rest.serialize_list_res(res);
-        if (!result.length())
+        delete r;
+        if (rest.serialize_list_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/default_values_for_type").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Default_Values_For_Type_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Default_Values_For_Type_Res res;
+        if (commands.list_cb && commands.default_values_for_type_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_default_values_for_type_res(res, result) < 0)
             error = rest.get_error();
     }
     else
@@ -229,13 +250,14 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::Analyze_Res res;
         if (commands.analyze_cb && commands.analyze_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
-        result = rest.serialize_analyze_res(res);
-        if (!result.length())
+            delete r;
+        if (rest.serialize_analyze_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/report").compare(uri_path))
@@ -252,13 +274,14 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::Report_Res res;
         if (commands.report_cb && commands.report_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
-        result = rest.serialize_report_res(res);
-        if (!result.length())
+        delete r;
+        if (rest.serialize_report_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/validate").compare(uri_path))
@@ -275,13 +298,14 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::Validate_Res res;
         if (commands.validate_cb && commands.validate_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
-        result = rest.serialize_validate_res(res);
-        if (!result.length())
+        delete r;
+        if (rest.serialize_validate_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/file_from_id").compare(uri_path))
@@ -298,13 +322,14 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         RESTAPI::File_From_Id_Res res;
         if (commands.file_from_id_cb && commands.file_from_id_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
-        result = rest.serialize_file_from_id_res(res);
-        if (!result.length())
+        delete r;
+        if (rest.serialize_file_from_id_res(res, result) < 0)
             error = rest.get_error();
     }
     else
@@ -349,12 +374,14 @@ void LibEventHttpd::request_put_coming(struct evhttp_request *req)
         RESTAPI::Retry_Res res;
         if (commands.retry_cb && commands.retry_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
-        result = rest.serialize_retry_res(res);
-        if (!result.length())
+
+        delete r;
+        if (rest.serialize_retry_res(res, result) < 0)
             error = rest.get_error();
     }
     else
@@ -389,13 +416,14 @@ void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
         RESTAPI::Clear_Res res;
         if (commands.clear_cb && commands.clear_cb(r, res, parent) < 0)
         {
+            delete r;
             ret_msg = "NOVALIDCONTENT";
             code = HTTP_BADREQUEST;
             goto send;
         }
 
-        result = rest.serialize_clear_res(res);
-        if (!result.length())
+        delete r;
+        if (rest.serialize_clear_res(res, result) < 0)
             error = rest.get_error();
     }
     else

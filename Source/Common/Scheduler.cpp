@@ -49,6 +49,7 @@ namespace MediaConch {
         }
         working.clear();
         CS.Leave();
+        delete queue;
     }
 
     //---------------------------------------------------------------------------
