@@ -132,6 +132,8 @@ void CheckerWindow::create_web_view_finished(bool ok)
         progress_bar = NULL;
     }
 
+    main_view->show();
+    main_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainwindow->set_widget_to_layout(main_view);
 }
 
@@ -140,6 +142,7 @@ void CheckerWindow::set_web_view_content(QString& html)
 {
     if (!main_view)
         main_view = new WebView(mainwindow);
+    main_view->hide();
 
     WebPage* page = new WebPage(mainwindow, main_view);
     main_view->setPage(page);

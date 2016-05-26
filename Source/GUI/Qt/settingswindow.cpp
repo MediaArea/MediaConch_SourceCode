@@ -7,6 +7,7 @@
 #include "settingswindow.h"
 #include "mainwindow.h"
 #include "WebPage.h"
+#include "progressbar.h"
 #if defined(WEB_MACHINE_ENGINE)
 #include <QWebEnginePage>
 #include <QWebChannel>
@@ -56,6 +57,7 @@ void SettingsWindow::create_settings_finished(bool ok)
         progress_bar = NULL;
     }
 
+    settings_view->show();
     parent->set_widget_to_layout(settings_view);
 }
 
@@ -66,12 +68,13 @@ void SettingsWindow::display_settings()
 
     clear_visual_elements();
 
-    progress_bar = new QProgressBar(parent);
+    progress_bar = new ProgressBar(parent);
     parent->set_widget_to_layout(progress_bar);
-    progress_bar->setValue(0);
+    progress_bar->get_progress_bar()->setValue(0);
     progress_bar->show();
 
     settings_view = new WebView(parent);
+    settings_view->hide();
     WebPage* page = new WebPage(parent, settings_view);
     settings_view->setPage(page);
 
@@ -79,7 +82,7 @@ void SettingsWindow::display_settings()
     QByteArray base = settings_file.readAll();
     settings_file.close();
 
-    QObject::connect(settings_view, SIGNAL(loadProgress(int)), progress_bar, SLOT(setValue(int)));
+    QObject::connect(settings_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
     QObject::connect(settings_view, SIGNAL(loadFinished(bool)), this, SLOT(create_settings_finished(bool)));
 
     QString html(base);
