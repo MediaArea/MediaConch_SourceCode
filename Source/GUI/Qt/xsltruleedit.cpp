@@ -321,6 +321,7 @@ void XsltRuleEdit::add_values_to_selector()
 //---------------------------------------------------------------------------
 void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std::string& new_field, const std::string& new_value)
 {
+    std::string new_field_remain(new_field);
     ui->field->clear();
     if (!is_free_text)
     {
@@ -341,16 +342,16 @@ void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std:
     }
     ui->field->model()->sort(0);
 
-    if (!new_field.length())
+    if (!new_field_remain.length())
         return;
 
-    int pos = ui->field->findText(QString().fromUtf8(new_field.c_str(), new_field.length()));
+    int pos = ui->field->findText(QString().fromUtf8(new_field_remain.c_str(), new_field_remain.length()));
     if (pos != -1)
         ui->field->setCurrentIndex(pos);
     else
     {
-        ui->field->addItem(QString().fromUtf8(new_field.c_str(), new_field.length()));
-        int pos = ui->field->findText(QString().fromUtf8(new_field.c_str(), new_field.length()));
+        ui->field->addItem(QString().fromUtf8(new_field_remain.c_str(), new_field_remain.length()));
+        int pos = ui->field->findText(QString().fromUtf8(new_field_remain.c_str(), new_field_remain.length()));
         if (pos != -1)
             ui->field->setCurrentIndex(pos);
     }

@@ -418,7 +418,9 @@ void XsltWindow::edit_rule_type()
         mainwindow->get_policy(rowPolicy)->saved = false;
         policieswindow->emphasis_policy_name_in_tree(item);
         r->type = ruleEdit->get_type_select()->currentText().toUtf8().data();
+        std::string remain(r->field);
         ruleEdit->change_values_of_field_selector(r->use_free_text, r->field, r->value);
+        r->field = remain;
         if (r->type == "General")
         {
             ruleEdit->get_occurrence_box()->setValue(-1);
