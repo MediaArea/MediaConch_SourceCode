@@ -2,6 +2,7 @@ $(document).ready(function() {
     result = $('#result-table').DataTable({
         'order': [],
         'autoWidth': false,
+        'fixedHeader': true,
         'columnDefs': [
             { 'orderable': true, targets: 0 },
             { 'orderable': true, 'searchable': false, targets: [1, 2, 5] },
