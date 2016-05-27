@@ -7,20 +7,24 @@
     <title>MediaConch</title>
     <style>
       .mc_header {
-        width   : 600px;
+        width: 600px;
         border: 1px black solid;
         background-color: #64A8DD;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 14px;
       }
 
-      .mc_header h1, .mc_header h2, .mc_header div {
+      .mc_header h4, .mc_header div {
+        margin: 10px;
         text-align: center;
+        width: 600px;
       }
 
       .mc_implementation {
-        width   : 600px;
+        width: 600px;
         background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 12px;
       }
 
       .mc_implementation h1  {
@@ -28,9 +32,11 @@
       }
 
       .mc_implementation table {
+        border-collapse:collapse;
         border: 1px black solid;
         width   : 600px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 12px;
       }
 
       .mc_implementation th {
@@ -41,14 +47,17 @@
 
       .mc_implementation td .reason {
         border-bottom: thin solid black;
-        padding-top: 8px;
+      }
+
+      .mc_implementation tr {
+        border-bottom: 1px black solid;
       }
 
       .mc_implementation p {
+        margin: 0px;
         background-color: #64A8DD;
-        font-size: 18px;
+        font-size: 12px;
         font-weight: 700;
-        padding: 10px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
@@ -56,6 +65,7 @@
         width   : 600px;
         background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 12px;
       }
 
       #mc_policy h1  {
@@ -63,9 +73,11 @@
       }
 
       #mc_policy table {
+        border-collapse:collapse;
         border: 1px black solid;
         width   : 600px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 12px;
       }
 
       #mc_policy th {
@@ -74,11 +86,15 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
+      #mc_policy tr {
+        border-bottom: 1px black solid;
+      }
+
       #mc_policy p {
+        margin: 0px;
         background-color: #64A8DD;
-        font-size: 18px;
+        font-size: 12px;
         font-weight: 700;
-        padding: 10px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
     </style>
@@ -86,20 +102,13 @@
   <body>
     <xsl:for-each select="mc:media">
       <div class="mc_header">
-        <div>
-        <xsl:text>&#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A; &#x1F41A;</xsl:text>
-        </div>
-        <h1>MediaConch Report</h1>
-        <div>
-        <xsl:text>&#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A;  &#x1F41A; &#x1F41A;</xsl:text>
-        </div>
-          <p>File path:  <xsl:value-of select="@ref"/></p>
+        <h4>&#x1F41A; MediaConch Report for <xsl:value-of select="@ref"/></h4>
       </div>
       <xsl:for-each select="mc:implementationChecks">
         <div class="mc_header">
-          <h2>
+          <h4>
             <xsl:value-of select="mc:name"/>
-          </h2>
+          </h4>
           <p>
             <xsl:value-of select="mc:description"/>
           </p>
