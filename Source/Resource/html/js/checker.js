@@ -274,10 +274,10 @@ function implementationCell(data, resultId, fileId) {
 </div>');
 
             if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                data = webpage.on_fill_implementation_report(name, $(node).data('display'), $(node).data('verbosity'));
+                data = webpage.on_fill_implementation_report(name, nodeModal.data('display'), nodeModal.data('verbosity'));
                 displayReport('#modalConformance' + resultId, data);
             } else {
-                webpage.on_fill_implementation_report(name, $(node).data('display'), $(node).data('verbosity'), function (data) {
+                webpage.on_fill_implementation_report(name, nodeModal.data('display'), nodeModal.data('verbosity'), function (data) {
                     displayReport('#modalConformance' + resultId, data);
                 });
             }
@@ -335,7 +335,7 @@ function implementationCell(data, resultId, fileId) {
         e.preventDefault();
         nodeDld = result.$('#' + resultId);
         sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
-        webpage.on_save_implementation_report(sourceName, $(node).data('display'), $(node).data('verbosity'));
+        webpage.on_save_implementation_report(sourceName, nodeDld.data('display'), nodeDld.data('verbosity'));
     });
 }
 
@@ -412,10 +412,10 @@ function policyModal(resultId, fileId)
             if (nodeModal.data('policy')) {
                 sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    data = webpage.on_fill_policy_report(sourceName, $(node).data('policy'), $(node).data('display'));
+                    data = webpage.on_fill_policy_report(sourceName, nodeModal.data('policy'), nodeModal.data('display'));
                     displayReport('#modalPolicy' + resultId, data);
                 } else {
-                    webpage.on_fill_policy_report(sourceName, $(node).data('policy'), $(node).data('display'), function (data) {
+                    webpage.on_fill_policy_report(sourceName, nodeModal.data('policy'), nodeModal.data('display'), function (data) {
                         displayReport('#modalPolicy' + resultId, data);
                     });
                 }
@@ -487,7 +487,7 @@ function policyModal(resultId, fileId)
         e.preventDefault();
         nodeDld = result.$('#' + resultId);
         sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
-        webpage.on_save_policy_report(sourceName, $(node).data('policy'), $(node).data('display'));
+        webpage.on_save_policy_report(sourceName, nodeDld.data('policy'), nodeDld.data('display'));
     });
 }
 
@@ -512,22 +512,24 @@ function updatePolicyCell(fileId, policyId) {
     if ($(result.cell('#result-' + fileId, 5).node()).hasClass('success')) {
         if (policyId.length && policyId >= 0) {
             resetPolicyCell(fileId);
-            sourceName = $(result.cell('#result-' + fileId, 0).node()).find('span').attr('title');
-            if (WEBMACHINE == "WEB_MACHINE_KIT") {
-                valid = webpage.policy_is_valid(sourceName);
-                var policyData = {};
-                policyData["valid"] = valid;
-                resultId = 'result-' + fileId;
-                policyCell(policyData, resultId, fileId);
-            }
-            else {
-                webpage.policy_is_valid(sourceName, function (valid) {
+            setTimeout(function () {
+                sourceName = $(result.cell('#result-' + fileId, 0).node()).find('span').attr('title');
+                if (WEBMACHINE == "WEB_MACHINE_KIT") {
+                    valid = webpage.policy_is_valid(sourceName);
                     var policyData = {};
                     policyData["valid"] = valid;
                     resultId = 'result-' + fileId;
                     policyCell(policyData, resultId, fileId);
-                });
-            }
+                }
+                else {
+                    webpage.policy_is_valid(sourceName, function (valid) {
+                        var policyData = {};
+                        policyData["valid"] = valid;
+                        resultId = 'result-' + fileId;
+                        policyCell(policyData, resultId, fileId);
+                    });
+                }
+            }, 50);
         }
         else {
             policyCellEmptyWithModal(resultId, fileId)
