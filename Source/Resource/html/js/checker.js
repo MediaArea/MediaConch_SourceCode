@@ -512,22 +512,24 @@ function updatePolicyCell(fileId, policyId) {
     if ($(result.cell('#result-' + fileId, 5).node()).hasClass('success')) {
         if (policyId.length && policyId >= 0) {
             resetPolicyCell(fileId);
-            sourceName = $(result.cell('#result-' + fileId, 0).node()).find('span').attr('title');
-            if (WEBMACHINE == "WEB_MACHINE_KIT") {
-                valid = webpage.policy_is_valid(sourceName);
-                var policyData = {};
-                policyData["valid"] = valid;
-                resultId = 'result-' + fileId;
-                policyCell(policyData, resultId, fileId);
-            }
-            else {
-                webpage.policy_is_valid(sourceName, function (valid) {
+            setTimeout(function () {
+                sourceName = $(result.cell('#result-' + fileId, 0).node()).find('span').attr('title');
+                if (WEBMACHINE == "WEB_MACHINE_KIT") {
+                    valid = webpage.policy_is_valid(sourceName);
                     var policyData = {};
                     policyData["valid"] = valid;
                     resultId = 'result-' + fileId;
                     policyCell(policyData, resultId, fileId);
-                });
-            }
+                }
+                else {
+                    webpage.policy_is_valid(sourceName, function (valid) {
+                        var policyData = {};
+                        policyData["valid"] = valid;
+                        resultId = 'result-' + fileId;
+                        policyCell(policyData, resultId, fileId);
+                    });
+                }
+            }, 50);
         }
         else {
             policyCellEmptyWithModal(resultId, fileId)
