@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionDisplay);
     ToolGroup->addAction(ui->actionSettings);
-    
+
     // Visual elements
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
     Layout->setContentsMargins(0, 0, 0, 0);
@@ -101,10 +101,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/icon/icon.png"));
     int left=70;
     int width=QApplication::desktop()->screenGeometry().width();
-    if (width>1170)
+    if (width>1366)
     {
-        left+=(width-1170)/2;
-        width=1170;
+        left+=(width-1366)/2;
+        width=1366;
     }
     move(left, 70);
     resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
