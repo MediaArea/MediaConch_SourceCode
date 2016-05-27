@@ -538,6 +538,7 @@ void WorkerFiles::fill_registered_files_from_db()
         full_file += fr->filename;
 
         fr->index = file_index++;
+        fr->analyzed = false;
 
         working_files[full_file] = fr;
         files.push_back(full_file);
