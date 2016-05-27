@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/icon">
         <file alias="icon.png">Image/MediaConch.png</file>
+        <file alias="icon-61x38.png">Image/MediaConch-61x38.png</file>
         <file alias="dropfiles.png">dropfiles_gray.png</file>
     </qresource>
     <qresource>
@@ -17,13 +18,14 @@
         <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
         <file alias="jstree.js">html/js/jstree.min.js</file>
         <file alias="jstreegrid.js">html/js/jstreegrid.js</file>
-        <file alias="datatables.js">html/js/datatables.js</file>
+        <file alias="datatables.js">html/js/datatables.min.js</file>
         <file alias="checker.js">html/js/checker.js</file>
         <file alias="settings.js">html/js/settings.js</file>
         <file alias="main.css">html/css/main.css</file>
+        <file alias="main-gui.css">html/css/main-gui.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
         <file alias="jstree.css">html/css/jstree.min.css</file>
-        <file alias="datatables.css">html/css/datatables.css</file>
+        <file alias="datatables.css">html/css/datatables.min.css</file>
         <file alias="32px.png">html/css/32px.png</file>
         <file alias="40px.png">html/css/40px.png</file>
         <file alias="glyphicons-halflings-regular.ttf">html/fonts/glyphicons-halflings-regular.ttf</file>

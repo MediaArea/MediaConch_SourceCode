@@ -105,6 +105,15 @@ footer .navbar {
     font-size: 16px;
 }
 
+#checkerResults {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+#checkerResultTitle button {
+    padding-right: 15px;
+}
+
 .checker-results .btn {
     font-size: inherit;
     padding: 0 0 0 10px;
