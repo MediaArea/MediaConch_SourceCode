@@ -5,7 +5,7 @@
  */
 
 #include "Common/XsltPolicy.h"
-#include "Common/GeneratedCSVVideos.hpp"
+#include "Common/GeneratedCSVVideos.h"
 #include "xsltruleedit.h"
 #include "ui_xsltruleedit.h"
 #include "mainwindow.h"
@@ -387,7 +387,6 @@ void XsltRuleEdit::change_values_of_value_selector(const std::string& type,
             }
         }
     }
-    ui->value->model()->sort(0);
 
     int pos = ui->value->findText(QString().fromUtf8(val.c_str(), val.length()));
     if (pos != -1)
