@@ -150,26 +150,36 @@
                 </xsl:if>
                 <xsl:if test="@outcome = 'fail'">
                   <xsl:text>&#x274C;  </xsl:text>
-                  <strong>
-                          <xsl:text>(Reason: </xsl:text>
-                        </strong>
-                        <xsl:value-of select="@reason"/>
-                        <xsl:text>)</xsl:text>
+                  <xsl:text>(Reason: </xsl:text>
+                  <xsl:value-of select="@reason"/>
+                  <xsl:text>)</xsl:text>
                 </xsl:if>
               </td>
                     <tr>
                       <td>
                         <div class="extra">
-                         Context of test: <xsl:value-of select="../mc:context/@name"/>
-                             <xsl:value-of select="../mc:context"/>
+                          <xsl:if test="../mc:context !=''">
+                           <strong>Context of test: </strong><xsl:value-of select="../mc:context/@name"/>
+                               <xsl:value-of select="../mc:context"/>
+                         </xsl:if>
                       </div>
                       <xsl:for-each select="mc:value">
                         <div class="extra">
-                         Name: <xsl:value-of select="@name"/><br/>
-                         Offset: <xsl:value-of select="@offset"/><br/>
-                         Value context: <xsl:value-of select="@context"/><br/>
-                         ID: <xsl:value-of select="@id"/><br/>
-                         Value: <xsl:value-of select="."/><br/>
+                        <xsl:if test="@name !=''">
+                           <strong>Name: </strong><xsl:value-of select="@name"/><br/>
+                         </xsl:if>
+                         <xsl:if test="@offset !=''">
+                           <strong>Offset: </strong><xsl:value-of select="@offset"/><br/>
+                         </xsl:if>
+                         <xsl:if test="@id !=''">
+                           <strong>ID: </strong><xsl:value-of select="@id"/><br/>
+                         </xsl:if>
+                         <xsl:if test="@context !=''">
+                           <strong>Value context: </strong><xsl:value-of select="@context"/><br/>
+                         </xsl:if>
+                         <xsl:if test=". !=''">
+                           <strong>Value: </strong><xsl:value-of select="."/><br/>
+                         </xsl:if>
                         <hr/>
                         </div>
                       </xsl:for-each>
