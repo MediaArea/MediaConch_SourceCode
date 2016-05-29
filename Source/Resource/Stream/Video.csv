@@ -1,0 +1,73 @@
+Format;;FromStats;
+Format_Commercial_IfAny;;FromStats;
+Format_Version;Video:Format;FromStats;
+Format_Profile;Video:Format;FromStats;
+Format_Compression;;FromStats;
+MultiView_BaseProfile;Video:Format;FromStats;
+MultiView_Count;;FromStats;
+MultiView_Layout;Video:Format;FromStats;
+Format_Settings_BVOP;Video:Format;FromStats;
+Format_Settings_QPel;Video:Format;FromStats;
+Format_Settings_GMC;Video:Format;FromStats;
+Format_Settings_Matrix;Video:Format;FromStats;
+Format_Settings_Matrix_Data;;FromList;Default
+Format_Settings_CABAC;Video:Format;FromStats;
+Format_Settings_RefFrames;Video:Format;FromStats;
+Format_Settings_Pulldown;Video:Format;FromStats;
+Format_Settings_FrameMode;Video:Format;FromStats;
+Format_Settings_GOP;Video:Format;FromStats;
+Format_Settings_PictureStructure;Video:Format;FromStats;
+Format_Settings_Wrapping;General:Format=MXF;FromStats;
+MuxingMode;;FromStats;
+CodecID;General:Format;FromStats;
+BitRate_Mode;;FromStats;
+Width;;FromList;720 / 1080 / 1920 / 3840 / 7680
+Width_Offset;;FromList;
+Width_Original;;FromList;720 / 1080 / 1920 / 3840 / 7680
+Height;;FromList;480 / 576 / 720 / 1080 / 2160 / 4320
+Height_Offset;;FromList;16 / 32
+Height_Original;;FromList;480 / 576 / 720 / 1080 / 2160 / 4320
+PixelAspectRatio;;FromList;1.000 / 1.067 / 1.126 / 1.422 / 1.500 / 1.501
+DisplayAspectRatio;;FromList;1.333 / 1.778
+ActiveFormatDescription;;FromStats;
+Rotation;;FromStats;
+FrameRate_Mode;;FromStats;
+FrameRate;;FromList;25.000 / 29.970 / 30.000 / 50.000 / 59.940 / 60.000
+FrameRate_Num;;FromList;29970 / 30000 / 59940 / 60000
+FrameRate_Den;;FromList;1000 / 1001
+Standard;;FromStats;
+ColorSpace;;FromStats;
+ChromaSubsampling;;FromStats;
+ChromaSubsampling_Position;;FromStats;
+BitDepth;;FromStats;
+ScanType;;FromStats;
+ScanOrder;;FromStats;
+ScanOrder_Stored;;FromStats;
+Compression_Mode;;FromStats;
+TimeCode_FirstFrame;;FromList;"00:00:00:000 / 00:00:00;000 / 01:00:00:000 / 01:00:00;000"
+TimeCode_Settings;;FromStats;
+TimeCode_Source;;FromStats;
+Gop_OpenClosed;;FromStats;
+Gop_OpenClosed_FirstFrame;;FromStats;
+Alignment;;FromStats;
+Encoded_Application_CompanyName;;FromStats;
+Encoded_Application_Name;;FromStats;
+Encoded_Application_Version;Video:Encoded_Application_Name;FromStats;
+Encoded_Library_CompanyName;;FromStats;
+Encoded_Library_Name;;FromStats;
+Encoded_Library_Version;Video:Encoded_Library_Name;FromStats;
+Language;;FromStats;
+Language_More;;FromStats;
+Disabled;;FromStats;
+Default;;FromStats;
+Forced;;FromStats;
+Encryption;;FromStats;
+colour_range;;FromStats;
+colour_description_present;;FromStats;
+colour_primaries;;FromStats;
+transfer_characteristics;;FromStats;
+matrix_coefficients;;FromStats;
+colour_description_present_Original;;FromStats;
+colour_primaries_Original;;FromStats;
+transfer_characteristics_Original;;FromStats;
+matrix_coefficients_Original;;FromStats;

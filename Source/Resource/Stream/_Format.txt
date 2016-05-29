@@ -1,0 +1,19 @@
+Column 0:
+field name
+
+Column 1:
+Filter used before showing the list
+Format: Type:Field[=Value] (e.g. General:Format=MPEG-4)
+Can be empty (meaning "all")
+if value is empty, value must be taken from the stat files with a filter on the field (e.g. select the list of "CodecID" fields after having filtered "Format", so the list of of MPEG-4 CodecID fields is displayed after the user has selected "MPEG-4" for the format)
+
+Column 2:
+Method used for data
+Format: Key[:MoreData]
+Key can be:
+- "List": from the list in column 3
+- "FromStats": take from stat files (not public)
+- "FromSource": take from source file. "MoreData" will be file name and function name
+
+Column 3:
+List of values separated by " / "
