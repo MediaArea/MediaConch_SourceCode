@@ -171,8 +171,8 @@
                          <xsl:if test="@offset !=''">
                            <strong>Offset: </strong><xsl:value-of select="@offset"/><br/>
                          </xsl:if>
-                         <xsl:if test="@id !=''">
-                           <strong>ID: </strong><xsl:value-of select="@id"/><br/>
+                         <xsl:if test="@formatid !=''">
+                           <strong>ID: </strong><xsl:value-of select="@formatid"/><br/>
                          </xsl:if>
                          <xsl:if test="@context !=''">
                            <strong>Value context: </strong><xsl:value-of select="@context"/><br/>
