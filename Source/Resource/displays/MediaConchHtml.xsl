@@ -20,18 +20,23 @@
         width: 600px;
       }
 
-      .mc_implementation {
+      .mc_header p {
+        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 12px;     
+      }
+
+      .mc {
         width: 600px;
         background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
       }
 
-      .mc_implementation h1  {
+      .mc h1  {
         background-color: #64A8DD;
       }
 
-      .mc_implementation table {
+      .mc table {
         border-collapse:collapse;
         border: 1px black solid;
         width   : 600px;
@@ -39,21 +44,7 @@
         font-size: 12px;
       }
 
-      .mc_implementation th {
-        border-bottom: 1px black solid;
-        text-align:left;
-        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-      }
-
-      .mc_implementation td .reason {
-        border-bottom: thin solid black;
-      }
-
-      .mc_implementation tr {
-        border-bottom: 1px black solid;
-      }
-
-      .mc_implementation p {
+      .mc p {
         margin: 0px;
         background-color: #64A8DD;
         font-size: 12px;
@@ -61,41 +52,73 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
-      #mc_policy {
-        width   : 600px;
+      .cmn-toggle {
+        position: absolute;
+        margin-left: -9999px;
+        visibility: hidden;
+      }
+      .cmn-toggle + label {
+        display: block;
+        position: relative;
+        cursor: pointer;
+        outline: none;
+        user-select: none;
+      }
+
+      input.cmn-toggle-round + label {
+        padding: 2px;
+        width: 30px;
+        height: 15px;
+        background-color: #dddddd;
+        border-radius: 15px;
+      }
+
+      input.cmn-toggle-round + label:before,
+      input.cmn-toggle-round + label:after {
+        display: block;
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        bottom: 1px;
+        content: "";
+      }
+      input.cmn-toggle-round + label:before {
+        right: 1px;
+        background-color: #f1f1f1;
+        border-radius: 28px;
+        transition: background 0.4s;
+      }
+      input.cmn-toggle-round + label:after {
+        width: 14px;
+        background-color: #fff;
+        border-radius: 100%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        transition: margin 0.4s;
+      }
+      input.cmn-toggle-round:checked + label:before {
+        background-color: #8ce196;
+      }
+      input.cmn-toggle-round:checked + label:after {
+        margin-left: 15px;
+      }
+
+      input[type=checkbox]:checked ~ .mc .extra {
+         display: block;
+      }
+
+      .extra {
+      display: none;
+      }
+
+      .verbosity {
+        width: 600px;
         background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
       }
 
-      #mc_policy h1  {
-        background-color: #64A8DD;
-      }
-
-      #mc_policy table {
-        border-collapse:collapse;
-        border: 1px black solid;
-        width   : 600px;
-        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 12px;
-      }
-
-      #mc_policy th {
-        border-bottom: 1px black solid;
-        text-align:left;
-        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-      }
-
-      #mc_policy tr {
-        border-bottom: 1px black solid;
-      }
-
-      #mc_policy p {
-        margin: 0px;
-        background-color: #64A8DD;
-        font-size: 12px;
-        font-weight: 700;
-        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+      hr {
+      width: 598px;
       }
     </style>
   </head>
@@ -113,131 +136,127 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
-        <table class="mc_implementation">
-            <xsl:for-each select="mc:check">
-              <tr>
-                <td>
-                  <p>
-                    <xsl:value-of select="@icid"/>
-                  </p>
-                  <xsl:if test="mc:context/@name != ''">
-                    <p>
-                      <xsl:text>Context (name): </xsl:text>
-                      <xsl:value-of select="mc:context/@name"/>
-                    </p>
-                  </xsl:if>
-                  <table>
+        <table class="mc"> 
+          <xsl:if test="position() &lt; 2">
+            <div class="verbosity mc_header">Verbose mode?</div>
+            <input id="implementation-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
+            <label for="implementation-toggle"></label>
+          </xsl:if>
+            <xsl:for-each select="mc:check/mc:test">
+              <td>
+                <strong><xsl:value-of select="../@icid"/></strong>
+                <xsl:text>:  </xsl:text>
+                <strong><xsl:value-of select="../@name"/></strong>
+                <xsl:text>  </xsl:text>
+                <xsl:value-of select="@outcome"/>
+                <xsl:text>  </xsl:text>
+                <xsl:if test="@outcome = 'pass'">
+                  <xsl:text>&#x2705;  </xsl:text>
+                </xsl:if>
+                <xsl:if test="@outcome = 'fail'">
+                  <xsl:text>&#x274C;  </xsl:text>
+                  <xsl:text>(Reason: </xsl:text>
+                  <xsl:value-of select="@reason"/>
+                  <xsl:text>)</xsl:text>
+                </xsl:if>
+                <xsl:if test="@outcome = 'n/a'">
+                (Reason: <xsl:value-of select="@reason"/>
+                <xsl:text>)</xsl:text>
+                </xsl:if>
+              </td>
                     <tr>
-                      <th>outcome</th>
-                      <th>value</th>
-                    </tr>
-                    <xsl:for-each select="mc:test">
-                      <tr>
-                        <td>
-                          <xsl:if test="@outcome = 'pass'">
-                            <xsl:text>&#x2705;  </xsl:text>
-                          </xsl:if>
-                          <xsl:if test="@outcome = 'fail'">
-                            <xsl:text>&#x274C;  </xsl:text>
-                          </xsl:if>
-                          <xsl:value-of select="@outcome"/>
-                        </td>
-                        <td>
-                          <xsl:for-each select="mc:value">
-                            <xsl:if test="@name != ''">
-                              <strong>
-                                <xsl:value-of select="@name"/>
-                              </strong>
-                              <xsl:text>: </xsl:text>
-                            </xsl:if>
-                            <xsl:value-of select="."/>
-                            <br/>
-                          </xsl:for-each>
-                        </td>
-                      </tr>
-                      <xsl:if test="@outcome = 'fail'">
-                        <tr>
-                          <td colspan="2" class="reason">
-                            <strong>
-                              <xsl:text>Reason: </xsl:text>
-                            </strong>
-                            <xsl:value-of select="@reason"/>
-                          </td>
-                        </tr>
-                      </xsl:if>
-                    </xsl:for-each>
-                  </table>
-                </td>
-              </tr>
+                      <td>
+                        <div class="extra">
+                          <xsl:if test="../mc:context !=''">
+                           <strong>Context of test: </strong><xsl:value-of select="../mc:context/@name"/>
+                               <xsl:value-of select="../mc:context"/>
+                         </xsl:if>
+                      </div>
+                      <xsl:for-each select="mc:value">
+                        <div class="extra">
+                        <xsl:if test="@name !=''">
+                           <strong>Name: </strong><xsl:value-of select="@name"/><br/>
+                         </xsl:if>
+                         <xsl:if test="@offset !=''">
+                           <strong>Offset: </strong><xsl:value-of select="@offset"/><br/>
+                         </xsl:if>
+                         <xsl:if test="@formatid !=''">
+                           <strong>ID: </strong><xsl:value-of select="@formatid"/><br/>
+                         </xsl:if>
+                         <xsl:if test="@context !=''">
+                           <strong>Value context: </strong><xsl:value-of select="@context"/><br/>
+                         </xsl:if>
+                         <xsl:if test=". !=''">
+                           <strong>Value: </strong><xsl:value-of select="."/><br/>
+                         </xsl:if>
+                        <hr/>
+                        </div>
+                      </xsl:for-each>
+                    </td>
+                  </tr>
             </xsl:for-each>
           </table>
       </xsl:for-each>
       <xsl:for-each select="mc:policyChecks">
         <div class="mc_header">
-          <h2>
+          <h4>
             <xsl:value-of select="mc:name"/>
-          </h2>
+          </h4>
           <p>
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
-        <table id="mc_policy">
-          <xsl:for-each select="mc:check">
+        <table class="mc">
+        <div class="verbosity">Verbose mode?</div>
+        <input id="policy-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
+        <label for="policy-toggle"></label>
+          <xsl:for-each select="mc:check/mc:test">
+            <tr><td>
+              <strong>
+              <xsl:value-of select="../@name"/>
+              </strong>
+              <xsl:text> </xsl:text>
+                <xsl:if test="@outcome = 'pass'">
+                  <xsl:text>&#x2705;  </xsl:text>
+                  <xsl:value-of select="@outcome"/>
+                </xsl:if>
+                <xsl:if test="@outcome = 'fail'">
+                  <xsl:text>&#x274C;  </xsl:text>
+                <xsl:value-of select="@outcome"/>
+                (Reason: <xsl:value-of select="@reason"/>
+                <xsl:text>)</xsl:text>
+                </xsl:if>
+                <xsl:if test="@outcome = 'N/A'">
+                <xsl:value-of select="@outcome"/>
+                </xsl:if>
+            </td></tr>
             <tr>
+              <td class="extra">
+                <xsl:if test="../mc:context/@field != ''">
+                    <strong><xsl:text>Context (field): </xsl:text></strong>
+                    <xsl:value-of select="../mc:context/@field"/><br/>
+                </xsl:if>
+                <xsl:if test="../mc:context/@value != ''">           
+                    <strong><xsl:text>Context (value): </xsl:text></strong>
+                    <xsl:value-of select="../mc:context/@value"/><br/>
+                </xsl:if>
+                <xsl:if test="@tracktype != ''">
+                  <strong>Track type: </strong> <xsl:value-of select="@tracktype"/><br/>
+                </xsl:if>
+               <xsl:if test="@tracktypeorder != ''"> 
+                  <strong>Track type order: </strong>  <xsl:value-of select="@tracktypeorder"/><br/>
+              </xsl:if>
+              <xsl:if test="@trackid != ''"> 
+                <strong>Track ID: </strong>  <xsl:value-of select="@trackid"/><br/>
+              </xsl:if>
+              <xsl:if test="@actual != ''"> 
+                <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
+              </xsl:if>
+              </td>
+            </tr>
+            <tr class="extra">
               <td>
-                <p>
-                  <xsl:value-of select="@name"/>
-                </p>
-                <xsl:if test="mc:context/@field != ''">
-                  <p>
-                    <xsl:text>Context (field): </xsl:text>
-                    <xsl:value-of select="mc:context/@field"/>
-                  </p>
-                </xsl:if>
-                <xsl:if test="mc:context/@value != ''">
-                  <p>
-                    <xsl:text>Context (value): </xsl:text>
-                    <xsl:value-of select="mc:context/@value"/>
-                  </p>
-                </xsl:if>
-                <table>
-                  <tr>
-                    <th>tracktype</th>
-                    <th>tracktypeorder</th>
-                    <th>trackid</th>
-                    <th>actual</th>
-                    <th>outcome</th>
-                    <th>reason</th>
-                  </tr>
-                  <xsl:for-each select="mc:test">
-                    <tr>
-                      <td>
-                        <xsl:value-of select="@tracktype"/>
-                      </td>
-                      <td>
-                        <xsl:value-of select="@tracktypeorder"/>
-                      </td>
-                      <td>
-                        <xsl:value-of select="@trackid"/>
-                      </td>
-                      <td>
-                        <xsl:value-of select="@actual"/>
-                      </td>
-                      <td>
-                        <xsl:if test="@outcome = 'pass'">
-                          <xsl:text>&#x2705;  </xsl:text>
-                        </xsl:if>
-                        <xsl:if test="@outcome = 'fail'">
-                          <xsl:text>&#x274C;  </xsl:text>
-                        </xsl:if>
-                        <xsl:value-of select="@outcome"/>
-                      </td>
-                      <td>
-                        <xsl:value-of select="@reason"/>
-                      </td>
-                    </tr>
-                  </xsl:for-each>
-                </table>
+                <hr/>
               </td>
             </tr>
           </xsl:for-each>
