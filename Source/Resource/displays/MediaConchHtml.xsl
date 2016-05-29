@@ -198,14 +198,16 @@
           <xsl:for-each select="mc:check/mc:test">
             <tr><td>
               <xsl:value-of select="../@name"/>
-              <xsl:text>: </xsl:text>
+              <xsl:text> </xsl:text>
                 <xsl:if test="@outcome = 'pass'">
                   <xsl:text>&#x2705;  </xsl:text>
                 </xsl:if>
                 <xsl:if test="@outcome = 'fail'">
                   <xsl:text>&#x274C;  </xsl:text>
-                </xsl:if>
                 <xsl:value-of select="@outcome"/>
+                (Reason: <xsl:value-of select="@reason"/>
+                <xsl:text>)</xsl:text>
+                </xsl:if>
             </td></tr>
             <tr>
               <td class="extra">
@@ -219,13 +221,6 @@
                 </xsl:if>
               </td>
             </tr>
-            <xsl:if test="@outcome = 'fail'">
-            <tr>
-              <td>
-               Reason: <xsl:value-of select="@reason"/>
-              </td>
-            </tr>
-            </xsl:if>
             <tr>
               <td class="extra">
                Track type: <xsl:value-of select="@tracktype"/>
