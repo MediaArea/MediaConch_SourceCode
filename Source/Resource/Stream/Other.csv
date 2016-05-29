@@ -1,0 +1,20 @@
+Format;;FromStats;
+Format_Commercial_IfAny;;FromStats;
+Format_Version;Other:Format;FromStats;
+Format_Profile;Other:Format;FromStats;
+Format_Compression;;FromStats;
+Format_Settings;;FromStats;
+MuxingMode;;FromStats;
+CodecID;;FromStats;
+FrameRate;;FromList;25.000 / 29.970 / 30.000 / 50.000 / 59.940 / 60.000
+FrameRate_Num;;FromList;29970 / 30000 / 59940 / 60000
+FrameRate_Den;;FromList;1000 / 1001
+TimeCode_FirstFrame;;FromList;"00:00:00:000 / 00:00:00;000 / 01:00:00:000 / 01:00:00;000"
+TimeCode_Settings;;FromStats;
+TimeCode_Striped;;FromStats;
+Language;;FromStats;
+Language_More;;FromStats;
+Disabled;;FromStats;
+Default;;FromStats;
+Forced;;FromStats;
+AlternateGroup;;FromStats;
