@@ -218,6 +218,7 @@
               <xsl:text> </xsl:text>
                 <xsl:if test="@outcome = 'pass'">
                   <xsl:text>&#x2705;  </xsl:text>
+                  <xsl:value-of select="@outcome"/>
                 </xsl:if>
                 <xsl:if test="@outcome = 'fail'">
                   <xsl:text>&#x274C;  </xsl:text>
@@ -225,10 +226,8 @@
                 (Reason: <xsl:value-of select="@reason"/>
                 <xsl:text>)</xsl:text>
                 </xsl:if>
-                <xsl:if test="@outcome = 'n/a'">
+                <xsl:if test="@outcome = 'N/A'">
                 <xsl:value-of select="@outcome"/>
-                (Reason: <xsl:value-of select="@reason"/>
-                <xsl:text>)</xsl:text>
                 </xsl:if>
             </td></tr>
             <tr>
