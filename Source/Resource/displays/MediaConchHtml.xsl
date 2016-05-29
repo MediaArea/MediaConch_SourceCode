@@ -226,7 +226,6 @@
                 <xsl:text>)</xsl:text>
                 </xsl:if>
                 <xsl:if test="@outcome = 'n/a'">
-                  <xsl:text>&#x274C;  </xsl:text>
                 <xsl:value-of select="@outcome"/>
                 (Reason: <xsl:value-of select="@reason"/>
                 <xsl:text>)</xsl:text>
