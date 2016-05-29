@@ -182,7 +182,7 @@ function processCheckerStatusRequest(data, resultId, fileId) {
         // Policy
         if (2 == data.tool)
         {
-            if (node.data('policy'))
+            if (node.data('policy') && node.data('policy') != -1)
             {
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
                     valid = webpage.policy_is_valid(sourceName);
