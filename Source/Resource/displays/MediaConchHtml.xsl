@@ -154,18 +154,13 @@
                 </xsl:if>
                 <xsl:if test="@outcome = 'fail'">
                   <xsl:text>&#x274C;  </xsl:text>
-                </xsl:if>
-              </td>
-                  <xsl:if test="@outcome = 'fail'">
-                    <tr>
-                      <td colspan="2" class="reason">
-                        <strong>
-                          <xsl:text>&#x274C; Reason: </xsl:text>
+                  <strong>
+                          <xsl:text>(Reason: </xsl:text>
                         </strong>
                         <xsl:value-of select="@reason"/>
-                      </td>
-                    </tr>
-                  </xsl:if>
+                        <xsl:text>)</xsl:text>
+                </xsl:if>
+              </td>
                     <tr>
                       <td>
                         <div class="extra">
