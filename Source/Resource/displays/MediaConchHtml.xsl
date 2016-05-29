@@ -135,10 +135,12 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
-        <table class="mc">
-          <div class="verbosity mc_header">Verbose?</div>
-        <input id="implementation-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
-        <label for="implementation-toggle"></label>
+        <table class="mc"> 
+          <xsl:if test="position() &lt; 2">
+            <div class="verbosity mc_header">Verbose mode?</div>
+            <input id="implementation-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
+            <label for="implementation-toggle"></label>
+          </xsl:if>
             <xsl:for-each select="mc:check/mc:test">
               <td>
                 <strong><xsl:value-of select="../@icid"/></strong>
@@ -182,7 +184,6 @@
                       </xsl:for-each>
                     </td>
                   </tr>
-
             </xsl:for-each>
           </table>
       </xsl:for-each>
