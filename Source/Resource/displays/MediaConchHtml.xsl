@@ -20,6 +20,11 @@
         width: 600px;
       }
 
+      .mc_header p {
+        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 12px;     
+      }
+
       .mc {
         width: 600px;
         background-color: #F2F5F8;
