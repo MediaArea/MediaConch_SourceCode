@@ -39,14 +39,6 @@
         font-size: 12px;
       }
 
-      .mc td .reason {
-        border-bottom: thin solid black;
-      }
-
-      .mc tr {
-        border-bottom: 1px black solid;
-      }
-
       .mc p {
         margin: 0px;
         background-color: #64A8DD;
@@ -119,6 +111,10 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
       }
+
+      hr {
+      width: 598px;
+      }
     </style>
   </head>
   <body>
@@ -174,7 +170,7 @@
                          Value context: <xsl:value-of select="@context"/><br/>
                          ID: <xsl:value-of select="@id"/><br/>
                          Value: <xsl:value-of select="."/><br/>
-                        <br/>
+                        <hr/>
                         </div>
                       </xsl:for-each>
                     </td>
@@ -192,12 +188,14 @@
           </p>
         </div>
         <table class="mc">
-        <div class="verbosity">Verbose?</div>
+        <div class="verbosity">Verbose mode?</div>
         <input id="policy-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
         <label for="policy-toggle"></label>
           <xsl:for-each select="mc:check/mc:test">
             <tr><td>
+              <strong>
               <xsl:value-of select="../@name"/>
+              </strong>
               <xsl:text> </xsl:text>
                 <xsl:if test="@outcome = 'pass'">
                   <xsl:text>&#x2705;  </xsl:text>
@@ -208,34 +206,35 @@
                 (Reason: <xsl:value-of select="@reason"/>
                 <xsl:text>)</xsl:text>
                 </xsl:if>
+              
             </td></tr>
             <tr>
               <td class="extra">
                 <xsl:if test="../mc:context/@field != ''">
-                    <xsl:text>Context (field): </xsl:text>
+                    <strong><xsl:text>Context (field): </xsl:text></strong>
                     <xsl:value-of select="../mc:context/@field"/><br/>
                 </xsl:if>
                 <xsl:if test="../mc:context/@value != ''">           
-                    <xsl:text>Context (value): </xsl:text>
+                    <strong><xsl:text>Context (value): </xsl:text></strong>
                     <xsl:value-of select="../mc:context/@value"/><br/>
                 </xsl:if>
+                <xsl:if test="@tracktype != ''">
+                  <strong>Track type: </strong> <xsl:value-of select="@tracktype"/><br/>
+                </xsl:if>
+               <xsl:if test="@tracktypeorder != ''"> 
+                  <strong>Track type order: </strong>  <xsl:value-of select="@tracktypeorder"/><br/>
+              </xsl:if>
+              <xsl:if test="@trackid != ''"> 
+                <strong>Track ID: </strong>  <xsl:value-of select="@trackid"/><br/>
+              </xsl:if>
+              <xsl:if test="@actual != ''"> 
+                <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
+              </xsl:if>
               </td>
             </tr>
-            <tr>
-              <td class="extra">
-               Track type: <xsl:value-of select="@tracktype"/>
-              </td>
-            </tr><tr>
-              <td class="extra">
-              Track type order:  <xsl:value-of select="@tracktypeorder"/>
-              </td>
-            </tr><tr>
-              <td class="extra">
-              Track ID:  <xsl:value-of select="@trackid"/>
-              </td>
-            </tr><tr>
-              <td class="extra">
-              Actual:  <xsl:value-of select="@actual"/>
+            <tr class="extra">
+              <td>
+                <hr/>
               </td>
             </tr>
           </xsl:for-each>
