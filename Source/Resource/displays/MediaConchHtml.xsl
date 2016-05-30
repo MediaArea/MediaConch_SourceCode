@@ -211,12 +211,12 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
+
+        <span class="verbosity">Verbose display : </span>
+        <input id="policy-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
+        <label for="policy-toggle-{generate-id()}"></label>
+
         <table class="mc">
-          <div class="verbosity">
-            Verbose mode?
-          </div>
-          <input id="policy-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
-          <label for="policy-toggle"></label>
           <xsl:for-each select="mc:check/mc:test">
             <tr>
               <td>
