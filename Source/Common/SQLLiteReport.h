@@ -40,10 +40,12 @@ public:
     virtual int update_report_table();
     virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& filename, const std::string& file_last_modification,
-                            const std::string& report, MediaConchLib::compression);
+                            const std::string& report, MediaConchLib::compression,
+                            bool has_mil_version);
     virtual int update_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                               const std::string& filename, const std::string& file_last_modification,
-                              const std::string& report, MediaConchLib::compression);
+                              const std::string& report, MediaConchLib::compression,
+                              bool has_mil_version);
     virtual int remove_report(const std::string& filename);
     virtual void get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& filename, const std::string& file_last_modification,
@@ -52,6 +54,7 @@ public:
                                     const std::string& filename, const std::string& file_last_modification);
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& filename);
+    virtual bool has_version_registered(const std::string& file);
     virtual void get_elements(std::vector<std::string>& vec);
     virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind);
 

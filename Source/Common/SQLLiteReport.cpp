@@ -100,6 +100,7 @@ int SQLLiteReport::update_report_table()
     } while(0);
 
     UPDATE_REPORT_TABLE_FOR_VERSION(0);
+    UPDATE_REPORT_TABLE_FOR_VERSION(1);
 
 #undef UPDATE_REPORT_TABLE_FOR_VERSION
 
@@ -108,17 +109,18 @@ int SQLLiteReport::update_report_table()
 
 int SQLLiteReport::save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                                const std::string& filename, const std::string& file_last_modification,
-                               const std::string& report, MediaConchLib::compression compress)
+                               const std::string& report, MediaConchLib::compression compress,
+                               bool has_mil_version)
 {
     std::stringstream create;
 
     if (file_is_registered(reportKind, format, filename))
-        return update_report(reportKind, format, filename, file_last_modification, report, compress);
+        return update_report(reportKind, format, filename, file_last_modification, report, compress, has_mil_version);
 
     reports.clear();
     create << "INSERT INTO Report";
-    create << " (FILENAME, FILE_LAST_MODIFICATION, TOOL, FORMAT, REPORT, COMPRESS)";
-    create << " VALUES (?, ?, ?, ?, ?, ?);";
+    create << " (FILENAME, FILE_LAST_MODIFICATION, TOOL, FORMAT, REPORT, COMPRESS, HAS_MIL_VERSION)";
+    create << " VALUES (?, ?, ?, ?, ?, ?, ?);";
     query = create.str();
 
     const char* end = NULL;
@@ -150,18 +152,23 @@ int SQLLiteReport::save_report(MediaConchLib::report reportKind, MediaConchLib::
     if (ret != SQLITE_OK)
         return -1;
 
+    ret = sqlite3_bind_int(stmt, 7, (int)has_mil_version);
+    if (ret != SQLITE_OK)
+        return -1;
+
     return execute();
 }
 
 int SQLLiteReport::update_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                                  const std::string& filename, const std::string& file_last_modification,
-                                 const std::string& report, MediaConchLib::compression compress)
+                                 const std::string& report, MediaConchLib::compression compress,
+                                 bool has_mil_version)
 {
     std::stringstream create;
 
     reports.clear();
     create << "UPDATE Report ";
-    create << "SET FILE_LAST_MODIFICATION = ?, REPORT = ?, COMPRESS = ? ";
+    create << "SET FILE_LAST_MODIFICATION = ?, REPORT = ?, COMPRESS = ?, HAS_MIL_VERSION = ? ";
     create << "WHERE FILENAME = ? AND TOOL = ? AND FORMAT = ?;";
     query = create.str();
 
@@ -182,15 +189,19 @@ int SQLLiteReport::update_report(MediaConchLib::report reportKind, MediaConchLib
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 4, filename.c_str(), filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int(stmt, 4, (int)has_mil_version);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 5, (int)reportKind);
+    ret = sqlite3_bind_blob(stmt, 5, filename.c_str(), filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 6, (int)format);
+    ret = sqlite3_bind_int(stmt, 6, (int)reportKind);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 7, (int)format);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -346,6 +357,33 @@ bool SQLLiteReport::file_is_registered(MediaConchLib::report reportKind, MediaCo
         return false;
 
     ret = sqlite3_bind_int(stmt, 3, (int)format);
+    if (ret != SQLITE_OK)
+        return false;
+
+    if (execute() || !reports.size() || reports[0].find(key) == reports[0].end())
+        return false;
+
+    if (reports[0][key] == "0")
+        return false;
+    return true;
+}
+
+bool SQLLiteReport::has_version_registered(const std::string& filename)
+{
+    std::stringstream create;
+    std::string key("HAS_MIL_VERSION");
+
+    reports.clear();
+    create << "SELECT " << key << " FROM Report WHERE ";
+    create << "FILENAME = ?;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return false;
+
+    ret = sqlite3_bind_blob(stmt, 1, filename.c_str(), filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return false;
 

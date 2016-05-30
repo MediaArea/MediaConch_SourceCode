@@ -70,4 +70,13 @@ void DatabaseReport::get_sql_query_for_update_report_table_v0(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseReport::get_sql_query_for_update_report_table_v1(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE Report "; // Table name
+    create << "ADD HAS_MIL_VERSION INT DEFAULT 0 NOT NULL;";
+    q = create.str();
+}
+
 }
