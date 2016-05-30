@@ -100,7 +100,7 @@ function updateFile(fileId, formValues) {
 }
 
 function addFile(sourceName, fileName, fileId, formValues) {
-    node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 23) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).draw(false).node();
+    node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 30) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).draw(false).node();
 
     // Add id
     resultId = 'result-' + fileId;
@@ -353,7 +353,7 @@ function policyCell(data, resultId, fileId)
         policyResultText += '<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> ';
     }
 
-    policyResultText += '<span title="' + nodeCell.data('policyName') + '">' + truncateString(nodeCell.data('policyName'), 13) + '</span>';
+    policyResultText += '<span title="' + nodeCell.data('policyName') + '">' + truncateString(nodeCell.data('policyName'), 20) + '</span>';
     policyResultText += '</span>';
 
     result.cell(nodeCell, 2).data(policyResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalPolicy' + resultId + '" title="View policy report"><span class="glyphicon glyphicon-eye-open policy-view" aria-hidden="true"></span></a><a href="#" class="policy-dld" data-target="#modalPolicy' + resultId + '" title="Download policy report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>');
