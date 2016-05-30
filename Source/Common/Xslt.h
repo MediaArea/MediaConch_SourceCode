@@ -33,7 +33,7 @@ class Xslt : public Schema
 {
 public:
     //Constructor/Destructor
-    Xslt();
+    Xslt(bool no_https);
     virtual ~Xslt();
 
     virtual bool register_schema_from_memory(const std::string& schem);

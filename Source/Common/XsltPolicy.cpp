@@ -806,12 +806,17 @@ xmlNsPtr XsltPolicy::create_namespace_xsl(xmlNodePtr node)
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_mc(xmlNodePtr node)
 {
+    if (no_https)
+        return xmlNewNs(node, (const xmlChar*)"http://mediaarea.net/mediaconch", NULL);
     return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaconch", NULL);
 }
 
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_ma(xmlNodePtr node)
 {
+    if (no_https)
+        return xmlNewNs(node, (const xmlChar*)"http://mediaarea.net/mediaarea",
+                        (const xmlChar *)"ma");
     return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaarea",
                     (const xmlChar *)"ma");
 }
@@ -819,6 +824,9 @@ xmlNsPtr XsltPolicy::create_namespace_ma(xmlNodePtr node)
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_mi(xmlNodePtr node)
 {
+    if (no_https)
+        return xmlNewNs(node, (const xmlChar*)"http://mediaarea.net/mediainfo",
+                        (const xmlChar *)"mi");
     return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediainfo",
                     (const xmlChar *)"mi");
 }

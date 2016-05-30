@@ -30,7 +30,7 @@ class Schema
 {
 public:
     //Constructor/Destructor
-    Schema();
+    Schema(bool no_https);
     virtual ~Schema();
 
     bool         register_schema_from_file(const char* filename);
@@ -52,6 +52,7 @@ protected:
     std::string                        report;
     std::vector<std::string>           errors;
     std::map<std::string, std::string> options;
+    bool                               no_https;
 
     // HELPER
     int          read_file(const char* filename, std::string& buffer);

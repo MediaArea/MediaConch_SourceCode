@@ -120,7 +120,10 @@ xmlNodePtr SchematronPolicy::write_ns()
 {
     xmlNodePtr nodeNs = xmlNewNode(NULL, (const xmlChar *)"ns");
     xmlNewProp(nodeNs, (const xmlChar *)"prefix", (const xmlChar *)"ma");
-    xmlNewProp(nodeNs, (const xmlChar *)"uri", (const xmlChar *)"https://mediaarea.net/mediaarea");
+    if (no_https)
+        xmlNewProp(nodeNs, (const xmlChar *)"uri", (const xmlChar *)"http://mediaarea.net/mediaarea");
+    else
+        xmlNewProp(nodeNs, (const xmlChar *)"uri", (const xmlChar *)"https://mediaarea.net/mediaarea");
     xmlNewNs(nodeNs, NULL, (const xmlChar *)"sch");
     xmlNsPtr defNs = xmlNewNs(NULL, (const xmlChar*)"http://www.ascc.net/xml/schematron",
                            (const xmlChar *)"sch");
