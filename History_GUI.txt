@@ -8,6 +8,19 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.05, 2016-05-31
+-------------
+MediaConch XML format v0.2
+Improved Matroska tests
+Improved HTML display
+FFV1 parsing speed improvement
+Updated settings display
+Remember last policy and display directories
+List of values for several elements in the policy editor
+Option for applying a policy to all open files
+Code refactoring of the user interface
+Minor UI fixes
+
 Version 16.04, 2016-04-29
 -------------
 Merge of "Checker" and "Results" pages in one page as in MediaConchOnline

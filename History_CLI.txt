@@ -8,6 +8,13 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.05, 2016-05-31
+-------------
+MediaConch XML format v0.2
+Improved Matroska tests
+Improved HTML display
+FFV1 parsing speed improvement
+
 Version 16.04, 2016-04-29
 -------------
 FFV1: display of the trace of the slice header
