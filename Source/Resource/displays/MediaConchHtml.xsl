@@ -137,11 +137,11 @@
           </p>
         </div>
               <xsl:if test="position() &lt; 2">
-                <div class="verbosity mc_header">Verbose mode?</div>
-                <input id="implementation-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
-                <label for="implementation-toggle"></label>
+                <span class="verbosity">Verbose display : </span>
+                <input id="implementation-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
+                <label for="implementation-toggle-{generate-id()}"></label>
               </xsl:if>
-        <table class="mc"> 
+        <table class="mc">
             <xsl:for-each select="mc:check/mc:test">
               <tr>
                 <td>
