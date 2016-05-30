@@ -1241,7 +1241,7 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
             else
                 implem = std::string();
 
-            report += "<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" version=\"0.1\">"
+            report += "<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" version=\"0.2\">"
                 + implem + "</MediaConch>\n";
         }
         report += std::string("</media>\n");
