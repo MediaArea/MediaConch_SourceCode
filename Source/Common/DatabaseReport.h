@@ -41,7 +41,8 @@ public:
     virtual int update_report_table() = 0;
     virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& filename, const std::string& file_last_modification,
-                            const std::string& report, MediaConchLib::compression) = 0;
+                            const std::string& report, MediaConchLib::compression,
+                            bool has_mil_version) = 0;
     virtual int remove_report(const std::string& filename) = 0;
     virtual void get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& filename, const std::string& file_last_modification,
@@ -50,6 +51,7 @@ public:
                                     const std::string& file, const std::string& file_last_modification) = 0;
     virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
                                     const std::string& file) = 0;
+    virtual bool has_version_registered(const std::string& file) = 0;
     virtual void get_elements(std::vector<std::string>& vec) = 0;
     virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind) = 0;
 
@@ -59,6 +61,7 @@ protected:
     //Database dependant
     void        get_sql_query_for_create_report_table(std::string& q);
     void        get_sql_query_for_update_report_table_v0(std::string& q);
+    void        get_sql_query_for_update_report_table_v1(std::string& q);
 
 private:
     DatabaseReport (const DatabaseReport&);

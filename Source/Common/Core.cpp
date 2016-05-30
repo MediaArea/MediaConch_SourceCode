@@ -970,7 +970,9 @@ void Core::register_report_xml_to_database(std::string& file, const std::string&
     compress_report(new_report, mode);
 
     db_mutex.Enter();
-    db->save_report(report_kind, MediaConchLib::format_Xml, file, time, new_report, mode);
+    db->save_report(report_kind, MediaConchLib::format_Xml, file, time,
+                    new_report, mode,
+                    true);
     db_mutex.Leave();
 }
 
@@ -988,7 +990,8 @@ void Core::register_report_mediainfo_text_to_database(std::string& file, const s
     db_mutex.Enter();
     db->save_report(MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
                     file, time,
-                    report, mode);
+                    report, mode,
+                    true);
     db_mutex.Leave();
 }
 
@@ -1004,7 +1007,8 @@ void Core::register_report_mediainfo_xml_to_database(std::string& file, const st
     db_mutex.Enter();
     db->save_report(MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
                     file, time,
-                    report, mode);
+                    report, mode,
+                    true);
     db_mutex.Leave();
 }
 
@@ -1020,7 +1024,8 @@ void Core::register_report_mediatrace_xml_to_database(std::string& file, const s
     db_mutex.Enter();
     db->save_report(MediaConchLib::report_MediaTrace, MediaConchLib::format_Xml,
                     file, time,
-                    report, mode);
+                    report, mode,
+                    true);
     db_mutex.Leave();
 }
 
@@ -1453,6 +1458,9 @@ bool Core::file_is_registered_in_db(const std::string& filename)
                 res = db->file_is_registered(report_kind, MediaConchLib::format_Xml, filename);
         }
     }
+
+    if (res)
+        res = db->has_version_registered(filename);
 
     db_mutex.Leave();
     return res;
