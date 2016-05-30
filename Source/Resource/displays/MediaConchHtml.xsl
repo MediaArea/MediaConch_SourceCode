@@ -261,11 +261,7 @@
               <xsl:if test="@actual != ''">
                 <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
               </xsl:if>
-              </td>
-            </tr>
-            <tr class="extra">
-              <td>
-                <hr/>
+              <hr/>
               </td>
             </tr>
           </xsl:for-each>
