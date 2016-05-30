@@ -1096,6 +1096,8 @@ void Core::register_file_to_database(std::string& filename)
 //---------------------------------------------------------------------------
 void Core::create_report_mi_xml(const std::vector<std::string>& files, std::string& report)
 {
+    bool AcceptsHttps = MI->Option(__T("Https_Get")) == __T("0") ? false : true; //With test on "0", we handle old version of MediaInfoLib which do not have this option
+
     if (files.size() == 1)
     {
         get_report_saved(files, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, report);
@@ -1111,14 +1113,14 @@ void Core::create_report_mi_xml(const std::vector<std::string>& files, std::stri
     std::stringstream start;
     start << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     start << "<MediaInfo\n";
-    start << "xmlns=\"https://mediaarea.net/mediainfo\"\n";
+    start << "xmlns=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediainfo\"\n";
     start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-    start << "xsi:schemaLocation=\"https://mediaarea.net/mediaarea https://mediaarea.net/mediainfo/mediainfo_2_0.xsd\"\n";
+    start << "xsi:schemaLocation=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediaarea http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediainfo/mediainfo_2_0.xsd\"\n";
     start << "version=\"2.0beta1\">\n";
     start << "<!-- Work in progress, not for production -->\n";
     start << "<creatingLibrary version=\"";
     start << version;
-    start << "\" url=\"https://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
+    start << "\" url=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
     report += start.str();
     std::vector<std::string> vec;
     for (size_t i = 0; i < files.size(); ++i)
@@ -1140,6 +1142,8 @@ void Core::create_report_mi_xml(const std::vector<std::string>& files, std::stri
 //---------------------------------------------------------------------------
 void Core::create_report_mt_xml(const std::vector<std::string>& files, std::string& report)
 {
+    bool AcceptsHttps = MI->Option(__T("Https_Get")) == __T("0") ? false : true; //With test on "0", we handle old version of MediaInfoLib which do not have this option
+
     if (files.size() == 1)
     {
         get_report_saved(files, MediaConchLib::report_MediaTrace, MediaConchLib::format_Xml, report);
@@ -1155,13 +1159,13 @@ void Core::create_report_mt_xml(const std::vector<std::string>& files, std::stri
     std::stringstream start;
     start << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     start << "<MediaTrace\n";
-    start << "xmlns=\"https://mediaarea.net/mediatrace\"\n";
+    start << "xmlns=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediatrace\"\n";
     start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-    start << "xsi:schemaLocation=\"https://mediaarea.net/mediaarea https://mediaarea.net/mediatrace/mediatrace_0_1.xsd\"\n";
+    start << "xsi:schemaLocation=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediaarea http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediatrace/mediatrace_0_1.xsd\"\n";
     start << "version=\"0.1\">\n";
     start << "<creatingLibrary version=\"";
     start << version;
-    start << "\" url=\"https://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
+    start << "\" url=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
     report += start.str();
 
     std::vector<std::string> vec;
@@ -1187,6 +1191,8 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
                                 std::string& report,
                                 std::bitset<MediaConchLib::report_Max> reports)
 {
+    bool AcceptsHttps = MI->Option(__T("Https_Get")) == __T("0") ? false : true; //With test on "0", we handle old version of MediaInfoLib which do not have this option
+
     std::string version = ZenLib::Ztring(Menu_Option_Preferences_Option (__T("Info_Version"), __T(""))).To_UTF8();
     std::string search(" - v");
     size_t pos = version.find(search);
@@ -1196,14 +1202,14 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
     std::stringstream start;
     start << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     start << "<MediaArea\n";
-    start << "xmlns=\"https://mediaarea.net/mediaarea\"\n";
+    start << "xmlns=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediaarea\"\n";
     start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-    start << "xsi:schemaLocation=\"https://mediaarea.net/mediaarea https://mediaarea.net/mediaarea/mediaarea_0_1.xsd\"\n";
+    start << "xsi:schemaLocation=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediaarea http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediaarea/mediaarea_0_1.xsd\"\n";
     start << "version=\"0.1\">\n";
     start << "<!-- Work in progress, not for production -->\n";
     start << "<creatingLibrary version=\"";
     start << version;
-    start << "\" url=\"https://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
+    start << "\" url=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
     report += start.str();
 
     std::vector<std::string> vec;
@@ -1219,7 +1225,7 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
             get_report_saved(vec, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, info);
             get_content_of_media_in_xml(info);
             if (info.length())
-                report += "<MediaInfo xmlns=\"https://mediaarea.net/mediainfo\" version=\"2.0beta1\">" + info + "</MediaInfo>\n";
+                report += "<MediaInfo xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediainfo\" version=\"2.0beta1\">" + info + "</MediaInfo>\n";
         }
 
         if (reports[MediaConchLib::report_MediaTrace])
@@ -1229,7 +1235,7 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
                          MediaConchLib::format_Xml, trace);
         get_content_of_media_in_xml(trace);
         if (trace.length())
-            report += "<MediaTrace xmlns=\"https://mediaarea.net/mediatrace\" version=\"0.1\">"
+            report += "<MediaTrace xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediatrace\" version=\"0.1\">"
                 + trace + "</MediaTrace>\n";
         }
 
@@ -1241,7 +1247,7 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
             else
                 implem = std::string();
 
-            report += "<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" version=\"0.2\">"
+            report += "<MediaConch xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediaconch\" version=\"0.2\">"
                 + implem + "</MediaConch>\n";
         }
         report += std::string("</media>\n");
