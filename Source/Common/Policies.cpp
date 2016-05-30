@@ -60,7 +60,7 @@ int Policies::import_schema(const std::string& filename)
     int ret = -1;
     if (!filename.compare(filename.length() - 4, 4, ".sch"))
     {
-        p = new SchematronPolicy;
+        p = new SchematronPolicy(!core->accepts_https());
         ret = p->import_schema(filename);
     }
 
@@ -68,13 +68,13 @@ int Policies::import_schema(const std::string& filename)
     {
         if (p)
             delete p;
-        p = new XsltPolicy;
+        p = new XsltPolicy(!core->accepts_https());
         ret = p->import_schema(filename);
         if (ret < 0)
         {
             if (p)
                 delete p;
-            p = new UnknownPolicy;
+            p = new UnknownPolicy(!core->accepts_https());
             ret = p->import_schema(filename);
         }
     }
@@ -98,7 +98,7 @@ int Policies::import_schema_from_memory(const std::string& filename, const char*
     int ret = -1;
     if (!filename.compare(filename.length() - 4, 4, ".sch"))
     {
-        p = new SchematronPolicy;
+        p = new SchematronPolicy(!core->accepts_https());
         ret = p->import_schema_from_memory(filename, buffer, len);
     }
 
@@ -107,13 +107,13 @@ int Policies::import_schema_from_memory(const std::string& filename, const char*
         if (p)
             delete p;
 
-        p = new XsltPolicy;
+        p = new XsltPolicy(!core->accepts_https());
         ret = p->import_schema_from_memory(filename, buffer, len);
         if (ret < 0)
         {
             if (p)
                 delete p;
-            p = new UnknownPolicy;
+            p = new UnknownPolicy(!core->accepts_https());
             ret = p->import_schema_from_memory(filename, buffer, len);
         }
     }

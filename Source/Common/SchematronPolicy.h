@@ -99,7 +99,7 @@ private:
 class SchematronPolicy : public Policy
 {
 public:
-    SchematronPolicy() : Policy(Policies::POLICY_SCHEMATRON) {}
+    SchematronPolicy(bool no_https) : Policy(Policies::POLICY_SCHEMATRON, no_https) {}
     SchematronPolicy(const SchematronPolicy*);
     virtual ~SchematronPolicy();
     std::vector<SchematronPattern *> patterns;

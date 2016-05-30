@@ -31,7 +31,7 @@ namespace MediaConch {
 class UnknownPolicy : public Policy
 {
 public:
-    UnknownPolicy() : Policy(Policies::POLICY_UNKNOWN) {}
+UnknownPolicy(bool no_https) : Policy(Policies::POLICY_UNKNOWN, no_https) {}
     UnknownPolicy(const UnknownPolicy*);
     virtual          ~UnknownPolicy();
     xmlDocPtr         create_doc();

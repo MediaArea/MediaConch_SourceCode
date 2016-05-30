@@ -24,7 +24,7 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Schematron::Schematron() : Schema()
+Schematron::Schematron(bool no_https) : Schema(no_https)
 {
     schematron_ctx = NULL;
 }
@@ -102,11 +102,18 @@ int Schematron::validate_xml(const std::string& x, bool silent)
 
     std::string xml(x);
     //Hack for removing namespace so we use .sch without namespace. TODO: find a way to keep namespace with .sch policy input
-    std::string xmlns("xmlns=\"https://mediaarea.net/mediaarea\"");
+    std::string xmlns;
+    if (no_https)
+        xmlns = std::string("xmlns=\"http://mediaarea.net/mediaarea\"");
+    else
+        xmlns = std::string("xmlns=\"https://mediaarea.net/mediaarea\"");
     size_t xmlns_pos=xml.rfind(xmlns, 1000);
     if (xmlns_pos!=std::string::npos)
         xml.erase(xmlns_pos, xmlns.size());
-    xmlns="xmlns=\"https://mediaarea.net/mediainfo\"";
+    if (no_https)
+        xmlns="xmlns=\"http://mediaarea.net/mediainfo\"";
+    else
+        xmlns="xmlns=\"https://mediaarea.net/mediainfo\"";
     xmlns_pos=xml.rfind(xmlns, 1000);
     if (xmlns_pos!=std::string::npos)
         xml.erase(xmlns_pos, xmlns.size());

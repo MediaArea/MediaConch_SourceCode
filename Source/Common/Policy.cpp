@@ -35,6 +35,7 @@ Policy::Policy(const Policy* p)
     this->title = p->title;
     this->description = p->description;
     this->saved = false;
+    this->no_https = p->no_https;
 }
 
 //---------------------------------------------------------------------------
@@ -45,7 +46,7 @@ Policy::~Policy()
 //---------------------------------------------------------------------------
 int Policy::import_schema(const std::string& filename)
 {
-    Schematron s;
+    Schematron s(no_https);
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
 
     xmlDocPtr doc = xmlParseFile(filename.c_str());
@@ -71,7 +72,7 @@ int Policy::import_schema_from_memory(const std::string& filename, const char* b
         return -1;
     }
 
-    Schematron s;
+    Schematron s(no_https);
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
 
     xmlDocPtr doc = xmlParseMemory(buffer, len);

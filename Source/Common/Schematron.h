@@ -30,7 +30,7 @@ class Schematron : public Schema
 {
 public:
     //Constructor/Destructor
-    Schematron();
+    Schematron(bool);
     virtual ~Schematron();
 
     virtual bool register_schema_from_memory(const std::string& schem);
