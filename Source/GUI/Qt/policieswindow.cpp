@@ -172,7 +172,7 @@ void PoliciesWindow::new_policy_filename(Policy* p)
 //---------------------------------------------------------------------------
 void PoliciesWindow::add_new_schematron_policy(QTreeWidgetItem* parent)
 {
-    Policy *p = new SchematronPolicy;
+    Policy *p = new SchematronPolicy(false);
 
     p->title = string("New policy");
     if (mainwindow->policy_exists(p->title))
@@ -209,7 +209,7 @@ void PoliciesWindow::add_new_schematron_policy(QTreeWidgetItem* parent)
 //---------------------------------------------------------------------------
 void PoliciesWindow::add_new_xslt_policy(QTreeWidgetItem* parent)
 {
-    Policy *p = new XsltPolicy;
+    Policy *p = new XsltPolicy(false);
 
     p->title = string("New policy");
     if (mainwindow->policy_exists(p->title))

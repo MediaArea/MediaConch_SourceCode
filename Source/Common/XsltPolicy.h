@@ -71,7 +71,7 @@ private:
 class XsltPolicy : public Policy
 {
 public:
-    XsltPolicy() : Policy(Policies::POLICY_XSLT) {}
+    XsltPolicy(bool no_https) : Policy(Policies::POLICY_XSLT, no_https) {}
     XsltPolicy(const XsltPolicy*);
     virtual ~XsltPolicy();
     std::vector<XsltRule *> rules;

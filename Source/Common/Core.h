@@ -134,6 +134,9 @@ public:
     static std::string get_local_data_path();
     static std::string get_local_config_path();
 
+    bool        accepts_https();
+    static void unify_no_https(std::string& str);
+
 private:
     Core (const Core&);
 
