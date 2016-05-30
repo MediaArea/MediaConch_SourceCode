@@ -426,7 +426,7 @@ void XsltRuleEdit::check_editor_is_possible(XsltRule* r)
         return;
     }
 
-    XsltPolicy p;
+    XsltPolicy p(false);
     XsltRule* rule = new XsltRule(*r);
     rule->use_free_text = false;
     if (!p.parse_test_for_rule(r->test, rule) || rule->use_free_text)
