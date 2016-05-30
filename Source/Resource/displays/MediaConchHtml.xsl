@@ -5,7 +5,7 @@
   <html>
   <head>
     <title>MediaConch</title>
-    <style>
+    <style type="text/css">
       .mc_header {
         width: 100%;
         max-width: 1280px;
