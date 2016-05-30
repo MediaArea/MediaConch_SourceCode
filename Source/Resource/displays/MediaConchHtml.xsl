@@ -5,7 +5,7 @@
   <html>
   <head>
     <title>MediaConch</title>
-    <style>
+    <style type="text/css">
       .mc_header {
         width: 100%;
         max-width: 1280px;
@@ -256,12 +256,8 @@
                   <xsl:if test="@actual != ''">
                     <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
                   </xsl:if>
+                  <hr/>
                 </div>
-              </td>
-            </tr>
-            <tr class="extra">
-              <td>
-                <hr/>
               </td>
             </tr>
           </xsl:for-each>
