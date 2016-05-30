@@ -71,7 +71,7 @@
       input.cmn-toggle-round + label {
         padding: 2px;
         width: 30px;
-        height: 15px;
+        height: 11px;
         background-color: #dddddd;
         border-radius: 15px;
       }
@@ -109,7 +109,7 @@
         margin-left: 15px;
       }
 
-      input[type=checkbox]:checked ~ .mc .extra {
+      input[type=checkbox]:checked ~ .extra {
         display: block;
       }
 
@@ -137,14 +137,9 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
-              <xsl:if test="position() &lt; 2">
-                <span class="verbosity">Verbose display : </span>
-                <input id="implementation-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
-                <label for="implementation-toggle-{generate-id()}"></label>
-              </xsl:if>
         <table class="mc">
             <xsl:for-each select="mc:check/mc:test">
-              <tr>
+              <tr class="test">
                 <td>
                   <strong><xsl:value-of select="../@icid"/></strong>
                   <xsl:text>:  </xsl:text>
@@ -163,12 +158,14 @@
                   </xsl:if>
                   <xsl:if test="@outcome = 'n/a'">
                   (Reason: <xsl:value-of select="@reason"/>
-                  <xsl:text>)</xsl:text>
+                  <xsl:text>) </xsl:text>
                   </xsl:if>
                 </td>
               </tr>
               <tr>
                 <td>
+                <input id="implementation-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
+                <label for="implementation-toggle-{generate-id()}"></label>
                   <div class="extra">
                     <xsl:if test="../mc:context !=''">
                       <strong><xsl:value-of select="../mc:context/@name"/></strong>
@@ -211,11 +208,6 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
-
-        <span class="verbosity">Verbose display : </span>
-        <input id="policy-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
-        <label for="policy-toggle-{generate-id()}"></label>
-
         <table class="mc">
           <xsl:for-each select="mc:check/mc:test">
             <tr>
@@ -240,28 +232,32 @@
               </td>
             </tr>
             <tr>
-              <td class="extra">
-                <xsl:if test="../mc:context/@field != ''">
-                    <strong><xsl:text>Context (field): </xsl:text></strong>
-                    <xsl:value-of select="../mc:context/@field"/><br/>
-                </xsl:if>
-                <xsl:if test="../mc:context/@value != ''">
-                    <strong><xsl:text>Context (value): </xsl:text></strong>
-                    <xsl:value-of select="../mc:context/@value"/><br/>
-                </xsl:if>
-                <xsl:if test="@tracktype != ''">
-                  <strong>Track type: </strong> <xsl:value-of select="@tracktype"/><br/>
-                </xsl:if>
-               <xsl:if test="@tracktypeorder != ''">
-                  <strong>Track type order: </strong>  <xsl:value-of select="@tracktypeorder"/><br/>
-              </xsl:if>
-              <xsl:if test="@trackid != ''">
-                <strong>Track ID: </strong>  <xsl:value-of select="@trackid"/><br/>
-              </xsl:if>
-              <xsl:if test="@actual != ''">
-                <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
-              </xsl:if>
-              <hr/>
+              <td>
+                <input id="policy-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
+                <label for="policy-toggle-{generate-id()}"></label>
+                <div class="extra">
+                    <xsl:if test="../mc:context/@field != ''">
+                        <strong><xsl:text>Context (field): </xsl:text></strong>
+                        <xsl:value-of select="../mc:context/@field"/><br/>
+                    </xsl:if>
+                    <xsl:if test="../mc:context/@value != ''">
+                        <strong><xsl:text>Context (value): </xsl:text></strong>
+                        <xsl:value-of select="../mc:context/@value"/><br/>
+                    </xsl:if>
+                    <xsl:if test="@tracktype != ''">
+                      <strong>Track type: </strong> <xsl:value-of select="@tracktype"/><br/>
+                    </xsl:if>
+                   <xsl:if test="@tracktypeorder != ''">
+                      <strong>Track type order: </strong>  <xsl:value-of select="@tracktypeorder"/><br/>
+                  </xsl:if>
+                  <xsl:if test="@trackid != ''">
+                    <strong>Track ID: </strong>  <xsl:value-of select="@trackid"/><br/>
+                  </xsl:if>
+                  <xsl:if test="@actual != ''">
+                    <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
+                  </xsl:if>
+                  <hr/>
+                </div>
               </td>
             </tr>
           </xsl:for-each>
