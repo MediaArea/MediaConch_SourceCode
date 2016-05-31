@@ -590,7 +590,7 @@ int Core::policies_check(const std::vector<std::string>& files,
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_file(const std::string& report, const std::string& xslt, std::string& result)
 {
-    Schema *S = new Xslt(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Xslt(!accepts_https());
 
     if (!S->register_schema_from_file(xslt.c_str()))
     {
@@ -614,7 +614,7 @@ int Core::transform_with_xslt_file(const std::string& report, const std::string&
 int Core::transform_with_xslt_memory(const std::string& report, const std::string& memory,
                                      std::string& result)
 {
-    Schema *S = new Xslt(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Xslt(!accepts_https());
 
     if (!S->register_schema_from_memory(memory))
     {
@@ -661,7 +661,7 @@ bool Core::validate_schematron_policy(const std::vector<std::string>& files, int
 {
     std::string policyFile;
     xmlDocPtr doc = NULL;
-    Schema *S = new Schematron(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Schematron(!accepts_https());
     bool valid = true;
 
     if (pos >= 0)
@@ -690,7 +690,7 @@ bool Core::validate_schematron_policy(const std::vector<std::string>& files, int
 bool Core::validate_schematron_policy_from_file(const std::vector<std::string>& files, const std::string& policy, std::string& report)
 {
     bool valid = true;
-    Schema *S = new Schematron(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Schematron(!accepts_https());
 
     if (S->register_schema_from_file(policy.c_str()))
         valid = validation(files, S, report);
@@ -714,7 +714,7 @@ bool Core::validate_schematron_policy_from_file(const std::vector<std::string>& 
 bool Core::validate_schematron_policy_from_memory(const std::vector<std::string>& files, const std::string& memory, std::string& report)
 {
     bool valid = true;
-    Schema *S = new Schematron(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Schematron(!accepts_https());
 
     if (S->register_schema_from_memory(memory))
         valid = validation(files, S, report);
@@ -742,7 +742,7 @@ bool Core::validate_xslt_policy(const std::vector<std::string>& files,
     bool valid = true;
     std::string policyFile;
     xmlDocPtr doc = NULL;
-    Schema *S = new Xslt(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Xslt(!accepts_https());
 
     if (pos >= 0)
         doc = policies.create_doc(pos);
@@ -771,7 +771,7 @@ bool Core::validate_xslt_policy_from_file(const std::vector<std::string>& files,
                                           const std::string& policy, std::string& report)
 {
     bool valid = true;
-    Schema *S = new Xslt(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Xslt(!accepts_https());
 
     if (S->register_schema_from_file(policy.c_str()))
         valid = validation(files, S, report);
@@ -798,7 +798,7 @@ bool Core::validate_xslt_policy_from_memory(const std::vector<std::string>& file
                                             bool is_implem)
 {
     bool valid = true;
-    Schema *S = new Xslt(MI->Option(__T("Https_Get")) == __T("0"));
+    Schema *S = new Xslt(!accepts_https());
 
     if (is_implem)
     {
@@ -888,7 +888,7 @@ void Core::unify_no_https(std::string& str)
 //---------------------------------------------------------------------------
 bool Core::accepts_https()
 {
-    return MI->Option(__T("Https_Get")) == __T("1");
+    return MI->Option(__T("Https_Get")) != __T("0"); //With test on "0", we handle old version of MediaInfoLib which do not have this option
 }
 
 //***************************************************************************
@@ -1110,7 +1110,7 @@ void Core::register_file_to_database(std::string& filename)
 //---------------------------------------------------------------------------
 void Core::create_report_mi_xml(const std::vector<std::string>& files, std::string& report)
 {
-    bool AcceptsHttps = MI->Option(__T("Https_Get")) == __T("0") ? false : true; //With test on "0", we handle old version of MediaInfoLib which do not have this option
+    bool AcceptsHttps = accepts_https();
 
     if (files.size() == 1)
     {
@@ -1156,7 +1156,7 @@ void Core::create_report_mi_xml(const std::vector<std::string>& files, std::stri
 //---------------------------------------------------------------------------
 void Core::create_report_mt_xml(const std::vector<std::string>& files, std::string& report)
 {
-    bool AcceptsHttps = MI->Option(__T("Https_Get")) == __T("0") ? false : true; //With test on "0", we handle old version of MediaInfoLib which do not have this option
+    bool AcceptsHttps = accepts_https();
 
     if (files.size() == 1)
     {
@@ -1205,7 +1205,7 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
                                 std::string& report,
                                 std::bitset<MediaConchLib::report_Max> reports)
 {
-    bool AcceptsHttps = MI->Option(__T("Https_Get")) == __T("0") ? false : true; //With test on "0", we handle old version of MediaInfoLib which do not have this option
+    bool AcceptsHttps = accepts_https();
 
     std::string version = ZenLib::Ztring(Menu_Option_Preferences_Option (__T("Info_Version"), __T(""))).To_UTF8();
     std::string search(" - v");
