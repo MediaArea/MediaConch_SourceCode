@@ -365,6 +365,13 @@ void MainWindow::exporting_policy(size_t pos)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::create_policy_from_file(const QString& file)
+{
+    std::string filename(file.toUtf8().data(), file.toUtf8().length());
+    size_t pos = MCL.create_policy_from_file(filename);
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::add_default_policy()
 {
     QDir policies_dir(":/policies");

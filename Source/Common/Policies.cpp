@@ -213,6 +213,69 @@ bool Policies::policy_exists(const std::string& policy)
     return false;
 }
 
+size_t Policies::create_policy_from_file(const std::string& file)
+{
+    std::bitset<MediaConchLib::report_Max> report_set;
+    std::vector<std::string> files;
+    std::map<std::string, std::string> options;
+    std::vector<std::string> policies_vec;
+    MediaConchLib::ReportRes result;
+
+    report_set.set(MediaConchLib::report_MediaInfo);
+    files.push_back(file);
+
+    core->get_report(report_set, MediaConchLib::format_Xml, files,
+                     policies_vec, policies_vec,
+                     options, &result,
+                     NULL, NULL);
+    if (!result.valid || !result.report.length())
+        return (size_t)-1;
+
+    Policy *p = new XsltPolicy(!core->accepts_https());
+
+    //Policy filename
+    for (size_t j = 0; ; ++j)
+    {
+        std::stringstream filename;
+        filename << file;
+        if (j)
+            filename << j;
+        filename << ".xsl";
+        size_t i = 0;
+
+        for (; i < policies.size(); ++i)
+            if (policies[i]->filename == filename.str())
+                break;
+
+        if (i == policies.size())
+        {
+            p->filename = filename.str();
+            break;
+        }
+    }
+
+    size_t title_pos = file.rfind("/");
+    if (title_pos == std::string::npos)
+        title_pos = 0;
+    else
+        title_pos++;
+    p->title = file.substr(title_pos, std::string::npos);
+
+    int ret = ((XsltPolicy*)p)->create_policy_from_mi(result.report);
+
+    size_t pos = (size_t)-1;
+    if (ret >= 0)
+    {
+        p->saved = false;
+        pos = policies.size();
+        policies.push_back(p);
+    }
+    else
+        delete p;
+
+    return pos;
+}
+
 bool Policies::check_test_type(const std::string& type)
 {
     std::map<std::string, std::list<std::string> >::iterator it = existing_type.begin();

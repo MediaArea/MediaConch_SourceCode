@@ -58,6 +58,7 @@ public Q_SLOTS:
     void    on_save_mediainfo_report(const QString& file);
     QString on_fill_mediatrace_report(const QString& file);
     void    on_save_mediatrace_report(const QString& file);
+    void    on_create_policy_from_file(const QString& file);
 
     void    close_all();
     void    close_element(const QString& file);

@@ -83,6 +83,8 @@ public:
     bool       parse_test_for_rule(const std::string& test, XsltRule *rule);
     void       create_test_from_rule(XsltRule *rule, std::string& xpath);
 
+    int        create_policy_from_mi(const std::string& report);
+
 private:
     // HELPER
     int        import_schema_from_doc(const std::string& filename, xmlDocPtr doc);
@@ -179,6 +181,10 @@ private:
     xmlNodePtr write_operator_new_node(xmlNodePtr node, const xmlChar* title,
                                        std::vector<std::pair<const xmlChar*, const xmlChar*> >& prop,
                                        const xmlChar* content = NULL, bool parentNs=true);
+
+    int        create_rule_from_media_track_child(xmlNodePtr node, const std::string& type);
+    int        find_media_track_node(xmlNodePtr node, std::string& type);
+    int        find_media_track_node(xmlNodePtr node);
 
     bool       operator_need_value(const std::string& ope);
     bool       operator_exists(const std::string& ope);

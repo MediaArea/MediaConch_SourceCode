@@ -64,6 +64,7 @@ public:
     xmlDocPtr   create_doc(size_t pos);
     void        erase_policy(size_t index);
     bool        policy_exists(const std::string& policy);
+    size_t      create_policy_from_file(const std::string& file);
 
     static bool        try_parsing_test(std::string data, SchematronAssert *r);
     static std::string serialize_assert_for_test(SchematronAssert *r);

@@ -402,6 +402,17 @@ int MediaConchLib::get_ui_database_path(std::string& path) const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+size_t MediaConchLib::create_policy_from_file(const std::string& file)
+{
+    if (use_daemon)
+    {
+        //TODO
+        //return daemon_client->create_policy_from_file(file);
+    }
+    return core->policies.create_policy_from_file(file);
+}
+
+//---------------------------------------------------------------------------
 void MediaConchLib::save_policies()
 {
     for (size_t i = 0; i < core->policies.policies.size(); ++i)

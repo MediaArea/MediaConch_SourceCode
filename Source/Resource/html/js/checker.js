@@ -570,6 +570,7 @@ function mediaInfoCell(resultId, fileId)
 </div> \
 </div> \
 <div class="modal-footer"> \
+<button type="button" class="btn btn-primary mi-create-policy" data-target="#modalInfo' + resultId + '">Create Policy from MediaInfo Report</button> \
 <button type="button" class="btn btn-primary mi-dld" data-target="#modalInfo' + resultId + '" data-save-name="' + resultId + '_MediaInfoReport.txt">Download MediaInfo report</button> \
 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> \
 </div> \
@@ -582,6 +583,10 @@ function mediaInfoCell(resultId, fileId)
             $('#modalInfo' + resultId + ' .mi-dld').on('click', function(e) {
                 e.preventDefault();
                 webpage.on_save_mediainfo_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+            });
+            $('#modalInfo' + resultId + ' .mi-create-policy').on('click', function(e) {
+                e.preventDefault();
+                webpage.on_create_policy_from_file($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
             });
         }
     });
