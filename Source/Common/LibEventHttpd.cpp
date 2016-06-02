@@ -196,7 +196,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         get_uri_request(query, &r);
 
         RESTAPI::Default_Values_For_Type_Res res;
-        if (commands.list_cb && commands.default_values_for_type_cb(r, res, parent) < 0)
+        if (commands.default_values_for_type_cb && commands.default_values_for_type_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -206,6 +206,25 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
 
         delete r;
         if (rest.serialize_default_values_for_type_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/create_policy_from_file").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Create_Policy_From_File_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Create_Policy_From_File_Res res;
+        if (commands.create_policy_from_file_cb && commands.create_policy_from_file_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_create_policy_from_file_res(res, result) < 0)
             error = rest.get_error();
     }
     else

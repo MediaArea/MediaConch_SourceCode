@@ -213,7 +213,7 @@ bool Policies::policy_exists(const std::string& policy)
     return false;
 }
 
-size_t Policies::create_policy_from_file(const std::string& file)
+size_t Policies::create_policy_from_file(const std::string& file, const std::string& policy_filename)
 {
     std::bitset<MediaConchLib::report_Max> report_set;
     std::vector<std::string> files;
@@ -234,25 +234,7 @@ size_t Policies::create_policy_from_file(const std::string& file)
     Policy *p = new XsltPolicy(!core->accepts_https());
 
     //Policy filename
-    for (size_t j = 0; ; ++j)
-    {
-        std::stringstream filename;
-        filename << file;
-        if (j)
-            filename << j;
-        filename << ".xsl";
-        size_t i = 0;
-
-        for (; i < policies.size(); ++i)
-            if (policies[i]->filename == filename.str())
-                break;
-
-        if (i == policies.size())
-        {
-            p->filename = filename.str();
-            break;
-        }
-    }
+    p->filename = policy_filename;
 
     size_t title_pos = file.rfind("/");
     if (title_pos == std::string::npos)

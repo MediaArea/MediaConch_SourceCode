@@ -404,12 +404,40 @@ int MediaConchLib::get_ui_database_path(std::string& path) const
 //---------------------------------------------------------------------------
 size_t MediaConchLib::create_policy_from_file(const std::string& file)
 {
+    std::string policy_filename;
+    // find the policy filename
+    for (size_t j = 0; ; ++j)
+    {
+        std::stringstream filename;
+        filename << file;
+        if (j)
+            filename << j;
+        filename << ".xsl";
+        size_t i = 0;
+
+        for (; i < core->policies.policies.size(); ++i)
+            if (core->policies.policies[i]->filename == filename.str())
+                break;
+
+        if (i == core->policies.policies.size())
+        {
+            policy_filename = filename.str();
+            break;
+        }
+    }
+
     if (use_daemon)
     {
-        //TODO
-        //return daemon_client->create_policy_from_file(file);
+        std::string policy;
+        if (daemon_client->create_policy_from_file(file, policy) < 0)
+            return (size_t)-1;
+
+        size_t pos = core->policies.policies.size();
+        if (core->policies.import_schema_from_memory(policy_filename, policy.c_str(), policy.length()))
+            return (size_t)-1;
+        return pos;
     }
-    return core->policies.create_policy_from_file(file);
+    return core->policies.create_policy_from_file(file, policy_filename);
 }
 
 //---------------------------------------------------------------------------

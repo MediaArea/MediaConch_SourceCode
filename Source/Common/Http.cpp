@@ -144,6 +144,19 @@ int Http::send_request(RESTAPI::Default_Values_For_Type_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Create_Policy_From_File_Req& req)
+{
+    std::string query;
+    rest.serialize_create_policy_from_file_req(req, query);
+
+    std::stringstream uri;
+    uri << "/" << RESTAPI::API_VERSION << "/create_policy_from_file" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
 void Http::set_port(int port)
 {
     this->port = port;

@@ -81,6 +81,8 @@ namespace MediaConch
                                            RESTAPI::File_From_Id_Res& res, void *arg);
         static int on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void *arg);
+        static int on_create_policy_from_file_command(const RESTAPI::Create_Policy_From_File_Req* req,
+                                                      RESTAPI::Create_Policy_From_File_Res& res, void *arg);
 
         size_t get_first_free_slot();
         bool id_is_existing(int id) const;
