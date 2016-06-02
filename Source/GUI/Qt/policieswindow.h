@@ -75,9 +75,9 @@ private:
     void                        displayPoliciesMenu();
     void                        createPoliciesMenu();
     void                        updatePoliciesTree();
-    void                        updatePoliciesTreeSchematronPolicy(SchematronPolicy* p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeUnknownPolicy(UnknownPolicy* p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeXsltPolicy(XsltPolicy* p, QTreeWidgetItem *parent);
+    QTreeWidgetItem*            updatePoliciesTreeSchematronPolicy(SchematronPolicy* p, QTreeWidgetItem *parent);
+    QTreeWidgetItem*            updatePoliciesTreeUnknownPolicy(UnknownPolicy* p, QTreeWidgetItem *parent);
+    QTreeWidgetItem*            updatePoliciesTreeXsltPolicy(XsltPolicy* p, QTreeWidgetItem *parent);
 
 //***************************************************************************
 // HELPER

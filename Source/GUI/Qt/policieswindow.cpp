@@ -479,7 +479,7 @@ void PoliciesWindow::updatePoliciesTreeSchematronPattern(SchematronPattern *patt
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy, QTreeWidgetItem *parent)
+QTreeWidgetItem* PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(policy->title);
@@ -494,14 +494,17 @@ void PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy
             continue;
         updatePoliciesTreeSchematronPattern(pat, item);
     }
+
+    return item;
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreeUnknownPolicy(UnknownPolicy* policy, QTreeWidgetItem *parent)
+QTreeWidgetItem* PoliciesWindow::updatePoliciesTreeUnknownPolicy(UnknownPolicy* policy, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(policy->filename);
     item->setText(0, title);
+    return item;
 }
 
 //---------------------------------------------------------------------------
@@ -515,7 +518,7 @@ void PoliciesWindow::updatePoliciesTreeXsltRule(XsltRule* rule, QTreeWidgetItem 
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreeXsltPolicy(XsltPolicy* policy, QTreeWidgetItem *parent)
+QTreeWidgetItem* PoliciesWindow::updatePoliciesTreeXsltPolicy(XsltPolicy* policy, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(policy->title);
@@ -530,6 +533,7 @@ void PoliciesWindow::updatePoliciesTreeXsltPolicy(XsltPolicy* policy, QTreeWidge
             continue;
         updatePoliciesTreeXsltRule(r, item);
     }
+    return item;
 }
 
 void PoliciesWindow::removeTreeChildren(QTreeWidgetItem* item)
@@ -555,12 +559,17 @@ void PoliciesWindow::updatePoliciesTree()
         Policy *policy = mainwindow->get_policy(i);
         if (!policy)
             continue;
+
+        QTreeWidgetItem* item = NULL;
         if (policy->type == Policies::POLICY_SCHEMATRON)
-            updatePoliciesTreeSchematronPolicy((SchematronPolicy*)policy, policies);
+            item = updatePoliciesTreeSchematronPolicy((SchematronPolicy*)policy, policies);
         else if (policy->type == Policies::POLICY_UNKNOWN)
-            updatePoliciesTreeUnknownPolicy((UnknownPolicy*)policy, policies);
+            item = updatePoliciesTreeUnknownPolicy((UnknownPolicy*)policy, policies);
         else if (policy->type == Policies::POLICY_XSLT)
-            updatePoliciesTreeXsltPolicy((XsltPolicy*)policy, policies);
+            item = updatePoliciesTreeXsltPolicy((XsltPolicy*)policy, policies);
+
+        if (item && !policy->saved)
+            emphasis_policy_name_in_tree(item);
     }
 }
 
