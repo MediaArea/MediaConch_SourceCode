@@ -372,10 +372,24 @@ void MainWindow::create_policy_from_file(const QString& file)
 {
     std::string filename(file.toUtf8().data(), file.toUtf8().length());
     size_t pos = MCL.create_policy_from_file(filename);
+
+    QMessageBox::Icon icon;
+    QString text;
     if (pos != (size_t)-1)
     {
+        icon = QMessageBox::Information;
+        text = QString("Creating policy from %1 with success").arg(file);
         // Q_EMIT selected_created_policy((int)pos);
     }
+    else
+    {
+        icon = QMessageBox::Critical;
+        text = QString("Cannot Create policy from %1").arg(file);
+    }
+
+    QMessageBox msgBox(icon, tr("Create policy"), text,
+                       QMessageBox::NoButton, this);
+    msgBox.exec();
 }
 
 //---------------------------------------------------------------------------
