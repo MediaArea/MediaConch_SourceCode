@@ -195,13 +195,6 @@ void JsTree::find_inform_data_node(xmlNodePtr node, bool& sep, std::string& json
     if (!node || node->type != XML_ELEMENT_NODE)
         return;
 
-    if (sep)
-        json += ", ";
-    else
-        sep = true;
-
-    json += "{\"type\":\"data\"";
-
     xmlChar *value_c = xmlNodeGetContent(node);
 
     std::string name;
@@ -210,21 +203,19 @@ void JsTree::find_inform_data_node(xmlNodePtr node, bool& sep, std::string& json
 
     if (name == "extra")
     {
-        xmlNodePtr child = node->children;
-        while (child)
+        for (xmlNodePtr child = node->children; child; child = child->next)
         {
-            if (child->type != XML_ELEMENT_NODE)
-            {
-                child = child->next;
-                continue;
-            }
-
-            if (child->name != NULL)
-                name = (const  char *)child->name;
-            value_c = xmlNodeGetContent(child);
-            break;
+            find_inform_data_node(child, sep, json);
         }
+        return;
     }
+
+    if (sep)
+        json += ", ";
+    else
+        sep = true;
+
+    json += "{\"type\":\"data\"";
 
     if (name.length())
     {
