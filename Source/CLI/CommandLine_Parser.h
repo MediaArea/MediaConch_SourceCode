@@ -47,6 +47,7 @@ CL_OPTION(Force);
 CL_OPTION(Asynchronous);
 CL_OPTION(PluginsConfiguration);
 CL_OPTION(DefaultValuesForType);
+CL_OPTION(CreatePolicy);
 CL_OPTION(Default);
 
 //***************************************************************************

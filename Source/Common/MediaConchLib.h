@@ -81,7 +81,8 @@ public:
         errorHttp_INVALID_DATA = -1,
         errorHttp_INIT         = -2,
         errorHttp_CONNECT      = -3,
-        errorHttp_MAX          = -4,
+        errorHttp_INTERNAL     = -4,
+        errorHttp_MAX          = -5,
     };
 
     enum PluginType

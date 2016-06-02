@@ -57,6 +57,8 @@ int Help()
     TEXTOUT("Policy Checker:");
     TEXTOUT("--Policy=PolicyFileName, -p PolicyFileName");
     TEXTOUT("                    Apply the policy (XSL or Schematron) ");
+    TEXTOUT("--CreatePolicy");
+    TEXTOUT("                    Create a policy (XSL) from a file");
     TEXTOUT("");
 
     TEXTOUT("Output Formats:");
