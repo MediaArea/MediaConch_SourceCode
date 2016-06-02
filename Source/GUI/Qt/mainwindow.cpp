@@ -110,6 +110,9 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
     setAcceptDrops(false);
 
+    connect(this, SIGNAL(select_created_policy(int)),
+            this, SLOT(selected_created_policy(int)));
+
     // Status bar
     statusBar()->show();
     clear_msg_in_status_bar();
@@ -362,6 +365,40 @@ int MainWindow::exporting_to_xslt_file(size_t pos)
 void MainWindow::exporting_policy(size_t pos)
 {
     MCL.save_policy(pos, NULL);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::create_policy_from_file(const QString& file)
+{
+    std::string filename(file.toUtf8().data(), file.toUtf8().length());
+    size_t pos = MCL.create_policy_from_file(filename);
+
+    QMessageBox::Icon icon;
+    QString text;
+    if (pos != (size_t)-1)
+    {
+        icon = QMessageBox::Information;
+        text = QString("Creating policy from %1 with success").arg(file);
+        // Q_EMIT selected_created_policy((int)pos);
+    }
+    else
+    {
+        icon = QMessageBox::Critical;
+        text = QString("Cannot Create policy from %1").arg(file);
+    }
+
+    QMessageBox msgBox(icon, tr("Create policy"), text,
+                       QMessageBox::NoButton, this);
+    msgBox.exec();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::selected_created_policy(int row)
+{
+    if (!ui->actionPolicies->isChecked())
+        ui->actionPolicies->setChecked(true);
+    current_view = RUN_POLICIES_VIEW;
+    createPoliciesView(row);
 }
 
 //---------------------------------------------------------------------------
@@ -684,12 +721,13 @@ void MainWindow::createCheckerView()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createPoliciesView()
+void MainWindow::createPoliciesView(int row)
 {
     if (clearVisualElements() < 0)
         return;
+
     policiesView = new PoliciesWindow(this);
-    policiesView->displayPoliciesTree();
+    policiesView->displayPoliciesTree(row);
 }
 
 //---------------------------------------------------------------------------

@@ -317,6 +317,22 @@ void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
 }
 
 //---------------------------------------------------------------------------
+void PoliciesWindow::select_policy(int row)
+{
+    QTreeWidget *tree = policiesTree->get_policies_tree();
+    QTreeWidgetItem* policies = tree->topLevelItem(0);
+    if (!policies || row >= policies->childCount())
+        return;
+
+    QTreeWidgetItem *item = policies->child(row);
+    if (item)
+    {
+        tree->setCurrentItem(item);
+        item->setExpanded(true);
+    }
+}
+
+//---------------------------------------------------------------------------
 void PoliciesWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -420,7 +436,7 @@ void PoliciesWindow::createPoliciesTree()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::displayPoliciesTree()
+void PoliciesWindow::displayPoliciesTree(int row)
 {
     createPoliciesTree();
 
@@ -439,6 +455,8 @@ void PoliciesWindow::displayPoliciesTree()
     if (policies->childCount())
         policies->setExpanded(true);
     connectPoliciesTreeSelectionChanged();
+    if (row != -1)
+        select_policy(row);
 }
 
 //---------------------------------------------------------------------------
@@ -479,7 +497,7 @@ void PoliciesWindow::updatePoliciesTreeSchematronPattern(SchematronPattern *patt
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy, QTreeWidgetItem *parent)
+QTreeWidgetItem* PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(policy->title);
@@ -494,14 +512,17 @@ void PoliciesWindow::updatePoliciesTreeSchematronPolicy(SchematronPolicy* policy
             continue;
         updatePoliciesTreeSchematronPattern(pat, item);
     }
+
+    return item;
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreeUnknownPolicy(UnknownPolicy* policy, QTreeWidgetItem *parent)
+QTreeWidgetItem* PoliciesWindow::updatePoliciesTreeUnknownPolicy(UnknownPolicy* policy, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(policy->filename);
     item->setText(0, title);
+    return item;
 }
 
 //---------------------------------------------------------------------------
@@ -515,7 +536,7 @@ void PoliciesWindow::updatePoliciesTreeXsltRule(XsltRule* rule, QTreeWidgetItem 
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::updatePoliciesTreeXsltPolicy(XsltPolicy* policy, QTreeWidgetItem *parent)
+QTreeWidgetItem* PoliciesWindow::updatePoliciesTreeXsltPolicy(XsltPolicy* policy, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem(parent);
     QString title = QString().fromStdString(policy->title);
@@ -530,6 +551,7 @@ void PoliciesWindow::updatePoliciesTreeXsltPolicy(XsltPolicy* policy, QTreeWidge
             continue;
         updatePoliciesTreeXsltRule(r, item);
     }
+    return item;
 }
 
 void PoliciesWindow::removeTreeChildren(QTreeWidgetItem* item)
@@ -555,12 +577,17 @@ void PoliciesWindow::updatePoliciesTree()
         Policy *policy = mainwindow->get_policy(i);
         if (!policy)
             continue;
+
+        QTreeWidgetItem* item = NULL;
         if (policy->type == Policies::POLICY_SCHEMATRON)
-            updatePoliciesTreeSchematronPolicy((SchematronPolicy*)policy, policies);
+            item = updatePoliciesTreeSchematronPolicy((SchematronPolicy*)policy, policies);
         else if (policy->type == Policies::POLICY_UNKNOWN)
-            updatePoliciesTreeUnknownPolicy((UnknownPolicy*)policy, policies);
+            item = updatePoliciesTreeUnknownPolicy((UnknownPolicy*)policy, policies);
         else if (policy->type == Policies::POLICY_XSLT)
-            updatePoliciesTreeXsltPolicy((XsltPolicy*)policy, policies);
+            item = updatePoliciesTreeXsltPolicy((XsltPolicy*)policy, policies);
+
+        if (item && !policy->saved)
+            emphasis_policy_name_in_tree(item);
     }
 }
 

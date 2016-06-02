@@ -16,6 +16,7 @@
 #include "Help.h"
 #include <ZenLib/ZtringList.h>
 #include <ZenLib/Dir.h>
+#include "Common/Policy.h"
 
 #if !defined(WINDOWS)
     #include <unistd.h>
@@ -36,7 +37,7 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false)
+    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -142,6 +143,10 @@ namespace MediaConch
             file_to_report.push_back(files[i]);
         }
 
+        //Ensure to analyze before creating library
+        if (create_policy_mode)
+            return run_create_policy();
+
         //Output
         MediaConchLib::ReportRes result;
         std::vector<std::string> policies_contents;
@@ -155,6 +160,30 @@ namespace MediaConch
         //Output, in a file if needed
         if (!LogFile_FileName.empty())
             LogFile_Action(report_mi);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_create_policy()
+    {
+        if (files.size() != 1)
+        {
+            error = "Create a policy only with one file";
+            return MediaConchLib::errorHttp_INTERNAL;
+        }
+
+        size_t pos = MCL.create_policy_from_file(files[0]);
+        Policy *p = NULL;
+        std::string policy;
+        if (pos == (size_t)-1 || (p = MCL.get_policy(pos)) == NULL || p->dump_schema(policy) < 0)
+        {
+            error = std::string("Cannot create policy from: ") + files[0];
+            return MediaConchLib::errorHttp_INTERNAL;
+        }
+
+        MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);
+        STRINGOUT(policy_mil);
+
         return 0;
     }
 
@@ -320,6 +349,12 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    void CLI::set_create_policy_mode()
+    {
+        create_policy_mode = true;
+    }
+
+    //--------------------------------------------------------------------------
     void CLI::add_files_recursively(const std::string& filename)
     {
         ZenLib::Ztring dirname = ZenLib::Ztring().From_UTF8(filename);
@@ -352,6 +387,12 @@ namespace MediaConch
             case MediaConchLib::errorHttp_CONNECT:
                 TEXTOUT("Cannot connect to the daemon");
                 break;
+            case MediaConchLib::errorHttp_INTERNAL:
+            {
+                MediaInfoLib::String error_mil = ZenLib::Ztring().From_UTF8(error);
+                STRINGOUT(error_mil);
+                break;
+            }
             default:
                 TEXTOUT("Internal error");
                 break;

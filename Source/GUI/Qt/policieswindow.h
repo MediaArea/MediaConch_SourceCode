@@ -38,7 +38,7 @@ public:
     ~PoliciesWindow();
 
     // Helpers
-    void                        displayPoliciesTree();
+    void                        displayPoliciesTree(int row=-1);
     int                         get_index_in_tree();
     QTreeWidgetItem*            get_item_in_tree();
     int                         get_index_of_item_backXX(QTreeWidgetItem* item, size_t back);
@@ -48,6 +48,7 @@ public:
     void                        emphasis_policy_name_in_tree(QTreeWidgetItem *item);
     void                        emphasis_tree_widget_and_children(QTreeWidgetItem *item, bool root=false);
     void                        unemphasis_policy_name_in_tree(QTreeWidgetItem *item);
+    void                        select_policy(int row);
 
     // Visual elements
     void                        updatePoliciesTreeSchematronPattern(SchematronPattern *p, QTreeWidgetItem *parent);
@@ -75,9 +76,9 @@ private:
     void                        displayPoliciesMenu();
     void                        createPoliciesMenu();
     void                        updatePoliciesTree();
-    void                        updatePoliciesTreeSchematronPolicy(SchematronPolicy* p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeUnknownPolicy(UnknownPolicy* p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeXsltPolicy(XsltPolicy* p, QTreeWidgetItem *parent);
+    QTreeWidgetItem*            updatePoliciesTreeSchematronPolicy(SchematronPolicy* p, QTreeWidgetItem *parent);
+    QTreeWidgetItem*            updatePoliciesTreeUnknownPolicy(UnknownPolicy* p, QTreeWidgetItem *parent);
+    QTreeWidgetItem*            updatePoliciesTreeXsltPolicy(XsltPolicy* p, QTreeWidgetItem *parent);
 
 //***************************************************************************
 // HELPER

@@ -50,6 +50,9 @@ public:
     // default_values_for_type
     int default_values_for_type(const std::string& type, std::vector<std::string>& values);
 
+    // create_policy_from_file
+    int create_policy_from_file(const std::string& id, std::string& policy);
+
     // Analyze
     int analyze(const std::string& file, bool& registered, bool force_analyze);
 

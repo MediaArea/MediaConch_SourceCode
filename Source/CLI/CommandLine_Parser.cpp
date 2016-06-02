@@ -175,6 +175,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--async",                                       Asynchronous)
     OPTION("--pluginsconfiguration",                        PluginsConfiguration)
     OPTION("--defaultvaluesfortype",                        DefaultValuesForType)
+    OPTION("--createpolicy",                                CreatePolicy)
     //Default
     OPTION("--",                                            Default)
     else
@@ -453,6 +454,15 @@ CL_OPTION(DefaultValuesForType)
     }
 
     return CLI_RETURN_FINISH;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(CreatePolicy)
+{
+    (void)argument;
+    //Form : --CreatePolicy
+    cli->set_create_policy_mode();
+    return CLI_RETURN_NONE;
 }
 
 //---------------------------------------------------------------------------

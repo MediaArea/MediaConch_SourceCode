@@ -81,7 +81,8 @@ public:
         errorHttp_INVALID_DATA = -1,
         errorHttp_INIT         = -2,
         errorHttp_CONNECT      = -3,
-        errorHttp_MAX          = -4,
+        errorHttp_INTERNAL     = -4,
+        errorHttp_MAX          = -5,
     };
 
     enum PluginType
@@ -173,6 +174,8 @@ public:
                                             std::string& reason);
 
     // Policies
+    //   Create policy
+    size_t                      create_policy_from_file(const std::string& file);
     //   Export policy
     void                        save_policies();
     void                        save_policy(size_t pos, const std::string* filename);

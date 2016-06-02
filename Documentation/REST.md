@@ -8,6 +8,10 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.5
+
+* Add the create policy from file command
+
 #### Version 1.4
 
 * Add the default values for type command
@@ -35,7 +39,7 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.2
+Current API version: $API_VERSION = 1.5
 
 #### Command
 
@@ -48,6 +52,7 @@ Current API version: $API_VERSION = 1.2
 * Validate:                HTTP POST
 * File_From_Id:            HTTP POST
 * Default_Values_For_type: HTTP GET
+* Create_Policy_From_File: HTTP GET
 
 #### Analyze
 
@@ -267,6 +272,28 @@ Parameters:
 Parameters:
 
 * values:            Array of values (String)
+
+#### Create_Policy_From_File
+
+URI format for the parameters.
+URL: /$API_VERSION/create_policy_from_file
+
+##### Request
+
+Parameters:
+
+* id:                Integer: Id given by analyze for a file
+
+##### Response
+
+Parameters:
+
+* policy:            String with the XSL policy
+
+* nok:               Object
+
+- id:                Integer: id given by the request
+- error:             Integer: Error code corresponding to the error
 
 #### Report kinds
 

@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.4";
+const std::string RESTAPI::API_VERSION = "1.5";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -268,6 +268,15 @@ std::string RESTAPI::Default_Values_For_Type_Req::to_str() const
 
     out << "{type: '" << type << "'";
     out << ", field: '" << field << "'}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Create_Policy_From_File_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id << "}";
     return out.str();
 }
 
@@ -564,6 +573,29 @@ std::string RESTAPI::Default_Values_For_Type_Res::to_str() const
     return out.str();
 }
 
+//---------------------------------------------------------------------------
+std::string RESTAPI::Create_Policy_From_File_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{id: " << id;
+    RESTAPI api;
+    out << ", reason: " << api.get_Reason_string(error) << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Create_Policy_From_File_Res::to_str() const
+{
+    std::stringstream out;
+
+    if (policy.length())
+        out << "{policy: '" << policy.length() << "']";
+    else if (nok)
+        out << "{nok: " << nok->to_str() << "}";
+    return out.str();
+}
+
 //***************************************************************************
 // Serialize: Request
 //***************************************************************************
@@ -765,6 +797,18 @@ int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& 
         error = model->get_error();
         return -1;
     }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_create_policy_from_file_req(Create_Policy_From_File_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?" << "id=" << req.id;
+    data = ss.str();
 
     return 0;
 }
@@ -992,6 +1036,35 @@ int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& 
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["DEFAULT_VALUES_FOR_TYPE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_create_policy_from_file_res(Create_Policy_From_File_Res& res, std::string& data)
+{
+    Container::Value v, child, policy, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.policy.length())
+    {
+        policy.type = Container::Value::CONTAINER_TYPE_STRING;
+        policy.s = res.policy;
+        child.obj["policy"] = policy;
+    }
+
+    if (res.nok)
+        child.obj["nok"] = serialize_generic_nok(res.nok->id, res.nok->error);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["CREATE_POLICY_FROM_FILE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -1349,6 +1422,31 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Create_Policy_From_File_Req *RESTAPI::parse_create_policy_from_file_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CREATE_POLICY_FROM_CHILD");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Create_Policy_From_File_Req *req = new Create_Policy_From_File_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
 {
     Analyze_Req *req = new Analyze_Req;
@@ -1479,6 +1577,26 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type
 
     req->type = type;
     req->field = field;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Create_Policy_From_File_Req *RESTAPI::parse_uri_create_policy_from_file_req(const std::string& uri)
+{
+    Create_Policy_From_File_Req *req = new Create_Policy_From_File_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "id")
+        return req;
+    ++start;
+
+    std::string id = uri.substr(start, std::string::npos);
+    if (!id.length())
+        return req;
+
+    req->id = strtoll(id.c_str(), NULL, 10);
 
     return req;
 }
@@ -1901,6 +2019,33 @@ RESTAPI::Default_Values_For_Type_Res *RESTAPI::parse_default_values_for_type_res
 
         res->values.push_back(values->array[i].s);
     }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Create_Policy_From_File_Res *RESTAPI::parse_create_policy_from_file_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CREATE_POLICY_FROM_FILE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policy;
+    policy = model->get_value_by_key(*child, "policy");
+
+    if (!policy || policy->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Create_Policy_From_File_Res *res = new Create_Policy_From_File_Res;
+    res->policy = policy->s;
 
     return res;
 }

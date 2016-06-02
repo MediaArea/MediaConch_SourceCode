@@ -537,6 +537,11 @@ void WorkerFiles::fill_registered_files_from_db()
             full_file += "/";
         full_file += fr->filename;
 
+        //check if policy still exists
+        Policy *p = mainwindow->get_policy(fr->policy);
+        if (!p)
+            fr->policy = -1;
+
         fr->index = file_index++;
         fr->analyzed = false;
 

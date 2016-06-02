@@ -101,6 +101,7 @@ public:
 
         switch (r)
         {
+            ReasonString(NO_REASON);
             ReasonString(FILE_NOT_EXISTING);
             ReasonString(ID_NOT_EXISTING);
             ReasonString(NOT_READY);
@@ -117,6 +118,7 @@ public:
         if (!str.compare(#reason)) \
             return reason;
 
+        ReasonString(NO_REASON);
         ReasonString(FILE_NOT_EXISTING);
         ReasonString(ID_NOT_EXISTING);
         ReasonString(NOT_READY);
@@ -359,6 +361,26 @@ public:
         std::string              to_str() const;
     };
 
+    struct Create_Policy_From_File_Req
+    {
+        int                          id;
+        std::string                  to_str() const;
+    };
+
+    struct Create_Policy_From_File_Nok
+    {
+        int                          id;
+        Reason                       error;
+        std::string                  to_str() const;
+    };
+
+    struct Create_Policy_From_File_Res
+    {
+        std::string                  policy;
+        Create_Policy_From_File_Nok *nok;
+        std::string                  to_str() const;
+    };
+
 public:
     //Constructor/Destructor
     RESTAPI();
@@ -374,6 +396,7 @@ public:
     int serialize_validate_req(Validate_Req& req, std::string&);
     int serialize_file_from_id_req(File_From_Id_Req& req, std::string&);
     int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&);
+    int serialize_create_policy_from_file_req(Create_Policy_From_File_Req& req, std::string&);
 
     // Serialize: Result
     int serialize_analyze_res(Analyze_Res& res, std::string&);
@@ -385,6 +408,7 @@ public:
     int serialize_validate_res(Validate_Res& res, std::string&);
     int serialize_file_from_id_res(File_From_Id_Res& res, std::string&);
     int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&);
+    int serialize_create_policy_from_file_res(Create_Policy_From_File_Res& res, std::string&);
 
     // Parse: Request
     Analyze_Req                 *parse_analyze_req(const std::string& data);
@@ -396,6 +420,7 @@ public:
     Validate_Req                *parse_validate_req(const std::string& data);
     File_From_Id_Req            *parse_file_from_id_req(const std::string& data);
     Default_Values_For_Type_Req *parse_default_values_for_type_req(const std::string& data);
+    Create_Policy_From_File_Req *parse_create_policy_from_file_req(const std::string& data);
 
     // Parse: URI Request
     Analyze_Req                 *parse_uri_analyze_req(const std::string& uri);
@@ -407,6 +432,7 @@ public:
     Validate_Req                *parse_uri_validate_req(const std::string& uri);
     File_From_Id_Req            *parse_uri_file_from_id_req(const std::string& uri);
     Default_Values_For_Type_Req *parse_uri_default_values_for_type_req(const std::string& uri);
+    Create_Policy_From_File_Req *parse_uri_create_policy_from_file_req(const std::string& uri);
 
     // Parse: Request
     Analyze_Res                 *parse_analyze_res(const std::string& data);
@@ -418,6 +444,7 @@ public:
     Validate_Res                *parse_validate_res(const std::string& data);
     File_From_Id_Res            *parse_file_from_id_res(const std::string& data);
     Default_Values_For_Type_Res *parse_default_values_for_type_res(const std::string& data);
+    Create_Policy_From_File_Res *parse_create_policy_from_file_res(const std::string& data);
 
     std::string get_error() const { return error; }
 

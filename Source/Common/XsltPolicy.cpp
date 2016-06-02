@@ -1729,4 +1729,102 @@ int XsltPolicy::get_operator_pretty_name(const std::string& ope, std::string& pr
     return -1;
 }
 
+//---------------------------------------------------------------------------
+int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::string& type)
+{
+    for (xmlNodePtr child = node->children; child; child = child->next)
+    {
+        if (!child->name)
+            continue;
+
+        std::string name((const char*)child->name);
+        if (name == "text" || name == "extra")
+            continue;
+
+        XsltRule *rule = new XsltRule;
+
+        rule->type = type;
+        rule->field = (const char*)child->name;
+        rule->title = rule->type + "/" + rule->field;
+        rule->ope = "is_equal";
+        rule->occurrence = -1;
+        rule->value = (const char*)xmlNodeGetContent(child);
+        rules.push_back(rule);
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_media_track_node(xmlNodePtr node, std::string& type)
+{
+    xmlChar *property = xmlGetNoNsProp(node, (const unsigned char*)"type");
+    
+    if (property == NULL)
+        return -1;
+
+    type = std::string((const char*)property);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_media_track_node(xmlNodePtr node)
+{
+    for (xmlNodePtr child = node->children; child; child = child->next)
+    {
+        std::string def("track");
+        if (!child->name || def.compare((const char*)child->name))
+            continue;
+
+        std::string type;
+        if (find_media_track_node(child, type) < 0)
+            return -1;
+
+        if (create_rule_from_media_track_child(child, type) < 0)
+            return -1;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::create_policy_from_mi(const std::string& report)
+{
+    Xslt s(no_https);
+    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
+
+    xmlDocPtr doc = xmlParseMemory(report.c_str(), report.length());
+    xmlSetGenericErrorFunc(NULL, NULL);
+
+    if (!doc)
+    {
+        // maybe put the errors from s.errors
+        error = "The MediaInfo report given cannot be parsed";
+        return -1;
+    }
+
+    xmlNodePtr root = xmlDocGetRootElement(doc);
+    if (!root)
+    {
+        error = "No root node, leaving";
+        xmlFreeDoc(doc);
+        return 0;
+    }
+
+    for (xmlNodePtr child = root->children; child; child = child->next)
+    {
+        std::string def("media");
+        if (!child->name || def.compare((const char*)child->name))
+            continue;
+
+        if (find_media_track_node(child) < 0)
+        {
+            xmlFreeDoc(doc);
+            return -1;
+        }
+        break;
+    }
+
+    xmlFreeDoc(doc);
+    return 0;
+}
+
 }

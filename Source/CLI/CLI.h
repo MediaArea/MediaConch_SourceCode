@@ -45,6 +45,7 @@ namespace MediaConch
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
         void set_asynchronous(bool async);
+        void set_create_policy_mode();
 
         void print_error(MediaConchLib::errorHttp code);
 
@@ -52,20 +53,23 @@ namespace MediaConch
         CLI(const CLI&);
         CLI& operator=(const CLI&);
 
-        int is_ready(size_t i, MediaConchLib::report& report_kind);
+        int  run_create_policy();
+        int  is_ready(size_t i, MediaConchLib::report& report_kind);
         void add_files_recursively(const std::string& filename);
 
         MediaConchLib MCL;
         std::vector<std::string> files;
         std::vector<std::string> policies;
+        std::string              error;
         std::string              display_file;
         std::string              configuration_file;
         std::string              plugins_configuration_file;
         std::bitset<MediaConchLib::report_Max> report_set;
-        MediaConchLib::format format;
-        bool use_daemon;
-        bool asynchronous;
-        bool force_analyze;
+        MediaConchLib::format   format;
+        bool                    use_daemon;
+        bool                    asynchronous;
+        bool                    force_analyze;
+        bool                    create_policy_mode;
     };
 
 }

@@ -181,6 +181,11 @@ namespace MediaConch
         on_download_report(report, file, "MediaTrace");
     }
 
+    void WebPage::on_create_policy_from_file(const QString& file)
+    {
+        mainwindow->create_policy_from_file(file);
+    }
+
     void WebPage::on_file_upload_selected(const QString& policy, const QString& display_xslt,
                                           const QString& verbosity)
     {

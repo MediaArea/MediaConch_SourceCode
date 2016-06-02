@@ -16,6 +16,7 @@
 #include "Common/Httpd.h"
 #include "Common/LibEventHttpd.h"
 #include "Common/GeneratedCSVVideos.h"
+#include "Common/Policy.h"
 #include "Daemon.h"
 #include "Help.h"
 #include "Config.h"
@@ -91,6 +92,7 @@ namespace MediaConch
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
+        httpd->commands.create_policy_from_file_cb = on_create_policy_from_file_command;
         return 0;
     }
 
@@ -854,6 +856,44 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon send default_values_for_type result: " << res.to_str() << std::endl;
 
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_create_policy_from_file_command(const RESTAPI::Create_Policy_From_File_Req* req, RESTAPI::Create_Policy_From_File_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a create_policy_from_file command: ";
+        std::clog << req->to_str() << std::endl;
+
+        if (!d->id_is_existing(req->id))
+        {
+            RESTAPI::Create_Policy_From_File_Nok *nok = new RESTAPI::Create_Policy_From_File_Nok;
+            nok->id = req->id;
+            nok->error = RESTAPI::ID_NOT_EXISTING;
+            res.nok = nok;
+        }
+        else
+        {
+            size_t pos = d->MCL->create_policy_from_file(*d->current_files[req->id]);
+            Policy *p = NULL;
+            std::string policy;
+            if (pos == (size_t)-1 || (p = d->MCL->get_policy(pos)) == NULL || p->dump_schema(policy) < 0)
+            {
+                RESTAPI::Create_Policy_From_File_Nok *nok = new RESTAPI::Create_Policy_From_File_Nok;
+                nok->id = req->id;
+                nok->error = RESTAPI::NO_REASON;
+                res.nok = nok;
+            }
+            else
+                res.policy = policy;
+        }
+
+        std::clog << d->get_date() << "Daemon send create_policy_from_file result: " << res.to_str() << std::endl;
         return 0;
     }
 
