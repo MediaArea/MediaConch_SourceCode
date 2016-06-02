@@ -164,6 +164,7 @@ private:
     std::vector<QString>          displays_list;
     WorkerFiles                   workerfiles;
     UiSettings                    uisettings;
+    Run_View                      current_view;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -177,7 +178,7 @@ private:
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();
-    void                        createPoliciesView();
+    void                        createPoliciesView(int row=-1);
     void                        createDisplayView();
     void                        createSettingsView();
     void                        choose_schematron_file();
@@ -189,11 +190,10 @@ private:
                                                   FileRegistered* fr);
     void                        fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p);
 
-    Run_View current_view;
-
 Q_SIGNALS:
     void status_bar_clear_message();
     void status_bar_show_message(const QString& message, int timeout);
+    void select_created_policy(int row);
 
 private Q_SLOTS:
     void on_actionOpen_triggered();
@@ -204,6 +204,7 @@ private Q_SLOTS:
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
+    void selected_created_policy(int row);
 
 public Q_SLOTS:
     //Help

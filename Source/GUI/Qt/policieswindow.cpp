@@ -317,6 +317,22 @@ void PoliciesWindow::policy_deleted(QTreeWidgetItem* item, int row)
 }
 
 //---------------------------------------------------------------------------
+void PoliciesWindow::select_policy(int row)
+{
+    QTreeWidget *tree = policiesTree->get_policies_tree();
+    QTreeWidgetItem* policies = tree->topLevelItem(0);
+    if (!policies || row >= policies->childCount())
+        return;
+
+    QTreeWidgetItem *item = policies->child(row);
+    if (item)
+    {
+        tree->setCurrentItem(item);
+        item->setExpanded(true);
+    }
+}
+
+//---------------------------------------------------------------------------
 void PoliciesWindow::policiesTree_selectionChanged()
 {
     QTreeWidget *tree = policiesTree->get_policies_tree();
@@ -420,7 +436,7 @@ void PoliciesWindow::createPoliciesTree()
 }
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::displayPoliciesTree()
+void PoliciesWindow::displayPoliciesTree(int row)
 {
     createPoliciesTree();
 
@@ -439,6 +455,8 @@ void PoliciesWindow::displayPoliciesTree()
     if (policies->childCount())
         policies->setExpanded(true);
     connectPoliciesTreeSelectionChanged();
+    if (row != -1)
+        select_policy(row);
 }
 
 //---------------------------------------------------------------------------
