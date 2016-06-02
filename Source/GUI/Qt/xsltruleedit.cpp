@@ -101,7 +101,7 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
 //---------------------------------------------------------------------------
 void XsltRuleEdit::fill_mode_frame_fields(XsltRule *r)
 {
-    if (r->ope == "exists" || r->ope == "does_not_exists")
+    if (r->ope == "exists" || r->ope == "does_not_exist")
         fill_mode_frame_exists_fields(r);
     else if (r->ope == "is_true" || r->ope == "is_not_true")
         fill_mode_frame_is_true_fields(r);
@@ -420,6 +420,12 @@ void XsltRuleEdit::change_occurence_spin_box()
 //---------------------------------------------------------------------------
 void XsltRuleEdit::check_editor_is_possible(XsltRule* r)
 {
+    if (r->ope == "is_true" || r->ope == "is_not_true")
+    {
+        ui->editorSelector->setDisabled(true);
+        return;
+    }
+
     if (!r->use_free_text)
     {
         ui->editorSelector->setEnabled(true);
@@ -429,7 +435,7 @@ void XsltRuleEdit::check_editor_is_possible(XsltRule* r)
     XsltPolicy p(false);
     XsltRule* rule = new XsltRule(*r);
     rule->use_free_text = false;
-    if (!p.parse_test_for_rule(r->test, rule) || rule->use_free_text)
+    if (r->test.length() && (!p.parse_test_for_rule(r->test, rule) || rule->use_free_text))
         ui->editorSelector->setDisabled(true);
     else
         ui->editorSelector->setEnabled(true);
