@@ -101,7 +101,7 @@ void XsltRuleEdit::rule_clicked(XsltRule *r)
 //---------------------------------------------------------------------------
 void XsltRuleEdit::fill_mode_frame_fields(XsltRule *r)
 {
-    if (r->ope == "exists" || r->ope == "does_not_exists")
+    if (r->ope == "exists" || r->ope == "does_not_exist")
         fill_mode_frame_exists_fields(r);
     else if (r->ope == "is_true" || r->ope == "is_not_true")
         fill_mode_frame_is_true_fields(r);
