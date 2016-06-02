@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.4";
+const std::string RESTAPI::API_VERSION = "1.5";
 
 //***************************************************************************
 // Constructor/Destructor
