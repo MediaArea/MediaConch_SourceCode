@@ -378,7 +378,7 @@ void MainWindow::create_policy_from_file(const QString& file)
     if (pos != (size_t)-1)
     {
         icon = QMessageBox::Information;
-        text = QString("Creating policy from %1 with success").arg(file);
+        text = QString("Policy from %1 is created, you can find it in the \"Policies\" tab").arg(file);
         // Q_EMIT selected_created_policy((int)pos);
     }
     else
