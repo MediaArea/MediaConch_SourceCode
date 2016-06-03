@@ -1738,17 +1738,27 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
             continue;
 
         std::string name((const char*)child->name);
-        if (name == "text" || name == "extra")
+        if (name == "text"
+         || name == "FileSize"
+         || name == "Duration"
+         || name == "DURATION"
+         || name == "OverallBitRate"
+         || name == "FrameCount"
+         || name == "StreamSize"
+         || name == "BitRate"
+         || name == "FrameCount"
+         || name == "Delay"
+         || name == "extra")
             continue;
 
         XsltRule *rule = new XsltRule;
 
         rule->type = type;
         rule->field = (const char*)child->name;
-        rule->title = rule->type + "/" + rule->field;
         rule->ope = "is_equal";
         rule->occurrence = -1;
         rule->value = (const char*)xmlNodeGetContent(child);
+        rule->title = rule->type + "/" + rule->field + " is " + rule->value;
         rules.push_back(rule);
     }
     return 0;
