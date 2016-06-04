@@ -1734,12 +1734,11 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
 {
     for (xmlNodePtr child = node->children; child; child = child->next)
     {
-        if (!child->name)
+        if (child->type != XML_ELEMENT_NODE || !child->name)
             continue;
 
         std::string name((const char*)child->name);
-        if (name == "text"
-         || name == "FileSize"
+        if (name == "FileSize"
          || name == "Duration"
          || name == "DURATION"
          || name == "OverallBitRate"
