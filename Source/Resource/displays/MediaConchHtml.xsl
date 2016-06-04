@@ -54,13 +54,13 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
-      .cmn-toggle {
+      .arrow {
         position: absolute;
         margin-left: -9999px;
         visibility: hidden;
       }
 
-      .cmn-toggle + label {
+      .arrow + label {
         display: inline-block;
         position: relative;
         cursor: pointer;
@@ -68,7 +68,41 @@
         user-select: none;
       }
 
-      input.cmn-toggle-round + label {
+      input.arrow-round + label {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 8px 8px 0 8px;
+        border-color: black transparent transparent transparent;
+      }
+
+      input.arrow-round + label:after {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 8px 0 8px 8px;
+        border-color: transparent transparent transparent black;
+      }
+
+      input[type=checkbox]:checked ~ .extra {
+        display: block;
+      }
+
+      .toggle {
+        position: absolute;
+        margin-left: -9999px;
+        visibility: hidden;
+      }
+
+      .toggle + label {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        outline: none;
+        user-select: none;
+      }
+
+      input.toggle-round + label {
         padding: 2px;
         width: 30px;
         height: 11px;
@@ -76,8 +110,8 @@
         border-radius: 15px;
       }
 
-      input.cmn-toggle-round + label:before,
-      input.cmn-toggle-round + label:after {
+      input.toggle-round + label:before,
+      input.toggle-round + label:after {
         display: inline-block;
         position: absolute;
         top: 1px;
@@ -86,14 +120,14 @@
         content: "";
       }
 
-      input.cmn-toggle-round + label:before {
+      input.toggle-round + label:before {
         right: 1px;
         background-color: #f1f1f1;
         border-radius: 28px;
         transition: background 0.4s;
       }
 
-      input.cmn-toggle-round + label:after {
+      input.toggle-round + label:after {
         width: 14px;
         background-color: #fff;
         border-radius: 100%;
@@ -101,15 +135,15 @@
         transition: margin 0.4s;
       }
 
-      input.cmn-toggle-round:checked + label:before {
+      input.toggle-round:checked + label:before {
         background-color: #8ce196;
       }
 
-      input.cmn-toggle-round:checked + label:after {
+      input.toggle-round:checked + label:after {
         margin-left: 15px;
       }
 
-      input[type=checkbox]:checked ~ .extra {
+      input[type=checkbox]:checked ~ .mc .extra {
         display: block;
       }
 
@@ -137,65 +171,62 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
+        <xsl:if test="position() &lt; 2">
+          <span class="verbosity">Toggle all verbosity:  </span> 
+          <input id="implementation-toggle-{generate-id()}" class="toggle toggle-round" type="checkbox"/>
+          <label for="implementation-toggle-{generate-id()}"></label>
+        </xsl:if>
         <table class="mc">
-            <xsl:for-each select="mc:check/mc:test">
-              <tr class="test">
-                <td>
-                  <strong><xsl:value-of select="../@icid"/></strong>
-                  <xsl:text>:  </xsl:text>
-                  <strong><xsl:value-of select="../@name"/></strong>
-                  <xsl:text>  </xsl:text>
-                  <xsl:value-of select="@outcome"/>
-                  <xsl:text>  </xsl:text>
-                  <xsl:if test="@outcome = 'pass'">
-                    <xsl:text>&#x2705;  </xsl:text>
-                  </xsl:if>
-                  <xsl:if test="@outcome = 'fail'">
-                    <xsl:text>&#x274C;  </xsl:text>
-                    <xsl:text>(Reason: </xsl:text>
-                    <xsl:value-of select="@reason"/>
-                    <xsl:text>)</xsl:text>
-                  </xsl:if>
-                  <xsl:if test="@outcome = 'n/a'">
-                  (Reason: <xsl:value-of select="@reason"/>
-                  <xsl:text>) </xsl:text>
-                  </xsl:if>
+          <xsl:for-each select="mc:check/mc:test">
+          <tr>
+            <td>
+              <input id="implementation-arrow-{generate-id()}" class="arrow arrow-round" type="checkbox"/>
+              <label for="implementation-arrow-{generate-id()}"></label>
+                <strong><xsl:value-of select="../@icid"/></strong>
+                <xsl:text>:  </xsl:text>
+                <strong><xsl:value-of select="../@name"/></strong>
+                <xsl:text>  </xsl:text>
+                <xsl:value-of select="@outcome"/>
+                <xsl:text>  </xsl:text>
+                <xsl:if test="@outcome = 'pass'">
+                  <xsl:text>&#x2705;  </xsl:text>
+                </xsl:if>
+                <xsl:if test="@outcome = 'fail'">
+                  <xsl:text>&#x274C;  </xsl:text>
+                  <xsl:text>(Reason: </xsl:text>
+                  <xsl:value-of select="@reason"/>
+                  <xsl:text>)</xsl:text>
+                </xsl:if>
+                <xsl:if test="@outcome = 'n/a'">
+                (Reason: <xsl:value-of select="@reason"/>
+                <xsl:text>) </xsl:text>
+                </xsl:if>
+                <div class="extra">
+                  <xsl:if test="../mc:context !=''">
+                    <strong><xsl:value-of select="../mc:context/@name"/></strong>
+                    <xsl:text>: </xsl:text>
+                    <xsl:value-of select="../mc:context"/><br/>
+                 </xsl:if>
+                  <xsl:if test="mc:value/@name !=''">
+                     <strong>Name: </strong><xsl:value-of select="mc:value/@name"/><br/>
+                   </xsl:if>
+                   <xsl:if test="mc:value/@offset !=''">
+                     <strong>Offset: </strong><xsl:value-of select="mc:value/@offset"/><br/>
+                   </xsl:if>
+                   <xsl:if test="mc:value/@formatid !=''">
+                     <strong>ID: </strong><xsl:value-of select="mc:value/@formatid"/><br/>
+                   </xsl:if>
+                   <xsl:if test="mc:value/@context !=''">
+                     <strong>Value context: </strong><xsl:value-of select="mc:value/@context"/><br/>
+                   </xsl:if>
+                   <xsl:if test="mc:value/. !=''">
+                     <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
+                   </xsl:if>
+                    <hr/>
+                  </div> 
                 </td>
               </tr>
-              <tr>
-                <td>
-                <input id="implementation-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
-                <label for="implementation-toggle-{generate-id()}"></label>
-                  <div class="extra">
-                    <xsl:if test="../mc:context !=''">
-                      <strong><xsl:value-of select="../mc:context/@name"/></strong>
-                      <xsl:text>: </xsl:text>
-                      <xsl:value-of select="../mc:context"/>
-                   </xsl:if>
-                  </div>
-                <xsl:for-each select="mc:value">
-                  <div class="extra">
-                    <xsl:if test="@name !=''">
-                       <strong>Name: </strong><xsl:value-of select="@name"/><br/>
-                     </xsl:if>
-                     <xsl:if test="@offset !=''">
-                       <strong>Offset: </strong><xsl:value-of select="@offset"/><br/>
-                     </xsl:if>
-                     <xsl:if test="@formatid !=''">
-                       <strong>ID: </strong><xsl:value-of select="@formatid"/><br/>
-                     </xsl:if>
-                     <xsl:if test="@context !=''">
-                       <strong>Value context: </strong><xsl:value-of select="@context"/><br/>
-                     </xsl:if>
-                     <xsl:if test=". !=''">
-                       <strong>Value: </strong><xsl:value-of select="."/><br/>
-                     </xsl:if>
-                    <hr/>
-                  </div>
-                </xsl:for-each>
-              </td>
-            </tr>
-          </xsl:for-each>
+            </xsl:for-each> 
         </table>
       </xsl:for-each>
 
@@ -208,10 +239,18 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </div>
+        <xsl:if test="position() &lt; 2">
+          <span class="verbosity">Toggle all verbosity:  </span> 
+          <input id="policy-toggle-{generate-id()}" class="toggle toggle-round" type="checkbox"/>
+          <label for="policy-toggle-{generate-id()}"></label>
+        </xsl:if>
         <table class="mc">
           <xsl:for-each select="mc:check/mc:test">
             <tr>
               <td>
+                <input id="policy-arrow-{generate-id()}" class="arrow arrow-round" type="checkbox"/>
+                <label for="policy-arrow-{generate-id()}"></label>
+                <xsl:text> </xsl:text>
                 <strong>
                   <xsl:value-of select="../@name"/>
                 </strong>
@@ -229,12 +268,6 @@
                 <xsl:if test="@outcome = 'N/A'">
                 <xsl:value-of select="@outcome"/>
                 </xsl:if>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input id="policy-toggle-{generate-id()}" class="cmn-toggle cmn-toggle-round" type="checkbox"/>
-                <label for="policy-toggle-{generate-id()}"></label>
                 <div class="extra">
                     <xsl:if test="../mc:context/@field != ''">
                         <strong><xsl:text>Context (field): </xsl:text></strong>
