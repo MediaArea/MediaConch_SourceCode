@@ -68,7 +68,7 @@
         user-select: none;
       }
 
-      input.arrow-round + label {
+      .arrow + label {
         width: 0;
         height: 0;
         border-style: solid;
@@ -76,12 +76,12 @@
         border-color: black transparent transparent transparent;
       }
 
-      input.arrow-round + label:after {
+      .arrow input:checked + label {
         width: 0;
         height: 0;
         border-style: solid;
         border-width: 8px 0 8px 8px;
-        border-color: transparent transparent transparent black;
+        border-color: transparent transparent black transparent;
       }
 
       input[type=checkbox]:checked ~ .extra {
@@ -180,7 +180,7 @@
           <xsl:for-each select="mc:check/mc:test">
           <tr>
             <td>
-              <input id="implementation-arrow-{generate-id()}" class="arrow arrow-round" type="checkbox"/>
+              <input id="implementation-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
               <label for="implementation-arrow-{generate-id()}"></label>
                 <strong><xsl:value-of select="../@icid"/></strong>
                 <xsl:text>:  </xsl:text>
@@ -248,7 +248,7 @@
           <xsl:for-each select="mc:check/mc:test">
             <tr>
               <td>
-                <input id="policy-arrow-{generate-id()}" class="arrow arrow-round" type="checkbox"/>
+                <input id="policy-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
                 <label for="policy-arrow-{generate-id()}"></label>
                 <xsl:text> </xsl:text>
                 <strong>
