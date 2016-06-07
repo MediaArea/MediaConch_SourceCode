@@ -147,6 +147,10 @@
         display: block;
       }
 
+      input[type=checkbox]:checked ~ .mc .arrow + label {
+        display: none;
+      }
+
       .extra {
         display: none;
       }
