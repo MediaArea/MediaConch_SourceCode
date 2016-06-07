@@ -130,9 +130,7 @@ namespace MediaConch {
                 break;
         if (it != working.end())
         {
-            //TODO: get percent without blocking
-            //percent_done = it->first->percent_done();
-            percent_done = 50.0;
+            percent_done = it->first->percent_done();
             CS.Leave();
             return false;
         }
