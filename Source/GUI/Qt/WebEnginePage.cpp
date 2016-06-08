@@ -88,6 +88,7 @@ namespace MediaConch
             return;
 
         QTextStream out(&file);
+        out.setCodec("UTF-8");
         out << report;
     }
 
