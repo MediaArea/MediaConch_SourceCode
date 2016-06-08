@@ -66,14 +66,13 @@
         cursor: pointer;
         outline: none;
         user-select: none;
-      }
-
-      .arrow + label {
-        width: 0;
-        height: 0;
-        border-style: solid;
-        border-width: 8px 8px 0 8px;
-        border-color: black transparent transparent transparent;
+        border-right:5px solid black;
+        border-bottom:5px solid black;
+        width:10px;
+        height:10px;
+        transform: rotate(-45deg);
+        margin-top:5px;
+        margin-right:5px;
       }
 
       .arrow input:checked + label {
@@ -86,6 +85,10 @@
 
       input[type=checkbox]:checked ~ .extra {
         display: block;
+      }
+
+      input.arrow:checked + label {
+        transform: rotate(45deg);
       }
 
       .toggle {
