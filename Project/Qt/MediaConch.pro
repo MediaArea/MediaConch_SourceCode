@@ -91,7 +91,6 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/xsltpolicymenu.cpp \
                     ../../Source/GUI/Qt/unknownpolicymenu.cpp \
                     ../../Source/GUI/Qt/xsltruleedit.cpp \
-                    ../../Source/GUI/Qt/displaymenu.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp \
                     ../../Source/GUI/Qt/workerfiles.cpp \
                     ../../Source/GUI/Qt/DatabaseUi.cpp \
@@ -163,7 +162,6 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/xsltpolicymenu.h \
                     ../../Source/GUI/Qt/unknownpolicymenu.h \
                     ../../Source/GUI/Qt/xsltruleedit.h \
-                    ../../Source/GUI/Qt/displaymenu.h \
                     ../../Source/GUI/Qt/progressbar.h \
                     ../../Source/GUI/Qt/workerfiles.h \
                     ../../Source/GUI/Qt/DatabaseUi.h \
@@ -181,7 +179,6 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/xsltpolicymenu.ui \
                     ../../Source/GUI/Qt/unknownpolicymenu.ui \
                     ../../Source/GUI/Qt/xsltruleedit.ui \
-                    ../../Source/GUI/Qt/displaymenu.ui \
                     ../../Source/GUI/Qt/progressbar.ui
 
 

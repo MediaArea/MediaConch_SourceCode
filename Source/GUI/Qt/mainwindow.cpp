@@ -736,7 +736,7 @@ void MainWindow::createDisplayView()
     if (clearVisualElements() < 0)
         return;
     displayView = new DisplayWindow(this);
-    displayView->displayDisplay();
+    displayView->display_display();
 }
 
 //---------------------------------------------------------------------------

@@ -10,12 +10,9 @@
 #include <QFileInfo>
 #include <QString>
 
-class QTableWidget;
-
 namespace MediaConch {
 
 class MainWindow;
-class DisplayMenu;
 
 class DisplayWindow : public QObject
 {
@@ -25,13 +22,12 @@ public:
     explicit DisplayWindow(MainWindow* m);
     ~DisplayWindow();
 
-    void displayDisplay();
-    void clearDisplay();
-    void fillTable();
+    void display_display();
+    void clear_display();
+    void fill_table();
 
 private:
     // Visual elements
-    DisplayMenu  *displayMenu;
     MainWindow   *mainwindow;
 
 private Q_SLOTS:
