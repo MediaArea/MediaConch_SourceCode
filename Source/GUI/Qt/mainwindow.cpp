@@ -505,6 +505,33 @@ std::vector<QString>& MainWindow::get_displays()
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::display_add_file(const QString& name, const QString& filename)
+{
+    if (!displayView)
+        return -1;
+
+    return displayView->add_new_file(name, filename);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::display_export_id(const QString& name)
+{
+    if (!displayView)
+        return;
+
+    displayView->export_file(name);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::display_delete_id(const QString& name)
+{
+    if (!displayView)
+        return;
+
+    displayView->delete_file(name);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::get_display_index_by_filename(const std::string& filename)
 {
     for (size_t i = 0; i < displays_list.size(); ++i)

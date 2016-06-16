@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="qrc:/bootstrap.css">
+    <link rel="stylesheet" href="qrc:/jstree.css">
+    <link rel="stylesheet" href="qrc:/datatables.css">
+    <link rel="stylesheet" type="text/css" href="qrc:/main.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="qrc:/main-gui.css" media="screen"/>
+    <script type="text/javascript">
+      var WEBMACHINE = '{{ webmachine }}';
+    </script>
+    <script src="qrc:/jquery.js"></script>
+    <script src="qrc:/bootstrap.js"></script>
+    <script src="qrc:/jstree.js"></script>
+    <script src="qrc:/jstreegrid.js"></script>
+    <script src="qrc:/display.js"></script>
+    <script type="text/javascript" src="qrc:/datatables.js"></script>
+    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <title>MediaConchOnline Display Management</title>
+  </head>
+  <body id="body"  class="container">
+    <div class="content">
+      <div class="row">
+        <div class="col-lg-11 col-lg-offset-1">
+          <div class="col-md-12">
+            <h1 class="headline">Display</h1>
+          </div>
+          <div class="col-md-6">
+            <div>
+              <h2>Import a display</h2>
+              <form id="displayImport" name="displayImport" method="post" action="" enctype="multipart/form-data">
+                <div id="displayImport">
+                  <div class="form-group">
+                    <label class="control-label required" for="displayImport_displayName">Display name</label>
+                    <input type="text" id="displayImport_displayName" name="displayImport_displayName" required="required" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label required" for="displayImport_displayFile">Display file</label>
+                    <input type="file" id="displayImport_displayFile" name="displayImport_displayFile" required="required" accept=".xsl,.xml"  onclick="webpage.on_input_changed(this.name);" />
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" id="displayImport_ImportDisplay" name="displayImport_ImportDisplay" class="btn-warning btn">Import display</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h4>Display list:</h4>
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            </div>
+
+            <h4>System display list:</h4>
+            <div class="panel-group" id="accordionSystem" role="tablist" aria-multiselectable="true">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% block bodyScript %}{% endblock %}
+    </body>
+</html>
