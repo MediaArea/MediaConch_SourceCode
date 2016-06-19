@@ -35,6 +35,8 @@
         <file alias="glyphicons-halflings-regular.svg">html/fonts/glyphicons-halflings-regular.svg</file>
         <file alias="glyphicons-halflings-regular.woff">html/fonts/glyphicons-halflings-regular.woff</file>
         <file alias="glyphicons-halflings-regular.woff2">html/fonts/glyphicons-halflings-regular.woff2</file>
+        <file alias="ajax-spinner-big.gif">Image/ajax-spinner-big.gif</file>
+        <file alias="ajax-spinner-small.gif">Image/ajax-spinner-small.gif</file>
     </qresource>
     <qresource prefix="/policies">
         <file alias="Policy_Set_Example.xsl">policies/Policy_Set_Example.xsl</file>
