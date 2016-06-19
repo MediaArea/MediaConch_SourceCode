@@ -196,14 +196,14 @@
                 </xsl:if>
                 <xsl:text> Results: </xsl:text>
                 <xsl:choose>
-                <xsl:when test="@fail_count &gt; 0">
-                  <xsl:text>&#x274C;  </xsl:text>
-                  <xsl:text>  Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>&#x2705;  </xsl:text><xsl:value-of select="@outcome"/>
-                </xsl:otherwise>
-              </xsl:choose>
+                  <xsl:when test="@fail_count &gt; 0">
+                    <xsl:text>&#x274C;  </xsl:text>
+                    <xsl:text>  Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>&#x2705;  </xsl:text><xsl:value-of select="@outcome"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               <br/>
               <xsl:for-each select="mc:test">
                 <div class="extra">
@@ -214,11 +214,11 @@
                     <xsl:text> &#x2705;  </xsl:text>
                   </xsl:if>
                   <xsl:if test="@outcome = 'fail'">
+                  </xsl:if>
                     <xsl:text> &#x274C;  </xsl:text>
                     <xsl:text>(Reason: </xsl:text>
                     <xsl:value-of select="@reason"/>
                     <xsl:text>)</xsl:text>
-                  </xsl:if>
                   <xsl:if test="@outcome = 'n/a'">
                   (Reason: <xsl:value-of select="@reason"/>
                   <xsl:text>) </xsl:text>
