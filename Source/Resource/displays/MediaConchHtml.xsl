@@ -190,8 +190,11 @@
                 <input id="implementation-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
                 <label for="implementation-arrow-{generate-id()}"></label>
                 <strong><xsl:value-of select="@icid"/></strong>
-                <xsl:text>  Tests run: </xsl:text><xsl:value-of select="@tests_run"/>
-                <xsl:text>  </xsl:text>
+                <xsl:if test="@tests_run !=''">
+                  <xsl:text>  Tests run: </xsl:text><xsl:value-of select="@tests_run"/>
+                  <xsl:text>  | </xsl:text>
+                </xsl:if>
+                <xsl:text> Results: </xsl:text>
                 <xsl:choose>
                 <xsl:when test="@fail_count &gt; 0">
                   <xsl:text>&#x274C;  </xsl:text>
@@ -205,13 +208,13 @@
               <xsl:for-each select="mc:test">
                 <div class="extra">
                   <strong><xsl:value-of select="/mc:context/@name"/></strong>
+                  <strong><xsl:text>Results: </xsl:text></strong> 
                   <xsl:value-of select="@outcome"/>
-                  <xsl:text>  </xsl:text>
                   <xsl:if test="@outcome = 'pass'">
-                    <xsl:text>&#x2705;  </xsl:text>
+                    <xsl:text> &#x2705;  </xsl:text>
                   </xsl:if>
                   <xsl:if test="@outcome = 'fail'">
-                    <xsl:text>&#x274C;  </xsl:text>
+                    <xsl:text> &#x274C;  </xsl:text>
                     <xsl:text>(Reason: </xsl:text>
                     <xsl:value-of select="@reason"/>
                     <xsl:text>)</xsl:text>
@@ -241,6 +244,7 @@
                    <xsl:if test="mc:value/. !=''">
                      <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
                    </xsl:if>
+                   <hr/>
                   </div> 
                 </xsl:for-each>
               </td>
