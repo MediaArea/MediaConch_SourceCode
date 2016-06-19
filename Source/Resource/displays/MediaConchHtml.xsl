@@ -184,31 +184,43 @@
           <label for="implementation-toggle-{generate-id()}"></label>
         </xsl:if>
         <table class="mc">
-          <xsl:for-each select="mc:check/mc:test">
-          <tr>
-            <td>
-              <input id="implementation-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
-              <label for="implementation-arrow-{generate-id()}"></label>
-                <strong><xsl:value-of select="../@icid"/></strong>
-                <xsl:text>:  </xsl:text>
-                <strong><xsl:value-of select="../@name"/></strong>
+          <xsl:for-each select="mc:check">
+            <tr>
+              <td>
+                <input id="implementation-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
+                <label for="implementation-arrow-{generate-id()}"></label>
+                <strong><xsl:value-of select="@icid"/></strong>
+                <xsl:text>  Tests run: </xsl:text><xsl:value-of select="@tests_run"/>
                 <xsl:text>  </xsl:text>
-                <xsl:value-of select="@outcome"/>
-                <xsl:text>  </xsl:text>
-                <xsl:if test="@outcome = 'pass'">
-                  <xsl:text>&#x2705;  </xsl:text>
-                </xsl:if>
-                <xsl:if test="@outcome = 'fail'">
+                <xsl:choose>
+                <xsl:when test="@fail_count &gt; 0">
                   <xsl:text>&#x274C;  </xsl:text>
-                  <xsl:text>(Reason: </xsl:text>
-                  <xsl:value-of select="@reason"/>
-                  <xsl:text>)</xsl:text>
-                </xsl:if>
-                <xsl:if test="@outcome = 'n/a'">
-                (Reason: <xsl:value-of select="@reason"/>
-                <xsl:text>) </xsl:text>
-                </xsl:if>
+                  <xsl:text>  Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>&#x2705;  </xsl:text><xsl:value-of select="@outcome"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              <br/>
+              <xsl:for-each select="mc:test">
                 <div class="extra">
+                  <strong><xsl:value-of select="/mc:context/@name"/></strong>
+                  <xsl:value-of select="@outcome"/>
+                  <xsl:text>  </xsl:text>
+                  <xsl:if test="@outcome = 'pass'">
+                    <xsl:text>&#x2705;  </xsl:text>
+                  </xsl:if>
+                  <xsl:if test="@outcome = 'fail'">
+                    <xsl:text>&#x274C;  </xsl:text>
+                    <xsl:text>(Reason: </xsl:text>
+                    <xsl:value-of select="@reason"/>
+                    <xsl:text>)</xsl:text>
+                  </xsl:if>
+                  <xsl:if test="@outcome = 'n/a'">
+                  (Reason: <xsl:value-of select="@reason"/>
+                  <xsl:text>) </xsl:text>
+                  </xsl:if>
+                  <br/>
                   <xsl:if test="../mc:context !=''">
                     <strong><xsl:value-of select="../mc:context/@name"/></strong>
                     <xsl:text>: </xsl:text>
@@ -229,11 +241,11 @@
                    <xsl:if test="mc:value/. !=''">
                      <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
                    </xsl:if>
-                    <hr/>
                   </div> 
-                </td>
-              </tr>
-            </xsl:for-each> 
+                </xsl:for-each>
+              </td>
+            </tr>
+          </xsl:for-each> 
         </table>
       </xsl:for-each>
 
