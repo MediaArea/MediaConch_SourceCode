@@ -203,3 +203,35 @@ p.registration {
 .panel-body a button.pull-right {
     margin-left: 10px;
 }
+
+.spinner-cell, .spinner-status {
+    background: transparent url("qrc:/ajax-spinner-small.gif");
+    width: 16px;
+    height: 14px;
+    display: block;
+    margin: 0 auto;
+}
+
+.spinner-status {
+    display: inline-block;
+}
+
+.spinner-modal {
+    background: transparent url("qrc:/ajax-spinner-big.gif");
+    width: 66px;
+    height: 66px;
+    display: block;
+    margin: 0 auto;
+}
+
+.alert-modal-create-policy {
+    display: inline-block;
+    margin-top: inherit;
+    margin-bottom: inherit;
+    font-size: 16px;
+    padding: 6px 12px;
+}
+
+.alert-modal-create-policy a {
+    text-decoration: underline;
+}
