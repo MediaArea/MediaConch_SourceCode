@@ -416,7 +416,7 @@ void MainWindow::add_default_policy()
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
         QByteArray schematron = file.readAll();
-        const std::string& file_str = list[i].absoluteFilePath().toStdString();
+        const std::string& file_str = list[i].absoluteFilePath().toUtf8().data();
         std::string memory(schematron.constData(), schematron.length());
         std::string err;
         MCL.import_policy_from_memory(memory, file_str, err);
@@ -437,7 +437,7 @@ void MainWindow::add_default_policy()
         QByteArray data = file.readAll();
         std::string memory(data.constData(), data.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, list[i].absoluteFilePath().toStdString(),
+        MCL.import_policy_from_memory(memory, list[i].absoluteFilePath().toUtf8().data(),
                                       err);
     }
 }
@@ -621,7 +621,7 @@ void MainWindow::on_actionChooseSchema_triggered()
         return;
 
     std::string err;
-    if (MCL.import_policy_from_file(file.toStdString(), err) < 0)
+    if (MCL.import_policy_from_file(file.toUtf8().data(), err) < 0)
         set_msg_to_status_bar("Policy not valid");
 
     if (!ui->actionPolicies->isChecked())
@@ -643,7 +643,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             if (!MCL.get_policy(i)->saved)
             {
                 info += "\r\n\t";
-                info += QString().fromStdString(MCL.get_policy(i)->title);
+                info += QString().fromUtf8(MCL.get_policy(i)->title.c_str());
             }
 
         msgBox.setInformativeText(info);
@@ -1078,7 +1078,7 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
                    vec, vec,
                    options,
                    &result, &display_name, &display_content);
-    return QString().fromStdString(result.report);
+    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
@@ -1295,7 +1295,7 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
             display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);
             QByteArray xsl = display_xsl.readAll();
             display_xsl.close();
-            display_content = QString(xsl).toStdString();
+            display_content = QString(xsl).toUtf8().data();
         }
         else
             display_content = std::string(implementation_report_display_html_xsl);
@@ -1306,7 +1306,7 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
         display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);
         QByteArray xsl = display_xsl.readAll();
         display_xsl.close();
-        display_content = QString(xsl).toStdString();
+        display_content = QString(xsl).toUtf8().data();
     }
     else
         display_content = std::string(implementation_report_display_html_xsl);
@@ -1350,7 +1350,7 @@ void MainWindow::create_and_configure_ui_database()
     if (get_ui_database_path(db_path) < 0)
     {
         db_path = Core::get_local_data_path();
-        QDir f(QString().fromStdString(db_path));
+        QDir f(QString().fromUtf8(db_path.c_str(), db_path.length()));
         if (!f.exists())
             db_path = ".";
     }
@@ -1369,7 +1369,7 @@ void MainWindow::create_and_configure_ui_database()
                 error += " ";
             error += errors[i];
         }
-        QString msg = QString().fromStdString(error);
+        QString msg = QString().fromUtf8(error.c_str(), error.length());
         set_msg_to_status_bar(msg);
         delete db;
         db = NULL;
@@ -1386,10 +1386,10 @@ void MainWindow::create_and_configure_ui_database()
 //---------------------------------------------------------------------------
 void MainWindow::fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p)
 {
-    std::string verbosity = QString().setNum(uisettings.get_default_verbosity()).toStdString();
+    std::string verbosity = QString().setNum(uisettings.get_default_verbosity()).toUtf8().data();
 
     if (verbosity_p && *verbosity_p != -1)
-        verbosity = QString().setNum(*verbosity_p).toStdString();
+        verbosity = QString().setNum(*verbosity_p).toUtf8().data();
 
     if (verbosity.length())
     {
