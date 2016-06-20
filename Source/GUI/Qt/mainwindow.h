@@ -143,10 +143,15 @@ public:
 
     const std::vector<Policy *>&  get_all_policies() const;
     void                          get_policies(std::vector<std::pair<QString, QString> >&);
-    std::vector<QString>&         get_displays();
-    int                           get_display_index_by_filename(const std::string& filename);
     QString                       get_local_folder() const;
     void                          get_registered_files(std::map<std::string, FileRegistered>& files);
+
+    // Display related
+    std::vector<QString>&         get_displays();
+    int                           display_add_file(const QString& name, const QString& filename);
+    void                          display_export_id(const QString& name);
+    void                          display_delete_id(const QString& name);
+    int                           get_display_index_by_filename(const std::string& filename);
 
     UiSettings&                 get_settings();
 

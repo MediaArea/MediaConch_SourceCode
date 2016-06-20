@@ -73,6 +73,11 @@ public Q_SLOTS:
     QString      file_is_analyzed(const QString& file);
     QString      change_policy_for_file(const QString& file, const QString& policy, const QString& fileId);
 
+
+    QString      display_add_file(const QString& name);
+    void         display_export_id(const QString& name);
+    void         display_delete_id(const QString& name);
+
 private Q_SLOTS:
     void         on_load_finished(bool ok);
 

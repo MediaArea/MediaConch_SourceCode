@@ -10,12 +10,11 @@
 #include <QFileInfo>
 #include <QString>
 
-class QTableWidget;
-
 namespace MediaConch {
 
 class MainWindow;
-class DisplayMenu;
+class WebView;
+class ProgressBar;
 
 class DisplayWindow : public QObject
 {
@@ -25,19 +24,28 @@ public:
     explicit DisplayWindow(MainWindow* m);
     ~DisplayWindow();
 
-    void displayDisplay();
-    void clearDisplay();
-    void fillTable();
+    void display_display();
+
+    int  add_new_file(const QString& name, const QString& filename);
+    void export_file(const QString& name);
+    void delete_file(const QString& name);
 
 private:
     // Visual elements
-    DisplayMenu  *displayMenu;
     MainWindow   *mainwindow;
+    WebView      *web_view;
+    ProgressBar  *progress_bar;
+    bool          is_finished;
+
+    void clear_display();
+    void create_html();
+    void create_html_display(QString& html);
+    void change_body_script_in_template(QString& html);
+    void set_webmachine_script_in_template(QString& html);
+    void fill_table();
 
 private Q_SLOTS:
-    void add_new_file();
-    void export_file();
-    void delete_file();
+    void create_web_view_finished(bool ok);
 };
 
 }

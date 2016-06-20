@@ -459,7 +459,11 @@ namespace MediaConch
             return choose_file_settings();
 
         QStringList list;
-        std::string suggested_str = mainwindow->select_correct_load_files_path();
+        std::string suggested_str;
+        if (select_file_name == "displayImport_displayFile")
+            suggested_str = mainwindow->select_correct_load_display_path();
+        else
+            suggested_str = mainwindow->select_correct_load_files_path();
         QString suggested = QString().fromUtf8(suggested_str.c_str(), suggested_str.length());
         if (mode == QWebEnginePage::FileSelectOpen)
         {
@@ -478,7 +482,10 @@ namespace MediaConch
             }
 
             QDir info(QFileInfo(value_input).absoluteDir());
-            mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
+            if (select_file_name == "displayImport_displayFile")
+                mainwindow->set_last_load_display_path(info.absolutePath().toUtf8().data());
+            else
+                mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
 
             if (it != file_selector.end())
                 file_selector[select_file_name] << value_input;
@@ -498,11 +505,11 @@ namespace MediaConch
             }
 
             list = names;
-            QMap<QString, QStringList>::iterator it = file_selector.find("checkerUpload_file");
+            QMap<QString, QStringList>::iterator it = file_selector.find(select_file_name);
             if (it != file_selector.end())
-                file_selector["checkerUpload_file"] = names;
+                file_selector[select_file_name] = names;
             else
-                file_selector.insert("checkerUpload_file", names);
+                file_selector.insert(select_file_name, names);
         }
 
         return list;
@@ -693,6 +700,32 @@ namespace MediaConch
         }
     }
 
+    QString WebPage::display_add_file(const QString& name)
+    {
+        QStringList files = file_selector.value("displayImport_displayFile", QStringList());
+        if (files.empty())
+            return "";
+
+        QString filename = files.last();
+        int id = mainwindow->display_add_file(name, filename);
+        if (id < 0)
+            return "";
+
+        file_selector.clear();
+        std::vector<QString>& displays = mainwindow->get_displays();
+        QFileInfo file(displays[id]);
+        return file.baseName();
+    }
+
+    void WebPage::display_export_id(const QString& name)
+    {
+        mainwindow->display_export_id(name);
+    }
+
+    void WebPage::display_delete_id(const QString& name)
+    {
+        mainwindow->display_delete_id(name);
+    }
 }
 
 #endif
