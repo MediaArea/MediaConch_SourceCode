@@ -309,6 +309,7 @@ function implementationCell(data, resultId, fileId) {
 
             // Update report when display is changed
             displayList = $('.tab-content .active .displayList').clone();
+            displayList.find('option').prop("selected", false);
             displayList.attr('id', 'modalConformanceDisplay' + resultId);
             displayList.find("option[value = '" + nodeModal.data('display') + "']").attr('selected', 'selected');
             $('#modalConformanceDisplay' + resultId).replaceWith(displayList);
@@ -328,6 +329,7 @@ function implementationCell(data, resultId, fileId) {
 
             // Update report when verbosity is changed
             verbosityList = $('.tab-content .active .verbosityList').clone();
+            verbosityList.find('option').prop("selected", false);
             verbosityList.attr('id', 'modalConformanceVerbosity' + resultId);
             verbosityList.find("option[value = '" + nodeModal.data('verbosity') + "']").attr('selected', 'selected');
             $('#modalConformanceVerbosity' + resultId).replaceWith(verbosityList);
@@ -455,6 +457,7 @@ function policyModal(resultId, fileId)
 
             // Update report when display is changed
             displayList = $('.tab-content .active .displayList').clone();
+            displayList.find('option').prop("selected", false);
             displayList.attr('id', 'modalPolicyDisplay' + resultId);
             displayList.find("option[value = '" + nodeModal.data('display') + "']").attr('selected', 'selected');
             $('#modalPolicyDisplay' + resultId).replaceWith(displayList);
@@ -480,6 +483,7 @@ function policyModal(resultId, fileId)
 
             // Update report when policy is changed
             policyList = $('.tab-content .active .policyList').clone();
+            policyList.find('option').prop("selected", false);
             policyList.attr('id', 'modalPolicyPolicy' + resultId);
             policyList.find("option[value = '" + nodeModal.data('policy') + "']").attr('selected', 'selected');
             $('#modalPolicyPolicy' + resultId).replaceWith(policyList);
