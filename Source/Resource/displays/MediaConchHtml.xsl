@@ -6,23 +6,35 @@
   <head>
     <title>MediaConch</title>
     <style type="text/css">
+
+      .mediaconch_report {
+        max-width: 1280px;
+        border: 1px black solid;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
       .mc_header {
         width: 100%;
         max-width: 1280px;
-        border: 1px black solid;
-        background-color: #64A8DD;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 14px;
-      }
-
-      .mc_header h4, .mc_header div {
-        margin: 10px;
-        text-align: center;
+        font-size: 16px;
       }
 
       .mc_header p {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 12px;
+        font-size: 14px;
+        margin-left:20px;
+      }
+
+      .mc_header h1 {
+        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 18px;
+      }
+
+      .mc_header h2 {
+        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 14px;
       }
 
       .mc {
@@ -31,6 +43,7 @@
         background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
+        margin-top: 18px;
       }
 
       .mc h1  {
@@ -54,6 +67,14 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
+      .mc_element {
+        border: 2px solid #ddd;
+        background-color: #f5f5f5;
+        padding: 5px;
+        padding-bottom: 10px;
+        border-bottom: 0;
+      }
+
       .arrow {
         position: absolute;
         margin-left: -9999px;
@@ -68,11 +89,11 @@
         user-select: none;
         border-right:5px solid black;
         border-bottom:5px solid black;
-        width:10px;
-        height:10px;
+        width:8px;
+        height:8px;
         transform: rotate(-45deg);
-        margin-top:5px;
-        margin-right:5px;
+        margin-top:6px;
+        margin-right:6px;
       }
 
       .arrow input:checked + label {
@@ -108,9 +129,10 @@
       input.toggle-round + label {
         padding: 2px;
         width: 30px;
-        height: 11px;
+        height: 12px;
         background-color: #dddddd;
         border-radius: 15px;
+        vertical-align:middle;
       }
 
       input.toggle-round + label:before,
@@ -160,20 +182,23 @@
 
       .verbosity {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 12px;
+        font-size: 14px;
+        margin-left:20px;
+        padding-right:4px;
       }
     </style>
   </head>
-  <body>
+  <body class="mediaconch_report">
     <xsl:for-each select="mc:media">
       <div class="mc_header">
-        <h4>&#x1F41A; MediaConch Report for <xsl:value-of select="@ref"/></h4>
+        <h1>&#x1F41A; MediaConch Report</h1>
+        <p>File: <xsl:value-of select="@ref"/></p>
       </div>
       <xsl:for-each select="mc:implementationChecks">
         <div class="mc_header">
-          <h4>
+          <h2>
             <xsl:value-of select="mc:name"/>
-          </h4>
+          </h2>
           <p>
             <xsl:value-of select="mc:description"/>
           </p>
@@ -186,7 +211,7 @@
         <table class="mc">
           <xsl:for-each select="mc:check">
             <tr>
-              <td>
+              <td class="mc_element">
                 <input id="implementation-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
                 <label for="implementation-arrow-{generate-id()}"></label>
                 <strong><xsl:value-of select="@icid"/></strong>
@@ -214,11 +239,11 @@
                     <xsl:text> &#x2705;  </xsl:text>
                   </xsl:if>
                   <xsl:if test="@outcome = 'fail'">
-                  </xsl:if>
                     <xsl:text> &#x274C;  </xsl:text>
                     <xsl:text>(Reason: </xsl:text>
                     <xsl:value-of select="@reason"/>
                     <xsl:text>)</xsl:text>
+                  </xsl:if>
                   <xsl:if test="@outcome = 'n/a'">
                   (Reason: <xsl:value-of select="@reason"/>
                   <xsl:text>) </xsl:text>
@@ -244,7 +269,6 @@
                    <xsl:if test="mc:value/. !=''">
                      <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
                    </xsl:if>
-                   <hr/>
                   </div> 
                 </xsl:for-each>
               </td>
