@@ -51,10 +51,7 @@
       }
 
       .mc hr  {
-        width: 99%;
-        border-top: 1px solid #000;
-        margin-top: 10px;
-        margin-bottom: 10px;
+        border-top: 1px solid whitesmoke;
         box-sizing: content-box;
         height: 0;
       }
@@ -70,9 +67,14 @@
       .mc_element {
         border: 2px solid #ddd;
         background-color: #f5f5f5;
-        padding: 5px;
-        padding-bottom: 10px;
         border-bottom: 0;
+        padding: 5px;
+      }
+
+      .mc_element .extra {
+        background-color: white;
+        padding: 8px;
+        border: 1px solid #ddd
       }
 
       .arrow {
@@ -94,6 +96,7 @@
         transform: rotate(-45deg);
         margin-top:6px;
         margin-right:6px;
+        margin-left:6px;
       }
 
       .arrow input:checked + label {
@@ -229,7 +232,7 @@
                     <xsl:text>&#x2705;  </xsl:text><xsl:value-of select="@outcome"/>
                   </xsl:otherwise>
                 </xsl:choose>
-              <br/>
+              <hr/>
               <xsl:for-each select="mc:test">
                 <div class="extra">
                   <strong><xsl:value-of select="/mc:context/@name"/></strong>
@@ -269,6 +272,7 @@
                    <xsl:if test="mc:value/. !=''">
                      <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
                    </xsl:if>
+                    <br/>
                   </div> 
                 </xsl:for-each>
               </td>
