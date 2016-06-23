@@ -83,7 +83,7 @@ void DisplayWindow::fill_table()
             script = "addUserDisplay";
 
         script += QString("('%2');")
-            .arg(file.baseName());
+            .arg(file.completeBaseName());
         ((WebPage*)web_view->page())->use_javascript(script);
     }
 }
@@ -106,15 +106,22 @@ int DisplayWindow::add_new_file(const QString& name, const QString& filename)
         if (!dir.mkpath(dir.absolutePath()))
             return -1;
 
+    QString display_name = name;
+    if (!display_name.length())
+    {
+        QFileInfo file_info(filename);
+        display_name = file_info.completeBaseName();
+    }
+
     std::vector<QString>& displays = mainwindow->get_displays();
     int pos = (int)displays.size();
     for (int j = 0; 1; ++j)
     {
         QString str;
         if (!j)
-            str = QString("%1/%2.xsl").arg(dir.absolutePath()).arg(name);
+            str = QString("%1/%2.xsl").arg(dir.absolutePath()).arg(display_name);
         else
-            str = QString("%1/%2_%3.xsl").arg(dir.absolutePath()).arg(name).arg(j);
+            str = QString("%1/%2_%3.xsl").arg(dir.absolutePath()).arg(display_name).arg(j);
         QFile info(str);
         if (info.exists())
             continue;
@@ -122,6 +129,56 @@ int DisplayWindow::add_new_file(const QString& name, const QString& filename)
         QFile::copy(filename, str);
         displays.push_back(str);
         break;
+    }
+
+    return pos;
+}
+
+int DisplayWindow::add_new_files(const QStringList& files)
+{
+#if QT_VERSION >= 0x050400
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+
+    path += ("/displays");
+
+    QDir dir(path);
+
+    if (!dir.exists())
+        if (!dir.mkpath(dir.absolutePath()))
+            return -1;
+
+    std::vector<QString>& displays = mainwindow->get_displays();
+    int pos = (int)displays.size();
+    for (int i = 0; i < files.size(); ++i)
+    {
+        QFileInfo file_info(files[i]);
+        QString name = file_info.completeBaseName();
+        for (int j = 0; 1; ++j)
+        {
+            QString str;
+            if (!j)
+                str = QString("%1/%2.xsl").arg(dir.absolutePath()).arg(name);
+            else
+                str = QString("%1/%2_%3.xsl").arg(dir.absolutePath()).arg(name).arg(j);
+            QFile info(str);
+            if (info.exists())
+                continue;
+
+            QFile::copy(files[i], str);
+            displays.push_back(str);
+
+            QString script = QString("addUserDisplay('%2');").arg(file_info.completeBaseName());
+            ((WebPage*)web_view->page())->use_javascript(script);
+            break;
+        }
+
+        if (i + 1 == files.size())
+            mainwindow->set_last_load_display_path(file_info.absolutePath().toUtf8().data());
     }
 
     return pos;
@@ -135,7 +192,7 @@ void DisplayWindow::export_file(const QString& name)
     for (; i < displays.size(); ++i)
     {
         QFileInfo f(displays[i]);
-        if (f.baseName() == name)
+        if (f.completeBaseName() == name)
             break;
     }
     if (i == displays.size())
@@ -162,8 +219,11 @@ void DisplayWindow::delete_file(const QString& name)
     size_t i = 0;
     for (; i < displays.size(); ++i)
     {
+        if (displays[i].startsWith(":/displays"))
+            continue;
+
         QFileInfo f(displays[i]);
-        if (f.baseName() == name)
+        if (f.completeBaseName() == name)
             break;
     }
     if (i == displays.size())

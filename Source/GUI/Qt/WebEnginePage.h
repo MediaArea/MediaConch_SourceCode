@@ -23,7 +23,7 @@ class WebPage : public QWebEnginePage
 public:
     explicit WebPage(MainWindow *m, QWidget *parent = 0);
 
-    void         change_local_files(QStringList& files);
+    void         change_local_files(const QStringList& files);
     void         use_javascript(const QString& js);
 
 protected:
