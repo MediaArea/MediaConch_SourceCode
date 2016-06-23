@@ -103,7 +103,7 @@ int Help_Advanced()
     TEXTOUT("                    Compress report in database using [Mode]");
     TEXTOUT("                    [Mode] can be None for no compression");
     TEXTOUT("                    [Mode] can be ZLib to use zlib");
-    TEXTOUT("--cz");
+    TEXTOUT("-cz");
     TEXTOUT("                    Same as --Compression=ZLib");
     TEXTOUT("");
     TEXTOUT("Implementation Checker:");
