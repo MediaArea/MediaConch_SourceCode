@@ -66,7 +66,7 @@ public:
     int  exporting_to_unknown_file(size_t pos);
     int  exporting_to_xslt_file(size_t pos);
     void exporting_policy(size_t pos);
-    void create_policy_from_file(const QString& file);
+    size_t create_policy_from_file(const QString& file);
 
     // UI
     void                        Ui_Init();

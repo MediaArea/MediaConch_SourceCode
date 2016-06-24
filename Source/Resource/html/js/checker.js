@@ -132,25 +132,32 @@ function addFile(sourceName, fileName, fileId, formValues) {
     (function theLoop(resultId, time, i) {
         setTimeout(function () {
             if (!$(result.cell('#' + resultId, 5).node()).hasClass('success')) {
-                    if (WEBMACHINE == "WEB_MACHINE_KIT") {
-                        analyzed = webpage.file_is_analyzed(sourceName);
+                if (WEBMACHINE == "WEB_MACHINE_KIT") {
+                    analyzed = webpage.file_is_analyzed(sourceName);
+                    var data = JSON.parse(analyzed);
+                    processCheckerStatusRequest(data, resultId, fileId);
+                }
+                else {
+                    webpage.file_is_analyzed(sourceName, function (analyzed) {
                         var data = JSON.parse(analyzed);
-                        processCheckerStatusRequest(data, resultId, fileId)
+                        processCheckerStatusRequest(data, resultId, fileId);
+                    });
+                }
+                // If i > 0, keep going
+                if ($(result.cell('#' + resultId, 5).node()).hasClass('info') && --i > 0) {
+                    // Limit loop timer to 10s
+                    if ((time *= 2) > 10000) {
+                        time = 10000;
                     }
-                    else {
-                        webpage.file_is_analyzed(sourceName, function (analyzed) {
-                            var data = JSON.parse(analyzed);
-                            processCheckerStatusRequest(data, resultId, fileId)
-                        });
-                    }
-            }
-            // If i > 0, keep going
-            if ($(result.cell('#' + resultId, 5).node()).hasClass('info') && --i > 0) {
-                // Call the loop again
-                theLoop(resultId, time * 2, i);
+                    // Call the loop again
+                    theLoop(resultId, time, i);
+                }
+                else if (i <= 0) {
+                    statusCellError(resultId, fileId);
+                }
             }
         }, time);
-    })(resultId, 100, 15);
+    })(resultId, 100, 100);
 
     if ($('#checkerResultTitle .close').hasClass('hidden')) {
         $('#checkerResultTitle .close').removeClass('hidden');
@@ -165,7 +172,12 @@ function processCheckerStatusRequest(data, resultId, fileId) {
         // Report type
         node.data('tool', data.tool);
 
+        // Status
+        statusCellSuccess(resultId, fileId);
+
         // Implementation
+        addSpinnerToCell(result.cell(node, 1));
+
         if (WEBMACHINE == "WEB_MACHINE_KIT") {
             valid = webpage.implementation_is_valid(sourceName);
             var implemData = {};
@@ -184,6 +196,7 @@ function processCheckerStatusRequest(data, resultId, fileId) {
         {
             if (node.data('policy') && node.data('policy') != -1)
             {
+                addSpinnerToCell(result.cell(node, 2));
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
                     valid = webpage.policy_is_valid(sourceName);
                     var policyData = {};
@@ -211,23 +224,27 @@ function processCheckerStatusRequest(data, resultId, fileId) {
 
         // MediaTrace
         mediaTraceCell(resultId, fileId);
-
-        // Status
-        statusCell(resultId, fileId);
-
-        //stop timer
-        //i = 0;
     }
     else if (data.percent > 0) {
-        $(result.cell('#' + resultId, 5).node()).find('.status-text').text('Analyzing');
+        if (undefined == data.tool || 2 != data.tool || 100 == data.percent) {
+            $(result.cell('#' + resultId, 5).node()).find('.status-text').html('<span class="spinner-status"></span>');
+        } else {
+            $(result.cell('#' + resultId, 5).node()).find('.status-text').html('<span class="spinner-status"></span>&nbsp;' + Math.round(data.percent) + '%');
+        }
     }
 }
 
-function statusCell(resultId, fileId) {
+function statusCellSuccess(resultId, fileId) {
     nodeStatus = $(result.cell('#' + resultId, 5).node());
     nodeStatus.removeClass().addClass('success');
-    nodeStatus.find('.status-text').text('Analyzed');
+    nodeStatus.find('.status-text').html('<span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Analyzed');
 };
+
+function statusCellError(resultId, fileId) {
+    nodeStatus = $(result.cell('#' + resultId, 5).node());
+    nodeStatus.removeClass().addClass('danger');
+    nodeStatus.find('.status-text').html('<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> Error');
+}
 
 function implementationCell(data, resultId, fileId) {
     nodeCell = result.$('#' + resultId);
@@ -272,6 +289,7 @@ function implementationCell(data, resultId, fileId) {
 </div> \
 </div> \
 </div>');
+            addSpinnerToModal('#modalConformance' + resultId);
 
             if (WEBMACHINE === 'WEB_MACHINE_KIT') {
                 data = webpage.on_fill_implementation_report(name, nodeModal.data('display'), nodeModal.data('verbosity'));
@@ -291,12 +309,14 @@ function implementationCell(data, resultId, fileId) {
 
             // Update report when display is changed
             displayList = $('.tab-content .active .displayList').clone();
+            displayList.find('option').prop("selected", false);
             displayList.attr('id', 'modalConformanceDisplay' + resultId);
             displayList.find("option[value = '" + nodeModal.data('display') + "']").attr('selected', 'selected');
             $('#modalConformanceDisplay' + resultId).replaceWith(displayList);
             $('#modalConformanceDisplay' + resultId).on('change', function(e) {
                 modalDisplay = $('#modalConformanceDisplay' + resultId).val();
                 modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
+                addSpinnerToModal('#modalConformance' + resultId);
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
                     data = webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity);
                     displayReport('#modalConformance' + resultId, data);
@@ -309,12 +329,14 @@ function implementationCell(data, resultId, fileId) {
 
             // Update report when verbosity is changed
             verbosityList = $('.tab-content .active .verbosityList').clone();
+            verbosityList.find('option').prop("selected", false);
             verbosityList.attr('id', 'modalConformanceVerbosity' + resultId);
             verbosityList.find("option[value = '" + nodeModal.data('verbosity') + "']").attr('selected', 'selected');
             $('#modalConformanceVerbosity' + resultId).replaceWith(verbosityList);
             $('#modalConformanceVerbosity' + resultId).on('change', function(e) {
                 modalDisplay = $('#modalConformanceDisplay' + resultId).val();
                 modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
+                addSpinnerToModal('#modalConformance' + resultId);
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
                     data = webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity);
                     displayReport('#modalConformance' + resultId, data);
@@ -410,6 +432,7 @@ function policyModal(resultId, fileId)
 </div>');
 
             if (nodeModal.data('policy')) {
+                addSpinnerToModal('#modalPolicy' + resultId);
                 sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
                     data = webpage.on_fill_policy_report(sourceName, nodeModal.data('policy'), nodeModal.data('display'));
@@ -434,6 +457,7 @@ function policyModal(resultId, fileId)
 
             // Update report when display is changed
             displayList = $('.tab-content .active .displayList').clone();
+            displayList.find('option').prop("selected", false);
             displayList.attr('id', 'modalPolicyDisplay' + resultId);
             displayList.find("option[value = '" + nodeModal.data('display') + "']").attr('selected', 'selected');
             $('#modalPolicyDisplay' + resultId).replaceWith(displayList);
@@ -441,6 +465,7 @@ function policyModal(resultId, fileId)
                 modalDisplay = $('#modalPolicyDisplay' + resultId).val();
                 modalPolicy = $('#modalPolicyPolicy' + resultId).val();
                 if (modalPolicy) {
+                    addSpinnerToModal('#modalPolicy' + resultId);
                     sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                     if (WEBMACHINE === 'WEB_MACHINE_KIT') {
                         data = webpage.on_fill_policy_report(sourceName, modalPolicy, modalDisplay);
@@ -458,6 +483,7 @@ function policyModal(resultId, fileId)
 
             // Update report when policy is changed
             policyList = $('.tab-content .active .policyList').clone();
+            policyList.find('option').prop("selected", false);
             policyList.attr('id', 'modalPolicyPolicy' + resultId);
             policyList.find("option[value = '" + nodeModal.data('policy') + "']").attr('selected', 'selected');
             $('#modalPolicyPolicy' + resultId).replaceWith(policyList);
@@ -466,6 +492,7 @@ function policyModal(resultId, fileId)
                 modalPolicy = $('#modalPolicyPolicy' + resultId).val();
                 if (modalPolicy)
                 {
+                    addSpinnerToModal('#modalPolicy' + resultId);
                     sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                     if (WEBMACHINE === 'WEB_MACHINE_KIT') {
                         data = webpage.on_fill_policy_report(sourceName, modalPolicy, modalDisplay);
@@ -512,6 +539,7 @@ function updatePolicyCell(fileId, policyId) {
     if ($(result.cell('#result-' + fileId, 5).node()).hasClass('success')) {
         if (policyId.length && policyId >= 0) {
             resetPolicyCell(fileId);
+            addSpinnerToCell(result.cell('#result-' + fileId, 2));
             setTimeout(function () {
                 sourceName = $(result.cell('#result-' + fileId, 0).node()).find('span').attr('title');
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
@@ -570,8 +598,8 @@ function mediaInfoCell(resultId, fileId)
 </div> \
 </div> \
 <div class="modal-footer"> \
-<button type="button" class="btn btn-primary mi-create-policy" data-target="#modalInfo' + resultId + '">Create Policy from MediaInfo Report</button> \
-<button type="button" class="btn btn-primary mi-dld" data-target="#modalInfo' + resultId + '" data-save-name="' + resultId + '_MediaInfoReport.txt">Download MediaInfo report</button> \
+<button type="button" class="btn btn-warning mi-create-report">Create policy from MediaInfo report</button> \
+<button type="button" class="btn btn-primary mi-dld">Download MediaInfo report</button> \
 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> \
 </div> \
 </div> \
@@ -584,9 +612,17 @@ function mediaInfoCell(resultId, fileId)
                 e.preventDefault();
                 webpage.on_save_mediainfo_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
             });
-            $('#modalInfo' + resultId + ' .mi-create-policy').on('click', function(e) {
+
+            $('#modalInfo' + resultId + ' .mi-create-report').on('click', function(e) {
                 e.preventDefault();
-                webpage.on_create_policy_from_file($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+                if (WEBMACHINE === 'WEB_MACHINE_KIT') {
+                    var data = webpage.on_create_policy_from_file($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+                    mediaInfoCreatePolicy(JSON.parse(data), 'result-' + fileId, fileId);
+                } else {
+                    webpage.on_create_policy_from_file($(result.cell('#' + resultId, 0).node()).find('span').attr('title'), function(data) {
+                        mediaInfoCreatePolicy(JSON.parse(data), 'result-' + fileId, fileId);
+                    });
+                }
             });
         }
     });
@@ -659,6 +695,22 @@ function mediaInfoTree(resultId, fileId)
     });
 }
 
+function mediaInfoCreatePolicy(createPolicy, resultId, fileId) {
+    if (createPolicy.policyId && createPolicy.policyId != -1) {
+        $('#modalInfo' + resultId + ' .mi-create-report').fadeOut(200).replaceWith('<div class="alert alert-success alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Policy successfuly created</div>');
+
+        // Add new policy to all select lists
+        $('.policyList').each(function () {
+            if ('User policies' == $(this).children('optgroup:first').attr('label')) {
+                $(this).children('optgroup:first').append('<option value="' + createPolicy.policyId + '">' + createPolicy.policyName + '</option>');
+            } else {
+                $(this).append('<optgroup label="User policies"><option value="' + createPolicy.policyId + '">' + createPolicy.policyName + '</option></optgroup>');
+            }
+        });
+    } else {
+        $('#modalInfo' + resultId + ' .mi-create-report').fadeOut(200).replaceWith('<div class="alert alert-danger alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> Error policy not created</div>');
+    }
+}
 
 function mediaTraceCell(resultId, fileId)
 {
@@ -803,7 +855,15 @@ function applyPolicyToAll()
 
 function resetSelectList(listId)
 {
-    $('#' + listId + ' option').removeAttr('selected');
+    $('#' + listId + ' option').prop('selected', false);
+}
+
+function addSpinnerToCell(cell) {
+    cell.data('<span class="spinner-cell"></span>');
+}
+
+function addSpinnerToModal(modal) {
+    $(modal + ' .modal-body').html('<span class="spinner-modal"></span>');
 }
 
 function truncateString(str, length)
@@ -853,14 +913,12 @@ function displayReport(elemId, dataReport)
 
     // // Display success message
     // function successMessage(message) {
-    //     $('#checkerInfo div').replaceWith('<div class="alert alert-success">' + message + '</div>');
-    //     $('#checkerInfo div').delay(5000).fadeOut();
+    //     $('#checkerInfo div').html('<div class="alert alert-success alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' + message + '</div>');
     // }
 
     // // Display error message
     // function errorMessage(message) {
-    //     $('#checkerInfo div').replaceWith('<div class="alert alert-danger">' + message + '</div>')
-    //     $('#checkerInfo div').delay(10000).fadeOut();
+    //     $('#checkerInfo div').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' + message + '</div>')
     // }
 
     // // Handle fail ajax response

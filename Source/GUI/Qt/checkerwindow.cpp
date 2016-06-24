@@ -158,8 +158,11 @@ void CheckerWindow::set_web_view_content(QString& html)
     QWebChannel *channel = new QWebChannel(page);
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
+    main_view->setHtml(html.toUtf8(), url);
 #endif
+#if defined(WEB_MACHINE_KIT)
     main_view->setContent(html.toUtf8(), "text/html", url);
+#endif
 }
 
 //---------------------------------------------------------------------------

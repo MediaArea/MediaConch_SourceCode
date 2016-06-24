@@ -182,9 +182,17 @@ namespace MediaConch
         on_download_report(report, file, "MediaTrace");
     }
 
-    void WebPage::on_create_policy_from_file(const QString& file)
+    QString WebPage::on_create_policy_from_file(const QString& file)
     {
-        mainwindow->create_policy_from_file(file);
+        size_t id = mainwindow->create_policy_from_file(file);
+        QString script;
+        Policy *p = ((int)id != -1) ? mainwindow->get_policy(id) : NULL;;
+        std::string title = p ? p->title : std::string();
+        QString name = QString().fromUtf8(title.c_str(), title.length());
+        script = QString("{\"policyId\":%1, \"policyName\":\"%2\"}")
+            .arg(id)
+            .arg(name);
+        return script;
     }
 
     void WebPage::on_file_upload_selected(const QString& policy, const QString& display_xslt,

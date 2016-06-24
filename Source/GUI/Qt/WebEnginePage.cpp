@@ -94,7 +94,7 @@ namespace MediaConch
 
     QString WebPage::on_fill_implementation_report(const QString& file, const QString& display, const QString& verbosity)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = file.toUtf8().data();
         QString report;
         int display_i = display.toInt();
         int *verbosity_p = NULL;
@@ -110,7 +110,7 @@ namespace MediaConch
 
     void WebPage::on_save_implementation_report(const QString& file, const QString& display, const QString& verbosity)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = file.toUtf8().data();
         QString report;
         int display_i = display.toInt();
         int *verbosity_p = NULL;
@@ -130,7 +130,7 @@ namespace MediaConch
         QString report;
         if (policy_i != -1)
         {
-            std::string file_s = file.toStdString();
+            std::string file_s = file.toUtf8().data();
             int display_i = display.toInt();
             mainwindow->validate_policy(file_s, report, policy_i, &display_i);
         }
@@ -139,7 +139,7 @@ namespace MediaConch
 
     void WebPage::on_save_policy_report(const QString& file, const QString& policy, const QString& display)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = file.toUtf8().data();
         QString report;
         int policy_i = policy.toInt();
         int display_i = display.toInt();
@@ -149,13 +149,13 @@ namespace MediaConch
 
     QString WebPage::on_fill_mediainfo_report(const QString& file)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = file.toUtf8().data();
         return mainwindow->get_mediainfo_jstree(file_s);
     }
 
     void WebPage::on_save_mediainfo_report(const QString& file)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = file.toUtf8().data();
         std::string display_name, display_content;
         QString report = mainwindow->get_mediainfo_xml(file_s, display_name, display_content);
         on_download_report(report, file, "MediaInfo");
@@ -163,21 +163,30 @@ namespace MediaConch
 
     QString WebPage::on_fill_mediatrace_report(const QString& file)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = file.toUtf8().data();
         return mainwindow->get_mediatrace_jstree(file_s);
     }
 
     void WebPage::on_save_mediatrace_report(const QString& file)
     {
-        std::string file_s = file.toStdString();
+        std::string file_s = file.toUtf8().data();
         std::string display_name, display_content;
         QString report = mainwindow->get_mediatrace_xml(file_s, display_name, display_content);
         on_download_report(report, file, "MediaTrace");
     }
 
-    void WebPage::on_create_policy_from_file(const QString& file)
+
+    QString WebPage::on_create_policy_from_file(const QString& file)
     {
-        mainwindow->create_policy_from_file(file);
+        size_t id = mainwindow->create_policy_from_file(file);
+        QString script;
+        Policy *p = ((int)id != -1) ? mainwindow->get_policy(id) : NULL;;
+        std::string title = p ? p->title : std::string();
+        QString name = QString().fromUtf8(title.c_str(), title.length());
+        script = QString("{\"policyId\":%1, \"policyName\":\"%2\"}")
+            .arg(id)
+            .arg(name);
+        return script;
     }
 
     void WebPage::on_save_settings_selected(const QString& policy,
