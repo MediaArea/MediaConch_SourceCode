@@ -553,7 +553,7 @@ namespace MediaConch
             tmp << list[i].absoluteFilePath();
     }
 
-    void WebPage::change_local_files(QStringList& files)
+    void WebPage::change_local_files(const QStringList& files)
     {
         QStringList tmp;
         for (int i = 0; i < files.size(); ++i)
@@ -736,7 +736,7 @@ namespace MediaConch
         file_selector.clear();
         std::vector<QString>& displays = mainwindow->get_displays();
         QFileInfo file(displays[id]);
-        return file.baseName();
+        return file.completeBaseName();
     }
 
     void WebPage::display_export_id(const QString& name)

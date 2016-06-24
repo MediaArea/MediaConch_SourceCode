@@ -776,14 +776,36 @@ void MainWindow::createSettingsView()
     settingsView->display_settings();
 }
 
+//---------------------------------------------------------------------------
 void MainWindow::set_msg_to_status_bar(const QString& message)
 {
     Q_EMIT status_bar_show_message(message, 5000);
 }
 
+//---------------------------------------------------------------------------
 void MainWindow::clear_msg_in_status_bar()
 {
     Q_EMIT status_bar_clear_message();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::drag_and_drop_files_action(const QStringList& files)
+{
+    if (checkerView)
+        checkerView->change_local_files(files);
+
+    if (displayView)
+        displayView->add_new_files(files);
+
+    if (settingsView)
+    {
+        //nothing to do
+    }
+
+    if (policiesView)
+    {
+        //nothing to do
+    }
 }
 
 //***************************************************************************

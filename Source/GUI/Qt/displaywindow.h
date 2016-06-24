@@ -9,6 +9,7 @@
 
 #include <QFileInfo>
 #include <QString>
+#include <QStringList>
 
 namespace MediaConch {
 
@@ -27,6 +28,7 @@ public:
     void display_display();
 
     int  add_new_file(const QString& name, const QString& filename);
+    int  add_new_files(const QStringList& files);
     void export_file(const QString& name);
     void delete_file(const QString& name);
 

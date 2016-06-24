@@ -72,6 +72,7 @@ public:
     void                        Ui_Init();
     void                        set_msg_to_status_bar(const QString& message);
     void                        clear_msg_in_status_bar();
+    void                        drag_and_drop_files_action(const QStringList& files);
 
     // Helpers
     void                        set_widget_to_layout(QWidget* w);

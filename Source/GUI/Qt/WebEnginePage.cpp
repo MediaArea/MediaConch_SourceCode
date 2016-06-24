@@ -531,7 +531,7 @@ namespace MediaConch
             tmp << list[i].absoluteFilePath();
     }
 
-    void WebPage::change_local_files(QStringList& files)
+    void WebPage::change_local_files(const QStringList& files)
     {
         QStringList tmp;
         for (int i = 0; i < files.size(); ++i)

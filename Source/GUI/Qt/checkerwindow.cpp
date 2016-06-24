@@ -190,7 +190,7 @@ void CheckerWindow::create_web_view()
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::change_local_files(QStringList& files)
+void CheckerWindow::change_local_files(const QStringList& files)
 {
     if (!main_view || !main_view->page())
         return;

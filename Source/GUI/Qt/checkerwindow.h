@@ -36,7 +36,7 @@ public:
     void                        create_web_view();
     void                        set_display_xslt(const QString& d) { display_xslt = d; }
     void                        reset_display_xslt() { display_xslt.clear(); }
-    void                        change_local_files(QStringList& files);
+    void                        change_local_files(const QStringList& files);
     void                        hide();
     void                        add_file_to_result_table(const std::string& full_path);
 

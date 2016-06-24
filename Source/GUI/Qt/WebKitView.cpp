@@ -13,10 +13,11 @@
 #include <QDropEvent>
 #include "WebView.h"
 #include "WebPage.h"
+#include "mainwindow.h"
 
 namespace MediaConch
 {
-    WebView::WebView(QWidget *parent) : QWebView(parent)
+    WebView::WebView(QWidget *parent) : QWebView(parent), mainwindow((MainWindow*)parent)
     {
         setAcceptDrops(true);
         setContextMenuPolicy(Qt::CustomContextMenu);
@@ -39,11 +40,10 @@ namespace MediaConch
         {
             QList<QUrl> urls=event->mimeData()->urls();
 
-            WebPage* p = (WebPage*)page();
             QStringList files;
             for (int i = 0; i < urls.size(); ++i)
                 files << urls[i].toLocalFile();
-            p->change_local_files(files);
+            mainwindow->drag_and_drop_files_action(files);
         }
     }
 }
