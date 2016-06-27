@@ -54,6 +54,7 @@ public:
         report_MediaTrace,
         report_MediaVeraPdf,
         report_MediaDpfManager,
+        report_MicroMediaTrace,
         report_Max,
     };
 

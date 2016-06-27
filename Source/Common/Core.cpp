@@ -32,6 +32,7 @@
 #include "Common/ImplementationReportMatroskaSchema.h"
 #include "Common/MediaTraceDisplayTextXsl.h"
 #include "Common/MediaTraceDisplayHtmlXsl.h"
+#include "Common/MicroMediaTraceToMediaTraceXsl.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
@@ -833,7 +834,7 @@ bool Core::validate_xslt_policy_from_memory(const std::vector<std::string>& file
 bool Core::validation(const std::vector<std::string>& files, Schema* S, std::string& report)
 {
     std::string xml;
-    create_report_ma_xml(files, S->get_options(), xml, get_bitset_with_mi_mt());
+    create_report_ma_xml(files, S->get_options(), xml, get_bitset_with_mi_mmt());
     bool valid = true;
 
     int ret = S->validate_xml(xml);
@@ -1025,16 +1026,16 @@ void Core::register_report_mediainfo_xml_to_database(std::string& file, const st
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediatrace_xml_to_database(std::string& file, const std::string& time,
+void Core::register_report_micromediatrace_xml_to_database(std::string& file, const std::string& time,
                                                       MediaInfoNameSpace::MediaInfo* curMI)
 {
     curMI->Option(__T("Details"), __T("1"));
-    curMI->Option(__T("Inform"), __T("XML"));
+    curMI->Option(__T("Inform"), __T("MICRO_XML"));
     std::string report = Ztring(curMI->Inform()).To_UTF8();
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
     db_mutex.Enter();
-    db->save_report(MediaConchLib::report_MediaTrace, MediaConchLib::format_Xml,
+    db->save_report(MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml,
                     file, time,
                     report, mode,
                     true);
@@ -1088,8 +1089,8 @@ void Core::register_file_to_database(std::string& filename, MediaInfoNameSpace::
     register_report_mediainfo_text_to_database(filename, time, curMI);
     register_report_mediainfo_xml_to_database(filename, time, curMI);
 
-    // MediaTrace
-    register_report_mediatrace_xml_to_database(filename, time, curMI);
+    // MicroMediaTrace
+    register_report_micromediatrace_xml_to_database(filename, time, curMI);
 }
 
 //---------------------------------------------------------------------------
@@ -1101,8 +1102,8 @@ void Core::register_file_to_database(std::string& filename)
     register_report_mediainfo_text_to_database(filename, time, MI);
     register_report_mediainfo_xml_to_database(filename, time, MI);
 
-    // MediaTrace
-    register_report_mediatrace_xml_to_database(filename, time, MI);
+    // MicroMediaTrace
+    register_report_micromediatrace_xml_to_database(filename, time, MI);
 }
 
 //---------------------------------------------------------------------------
@@ -1165,6 +1166,51 @@ void Core::create_report_mt_xml(const std::vector<std::string>& files, std::stri
     start << "<creatingLibrary version=\"";
     start << version;
     start << "\" url=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
+
+    report += start.str();
+
+    std::vector<std::string> vec;
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        vec.clear();
+        vec.push_back(files[i]);
+        report += "<media ref=\"" + files[i] + "\">\n";
+
+        std::string tmp;
+        create_report_mmt_xml(files, tmp);
+        if (tmp.length())
+        {
+            std::string memory(micromediatrace_to_mediatrace_xsl);
+            transform_with_xslt_memory(tmp, memory, tmp);
+            get_content_of_media_in_xml(tmp);
+            report += tmp;
+        }
+        report += std::string("</media>\n");
+    }
+    report += std::string("</MediaTrace>");
+}
+
+//---------------------------------------------------------------------------
+void Core::create_report_mmt_xml(const std::vector<std::string>& files, std::string& report)
+{
+    bool AcceptsHttps = accepts_https();
+    std::string version = ZenLib::Ztring(Menu_Option_Preferences_Option (__T("Info_Version"), __T(""))).To_UTF8();
+    std::string search(" - v");
+    size_t pos = version.find(search);
+    if (pos != std::string::npos)
+        version = version.substr(pos + search.length());
+
+    std::stringstream start;
+    start << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    start << "<MicroMediaTrace\n";
+    start << "xmlns=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/micromediatrace\"\n";
+    start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
+    start << "mtsl=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/micromediatrace https://mediaarea.net/micromediatrace/micromediatrace.xsd\"\n";
+    start << "version=\"0.1\">\n";
+    start << "<creatingLibrary version=\"";
+    start << version;
+    start << "\" url=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>\n";
+
     report += start.str();
 
     std::vector<std::string> vec;
@@ -1175,12 +1221,12 @@ void Core::create_report_mt_xml(const std::vector<std::string>& files, std::stri
         report += "<media ref=\"" + files[i] + "\">\n";
 
         std::string trace;
-        get_report_saved(vec, MediaConchLib::report_MediaTrace, MediaConchLib::format_Xml, trace);
+        get_report_saved(vec, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml, trace);
         if (trace.length())
             report += trace;
         report += std::string("</media>\n");
     }
-    report += std::string("</MediaTrace>");
+    report += std::string("</MicroMediaTrace>");
 }
 
 //---------------------------------------------------------------------------
@@ -1229,11 +1275,24 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
         if (reports[MediaConchLib::report_MediaTrace])
         {
             std::string trace;
-            get_report_saved(vec, MediaConchLib::report_MediaTrace,
-                             MediaConchLib::format_Xml, trace);
+            create_report_mt_xml(vec, trace);
+            get_content_of_media_in_xml(trace);
+            report += "<MediaTrace xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediatrace\" version=\"0.1\">\n";
             if (trace.length())
-                report += "<MediaTrace xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediatrace\" version=\"0.1\">\n"
-                    + trace + "</MediaTrace>\n";
+                report += trace;
+            report += "</MediaTrace>\n";
+        }
+
+        if (reports[MediaConchLib::report_MicroMediaTrace])
+        {
+            std::string trace;
+            get_report_saved(vec, MediaConchLib::report_MicroMediaTrace,
+                             MediaConchLib::format_Xml, trace);
+            report += "<MicroMediaTrace xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/micromediatrace\" version=\"0.1\">\n";
+            if (trace.length())
+                report += trace;
+
+            report += "</MicroMediaTrace>\n";
         }
 
         if (reports[MediaConchLib::report_MediaConch])
@@ -1286,7 +1345,7 @@ void Core::get_report_saved(const std::vector<std::string>& files,
         return;
     }
 
-    if (reportKind != MediaConchLib::report_MediaInfo && reportKind != MediaConchLib::report_MediaTrace
+    if (reportKind != MediaConchLib::report_MediaInfo && reportKind != MediaConchLib::report_MicroMediaTrace
         && reportKind != MediaConchLib::report_MediaVeraPdf && reportKind != MediaConchLib::report_MediaDpfManager)
         return;
 
@@ -1663,6 +1722,16 @@ std::bitset<MediaConchLib::report_Max> Core::get_bitset_with_mi_mt()
 
     bits.set(MediaConchLib::report_MediaInfo);
     bits.set(MediaConchLib::report_MediaTrace);
+    return bits;
+}
+
+//---------------------------------------------------------------------------
+std::bitset<MediaConchLib::report_Max> Core::get_bitset_with_mi_mmt()
+{
+    std::bitset<MediaConchLib::report_Max> bits;
+
+    bits.set(MediaConchLib::report_MediaInfo);
+    bits.set(MediaConchLib::report_MicroMediaTrace);
     return bits;
 }
 

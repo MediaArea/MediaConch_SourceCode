@@ -301,7 +301,7 @@ namespace MediaConch
         }
         return CLI_RETURN_NONE;
     }
-    
+
     //--------------------------------------------------------------------------
     int CLI::is_ready(size_t i, MediaConchLib::report& report_kind)
     {
