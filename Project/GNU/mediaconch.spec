@@ -43,9 +43,13 @@ BuildRequires:  libevent-devel
 
 %if 0%{?fedora}
 BuildRequires:  pkgconfig(Qt5)
-BuildRequires:  pkgconfig(Qt5WebKit)
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  desktop-file-utils
+%if 0%{?fedora} >= 24
+BuildRequires:  pkgconfig(Qt5WebEngine)
+%else
+BuildRequires:  pkgconfig(Qt5WebKit)
+%endif
 %else
 BuildRequires:  libqt4-devel
 %endif
