@@ -27,7 +27,7 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s)
 {
-    MI = new MediaInfoNameSpace::MediaInfoList;
+    MI = new MediaInfoNameSpace::MediaInfo;
 }
 
 //---------------------------------------------------------------------------
