@@ -23,7 +23,7 @@
     #include "MediaInfoDLL/MediaInfoDLL_Static.h"
     #define MediaInfoNameSpace MediaInfoDLL
 #else
-    #include "MediaInfo/MediaInfoList.h"
+    #include "MediaInfo/MediaInfo.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include "ZenLib/Thread.h"
@@ -57,7 +57,7 @@ namespace MediaConch
 
     private:
         Scheduler*                         scheduler;
-        MediaInfoNameSpace::MediaInfoList *MI;
+        MediaInfoNameSpace::MediaInfo     *MI;
     };
 
     //***************************************************************************

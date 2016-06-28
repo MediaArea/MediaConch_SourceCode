@@ -62,6 +62,7 @@ protected:
     void        get_sql_query_for_create_report_table(std::string& q);
     void        get_sql_query_for_update_report_table_v0(std::string& q);
     void        get_sql_query_for_update_report_table_v1(std::string& q);
+    void        get_sql_query_for_update_report_table_v2(std::string& q);
 
 private:
     DatabaseReport (const DatabaseReport&);

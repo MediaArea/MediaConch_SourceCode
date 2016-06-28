@@ -106,7 +106,7 @@ static void change_short_options_to_long(std::string& argument)
         argument = "-mi";
     if (argument=="--mediatrace")
         argument = "-mt";
-    
+
     // Report short options
     if (argument=="-mc")
         argument = "--report=MediaConch";
@@ -227,7 +227,7 @@ CL_OPTION(Report)
         Help();
         return CLI_RETURN_ERROR;
     }
-        
+
     // New requested reports
     std::string report_kind = argument.substr(egal_pos + 1);
     cli->set_report_set(report_kind);

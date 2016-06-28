@@ -27,7 +27,7 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s)
 {
-    MI = new MediaInfoNameSpace::MediaInfoList;
+    MI = new MediaInfoNameSpace::MediaInfo;
 }
 
 //---------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void QueueElement::Entry()
     // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
     MI->Option(__T("ReadByHuman"), __T("1"));
     MI->Option(__T("Language"), __T("raw"));
-    MI->Option(__T("Inform"), __T("XML"));
+    MI->Option(__T("Inform"), __T("MICRO_XML"));
 
     std::map<std::string, std::string>::iterator it = options.begin();
     for (; it != options.end(); ++it)

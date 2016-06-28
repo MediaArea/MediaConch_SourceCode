@@ -114,6 +114,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/ImplementationReportDisplayTextXsl.h \
                     ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
                     ../../Source/Common/ImplementationReportMatroskaSchema.h \
+                    ../../Source/Common/MicroMediaTraceToMediaTraceXsl.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/DatabaseReport.h \
                     ../../Source/Common/NoDatabaseReport.h \

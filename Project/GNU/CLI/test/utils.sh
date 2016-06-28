@@ -43,7 +43,7 @@ cmd_is_ko()
 
 xml_is_correct()
 {
-    $(echo "$DATA" | xmllint --noout - 2> /dev/null)
+    $(echo "$DATA" | xmllint --noout -)
     if test $? -ne 0
     then
         exit 1;
@@ -52,7 +52,7 @@ xml_is_correct()
 
 xml_is_invalid()
 {
-    $(echo "$DATA" | xmllint --noout - 2> /dev/null)
+    $(echo "$DATA" | xmllint --noout -)
     if test $? -eq 0
     then
         exit 1;
@@ -109,7 +109,7 @@ output_has_not_mi_xml()
 
 output_xml_is_a_valid_mc()
 {
-    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediaconch.xsd" - 2> /dev/null)
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediaconch.xsd" -)
     if test $? -ne 0
     then
         exit 1;
@@ -118,7 +118,7 @@ output_xml_is_a_valid_mc()
 
 output_xml_is_a_valid_mi()
 {
-    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediainfo.xsd" - 2> /dev/null)
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediainfo.xsd" -)
     if test $? -ne 0
     then
         exit 1;
@@ -127,7 +127,7 @@ output_xml_is_a_valid_mi()
 
 output_xml_is_a_valid_mt()
 {
-    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediatrace.xsd" - 2> /dev/null)
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediatrace.xsd" -)
     if test $? -ne 0
     then
         exit 1;
@@ -136,7 +136,7 @@ output_xml_is_a_valid_mt()
 
 output_xml_is_a_valid_ma()
 {
-    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediaarea.xsd" - 2> /dev/null)
+    $(echo "$DATA" | xmllint --noout --schema "$UTILS_PATH/mediaarea.xsd" -)
     if test $? -ne 0
     then
         exit 1;

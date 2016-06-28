@@ -83,7 +83,7 @@ namespace MediaConch {
         CS.Leave();
     }
 
-    void Scheduler::work_finished(QueueElement *el, MediaInfoNameSpace::MediaInfoList* MI)
+    void Scheduler::work_finished(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
     {
         if (!el)
             return;
@@ -159,10 +159,10 @@ namespace MediaConch {
         return ret;
     }
 
-    int Scheduler::another_work_to_do(QueueElement *el, MediaInfoNameSpace::MediaInfoList* MI)
+    int Scheduler::another_work_to_do(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
     {
         // Before registering, check the format
-        String format = MI->Get(0, Stream_General, 0, __T("Format"));
+        String format = MI->Get(Stream_General, 0, __T("Format"));
         std::string format_str = ZenLib::Ztring(format).To_UTF8().c_str();
 
         std::map<std::string, Plugin*> plugins = core->get_format_plugins();

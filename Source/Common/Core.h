@@ -23,7 +23,7 @@
     #include "MediaInfoDLL/MediaInfoDLL_Static.h"
     #define MediaInfoNameSpace MediaInfoDLL
 #else
-    #include "MediaInfo/MediaInfoList.h"
+    #include "MediaInfo/MediaInfo.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include <ZenLib/CriticalSection.h>
@@ -119,10 +119,11 @@ public:
     //General Report Database
     void load_database();
     bool database_is_enabled() const;
-    void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
-    void register_file_to_database(std::string& file, const std::string& report, MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfoList* curMI);
+    void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfo* MI);
+    void register_file_to_database(std::string& file, const std::string& report, MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfo* curMI);
     void create_report_mi_xml(const std::vector<std::string>& filename, std::string& report);
     void create_report_mt_xml(const std::vector<std::string>& filename, std::string& report);
+    void create_report_mmt_xml(const std::vector<std::string>& filename, std::string& report);
     void create_report_ma_xml(const std::vector<std::string>& files, const std::map<std::string, std::string>& options, std::string& report, bitset<MediaConchLib::report_Max> reports);
     void create_report_verapdf_xml(const std::vector<std::string>& files, std::string& report);
     void create_report_dpfmanager_xml(const std::vector<std::string>& files, std::string& report);
@@ -140,7 +141,7 @@ public:
 private:
     Core (const Core&);
 
-    MediaInfoNameSpace::MediaInfoList* MI;
+    MediaInfoNameSpace::MediaInfo     *MI;
     DatabaseReport*                    db;
     CriticalSection                    db_mutex;
     static const std::string           database_name;
@@ -201,18 +202,15 @@ private:
                                          const std::string& report,
                                          MediaConchLib::report report_kind);
     void register_report_mediainfo_text_to_database(std::string& file, const std::string& time,
-                                                    MediaInfoNameSpace::MediaInfoList* MI);
+                                                    MediaInfoNameSpace::MediaInfo* MI);
     void register_report_mediainfo_xml_to_database(std::string& file, const std::string& time,
-                                                   MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediatrace_text_to_database(std::string& file, const std::string& time,
-                                                     MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediatrace_xml_to_database(std::string& file, const std::string& time,
-                                                    MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_implementation_xml_to_database(const std::string& file, const std::string& time,
-                                                        std::string& report);
+                                                   MediaInfoNameSpace::MediaInfo* MI);
+    void register_report_micromediatrace_xml_to_database(std::string& file, const std::string& time,
+                                                         MediaInfoNameSpace::MediaInfo* MI);
     void get_content_of_media_in_xml(std::string& report);
     //No idea how to do it better way
     bitset<MediaConchLib::report_Max> get_bitset_with_mi_mt();
+    bitset<MediaConchLib::report_Max> get_bitset_with_mi_mmt();
 
     std::string get_config_file();
     std::string get_database_path();

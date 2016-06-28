@@ -124,6 +124,12 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
                                                        const std::string& display, MediaConchLib::format& Format,
                                                        std::string& reason)
 {
+    if (reports[MediaConchLib::report_MicroMediaTrace])
+    {
+        reason = "MicroMediaTrace is for internal use only";
+        return false;
+    }
+
     // Forcing some formats
     if (Format == MediaConchLib::format_Text && !display.empty())
         Format = format_Xml; //Forcing Text (default) to XML
@@ -136,7 +142,7 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 
     if (reports.count() > 1 && Format == MediaConchLib::format_Xml)
         Format = MediaConchLib::format_MaXml;
-    
+
     // Test of incompatibilities
     if (reports[MediaConchLib::report_MediaConch] && reports[MediaConchLib::report_MediaTrace]
         && Format == MediaConchLib::format_Text)
