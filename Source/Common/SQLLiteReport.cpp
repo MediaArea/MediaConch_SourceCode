@@ -27,7 +27,7 @@ namespace MediaConch {
 // SQLLiteReport
 //***************************************************************************
 
-int SQLLiteReport::current_report_version = 1;
+int SQLLiteReport::current_report_version = 3;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -91,16 +91,17 @@ int SQLLiteReport::update_report_table()
         get_sql_query_for_update_report_table_v##version(query);                      \
                                                                                       \
         ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end); \
-        if (version != 0 && (ret != SQLITE_OK || !stmt || (end && *end)))             \
+        if (version > 1 && (ret != SQLITE_OK || !stmt || (end && *end)))              \
             return -1;                                                                \
         ret = execute();                                                              \
                                                                                       \
-        if (version != 0 && ret < 0)                                                  \
+        if (version > 1 && ret < 0)                                                   \
             return ret;                                                               \
     } while(0);
 
     UPDATE_REPORT_TABLE_FOR_VERSION(0);
     UPDATE_REPORT_TABLE_FOR_VERSION(1);
+    UPDATE_REPORT_TABLE_FOR_VERSION(2);
 
 #undef UPDATE_REPORT_TABLE_FOR_VERSION
 

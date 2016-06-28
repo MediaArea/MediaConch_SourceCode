@@ -79,4 +79,12 @@ void DatabaseReport::get_sql_query_for_update_report_table_v1(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseReport::get_sql_query_for_update_report_table_v2(std::string& q)
+{
+    std::stringstream create;
+    create << "DELETE FROM Report;"; // Table name
+    q = create.str();
+}
+
 }
