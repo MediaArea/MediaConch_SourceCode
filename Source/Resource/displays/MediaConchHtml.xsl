@@ -18,12 +18,11 @@
         width: 100%;
         max-width: 1280px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 16px;
       }
 
       .mc_header p {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 14px;
+        font-size: 12px;
         margin-left:20px;
       }
 
@@ -43,7 +42,7 @@
         background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
-        margin-top: 18px;
+        margin-top: 12px;
       }
 
       .mc h1  {
@@ -68,7 +67,7 @@
         border: 2px solid #ddd;
         background-color: #f5f5f5;
         border-bottom: 0;
-        padding: 5px;
+        padding: 0 5px 0 5px;
       }
 
       .mc_element .extra {
@@ -91,8 +90,8 @@
         user-select: none;
         border-right:5px solid black;
         border-bottom:5px solid black;
-        width:8px;
-        height:8px;
+        width:6px;
+        height:6px;
         transform: rotate(-45deg);
         margin-top:6px;
         margin-right:6px;
@@ -103,7 +102,7 @@
         width: 0;
         height: 0;
         border-style: solid;
-        border-width: 8px 0 8px 8px;
+        border-width: 6px 0 6px 6px;
         border-color: transparent transparent black transparent;
       }
 
@@ -185,7 +184,7 @@
 
       .verbosity {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 14px;
+        font-size: 12px;
         margin-left:20px;
         padding-right:4px;
       }
@@ -233,7 +232,6 @@
                       <xsl:text>&#x2705;  </xsl:text><xsl:value-of select="@outcome"/>
                     </xsl:otherwise>
                   </xsl:choose>
-                <hr/>
                 <xsl:for-each select="mc:test">
                   <div class="extra">
                     <strong><xsl:value-of select="/mc:context/@name"/></strong>
@@ -273,7 +271,6 @@
                      <xsl:if test="mc:value/. !=''">
                        <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
                      </xsl:if>
-                      <br/>
                     </div> 
                   </xsl:for-each>
                 </td>
