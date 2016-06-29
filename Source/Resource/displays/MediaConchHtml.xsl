@@ -88,8 +88,8 @@
         cursor: pointer;
         outline: none;
         user-select: none;
-        border-right:5px solid black;
-        border-bottom:5px solid black;
+        border-right:3px solid black;
+        border-bottom:3px solid black;
         width:6px;
         height:6px;
         transform: rotate(-45deg);
