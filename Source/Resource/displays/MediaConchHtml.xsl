@@ -282,9 +282,9 @@
 
       <xsl:for-each select="mc:policyChecks">
         <div class="mc_header">
-          <h4>
+          <h2>
             <xsl:value-of select="mc:name"/>
-          </h4>
+          </h2>
           <p>
             <xsl:value-of select="mc:description"/>
           </p>
@@ -297,7 +297,7 @@
         <table class="mc">
           <xsl:for-each select="mc:check/mc:test">
             <tr>
-              <td>
+              <td class="mc_element">
                 <input id="policy-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
                 <label for="policy-arrow-{generate-id()}"></label>
                 <xsl:text> </xsl:text>
@@ -339,7 +339,6 @@
                   <xsl:if test="@actual != ''">
                     <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
                   </xsl:if>
-                  <hr/>
                 </div>
               </td>
             </tr>
