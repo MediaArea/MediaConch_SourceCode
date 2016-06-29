@@ -208,12 +208,7 @@ p.registration {
     background: transparent url("qrc:/ajax-spinner-small.gif");
     width: 16px;
     height: 14px;
-    display: block;
     margin: 0 auto;
-}
-
-.spinner-status {
-    display: inline-block;
 }
 
 .spinner-modal {
