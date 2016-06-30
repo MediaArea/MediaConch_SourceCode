@@ -918,6 +918,34 @@ void Core::compress_report(std::string& report, MediaConchLib::compression& comp
 }
 
 //---------------------------------------------------------------------------
+void Core::compress_report_copy(std::string& report, const char* src, size_t src_len, MediaConchLib::compression& compress)
+{
+    switch (compress)
+    {
+        case MediaConchLib::compression_ZLib : 
+        {
+            uLongf dst_len;
+
+            dst_len = (uLongf)src_len;
+            Bytef* dst = new Bytef[src_len + 1];
+
+            if (compress2((Bytef*)dst, &dst_len, (const Bytef*)src, src_len, Z_BEST_COMPRESSION) != Z_OK || src_len <= dst_len)
+            {
+                //Fallback to no compression
+                report = std::string((const char *)src, src_len);
+                compress = MediaConchLib::compression_None;
+            }
+            else
+                report = std::string((const char *)dst, dst_len);
+            delete[] dst;
+        }
+        break;
+        default:
+            report = std::string((const char *)src, src_len);
+    }
+}
+
+//---------------------------------------------------------------------------
 int Core::uncompress_report(std::string& report, MediaConchLib::compression compress)
 {
     switch (compress)
@@ -1031,9 +1059,29 @@ void Core::register_report_micromediatrace_xml_to_database(std::string& file, co
 {
     curMI->Option(__T("Details"), __T("1"));
     curMI->Option(__T("Inform"), __T("MICRO_XML"));
-    std::string report = Ztring(curMI->Inform()).To_UTF8();
+
+    //Trying with direct access to the string from MediaInfoLib, then use the classic method if it failed 
+    std::string report;
     MediaConchLib::compression mode = compression_mode;
-    compress_report(report, mode);
+    Ztring Temp = curMI->Option(__T("File_Details_StringPointer"), Ztring());
+    if (Temp.find_first_not_of(__T("0123456789:")) == string::npos) //Form is "Pointer:Size"
+    {
+        ZtringList TempZL;
+        TempZL.Separator_Set(0, __T(":"));
+        TempZL.Write(Temp);
+        if (TempZL.size() == 2)
+        {
+            const char* report_buffer = (const char*)TempZL[0].To_int64u();
+            size_t report_size = (size_t)TempZL[1].To_int64u();
+            compress_report_copy(report, report_buffer, report_size, mode);
+        }
+    }
+    if (report.empty())
+    {
+        std::string report = Ztring(curMI->Inform()).To_UTF8();
+        compress_report(report, mode);
+    }
+
     db_mutex.Enter();
     db->save_report(MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml,
                     file, time,
