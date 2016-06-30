@@ -8,6 +8,11 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.06, 2016-06-30
+-------------
+Matroska files with CodecPrivate element before CodecID element where not always correctly parsed
+Performance improvements
+
 Version 16.05, 2016-05-31
 -------------
 MediaConch XML format v0.2
