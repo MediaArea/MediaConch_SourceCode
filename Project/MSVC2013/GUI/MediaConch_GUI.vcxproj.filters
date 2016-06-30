@@ -182,14 +182,8 @@
     <ClCompile Include="_Automated\moc_helpwindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_displaymenu.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="_Automated\moc_displaywindow.cpp">
       <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaymenu.cpp">
-      <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp">
       <Filter>Source Files\GUI</Filter>
@@ -430,9 +424,6 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="_Automated\ui_displaymenu.h">
-      <Filter>Header Files\_Automated</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
@@ -511,6 +502,9 @@
     <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html">
@@ -529,9 +523,6 @@
       <Filter>Resource Files</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\xsltruleedit.ui">
-      <Filter>Resource Files\UI</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
       <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
