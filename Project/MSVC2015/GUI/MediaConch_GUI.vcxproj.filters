@@ -182,17 +182,8 @@
     <ClCompile Include="_Automated\moc_helpwindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_displaymenu.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="_Automated\moc_displaywindow.cpp">
       <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaymenu.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp">
-      <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp">
       <Filter>Source Files\GUI</Filter>
@@ -329,6 +320,9 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -424,9 +418,6 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="_Automated\ui_displaymenu.h">
-      <Filter>Header Files\_Automated</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
@@ -505,6 +496,9 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\..\Source\Resource\Resources.qrc">
@@ -515,9 +509,6 @@
     </Xml>
     <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html">
       <Filter>Resource Files\HTML</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
-      <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
       <Filter>Resource Files\UI</Filter>

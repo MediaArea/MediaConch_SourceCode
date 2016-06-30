@@ -202,7 +202,6 @@
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\groupofrules.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp" />
@@ -235,7 +234,6 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltwindow.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
     <ClCompile Include="_Automated\moc_checkerwindow.cpp" />
-    <ClCompile Include="_Automated\moc_displaymenu.cpp" />
     <ClCompile Include="_Automated\moc_displaywindow.cpp" />
     <ClCompile Include="_Automated\moc_groupofrules.cpp" />
     <ClCompile Include="_Automated\moc_helpwindow.cpp" />
@@ -293,6 +291,7 @@
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\DatabaseUi.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
@@ -320,7 +319,6 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\xsltruleedit.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
-    <ClInclude Include="_Automated\ui_displaymenu.h" />
     <ClInclude Include="_Automated\ui_groupofrules.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
     <ClInclude Include="_Automated\ui_policiesmenu.h" />
@@ -360,9 +358,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
-      <FileType>Document</FileType>
-    </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
       <FileType>Document</FileType>
     </Xml>
