@@ -376,9 +376,10 @@ public:
 
     struct Create_Policy_From_File_Res
     {
-        std::string                  policy;
-        Create_Policy_From_File_Nok *nok;
-        std::string                  to_str() const;
+        Create_Policy_From_File_Res() :  nok(NULL) {}
+        std::string                      policy;
+        Create_Policy_From_File_Nok     *nok;
+        std::string                      to_str() const;
     };
 
 public:
