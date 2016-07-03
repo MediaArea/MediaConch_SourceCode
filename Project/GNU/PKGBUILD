@@ -1,0 +1,110 @@
+# $Id$
+# Maintainer: MediaArea.net SARL <info@mediaarea.net>
+# This PKGBUILD is for OBS
+
+pkgname=('mediaconch' 'mediaconch-server' 'mediaconch-gui')
+pkgver=16.06.20160703
+pkgrel=1
+pkgdesc="Implementation checker and policy checker for video and audio files"
+url="http://MediaArea.net/MediaConch"
+license=('custom:MPL2' 'GPL3')
+source=(${pkgname}_${pkgver}.tar.xz)
+md5sums=('00000000000000000000000000000000')
+arch=('i686' 'x86_64')
+
+# Buildtime dependencies for all packages need to be listed here
+makedepends=('desktop-file-utils' 'libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webengine' 'libzen>=0.4.33' 'libmediainfo>=0.7.87')
+# OBS don't provide jansson
+#makedepends=(${makedepends[@]} jansson)
+
+prepare() {
+    cd "${srcdir}"/MediaConch
+    sed -i 's/.$//' *.txt *.html Release/*.txt
+
+    cd "${srcdir}"/MediaConch/Project/GNU/CLI
+    chmod u+x autogen.sh
+    ./autogen.sh
+    ./configure --prefix=/usr --without-jansson
+
+    cd "${srcdir}"/MediaConch/Project/GNU/Server
+    chmod u+x autogen.sh
+    ./autogen.sh
+    ./configure --prefix=/usr --without-jansson
+
+    cd "${srcdir}"/MediaConch/Project/Qt
+    chmod u+x prepare
+    ./prepare NO_JANSSON=yes
+}
+
+build() {
+    cd "${srcdir}"/MediaConch/Project/GNU/CLI
+    make
+
+    cd "${srcdir}"/MediaConch/Project/GNU/Server
+    make
+
+    cd "${srcdir}"/MediaConch/Project/Qt
+    make
+}
+
+package_mediaconch() {
+    pkgdesc="${pkgdesc} (CLI)"
+    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'libzen>=0.4.33' 'libmediainfo>=0.7.87')
+
+    cd "${srcdir}"/MediaConch/Project/GNU/CLI
+    make DESTDIR="${pkgdir}" install-strip
+
+    cd "${srcdir}"/MediaConch
+    install -D -m 0644 License.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.html
+    install -D -m 0644 License.MPLv2.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.MPLv2.html
+    install -D -m 0644 License.GPLv3.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.GPLv3.html
+
+    install -D -m 0644 History_CLI.txt "${pkgdir}"/usr/share/docs/${pkgname}/History.txt
+    install -D -m 0644 Release/ReadMe_CLI_Linux.txt "${pkgdir}"/usr/share/docs/${pkgname}/ReadMe.txt
+}
+
+package_mediaconch-server() {
+    pkgdesc="${pkgdesc} (Server)"
+    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'libzen>=0.4.33' 'libmediainfo>=0.7.87')
+    backup=('etc/mediaconch/MediaConch.rc')
+
+    cd "${srcdir}"/MediaConch/Project/GNU/Server
+    make DESTDIR="${pkgdir}" install-strip
+
+    install -D -m 0644 MediaConch.rc "${pkgdir}"/etc/mediaconch/MediaConch.rc
+    install -D -m 0644 mediaconchd.service "${pkgdir}"/usr/lib/systemd/system/mediaconchd.service
+
+    cd "${srcdir}"/MediaConch
+    install -D -m 0644 License.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.html
+    install -D -m 0644 License.MPLv2.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.MPLv2.html
+    install -D -m 0644 License.GPLv3.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.GPLv3.html
+
+    install -D -m 0644 Documentation/Daemon.md "${pkgdir}"/usr/share/docs/${pkgname}/Daemon.md
+    install -D -m 0644 Documentation/Config.md "${pkgdir}"/usr/share/docs/${pkgname}/Config.md
+    install -D -m 0644 Documentation/REST.md "${pkgdir}"/usr/share/docs/${pkgname}/REST.md
+}
+
+package_mediaconch-gui() {
+    pkgdesc="${pkgdesc} (GUI)"
+    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webengine' 'libzen>=0.4.33' 'libmediainfo>=0.7.87')
+
+    cd "${srcdir}"/MediaConch
+    install -D -m 0755 Project/Qt/mediaconch-gui "${pkgdir}"/usr/bin/mediaconch-gui
+
+    install -D -m 0644 Source/Resource/Image/MediaConch.png "${pkgdir}"/usr/share/icons/hicolor/256x256/apps/mediaconch.png
+    install -D -m 0644 Source/Resource/Image/MediaConch.png "${pkgdir}"/usr/share/pixmaps/mediaconch.png
+
+    desktop-file-install --dir="${pkgdir}"/usr/share/applications -m 0644 Project/GNU/GUI/mediaconch-gui.desktop
+
+    install -D -m 0644 Project/GNU/GUI/mediaconch-gui.kde3.desktop "${pkgdir}"/usr/share/apps/konqueror/servicemenus/mediaconch-gui.desktop
+    install -D -m 0644 Project/GNU/GUI/mediaconch-gui.kde4.desktop "${pkgdir}"/usr/share/kde4/services/ServiceMenus/mediaconch-gui.desktop
+    install -D -m 0644 Project/GNU/GUI/mediaconch-gui.appdata.xml "${pkgdir}"/usr/share/appdata/mediaconch-gui.appdata.xml
+
+    install -D -m 0644 License.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.html
+    install -D -m 0644 License.MPLv2.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.MPLv2.html
+    install -D -m 0644 License.GPLv3.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.GPLv3.html
+
+    install -D -m 0644 History_GUI.txt "${pkgdir}"/usr/share/docs/${pkgname}/History.txt
+    install -D -m 0644 Release/ReadMe_GUI_Linux.txt "${pkgdir}"/usr/share/docs/${pkgname}/ReadMe.txt
+}
+
