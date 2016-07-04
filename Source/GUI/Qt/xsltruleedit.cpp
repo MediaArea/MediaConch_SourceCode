@@ -356,10 +356,9 @@ void XsltRuleEdit::change_values_of_field_selector(bool is_free_text, const std:
             ui->field->setCurrentIndex(pos);
     }
 
-    if (!is_free_text)
-        change_values_of_value_selector(ui->type->currentText().toUtf8().data(),
-                                        ui->field->currentText().toUtf8().data(),
-                                        new_value);
+    change_values_of_value_selector(ui->type->currentText().toUtf8().data(),
+                                    ui->field->currentText().toUtf8().data(),
+                                    new_value);
 }
 
 //---------------------------------------------------------------------------
