@@ -8,10 +8,10 @@ before_install:
   - sudo dpkg -i libzen0_0.4.33-1_amd64.xUbuntu_12.04.deb
   - wget http://mediaarea.net/download/binary/libzen0/0.4.33/libzen-dev_0.4.33-1_amd64.xUbuntu_12.04.deb
   - sudo dpkg -i libzen-dev_0.4.33-1_amd64.xUbuntu_12.04.deb
-  # - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.85/libmediainfo0_0.7.85-1_amd64.xUbuntu_12.04.deb
-  - wget https://mediaarea.net/download/snapshots/binary/libmediainfo0/20160628/libmediainfo0_0.7.86.20160628-1_amd64.xUbuntu_12.04.deb
-  - sudo dpkg -i libmediainfo0_0.7.86.20160628-1_amd64.xUbuntu_12.04.deb
-  # - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.85/libmediainfo-dev_0.7.85-1_amd64.xUbuntu_12.04.deb
-  - wget https://mediaarea.net/download/snapshots/binary/libmediainfo0/20160628/libmediainfo-dev_0.7.86.20160628-1_amd64.xUbuntu_12.04.deb
-  - sudo dpkg -i libmediainfo-dev_0.7.86.20160628-1_amd64.xUbuntu_12.04.deb
+  - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.87/libmediainfo0_0.7.87-1_amd64.xUbuntu_12.04.deb
+  # - wget https://mediaarea.net/download/snapshots/binary/libmediainfo0/20160628/libmediainfo0_0.7.86.20160628-1_amd64.xUbuntu_12.04.deb
+  - sudo dpkg -i libmediainfo0_0.7.87-1_amd64.xUbuntu_12.04.deb
+  - wget http://mediaarea.net/download/binary/libmediainfo0/0.7.87/libmediainfo-dev_0.7.87-1_amd64.xUbuntu_12.04.deb
+  # - wget https://mediaarea.net/download/snapshots/binary/libmediainfo0/20160628/libmediainfo-dev_0.7.86.20160628-1_amd64.xUbuntu_12.04.deb
+  - sudo dpkg -i libmediainfo-dev_0.7.87-1_amd64.xUbuntu_12.04.deb
 script: cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make check && cd ../../Qt && ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES" && make
