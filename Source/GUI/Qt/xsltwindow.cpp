@@ -616,15 +616,13 @@ void XsltWindow::displayRuleEdit(int rowPolicy, int rowRule)
                      this, SLOT(delete_rule()));
     QObject::connect(ruleEdit->get_duplicateRule_button(), SIGNAL(clicked()),
                      this, SLOT(duplicate_rule()));
-    QObject::connect(ruleEdit->get_type_select(), SIGNAL(currentIndexChanged(int)),
+    QObject::connect(ruleEdit->get_type_select(), SIGNAL(editTextChanged(const QString&)),
                      this, SLOT(edit_rule_type()));
-    QObject::connect(ruleEdit->get_field_select(), SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(edit_rule_field()));
     QObject::connect(ruleEdit->get_field_select(), SIGNAL(editTextChanged(const QString&)),
                      this, SLOT(edit_rule_field()));
     QObject::connect(ruleEdit->get_operator_select(), SIGNAL(currentIndexChanged(int)),
                      this, SLOT(edit_rule_operator()));
-    QObject::connect(ruleEdit->get_value_select(), SIGNAL(currentIndexChanged(int)),
+    QObject::connect(ruleEdit->get_value_select(), SIGNAL(editTextChanged(const QString&)),
                      this, SLOT(edit_rule_value()));
     QObject::connect(ruleEdit->get_occurrence_box(), SIGNAL(valueChanged(int)),
                      this, SLOT(edit_rule_occurrence()));
