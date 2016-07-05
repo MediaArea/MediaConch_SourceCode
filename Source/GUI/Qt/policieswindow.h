@@ -7,11 +7,6 @@
 #ifndef POLICIESWINDOW_H
 #define POLICIESWINDOW_H
 
-#include "Common/Core.h"
-#include "Common/SchematronPolicy.h"
-#include "Common/UnknownPolicy.h"
-#include "Common/XsltPolicy.h"
-
 #include <QFileInfo>
 #include <QString>
 
@@ -25,6 +20,8 @@ class QFrame;
 namespace MediaConch {
 
 class MainWindow;
+class WebView;
+class ProgressBar;
 
 class PoliciesWindow : public QObject
 {
@@ -34,15 +31,37 @@ public:
     explicit PoliciesWindow(MainWindow *parent = 0);
     ~PoliciesWindow();
 
-    // Helpers
-    void                        display_policies();
-
-private:
-    MainWindow     *mainwindow;
-
 //***************************************************************************
 // HELPER
 //***************************************************************************
+    void                        display_policies();
+
+private:
+    MainWindow   *mainwindow;
+    WebView      *web_view;
+    ProgressBar  *progress_bar;
+
+//***************************************************************************
+// VISUAL
+//***************************************************************************
+    void clear_visual_elements();
+
+//***************************************************************************
+// WEB
+//***************************************************************************
+    void change_qt_scripts_in_template(QString& html);
+    void set_webmachine_script_in_template(QString& html);
+    void remove_result_in_template(QString& html);
+    void change_checker_in_template(const QString& policy, QString& html);
+    void create_html_base(const QString& policy, QString& base);
+    void create_html_policy(QString& policy);
+    void create_html();
+
+//***************************************************************************
+// SLOTS
+//***************************************************************************
+private Q_SLOTS:
+    void create_web_view_finished(bool ok);
 };
 
 }

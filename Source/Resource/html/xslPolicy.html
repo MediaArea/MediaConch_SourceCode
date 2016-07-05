@@ -1,0 +1,56 @@
+<h1>Policy editor</h1>
+
+<div class="col-md-8">
+    <h2>Policy list:</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="jstreeSearch" id="policiesTreeSearch" placeholder="Search" />
+        </div>
+        <div class="col-md-12">
+            <div id="policiesTree"></div>
+        </div>
+    </div>
+</div>
+<div class="col-md-4 policyRightCol">
+    <div id="policyFix" class="row">
+        <div id="policyInfo" class="row">
+            <div></div>
+        </div>
+        <div class="row policyManage">
+            <div>
+                <h2>Import a policy</h2>
+                {{ form(importPolicyForm) }}
+            </div>
+
+            <div>
+                <h2>Create a policy</h2>
+                {{ form(createPolicyForm) }}
+            </div>
+        </div>
+
+        <div class="row policyEdit hidden">
+            <div>
+                <h4>Policy edition:</h4>
+                <span class="policyEditTitle"></span>
+            </div>
+
+            <div>
+                <h4>Policy actions:</h4>
+                <button id="policyDuplicate" class="btn btn-warning">Duplicate</button>
+                <button id="policyExport" class="btn btn-warning">Export</button>
+                <button id="policyDelete" class="btn btn-danger">Delete</button>
+            </div>
+
+            <div id="policyRuleCreateContainer">
+                <h4>Policy rule actions:</h4>
+                <button id="policyRuleCreate" class="btn btn-warning">Add a new rule</button>
+            </div>
+        </div>
+
+        <div class="row policyEditRule hidden">
+            {{ form(policyRuleForm) }}
+            <p>Fields marked by asterisks (*) are required</p>
+        </div>
+    </div>
+</div>
