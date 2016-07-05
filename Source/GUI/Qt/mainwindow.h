@@ -184,7 +184,7 @@ private:
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();
-    void                        createPoliciesView(int row=-1);
+    void                        createPoliciesView();
     void                        createDisplayView();
     void                        createSettingsView();
     void                        choose_schematron_file();
@@ -199,7 +199,6 @@ private:
 Q_SIGNALS:
     void status_bar_clear_message();
     void status_bar_show_message(const QString& message, int timeout);
-    void select_created_policy(int row);
 
 private Q_SLOTS:
     void on_actionOpen_triggered();
@@ -210,7 +209,6 @@ private Q_SLOTS:
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
-    void selected_created_policy(int row);
 
 public Q_SLOTS:
     //Help

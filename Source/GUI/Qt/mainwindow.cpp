@@ -110,9 +110,6 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
     setAcceptDrops(false);
 
-    connect(this, SIGNAL(select_created_policy(int)),
-            this, SLOT(selected_created_policy(int)));
-
     // Status bar
     statusBar()->show();
     clear_msg_in_status_bar();
@@ -379,7 +376,6 @@ size_t MainWindow::create_policy_from_file(const QString& file)
     {
         icon = QMessageBox::Information;
         text = QString("Policy from %1 is created, you can find it in the \"Policies\" tab").arg(file);
-        // Q_EMIT selected_created_policy((int)pos);
     }
     else
     {
@@ -391,15 +387,6 @@ size_t MainWindow::create_policy_from_file(const QString& file)
                        QMessageBox::NoButton, this);
     msgBox.exec();
     return pos;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::selected_created_policy(int row)
-{
-    if (!ui->actionPolicies->isChecked())
-        ui->actionPolicies->setChecked(true);
-    current_view = RUN_POLICIES_VIEW;
-    createPoliciesView(row);
 }
 
 //---------------------------------------------------------------------------
@@ -749,13 +736,13 @@ void MainWindow::createCheckerView()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createPoliciesView(int row)
+void MainWindow::createPoliciesView()
 {
     if (clearVisualElements() < 0)
         return;
 
     policiesView = new PoliciesWindow(this);
-    policiesView->displayPoliciesTree(row);
+    policiesView->display_policies();
 }
 
 //---------------------------------------------------------------------------
