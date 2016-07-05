@@ -10,16 +10,16 @@
     <link rel="stylesheet" href="qrc:/datatables.css">
     <link rel="stylesheet" type="text/css" href="qrc:/main.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="qrc:/main-gui.css" media="screen"/>
+    <script src="qrc:/jquery.js"></script>
+    <script src="qrc:/bootstrap.js"></script>
+    {{ QT_SCRIPTS }}
     <script type="text/javascript">
       var WEBMACHINE = '{{ webmachine }}';
     </script>
-    <script src="qrc:/jquery.js"></script>
-    <script src="qrc:/bootstrap.js"></script>
     <script src="qrc:/jstree.js"></script>
     <script src="qrc:/jstreegrid.js"></script>
     <script src="qrc:/display.js"></script>
     <script type="text/javascript" src="qrc:/datatables.js"></script>
-    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <title>MediaConchOnline Display Management</title>
   </head>
   <body id="body"  class="container">
@@ -61,6 +61,5 @@
         </div>
       </div>
     </div>
-    {% block bodyScript %}{% endblock %}
     </body>
 </html>
