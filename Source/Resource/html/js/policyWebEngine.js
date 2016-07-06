@@ -1,4 +1,8 @@
 function getPolicyTreeData() {
+    webpage.get_policies_tree(function(data) {
+        var policies = JSON.parse(data);
+        displayTree(policies.policiesTree);
+    });
 }
 
 function policyImportForm(form) {

@@ -123,7 +123,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Default
     add_default_policy();
     add_default_displays();
-    on_actionChecker_triggered();
+    on_actionPolicies_triggered();
 }
 
 MainWindow::~MainWindow()

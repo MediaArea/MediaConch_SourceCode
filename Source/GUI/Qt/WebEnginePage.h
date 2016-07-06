@@ -78,6 +78,8 @@ public Q_SLOTS:
     void         display_export_id(const QString& name);
     void         display_delete_id(const QString& name);
 
+    QString      get_policies_tree();
+
 private Q_SLOTS:
     void         on_load_finished(bool ok);
 

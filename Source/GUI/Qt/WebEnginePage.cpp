@@ -17,6 +17,7 @@
 #include <QWebChannel>
 
 #include "Common/FileRegistered.h"
+#include "Common/XsltPolicy.h"
 #include "mainwindow.h"
 #include "WebPage.h"
 
@@ -735,6 +736,93 @@ namespace MediaConch
     {
         mainwindow->display_delete_id(name);
     }
+
+    QString WebPage::get_policies_tree()
+    {
+        size_t nb_policies;
+        QString res("{\"policiesTree\":[");
+
+        nb_policies = mainwindow->get_policies_count();
+        bool has_user = false;
+        bool has_system = false;
+        QString user("{\"id\":\"u_p\",\"text\":\"User Policies\",\"type\":\"up\",\"state\":{\"opened\":true},\"children\":[");
+        QString system("{\"id\":\"s_p\",\"text\":\"System Policies\",\"type\":\"sp\",\"state\":{\"opened\":true, \"selected\": true},\"children\":[");
+        for (size_t i = 0; i < nb_policies; ++i)
+        {
+            Policy *p = mainwindow->get_policy(i);
+            if (!p || p->type != Policies::POLICY_XSLT)
+                continue;
+
+            QString rule("[");
+            XsltPolicy *policy = (XsltPolicy *)p;
+            for (size_t j = 0; j < policy->rules.size(); ++j)
+            {
+                XsltRule *r = policy->rules[j];
+                if (!r)
+                    continue;
+
+                if (j)
+                    rule += ",";
+                QString rule_data("{");
+                rule_data += QString("\"ruleId\":%1").arg(j);
+
+                int len = r->type.length();
+                if (len > 0)
+                    rule_data += QString(",\"trackType\":\"%1\"").arg(QString().fromUtf8(r->type.c_str(), r->type.length()));
+                else
+                    rule_data += ",\"trackType\":null";
+
+                len = r->field.length();
+                if (len > 0)
+                    rule_data += QString(",\"field\":\"%1\"").arg(QString().fromUtf8(r->field.c_str(), r->field.length()));
+                else
+                    rule_data += ",\"field\":null";
+
+                if (r->occurrence > 0)
+                    rule_data += QString(",\"occurrence\":%1").arg(r->occurrence);
+                else
+                    rule_data += ",\"occurrence\":null";
+
+                len = r->ope.length();
+                if (len > 0)
+                    rule_data += QString(",\"validator\":\"%1\"").arg(QString().fromUtf8(r->ope.c_str(), r->ope.length()));
+                else
+                    rule_data += ",\"validator\":null";
+
+                len = r->value.length();
+                if (len > 0)
+                    rule_data += QString(",\"value\":\"%1\"").arg(QString().fromUtf8(r->value.c_str(), r->value.length()));
+                else
+                    rule_data += ",\"value\":null";
+                rule_data += "}";
+                rule += QString("{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}")
+                            .arg(QString().fromUtf8(r->title.c_str(), r->title.length()))
+                            .arg(rule_data);
+            }
+            rule += "]";
+            if (p->filename.find(":/") == 0)
+            {
+                if (has_system)
+                    system += ",";
+                system += QString("{\"text\":\"%1\",\"type\":\"s\",\"data\":{\"policyId\":%2},\"children\":%3}")
+                              .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i).arg(rule);
+                has_system = true;
+            }
+            else
+            {
+                if (has_user)
+                    user += ",";
+                user += QString("{\"text\":\"%1\",\"type\":\"u\",\"data\":{\"policyId\":%2},\"children\":%3}")
+                              .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i).arg(rule);
+                has_user = true;
+            }
+        }
+        user += "]}";
+        system += "]}";
+        res += QString("%1,%2]}").arg(user).arg(system);
+        return res;
+    }
+
 }
 
 #endif
