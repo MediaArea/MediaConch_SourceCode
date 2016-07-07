@@ -118,7 +118,7 @@ public:
     Policy                     *get_policy(size_t pos);
     int                         get_policy_index_by_filename(const std::string& filename);
     void                        add_policy(Policy* policy);
-    void                        remove_policy(size_t pos);
+    int                         remove_policy(size_t pos, std::string& err);
     void                        clear_policies();
     size_t                      get_policies_count() const;
 

@@ -193,7 +193,7 @@ public:
     Policy*                     get_policy(size_t pos);
     bool                        policy_exists(const std::string& title);
     void                        add_policy(Policy* p);
-    void                        remove_policy(size_t pos);
+    int                         remove_policy(size_t pos, std::string& err);
     void                        clear_policies();
     const std::vector<Policy *>& get_policies() const;
 

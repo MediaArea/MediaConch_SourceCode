@@ -62,7 +62,7 @@ public:
     int         import_schema_from_memory(const std::string& filename, const char* memory, int len);
     void        export_schema(const char* filename, size_t pos);
     xmlDocPtr   create_doc(size_t pos);
-    void        erase_policy(size_t index);
+    int         erase_policy(size_t index, std::string& err);
     bool        policy_exists(const std::string& policy);
     size_t      create_policy_from_file(const std::string& file, const std::string& policy_filename);
     int         create_xslt_policy(const std::string& name, const std::string& description, std::string& err);

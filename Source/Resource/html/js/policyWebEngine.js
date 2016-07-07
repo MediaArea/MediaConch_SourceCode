@@ -54,10 +54,17 @@ function policyDuplicateRequest(policyNode) {
 }
 
 function policyDeleteRequest(policyNode) {
-    // webpage.delete_policy(policyNode, function (data) {
-    // // data:
-    //     policyDelete(data, policyNode);
-    // });
+    if (!policyNode || !policyNode.data || !policyNode.data.policyId)
+        return;
+
+    webpage.delete_policy(policyNode.data.policyId, function (data) {
+    // data:
+        var deleted = JSON.parse(data);
+        if (!deleted.error)
+            policyDelete(deleted, policyNode);
+        else
+            errorMessage(deleted.error);
+    });
 }
 
 function policyRuleCreateRequest(policyNode) {

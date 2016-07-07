@@ -188,8 +188,9 @@ void MainWindow::update_policy_of_file_in_list(const QString& file, const QStrin
 
 void MainWindow::policy_to_delete(int index)
 {
+    std::string err;
     //Delete policy
-    MCL.remove_policy((size_t)index);
+    MCL.remove_policy((size_t)index, err);
 }
 
 //***************************************************************************
@@ -883,9 +884,9 @@ int MainWindow::get_policy_index_by_filename(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::remove_policy(size_t pos)
+int MainWindow::remove_policy(size_t pos, std::string& err)
 {
-    return MCL.remove_policy(pos);
+    return MCL.remove_policy(pos, err);
 }
 
 //---------------------------------------------------------------------------

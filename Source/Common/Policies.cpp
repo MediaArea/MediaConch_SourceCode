@@ -136,14 +136,18 @@ void Policies::export_schema(const char* filename, size_t pos)
     policies[pos]->export_schema(filename);
 }
 
-void Policies::erase_policy(size_t index)
+int Policies::erase_policy(size_t index, std::string& err)
 {
-    if (index >= policies.size())
-        return;
+    if ((int)index < 0 || index >= policies.size())
+    {
+        err = "Policy index is not valid";
+        return -1;
+    }
 
     if (policies[index])
         delete policies[index];
     policies.erase(policies.begin() + index);
+    return 0;
 }
 
 void Policies::create_values_from_csv()

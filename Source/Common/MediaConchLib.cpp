@@ -545,9 +545,9 @@ void MediaConchLib::add_policy(Policy* p)
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::remove_policy(size_t pos)
+int MediaConchLib::remove_policy(size_t pos, std::string& err)
 {
-    core->policies.erase_policy(pos);
+    return core->policies.erase_policy(pos, err);
 }
 
 //---------------------------------------------------------------------------
