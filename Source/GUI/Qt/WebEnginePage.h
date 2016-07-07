@@ -15,6 +15,7 @@
 namespace MediaConch {
 
 class FileRegistered;
+class XsltRule;
 
 class WebPage : public QWebEnginePage
 {
@@ -79,6 +80,7 @@ public Q_SLOTS:
     void         display_delete_id(const QString& name);
 
     QString      get_policies_tree();
+    void         create_rule_tree(XsltRule *r, int index, QString& rule_data);
 
 private Q_SLOTS:
     void         on_load_finished(bool ok);

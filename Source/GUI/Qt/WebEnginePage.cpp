@@ -737,6 +737,45 @@ namespace MediaConch
         mainwindow->display_delete_id(name);
     }
 
+    void WebPage::create_rule_tree(XsltRule *r, int index, QString& rule_data)
+    {
+        if (!r)
+            return;
+
+        rule_data = "{";
+        rule_data += QString("\"ruleId\":%1").arg(index);
+
+        int len = r->type.length();
+        if (len > 0)
+            rule_data += QString(",\"trackType\":\"%1\"").arg(QString().fromUtf8(r->type.c_str(), r->type.length()));
+        else
+            rule_data += ",\"trackType\":null";
+
+        len = r->field.length();
+        if (len > 0)
+            rule_data += QString(",\"field\":\"%1\"").arg(QString().fromUtf8(r->field.c_str(), r->field.length()));
+        else
+            rule_data += ",\"field\":null";
+
+        if (r->occurrence > 0)
+            rule_data += QString(",\"occurrence\":%1").arg(r->occurrence);
+        else
+            rule_data += ",\"occurrence\":null";
+
+        len = r->ope.length();
+        if (len > 0)
+            rule_data += QString(",\"validator\":\"%1\"").arg(QString().fromUtf8(r->ope.c_str(), r->ope.length()));
+        else
+            rule_data += ",\"validator\":null";
+
+        len = r->value.length();
+        if (len > 0)
+            rule_data += QString(",\"value\":\"%1\"").arg(QString().fromUtf8(r->value.c_str(), r->value.length()));
+        else
+            rule_data += ",\"value\":null";
+        rule_data += "}";
+    }
+
     QString WebPage::get_policies_tree()
     {
         size_t nb_policies;
@@ -763,38 +802,9 @@ namespace MediaConch
 
                 if (j)
                     rule += ",";
-                QString rule_data("{");
-                rule_data += QString("\"ruleId\":%1").arg(j);
 
-                int len = r->type.length();
-                if (len > 0)
-                    rule_data += QString(",\"trackType\":\"%1\"").arg(QString().fromUtf8(r->type.c_str(), r->type.length()));
-                else
-                    rule_data += ",\"trackType\":null";
-
-                len = r->field.length();
-                if (len > 0)
-                    rule_data += QString(",\"field\":\"%1\"").arg(QString().fromUtf8(r->field.c_str(), r->field.length()));
-                else
-                    rule_data += ",\"field\":null";
-
-                if (r->occurrence > 0)
-                    rule_data += QString(",\"occurrence\":%1").arg(r->occurrence);
-                else
-                    rule_data += ",\"occurrence\":null";
-
-                len = r->ope.length();
-                if (len > 0)
-                    rule_data += QString(",\"validator\":\"%1\"").arg(QString().fromUtf8(r->ope.c_str(), r->ope.length()));
-                else
-                    rule_data += ",\"validator\":null";
-
-                len = r->value.length();
-                if (len > 0)
-                    rule_data += QString(",\"value\":\"%1\"").arg(QString().fromUtf8(r->value.c_str(), r->value.length()));
-                else
-                    rule_data += ",\"value\":null";
-                rule_data += "}";
+                QString rule_data;
+                create_rule_tree(r, j, rule_data);
                 rule += QString("{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}")
                             .arg(QString().fromUtf8(r->title.c_str(), r->title.length()))
                             .arg(rule_data);
