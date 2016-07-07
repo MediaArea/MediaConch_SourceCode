@@ -31,6 +31,7 @@ PoliciesWindow::PoliciesWindow(MainWindow *parent) : mainwindow(parent), web_vie
 
 PoliciesWindow::~PoliciesWindow()
 {
+    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -61,6 +62,7 @@ void PoliciesWindow::clear_visual_elements()
         if (channel)
             channel->deregisterObject(page);
 #endif
+        mainwindow->remove_widget_from_layout(web_view);
         delete web_view;
         web_view = NULL;
     }
