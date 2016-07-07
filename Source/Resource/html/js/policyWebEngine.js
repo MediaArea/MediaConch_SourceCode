@@ -82,8 +82,12 @@ function getFieldsList(trackType, field) {
 }
 
 function getValuesList(trackType, field, value) {
-    // webpage.get_values_list(trackType, field, value, function (data) {
-    // // data: [{key,value}]
-    //     valuesListOk(data.values, value);
-    // });
+    // // data: {values:[value,value,...]}
+    webpage.get_values_list(trackType, field, value, function (data) {
+        var values = JSON.parse(data);
+        if (!values.error)
+            valuesListOk(values.values, value);
+        else
+            valuesListError(value);
+    });
 }

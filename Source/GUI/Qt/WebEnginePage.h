@@ -88,6 +88,7 @@ public Q_SLOTS:
     QString      create_policy(const QString& name, const QString& description);
     QString      duplicate_policy(int id);
     QString      delete_policy(int id);
+    QString      get_values_list(const QString& type, const QString& field, const QString& value);
 
 private Q_SLOTS:
     void         on_load_finished(bool ok);

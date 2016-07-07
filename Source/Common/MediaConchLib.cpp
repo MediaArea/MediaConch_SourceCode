@@ -580,4 +580,10 @@ void MediaConchLib::get_daemon_address(std::string& addr, int& port) const
     core->get_daemon_address(addr, port);
 }
 
+//---------------------------------------------------------------------------
+int MediaConchLib::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+{
+    return core->get_values_for_type_field(type, field, values);
+}
+
 }

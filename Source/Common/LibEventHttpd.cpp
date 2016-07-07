@@ -189,7 +189,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_list_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/default_values_for_type").compare(uri_path))
+    else if (query_str && !std::string("/default_values_for_type").compare(uri_path))
     {
         std::string query(query_str);
         RESTAPI::Default_Values_For_Type_Req *r = NULL;
@@ -208,7 +208,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_default_values_for_type_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/create_policy_from_file").compare(uri_path))
+    else if (query_str && !std::string("/create_policy_from_file").compare(uri_path))
     {
         std::string query(query_str);
         RESTAPI::Create_Policy_From_File_Req *r = NULL;

@@ -538,6 +538,11 @@ UiSettings& MainWindow::get_settings()
     return uisettings;
 }
 
+int MainWindow::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+{
+    return MCL.get_values_for_type_field(type, field, values);
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************

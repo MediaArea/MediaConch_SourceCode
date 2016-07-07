@@ -14,7 +14,6 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "Common/GeneratedCSVVideos.h"
 #include "CommandLine_Parser.h"
 #include "Help.h"
 //---------------------------------------------------------------------------
@@ -412,7 +411,6 @@ CL_OPTION(PluginsConfiguration)
 //---------------------------------------------------------------------------
 CL_OPTION(DefaultValuesForType)
 {
-    (void)cli;
     //Form : --DefaultValuesForType=type,field
     size_t egal_pos = argument.find('=');
     if (egal_pos == std::string::npos)
@@ -432,26 +430,20 @@ CL_OPTION(DefaultValuesForType)
     type = argument.substr(egal_pos + 1, comma_pos - egal_pos - 1);
     field.assign(argument, comma_pos + 1 , std::string::npos);
 
-    std::map<std::string, std::map<std::string, std::vector<std::string> > > values;
-    if (get_generated_values_from_csv(values) < 0)
+    std::vector<std::string> values;
+    if (cli->get_values_for_type_field(type, field, values) < 0)
         return CLI_RETURN_ERROR;
 
-    if (values.find(type) != values.end())
+    std::stringstream out;
+    for (size_t i = 0; i < values.size(); ++i)
     {
-        if (values[type].find(field) != values[type].end())
-        {
-            std::stringstream out;
-            for (size_t i = 0; i < values[type][field].size(); ++i)
-            {
-                if (i)
-                    out << ",";
-                out << values[type][field][i];
-            }
-            ZenLib::Ztring str;
-            str.From_UTF8(out.str());
-            STRINGOUT(str);
-        }
+        if (i)
+            out << ",";
+        out << values[i];
     }
+    ZenLib::Ztring str;
+    str.From_UTF8(out.str());
+    STRINGOUT(str);
 
     return CLI_RETURN_FINISH;
 }

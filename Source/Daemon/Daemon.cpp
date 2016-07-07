@@ -15,7 +15,6 @@
 #include <ZenLib/Ztring.h>
 #include "Common/Httpd.h"
 #include "Common/LibEventHttpd.h"
-#include "Common/GeneratedCSVVideos.h"
 #include "Common/Policy.h"
 #include "Daemon.h"
 #include "Help.h"
@@ -841,18 +840,10 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a default_values_for_type command: ";
         std::clog << req->to_str() << std::endl;
 
-        std::map<std::string, std::map<std::string, std::vector<std::string> > > values;
-        if (get_generated_values_from_csv(values) < 0)
-            return 0;
-
-        if (values.find(req->type) != values.end())
-        {
-            if (values[req->type].find(req->field) != values[req->type].end())
-            {
-                for (size_t i = 0; i < values[req->type][req->field].size(); ++i)
-                    res.values.push_back(values[req->type][req->field][i]);
-            }
-        }
+        std::vector<std::string> values;
+        if (d->MCL->get_values_for_type_field(req->type, req->field, values) >= 0)
+            for (size_t i = 0; i < values.size(); ++i)
+                res.values.push_back(values[i]);
 
         std::clog << d->get_date() << "Daemon send default_values_for_type result: " << res.to_str() << std::endl;
 

@@ -33,6 +33,7 @@
 #include "Common/MediaTraceDisplayTextXsl.h"
 #include "Common/MediaTraceDisplayHtmlXsl.h"
 #include "Common/MicroMediaTraceToMediaTraceXsl.h"
+#include "Common/GeneratedCSVVideos.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
@@ -1826,6 +1827,25 @@ bool Core::dpfmanager_report_is_valid(const std::string& report)
     if (pos != std::string::npos)
         return false;
     return true;
+}
+
+//---------------------------------------------------------------------------
+int Core::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+{
+    std::map<std::string, std::map<std::string, std::vector<std::string> > > vs;
+    if (get_generated_values_from_csv(vs) < 0)
+        return -1;
+
+    if (vs.find(type) != vs.end())
+    {
+        if (vs[type].find(field) != vs[type].end())
+        {
+            for (size_t i = 0; i < vs[type][field].size(); ++i)
+                values.push_back(vs[type][field][i]);
+        }
+    }
+
+    return 0;
 }
 
 }

@@ -121,6 +121,7 @@ public:
     int                         remove_policy(size_t pos, std::string& err);
     void                        clear_policies();
     size_t                      get_policies_count() const;
+    int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
 
     int                         select_correct_policy();
     int                         select_correct_display();

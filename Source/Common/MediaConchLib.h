@@ -197,6 +197,9 @@ public:
     void                        clear_policies();
     const std::vector<Policy *>& get_policies() const;
 
+    //Generated Values
+    int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+
     // Daemon
     void set_use_daemon(bool use);
     bool get_use_daemon() const;
