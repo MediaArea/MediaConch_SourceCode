@@ -447,6 +447,18 @@ size_t MediaConchLib::create_policy_from_file(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::create_xslt_policy(const std::string& name, const std::string& description, std::string& err)
+{
+    return core->policies.create_xslt_policy(name, description, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::duplicate_policy(int id, std::string& err)
+{
+    return core->policies.duplicate_policy(id, err);
+}
+
+//---------------------------------------------------------------------------
 void MediaConchLib::save_policies()
 {
     for (size_t i = 0; i < core->policies.policies.size(); ++i)

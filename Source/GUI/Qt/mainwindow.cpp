@@ -845,6 +845,18 @@ int MainWindow::import_policy(const QString& file, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::create_xslt_policy(const QString& name, const QString& description, std::string& err)
+{
+    return MCL.create_xslt_policy(name.toUtf8().data(), description.toUtf8().data(), err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::duplicate_policy(int id, std::string& err)
+{
+    return MCL.duplicate_policy(id, err);
+}
+
+//---------------------------------------------------------------------------
 bool MainWindow::policy_exists(const std::string& title)
 {
     return MCL.policy_exists(title);

@@ -85,6 +85,8 @@ public Q_SLOTS:
     void         create_rule_tree(XsltRule *r, int index, QString& rule_data);
     void         create_xslt_policy_rules_tree(XsltPolicy *policy, QString& rules_data);
     QString      import_policy();
+    QString      create_policy(const QString& name, const QString& description);
+    QString      duplicate_policy(int id);
 
 private Q_SLOTS:
     void         on_load_finished(bool ok);

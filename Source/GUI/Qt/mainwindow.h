@@ -112,6 +112,8 @@ public:
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
     int                         import_policy(const QString& file, std::string& err);
+    int                         create_xslt_policy(const QString& name, const QString& description, std::string& err);
+    int                         duplicate_policy(int id, std::string& err);
     bool                        policy_exists(const std::string& title);
     Policy                     *get_policy(size_t pos);
     int                         get_policy_index_by_filename(const std::string& filename);

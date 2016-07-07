@@ -258,6 +258,53 @@ size_t Policies::create_policy_from_file(const std::string& file, const std::str
     return pos;
 }
 
+int Policies::create_xslt_policy(const std::string& name, const std::string& description, std::string&)
+{
+    Policy *p = new XsltPolicy(!core->accepts_https());
+
+    //Policy filename
+    //p->filename = ;
+    p->title = name;
+    p->description = description;
+    p->saved = false;
+    size_t pos = policies.size();
+    policies.push_back(p);
+
+    return (int)pos;
+}
+
+int Policies::duplicate_policy(int id, std::string& err)
+{
+    if (id < 0 || id > (int)policies.size())
+    {
+        err = "policy id is not existing";
+        return -1;
+    }
+
+    Policy *old = policies[id];
+    if (!old)
+    {
+        err = "policy id is not existing anymore";
+        return -1;
+    }
+
+    if (old->type != POLICY_XSLT)
+    {
+        err = "policy cannot be duplicate";
+        return -1;
+    }
+
+    Policy *p = new XsltPolicy((XsltPolicy*)old);
+
+    //Policy filename
+    //p->filename = ;
+    p->title += "_copy";
+    size_t pos = policies.size();
+    policies.push_back(p);
+
+    return (int)pos;
+}
+
 bool Policies::check_test_type(const std::string& type)
 {
     std::map<std::string, std::list<std::string> >::iterator it = existing_type.begin();

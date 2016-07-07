@@ -17,10 +17,23 @@ function policyImportForm(form) {
 }
 
 function policyCreateForm(form) {
-    // webpage.create_policy(form, function (data) {
-    // //     data: policyName, policyId
-    //     policyCreate(data);
-    // });
+    var name = $(form).find("#xslPolicyCreate_policyName").val();
+    var description = $(form).find("#xslPolicyCreate_policyDescription").val();
+
+    if (name === undefined)
+        return;
+
+    if (description === undefined)
+        description = "";
+
+    webpage.create_policy(name, description, function (data) {
+    //     data: policyName, policyId
+        var created = JSON.parse(data);
+        if (!created.error)
+            policyCreate(created);
+        else
+            errorMessage(created.error);
+    });
 }
 
 function policyRuleForm(form, ruleNode, action, routeAction) {
@@ -30,10 +43,14 @@ function policyRuleForm(form, ruleNode, action, routeAction) {
 }
 
 function policyDuplicateRequest(policyNode) {
-    // webpage.duplicate_policy(policyNode, function (data) {
-    // // data: policyName, policyId, policyRules
-    //     policyDuplicate(data, policyNode);
-    // });
+    webpage.duplicate_policy(policyNode.data.policyId, function (data) {
+    // data: policyName, policyId, policyRules
+        var duplicated = JSON.parse(data);
+        if (!duplicated.error)
+            policyDuplicate(duplicated, policyNode);
+        else
+            errorMessage(duplicated.error);
+    });
 }
 
 function policyDeleteRequest(policyNode) {

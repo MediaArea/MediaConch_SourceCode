@@ -916,6 +916,78 @@ namespace MediaConch
                    .arg(rules);
         return json;
     }
+
+    QString WebPage::create_policy(const QString& name, const QString& description)
+    {
+        //return: policyName, policyId
+        QString json;
+        std::string err;
+        size_t nb_policies = mainwindow->get_policies_count();
+
+        int ret;
+        if ((ret = mainwindow->create_xslt_policy(name, description, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        if (ret != (int)nb_policies)
+        {
+            json = "{\"error\":\"Cannot create a policy\"}";
+            return json;
+        }
+
+        Policy *p = mainwindow->get_policy(ret);
+        if (!p || p->type != Policies::POLICY_XSLT)
+        {
+            json = "{\"error\":\"Cannot create a policy\"}";
+            return json;
+        }
+        // TODO: save by default the policy to be consistent with the web
+
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2}")
+                   .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
+                   .arg(ret);
+        return json;
+    }
+
+    QString WebPage::duplicate_policy(int id)
+    {
+        //return: policyName, policyId, policyRules
+        QString json;
+        std::string err;
+        size_t nb_policies = mainwindow->get_policies_count();
+        int ret;
+
+        if ((ret = mainwindow->duplicate_policy(id, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        if (ret != (int)nb_policies)
+        {
+            json = "{\"error\":\"Cannot duplicate the policy\"}";
+            return json;
+        }
+
+        Policy *p = mainwindow->get_policy(ret);
+        if (!p || p->type != Policies::POLICY_XSLT)
+        {
+            json = "{\"error\":\"Cannot duplicate the policy\"}";
+            return json;
+        }
+        // TODO: save by default the policy to be consistent with the web
+
+        QString rules;
+        create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"policyRules\":%3}")
+                   .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
+                   .arg(ret)
+                   .arg(rules);
+        return json;
+    }
 }
 
 #endif
