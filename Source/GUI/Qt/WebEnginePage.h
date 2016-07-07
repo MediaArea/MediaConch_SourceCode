@@ -15,6 +15,7 @@
 namespace MediaConch {
 
 class FileRegistered;
+class XsltPolicy;
 class XsltRule;
 
 class WebPage : public QWebEnginePage
@@ -35,6 +36,7 @@ protected:
     void         add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list);
     void         charge_local_dir(const QString& directory, QStringList& tmp);
     QStringList  choose_file_settings();
+    QStringList  choose_file_import_policy();
 
 public Q_SLOTS:
     void         on_file_upload_selected(const QString& policy, const QString& display_xslt, const QString& verbosity);
@@ -81,6 +83,8 @@ public Q_SLOTS:
 
     QString      get_policies_tree();
     void         create_rule_tree(XsltRule *r, int index, QString& rule_data);
+    void         create_xslt_policy_rules_tree(XsltPolicy *policy, QString& rules_data);
+    QString      import_policy();
 
 private Q_SLOTS:
     void         on_load_finished(bool ok);

@@ -463,10 +463,39 @@ namespace MediaConch
         return list;
     }
 
+    QStringList WebPage::choose_file_import_policy()
+    {
+        std::string suggested_str;
+
+        if (select_file_name == "xslPolicyImport[policyFile]")
+            suggested_str = mainwindow->select_correct_load_policy_path();
+        else
+            return QStringList();
+
+        QString suggested = QString().fromUtf8(suggested_str.c_str(), suggested_str.length());
+        QString value_input = QFileDialog::getOpenFileName(mainwindow, "Open file", suggested, "XSL file (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+
+        QMap<QString, QStringList>::iterator it = file_selector.find(select_file_name);
+        if (it != file_selector.end())
+            file_selector.erase(it);
+
+        if (!value_input.length())
+            return QStringList();
+
+        mainwindow->set_last_load_policy_path(value_input.toUtf8().data());
+        file_selector.insert(select_file_name, QStringList(value_input));
+
+        QStringList list;
+        list = QStringList(value_input);
+        return list;
+    }
+
     QStringList WebPage::chooseFiles(FileSelectionMode mode, const QStringList &, const QStringList&)
     {
         if (select_file_name.startsWith("settings_"))
             return choose_file_settings();
+        else if (select_file_name.startsWith("xslPolicyImport"))
+            return choose_file_import_policy();
 
         QStringList list;
         std::string suggested_str;
@@ -776,6 +805,30 @@ namespace MediaConch
         rule_data += "}";
     }
 
+    void WebPage::create_xslt_policy_rules_tree(XsltPolicy *policy, QString& rules)
+    {
+        if (!policy || policy->type != Policies::POLICY_XSLT)
+            return;
+
+        rules = "[";
+        for (size_t j = 0; j < policy->rules.size(); ++j)
+        {
+            XsltRule *r = policy->rules[j];
+            if (!r)
+                continue;
+
+            if (j)
+                rules += ",";
+
+            QString rule_data;
+            create_rule_tree(r, j, rule_data);
+            rules += QString("{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}")
+                         .arg(QString().fromUtf8(r->title.c_str(), r->title.length()))
+                         .arg(rule_data);
+        }
+        rules += "]";
+    }
+
     QString WebPage::get_policies_tree()
     {
         size_t nb_policies;
@@ -792,30 +845,15 @@ namespace MediaConch
             if (!p || p->type != Policies::POLICY_XSLT)
                 continue;
 
-            QString rule("[");
-            XsltPolicy *policy = (XsltPolicy *)p;
-            for (size_t j = 0; j < policy->rules.size(); ++j)
-            {
-                XsltRule *r = policy->rules[j];
-                if (!r)
-                    continue;
+            QString rules;
+            create_xslt_policy_rules_tree((XsltPolicy*)p, rules);
 
-                if (j)
-                    rule += ",";
-
-                QString rule_data;
-                create_rule_tree(r, j, rule_data);
-                rule += QString("{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}")
-                            .arg(QString().fromUtf8(r->title.c_str(), r->title.length()))
-                            .arg(rule_data);
-            }
-            rule += "]";
             if (p->filename.find(":/") == 0)
             {
                 if (has_system)
                     system += ",";
                 system += QString("{\"text\":\"%1\",\"type\":\"s\",\"data\":{\"policyId\":%2},\"children\":%3}")
-                              .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i).arg(rule);
+                              .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i).arg(rules);
                 has_system = true;
             }
             else
@@ -823,7 +861,7 @@ namespace MediaConch
                 if (has_user)
                     user += ",";
                 user += QString("{\"text\":\"%1\",\"type\":\"u\",\"data\":{\"policyId\":%2},\"children\":%3}")
-                              .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i).arg(rule);
+                              .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i).arg(rules);
                 has_user = true;
             }
         }
@@ -833,6 +871,51 @@ namespace MediaConch
         return res;
     }
 
+    QString WebPage::import_policy()
+    {
+        //return: policyName, policyId, policyRules
+        QString file;
+        QStringList list = file_selector["xslPolicyImport[policyFile]"];
+        if (list.size())
+            file = list.last().toUtf8().data();
+
+        file_selector.clear();
+
+        if (!file.length())
+            return QString("{\"error\":\"No file selected\"}");
+
+        QString json;
+        std::string err;
+        size_t nb_policies = mainwindow->get_policies_count();
+        if (mainwindow->import_policy(file, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        if (mainwindow->get_policies_count() != nb_policies + 1)
+        {
+            json = "{\"error\":\"Cannot import the policy\"}";
+            return json;
+        }
+
+        Policy *p = mainwindow->get_policy(nb_policies);
+        if (!p || p->type != Policies::POLICY_XSLT)
+        {
+            json = "{\"error\":\"Cannot import the policy\"}";
+            return json;
+        }
+        // TODO: save by default the policy to be consistent with the web
+
+        QString rules;
+        create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"policyRules\":%3}")
+                   .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
+                   .arg(nb_policies)
+                   .arg(rules);
+        return json;
+    }
 }
 
 #endif

@@ -254,7 +254,7 @@ QString MainWindow::get_local_folder() const
 QString MainWindow::ask_for_schema_file()
 {
     QString suggested = QString().fromUtf8(select_correct_load_policy_path().c_str());
-    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
     if (file.length())
     {

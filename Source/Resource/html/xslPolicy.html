@@ -23,12 +23,8 @@
               <form name="xslPolicyImport" method="post" action="" enctype="multipart/form-data">
                 <div id="xslPolicyImport">
                   <div class="form-group">
-                    <label class="control-label required" for="xslPolicyImport_policyName">Policy name</label>
-                    <input type="text" id="xslPolicyImport_policyName" name="xslPolicyImport[policyName]" required="required" maxlength="50" class="form-control" />
-                  </div>
-                  <div class="form-group">
                     <label class="control-label required" for="xslPolicyImport_policyFile">Policy file</label>
-                    <input type="file" id="xslPolicyImport_policyFile" name="xslPolicyImport[policyFile]" required="required" accept=".xsl,.xml" />
+                    <input type="file" id="xslPolicyImport_policyFile" name="xslPolicyImport[policyFile]" required="required" accept=".xsl,.xml" onclick="webpage.on_input_changed(this.name);"/>
                   </div>
                   <div class="form-group">
                     <button type="submit" id="xslPolicyImport_ImportPolicy" name="xslPolicyImport[ImportPolicy]" class="btn-warning btn">Import policy</button>

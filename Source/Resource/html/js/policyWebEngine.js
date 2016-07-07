@@ -6,10 +6,14 @@ function getPolicyTreeData() {
 }
 
 function policyImportForm(form) {
-    // webpage.import_policy(form, function (data) {
-    // //     data: policyName, policyId, policyRules
-    //     policyImport(data);
-    // });
+    webpage.import_policy(function (data) {
+    //     data: policyName, policyId, policyRules
+        var imported = JSON.parse(data);
+        if (!imported.error)
+            policyImport(imported);
+        else
+            errorMessage(imported.error);
+    });
 }
 
 function policyCreateForm(form) {
@@ -34,7 +38,7 @@ function policyDuplicateRequest(policyNode) {
 
 function policyDeleteRequest(policyNode) {
     // webpage.delete_policy(policyNode, function (data) {
-    // // data: 
+    // // data:
     //     policyDelete(data, policyNode);
     // });
 }
