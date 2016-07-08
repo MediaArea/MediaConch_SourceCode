@@ -6,6 +6,15 @@
 
 @echo off
 
+rem --- Search binaries ---
+set BPATH=
+if exist "%~dp0\..\..\..\MediaArea-Utils-Binaries" set BPATH="%~dp0\..\..\..\MediaArea-Utils-Binaries"
+if exist "%~dp0\..\..\MediaArea-Utils-Binaries" set BPATH="%~dp0\..\..\MediaArea-Utils-Binaries"
+if "%BPATH%"=="" (
+    echo "ERROR: binaries path not found"
+    exit /b 1
+)
+
 rem --- Clean up ---
 del mediaconch_.tar.bz2
 del MediaConch_Source.tar
@@ -106,9 +115,9 @@ xcopy ..\*.cvsignore MediaConch_Source\
 rem --- Compressing Archive ---
 if "%2"=="SkipCompression" goto SkipCompression
 move MediaConch_Source MediaConch
-..\..\Shared\Binary\Windows_i386\7-zip\7z a -r -ttar -mx9 MediaConch_Source.tar MediaConch\*
-..\..\Shared\Binary\Windows_i386\7-zip\7z a -r -tbzip2 -mx9 mediaconch_.tar.bz2 MediaConch_Source.tar
-..\..\Shared\Binary\Windows_i386\7-zip\7z a -r -tgzip -mx9 mediaconch_-1.tar.gz MediaConch_Source.tar
+%BPATH%\Windows\7-zip\7z a -r -ttar -mx9 MediaConch_Source.tar MediaConch\*
+%BPATH%\Windows\7-zip\7z a -r -tbzip2 -mx9 mediaconch_.tar.bz2 MediaConch_Source.tar
+%BPATH%\Windows\7-zip\7z a -r -tgzip -mx9 mediaconch_-1.tar.gz MediaConch_Source.tar
 :SkipCompression
 
 rem --- Clean up ---
