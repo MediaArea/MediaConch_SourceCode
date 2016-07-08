@@ -543,6 +543,11 @@ int MainWindow::get_values_for_type_field(const std::string& type, const std::st
     return MCL.get_values_for_type_field(type, field, values);
 }
 
+int MainWindow::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+{
+    return MCL.get_fields_for_type(type, fields);
+}
+
 //***************************************************************************
 // Slots
 //***************************************************************************

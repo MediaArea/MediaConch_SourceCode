@@ -1830,6 +1830,21 @@ bool Core::dpfmanager_report_is_valid(const std::string& report)
 }
 
 //---------------------------------------------------------------------------
+int Core::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+{
+    const std::map<std::string, std::list<std::string> >& types = Policies::existing_type;
+
+    if (types.find(type) == types.end())
+        return -1;
+
+    const std::list<std::string>& list = types.at(type);
+    std::list<std::string>::const_iterator it = list.begin();
+    for (; it != list.end(); ++it)
+        fields.push_back(*it);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int Core::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
 {
     std::map<std::string, std::map<std::string, std::vector<std::string> > > vs;

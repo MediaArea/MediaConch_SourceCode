@@ -75,10 +75,14 @@ function policyRuleCreateRequest(policyNode) {
 }
 
 function getFieldsList(trackType, field) {
-    // webpage.get_fields_list(trackType, field, function (data) {
-    // // data: [{key,value}]
-    //     fieldsListOk(data, field);
-    // });
+    // // data: {values:[value,value]}
+    webpage.get_fields_list(trackType, field, function (data) {
+        var fields = JSON.parse(data);
+        if (!fields.error)
+            fieldsListOk(fields.fields, field);
+        else
+            fieldsListError(field);
+    });
 }
 
 function getValuesList(trackType, field, value) {

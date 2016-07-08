@@ -95,6 +95,7 @@ public:
     int  transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
 
     int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int  get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
     Policies policies;
     std::string xslt_display;

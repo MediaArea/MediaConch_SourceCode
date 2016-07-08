@@ -199,6 +199,7 @@ public:
 
     //Generated Values
     int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
     // Daemon
     void set_use_daemon(bool use);

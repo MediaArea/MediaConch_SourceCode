@@ -1011,6 +1011,34 @@ namespace MediaConch
         return json;
     }
 
+    QString WebPage::get_fields_list(const QString& type, const QString& field)
+    {
+        //return: {values:[value,value]}
+        QString json;
+
+        std::vector<std::string> fields;
+        if (mainwindow->get_fields_for_type(type.toUtf8().data(), fields) < 0)
+        {
+            json = "{\"error\":\"\"}";
+            return json;
+        }
+
+        json = "{\"fields\":[";
+        bool has_field = false;
+        for (size_t i = 0; i < fields.size(); ++i)
+        {
+            if (i)
+                json += ",";
+            json += QString("\"%1\"").arg(QString().fromUtf8(fields[i].c_str()));
+            if (fields[i] == field.toUtf8().data())
+                has_field = true;
+        }
+        if (!has_field && field.length())
+            json += QString("%1\"%2\"").arg(fields.size() > 0 ? "," : "").arg(field);
+        json += "]}";
+        return json;
+    }
+
     QString WebPage::get_values_list(const QString& type, const QString& field, const QString& value)
     {
         //return: {values:[value,value]}

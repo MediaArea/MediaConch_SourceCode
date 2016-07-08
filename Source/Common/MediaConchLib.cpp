@@ -586,4 +586,10 @@ int MediaConchLib::get_values_for_type_field(const std::string& type, const std:
     return core->get_values_for_type_field(type, field, values);
 }
 
+//---------------------------------------------------------------------------
+int MediaConchLib::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+{
+    return core->get_fields_for_type(type, fields);
+}
+
 }
