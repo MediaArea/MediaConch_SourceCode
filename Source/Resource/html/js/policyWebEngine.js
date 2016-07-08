@@ -35,11 +35,61 @@ function policyCreateForm(form) {
             errorMessage(created.error);
     });
 }
+function policyRuleFormEdit(form, policyNode, ruleNode) {
+    var title = $(form).find("#xslPolicyRule_title").val();
+    var editor_selected = $(form).find("#xslPolicyRule_editor_0").is(':checked');
+    var type = $(form).find("#xslPolicyRule_trackType").val();
+    var field = $(form).find("#xslPolicyRule_field").val();
+    var occurrence = $(form).find("#xslPolicyRule_occurrence").val();
 
-function policyRuleForm(form, ruleNode, action, routeAction) {
-    // webpage.rule_action(routeAction, policyId, ruleNode.data.Id, action, function (data) {
-    //     ruleAction(data, ruleNode, action);
-    // });
+    if (occurrence === "*")
+        occurrence = -1;
+    occurrence = parseInt(occurrence);
+    if (isNaN(occurrence))
+        occurrence = 0;
+
+    var validator = $(form).find("#xslPolicyRule_validator").val();
+    var value = $(form).find("#xslPolicyRule_value").val();
+    var text = $(form).find("#xslPolicyRule_valueFreeText").val();
+    webpage.policy_rule_edit(policyNode.data.policyId, ruleNode.data.ruleId, title, editor_selected, type, field, occurrence, validator, value, text, function (data) {
+        //data: rule
+        var edited = JSON.parse(data);
+        if (!edited.error)
+            ruleEdit(edited, ruleNode);
+        else
+            errorMessage(edited.error);
+    });
+}
+
+function policyRuleForm(form, policyNode, ruleNode, action, routeAction) {
+    // routeAction is for MCO
+
+    if (action === "duplicate")
+    {
+        webpage.policy_rule_duplicate(policyNode.data.policyId, ruleNode.data.ruleId, function (data) {
+            //data: rule
+            var duplicated = JSON.parse(data);
+            if (!duplicated.error)
+                ruleDuplicate(duplicated, ruleNode);
+            else
+                errorMessage(duplicated.error);
+        });
+    }
+    else if (action === "delete")
+    {
+        webpage.policy_rule_delete(policyNode.data.policyId, ruleNode.data.ruleId, function (data) {
+            //data: rule
+            var deleted = JSON.parse(data);
+            if (!deleted.error)
+                ruleDelete(deleted, ruleNode);
+            else
+                errorMessage(deleted.error);
+        });
+    }
+    else if (action === "edit")
+    {
+        policyRuleFormEdit(form, policyNode, ruleNode);
+    }
 }
 
 function policyDuplicateRequest(policyNode) {

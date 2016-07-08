@@ -459,6 +459,24 @@ int MediaConchLib::duplicate_policy(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::create_policy_rule(int policy_id, std::string& err)
+{
+    return core->policies.create_policy_rule(policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return core->policies.duplicate_policy_rule(policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::delete_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return core->policies.delete_policy_rule(policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
 void MediaConchLib::save_policies()
 {
     for (size_t i = 0; i < core->policies.policies.size(); ++i)
@@ -527,7 +545,7 @@ size_t MediaConchLib::get_policies_count() const
 //---------------------------------------------------------------------------
 Policy* MediaConchLib::get_policy(size_t pos)
 {
-    if (pos >= core->policies.policies.size())
+    if ((int)pos < 0 || pos >= core->policies.policies.size())
         return NULL;
     return core->policies.policies[pos];
 }

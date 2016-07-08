@@ -29,8 +29,13 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 XsltRule::XsltRule(const XsltRule& r)
 {
+    *this = r;
+}
+
+XsltRule& XsltRule::operator=(const XsltRule& r)
+{
     if (&r == this)
-        return;
+        return *this;
 
     this->title = r.title;
     this->ope = r.ope;
@@ -40,6 +45,7 @@ XsltRule::XsltRule(const XsltRule& r)
     this->occurrence = r.occurrence;
     this->value = r.value;
     this->test = r.test;
+    return *this;
 }
 
 //***************************************************************************

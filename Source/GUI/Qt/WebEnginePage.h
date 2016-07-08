@@ -88,6 +88,9 @@ public Q_SLOTS:
     QString      create_policy(const QString& name, const QString& description);
     QString      duplicate_policy(int id);
     QString      delete_policy(int id);
+    QString      policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text);
+    QString      policy_rule_duplicate(int policy_id, int rule_id);
+    QString      policy_rule_delete(int policy_id, int rule_id);
     QString      get_values_list(const QString& type, const QString& field, const QString& value);
     QString      get_fields_list(const QString& type, const QString& field);
 

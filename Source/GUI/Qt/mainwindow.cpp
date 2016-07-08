@@ -868,6 +868,24 @@ int MainWindow::duplicate_policy(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::create_policy_rule(int policy_id, std::string& err)
+{
+    return MCL.create_policy_rule(policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.duplicate_policy_rule(policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::delete_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.delete_policy_rule(policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
 bool MainWindow::policy_exists(const std::string& title)
 {
     return MCL.policy_exists(title);

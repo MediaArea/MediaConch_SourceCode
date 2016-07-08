@@ -38,6 +38,7 @@ namespace MediaConch {
 /* TODO: remove */
 class SchematronAssert;
 class Policy;
+class XsltRule;
 class Core;
 
 //***************************************************************************
@@ -67,6 +68,9 @@ public:
     size_t      create_policy_from_file(const std::string& file, const std::string& policy_filename);
     int         create_xslt_policy(const std::string& name, const std::string& description, std::string& err);
     int         duplicate_policy(int id, std::string& err);
+    int         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
+    int         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
+    int         delete_policy_rule(int policy_id, int rule_id, std::string& err);
 
     static bool        try_parsing_test(std::string data, SchematronAssert *r);
     static std::string serialize_assert_for_test(SchematronAssert *r);

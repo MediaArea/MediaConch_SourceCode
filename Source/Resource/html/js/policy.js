@@ -77,7 +77,7 @@ function start() {
             routeAction = 'app_xslpolicy_xslpolicytreeruleedit';
         }
 
-        policyRuleForm($(this), selectedRuleNode, action, routeAction);
+        policyRuleForm($(this), policyNode, selectedRuleNode, action, routeAction);
     });
 
     $('#policiesTree').on('ready.jstree', function () {
@@ -408,7 +408,7 @@ function fieldsListOk(fields, field) {
     $('#xslPolicyRule_field option').remove();
     $('#xslPolicyRule_field').append('<option value="">Choose a field</option>');
     $.each(fields, function(k, v) {
-        $('#xslPolicyRule_field').append('<option value="' + k + '">' + v + '</option>');
+        $('#xslPolicyRule_field').append('<option value="' + v + '">' + v + '</option>');
     });
 
     if (field) {

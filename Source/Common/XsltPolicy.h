@@ -45,6 +45,7 @@ public:
     XsltRule() : use_free_text(false), occurrence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
+    XsltRule& operator=(const XsltRule&);
 
     std::string title;
 
@@ -59,9 +60,6 @@ public:
     std::string value;
 
     std::string test; // Free text
-
-private:
-    XsltRule& operator=(const XsltRule&);
 };
 
 //***************************************************************************

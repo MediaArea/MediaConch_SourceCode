@@ -1011,6 +1011,76 @@ namespace MediaConch
         return json;
     }
 
+    QString WebPage::policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text)
+    {
+        //return: rule
+        std::string err;
+        QString json;
+
+        XsltRule rule;
+        rule.title         = title.toUtf8().data();;
+        rule.ope           = ope.toUtf8().data();;
+        rule.use_free_text = !is_editor;
+        rule.type          = type.toUtf8().data();;
+        rule.field         = field.toUtf8().data();;
+        rule.occurrence    = occurrence;
+        rule.value         = value.toUtf8().data();;
+        rule.test          = free_text.toUtf8().data();;
+
+        if (mainwindow->edit_policy_rule(policy_id, rule_id, &rule, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
+        XsltRule* r = p->rules[rule_id];
+        // TODO: save by default the policy to be consistent with the web
+
+        QString rule_data;
+        create_rule_tree(r, rule_id, rule_data);
+        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(QString().fromUtf8(r->title.c_str())).arg(rule_data);
+        return json;
+    }
+
+    QString WebPage::policy_rule_duplicate(int policy_id, int rule_id)
+    {
+        //return: rule
+        std::string err;
+        QString json;
+        int new_rule_id = -1;
+        if ((new_rule_id = mainwindow->duplicate_policy_rule(policy_id, rule_id, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
+        XsltRule* r = p->rules[new_rule_id];
+        // TODO: save by default the policy to be consistent with the web
+
+        QString rule_data;
+        create_rule_tree(r, new_rule_id, rule_data);
+        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(QString().fromUtf8(r->title.c_str())).arg(rule_data);
+        return json;
+    }
+
+    QString WebPage::policy_rule_delete(int policy_id, int rule_id)
+    {
+        //return: ruleId
+        std::string err;
+        QString json;
+        if (mainwindow->delete_policy_rule(policy_id, rule_id, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+        // TODO: save by default the policy to be consistent with the web
+
+        json = QString("{\"ruleId\":%1}").arg(rule_id);
+        return json;
+    }
+
     QString WebPage::get_fields_list(const QString& type, const QString& field)
     {
         //return: {values:[value,value]}
