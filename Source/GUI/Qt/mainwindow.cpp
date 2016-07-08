@@ -874,6 +874,12 @@ int MainWindow::create_policy_rule(int policy_id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err)
+{
+    return MCL.edit_policy_rule(policy_id, rule_id, rule, err);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
 {
     return MCL.duplicate_policy_rule(policy_id, rule_id, err);

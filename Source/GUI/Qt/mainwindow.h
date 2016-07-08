@@ -121,6 +121,7 @@ public:
     int                         remove_policy(size_t pos, std::string& err);
     void                        clear_policies();
     size_t                      get_policies_count() const;
+    int                         create_policy_rule(int policy_id, std::string& err);
     int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
     int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
     int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);

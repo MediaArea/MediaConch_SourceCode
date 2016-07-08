@@ -309,6 +309,35 @@ int Policies::duplicate_policy(int id, std::string& err)
     return (int)pos;
 }
 
+int Policies::create_policy_rule(int policy_id, std::string& err)
+{
+    if (policy_id < 0 || policy_id > (int)policies.size())
+    {
+        err = "policy id is not existing";
+        return -1;
+    }
+    XsltPolicy *p = (XsltPolicy *)policies[policy_id];
+
+    if (!p)
+    {
+        err = "policy id is not existing anymore";
+        return -1;
+    }
+
+    if (p->type != POLICY_XSLT)
+    {
+        err = "policy rule cannot be added";
+        return -1;
+    }
+    XsltRule *rule = new XsltRule();
+
+    rule->title = "New Rule";
+    size_t pos = p->rules.size();
+    p->rules.push_back(rule);
+
+    return (int)pos;
+}
+
 int Policies::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err)
 {
     if (policy_id < 0 || policy_id > (int)policies.size())

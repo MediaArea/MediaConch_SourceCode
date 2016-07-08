@@ -465,6 +465,12 @@ int MediaConchLib::create_policy_rule(int policy_id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err)
+{
+    return core->policies.edit_policy_rule(policy_id, rule_id, rule, err);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
 {
     return core->policies.duplicate_policy_rule(policy_id, rule_id, err);

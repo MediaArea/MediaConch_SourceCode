@@ -118,10 +118,13 @@ function policyDeleteRequest(policyNode) {
 }
 
 function policyRuleCreateRequest(policyNode) {
-    // webpage.create_rule(policyNode, function (data) {
-    // // data: ...
-    //     policyRuleCreate(data, policyNode);
-    // });
+    webpage.policy_rule_create(policyNode.data.policyId, function (data) {
+        var created = JSON.parse(data);
+        if (!created.error)
+            policyRuleCreate(created.rule, policyNode);
+        else
+            errorMessage(created.error);
+    });
 }
 
 function getFieldsList(trackType, field) {

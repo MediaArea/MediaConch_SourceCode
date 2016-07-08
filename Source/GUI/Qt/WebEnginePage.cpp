@@ -1011,6 +1011,28 @@ namespace MediaConch
         return json;
     }
 
+    QString WebPage::policy_rule_create(int policy_id)
+    {
+        //return: rule
+        std::string err;
+        QString json;
+        int new_rule_id = -1;
+        if ((new_rule_id = mainwindow->create_policy_rule(policy_id, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
+        XsltRule* r = p->rules[new_rule_id];
+        // TODO: save by default the policy to be consistent with the web
+
+        QString rule_data;
+        create_rule_tree(r, new_rule_id, rule_data);
+        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(QString().fromUtf8(r->title.c_str())).arg(rule_data);
+        return json;
+    }
+
     QString WebPage::policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text)
     {
         //return: rule
