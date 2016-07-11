@@ -212,8 +212,11 @@ void PoliciesWindow::create_html()
     QWebChannel *channel = new QWebChannel(page);
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
+    web_view->setHtml(html.toUtf8(), url);
 #endif
+#if defined(WEB_MACHINE_KIT)
     web_view->setContent(html.toUtf8(), "text/html", url);
+#endif
 }
 
 //***************************************************************************
