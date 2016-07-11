@@ -137,6 +137,11 @@ function policyRuleCreateRequest(policyNode) {
 
 function getFieldsList(trackType, field) {
     // // data: {values:[value,value]}
+    if (null === trackType)
+        trackType = "";
+    if (null === field)
+        field = "";
+
     webpage.get_fields_list(trackType, field, function (data) {
         var fields = JSON.parse(data);
         if (!fields.error)
@@ -148,6 +153,13 @@ function getFieldsList(trackType, field) {
 
 function getValuesList(trackType, field, value) {
     // // data: {values:[value,value,...]}
+    if (null === trackType)
+        trackType = "";
+    if (null === field)
+        field = "";
+    if (null === value)
+        value = "";
+
     webpage.get_values_list(trackType, field, value, function (data) {
         var values = JSON.parse(data);
         if (!values.error)

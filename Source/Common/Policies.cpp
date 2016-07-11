@@ -367,13 +367,11 @@ int Policies::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule,
         err = "rule id is not existing";
         return -1;
     }
-    XsltRule *r = p->rules[rule_id];
 
-    if (!r)
-    {
-        err = "rule is not existing anymore";
-        return -1;
-    }
+    if (p->rules[rule_id])
+        *p->rules[rule_id] = *rule;
+    else
+        p->rules[rule_id] = new XsltRule(*rule);
 
     return 0;
 }

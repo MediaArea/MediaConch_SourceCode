@@ -786,10 +786,10 @@ namespace MediaConch
         else
             rule_data += ",\"field\":null";
 
-        if (r->occurrence > 0)
+        if (r->occurrence >= 0)
             rule_data += QString(",\"occurrence\":%1").arg(r->occurrence);
         else
-            rule_data += ",\"occurrence\":null";
+            rule_data += ",\"occurrence\":\"*\"";
 
         len = r->ope.length();
         if (len > 0)
@@ -1055,14 +1055,14 @@ namespace MediaConch
         QString json;
 
         XsltRule rule;
-        rule.title         = title.toUtf8().data();;
-        rule.ope           = ope.toUtf8().data();;
+        rule.title         = title.toUtf8().data();
+        rule.ope           = ope.toUtf8().data();
         rule.use_free_text = !is_editor;
-        rule.type          = type.toUtf8().data();;
-        rule.field         = field.toUtf8().data();;
+        rule.type          = type.toUtf8().data();
+        rule.field         = field.toUtf8().data();
         rule.occurrence    = occurrence;
-        rule.value         = value.toUtf8().data();;
-        rule.test          = free_text.toUtf8().data();;
+        rule.value         = value.toUtf8().data();
+        rule.test          = free_text.toUtf8().data();
 
         if (mainwindow->edit_policy_rule(policy_id, rule_id, &rule, err) < 0)
         {
