@@ -38,7 +38,7 @@ UnknownPolicy(bool no_https) : Policy(Policies::POLICY_UNKNOWN, no_https) {}
 
 private:
     // HELPER
-    int import_schema_from_doc(const std::string& filename, xmlDocPtr doc);
+    int import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
 };
 
 }

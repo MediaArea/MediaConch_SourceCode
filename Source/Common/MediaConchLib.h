@@ -189,11 +189,12 @@ public:
     bool                        is_policy_saved(size_t pos) const;
     //   Import policy
     int                         import_policy_from_file(const std::string& filename, std::string& err);
-    int                         import_policy_from_memory(const std::string& memory, const std::string& filename, std::string& err);
+    int                         import_policy_from_memory(const std::string& memory, std::string& err, bool is_system_policy=false);
     //   Policy helper
     size_t                      get_policies_count() const;
     Policy*                     get_policy(size_t pos);
     bool                        policy_exists(const std::string& title);
+    int                         save_policy(size_t pos, std::string& err);
     void                        add_policy(Policy* p);
     int                         remove_policy(size_t pos, std::string& err);
     void                        save_policies();

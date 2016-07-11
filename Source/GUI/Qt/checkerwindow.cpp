@@ -580,10 +580,11 @@ void CheckerWindow::change_body_script_in_template(QString& html)
 
     reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
-    script = "";
+    script = "        <script type=\"text/javascript\" src=\"qrc:/checker.js\"></script>\n";
 #elif defined(WEB_MACHINE_ENGINE)
-    script = "        <script type=\"text/javascript\" src=\"qrc:///qtwebchannel/qwebchannel.js\"></script>\n"
-             "        <script type=\"text/javascript\" src=\"qrc:///webengine.js\"></script>";
+    script = "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/checker.js\"></script>\n";
 #endif
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), script);

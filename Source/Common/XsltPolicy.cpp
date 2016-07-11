@@ -536,7 +536,7 @@ int XsltPolicy::find_policychecks_node(xmlNodePtr node)
         }
         else
             ret = 0;
-        
+
         child = child->next;
     }
     return ret;
@@ -677,7 +677,7 @@ bool XsltPolicy::validate_template_match_node(xmlNodePtr node)
 int XsltPolicy::find_template_match_node(xmlNodePtr node)
 {
     xmlChar *match = xmlGetNoNsProp(node, (const unsigned char*)"match");
-    
+
     if (match == NULL || std::string((const char*)match) != "ma:MediaArea")
         return 1;
 
@@ -741,7 +741,7 @@ int XsltPolicy::find_template_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-int XsltPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
+int XsltPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& filename)
 {
     if (!doc)
     {
@@ -1773,7 +1773,7 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
 int XsltPolicy::find_media_track_node(xmlNodePtr node, std::string& type)
 {
     xmlChar *property = xmlGetNoNsProp(node, (const unsigned char*)"type");
-    
+
     if (property == NULL)
         return -1;
 

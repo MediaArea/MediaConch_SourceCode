@@ -11,17 +11,18 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "Policies.h"
-#include "Core.h"
-#include "Policy.h"
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <ZenLib/Ztring.h>
+#include <ZenLib/ZtringList.h>
+#include <ZenLib/File.h>
+#include "Policies.h"
+#include "Core.h"
+#include "Policy.h"
 #include "SchematronPolicy.h"
 #include "XsltPolicy.h"
 #include "UnknownPolicy.h"
-#include "ZenLib/Ztring.h"
-#include "ZenLib/ZtringList.h"
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
@@ -48,229 +49,13 @@ Policies::~Policies()
     policies.clear();
 }
 
-int Policies::import_schema(const std::string& filename)
-{
-    if (!filename.length())
-    {
-        error = "The policy file does not exist";
-        return -1;
-    }
-
-    Policy *p = NULL;
-    int ret = -1;
-    if (!filename.compare(filename.length() - 4, 4, ".sch"))
-    {
-        p = new SchematronPolicy(!core->accepts_https());
-        ret = p->import_schema(filename);
-    }
-
-    if (ret < 0)
-    {
-        if (p)
-            delete p;
-        p = new XsltPolicy(!core->accepts_https());
-        ret = p->import_schema(filename);
-        if (ret < 0)
-        {
-            if (p)
-                delete p;
-            p = new UnknownPolicy(!core->accepts_https());
-            ret = p->import_schema(filename);
-        }
-    }
-
-    if (ret >= 0)
-        policies.push_back(p);
-    else
-        delete p;
-    return ret;
-}
-
-int Policies::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
-{
-    if (!buffer || !len)
-    {
-        error = "The policy does not exist";
-        return -1;
-    }
-
-    Policy *p = NULL;
-    int ret = -1;
-    if (!filename.compare(filename.length() - 4, 4, ".sch"))
-    {
-        p = new SchematronPolicy(!core->accepts_https());
-        ret = p->import_schema_from_memory(filename, buffer, len);
-    }
-
-    if (ret < 0)
-    {
-        if (p)
-            delete p;
-
-        p = new XsltPolicy(!core->accepts_https());
-        ret = p->import_schema_from_memory(filename, buffer, len);
-        if (ret < 0)
-        {
-            if (p)
-                delete p;
-            p = new UnknownPolicy(!core->accepts_https());
-            ret = p->import_schema_from_memory(filename, buffer, len);
-        }
-    }
-
-    if (ret >= 0)
-        policies.push_back(p);
-    else
-        delete p;
-    return ret;
-}
-
-int Policies::export_policy(const char* filename, size_t pos, std::string& err)
-{
-    if ((int)pos == -1 || pos >= policies.size() || !policies[pos])
-    {
-        err = "Policy Id is not existing";
-        return -1;
-    }
-
-    if (filename == NULL)
-        filename = policies[pos]->filename.c_str();
-
-    return policies[pos]->export_schema(filename, err);
-}
-
-int Policies::erase_policy(size_t index, std::string& err)
-{
-    if ((int)index < 0 || index >= policies.size())
-    {
-        err = "Policy index is not valid";
-        return -1;
-    }
-
-    if (policies[index])
-        delete policies[index];
-    policies.erase(policies.begin() + index);
-    return 0;
-}
-
-void Policies::create_values_from_csv()
-{
-    ZenLib::ZtringList list;
-    list.Separator_Set(0, __T(","));
-    list.Write(core->Menu_Option_Preferences_Option(__T("MAXML_StreamKinds"), ZenLib::Ztring()));
-    for (size_t i = 0; i < list.size(); ++i)
-    {
-        std::list<std::string> fields;
-        fields.push_back("");
-
-        ZenLib::ZtringList listField;
-        listField.Separator_Set(0, __T(","));
-        listField.Write(core->Menu_Option_Preferences_Option(__T("MAXML_Fields"), list[i]));
-        for (size_t j = 0; j < listField.size(); ++j)
-            fields.push_back(listField[j].To_UTF8());
-
-        existing_type[list[i].To_UTF8()] = fields;
-    }
-
-    validatorType validators[] = {
-        { "", "", "" },
-        { "=", "is_equal", "Equal" },
-        { "!=", "is_not_equal", "Not Equal" },
-        { ">", "is_greater_than", "Greater than" },
-        { ">=", "is_greater_or_equal_than", "Greater or equal" },
-        { "<", "is_less_than", "Less" },
-        { "<=", "is_less_or_equal_than", "Less or equal" }
-    };
-
-    for (size_t i=0; i < (sizeof(validators) / sizeof(*validators)); i++)
-        existing_validator.push_back(validators[i]);
-
-    std::string xsltOperators[] =
-    {
-        "is_equal",
-        "is_not_equal",
-        "is_greater_than",
-        "is_less_than",
-        "is_greater_or_equal_than",
-        "is_less_or_equal_than",
-        "exists",
-        "does_not_exist",
-        "contains_string",
-        "is_true",
-    };
-
-    for (size_t i=0; i < (sizeof(xsltOperators) / sizeof(*xsltOperators)); i++)
-        existing_xsltOperator.push_back(xsltOperators[i]);
-}
-
-xmlDocPtr Policies::create_doc(size_t pos)
-{
-    if (pos >= policies.size() || !policies[pos])
-        return NULL;
-
-    return policies[pos]->create_doc();
-}
-
-bool Policies::policy_exists(const std::string& policy)
-{
-    for (size_t i =0; i < policies.size(); ++i)
-        if (policies[i]->title == policy)
-            return true;
-
-    return false;
-}
-
-size_t Policies::create_policy_from_file(const std::string& file, const std::string& policy_filename)
-{
-    std::bitset<MediaConchLib::report_Max> report_set;
-    std::vector<std::string> files;
-    std::map<std::string, std::string> options;
-    std::vector<std::string> policies_vec;
-    MediaConchLib::ReportRes result;
-
-    report_set.set(MediaConchLib::report_MediaInfo);
-    files.push_back(file);
-
-    core->get_report(report_set, MediaConchLib::format_Xml, files,
-                     policies_vec, policies_vec,
-                     options, &result,
-                     NULL, NULL);
-    if (!result.valid || !result.report.length())
-        return (size_t)-1;
-
-    Policy *p = new XsltPolicy(!core->accepts_https());
-
-    //Policy filename
-    p->filename = policy_filename;
-
-    size_t title_pos = file.rfind("/");
-    if (title_pos == std::string::npos)
-        title_pos = 0;
-    else
-        title_pos++;
-    p->title = file.substr(title_pos, std::string::npos);
-
-    int ret = ((XsltPolicy*)p)->create_policy_from_mi(result.report);
-
-    size_t pos = (size_t)-1;
-    if (ret >= 0)
-    {
-        p->saved = false;
-        pos = policies.size();
-        policies.push_back(p);
-    }
-    else
-        delete p;
-
-    return pos;
-}
-
+// Policy
 int Policies::create_xslt_policy(const std::string& name, const std::string& description, std::string&)
 {
     Policy *p = new XsltPolicy(!core->accepts_https());
 
-    //Policy filename
-    //p->filename = ;
+    // Policy filename
+    find_save_name(NULL, p->filename);
     p->title = name;
     p->description = description;
     p->saved = false;
@@ -278,6 +63,72 @@ int Policies::create_xslt_policy(const std::string& name, const std::string& des
     policies.push_back(p);
 
     return (int)pos;
+}
+
+int Policies::import_policy(const std::string& filename)
+{
+    if (!filename.length())
+    {
+        error = "The policy file does not exist";
+        return -1;
+    }
+
+    std::string save_name;
+    find_save_name(filename.c_str(), save_name);
+
+    Policy *p = NULL;
+    int ret = -1;
+    p = new XsltPolicy(!core->accepts_https());
+    ret = p->import_schema(filename, save_name);
+    if (ret < 0)
+    {
+        if (p)
+            delete p;
+        p = new UnknownPolicy(!core->accepts_https());
+        ret = p->import_schema(filename, filename);
+    }
+
+    if (ret >= 0)
+        policies.push_back(p);
+    else
+        delete p;
+    return ret;
+}
+
+int Policies::import_policy_from_memory(const char* buffer, int len, bool is_system_policy)
+{
+    if (!buffer || !len)
+    {
+        error = "The policy does not exist";
+        return -1;
+    }
+
+    std::string save_name;
+    find_save_name(NULL, save_name);
+    Policy *p = NULL;
+    int ret = -1;
+
+    p = new XsltPolicy(!core->accepts_https());
+    ret = p->import_schema_from_memory(buffer, len, save_name);
+    if (ret < 0)
+    {
+        if (p)
+            delete p;
+        p = new UnknownPolicy(!core->accepts_https());
+        ret = p->import_schema_from_memory(buffer, len, save_name);
+    }
+
+    if (ret >= 0)
+        policies.push_back(p);
+    else
+        delete p;
+    p->is_system = is_system_policy;
+    return ret;
+}
+
+int Policies::save_policy(size_t index, std::string& err)
+{
+    return export_policy(NULL, index, err);
 }
 
 int Policies::duplicate_policy(int id, std::string& err)
@@ -303,8 +154,8 @@ int Policies::duplicate_policy(int id, std::string& err)
 
     Policy *p = new XsltPolicy((XsltPolicy*)old);
 
-    //Policy filename
-    //p->filename = ;
+    // Policy filename
+    find_save_name(NULL, p->filename);
     p->title += "_copy";
     size_t pos = policies.size();
     policies.push_back(p);
@@ -312,6 +163,98 @@ int Policies::duplicate_policy(int id, std::string& err)
     return (int)pos;
 }
 
+int Policies::export_policy(const char* filename, size_t pos, std::string& err)
+{
+    if ((int)pos == -1 || pos >= policies.size() || !policies[pos])
+    {
+        err = "Policy Id is not existing";
+        return -1;
+    }
+
+    if (filename == NULL)
+        filename = policies[pos]->filename.c_str();
+
+    return policies[pos]->export_schema(filename, err);
+}
+
+int Policies::erase_policy(size_t index, std::string& err)
+{
+    if ((int)index < 0 || index >= policies.size())
+    {
+        err = "Policy index is not valid";
+        return -1;
+    }
+
+    remove_saved_policy(policies[index]->filename);
+    if (policies[index])
+        delete policies[index];
+    policies.erase(policies.begin() + index);
+    return 0;
+}
+
+xmlDocPtr Policies::create_doc(size_t pos)
+{
+    if (pos >= policies.size() || !policies[pos])
+        return NULL;
+
+    return policies[pos]->create_doc();
+}
+
+bool Policies::policy_exists(const std::string& policy)
+{
+    for (size_t i =0; i < policies.size(); ++i)
+        if (policies[i]->title == policy)
+            return true;
+
+    return false;
+}
+
+size_t Policies::create_policy_from_file(const std::string& file)
+{
+    std::bitset<MediaConchLib::report_Max> report_set;
+    std::vector<std::string> files;
+    std::map<std::string, std::string> options;
+    std::vector<std::string> policies_vec;
+    MediaConchLib::ReportRes result;
+
+    report_set.set(MediaConchLib::report_MediaInfo);
+    files.push_back(file);
+
+    core->get_report(report_set, MediaConchLib::format_Xml, files,
+                     policies_vec, policies_vec,
+                     options, &result,
+                     NULL, NULL);
+    if (!result.valid || !result.report.length())
+        return (size_t)-1;
+
+    Policy *p = new XsltPolicy(!core->accepts_https());
+
+    //Policy filename
+    find_save_name(NULL, p->filename);
+
+    size_t title_pos = file.rfind("/");
+    if (title_pos == std::string::npos)
+        title_pos = 0;
+    else
+        title_pos++;
+    p->title = file.substr(title_pos, std::string::npos);
+
+    int ret = ((XsltPolicy*)p)->create_policy_from_mi(result.report);
+
+    size_t pos = (size_t)-1;
+    if (ret >= 0)
+    {
+        p->saved = false;
+        pos = policies.size();
+        policies.push_back(p);
+    }
+    else
+        delete p;
+
+    return pos;
+}
+
+// Rule
 int Policies::create_policy_rule(int policy_id, std::string& err)
 {
     if (policy_id < 0 || policy_id > (int)policies.size())
@@ -450,6 +393,57 @@ int Policies::delete_policy_rule(int policy_id, int rule_id, std::string& err)
     p->rules.erase(p->rules.begin() + rule_id);
 
     return 0;
+}
+
+// Helper
+void Policies::create_values_from_csv()
+{
+    ZenLib::ZtringList list;
+    list.Separator_Set(0, __T(","));
+    list.Write(core->Menu_Option_Preferences_Option(__T("MAXML_StreamKinds"), ZenLib::Ztring()));
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        std::list<std::string> fields;
+        fields.push_back("");
+
+        ZenLib::ZtringList listField;
+        listField.Separator_Set(0, __T(","));
+        listField.Write(core->Menu_Option_Preferences_Option(__T("MAXML_Fields"), list[i]));
+        for (size_t j = 0; j < listField.size(); ++j)
+            fields.push_back(listField[j].To_UTF8());
+
+        existing_type[list[i].To_UTF8()] = fields;
+    }
+
+    validatorType validators[] = {
+        { "", "", "" },
+        { "=", "is_equal", "Equal" },
+        { "!=", "is_not_equal", "Not Equal" },
+        { ">", "is_greater_than", "Greater than" },
+        { ">=", "is_greater_or_equal_than", "Greater or equal" },
+        { "<", "is_less_than", "Less" },
+        { "<=", "is_less_or_equal_than", "Less or equal" }
+    };
+
+    for (size_t i=0; i < (sizeof(validators) / sizeof(*validators)); i++)
+        existing_validator.push_back(validators[i]);
+
+    std::string xsltOperators[] =
+    {
+        "is_equal",
+        "is_not_equal",
+        "is_greater_than",
+        "is_less_than",
+        "is_greater_or_equal_than",
+        "is_less_or_equal_than",
+        "exists",
+        "does_not_exist",
+        "contains_string",
+        "is_true",
+    };
+
+    for (size_t i=0; i < (sizeof(xsltOperators) / sizeof(*xsltOperators)); i++)
+        existing_xsltOperator.push_back(xsltOperators[i]);
 }
 
 bool Policies::check_test_type(const std::string& type)
@@ -599,6 +593,48 @@ std::string Policies::serialize_assert_for_test(SchematronAssert *r)
 
 end:
     return ret.str();
+}
+
+void Policies::find_save_name(const char* basename, std::string& save_name)
+{
+    std::string data_path = Core::get_local_data_path();
+
+    data_path += "policies/";
+    if (basename)
+    {
+        std::string base(basename);
+        ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(base);
+        if (base.find(data_path) == 0 && ZenLib::File::Exists(z_path))
+        {
+            save_name = basename;
+            return;
+        }
+    }
+
+    for (size_t i = 0; 1; ++i)
+    {
+        std::stringstream ss;
+        ss << data_path << "policy";
+        if (i)
+            ss << i;
+        ss << ".xsl";
+
+        ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(ss.str());
+        if (!ZenLib::File::Exists(z_path))
+        {
+            save_name = ss.str();
+            break;
+        }
+    }
+}
+
+void Policies::remove_saved_policy(const std::string& saved_name)
+{
+    ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(saved_name);
+    if (!ZenLib::File::Exists(z_path))
+        return;
+
+    ZenLib::File::Delete(z_path);
 }
 
 }

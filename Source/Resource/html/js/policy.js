@@ -1,4 +1,3 @@
-var webpage = undefined;
 $(document).ready(function() {
     (function loop_init(time) {
         setTimeout(function() {
@@ -18,9 +17,9 @@ function start() {
     $('div.content').css('min-height', function () {
         return $('.policyRightCol').outerHeight(true);
     })
-    $('#policyFix').css('width', function () {
-        return $('.policyRightCol').outerWidth(true);
-    })
+    // $('#policyFix').css('width', function () {
+    //     return $('.policyRightCol').outerWidth(true);
+    // })
 
     $('#policyFix').affix({
         offset: {

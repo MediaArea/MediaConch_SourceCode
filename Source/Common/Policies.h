@@ -59,19 +59,24 @@ public:
     Policies(Core*);
     ~Policies();
 
-    int         import_schema(const std::string& filename);
-    int         import_schema_from_memory(const std::string& filename, const char* memory, int len);
-    int         export_policy(const char* filename, size_t pos, std::string& err);
-    xmlDocPtr   create_doc(size_t pos);
-    int         erase_policy(size_t index, std::string& err);
-    bool        policy_exists(const std::string& policy);
-    size_t      create_policy_from_file(const std::string& file, const std::string& policy_filename);
+    // Policy
     int         create_xslt_policy(const std::string& name, const std::string& description, std::string& err);
+    int         import_policy(const std::string& filename);
+    int         import_policy_from_memory(const char* memory, int len, bool is_system_policy);
+    int         save_policy(size_t index, std::string& err);
+    int         export_policy(const char* filename, size_t pos, std::string& err);
     int         duplicate_policy(int id, std::string& err);
+    int         erase_policy(size_t index, std::string& err);
+
+    // Rule
     int         create_policy_rule(int policy_id, std::string& err);
     int         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
     int         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
     int         delete_policy_rule(int policy_id, int rule_id, std::string& err);
+
+    size_t      create_policy_from_file(const std::string& file);
+    bool        policy_exists(const std::string& policy);
+    xmlDocPtr   create_doc(size_t pos);
 
     static bool        try_parsing_test(std::string data, SchematronAssert *r);
     static std::string serialize_assert_for_test(SchematronAssert *r);
@@ -108,6 +113,10 @@ private:
 
     Policies (const Policies&);
     Policies& operator=(const Policies&);
+
+    //Helper
+    void find_save_name(const char* base, std::string& save_name);
+    void remove_saved_policy(const std::string& saved_name);
 };
 
 }

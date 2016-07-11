@@ -35,6 +35,7 @@ Policy::Policy(const Policy* p)
     this->title = p->title;
     this->description = p->description;
     this->saved = false;
+    this->is_system = false;
     this->no_https = p->no_https;
 }
 
@@ -44,7 +45,7 @@ Policy::~Policy()
 }
 
 //---------------------------------------------------------------------------
-int Policy::import_schema(const std::string& filename)
+int Policy::import_schema(const std::string& filename, const std::string& save_name)
 {
     Schematron s(no_https);
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
@@ -57,14 +58,14 @@ int Policy::import_schema(const std::string& filename)
         return -1;
     }
 
-    int ret = import_schema_from_doc(filename, doc);
+    int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
     saved = true;
     return ret;
 }
 
 //---------------------------------------------------------------------------
-int Policy::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
+int Policy::import_schema_from_memory(const char* buffer, int len, const std::string& save_name)
 {
     if (!buffer || !len)
     {
@@ -83,7 +84,7 @@ int Policy::import_schema_from_memory(const std::string& filename, const char* b
         return -1;
     }
 
-    int ret = import_schema_from_doc(filename, doc);
+    int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
     saved = true;
     return ret;

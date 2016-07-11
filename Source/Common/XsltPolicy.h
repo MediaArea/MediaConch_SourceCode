@@ -85,7 +85,7 @@ public:
 
 private:
     // HELPER
-    int        import_schema_from_doc(const std::string& filename, xmlDocPtr doc);
+    int        import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
 
     bool       find_xslt_header(xmlNodePtr node);
     bool       find_title_node(xmlNodePtr node, std::string& title);

@@ -32,6 +32,7 @@
         <file alias="main.css">html/css/main.css</file>
         <file alias="main-gui.css">html/css/main-gui.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
+        <file alias="select2.css">html/css/select2.min.css</file>
         <file alias="select2-bootstrap.css">html/css/select2-bootstrap.min.css</file>
         <file alias="jstree.css">html/css/jstree.min.css</file>
         <file alias="datatables.css">html/css/datatables.min.css</file>

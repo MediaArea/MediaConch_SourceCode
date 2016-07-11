@@ -304,11 +304,10 @@ void MainWindow::add_default_policy()
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
-        QByteArray schematron = file.readAll();
-        const std::string& file_str = list[i].absoluteFilePath().toUtf8().data();
-        std::string memory(schematron.constData(), schematron.length());
+        QByteArray schema = file.readAll();
+        std::string memory(schema.constData(), schema.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, file_str, err);
+        MCL.import_policy_from_memory(memory, err, true);
     }
 
     QString path = get_local_folder();
@@ -319,15 +318,8 @@ void MainWindow::add_default_policy()
     list = policies_dir.entryInfoList();
     for (int i = 0; i < list.count(); ++i)
     {
-        QFile file(list[i].absoluteFilePath());
-
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            continue;
-        QByteArray data = file.readAll();
-        std::string memory(data.constData(), data.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, list[i].absoluteFilePath().toUtf8().data(),
-                                      err);
+        MCL.import_policy_from_file(list[i].absoluteFilePath().toUtf8().data(), err);
     }
 }
 
@@ -828,6 +820,12 @@ int MainWindow::remove_policy(size_t pos, std::string& err)
 void MainWindow::add_policy(Policy* policy)
 {
     return MCL.add_policy(policy);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::save_policy(size_t pos, std::string& err)
+{
+    return MCL.save_policy(pos, err);
 }
 
 //---------------------------------------------------------------------------

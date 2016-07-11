@@ -45,8 +45,8 @@ Policy(Policies::PolicyType t, bool n_https) : type(t), saved(false), no_https(n
     virtual ~Policy();
     Policy(const Policy*);
 
-    int               import_schema(const std::string& filename);
-    int               import_schema_from_memory(const std::string& filename, const char* memory, int len);
+    int               import_schema(const std::string& filename, const std::string& save_name);
+    int               import_schema_from_memory(const char* memory, int len, const std::string& save_name);
     int               export_schema(const char* filename, std::string& err);
     int               dump_schema(std::string& data);
     std::string       get_error() const { return error; }
@@ -57,11 +57,12 @@ Policy(Policies::PolicyType t, bool n_https) : type(t), saved(false), no_https(n
     std::string          description;
     Policies::PolicyType type;
     bool                 saved;
+    bool                 is_system;
     bool                 no_https;
 
 protected:
     // HELPER
-    virtual int          import_schema_from_doc(const std::string& filename, xmlDocPtr doc) = 0;
+    virtual int          import_schema_from_doc(xmlDocPtr doc, const std::string& filename) = 0;
     std::string          error;
 
 private:

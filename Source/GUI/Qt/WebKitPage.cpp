@@ -840,7 +840,7 @@ namespace MediaConch
             QString rules;
             create_xslt_policy_rules_tree((XsltPolicy*)p, rules);
 
-            if (p->filename.find(":/") == 0)
+            if (p->is_system)
             {
                 if (has_system)
                     system += ",";
@@ -897,7 +897,7 @@ namespace MediaConch
             json = "{\"error\":\"Cannot import the policy\"}";
             return json;
         }
-        // TODO: save by default the policy to be consistent with the web
+        mainwindow->save_policy(nb_policies, err);
 
         QString rules;
         create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
@@ -916,7 +916,7 @@ namespace MediaConch
         std::string err;
         size_t nb_policies = mainwindow->get_policies_count();
 
-        int ret;
+        int ret = -1;
         if ((ret = mainwindow->create_xslt_policy(name, description, err)) < 0)
         {
             json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
@@ -935,7 +935,7 @@ namespace MediaConch
             json = "{\"error\":\"Cannot create a policy\"}";
             return json;
         }
-        // TODO: save by default the policy to be consistent with the web
+        mainwindow->save_policy(ret, err);
 
         json = QString("{\"policyName\":\"%1\", \"policyId\":%2}")
                    .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
@@ -949,7 +949,7 @@ namespace MediaConch
         QString json;
         std::string err;
         size_t nb_policies = mainwindow->get_policies_count();
-        int ret;
+        int ret = -1;
 
         if ((ret = mainwindow->duplicate_policy(id, err)) < 0)
         {
@@ -969,7 +969,7 @@ namespace MediaConch
             json = "{\"error\":\"Cannot duplicate the policy\"}";
             return json;
         }
-        // TODO: save by default the policy to be consistent with the web
+        mainwindow->save_policy(ret, err);
 
         QString rules;
         create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
@@ -1032,7 +1032,7 @@ namespace MediaConch
 
         XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
         XsltRule* r = p->rules[new_rule_id];
-        // TODO: save by default the policy to be consistent with the web
+        mainwindow->save_policy(policy_id, err);
 
         QString rule_data;
         create_rule_tree(r, new_rule_id, rule_data);
@@ -1064,7 +1064,7 @@ namespace MediaConch
 
         XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
         XsltRule* r = p->rules[rule_id];
-        // TODO: save by default the policy to be consistent with the web
+        mainwindow->save_policy(policy_id, err);
 
         QString rule_data;
         create_rule_tree(r, rule_id, rule_data);
@@ -1086,7 +1086,7 @@ namespace MediaConch
 
         XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
         XsltRule* r = p->rules[new_rule_id];
-        // TODO: save by default the policy to be consistent with the web
+        mainwindow->save_policy(policy_id, err);
 
         QString rule_data;
         create_rule_tree(r, new_rule_id, rule_data);
@@ -1104,7 +1104,7 @@ namespace MediaConch
             json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
             return json;
         }
-        // TODO: save by default the policy to be consistent with the web
+        mainwindow->save_policy(policy_id, err);
 
         json = QString("{\"ruleId\":%1}").arg(rule_id);
         return json;
