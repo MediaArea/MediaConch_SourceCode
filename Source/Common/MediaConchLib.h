@@ -184,9 +184,6 @@ public:
     int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
     int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
     int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);
-    //   Export policy
-    void                        save_policies();
-    void                        save_policy(size_t pos, const std::string* filename);
     //   Policy saved?
     bool                        is_policies_saved() const;
     bool                        is_policy_saved(size_t pos) const;
@@ -199,6 +196,8 @@ public:
     bool                        policy_exists(const std::string& title);
     void                        add_policy(Policy* p);
     int                         remove_policy(size_t pos, std::string& err);
+    void                        save_policies();
+    int                         export_policy(const char* filename, size_t pos, std::string& err);
     void                        clear_policies();
     const std::vector<Policy *>& get_policies() const;
 

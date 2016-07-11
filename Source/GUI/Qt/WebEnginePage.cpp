@@ -1011,6 +1011,21 @@ namespace MediaConch
         return json;
     }
 
+    QString WebPage::export_policy(int id)
+    {
+        //return: error?
+        QString json;
+        std::string err;
+        if (mainwindow->export_policy((size_t)id, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        json = QString("{}");
+        return json;
+    }
+
     QString WebPage::policy_rule_create(int policy_id)
     {
         //return: rule

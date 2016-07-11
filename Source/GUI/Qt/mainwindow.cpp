@@ -267,105 +267,6 @@ QString MainWindow::ask_for_schema_file()
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::exporting_to_schematron_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".sch";
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("Schematron (*.sch)"));
-
-    if (!filename.length())
-        return -1;
-
-    QDir info(QFileInfo(filename).absoluteDir());
-    set_last_save_policy_path(info.absolutePath().toUtf8().data());
-
-    std::string f(filename.toUtf8().data());
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_unknown_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xml";
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("XML (*.xml)"));
-
-    if (!filename.length())
-        return -1;
-
-    QDir info(QFileInfo(filename).absoluteDir());
-    set_last_save_policy_path(info.absolutePath().toUtf8().data());
-
-    std::string f(filename.toUtf8().data());
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_xslt_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xsl";
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("XSLT (*.xsl)"));
-
-    if (!filename.length())
-        return -1;
-
-    QDir info(QFileInfo(filename).absoluteDir());
-    set_last_save_policy_path(info.absolutePath().toUtf8().data());
-
-    std::string f(filename.toUtf8().data());
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::exporting_policy(size_t pos)
-{
-    MCL.save_policy(pos, NULL);
-}
-
-//---------------------------------------------------------------------------
 size_t MainWindow::create_policy_from_file(const QString& file)
 {
     std::string filename(file.toUtf8().data(), file.toUtf8().length());
@@ -927,6 +828,35 @@ int MainWindow::remove_policy(size_t pos, std::string& err)
 void MainWindow::add_policy(Policy* policy)
 {
     return MCL.add_policy(policy);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::export_policy(size_t pos, std::string& err)
+{
+    QString path = get_local_folder();
+    path += "/policies";
+
+    QDir dir(path);
+    if (!dir.exists())
+        dir.mkpath(dir.absolutePath());
+
+    Policy* p = MCL.get_policy(pos);
+    if (!p)
+        return -1;
+
+    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
+    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xsl";
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                                    suggested, tr("XSLT (*.xsl)"));
+
+    if (!filename.length())
+        return -1;
+
+    QDir info(QFileInfo(filename).absoluteDir());
+    set_last_save_policy_path(info.absolutePath().toUtf8().data());
+
+    return MCL.export_policy(filename.toUtf8().data(), pos, err);
 }
 
 //---------------------------------------------------------------------------

@@ -62,10 +62,6 @@ public:
     void update_policy_of_file_in_list(const QString& file, const QString& policy);
     void clear_file_list();
     void policy_to_delete(int row);
-    int  exporting_to_schematron_file(size_t pos);
-    int  exporting_to_unknown_file(size_t pos);
-    int  exporting_to_xslt_file(size_t pos);
-    void exporting_policy(size_t pos);
     size_t create_policy_from_file(const QString& file);
 
     // UI
@@ -119,6 +115,7 @@ public:
     int                         get_policy_index_by_filename(const std::string& filename);
     void                        add_policy(Policy* policy);
     int                         remove_policy(size_t pos, std::string& err);
+    int                         export_policy(size_t pos, std::string& err);
     void                        clear_policies();
     size_t                      get_policies_count() const;
     int                         create_policy_rule(int policy_id, std::string& err);

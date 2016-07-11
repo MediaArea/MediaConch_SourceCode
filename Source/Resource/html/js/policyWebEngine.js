@@ -103,6 +103,14 @@ function policyDuplicateRequest(policyNode) {
     });
 }
 
+function policyExportRequest(policyId) {
+    webpage.export_policy(policyId, function (data) {
+        var exported = JSON.parse(data);
+        if (exported.error)
+            errorMessage(exported.error);
+    });
+}
+
 function policyDeleteRequest(policyNode) {
     if (!policyNode || !policyNode.data || !policyNode.data.policyId)
         return;

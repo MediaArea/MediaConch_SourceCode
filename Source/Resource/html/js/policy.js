@@ -121,9 +121,9 @@ function start() {
         policyDuplicateRequest(selectedPolicyNode);
     })
 
-    // $('#policyExport').on('click', function() {
-    //     window.location = Routing.generate('app_xslpolicy_xslpolicyexport', {id: selectedPolicyNode.data.policyId});
-    // })
+    $('#policyExport').on('click', function() {
+        policyExportRequest(selectedPolicyNode.data.policyId);
+    })
 
     $('#policyDelete').on('click', function() {
         policyDeleteRequest(selectedPolicyNode);

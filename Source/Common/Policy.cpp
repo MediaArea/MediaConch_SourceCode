@@ -90,15 +90,25 @@ int Policy::import_schema_from_memory(const std::string& filename, const char* b
 }
 
 //---------------------------------------------------------------------------
-void Policy::export_schema(const char* filename)
+int Policy::export_schema(const char* filename, std::string& err)
 {
     xmlDocPtr new_doc = create_doc();
     if (!new_doc)
-        return;
+    {
+        err = "cannot create the XML Document";
+        return -1;
+    }
 
-    xmlSaveFormatFile(filename, new_doc, 2);
+    int ret = xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);
     saved = true;
+    if (ret < 0)
+    {
+        err = "cannot save the schema";
+        return -1;
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------

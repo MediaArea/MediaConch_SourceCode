@@ -485,20 +485,10 @@ int MediaConchLib::delete_policy_rule(int policy_id, int rule_id, std::string& e
 //---------------------------------------------------------------------------
 void MediaConchLib::save_policies()
 {
+    std::string err;
     for (size_t i = 0; i < core->policies.policies.size(); ++i)
         if (!core->policies.policies[i]->saved)
-            core->policies.export_schema(NULL, i);
-}
-
-//---------------------------------------------------------------------------
-void MediaConchLib::save_policy(size_t pos, const std::string* filename)
-{
-    if (pos > core->policies.policies.size())
-        return;
-    const char* path = NULL;
-    if (filename)
-        path = filename->c_str();
-    core->policies.export_schema(path, pos);
+            core->policies.export_policy(NULL, i, err);
 }
 
 //---------------------------------------------------------------------------
@@ -572,6 +562,12 @@ void MediaConchLib::add_policy(Policy* p)
 int MediaConchLib::remove_policy(size_t pos, std::string& err)
 {
     return core->policies.erase_policy(pos, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::export_policy(const char* filename, size_t pos, std::string& err)
+{
+    return core->policies.export_policy(filename, pos, err);
 }
 
 //---------------------------------------------------------------------------

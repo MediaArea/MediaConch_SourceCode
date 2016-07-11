@@ -125,15 +125,18 @@ int Policies::import_schema_from_memory(const std::string& filename, const char*
     return ret;
 }
 
-void Policies::export_schema(const char* filename, size_t pos)
+int Policies::export_policy(const char* filename, size_t pos, std::string& err)
 {
-    if (pos >= policies.size() || !policies[pos])
-        return;
+    if ((int)pos == -1 || pos >= policies.size() || !policies[pos])
+    {
+        err = "Policy Id is not existing";
+        return -1;
+    }
 
     if (filename == NULL)
         filename = policies[pos]->filename.c_str();
 
-    policies[pos]->export_schema(filename);
+    return policies[pos]->export_schema(filename, err);
 }
 
 int Policies::erase_policy(size_t index, std::string& err)
