@@ -1,3 +1,4 @@
+var webpage = undefined;
 $(document).ready(function() {
     (function loop_init(time) {
         setTimeout(function() {
@@ -7,7 +8,6 @@ $(document).ready(function() {
                 start();
         }, time);
     })(0);
-
 });
 
 function start() {
