@@ -6,6 +6,15 @@
 
 @echo off
 
+rem --- Search binaries ---
+set BPATH=
+if exist "%~dp0\..\..\..\MediaArea-Utils-Binaries" set BPATH="%~dp0\..\..\..\MediaArea-Utils-Binaries"
+if exist "%~dp0\..\..\MediaArea-Utils-Binaries" set BPATH="%~dp0\..\..\MediaArea-Utils-Binaries"
+if "%BPATH%"=="" (
+    echo "ERROR: binaries path not found"
+    exit /b 1
+)
+
 rem --- Clean up ---
 del MediaConch_GUI_GNU_Prepare.7z
 rmdir MediaConch_GUI_GNU_Prepare /S /Q
@@ -72,7 +81,7 @@ xcopy ..\..\Shared\Project\WxWidgets\*.sh MediaConch_GUI_GNU_Prepare\Shared\Proj
 
 rem --- Compressing Archive ---
 if "%2"=="SkipCompression" goto SkipCompression
-..\..\Shared\Binary\Windows_i386\7-Zip\7z a -r -t7z -mx9 MediaConch_GUI_GNU_Prepare.7z MediaConch_GUI_GNU_Prepare\*
+%BPATH%\Windows\7-Zip\7z a -r -t7z -mx9 MediaConch_GUI_GNU_Prepare.7z MediaConch_GUI_GNU_Prepare\*
 :SkipCompression
 
 rem --- Clean up ---
