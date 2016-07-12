@@ -1,0 +1,35 @@
+<policy type="or" name="Do I like these frames?">
+    <description>NTSC is nice, so is PAL, also 320x240 cuz it's my sample file</description>
+    <policy type="and" name="Does this use framesize and framerates that I like?">
+        <policy type="or" name="I like frame heights like 240, 480, 486">
+            <test value="Height" tracktype="Video" occurrence="1" operator="=">486</test>
+            <test value="Height" tracktype="Video" occurrence="1" operator="=">480</test>
+            <test value="Height" tracktype="Video" occurrence="1" operator="=">240</test>
+        </policy>
+        <test value="Width" tracktype="Video" occurrence="1" operator="=">320</test>
+        <policy type="or" name="These are the framerates that I trust">
+            <policy type="and" name="NTSC 4EVA">
+                <test value="FrameRate_Num" tracktype="Video" occurrence="1" operator="=">30000</test>
+                <test value="FrameRate_Den" tracktype="Video" occurrence="1" operator="=">1001</test>
+            </policy>
+            <policy type="and" name="Or Fake NTSC">
+                <test value="FrameRate_Num" tracktype="Video" occurrence="1" operator="=">2997</test>
+                <test value="FrameRate_Den" tracktype="Video" occurrence="1" operator="=">100</test>
+            </policy>
+            <policy type="and" name="PAL, why not">
+                <test value="FrameRate_Num" tracktype="Video" occurrence="1" operator="=">25</test>
+                <test value="FrameRate_Den" tracktype="Video" occurrence="1" operator="=">1</test>
+            </policy>
+        </policy>
+        <policy type="or" name="Frames widths like 720, 640, and 320 are nice">
+            <test value="Width" tracktype="Video" occurrence="1" operator="=">720</test>
+            <test value="Width" tracktype="Video" occurrence="1" operator="=">640</test>
+            <test value="Width" tracktype="Video" occurrence="1" operator="=">320</test>
+        </policy>
+    </policy>
+    <policy type="and" name="In my aspect ratio zone?">
+      <test value="DisplayAspectRatio" tracktype="Video" occurrence="1" operator="&lt;=">1.5</test>
+      <test value="DisplayAspectRatio" tracktype="Video" occurrence="1" operator="&gt;=">1.0</test>
+    </policy>
+    <test value="DisplayAspectRatio" tracktype="Video" occurrence="1" operator="&gt;=">1.0</test>
+</policy>
