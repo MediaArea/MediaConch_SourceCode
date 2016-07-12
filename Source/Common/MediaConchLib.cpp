@@ -417,7 +417,7 @@ size_t MediaConchLib::create_policy_from_file(const std::string& file)
             return (size_t)-1;
 
         size_t pos = core->policies.policies.size();
-        if (core->policies.import_policy_from_memory(policy.c_str(), policy.length(), false))
+        if (core->policies.import_policy_from_memory(file.c_str(), policy.c_str(), policy.length(), false))
             return (size_t)-1;
         return pos;
     }
@@ -502,9 +502,9 @@ int MediaConchLib::import_policy_from_file(const std::string& filename, std::str
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::import_policy_from_memory(const std::string& memory, std::string& err, bool is_system_policy)
+int MediaConchLib::import_policy_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy)
 {
-    int ret = core->policies.import_policy_from_memory(memory.c_str(), memory.length(), is_system_policy);
+    int ret = core->policies.import_policy_from_memory(filename, memory.c_str(), memory.length(), is_system_policy);
     if (ret < 0)
         err = core->policies.get_error();
     return ret;

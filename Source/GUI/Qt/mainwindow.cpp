@@ -123,7 +123,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Default
     add_default_policy();
     add_default_displays();
-    on_actionPolicies_triggered();
+    on_actionChecker_triggered();
 }
 
 MainWindow::~MainWindow()
@@ -307,7 +307,7 @@ void MainWindow::add_default_policy()
         QByteArray schema = file.readAll();
         std::string memory(schema.constData(), schema.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, err, true);
+        MCL.import_policy_from_memory(list[i].absoluteFilePath().toUtf8().data(), memory, err, true);
     }
 
     QString path = QString().fromUtf8(Core::get_local_data_path().c_str());

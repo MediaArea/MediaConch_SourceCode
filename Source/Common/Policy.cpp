@@ -55,12 +55,14 @@ int Policy::import_schema(const std::string& filename, const std::string& save_n
     {
         // maybe put the errors from s.errors
         error = "The schema cannot be parsed";
+        xmlSetGenericErrorFunc(NULL, NULL);
         return -1;
     }
 
     int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
     saved = true;
+    xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
 
@@ -69,7 +71,7 @@ int Policy::import_schema_from_memory(const char* buffer, int len, const std::st
 {
     if (!buffer || !len)
     {
-        error = "The schematron does not exist";
+        error = "The schema does not exist";
         return -1;
     }
 
@@ -81,30 +83,34 @@ int Policy::import_schema_from_memory(const char* buffer, int len, const std::st
     {
         // maybe put the errors from s.errors
         error = "The schema given cannot be parsed";
+        xmlSetGenericErrorFunc(NULL, NULL);
         return -1;
     }
 
     int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
     saved = true;
+    xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
 
 //---------------------------------------------------------------------------
 int Policy::export_schema(const char* filename, std::string& err)
 {
+    Schematron s(no_https);
+    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
+
     xmlDocPtr new_doc = create_doc();
     if (!new_doc)
     {
         err = "cannot create the XML Document";
+        xmlSetGenericErrorFunc(NULL, NULL);
         return -1;
     }
 
-    Schematron s(no_https);
-    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
-
     int ret = xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);
+    xmlSetGenericErrorFunc(NULL, NULL);
     saved = true;
     if (ret < 0)
     {

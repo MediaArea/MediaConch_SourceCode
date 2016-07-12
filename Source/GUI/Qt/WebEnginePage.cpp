@@ -802,6 +802,12 @@ namespace MediaConch
             rule_data += QString(",\"value\":\"%1\"").arg(QString().fromUtf8(r->value.c_str(), r->value.length()));
         else
             rule_data += ",\"value\":null";
+
+        // len = r->test.length();
+        // if (len > 0)
+        //     rule_data += QString(",\"valueFreeText\":\"%1\"").arg(QString().fromUtf8(r->test.c_str(), r->test.length()));
+        // else
+        //     rule_data += QString(",\"valueFreeText\":null");
         rule_data += "}";
     }
 
@@ -849,7 +855,7 @@ namespace MediaConch
             {
                 if (has_system)
                     system += ",";
-                system += QString("{\"text\":\"%1\",\"type\":\"s\",\"data\":{\"policyId\":%2, \"isEditable\": false}")
+                system += QString("{\"text\":\"%1\",\"type\":\"s\",\"data\":{\"policyId\":%2,\"isEditable\":false}")
                               .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i);
                 if (p->type==Policies::POLICY_XSLT)
                 {
@@ -858,7 +864,7 @@ namespace MediaConch
                     system += QString(",\"children\":%3}").arg(rules);
                 }
                 else
-                    user += "}";
+                    system += "}";
                 has_system = true;
             }
             else
@@ -998,11 +1004,15 @@ namespace MediaConch
         mainwindow->save_policy(ret, err);
 
         QString rules;
-        create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+        if (p->type == Policies::POLICY_XSLT)
+            create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+        else
+            rules = "[]";
 
-        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"policyRules\":%3}")
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"isEditable\":%3, \"policyRules\":%4}")
                    .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
                    .arg(ret)
+                   .arg(p->type == Policies::POLICY_XSLT?"true":"false")
                    .arg(rules);
         return json;
     }

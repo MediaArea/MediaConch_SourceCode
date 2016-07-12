@@ -881,7 +881,7 @@ bool XsltPolicy::parse_test_for_rule_free_text(const std::string& test, XsltRule
 {
     rule->use_free_text = true;
     rule->test = test;
-    return true;
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -1478,7 +1478,7 @@ void XsltPolicy::write_check_context_child(xmlNodePtr node, XsltRule *rule)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"context");
     child->ns = node->ns;
     xmlAddChild(node, child);
-    
+
     write_check_context_field_child(child, rule);
     if (operator_need_value(rule->ope))
         write_check_context_value_child(child, rule);

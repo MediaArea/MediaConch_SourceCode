@@ -97,7 +97,7 @@ int Policies::import_policy(const std::string& filename)
     return ret;
 }
 
-int Policies::import_policy_from_memory(const char* buffer, int len, bool is_system_policy)
+int Policies::import_policy_from_memory(const char* filename, const char* buffer, int len, bool is_system_policy)
 {
     if (!buffer || !len)
     {
@@ -106,7 +106,11 @@ int Policies::import_policy_from_memory(const char* buffer, int len, bool is_sys
     }
 
     std::string save_name;
-    find_save_name(NULL, save_name);
+    if (is_system_policy && filename)
+        save_name = filename;
+    else
+        find_save_name(NULL, save_name);
+
     Policy *p = NULL;
     int ret = -1;
 
@@ -118,6 +122,8 @@ int Policies::import_policy_from_memory(const char* buffer, int len, bool is_sys
             delete p;
         p = new UnknownPolicy(!core->accepts_https());
         ret = p->import_schema_from_memory(buffer, len, save_name);
+        if (ret < 0)
+            error = p->get_error();
     }
 
     if (ret >= 0)
@@ -166,6 +172,9 @@ int Policies::duplicate_policy(int id, std::string& err)
     size_t pos = policies.size();
     policies.push_back(p);
 
+    if (old->type == POLICY_UNKNOWN)
+        export_policy(p->filename.c_str(), (size_t)id, err);
+
     return (int)pos;
 }
 
@@ -178,7 +187,11 @@ int Policies::export_policy(const char* filename, size_t pos, std::string& err)
     }
 
     if (filename == NULL)
+    {
+        if (policies[pos]->is_system)
+            return 0;
         filename = policies[pos]->filename.c_str();
+    }
 
     return policies[pos]->export_schema(filename, err);
 }

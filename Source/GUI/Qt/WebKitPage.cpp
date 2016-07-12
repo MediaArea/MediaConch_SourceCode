@@ -849,7 +849,7 @@ namespace MediaConch
                     system += QString(",\"children\":%3}").arg(rules);
                 }
                 else
-                    user += "}";
+                    system += "}";
                 has_system = true;
             }
             else
@@ -981,7 +981,7 @@ namespace MediaConch
         }
 
         Policy *p = mainwindow->get_policy(ret);
-        if (!p || p->type != Policies::POLICY_XSLT)
+        if (!p)
         {
             json = "{\"error\":\"Cannot duplicate the policy\"}";
             return json;
@@ -989,11 +989,15 @@ namespace MediaConch
         mainwindow->save_policy(ret, err);
 
         QString rules;
-        create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+        if (p->type == Policies::POLICY_XSLT)
+            create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+        else
+            rules = "[]";
 
-        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"policyRules\":%3}")
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"isEditable\":%3, \"policyRules\":%3}")
                    .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
                    .arg(ret)
+                   .arg(p->type == Policies::POLICY_XSLT?"true":"false")
                    .arg(rules);
         return json;
     }
