@@ -33,6 +33,7 @@ UnknownPolicy::UnknownPolicy(const UnknownPolicy* s) : Policy(s)
 {
     type = Policies::POLICY_UNKNOWN;
     this->filename = s->filename;
+    this->title = s->title;
 }
 
 //---------------------------------------------------------------------------
@@ -50,7 +51,9 @@ int UnknownPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& file
     }
 
     this->filename = filename;
-    this->title = this->filename;
+    std::string title = filename;
+    size_t pos = title.rfind("/");
+    this->title = title.substr(pos == std::string::npos? 0 : pos + 1);
 
     ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(filename);
     if (ZenLib::File::Exists(z_path))
@@ -73,7 +76,7 @@ xmlDocPtr UnknownPolicy::create_doc()
     xmlDocPtr doc = xmlParseFile(filename.c_str());
     if (!doc)
     {
-        error = "The schema cannot be parsed";
+        error = "Unknwn policy should be a valid XML";
         return NULL;
     }
     return doc;

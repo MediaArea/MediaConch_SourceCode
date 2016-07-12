@@ -5,7 +5,7 @@ function getPolicyTreeData() {
 }
 
 function policyImportForm(form) {
-    // data: policyName, policyId, policyRules
+    // data: policyName, isEditable, policyId, policyRules
     var data = webpage.import_policy();
     var imported = JSON.parse(data);
     if (!imported.error)

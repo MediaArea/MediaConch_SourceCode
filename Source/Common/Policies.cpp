@@ -85,7 +85,9 @@ int Policies::import_policy(const std::string& filename)
         if (p)
             delete p;
         p = new UnknownPolicy(!core->accepts_https());
-        ret = p->import_schema(filename, filename);
+        ret = p->import_schema(filename, save_name);
+        if (ret < 0)
+            error = p->get_error();
     }
 
     if (ret >= 0)
@@ -146,13 +148,17 @@ int Policies::duplicate_policy(int id, std::string& err)
         return -1;
     }
 
-    if (old->type != POLICY_XSLT)
+    Policy *p = NULL;
+    if (old->type == POLICY_XSLT)
+        p = new XsltPolicy((XsltPolicy*)old);
+    else if (old->type == POLICY_UNKNOWN)
+        p = new UnknownPolicy((UnknownPolicy*)old);
+
+    if (!p)
     {
         err = "policy cannot be duplicate";
         return -1;
     }
-
-    Policy *p = new XsltPolicy((XsltPolicy*)old);
 
     // Policy filename
     find_save_name(NULL, p->filename);

@@ -41,7 +41,7 @@ namespace MediaConch {
 class Policy
 {
 public:
-Policy(Policies::PolicyType t, bool n_https) : type(t), saved(false), no_https(n_https) {}
+    Policy(Policies::PolicyType t, bool n_https) : type(t), saved(false), is_system(false), no_https(n_https) {}
     virtual ~Policy();
     Policy(const Policy*);
 
