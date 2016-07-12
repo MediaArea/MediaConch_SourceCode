@@ -829,8 +829,8 @@ namespace MediaConch
         nb_policies = mainwindow->get_policies_count();
         bool has_user = false;
         bool has_system = false;
-        QString user("{\"id\":\"u_p\",\"text\":\"User Policies\",\"type\":\"up\",\"state\":{\"opened\":true},\"children\":[");
-        QString system("{\"id\":\"s_p\",\"text\":\"System Policies\",\"type\":\"sp\",\"state\":{\"opened\":true, \"selected\": true},\"children\":[");
+        QString user("{\"id\":\"u_p\",\"text\":\"User Policies\",\"type\":\"up\",\"state\":{\"opened\":true, \"selected\": true},\"children\":[");
+        QString system("{\"id\":\"s_p\",\"text\":\"System Policies\",\"type\":\"sp\",\"state\":{\"opened\":true},\"children\":[");
         for (size_t i = 0; i < nb_policies; ++i)
         {
             Policy *p = mainwindow->get_policy(i);

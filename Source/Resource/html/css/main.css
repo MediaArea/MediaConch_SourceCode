@@ -200,6 +200,10 @@ p.registration {
     margin-left: 30px;
 }
 
+.policyEditActions .btn + .btn {
+    margin-left: 30px;
+}
+
 .panel-body a button.pull-right {
     margin-left: 10px;
 }
