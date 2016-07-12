@@ -314,6 +314,9 @@ void MainWindow::add_default_policy()
     path += "policies/";
     policies_dir = QDir(path);
 
+    if (!policies_dir.exists())
+        policies_dir.mkpath(path);
+
     policies_dir.setFilter(QDir::Files);
     list = policies_dir.entryInfoList();
     for (int i = 0; i < list.count(); ++i)

@@ -100,6 +100,9 @@ int Policy::export_schema(const char* filename, std::string& err)
         return -1;
     }
 
+    Schematron s(no_https);
+    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
+
     int ret = xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);
     saved = true;
