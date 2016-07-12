@@ -1018,6 +1018,22 @@ namespace MediaConch
         return json;
     }
 
+    QString WebPage::policy_change_name(int id, const QString& name)
+    {
+        //return: error?
+        QString json;
+        std::string err;
+        if (mainwindow->policy_change_name((size_t)id, name.toUtf8().data(), err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+        mainwindow->save_policy(id, err);
+
+        json = QString("{\"policyName\": \"%1\"}").arg(name);
+        return json;
+    }
+
     QString WebPage::policy_rule_create(int policy_id)
     {
         //return: rule

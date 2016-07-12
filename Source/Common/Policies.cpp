@@ -192,6 +192,26 @@ int Policies::erase_policy(size_t index, std::string& err)
     return 0;
 }
 
+int Policies::policy_change_name(int id, const std::string& name, std::string& err)
+{
+    if (id < 0 || id > (int)policies.size())
+    {
+        err = "policy id is not existing";
+        return -1;
+    }
+
+    Policy *p = policies[id];
+    if (!p)
+    {
+        err = "policy id is not existing anymore";
+        return -1;
+    }
+
+    p->title = name;
+
+    return 0;
+}
+
 xmlDocPtr Policies::create_doc(size_t pos)
 {
     if (pos >= policies.size() || !policies[pos])

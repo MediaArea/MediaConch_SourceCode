@@ -437,6 +437,12 @@ int MediaConchLib::duplicate_policy(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::policy_change_name(int id, const std::string& name, std::string& err)
+{
+    return core->policies.policy_change_name(id, name, err);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::create_policy_rule(int policy_id, std::string& err)
 {
     return core->policies.create_policy_rule(policy_id, err);

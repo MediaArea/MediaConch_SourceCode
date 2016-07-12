@@ -85,6 +85,17 @@ function policyRuleForm(form, policyNode, ruleNode, action, routeAction) {
         policyRuleFormEdit(form, policyNode, ruleNode);
 }
 
+function policyNameForm(form, policyNode) {
+    var name = $(form).find("#xslPolicyName_policyName").val();
+    var data = webpage.policy_change_name(policyNode.data.policyId, name);
+    //data: rule
+    var changed = JSON.parse(data);
+    if (!changed.error)
+        policyNameChange(changed, policyNode);
+    else
+        errorMessage(duplicated.error);
+}
+
 function policyDuplicateRequest(policyNode) {
     // data: policyName, policyId, policyRules
     var data = webpage.duplicate_policy(policyNode.data.policyId);

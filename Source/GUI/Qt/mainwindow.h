@@ -111,6 +111,7 @@ public:
     int                         create_xslt_policy(const QString& name, const QString& description, std::string& err);
     int                         duplicate_policy(int id, std::string& err);
     bool                        policy_exists(const std::string& title);
+    int                         policy_change_name(int id, const std::string& name, std::string& err);
     Policy                     *get_policy(size_t pos);
     int                         get_policy_index_by_filename(const std::string& filename);
     void                        add_policy(Policy* policy);

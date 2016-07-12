@@ -310,8 +310,8 @@ void MainWindow::add_default_policy()
         MCL.import_policy_from_memory(memory, err, true);
     }
 
-    QString path = get_local_folder();
-    path += "/policies";
+    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
+    path += "policies/";
     policies_dir = QDir(path);
 
     policies_dir.setFilter(QDir::Files);
@@ -333,8 +333,8 @@ void MainWindow::add_default_displays()
     for (int i = 0; i < list.count(); ++i)
         displays_list.push_back(list[i].absoluteFilePath());
 
-    QString path = get_local_folder();
-    path += "/displays";
+    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
+    path += "policies/";
 
     QDir dir(path);
     if (dir.exists())
@@ -758,6 +758,12 @@ int MainWindow::create_xslt_policy(const QString& name, const QString& descripti
 int MainWindow::duplicate_policy(int id, std::string& err)
 {
     return MCL.duplicate_policy(id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_change_name(int id, const std::string& name, std::string& err)
+{
+    return MCL.policy_change_name(id, name, err);
 }
 
 //---------------------------------------------------------------------------
