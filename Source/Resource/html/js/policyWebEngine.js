@@ -37,20 +37,34 @@ function policyCreateForm(form) {
 }
 function policyRuleFormEdit(form, policyNode, ruleNode) {
     var title = $(form).find("#xslPolicyRule_title").val();
+    if (title === undefined)
+        title = "";
+
     var editor_selected = $(form).find("#xslPolicyRule_editor_0").is(':checked');
     var type = $(form).find("#xslPolicyRule_trackType").val();
+    if (type === undefined)
+        type = "";
     var field = $(form).find("#xslPolicyRule_field").val();
+    if (field === undefined)
+        field = "";
     var occurrence = $(form).find("#xslPolicyRule_occurrence").val();
 
-    if (occurrence === "*")
+    if (occurrence === undefined || occurrence === "*")
         occurrence = -1;
     occurrence = parseInt(occurrence);
     if (isNaN(occurrence))
         occurrence = 0;
 
     var validator = $(form).find("#xslPolicyRule_validator").val();
+    if (validator === undefined)
+        validator = "";
     var value = $(form).find("#xslPolicyRule_value").val();
+    if (value === undefined)
+        value = "";
     var text = $(form).find("#xslPolicyRule_valueFreeText").val();
+    if (text === undefined)
+        text = "";
+
     webpage.policy_rule_edit(policyNode.data.policyId, ruleNode.data.ruleId, title, editor_selected, type, field, occurrence, validator, value, text, function (data) {
         //data: rule
         var edited = JSON.parse(data);
