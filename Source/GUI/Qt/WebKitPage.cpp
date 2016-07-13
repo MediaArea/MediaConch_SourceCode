@@ -18,6 +18,7 @@
 #include <QTextStream>
 
 #include "Common/FileRegistered.h"
+#include "Common/XsltPolicy.h"
 #include "mainwindow.h"
 #include "WebPage.h"
 #include <QtGlobal>
@@ -758,6 +759,451 @@ namespace MediaConch
     void WebPage::display_delete_id(const QString& name)
     {
         mainwindow->display_delete_id(name);
+    }
+
+    void WebPage::create_rule_tree(XsltRule *r, int index, QString& rule_data)
+    {
+        if (!r)
+            return;
+
+        rule_data = "{";
+        rule_data += QString("\"ruleId\":%1").arg(index);
+
+        int len = r->type.length();
+        if (len > 0)
+            rule_data += QString(",\"trackType\":\"%1\"").arg(QString().fromUtf8(r->type.c_str(), r->type.length()));
+        else
+            rule_data += ",\"trackType\":null";
+
+        len = r->field.length();
+        if (len > 0)
+            rule_data += QString(",\"field\":\"%1\"").arg(QString().fromUtf8(r->field.c_str(), r->field.length()));
+        else
+            rule_data += ",\"field\":null";
+
+        if (r->occurrence >= 0)
+            rule_data += QString(",\"occurrence\":%1").arg(r->occurrence);
+        else
+            rule_data += ",\"occurrence\":\"*\"";
+
+        len = r->ope.length();
+        if (len > 0)
+            rule_data += QString(",\"validator\":\"%1\"").arg(QString().fromUtf8(r->ope.c_str(), r->ope.length()));
+        else
+            rule_data += ",\"validator\":null";
+
+        len = r->value.length();
+        if (len > 0)
+            rule_data += QString(",\"value\":\"%1\"").arg(QString().fromUtf8(r->value.c_str(), r->value.length()));
+        else
+            rule_data += ",\"value\":null";
+        rule_data += "}";
+    }
+
+    void WebPage::create_xslt_policy_rules_tree(XsltPolicy *policy, QString& rules)
+    {
+        if (!policy || policy->type != Policies::POLICY_XSLT)
+            return;
+
+        rules = "[";
+        for (size_t j = 0; j < policy->rules.size(); ++j)
+        {
+            XsltRule *r = policy->rules[j];
+            if (!r)
+                continue;
+
+            if (j)
+                rules += ",";
+
+            QString rule_data;
+            create_rule_tree(r, j, rule_data);
+            rules += QString("{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}")
+                         .arg(QString().fromUtf8(r->title.c_str(), r->title.length()))
+                         .arg(rule_data);
+        }
+        rules += "]";
+    }
+
+    QString WebPage::get_policies_tree()
+    {
+        size_t nb_policies;
+
+        nb_policies = mainwindow->get_policies_count();
+        bool has_user = false;
+        bool has_system = false;
+        QString user("{\"id\":\"u_p\",\"text\":\"User Policies\",\"type\":\"up\",\"state\":{\"opened\":true, \"selected\": true},\"children\":[");
+        QString system("{\"id\":\"s_p\",\"text\":\"System Policies\",\"type\":\"sp\",\"state\":{\"opened\":true},\"children\":[");
+        for (size_t i = 0; i < nb_policies; ++i)
+        {
+            Policy *p = mainwindow->get_policy(i);
+            if (!p)
+                continue;
+
+            if (p->is_system)
+            {
+                if (has_system)
+                    system += ",";
+                system += QString("{\"text\":\"%1\",\"type\":\"s\",\"data\":{\"policyId\":%2, \"isEditable\": false}")
+                              .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i);
+                if (p->type==Policies::POLICY_XSLT)
+                {
+                    QString rules;
+                    create_xslt_policy_rules_tree((XsltPolicy*)p, rules);
+                    system += QString(",\"children\":%3}").arg(rules);
+                }
+                else
+                    system += "}";
+                has_system = true;
+            }
+            else
+            {
+                if (has_user)
+                    user += ",";
+                user += QString("{\"text\":\"%1\",\"type\":\"u\",\"data\":{\"policyId\":%2")
+                            .arg(QString().fromUtf8(p->title.c_str(), p->title.length())).arg(i);
+                if (p->type==Policies::POLICY_XSLT)
+                {
+                    QString rules;
+                    create_xslt_policy_rules_tree((XsltPolicy*)p, rules);
+                    user += QString(",\"isEditable\":true},\"children\":%4}").arg(rules);
+                }
+                else
+                    user += ",\"isEditable\":false}}";
+                has_user = true;
+            }
+        }
+        user += "]}";
+        system += "]}";
+        QString res = QString("{\"policiesTree\":[%1,%2]}").arg(user).arg(system);
+        return res;
+    }
+
+    QString WebPage::import_policy()
+    {
+        //return: policyName, policyId, policyRules
+        QString file;
+        QStringList list = file_selector["xslPolicyImport[policyFile]"];
+        if (list.size())
+            file = list.last().toUtf8().data();
+
+        file_selector.clear();
+
+        if (!file.length())
+            return QString("{\"error\":\"No file selected\"}");
+
+        QString json;
+        std::string err;
+        size_t nb_policies = mainwindow->get_policies_count();
+        if (mainwindow->import_policy(file, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        if (mainwindow->get_policies_count() != nb_policies + 1)
+        {
+            json = "{\"error\":\"Cannot import the policy\"}";
+            return json;
+        }
+
+        Policy *p = mainwindow->get_policy(nb_policies);
+        if (!p || (p->type != Policies::POLICY_XSLT && p->type != Policies::POLICY_UNKNOWN))
+        {
+            json = "{\"error\":\"Cannot import the policy\"}";
+            return json;
+        }
+        mainwindow->save_policy(nb_policies, err);
+
+        json = QString("{\"policyName\":\"%1\",\"policyId\":%2,\"isEditable\":%3")
+                   .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
+                   .arg(nb_policies)
+                   .arg(p->type==Policies::POLICY_XSLT?"true":"false");
+        if (p->type==Policies::POLICY_XSLT)
+        {
+            QString rules;
+            create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+            json += QString(",\"policyRules\":%4}").arg(rules);
+        }
+        else
+            json += "}";
+        return json;
+    }
+
+    QString WebPage::create_policy(const QString& name, const QString& description)
+    {
+        //return: policyName, policyId
+        QString json;
+        std::string err;
+        size_t nb_policies = mainwindow->get_policies_count();
+
+        int ret = -1;
+        if ((ret = mainwindow->create_xslt_policy(name, description, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        if (ret != (int)nb_policies)
+        {
+            json = "{\"error\":\"Cannot create a policy\"}";
+            return json;
+        }
+
+        Policy *p = mainwindow->get_policy(ret);
+        if (!p || p->type != Policies::POLICY_XSLT)
+        {
+            json = "{\"error\":\"Cannot create a policy\"}";
+            return json;
+        }
+        mainwindow->save_policy(ret, err);
+
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2}")
+                   .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
+                   .arg(ret);
+        return json;
+    }
+
+    QString WebPage::duplicate_policy(int id)
+    {
+        //return: policyName, policyId, policyRules
+        QString json;
+        std::string err;
+        size_t nb_policies = mainwindow->get_policies_count();
+        int ret = -1;
+
+        if ((ret = mainwindow->duplicate_policy(id, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        if (ret != (int)nb_policies)
+        {
+            json = "{\"error\":\"Cannot duplicate the policy\"}";
+            return json;
+        }
+
+        Policy *p = mainwindow->get_policy(ret);
+        if (!p)
+        {
+            json = "{\"error\":\"Cannot duplicate the policy\"}";
+            return json;
+        }
+        mainwindow->save_policy(ret, err);
+
+        QString rules;
+        if (p->type == Policies::POLICY_XSLT)
+            create_xslt_policy_rules_tree((XsltPolicy *)p, rules);
+        else
+            rules = "[]";
+
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"isEditable\":%3, \"policyRules\":%4}")
+                   .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
+                   .arg(ret)
+                   .arg(p->type == Policies::POLICY_XSLT?"true":"false")
+                   .arg(rules);
+        return json;
+    }
+
+    QString WebPage::delete_policy(int id)
+    {
+        //return:
+        QString json;
+
+        if (id < 0)
+        {
+            json = "{\"error\":\"Policy does not exist\"}";
+            return json;
+        }
+
+        std::string err;
+        if (mainwindow->remove_policy((size_t)id, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        json = QString("{}");
+        return json;
+    }
+
+    QString WebPage::export_policy(int id)
+    {
+        //return: error?
+        QString json;
+        std::string err;
+        if (mainwindow->export_policy((size_t)id, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        json = QString("{}");
+        return json;
+    }
+
+    QString WebPage::policy_change_name(int id, const QString& name)
+    {
+        //return: error?
+        QString json;
+        std::string err;
+        if (mainwindow->policy_change_name((size_t)id, name.toUtf8().data(), err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+        mainwindow->save_policy(id, err);
+
+        json = QString("{\"policyName\": \"%1\"}").arg(name);
+        return json;
+    }
+
+    QString WebPage::policy_rule_create(int policy_id)
+    {
+        //return: rule
+        std::string err;
+        QString json;
+        int new_rule_id = -1;
+        if ((new_rule_id = mainwindow->create_policy_rule(policy_id, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
+        XsltRule* r = p->rules[new_rule_id];
+        mainwindow->save_policy(policy_id, err);
+
+        QString rule_data;
+        create_rule_tree(r, new_rule_id, rule_data);
+        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(QString().fromUtf8(r->title.c_str())).arg(rule_data);
+        return json;
+    }
+
+    QString WebPage::policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text)
+    {
+        //return: rule
+        std::string err;
+        QString json;
+
+        XsltRule rule;
+        rule.title         = title.toUtf8().data();
+        rule.ope           = ope.toUtf8().data();
+        rule.use_free_text = !is_editor;
+        rule.type          = type.toUtf8().data();
+        rule.field         = field.toUtf8().data();
+        rule.occurrence    = occurrence;
+        rule.value         = value.toUtf8().data();
+        rule.test          = free_text.toUtf8().data();
+
+        if (mainwindow->edit_policy_rule(policy_id, rule_id, &rule, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
+        XsltRule* r = p->rules[rule_id];
+        mainwindow->save_policy(policy_id, err);
+
+        QString rule_data;
+        create_rule_tree(r, rule_id, rule_data);
+        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(QString().fromUtf8(r->title.c_str())).arg(rule_data);
+        return json;
+    }
+
+    QString WebPage::policy_rule_duplicate(int policy_id, int rule_id)
+    {
+        //return: rule
+        std::string err;
+        QString json;
+        int new_rule_id = -1;
+        if ((new_rule_id = mainwindow->duplicate_policy_rule(policy_id, rule_id, err)) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+
+        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
+        XsltRule* r = p->rules[new_rule_id];
+        mainwindow->save_policy(policy_id, err);
+
+        QString rule_data;
+        create_rule_tree(r, new_rule_id, rule_data);
+        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(QString().fromUtf8(r->title.c_str())).arg(rule_data);
+        return json;
+    }
+
+    QString WebPage::policy_rule_delete(int policy_id, int rule_id)
+    {
+        //return: ruleId
+        std::string err;
+        QString json;
+        if (mainwindow->delete_policy_rule(policy_id, rule_id, err) < 0)
+        {
+            json = QString("{\"error\":\"%1\"}").arg(QString().fromUtf8(err.c_str(), err.length()));
+            return json;
+        }
+        mainwindow->save_policy(policy_id, err);
+
+        json = QString("{\"ruleId\":%1}").arg(rule_id);
+        return json;
+    }
+
+    QString WebPage::get_fields_list(const QString& type, const QString& field)
+    {
+        //return: {values:[value,value]}
+        QString json;
+
+        std::vector<std::string> fields;
+        if (mainwindow->get_fields_for_type(type.toUtf8().data(), fields) < 0)
+        {
+            json = "{\"error\":\"\"}";
+            return json;
+        }
+
+        json = "{\"fields\":[";
+        bool has_field = false;
+        for (size_t i = 0; i < fields.size(); ++i)
+        {
+            if (i)
+                json += ",";
+            json += QString("\"%1\"").arg(QString().fromUtf8(fields[i].c_str()));
+            if (fields[i] == field.toUtf8().data())
+                has_field = true;
+        }
+        if (!has_field && field.length())
+            json += QString("%1\"%2\"").arg(fields.size() > 0 ? "," : "").arg(field);
+        json += "]}";
+        return json;
+    }
+
+    QString WebPage::get_values_list(const QString& type, const QString& field, const QString& value)
+    {
+        //return: {values:[value,value]}
+        QString json;
+
+        std::vector<std::string> values;
+        if (mainwindow->get_values_for_type_field(type.toUtf8().data(), field.toUtf8().data(), values) < 0)
+        {
+            json = "{\"error\":\"\"}";
+            return json;
+        }
+
+        json = "{\"values\":[";
+        bool has_value = false;
+        for (size_t i = 0; i < values.size(); ++i)
+        {
+            if (i)
+                json += ",";
+            json += QString("\"%1\"").arg(QString().fromUtf8(values[i].c_str()));
+            if (values[i] == value.toUtf8().data())
+                has_value = true;
+        }
+        if (!has_value && value.length())
+            json += QString("%1\"%2\"").arg(values.size() > 0 ? "," : "").arg(value);
+        json += "]}";
+        return json;
     }
 }
 

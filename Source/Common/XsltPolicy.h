@@ -45,6 +45,7 @@ public:
     XsltRule() : use_free_text(false), occurrence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
+    XsltRule& operator=(const XsltRule&);
 
     std::string title;
 
@@ -59,9 +60,6 @@ public:
     std::string value;
 
     std::string test; // Free text
-
-private:
-    XsltRule& operator=(const XsltRule&);
 };
 
 //***************************************************************************
@@ -87,7 +85,7 @@ public:
 
 private:
     // HELPER
-    int        import_schema_from_doc(const std::string& filename, xmlDocPtr doc);
+    int        import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
 
     bool       find_xslt_header(xmlNodePtr node);
     bool       find_title_node(xmlNodePtr node, std::string& title);

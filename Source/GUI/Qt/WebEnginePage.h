@@ -15,6 +15,8 @@
 namespace MediaConch {
 
 class FileRegistered;
+class XsltPolicy;
+class XsltRule;
 
 class WebPage : public QWebEnginePage
 {
@@ -34,6 +36,7 @@ protected:
     void         add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list);
     void         charge_local_dir(const QString& directory, QStringList& tmp);
     QStringList  choose_file_settings();
+    QStringList  choose_file_import_policy();
 
 public Q_SLOTS:
     void         on_file_upload_selected(const QString& policy, const QString& display_xslt, const QString& verbosity);
@@ -77,6 +80,22 @@ public Q_SLOTS:
     QString      display_add_file(const QString& name);
     void         display_export_id(const QString& name);
     void         display_delete_id(const QString& name);
+
+    QString      get_policies_tree();
+    void         create_rule_tree(XsltRule *r, int index, QString& rule_data);
+    void         create_xslt_policy_rules_tree(XsltPolicy *policy, QString& rules_data);
+    QString      import_policy();
+    QString      create_policy(const QString& name, const QString& description);
+    QString      duplicate_policy(int id);
+    QString      export_policy(int id);
+    QString      delete_policy(int id);
+    QString      policy_change_name(int id, const QString& name);
+    QString      policy_rule_create(int policy_id);
+    QString      policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text);
+    QString      policy_rule_duplicate(int policy_id, int rule_id);
+    QString      policy_rule_delete(int policy_id, int rule_id);
+    QString      get_values_list(const QString& type, const QString& field, const QString& value);
+    QString      get_fields_list(const QString& type, const QString& field);
 
 private Q_SLOTS:
     void         on_load_finished(bool ok);

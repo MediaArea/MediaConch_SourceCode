@@ -399,4 +399,10 @@ namespace MediaConch
         }
     }
 
+    //--------------------------------------------------------------------------
+    int CLI::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+    {
+        return MCL.get_values_for_type_field(type, field, values);
+    }
+
 }

@@ -9,12 +9,6 @@
 #include "mainwindow.h"
 #include "checkerwindow.h"
 #include "ui_mainwindow.h"
-#include "policiestree.h"
-#include "policiesmenu.h"
-#include "policymenu.h"
-#include "groupofrules.h"
-#include "rulemenu.h"
-#include "ruleedit.h"
 #include "WebPage.h"
 #include "WebView.h"
 #include "progressbar.h"
@@ -584,24 +578,17 @@ void CheckerWindow::change_result_in_template(const QString& result, QString& ht
 //---------------------------------------------------------------------------
 void CheckerWindow::change_body_script_in_template(QString& html)
 {
-    QRegExp reg("\\{% block bodyScript %\\}\\{% endblock %\\}");
+    QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
     QString script;
     int     pos = 0;
 
     reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
-    script = "";
+    script = "        <script type=\"text/javascript\" src=\"qrc:/checker.js\"></script>\n";
 #elif defined(WEB_MACHINE_ENGINE)
-    script = "<script>\n"
-        "var webpage;\n"
-        "$(document).ready(function()\n"
-        "{\n"
-        "// Register Qt WebPage object\n"
-        "new QWebChannel(qt.webChannelTransport, function (channel) {\n"
-        "webpage = channel.objects.webpage;\n"
-        "});\n"
-        "});\n"
-        "</script>";
+    script = "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/checker.js\"></script>\n";
 #endif
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), script);

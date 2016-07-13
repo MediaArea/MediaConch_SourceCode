@@ -62,10 +62,6 @@ public:
     void update_policy_of_file_in_list(const QString& file, const QString& policy);
     void clear_file_list();
     void policy_to_delete(int row);
-    int  exporting_to_schematron_file(size_t pos);
-    int  exporting_to_unknown_file(size_t pos);
-    int  exporting_to_xslt_file(size_t pos);
-    void exporting_policy(size_t pos);
     size_t create_policy_from_file(const QString& file);
 
     // UI
@@ -112,13 +108,24 @@ public:
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
     int                         import_policy(const QString& file, std::string& err);
+    int                         create_xslt_policy(const QString& name, const QString& description, std::string& err);
+    int                         duplicate_policy(int id, std::string& err);
     bool                        policy_exists(const std::string& title);
+    int                         policy_change_name(int id, const std::string& name, std::string& err);
     Policy                     *get_policy(size_t pos);
     int                         get_policy_index_by_filename(const std::string& filename);
     void                        add_policy(Policy* policy);
-    void                        remove_policy(size_t pos);
+    int                         save_policy(size_t pos, std::string& err);
+    int                         remove_policy(size_t pos, std::string& err);
+    int                         export_policy(size_t pos, std::string& err);
     void                        clear_policies();
     size_t                      get_policies_count() const;
+    int                         create_policy_rule(int policy_id, std::string& err);
+    int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
+    int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
+    int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);
+    int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
     int                         select_correct_policy();
     int                         select_correct_display();
@@ -184,7 +191,7 @@ private:
     int                         clearVisualElements();
     void                        clearPoliciesElements();
     void                        createCheckerView();
-    void                        createPoliciesView(int row=-1);
+    void                        createPoliciesView();
     void                        createDisplayView();
     void                        createSettingsView();
     void                        choose_schematron_file();
@@ -199,7 +206,6 @@ private:
 Q_SIGNALS:
     void status_bar_clear_message();
     void status_bar_show_message(const QString& message, int timeout);
-    void select_created_policy(int row);
 
 private Q_SLOTS:
     void on_actionOpen_triggered();
@@ -210,7 +216,6 @@ private Q_SLOTS:
     void on_actionPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
-    void selected_created_policy(int row);
 
 public Q_SLOTS:
     //Help

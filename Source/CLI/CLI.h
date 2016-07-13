@@ -46,6 +46,7 @@ namespace MediaConch
         void set_force_analyze(bool force);
         void set_asynchronous(bool async);
         void set_create_policy_mode();
+        int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
 
         void print_error(MediaConchLib::errorHttp code);
 

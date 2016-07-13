@@ -110,9 +110,6 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
     setAcceptDrops(false);
 
-    connect(this, SIGNAL(select_created_policy(int)),
-            this, SLOT(selected_created_policy(int)));
-
     // Status bar
     statusBar()->show();
     clear_msg_in_status_bar();
@@ -191,8 +188,9 @@ void MainWindow::update_policy_of_file_in_list(const QString& file, const QStrin
 
 void MainWindow::policy_to_delete(int index)
 {
+    std::string err;
     //Delete policy
-    MCL.remove_policy((size_t)index);
+    MCL.remove_policy((size_t)index, err);
 }
 
 //***************************************************************************
@@ -257,7 +255,7 @@ QString MainWindow::get_local_folder() const
 QString MainWindow::ask_for_schema_file()
 {
     QString suggested = QString().fromUtf8(select_correct_load_policy_path().c_str());
-    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
     if (file.length())
     {
@@ -266,105 +264,6 @@ QString MainWindow::ask_for_schema_file()
     }
 
     return file;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_schematron_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".sch";
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("Schematron (*.sch)"));
-
-    if (!filename.length())
-        return -1;
-
-    QDir info(QFileInfo(filename).absoluteDir());
-    set_last_save_policy_path(info.absolutePath().toUtf8().data());
-
-    std::string f(filename.toUtf8().data());
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_unknown_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xml";
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("XML (*.xml)"));
-
-    if (!filename.length())
-        return -1;
-
-    QDir info(QFileInfo(filename).absoluteDir());
-    set_last_save_policy_path(info.absolutePath().toUtf8().data());
-
-    std::string f(filename.toUtf8().data());
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_xslt_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xsl";
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("XSLT (*.xsl)"));
-
-    if (!filename.length())
-        return -1;
-
-    QDir info(QFileInfo(filename).absoluteDir());
-    set_last_save_policy_path(info.absolutePath().toUtf8().data());
-
-    std::string f(filename.toUtf8().data());
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::exporting_policy(size_t pos)
-{
-    MCL.save_policy(pos, NULL);
 }
 
 //---------------------------------------------------------------------------
@@ -379,7 +278,6 @@ size_t MainWindow::create_policy_from_file(const QString& file)
     {
         icon = QMessageBox::Information;
         text = QString("Policy from %1 is created, you can find it in the \"Policies\" tab").arg(file);
-        // Q_EMIT selected_created_policy((int)pos);
     }
     else
     {
@@ -391,15 +289,6 @@ size_t MainWindow::create_policy_from_file(const QString& file)
                        QMessageBox::NoButton, this);
     msgBox.exec();
     return pos;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::selected_created_policy(int row)
-{
-    if (!ui->actionPolicies->isChecked())
-        ui->actionPolicies->setChecked(true);
-    current_view = RUN_POLICIES_VIEW;
-    createPoliciesView(row);
 }
 
 //---------------------------------------------------------------------------
@@ -415,30 +304,25 @@ void MainWindow::add_default_policy()
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
-        QByteArray schematron = file.readAll();
-        const std::string& file_str = list[i].absoluteFilePath().toUtf8().data();
-        std::string memory(schematron.constData(), schematron.length());
+        QByteArray schema = file.readAll();
+        std::string memory(schema.constData(), schema.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, file_str, err);
+        MCL.import_policy_from_memory(list[i].absoluteFilePath().toUtf8().data(), memory, err, true);
     }
 
-    QString path = get_local_folder();
-    path += "/policies";
+    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
+    path += "policies/";
     policies_dir = QDir(path);
+
+    if (!policies_dir.exists())
+        policies_dir.mkpath(path);
 
     policies_dir.setFilter(QDir::Files);
     list = policies_dir.entryInfoList();
     for (int i = 0; i < list.count(); ++i)
     {
-        QFile file(list[i].absoluteFilePath());
-
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            continue;
-        QByteArray data = file.readAll();
-        std::string memory(data.constData(), data.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, list[i].absoluteFilePath().toUtf8().data(),
-                                      err);
+        MCL.import_policy_from_file(list[i].absoluteFilePath().toUtf8().data(), err);
     }
 }
 
@@ -452,8 +336,8 @@ void MainWindow::add_default_displays()
     for (int i = 0; i < list.count(); ++i)
         displays_list.push_back(list[i].absoluteFilePath());
 
-    QString path = get_local_folder();
-    path += "/displays";
+    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
+    path += "policies/";
 
     QDir dir(path);
     if (dir.exists())
@@ -548,6 +432,16 @@ int MainWindow::get_display_index_by_filename(const std::string& filename)
 UiSettings& MainWindow::get_settings()
 {
     return uisettings;
+}
+
+int MainWindow::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+{
+    return MCL.get_values_for_type_field(type, field, values);
+}
+
+int MainWindow::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+{
+    return MCL.get_fields_for_type(type, fields);
 }
 
 //***************************************************************************
@@ -750,13 +644,13 @@ void MainWindow::createCheckerView()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::createPoliciesView(int row)
+void MainWindow::createPoliciesView()
 {
     if (clearVisualElements() < 0)
         return;
 
     policiesView = new PoliciesWindow(this);
-    policiesView->displayPoliciesTree(row);
+    policiesView->display_policies();
 }
 
 //---------------------------------------------------------------------------
@@ -859,6 +753,48 @@ int MainWindow::import_policy(const QString& file, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::create_xslt_policy(const QString& name, const QString& description, std::string& err)
+{
+    return MCL.create_xslt_policy(name.toUtf8().data(), description.toUtf8().data(), err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::duplicate_policy(int id, std::string& err)
+{
+    return MCL.duplicate_policy(id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_change_name(int id, const std::string& name, std::string& err)
+{
+    return MCL.policy_change_name(id, name, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::create_policy_rule(int policy_id, std::string& err)
+{
+    return MCL.create_policy_rule(policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err)
+{
+    return MCL.edit_policy_rule(policy_id, rule_id, rule, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.duplicate_policy_rule(policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::delete_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.delete_policy_rule(policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
 bool MainWindow::policy_exists(const std::string& title)
 {
     return MCL.policy_exists(title);
@@ -885,15 +821,50 @@ int MainWindow::get_policy_index_by_filename(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::remove_policy(size_t pos)
+int MainWindow::remove_policy(size_t pos, std::string& err)
 {
-    return MCL.remove_policy(pos);
+    return MCL.remove_policy(pos, err);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::add_policy(Policy* policy)
 {
     return MCL.add_policy(policy);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::save_policy(size_t pos, std::string& err)
+{
+    return MCL.save_policy(pos, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::export_policy(size_t pos, std::string& err)
+{
+    QString path = get_local_folder();
+    path += "/policies";
+
+    QDir dir(path);
+    if (!dir.exists())
+        dir.mkpath(dir.absolutePath());
+
+    Policy* p = MCL.get_policy(pos);
+    if (!p)
+        return -1;
+
+    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
+    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xsl";
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                                    suggested, tr("XSLT (*.xsl)"));
+
+    if (!filename.length())
+        return -1;
+
+    QDir info(QFileInfo(filename).absoluteDir());
+    set_last_save_policy_path(info.absolutePath().toUtf8().data());
+
+    return MCL.export_policy(filename.toUtf8().data(), pos, err);
 }
 
 //---------------------------------------------------------------------------

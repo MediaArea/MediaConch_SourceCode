@@ -304,7 +304,7 @@ SchematronAssert* SchematronPolicy::create_assert_from_data(std::string descr, s
 }
 
 //---------------------------------------------------------------------------
-int SchematronPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
+int SchematronPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& filename)
 {
     if (!doc)
     {

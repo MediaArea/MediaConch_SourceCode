@@ -195,8 +195,12 @@ p.registration {
     display: inline-block;
 }
 
-.xslPolicyRuleDuplicateButton {
+.xslPolicyRuleDuplicateButton, .xslPolicyRuleDeleteButton {
     display: inline-block;
+    margin-left: 30px;
+}
+
+.policyEditActions .btn + .btn {
     margin-left: 30px;
 }
 

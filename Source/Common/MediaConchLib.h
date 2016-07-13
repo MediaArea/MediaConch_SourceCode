@@ -25,6 +25,7 @@ namespace MediaConch {
 class Core;
 class DaemonClient;
 class Policy;
+class XsltRule;
 class Http;
 
 #ifdef _WIN32
@@ -177,23 +178,34 @@ public:
     // Policies
     //   Create policy
     size_t                      create_policy_from_file(const std::string& file);
-    //   Export policy
-    void                        save_policies();
-    void                        save_policy(size_t pos, const std::string* filename);
+    int                         create_xslt_policy(const std::string& name, const std::string& description, std::string& err);
+    int                         duplicate_policy(int id, std::string& err);
+    int                         policy_change_name(int id, const std::string& name, std::string& err);
+    int                         create_policy_rule(int policy_id, std::string& err);
+    int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
+    int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
+    int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);
     //   Policy saved?
     bool                        is_policies_saved() const;
     bool                        is_policy_saved(size_t pos) const;
     //   Import policy
     int                         import_policy_from_file(const std::string& filename, std::string& err);
-    int                         import_policy_from_memory(const std::string& memory, const std::string& filename, std::string& err);
+    int                         import_policy_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy=false);
     //   Policy helper
     size_t                      get_policies_count() const;
     Policy*                     get_policy(size_t pos);
     bool                        policy_exists(const std::string& title);
+    int                         save_policy(size_t pos, std::string& err);
     void                        add_policy(Policy* p);
-    void                        remove_policy(size_t pos);
+    int                         remove_policy(size_t pos, std::string& err);
+    void                        save_policies();
+    int                         export_policy(const char* filename, size_t pos, std::string& err);
     void                        clear_policies();
     const std::vector<Policy *>& get_policies() const;
+
+    //Generated Values
+    int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
     // Daemon
     void set_use_daemon(bool use);

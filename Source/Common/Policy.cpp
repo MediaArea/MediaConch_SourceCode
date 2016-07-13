@@ -35,6 +35,7 @@ Policy::Policy(const Policy* p)
     this->title = p->title;
     this->description = p->description;
     this->saved = false;
+    this->is_system = false;
     this->no_https = p->no_https;
 }
 
@@ -44,7 +45,7 @@ Policy::~Policy()
 }
 
 //---------------------------------------------------------------------------
-int Policy::import_schema(const std::string& filename)
+int Policy::import_schema(const std::string& filename, const std::string& save_name)
 {
     Schematron s(no_https);
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
@@ -54,21 +55,23 @@ int Policy::import_schema(const std::string& filename)
     {
         // maybe put the errors from s.errors
         error = "The schema cannot be parsed";
+        xmlSetGenericErrorFunc(NULL, NULL);
         return -1;
     }
 
-    int ret = import_schema_from_doc(filename, doc);
+    int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
     saved = true;
+    xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
 
 //---------------------------------------------------------------------------
-int Policy::import_schema_from_memory(const std::string& filename, const char* buffer, int len)
+int Policy::import_schema_from_memory(const char* buffer, int len, const std::string& save_name)
 {
     if (!buffer || !len)
     {
-        error = "The schematron does not exist";
+        error = "The schema does not exist";
         return -1;
     }
 
@@ -80,25 +83,42 @@ int Policy::import_schema_from_memory(const std::string& filename, const char* b
     {
         // maybe put the errors from s.errors
         error = "The schema given cannot be parsed";
+        xmlSetGenericErrorFunc(NULL, NULL);
         return -1;
     }
 
-    int ret = import_schema_from_doc(filename, doc);
+    int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
     saved = true;
+    xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
 
 //---------------------------------------------------------------------------
-void Policy::export_schema(const char* filename)
+int Policy::export_schema(const char* filename, std::string& err)
 {
+    Schematron s(no_https);
+    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
+
     xmlDocPtr new_doc = create_doc();
     if (!new_doc)
-        return;
+    {
+        err = "cannot create the XML Document";
+        xmlSetGenericErrorFunc(NULL, NULL);
+        return -1;
+    }
 
-    xmlSaveFormatFile(filename, new_doc, 2);
+    int ret = xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);
+    xmlSetGenericErrorFunc(NULL, NULL);
     saved = true;
+    if (ret < 0)
+    {
+        err = "cannot save the schema";
+        return -1;
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------

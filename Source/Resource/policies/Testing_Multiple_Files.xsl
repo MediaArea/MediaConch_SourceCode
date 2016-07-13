@@ -82,9 +82,9 @@
                 </xsl:when>
               </xsl:choose>
             </check>
-          </media>
-        </xsl:for-each>
-      </policyChecks>
+          </policyChecks>
+        </media>
+    </xsl:for-each>
     </MediaConch>
   </xsl:template>
   <xsl:template name="is_true">

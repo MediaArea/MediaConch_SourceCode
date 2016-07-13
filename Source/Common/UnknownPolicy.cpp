@@ -29,19 +29,20 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-UnknownPolicy::UnknownPolicy(const UnknownPolicy* s) : Policy(s)
+UnknownPolicy::UnknownPolicy(const UnknownPolicy* s) : Policy(s), system_doc(NULL)
 {
     type = Policies::POLICY_UNKNOWN;
-    this->filename = s->filename;
 }
 
 //---------------------------------------------------------------------------
 UnknownPolicy::~UnknownPolicy()
 {
+    if (system_doc)
+        xmlFreeDoc(system_doc);
 }
 
 //---------------------------------------------------------------------------
-int UnknownPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
+int UnknownPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& filename)
 {
     if (!doc)
     {
@@ -49,39 +50,41 @@ int UnknownPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr
         return -1;
     }
 
-    std::string path = Core::get_local_data_path() + "policies/";
-
-    size_t pos = filename.rfind("/");
-    std::string file;
-    if (pos != std::string::npos)
+    if (!filename.length())
     {
-        if (filename.substr(0, pos + 1) == path)
-        {
-            this->filename = filename;
-            this->title = this->filename;
-            return 0;
-        }
-        file = filename.substr(pos + 1);
+        error = "Cannot copy the policy";
+        return -1;
     }
-    path += file;
 
-    std::string current_path = path;
-    for (size_t i = 0; ; ++i)
+    this->filename = filename;
+    std::string title = filename;
+    size_t pos = title.rfind("/");
+    this->title = title.substr(pos == std::string::npos? 0 : pos + 1);
+
+    size_t ext_pos;
+    if ((ext_pos = this->title.rfind(".")) != std::string::npos)
+        this->title = this->title.substr(0, ext_pos);
+
+    if (!this->title.length())
+        this->title = "Policy example";
+
+    if (filename.find(":/") == 0)
     {
-        ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(current_path);
-        if (!ZenLib::File::Exists(z_path))
-            break;
-
-        std::stringstream ss;
-        if (path.substr(path.length() - 4) == ".xsl")
-            ss << path.substr(0, path.length() - 4) << i << ".xsl";
-        else
-            ss << path << i;
-        current_path = ss.str();
+        system_doc = xmlCopyDoc(doc, 1);
+        return 0;
     }
-    this->filename = current_path;
-    this->title = this->filename;
-    xmlSaveFormatFile(this->filename.c_str(), doc, 2);
+
+    ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(filename);
+    if (ZenLib::File::Exists(z_path))
+        return 0;
+
+    int ret = xmlSaveFormatFile(this->filename.c_str(), doc, 2);
+
+    if (ret < 0)
+    {
+        error = "Cannot copy the policy";
+        return -1;
+    }
 
     return 0;
 }
@@ -89,10 +92,15 @@ int UnknownPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr
 //---------------------------------------------------------------------------
 xmlDocPtr UnknownPolicy::create_doc()
 {
-    xmlDocPtr doc = xmlParseFile(filename.c_str());
+    xmlDocPtr doc = NULL;
+
+    if (system_doc)
+        doc = xmlCopyDoc(system_doc, 1);
+    else
+        doc = xmlParseFile(filename.c_str());
     if (!doc)
     {
-        error = "The schema cannot be parsed";
+        error = "Unknwn policy should be a valid XML";
         return NULL;
     }
     return doc;
