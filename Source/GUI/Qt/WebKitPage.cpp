@@ -994,7 +994,7 @@ namespace MediaConch
         else
             rules = "[]";
 
-        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"isEditable\":%3, \"policyRules\":%3}")
+        json = QString("{\"policyName\":\"%1\", \"policyId\":%2, \"isEditable\":%3, \"policyRules\":%4}")
                    .arg(QString().fromUtf8(p->title.c_str(), p->title.length()))
                    .arg(ret)
                    .arg(p->type == Policies::POLICY_XSLT?"true":"false")
