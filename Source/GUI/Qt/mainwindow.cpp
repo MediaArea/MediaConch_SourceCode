@@ -746,6 +746,7 @@ void MainWindow::createCheckerView()
     std::map<std::string, FileRegistered>::iterator it = files.begin();
     for (; it != files.end(); ++it)
         checkerView->add_file_to_result_table(it->first);
+    checkerView->page_start_waiting_loop();
 }
 
 //---------------------------------------------------------------------------

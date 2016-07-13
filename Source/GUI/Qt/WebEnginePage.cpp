@@ -380,6 +380,7 @@ namespace MediaConch
         }
         file_selector.clear();
         clean_forms();
+        use_javascript(QString("startWaitingLoop()"));
     }
 
     void WebPage::on_file_online_selected(const QString& url, const QString& policy, const QString& display_xslt, const QString& verbosity)
@@ -390,6 +391,7 @@ namespace MediaConch
         mainwindow->add_file_to_list(url, "", policy, display_xslt, verbosity);
         file_selector.clear();
         clean_forms();
+        use_javascript(QString("startWaitingLoop()"));
     }
 
     void WebPage::on_file_repository_selected(const QString& policy, const QString& display_xslt, const QString& verbosity)
@@ -408,6 +410,7 @@ namespace MediaConch
             mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display_xslt, verbosity);
         file_selector.clear();
         clean_forms();
+        use_javascript(QString("startWaitingLoop()"));
     }
 
     void WebPage::close_all()

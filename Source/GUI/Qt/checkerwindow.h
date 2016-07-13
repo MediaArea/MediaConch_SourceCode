@@ -39,6 +39,7 @@ public:
     void                        change_local_files(const QStringList& files);
     void                        hide();
     void                        add_file_to_result_table(const std::string& full_path);
+    void                        page_start_waiting_loop();
 
 private:
     // Visual elements

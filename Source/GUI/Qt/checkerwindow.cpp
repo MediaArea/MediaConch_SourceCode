@@ -121,9 +121,13 @@ void CheckerWindow::create_web_view_finished(bool ok)
     is_finished = true;
 
     result_table = new ResultTable(mainwindow, (WebPage*)main_view->page());
-    for (size_t i = 0; i < files.size(); ++i)
-        result_table->add_file_to_result_table(files[i]);
-    files.clear();
+    if (files.size())
+    {
+        for (size_t i = 0; i < files.size(); ++i)
+            result_table->add_file_to_result_table(files[i]);
+        files.clear();
+        page_start_waiting_loop();
+    }
 
     if (progress_bar)
     {
@@ -658,6 +662,18 @@ void CheckerWindow::add_file_to_result_table(const std::string& full_path)
     }
 
     result_table->add_file_to_result_table(full_path);
+}
+
+void CheckerWindow::page_start_waiting_loop()
+{
+    if (!main_view || !is_finished)
+        return;
+
+    WebPage* page = (WebPage*)main_view->page();
+    if (!page)
+        return;
+
+    page->use_javascript("startWaitingLoop()");
 }
 
 }

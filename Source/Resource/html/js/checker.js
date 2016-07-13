@@ -12,6 +12,9 @@ $(document).ready(function() {
         ]
     });
 
+    // Waiting loop ID value
+    waitingLoopId = null;
+
     // Upload form
     $('#file form').on('submit', function (e) {
         e.preventDefault();
@@ -100,7 +103,7 @@ function updateFile(fileId, formValues) {
 }
 
 function addFile(sourceName, fileName, fileId, formValues) {
-    node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 30) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).draw(false).node();
+    node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 30) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).node();
 
     // Add id
     resultId = 'result-' + fileId;
@@ -115,7 +118,7 @@ function addFile(sourceName, fileName, fileId, formValues) {
     $(node).data('verbosity', formValues.verbosity);
 
     // Change status class
-    $(result.cell(node, 5).node()).addClass('info');
+    $(result.cell(node, 5).node()).addClass('statusCell info');
 
     // Close button
     $(node).find('.result-close').click(node, function (e) {
@@ -128,42 +131,99 @@ function addFile(sourceName, fileName, fileId, formValues) {
         };
     });
 
-    // Waiting loop for analyze
-    (function theLoop(resultId, time, i) {
-        setTimeout(function () {
-            if (!$(result.cell('#' + resultId, 5).node()).hasClass('success')) {
-                if (WEBMACHINE == "WEB_MACHINE_KIT") {
-                    analyzed = webpage.file_is_analyzed(sourceName);
-                    var data = JSON.parse(analyzed);
-                    processCheckerStatusRequest(data, resultId, fileId);
-                }
-                else {
-                    webpage.file_is_analyzed(sourceName, function (analyzed) {
-                        var data = JSON.parse(analyzed);
-                        processCheckerStatusRequest(data, resultId, fileId);
-                    });
-                }
-                // If i > 0, keep going
-                if ($(result.cell('#' + resultId, 5).node()).hasClass('info') && --i > 0) {
-                    // Limit loop timer to 10s
-                    if ((time *= 2) > 10000) {
-                        time = 10000;
-                    }
-                    // Call the loop again
-                    theLoop(resultId, time, i);
-                }
-                else if (i <= 0) {
-                    statusCellError(resultId, fileId);
-                }
-            }
-        }, time);
-    })(resultId, 100, 100);
-
     if ($('#checkerResultTitle .close').hasClass('hidden')) {
         $('#checkerResultTitle .close').removeClass('hidden');
         $('#checkerApplyAll').removeClass('hidden');
     }
 };
+
+function startWaitingLoop() {
+    result.draw();
+    stopWaitingLoop();
+    waitingLoop(100, 1000);
+}
+
+function stopWaitingLoop() {
+    if (null !== waitingLoopId) {
+        clearTimeout(waitingLoopId);
+        waitingLoopId = null;
+    }
+}
+
+function waitingLoop(time, iteration) {
+    // Increase delay for the loop after 1st iteration
+    if (null === waitingLoopId) {
+        time = 500;
+    }
+    waitingLoopId = setTimeout(function () {
+        nbProcess = 0;
+        nbProcessInProgress = 0;
+        // Process visible results first
+        if ($('.statusCell.info').size() > 0) {
+            $.each($('.statusCell.info'), function(index, waitingNode) {
+                if (!$(waitingNode).hasClass('checkInProgress')) {
+                    if (nbProcess++ < 5) {
+                        checkerStatusRequest($(waitingNode), $(waitingNode).parent());
+                    }
+                }
+                else {
+                    if (nbProcessInProgress++ < 5) {
+                        checkerStatusRequest($(waitingNode), $(waitingNode).parent());
+                    }
+                }
+            })
+        }
+        // Process hidden results
+        else {
+            result.cells('.statusCell.info').every(function(currentCell) {
+                if (!$(this.node()).hasClass('checkInProgress')) {
+                    if (nbProcess++ < 5) {
+                        checkerStatusRequest($(this.node()), $(result.row(currentCell).node()));
+                    }
+                }
+                else {
+                    if (nbProcessInProgress++ < 5) {
+                        checkerStatusRequest($(this.node()), $(result.row(currentCell).node()));
+                    }
+                }
+            })
+        }
+
+        if (result.cells('.statusCell.info').count() > 0 && --iteration > 0) {
+            // Increase loop delay each ten iteration
+            if (0 == iteration % 10 && time < 10000) {
+                time += 500;
+            }
+            waitingLoop(time, iteration);
+        }
+        else {
+            waitingLoopId = null;
+        }
+
+        // Display error for unfinished cells
+        if (iteration <= 0) {
+            result.cells('.statusCell.info').every(function(currentCell) {
+                statusCellError($(this.node()));
+            })
+        }
+
+    }, time);
+}
+
+function checkerStatusRequest(nodeStatus, nodeChecker) {
+    sourceName = nodeChecker.find('span').attr('title');
+    if (WEBMACHINE == "WEB_MACHINE_KIT") {
+        analyzed = webpage.file_is_analyzed(sourceName);
+        var data = JSON.parse(analyzed);
+        processCheckerStatusRequest(data, nodeChecker.prop('id'), nodeChecker.data('fileId'));
+    }
+    else {
+        webpage.file_is_analyzed(sourceName, function (analyzed) {
+            var data = JSON.parse(analyzed);
+            processCheckerStatusRequest(data, nodeChecker.prop('id'), nodeChecker.data('fileId'));
+        });
+    }
+}
 
 function processCheckerStatusRequest(data, resultId, fileId) {
     sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
@@ -173,7 +233,7 @@ function processCheckerStatusRequest(data, resultId, fileId) {
         node.data('tool', data.tool);
 
         // Status
-        statusCellSuccess(resultId, fileId);
+        statusCellSuccess($(result.cell(node, 5).node()));
 
         // Implementation
         addSpinnerToCell(result.cell(node, 1));
@@ -226,6 +286,7 @@ function processCheckerStatusRequest(data, resultId, fileId) {
         mediaTraceCell(resultId, fileId);
     }
     else if (data.percent > 0) {
+        $(result.cell('#' + resultId, 5).node()).addClass('checkInProgress');
         if (undefined == data.tool || 2 != data.tool || 100 == data.percent) {
             $(result.cell('#' + resultId, 5).node()).find('.status-text').html('<span class="spinner-status"></span>');
         } else {
@@ -234,15 +295,13 @@ function processCheckerStatusRequest(data, resultId, fileId) {
     }
 }
 
-function statusCellSuccess(resultId, fileId) {
-    nodeStatus = $(result.cell('#' + resultId, 5).node());
-    nodeStatus.removeClass().addClass('success');
+function statusCellSuccess(nodeStatus) {
+    nodeStatus.removeClass('info danger checkInProgress').addClass('success');
     nodeStatus.find('.status-text').html('<span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Analyzed');
 };
 
-function statusCellError(resultId, fileId) {
-    nodeStatus = $(result.cell('#' + resultId, 5).node());
-    nodeStatus.removeClass().addClass('danger');
+function statusCellError(nodeStatus) {
+    nodeStatus.removeClass('info danger checkInProgress').addClass('danger');
     nodeStatus.find('.status-text').html('<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> Error');
 }
 
