@@ -205,7 +205,7 @@ function start() {
 }
 
 function policyImport(policy) {
-    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, isEditable: policy.isEditable}});
+    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, description: policy.policyDescription, isEditable: policy.isEditable}});
     $.each(policy.policyRules, function(ruleId, policyRule) {
         pTree.create_node(policyNodeId, policyRule);
     });
@@ -215,7 +215,7 @@ function policyImport(policy) {
 }
 
 function policyCreate(policy) {
-    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, isEditable: true}});
+    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, description: policy.policyDescription, isEditable: true}});
     pTree.deselect_node(pTree.get_selected(), true);
     pTree.select_node(policyNodeId);
     successMessage('Policy created successfuly');
@@ -272,6 +272,7 @@ function ruleDelete(data, ruleNode) {
 
 function policyNameChange(policy, policyNode) {
     pTree.rename_node(policyNode, policy.policyName);
+    policyNode.data.description = policy.policyDescription;
 }
 
 function displayTree(policiesTree) {
@@ -313,16 +314,19 @@ function displayPolicyManage(node) {
 function displayPolicyEdit(node, system) {
     selectedPolicyNode = node;
     $('#xslPolicyName_policyName').val(node.text);
+    $('#xslPolicyName_policyDescription').val(node.data.description);
 
     if (system) {
         $('#policyDelete').addClass('hidden');
         $('#policyRuleCreateContainer').addClass('hidden');
         $('#xslPolicyName_policyName').prop('disabled', true);
+        $('#xslPolicyName_policyDescription').prop('disabled', true);
         $('#xslPolicyName_SavePolicyName').addClass('hidden');
     }
     else {
         $('#policyDelete').removeClass('hidden');
         $('#xslPolicyName_policyName').prop('disabled', false);
+        $('#xslPolicyName_policyDescription').prop('disabled', false);
         $('#xslPolicyName_SavePolicyName').removeClass('hidden');
 
         // Do not show "Add a new rule" button for unknown policies
@@ -340,7 +344,7 @@ function displayPolicyEdit(node, system) {
 }
 
 function policyDuplicate(policy, selectedPolicyNode) {
-    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, isEditable: policy.isEditable}});
+    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, description: policy.policyDescription, isEditable: policy.isEditable}});
     $.each(policy.policyRules, function(ruleId, policyRule) {
         pTree.create_node(policyNodeId, policyRule);
     });

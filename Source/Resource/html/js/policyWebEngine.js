@@ -108,13 +108,18 @@ function policyRuleForm(form, policyNode, ruleNode, action, routeAction) {
 
 function policyNameForm(form, policyNode) {
     var name = $(form).find("#xslPolicyName_policyName").val();
-    webpage.policy_change_name(policyNode.data.policyId, name, function (data) {
+    if (name === undefined)
+        name = "";
+    var description = $(form).find("#xslPolicyDescription_policyDescription").val();
+    if (description === undefined)
+        description = "";
+    webpage.policy_change_name(policyNode.data.policyId, name, description, function (data) {
         //data: rule
         var changed = JSON.parse(data);
         if (!changed.error)
             policyNameChange(changed, policyNode);
         else
-            errorMessage(duplicated.error);
+            errorMessage(changed.error);
     });
 }
 

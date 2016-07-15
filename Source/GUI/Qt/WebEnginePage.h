@@ -37,6 +37,7 @@ protected:
     void         charge_local_dir(const QString& directory, QStringList& tmp);
     QStringList  choose_file_settings();
     QStringList  choose_file_import_policy();
+    void         string_to_json(QString& str);
 
 public Q_SLOTS:
     void         on_file_upload_selected(const QString& policy, const QString& display_xslt, const QString& verbosity);
@@ -89,7 +90,7 @@ public Q_SLOTS:
     QString      duplicate_policy(int id);
     QString      export_policy(int id);
     QString      delete_policy(int id);
-    QString      policy_change_name(int id, const QString& name);
+    QString      policy_change_name(int id, const QString& name, const QString& description);
     QString      policy_rule_create(int policy_id);
     QString      policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text);
     QString      policy_rule_duplicate(int policy_id, int rule_id);

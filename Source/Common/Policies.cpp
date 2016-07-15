@@ -211,7 +211,7 @@ int Policies::erase_policy(size_t index, std::string& err)
     return 0;
 }
 
-int Policies::policy_change_name(int id, const std::string& name, std::string& err)
+int Policies::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
 {
     if (id < 0 || id > (int)policies.size())
     {
@@ -227,6 +227,7 @@ int Policies::policy_change_name(int id, const std::string& name, std::string& e
     }
 
     p->title = name;
+    p->description = description;
 
     return 0;
 }

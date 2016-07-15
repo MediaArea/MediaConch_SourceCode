@@ -765,9 +765,9 @@ int MainWindow::duplicate_policy(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::policy_change_name(int id, const std::string& name, std::string& err)
+int MainWindow::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
 {
-    return MCL.policy_change_name(id, name, err);
+    return MCL.policy_change_name(id, name, description, err);
 }
 
 //---------------------------------------------------------------------------

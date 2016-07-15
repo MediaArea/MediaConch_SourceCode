@@ -67,7 +67,7 @@ public:
     int         export_policy(const char* filename, size_t pos, std::string& err);
     int         duplicate_policy(int id, std::string& err);
     int         erase_policy(size_t index, std::string& err);
-    int         policy_change_name(int id, const std::string& name, std::string& err);
+    int         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
 
     // Rule
     int         create_policy_rule(int policy_id, std::string& err);
