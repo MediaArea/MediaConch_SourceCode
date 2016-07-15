@@ -17,16 +17,7 @@ function policyImportForm(form) {
 }
 
 function policyCreateForm(form) {
-    var name = $(form).find("#xslPolicyCreate_policyName").val();
-    var description = $(form).find("#xslPolicyCreate_policyDescription").val();
-
-    if (name === undefined)
-        return;
-
-    if (description === undefined)
-        description = "";
-
-    webpage.create_policy(name, description, function (data) {
+    webpage.create_policy(function (data) {
     //     data: policyName, policyId
         var created = JSON.parse(data);
         if (!created.error)
@@ -110,7 +101,7 @@ function policyNameForm(form, policyNode) {
     var name = $(form).find("#xslPolicyName_policyName").val();
     if (name === undefined)
         name = "";
-    var description = $(form).find("#xslPolicyDescription_policyDescription").val();
+    var description = $(form).find("#xslPolicyName_policyDescription").val();
     if (description === undefined)
         description = "";
     webpage.policy_change_name(policyNode.data.policyId, name, description, function (data) {

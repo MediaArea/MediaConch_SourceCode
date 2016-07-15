@@ -215,7 +215,7 @@ function policyImport(policy) {
 }
 
 function policyCreate(policy) {
-    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, description: policy.policyDescription, isEditable: true}});
+    policyNodeId = pTree.create_node('u_p', {text: policy.policyName, type: 'u', data: {policyId: policy.policyId, description: '', isEditable: true}});
     pTree.deselect_node(pTree.get_selected(), true);
     pTree.select_node(policyNodeId);
     successMessage('Policy created successfuly');
@@ -273,6 +273,7 @@ function ruleDelete(data, ruleNode) {
 function policyNameChange(policy, policyNode) {
     pTree.rename_node(policyNode, policy.policyName);
     policyNode.data.description = policy.policyDescription;
+    successMessage('Policy information successfully changed');
 }
 
 function displayTree(policiesTree) {

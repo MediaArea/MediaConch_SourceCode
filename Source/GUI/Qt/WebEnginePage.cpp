@@ -981,7 +981,7 @@ namespace MediaConch
         return json;
     }
 
-    QString WebPage::create_policy(const QString& name, const QString& description)
+    QString WebPage::create_policy()
     {
         //return: policyName, policyId
         QString json;
@@ -989,7 +989,7 @@ namespace MediaConch
         size_t nb_policies = mainwindow->get_policies_count();
 
         int ret;
-        if ((ret = mainwindow->create_xslt_policy(name, description, err)) < 0)
+        if ((ret = mainwindow->create_xslt_policy(err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1012,12 +1012,9 @@ namespace MediaConch
         mainwindow->save_policy(ret, err);
 
         QString title = QString().fromUtf8(p->title.c_str(), p->title.length());
-        QString d = QString().fromUtf8(p->description.c_str(), p->description.length());
         string_to_json(title);
-        string_to_json(d);
-        json = QString("{\"policyName\":\"%1\",\"policyDescription\":\"%2\",\"policyId\":%3}")
+        json = QString("{\"policyName\":\"%1\",\"policyId\":%3}")
                    .arg(title)
-                   .arg(d)
                    .arg(ret);
         return json;
     }

@@ -178,7 +178,7 @@ public:
     // Policies
     //   Create policy
     size_t                      create_policy_from_file(const std::string& file);
-    int                         create_xslt_policy(const std::string& name, const std::string& description, std::string& err);
+    int                         create_xslt_policy(std::string& err);
     int                         duplicate_policy(int id, std::string& err);
     int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
     int                         create_policy_rule(int policy_id, std::string& err);
