@@ -35,6 +35,7 @@ public:
 // HELPER
 //***************************************************************************
     void                        display_policies();
+    int                         add_new_policies(const QStringList& files);
 
 private:
     MainWindow   *mainwindow;

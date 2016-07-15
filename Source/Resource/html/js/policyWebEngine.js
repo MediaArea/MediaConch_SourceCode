@@ -16,6 +16,14 @@ function policyImportForm(form) {
     });
 }
 
+function policyImportDrag(imported) {
+    //     data: policyName, policyId, policyRules
+    if (!imported.error)
+        policyImport(imported);
+    else
+        errorMessage(imported.error);
+}
+
 function policyCreateForm(form) {
     webpage.create_policy(function (data) {
     //     data: policyName, policyId

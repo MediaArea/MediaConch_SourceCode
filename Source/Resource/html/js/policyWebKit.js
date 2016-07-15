@@ -14,6 +14,14 @@ function policyImportForm(form) {
         errorMessage(imported.error);
 }
 
+function policyImportDrag(imported) {
+    // data: policyName, policyId, policyRules
+    if (!imported.error)
+        policyImport(imported);
+    else
+        errorMessage(imported.error);
+}
+
 function policyCreateForm(form) {
     // data: policyName, policyId
     var data = webpage.create_policy();

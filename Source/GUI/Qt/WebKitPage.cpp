@@ -917,6 +917,11 @@ namespace MediaConch
         if (!file.length())
             return QString("{\"error\":\"No file selected\"}");
 
+        return import_policy(file);
+    }
+
+    QString WebPage::import_policy(const QString& file)
+    {
         QString json;
         std::string err;
         size_t nb_policies = mainwindow->get_policies_count();
@@ -960,6 +965,24 @@ namespace MediaConch
         else
             json += "}";
         return json;
+    }
+
+    int WebPage::import_policy(const QStringList& files)
+    {
+        int ret = 0;
+
+        QString script;
+        for (int i = 0; i < files.size(); ++i)
+        {
+            QString tmp = import_policy(files[i]);
+            if (tmp.startsWith("{\"error\":"))
+                ret = -1;
+            else
+                script += QString("policyImportDrag(%1);").arg(tmp);
+        }
+        if (script.length())
+            use_javascript(script);
+        return ret;
     }
 
     QString WebPage::create_policy()

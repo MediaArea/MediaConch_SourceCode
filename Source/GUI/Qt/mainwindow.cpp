@@ -699,9 +699,7 @@ void MainWindow::drag_and_drop_files_action(const QStringList& files)
     }
 
     if (policiesView)
-    {
-        //nothing to do
-    }
+        policiesView->add_new_policies(files);
 }
 
 //***************************************************************************
