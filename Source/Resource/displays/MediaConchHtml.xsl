@@ -88,14 +88,17 @@
         cursor: pointer;
         outline: none;
         user-select: none;
-        border-right:3px solid black;
-        border-bottom:3px solid black;
-        width:6px;
+        width: auto;
         height:6px;
-        transform: rotate(-45deg);
         margin-top:6px;
         margin-right:6px;
         margin-left:6px;
+      }
+
+      .arrow + label:before {
+        font-size: 18px;
+        font-weight: bold;
+        content: "→ ";
       }
 
       .arrow input:checked + label {
@@ -110,8 +113,10 @@
         display: block;
       }
 
-      input.arrow:checked + label {
-        transform: rotate(45deg);
+      input.arrow:checked + label:before {
+        font-size: 18px;
+        font-weight: bold;
+        content: "↓ ";
       }
 
       .toggle {
@@ -216,8 +221,9 @@
               <tr>
                 <td class="mc_element">
                   <input id="implementation-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
-                  <label for="implementation-arrow-{generate-id()}"></label>
-                  <strong><xsl:value-of select="@icid"/></strong>
+                  <label class="label" for="implementation-arrow-{generate-id()}">
+                    <span><strong><xsl:value-of select="@icid"/></strong></span>
+                  </label>
                   <xsl:if test="@tests_run !=''">
                     <xsl:text>  Tests run: </xsl:text><xsl:value-of select="@tests_run"/>
                     <xsl:text>  | </xsl:text>
