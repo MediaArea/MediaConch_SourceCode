@@ -699,9 +699,7 @@ void MainWindow::drag_and_drop_files_action(const QStringList& files)
     }
 
     if (policiesView)
-    {
-        //nothing to do
-    }
+        policiesView->add_new_policies(files);
 }
 
 //***************************************************************************
@@ -753,9 +751,9 @@ int MainWindow::import_policy(const QString& file, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::create_xslt_policy(const QString& name, const QString& description, std::string& err)
+int MainWindow::create_xslt_policy(std::string& err)
 {
-    return MCL.create_xslt_policy(name.toUtf8().data(), description.toUtf8().data(), err);
+    return MCL.create_xslt_policy(err);
 }
 
 //---------------------------------------------------------------------------
@@ -765,9 +763,9 @@ int MainWindow::duplicate_policy(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::policy_change_name(int id, const std::string& name, std::string& err)
+int MainWindow::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
 {
-    return MCL.policy_change_name(id, name, err);
+    return MCL.policy_change_name(id, name, description, err);
 }
 
 //---------------------------------------------------------------------------

@@ -50,14 +50,13 @@ Policies::~Policies()
 }
 
 // Policy
-int Policies::create_xslt_policy(const std::string& name, const std::string& description, std::string&)
+int Policies::create_xslt_policy(std::string&)
 {
     Policy *p = new XsltPolicy(!core->accepts_https());
 
     // Policy filename
     find_save_name(NULL, p->filename);
-    p->title = name;
-    p->description = description;
+    find_new_policy_name(p->title);
     p->saved = false;
     size_t pos = policies.size();
     policies.push_back(p);
@@ -211,7 +210,7 @@ int Policies::erase_policy(size_t index, std::string& err)
     return 0;
 }
 
-int Policies::policy_change_name(int id, const std::string& name, std::string& err)
+int Policies::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
 {
     if (id < 0 || id > (int)policies.size())
     {
@@ -227,6 +226,7 @@ int Policies::policy_change_name(int id, const std::string& name, std::string& e
     }
 
     p->title = name;
+    p->description = description;
 
     return 0;
 }
@@ -662,6 +662,27 @@ void Policies::find_save_name(const char* basename, std::string& save_name)
         if (!ZenLib::File::Exists(z_path))
         {
             save_name = ss.str();
+            break;
+        }
+    }
+}
+void Policies::find_new_policy_name(std::string& title)
+{
+    title = "New policy";
+    for (size_t i = 0; 1; ++i)
+    {
+        std::stringstream ss;
+        ss << title;
+        if (i)
+            ss << " " << i;
+
+        size_t j = 0;
+        for (; j < policies.size(); ++j)
+            if (policies[j] && policies[j]->title == ss.str())
+                break;
+        if (j == policies.size())
+        {
+            title = ss.str();
             break;
         }
     }

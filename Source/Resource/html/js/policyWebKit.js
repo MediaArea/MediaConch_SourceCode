@@ -14,18 +14,17 @@ function policyImportForm(form) {
         errorMessage(imported.error);
 }
 
+function policyImportDrag(imported) {
+    // data: policyName, policyId, policyRules
+    if (!imported.error)
+        policyImport(imported);
+    else
+        errorMessage(imported.error);
+}
+
 function policyCreateForm(form) {
-    var name = $(form).find("#xslPolicyCreate_policyName").val();
-    var description = $(form).find("#xslPolicyCreate_policyDescription").val();
-
-    if (name === undefined)
-        return;
-
-    if (description === undefined)
-        description = "";
-
     // data: policyName, policyId
-    var data = webpage.create_policy(name, description);
+    var data = webpage.create_policy();
     var created = JSON.parse(data);
     if (!created.error)
         policyCreate(created);
@@ -87,13 +86,18 @@ function policyRuleForm(form, policyNode, ruleNode, action, routeAction) {
 
 function policyNameForm(form, policyNode) {
     var name = $(form).find("#xslPolicyName_policyName").val();
-    var data = webpage.policy_change_name(policyNode.data.policyId, name);
+    if (name === undefined)
+        name = "";
+    var description = $(form).find("#xslPolicyName_policyDescription").val();
+    if (description === undefined)
+        description = "";
+    var data = webpage.policy_change_name(policyNode.data.policyId, name, description);
     //data: rule
     var changed = JSON.parse(data);
     if (!changed.error)
         policyNameChange(changed, policyNode);
     else
-        errorMessage(duplicated.error);
+        errorMessage(changed.error);
 }
 
 function policyDuplicateRequest(policyNode) {

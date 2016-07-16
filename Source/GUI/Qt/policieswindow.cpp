@@ -68,6 +68,15 @@ void PoliciesWindow::clear_visual_elements()
     }
 }
 
+int PoliciesWindow::add_new_policies(const QStringList& files)
+{
+    WebPage* page = (WebPage*)web_view->page();
+    if (!page)
+        return -1;
+
+    return page->import_policy(files);
+}
+
 //***************************************************************************
 // WEB
 //***************************************************************************
