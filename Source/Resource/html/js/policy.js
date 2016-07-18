@@ -222,8 +222,16 @@ function policyCreate(policy) {
 }
 
 function policyDelete(policy, selectedPolicyNode) {
+    // Update policyId for next nodes
+    tmpPolicy = selectedPolicyNode;
+    while (tmpPolicy = pTree.get_next_dom(tmpPolicy, true)) {
+        nextNode = pTree.get_node(tmpPolicy);
+        nextNode.data.policyId = nextNode.data.policyId - 1;
+    }
+
     pTree.delete_node(selectedPolicyNode.id);
     pTree.select_node('u_p', true);
+
     successMessage('Policy successfuly removed');
 }
 
