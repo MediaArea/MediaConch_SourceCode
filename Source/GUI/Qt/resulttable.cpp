@@ -52,10 +52,10 @@ void ResultTable::add_file_to_result_table(const std::string& full_path)
     QUrl url(QString().fromUtf8(filename.c_str(), filename.length()));
     QFileInfo info(url.path());
 
-    Policy *p = mainwindow->get_policy(file->policy);
+    Policy *p = mainwindow->policy_get(file->policy);
     QString policyName;
     if (p)
-        policyName = QString().fromUtf8(p->title.c_str(), p->title.length());
+        policyName = QString().fromUtf8(p->name.c_str(), p->name.length());
     else
         policyName = "N/A";
     // Make the javascript structure Arghh!

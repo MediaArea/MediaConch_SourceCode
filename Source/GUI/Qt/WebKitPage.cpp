@@ -185,14 +185,14 @@ namespace MediaConch
 
     QString WebPage::on_create_policy_from_file(const QString& file)
     {
-        size_t id = mainwindow->create_policy_from_file(file);
-        QString script;
-        Policy *p = ((int)id != -1) ? mainwindow->get_policy(id) : NULL;;
-        std::string title = p ? p->title : std::string();
-        QString name = QString().fromUtf8(title.c_str(), title.length());
-        script = QString("{\"policyId\":%1, \"policyName\":\"%2\"}")
-            .arg(id)
-            .arg(name);
+        int id = mainwindow->xslt_policy_create_from_file(file);
+        Policy *p = (id != -1) ? mainwindow->policy_get(id) : NULL;;
+        std::string n = p ? p->name : std::string();
+        QString name = QString().fromUtf8(n.c_str(), n.length());
+
+        QString script = QString("{\"policyId\":%1, \"policyName\":\"%2\"}")
+                             .arg(id)
+                             .arg(name);
         return script;
     }
 
@@ -261,7 +261,7 @@ namespace MediaConch
             settings.change_default_policy("");
         else
         {
-            Policy* p = mainwindow->get_policy((size_t)policy.toInt());
+            Policy* p = mainwindow->policy_get(policy.toInt());
             if (p)
                 settings.change_default_policy(p->filename);
             else
@@ -761,7 +761,7 @@ namespace MediaConch
         mainwindow->display_delete_id(name);
     }
 
-    void WebPage::create_rule_tree(XsltRule *r, int index, QString& rule_data)
+    void WebPage::create_rule_tree(XsltPolicyRule *r, int index, QString& rule_data)
     {
         if (!r)
             return;
@@ -769,10 +769,10 @@ namespace MediaConch
         rule_data = "{";
         rule_data += QString("\"ruleId\":%1").arg(index);
 
-        int len = r->type.length();
+        int len = r->track_type.length();
         if (len > 0)
         {
-            QString type = QString().fromUtf8(r->type.c_str(), r->type.length());
+            QString type = QString().fromUtf8(r->track_type.c_str(), r->track_type.length());
             string_to_json(type);
             rule_data += QString(",\"trackType\":\"%1\"").arg(type);
         }
@@ -822,23 +822,23 @@ namespace MediaConch
             return;
 
         rules = "[";
-        for (size_t j = 0; j < policy->rules.size(); ++j)
-        {
-            XsltRule *r = policy->rules[j];
-            if (!r)
-                continue;
+        // for (size_t j = 0; j < policy->rules.size(); ++j)
+        // {
+        //     XsltPolicyRule *r = policy->rules[j];
+        //     if (!r)
+        //         continue;
 
-            if (j)
-                rules += ",";
+        //     if (j)
+        //         rules += ",";
 
-            QString rule_data;
-            create_rule_tree(r, j, rule_data);
-            QString type = QString().fromUtf8(r->title.c_str(), r->title.length());
-            string_to_json(type);
-            rules += QString("{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}")
-                         .arg(type)
-                         .arg(rule_data);
-        }
+        //     QString rule_data;
+        //     create_rule_tree(r, j, rule_data);
+        //     QString type = QString().fromUtf8(r->name.c_str(), r->name.length());
+        //     string_to_json(type);
+        //     rules += QString("{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}")
+        //                  .arg(type)
+        //                  .arg(rule_data);
+        // }
         rules += "]";
     }
 
@@ -853,11 +853,11 @@ namespace MediaConch
         QString system("{\"id\":\"s_p\",\"text\":\"System Policies\",\"type\":\"sp\",\"state\":{\"opened\":true},\"children\":[");
         for (size_t i = 0; i < nb_policies; ++i)
         {
-            Policy *p = mainwindow->get_policy(i);
+            Policy *p = mainwindow->policy_get(i);
             if (!p)
                 continue;
 
-            QString type = QString().fromUtf8(p->title.c_str(), p->title.length());
+            QString type = QString().fromUtf8(p->name.c_str(), p->name.length());
             QString description = QString().fromUtf8(p->description.c_str(), p->description.length());
             string_to_json(type);
             string_to_json(description);
@@ -925,7 +925,7 @@ namespace MediaConch
         QString json;
         std::string err;
         size_t nb_policies = mainwindow->get_policies_count();
-        if (mainwindow->import_policy(file, err) < 0)
+        if (mainwindow->policy_import(file, err) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -939,15 +939,15 @@ namespace MediaConch
             return json;
         }
 
-        Policy *p = mainwindow->get_policy(nb_policies);
+        Policy *p = mainwindow->policy_get((int)nb_policies);
         if (!p || (p->type != Policies::POLICY_XSLT && p->type != Policies::POLICY_UNKNOWN))
         {
             json = "{\"error\":\"Cannot import the policy\"}";
             return json;
         }
-        mainwindow->save_policy(nb_policies, err);
+        mainwindow->policy_save(nb_policies, err);
 
-        QString type = QString().fromUtf8(p->title.c_str(), p->title.length());
+        QString type = QString().fromUtf8(p->name.c_str(), p->name.length());
         QString description = QString().fromUtf8(p->description.c_str(), p->description.length());
         string_to_json(type);
         string_to_json(description);
@@ -993,7 +993,7 @@ namespace MediaConch
         size_t nb_policies = mainwindow->get_policies_count();
 
         int ret = -1;
-        if ((ret = mainwindow->create_xslt_policy(err)) < 0)
+        if ((ret = mainwindow->xslt_policy_create(err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1007,18 +1007,18 @@ namespace MediaConch
             return json;
         }
 
-        Policy *p = mainwindow->get_policy(ret);
+        Policy *p = mainwindow->policy_get(ret);
         if (!p || p->type != Policies::POLICY_XSLT)
         {
             json = "{\"error\":\"Cannot create a policy\"}";
             return json;
         }
-        mainwindow->save_policy(ret, err);
+        mainwindow->policy_save(ret, err);
 
-        QString title = QString().fromUtf8(p->title.c_str(), p->title.length());
-        string_to_json(title);
+        QString name = QString().fromUtf8(p->name.c_str(), p->name.length());
+        string_to_json(name);
         json = QString("{\"policyName\":\"%1\",\"policyId\":%3}")
-                   .arg(title)
+                   .arg(name)
                    .arg(ret);
         return json;
     }
@@ -1031,7 +1031,7 @@ namespace MediaConch
         size_t nb_policies = mainwindow->get_policies_count();
         int ret = -1;
 
-        if ((ret = mainwindow->duplicate_policy(id, err)) < 0)
+        if ((ret = mainwindow->policy_duplicate(id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1045,13 +1045,13 @@ namespace MediaConch
             return json;
         }
 
-        Policy *p = mainwindow->get_policy(ret);
+        Policy *p = mainwindow->policy_get(ret);
         if (!p)
         {
             json = "{\"error\":\"Cannot duplicate the policy\"}";
             return json;
         }
-        mainwindow->save_policy(ret, err);
+        mainwindow->policy_save(ret, err);
 
         QString rules;
         if (p->type == Policies::POLICY_XSLT)
@@ -1059,12 +1059,12 @@ namespace MediaConch
         else
             rules = "[]";
 
-        QString title = QString().fromUtf8(p->title.c_str(), p->title.length());
+        QString name = QString().fromUtf8(p->name.c_str(), p->name.length());
         QString description = QString().fromUtf8(p->description.c_str(), p->description.length());
-        string_to_json(title);
+        string_to_json(name);
         string_to_json(description);
         json = QString("{\"policyName\":\"%1\",\"policyDescription\":\"%2\",\"policyId\":%3,\"isEditable\":%4,\"policyRules\":%5}")
-                   .arg(title)
+                   .arg(name)
                    .arg(description)
                    .arg(ret)
                    .arg(p->type == Policies::POLICY_XSLT?"true":"false")
@@ -1084,7 +1084,7 @@ namespace MediaConch
         }
 
         std::string err;
-        if (mainwindow->remove_policy((size_t)id, err) < 0)
+        if (mainwindow->policy_remove((size_t)id, err) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1101,7 +1101,7 @@ namespace MediaConch
         //return: error?
         QString json;
         std::string err;
-        if (mainwindow->export_policy((size_t)id, err) < 0)
+        if (mainwindow->policy_export((size_t)id, err) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1125,11 +1125,11 @@ namespace MediaConch
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
         }
-        mainwindow->save_policy(id, err);
+        mainwindow->policy_save(id, err);
 
-        QString title = name;
+        QString n = name;
         QString desc = description;
-        string_to_json(title);
+        string_to_json(n);
         string_to_json(desc);
         json = QString("{\"policyName\":\"%1\",\"policyDescription\":\"%2\"}").arg(name).arg(desc);
         return json;
@@ -1141,7 +1141,7 @@ namespace MediaConch
         std::string err;
         QString json;
         int new_rule_id = -1;
-        if ((new_rule_id = mainwindow->create_policy_rule(policy_id, err)) < 0)
+        if ((new_rule_id = mainwindow->xslt_policy_rule_create(policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1149,15 +1149,15 @@ namespace MediaConch
             return json;
         }
 
-        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
-        XsltRule* r = p->rules[new_rule_id];
-        mainwindow->save_policy(policy_id, err);
+        XsltPolicy* p = (XsltPolicy*)mainwindow->policy_get(policy_id);
+        // XsltPolicyRule* r = p->rules[new_rule_id];
+        // mainwindow->policy_save(policy_id, err);
 
-        QString rule_data;
-        create_rule_tree(r, new_rule_id, rule_data);
-        QString title = QString().fromUtf8(r->title.c_str());
-        string_to_json(title);
-        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(title).arg(rule_data);
+        // QString rule_data;
+        // create_rule_tree(r, new_rule_id, rule_data);
+        // QString name = QString().fromUtf8(r->name.c_str());
+        // string_to_json(name);
+        // json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(name).arg(rule_data);
         return json;
     }
 
@@ -1167,33 +1167,33 @@ namespace MediaConch
         std::string err;
         QString json;
 
-        XsltRule rule;
-        rule.title         = title.toUtf8().data();
-        rule.ope           = ope.toUtf8().data();
-        rule.use_free_text = !is_editor;
-        rule.type          = type.toUtf8().data();
-        rule.field         = field.toUtf8().data();
-        rule.occurrence    = occurrence;
-        rule.value         = value.toUtf8().data();
-        rule.test          = free_text.toUtf8().data();
+        // XsltPolicyRule rule;
+        // rule.name          = title.toUtf8().data();
+        // rule.ope           = ope.toUtf8().data();
+        // rule.use_free_text = !is_editor;
+        // rule.track_type    = track_type.toUtf8().data();
+        // rule.field         = field.toUtf8().data();
+        // rule.occurrence    = occurrence;
+        // rule.value         = value.toUtf8().data();
+        // rule.test          = free_text.toUtf8().data();
 
-        if (mainwindow->edit_policy_rule(policy_id, rule_id, &rule, err) < 0)
-        {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
-            return json;
-        }
+        // if (mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err) < 0)
+        // {
+        //     QString error = QString().fromUtf8(err.c_str(), err.length());
+        //     string_to_json(error);
+        //     json = QString("{\"error\":\"%1\"}").arg(error);
+        //     return json;
+        // }
 
-        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
-        XsltRule* r = p->rules[rule_id];
-        mainwindow->save_policy(policy_id, err);
+        // XsltPolicy* p = (XsltPolicy*)mainwindow->policy_get(policy_id);
+        // XsltPolicyRule* r = p->rules[rule_id];
+        // mainwindow->policy_save(policy_id, err);
 
-        QString rule_data;
-        create_rule_tree(r, rule_id, rule_data);
-        QString t = QString().fromUtf8(r->title.c_str());
-        string_to_json(t);
-        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(t).arg(rule_data);
+        // QString rule_data;
+        // create_rule_tree(r, rule_id, rule_data);
+        // QString t = QString().fromUtf8(r->name.c_str());
+        // string_to_json(t);
+        // json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(t).arg(rule_data);
         return json;
     }
 
@@ -1203,7 +1203,7 @@ namespace MediaConch
         std::string err;
         QString json;
         int new_rule_id = -1;
-        if ((new_rule_id = mainwindow->duplicate_policy_rule(policy_id, rule_id, err)) < 0)
+        if ((new_rule_id = mainwindow->xslt_policy_rule_duplicate(policy_id, rule_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1211,15 +1211,15 @@ namespace MediaConch
             return json;
         }
 
-        XsltPolicy* p = (XsltPolicy*)mainwindow->get_policy(policy_id);
-        XsltRule* r = p->rules[new_rule_id];
-        mainwindow->save_policy(policy_id, err);
+        // XsltPolicy* p = (XsltPolicy*)mainwindow->policy_get(policy_id);
+        // XsltPolicyRule* r = p->rules[new_rule_id];
+        // mainwindow->policy_save(policy_id, err);
 
-        QString rule_data;
-        create_rule_tree(r, new_rule_id, rule_data);
-        QString title = QString().fromUtf8(r->title.c_str());
-        string_to_json(title);
-        json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(title).arg(rule_data);
+        // QString rule_data;
+        // create_rule_tree(r, new_rule_id, rule_data);
+        // QString name = QString().fromUtf8(r->name.c_str());
+        // string_to_json(name);
+        // json = QString("{\"rule\":{\"text\":\"%1\",\"type\":\"r\",\"data\":%2}}").arg(name).arg(rule_data);
         return json;
     }
 
@@ -1228,14 +1228,14 @@ namespace MediaConch
         //return: ruleId
         std::string err;
         QString json;
-        if (mainwindow->delete_policy_rule(policy_id, rule_id, err) < 0)
+        if (mainwindow->xslt_policy_rule_delete(policy_id, rule_id, err) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
         }
-        mainwindow->save_policy(policy_id, err);
+        mainwindow->policy_save(policy_id, err);
 
         json = QString("{\"ruleId\":%1}").arg(rule_id);
         return json;

@@ -41,11 +41,9 @@ DEFINES          +=  _UNICODE
 SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schema.cpp \
-                    ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Xslt.cpp \
                     ../../Source/Common/Policies.cpp \
                     ../../Source/Common/Policy.cpp \
-                    ../../Source/Common/SchematronPolicy.cpp \
                     ../../Source/Common/XsltPolicy.cpp \
                     ../../Source/Common/UnknownPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
@@ -88,12 +86,10 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
 HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Core.h \
                     ../../Source/Common/Schema.h \
-                    ../../Source/Common/Schematron.h \
                     ../../Source/Common/Xslt.h \
                     ../../Source/Common/JS_Tree.h \
                     ../../Source/Common/Policies.h \
                     ../../Source/Common/Policy.h \
-                    ../../Source/Common/SchematronPolicy.h \
                     ../../Source/Common/XsltPolicy.h \
                     ../../Source/Common/UnknownPolicy.h \
                     ../../Source/Common/ImplementationReportXsl.h \

@@ -53,6 +53,18 @@ bool Schema::register_schema_from_file(const char* filename)
 }
 
 //---------------------------------------------------------------------------
+bool Schema::register_schema_from_memory(const std::string&)
+{
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool Schema::register_schema_from_doc(void*)
+{
+    return false;
+}
+
+//---------------------------------------------------------------------------
 int Schema::read_file(const char* filename, std::string& buffer)
 {
     // open at the end (ate) to get the length of the file
@@ -83,6 +95,46 @@ int Schema::validate_xml_from_file(const char* filename, bool silent)
         return -1;
 
     return validate_xml(xml, silent);
+}
+
+//---------------------------------------------------------------------------
+int Schema::validate_xml(const std::string& xml, bool silent)
+{
+    return -1;
+}
+
+//***************************************************************************
+// Callbacks
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void Schema::manage_error(void *userData, xmlErrorPtr err)
+{
+    Schema *obj = (Schema *)userData;
+    if (!err || err->code == XML_ERR_OK)
+        return;
+
+    obj->errors.push_back(err->message);
+}
+
+//---------------------------------------------------------------------------
+void Schema::manage_generic_error(void *userData, const char* msg, ...)
+{
+    Schema *obj = (Schema *)userData;
+    va_list args;
+    char buf[4096] = {0};
+
+    va_start(args, msg);
+#ifdef _MSC_VER
+    int ret = vsnprintf_s(buf, sizeof(buf), _TRUNCATE, msg, args);
+#else //_MSC_VER
+    int ret = vsnprintf(buf, sizeof(buf), msg, args);
+    if (ret < 0)
+        ret = 0;
+    buf[ret] = '\0';
+#endif //_MSC_VER
+    obj->errors.push_back(buf);
+    va_end(args);
 }
 
 }

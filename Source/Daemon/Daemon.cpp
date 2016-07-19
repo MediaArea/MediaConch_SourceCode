@@ -91,7 +91,7 @@ namespace MediaConch
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
-        httpd->commands.create_policy_from_file_cb = on_create_policy_from_file_command;
+        httpd->commands.policy_create_from_file_cb = on_policy_create_from_file_command;
         return 0;
     }
 
@@ -841,7 +841,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::vector<std::string> values;
-        if (d->MCL->get_values_for_type_field(req->type, req->field, values) >= 0)
+        if (d->MCL->policy_get_values_for_type_field(req->type, req->field, values) >= 0)
             for (size_t i = 0; i < values.size(); ++i)
                 res.values.push_back(values[i]);
 
@@ -851,40 +851,50 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_create_policy_from_file_command(const RESTAPI::Create_Policy_From_File_Req* req, RESTAPI::Create_Policy_From_File_Res& res, void *arg)
+    int Daemon::on_policy_create_from_file_command(const RESTAPI::Policy_Create_From_File_Req* req, RESTAPI::Policy_Create_From_File_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a create_policy_from_file command: ";
+        std::clog << d->get_date() << "Daemon received a policy_create_from_file command: ";
         std::clog << req->to_str() << std::endl;
 
         if (!d->id_is_existing(req->id))
         {
-            RESTAPI::Create_Policy_From_File_Nok *nok = new RESTAPI::Create_Policy_From_File_Nok;
+            RESTAPI::Policy_Create_From_File_Nok *nok = new RESTAPI::Policy_Create_From_File_Nok;
             nok->id = req->id;
             nok->error = RESTAPI::ID_NOT_EXISTING;
             res.nok = nok;
         }
         else
         {
-            size_t pos = d->MCL->create_policy_from_file(*d->current_files[req->id]);
-            Policy *p = NULL;
-            std::string policy;
-            if (pos == (size_t)-1 || (p = d->MCL->get_policy(pos)) == NULL || p->dump_schema(policy) < 0)
+            std::string err;
+            int pos = d->MCL->policy_create_from_file(*d->current_files[req->id], err);
+
+            if (pos == -1)
             {
-                RESTAPI::Create_Policy_From_File_Nok *nok = new RESTAPI::Create_Policy_From_File_Nok;
+                RESTAPI::Policy_Create_From_File_Nok *nok = new RESTAPI::Policy_Create_From_File_Nok;
                 nok->id = req->id;
                 nok->error = RESTAPI::NO_REASON;
                 res.nok = nok;
             }
             else
-                res.policy = policy;
+            {
+                int pos = d->MCL->policy_dump_to_memory(pos, res.policy, err);
+
+                if (pos == -1)
+                {
+                    RESTAPI::Policy_Create_From_File_Nok *nok = new RESTAPI::Policy_Create_From_File_Nok;
+                    nok->id = req->id;
+                    nok->error = RESTAPI::NO_REASON;
+                    res.nok = nok;
+                }
+            }
         }
 
-        std::clog << d->get_date() << "Daemon send create_policy_from_file result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send policy_create_from_file result: " << res.to_str() << std::endl;
         return 0;
     }
 

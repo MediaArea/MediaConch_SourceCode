@@ -13,7 +13,7 @@
 //---------------------------------------------------------------------------
 #include "Policies.h"
 #include "Policy.h"
-#include "Schematron.h"
+#include "Schema.h"
 #include <iostream>
 #include <sstream>
 #include <string.h>
@@ -26,17 +26,23 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+Policy::Policy(Policies *p, Policies::PolicyType t, bool n_https) : type(t), is_system(false), no_https(n_https), policies(p)
+{
+    this->id = p->get_an_id();
+}
+
+//---------------------------------------------------------------------------
 Policy::Policy(const Policy* p)
 {
-    if (p == this) {
+    if (p == this)
         return;
-    }
 
-    this->title = p->title;
+    this->name = p->name;
     this->description = p->description;
-    this->saved = false;
     this->is_system = false;
     this->no_https = p->no_https;
+    this->policies = p->policies;
+    this->id = p->policies->get_an_id();
 }
 
 //---------------------------------------------------------------------------
@@ -47,7 +53,7 @@ Policy::~Policy()
 //---------------------------------------------------------------------------
 int Policy::import_schema(const std::string& filename, const std::string& save_name)
 {
-    Schematron s(no_https);
+    Schema s(no_https);
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
 
     xmlDocPtr doc = xmlParseFile(filename.c_str());
@@ -61,7 +67,7 @@ int Policy::import_schema(const std::string& filename, const std::string& save_n
 
     int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
-    saved = true;
+    xmlCleanupCharEncodingHandlers();
     xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
@@ -75,7 +81,7 @@ int Policy::import_schema_from_memory(const char* buffer, int len, const std::st
         return -1;
     }
 
-    Schematron s(no_https);
+    Schema s(no_https);
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
 
     xmlDocPtr doc = xmlParseMemory(buffer, len);
@@ -89,7 +95,6 @@ int Policy::import_schema_from_memory(const char* buffer, int len, const std::st
 
     int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
-    saved = true;
     xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
@@ -97,13 +102,13 @@ int Policy::import_schema_from_memory(const char* buffer, int len, const std::st
 //---------------------------------------------------------------------------
 int Policy::export_schema(const char* filename, std::string& err)
 {
-    Schematron s(no_https);
+    Schema s(no_https);
     xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
 
     xmlDocPtr new_doc = create_doc();
     if (!new_doc)
     {
-        err = "cannot create the XML Document";
+        err = error;
         xmlSetGenericErrorFunc(NULL, NULL);
         return -1;
     }
@@ -111,7 +116,6 @@ int Policy::export_schema(const char* filename, std::string& err)
     int ret = xmlSaveFormatFile(filename, new_doc, 2);
     xmlFreeDoc(new_doc);
     xmlSetGenericErrorFunc(NULL, NULL);
-    saved = true;
     if (ret < 0)
     {
         err = "cannot save the schema";

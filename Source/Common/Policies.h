@@ -35,10 +35,8 @@ using namespace MediaInfoNameSpace;
 
 namespace MediaConch {
 
-/* TODO: remove */
-class SchematronAssert;
 class Policy;
-class XsltRule;
+class XsltPolicyRule;
 class Core;
 
 //***************************************************************************
@@ -50,7 +48,6 @@ class Policies
 public:
     enum PolicyType
     {
-        POLICY_SCHEMATRON,
         POLICY_XSLT,
         POLICY_UNKNOWN,
     };
@@ -63,26 +60,31 @@ public:
     int         create_xslt_policy(std::string& err);
     int         import_policy(const std::string& filename);
     int         import_policy_from_memory(const char* filename, const char* memory, int len, bool is_system_policy);
+    int         duplicate_policy(int id, std::string& err);
+    int         create_xslt_policy_from_file(const std::string& file, std::string& err);
+
     int         save_policy(size_t index, std::string& err);
     int         export_policy(const char* filename, size_t pos, std::string& err);
-    int         duplicate_policy(int id, std::string& err);
-    int         erase_policy(size_t index, std::string& err);
+    int         dump_policy_to_memory(int pos, std::string& memory, std::string& err);
+    /* int         policy_dump_to_memory(int id, std::string& memory, std::string& err); */
+
     int         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
 
-    // Rule
-    int         create_policy_rule(int policy_id, std::string& err);
-    int         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
-    int         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
-    int         delete_policy_rule(int policy_id, int rule_id, std::string& err);
+    int         erase_policy(size_t index, std::string& err);
+    void        clear_policies();
 
-    size_t      create_policy_from_file(const std::string& file);
+    size_t      get_policies_size() const { return policies.size(); };
+    Policy*     get_policy(int pos);
+
+    // Rule
+    int         create_xslt_policy_rule(int policy_id, std::string& err);
+    int         edit_xslt_policy_rule(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int         duplicate_xslt_policy_rule(int policy_id, int rule_id, std::string& err);
+    int         delete_xslt_policy_rule(int policy_id, int rule_id, std::string& err);
+
     bool        policy_exists(const std::string& policy);
     xmlDocPtr   create_doc(size_t pos);
 
-    static bool        try_parsing_test(std::string data, SchematronAssert *r);
-    static std::string serialize_assert_for_test(SchematronAssert *r);
-
-    std::vector<Policy *> policies;
     std::string get_error() const { return error; }
     //***************************************************************************
     // Type/Field/Validator
@@ -108,9 +110,15 @@ public:
     static bool check_test_field(const std::string& field);
     static bool check_test_validator(const std::string& validator);
 
+    size_t get_an_id() { return policy_global_id++; }
+
 private:
-    Core        *core;
-    std::string  error;
+    Core                  *core;
+    std::string            error;
+    std::vector<Policy *>  policies;
+
+    static size_t          policy_global_id;
+    //mutex?
 
     Policies (const Policies&);
     Policies& operator=(const Policies&);

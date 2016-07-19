@@ -97,7 +97,7 @@ int Httpd::send_result()
     MAKE_URI_REQ_FUNC(clear, Clear)
     MAKE_URI_REQ_FUNC(list, List)
     MAKE_URI_REQ_FUNC(default_values_for_type, Default_Values_For_Type)
-    MAKE_URI_REQ_FUNC(create_policy_from_file, Create_Policy_From_File)
+    MAKE_URI_REQ_FUNC(xslt_policy_create_from_file, XSLT_Policy_Create_From_File)
 
 #undef MAKE_URI_REQ_FUNC
 

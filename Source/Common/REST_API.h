@@ -361,24 +361,24 @@ public:
         std::string              to_str() const;
     };
 
-    struct Create_Policy_From_File_Req
+    struct XSLT_Policy_Create_From_File_Req
     {
         int                          id;
         std::string                  to_str() const;
     };
 
-    struct Create_Policy_From_File_Nok
+    struct XSLT_Policy_Create_From_File_Nok
     {
         int                          id;
         Reason                       error;
         std::string                  to_str() const;
     };
 
-    struct Create_Policy_From_File_Res
+    struct XSLT_Policy_Create_From_File_Res
     {
-        Create_Policy_From_File_Res() :  nok(NULL) {}
-        std::string                      policy;
-        Create_Policy_From_File_Nok     *nok;
+        XSLT_Policy_Create_From_File_Res() :  nok(NULL) {}
+        int                              policy_id;
+        XSLT_Policy_Create_From_File_Nok     *nok;
         std::string                      to_str() const;
     };
 
@@ -397,7 +397,7 @@ public:
     int serialize_validate_req(Validate_Req& req, std::string&);
     int serialize_file_from_id_req(File_From_Id_Req& req, std::string&);
     int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&);
-    int serialize_create_policy_from_file_req(Create_Policy_From_File_Req& req, std::string&);
+    int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&);
 
     // Serialize: Result
     int serialize_analyze_res(Analyze_Res& res, std::string&);
@@ -409,43 +409,43 @@ public:
     int serialize_validate_res(Validate_Res& res, std::string&);
     int serialize_file_from_id_res(File_From_Id_Res& res, std::string&);
     int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&);
-    int serialize_create_policy_from_file_res(Create_Policy_From_File_Res& res, std::string&);
+    int serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string&);
 
     // Parse: Request
-    Analyze_Req                 *parse_analyze_req(const std::string& data);
-    Status_Req                  *parse_status_req(const std::string& data);
-    Report_Req                  *parse_report_req(const std::string& data);
-    Retry_Req                   *parse_retry_req(const std::string& data);
-    Clear_Req                   *parse_clear_req(const std::string& data);
-    List_Req                    *parse_list_req(const std::string& data);
-    Validate_Req                *parse_validate_req(const std::string& data);
-    File_From_Id_Req            *parse_file_from_id_req(const std::string& data);
-    Default_Values_For_Type_Req *parse_default_values_for_type_req(const std::string& data);
-    Create_Policy_From_File_Req *parse_create_policy_from_file_req(const std::string& data);
+    Analyze_Req                      *parse_analyze_req(const std::string& data);
+    Status_Req                       *parse_status_req(const std::string& data);
+    Report_Req                       *parse_report_req(const std::string& data);
+    Retry_Req                        *parse_retry_req(const std::string& data);
+    Clear_Req                        *parse_clear_req(const std::string& data);
+    List_Req                         *parse_list_req(const std::string& data);
+    Validate_Req                     *parse_validate_req(const std::string& data);
+    File_From_Id_Req                 *parse_file_from_id_req(const std::string& data);
+    Default_Values_For_Type_Req      *parse_default_values_for_type_req(const std::string& data);
+    XSLT_Policy_Create_From_File_Req *parse_xslt_policy_create_from_file_req(const std::string& data);
 
     // Parse: URI Request
-    Analyze_Req                 *parse_uri_analyze_req(const std::string& uri);
-    Status_Req                  *parse_uri_status_req(const std::string& uri);
-    Report_Req                  *parse_uri_report_req(const std::string& uri);
-    Retry_Req                   *parse_uri_retry_req(const std::string& uri);
-    Clear_Req                   *parse_uri_clear_req(const std::string& uri);
-    List_Req                    *parse_uri_list_req(const std::string& uri);
-    Validate_Req                *parse_uri_validate_req(const std::string& uri);
-    File_From_Id_Req            *parse_uri_file_from_id_req(const std::string& uri);
-    Default_Values_For_Type_Req *parse_uri_default_values_for_type_req(const std::string& uri);
-    Create_Policy_From_File_Req *parse_uri_create_policy_from_file_req(const std::string& uri);
+    Analyze_Req                      *parse_uri_analyze_req(const std::string& uri);
+    Status_Req                       *parse_uri_status_req(const std::string& uri);
+    Report_Req                       *parse_uri_report_req(const std::string& uri);
+    Retry_Req                        *parse_uri_retry_req(const std::string& uri);
+    Clear_Req                        *parse_uri_clear_req(const std::string& uri);
+    List_Req                         *parse_uri_list_req(const std::string& uri);
+    Validate_Req                     *parse_uri_validate_req(const std::string& uri);
+    File_From_Id_Req                 *parse_uri_file_from_id_req(const std::string& uri);
+    Default_Values_For_Type_Req      *parse_uri_default_values_for_type_req(const std::string& uri);
+    XSLT_Policy_Create_From_File_Req *parse_uri_xslt_policy_create_from_file_req(const std::string& uri);
 
     // Parse: Request
-    Analyze_Res                 *parse_analyze_res(const std::string& data);
-    Status_Res                  *parse_status_res(const std::string& data);
-    Report_Res                  *parse_report_res(const std::string& data);
-    Retry_Res                   *parse_retry_res(const std::string& data);
-    Clear_Res                   *parse_clear_res(const std::string& data);
-    List_Res                    *parse_list_res(const std::string& data);
-    Validate_Res                *parse_validate_res(const std::string& data);
-    File_From_Id_Res            *parse_file_from_id_res(const std::string& data);
-    Default_Values_For_Type_Res *parse_default_values_for_type_res(const std::string& data);
-    Create_Policy_From_File_Res *parse_create_policy_from_file_res(const std::string& data);
+    Analyze_Res                      *parse_analyze_res(const std::string& data);
+    Status_Res                       *parse_status_res(const std::string& data);
+    Report_Res                       *parse_report_res(const std::string& data);
+    Retry_Res                        *parse_retry_res(const std::string& data);
+    Clear_Res                        *parse_clear_res(const std::string& data);
+    List_Res                         *parse_list_res(const std::string& data);
+    Validate_Res                     *parse_validate_res(const std::string& data);
+    File_From_Id_Res                 *parse_file_from_id_res(const std::string& data);
+    Default_Values_For_Type_Res      *parse_default_values_for_type_res(const std::string& data);
+    XSLT_Policy_Create_From_File_Res *parse_xslt_policy_create_from_file_res(const std::string& data);
 
     std::string get_error() const { return error; }
 

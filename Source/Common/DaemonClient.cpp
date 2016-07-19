@@ -187,7 +187,7 @@ int DaemonClient::default_values_for_type(const std::string& type, std::vector<s
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::create_policy_from_file(const std::string& file, std::string& policy)
+int DaemonClient::xslt_policy_create_from_file(const std::string& file)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -197,7 +197,7 @@ int DaemonClient::create_policy_from_file(const std::string& file, std::string& 
         return MediaConchLib::errorHttp_MAX;
     int id = it->second;
 
-    RESTAPI::Create_Policy_From_File_Req req;
+    RESTAPI::XSLT_Policy_Create_From_File_Req req;
     req.id = id;
 
     int ret = http_client->start();
@@ -214,13 +214,13 @@ int DaemonClient::create_policy_from_file(const std::string& file, std::string& 
         return http_client->get_error();
 
     RESTAPI rest;
-    RESTAPI::Create_Policy_From_File_Res *res = rest.parse_create_policy_from_file_res(data);
+    RESTAPI::XSLT_Policy_Create_From_File_Res *res = rest.parse_xslt_policy_create_from_file_res(data);
     if (!res)
         return MediaConchLib::errorHttp_INVALID_DATA;
 
-    policy = res->policy;
+    int policy = res->policy_id;
     delete res;
-    return MediaConchLib::errorHttp_NONE;
+    return policy;
 }
 
 //---------------------------------------------------------------------------

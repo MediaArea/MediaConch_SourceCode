@@ -226,7 +226,7 @@ void CheckerWindow::create_policy_options(QString& policies)
             if ((int)i == selected_policy)
                 system_policy += QString("selected=\"selected\" ");
             system_policy += QString("value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+                .arg((int)i).arg(QString().fromUtf8(list[i]->name.c_str(), list[i]->name.length()));
         }
         else
         {
@@ -234,7 +234,7 @@ void CheckerWindow::create_policy_options(QString& policies)
             if ((int)i == selected_policy)
                 user_policy += QString("selected=\"selected\" ");
             user_policy += QString("value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+                .arg((int)i).arg(QString().fromUtf8(list[i]->name.c_str(), list[i]->name.length()));
         }
     }
 

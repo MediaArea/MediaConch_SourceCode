@@ -62,7 +62,7 @@ public:
     void update_policy_of_file_in_list(const QString& file, const QString& policy);
     void clear_file_list();
     void policy_to_delete(int row);
-    size_t create_policy_from_file(const QString& file);
+    int  xslt_policy_create_from_file(const QString& file);
 
     // UI
     void                        Ui_Init();
@@ -101,29 +101,27 @@ public:
     void                        add_default_displays();
     void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);
-    bool                        is_all_policies_saved();
 
     void                        add_policy_to_list(const QString& policy);
     void                        clear_policy_list();
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
-    int                         import_policy(const QString& file, std::string& err);
-    int                         create_xslt_policy(std::string& err);
-    int                         duplicate_policy(int id, std::string& err);
+    int                         policy_import(const QString& file, std::string& err);
+    int                         xslt_policy_create(std::string& err);
+    int                         policy_duplicate(int id, std::string& err);
     bool                        policy_exists(const std::string& title);
     int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
-    Policy                     *get_policy(size_t pos);
+    Policy                     *policy_get(int pos);
     int                         get_policy_index_by_filename(const std::string& filename);
-    void                        add_policy(Policy* policy);
-    int                         save_policy(size_t pos, std::string& err);
-    int                         remove_policy(size_t pos, std::string& err);
-    int                         export_policy(size_t pos, std::string& err);
+    int                         policy_save(int pos, std::string& err);
+    int                         policy_remove(int pos, std::string& err);
+    int                         policy_export(int pos, std::string& err);
     void                        clear_policies();
     size_t                      get_policies_count() const;
-    int                         create_policy_rule(int policy_id, std::string& err);
-    int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
-    int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
-    int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);
+    int                         xslt_policy_rule_create(int policy_id, std::string& err);
+    int                         xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int                         xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err);
+    int                         xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err);
     int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
     int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
@@ -194,7 +192,6 @@ private:
     void                        createPoliciesView();
     void                        createDisplayView();
     void                        createSettingsView();
-    void                        choose_schematron_file();
     void                        closeEvent(QCloseEvent *event);
 
     void                        fill_display_used(int *policy_i,

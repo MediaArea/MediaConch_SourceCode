@@ -408,30 +408,13 @@ int MediaConchLib::get_ui_database_path(std::string& path) const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-size_t MediaConchLib::create_policy_from_file(const std::string& file)
-{
-    if (use_daemon)
-    {
-        std::string policy;
-        if (daemon_client->create_policy_from_file(file, policy) < 0)
-            return (size_t)-1;
-
-        size_t pos = core->policies.policies.size();
-        if (core->policies.import_policy_from_memory(file.c_str(), policy.c_str(), policy.length(), false))
-            return (size_t)-1;
-        return pos;
-    }
-    return core->policies.create_policy_from_file(file);
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::create_xslt_policy(std::string& err)
+int MediaConchLib::xslt_policy_create(std::string& err)
 {
     return core->policies.create_xslt_policy(err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::duplicate_policy(int id, std::string& err)
+int MediaConchLib::policy_duplicate(int id, std::string& err)
 {
     return core->policies.duplicate_policy(id, err);
 }
@@ -443,57 +426,40 @@ int MediaConchLib::policy_change_name(int id, const std::string& name, const std
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::create_policy_rule(int policy_id, std::string& err)
+int MediaConchLib::xslt_policy_rule_create(int policy_id, std::string& err)
 {
-    return core->policies.create_policy_rule(policy_id, err);
+    return core->policies.create_xslt_policy_rule(policy_id, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err)
+int MediaConchLib::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
 {
-    return core->policies.edit_policy_rule(policy_id, rule_id, rule, err);
+    return core->policies.edit_xslt_policy_rule(policy_id, rule_id, rule, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
+int MediaConchLib::xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err)
 {
-    return core->policies.duplicate_policy_rule(policy_id, rule_id, err);
+    return core->policies.duplicate_xslt_policy_rule(policy_id, rule_id, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::delete_policy_rule(int policy_id, int rule_id, std::string& err)
+int MediaConchLib::xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err)
 {
-    return core->policies.delete_policy_rule(policy_id, rule_id, err);
+    return core->policies.delete_xslt_policy_rule(policy_id, rule_id, err);
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::save_policies()
+int MediaConchLib::xslt_policy_create_from_file(const std::string& file, std::string& err)
 {
-    std::string err;
-    for (size_t i = 0; i < core->policies.policies.size(); ++i)
-        if (!core->policies.policies[i]->saved)
-            core->policies.export_policy(NULL, i, err);
+    if (use_daemon)
+        return daemon_client->xslt_policy_create_from_file(file);
+
+    return core->policies.create_xslt_policy_from_file(file, err);
 }
 
 //---------------------------------------------------------------------------
-bool MediaConchLib::is_policies_saved() const
-{
-    for (size_t i = 0; i < core->policies.policies.size(); ++i)
-        if (!core->policies.policies[i]->saved)
-            return false;
-    return true;
-}
-
-//---------------------------------------------------------------------------
-bool MediaConchLib::is_policy_saved(size_t pos) const
-{
-    if (pos > core->policies.policies.size())
-        return false;
-    return core->policies.policies[pos]->saved;
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::import_policy_from_file(const std::string& filename, std::string& err)
+int MediaConchLib::policy_import_from_file(const std::string& filename, std::string& err)
 {
     int ret = core->policies.import_policy(filename);
     if (ret < 0)
@@ -502,7 +468,7 @@ int MediaConchLib::import_policy_from_file(const std::string& filename, std::str
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::import_policy_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy)
+int MediaConchLib::policy_import_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy)
 {
     int ret = core->policies.import_policy_from_memory(filename, memory.c_str(), memory.length(), is_system_policy);
     if (ret < 0)
@@ -517,55 +483,57 @@ bool MediaConchLib::policy_exists(const std::string& title)
 }
 
 //---------------------------------------------------------------------------
-size_t MediaConchLib::get_policies_count() const
+size_t MediaConchLib::policy_get_policies_count() const
 {
-    return core->policies.policies.size();
+    return core->policies.get_policies_size();
 }
 
 //---------------------------------------------------------------------------
-Policy* MediaConchLib::get_policy(size_t pos)
+Policy* MediaConchLib::policy_get(int pos)
 {
-    if ((int)pos < 0 || pos >= core->policies.policies.size())
-        return NULL;
-    return core->policies.policies[pos];
+    return core->policies.get_policy(pos);
 }
 
 //---------------------------------------------------------------------------
-const std::vector<Policy *>& MediaConchLib::get_policies() const
-{
-    return core->policies.policies;
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::save_policy(size_t pos, std::string& err)
+int MediaConchLib::policy_save(size_t pos, std::string& err)
 {
     return core->policies.save_policy(pos, err);
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::add_policy(Policy* p)
-{
-    core->policies.policies.push_back(p);
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::remove_policy(size_t pos, std::string& err)
+int MediaConchLib::policy_remove(size_t pos, std::string& err)
 {
     return core->policies.erase_policy(pos, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::export_policy(const char* filename, size_t pos, std::string& err)
+int MediaConchLib::policy_export(const char* filename, size_t pos, std::string& err)
 {
     return core->policies.export_policy(filename, pos, err);
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::clear_policies()
+int MediaConchLib::policy_dump_to_memory(int id, std::string& memory, std::string& err)
 {
-    for (size_t i = 0; i < core->policies.policies.size(); ++i)
-        delete core->policies.policies[i];
-    core->policies.policies.clear();
+    return core->policies.dump_policy_to_memory(id, memory, err);
+}
+
+//---------------------------------------------------------------------------
+void MediaConchLib::policy_clear_policies()
+{
+    core->policies.clear_policies();
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+{
+    return core->policy_get_values_for_type_field(type, field, values);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+{
+    return core->policy_get_fields_for_type(type, fields);
 }
 
 //---------------------------------------------------------------------------
@@ -588,18 +556,6 @@ bool MediaConchLib::get_use_daemon() const
 void MediaConchLib::get_daemon_address(std::string& addr, int& port) const
 {
     core->get_daemon_address(addr, port);
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
-{
-    return core->get_values_for_type_field(type, field, values);
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
-{
-    return core->get_fields_for_type(type, fields);
 }
 
 }

@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.5";
+const std::string RESTAPI::API_VERSION = "1.6";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -272,7 +272,7 @@ std::string RESTAPI::Default_Values_For_Type_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Create_Policy_From_File_Req::to_str() const
+std::string RESTAPI::XSLT_Policy_Create_From_File_Req::to_str() const
 {
     std::stringstream out;
 
@@ -574,7 +574,7 @@ std::string RESTAPI::Default_Values_For_Type_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Create_Policy_From_File_Nok::to_str() const
+std::string RESTAPI::XSLT_Policy_Create_From_File_Nok::to_str() const
 {
     std::stringstream out;
 
@@ -585,12 +585,12 @@ std::string RESTAPI::Create_Policy_From_File_Nok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Create_Policy_From_File_Res::to_str() const
+std::string RESTAPI::XSLT_Policy_Create_From_File_Res::to_str() const
 {
     std::stringstream out;
 
-    if (policy.length())
-        out << "{policy: '" << policy.length() << "']";
+    if (policy_id < 0)
+        out << "{policy: " << policy_id << "}";
     else if (nok)
         out << "{nok: " << nok->to_str() << "}";
     return out.str();
@@ -802,7 +802,7 @@ int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_create_policy_from_file_req(Create_Policy_From_File_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string& data)
 {
     //URI
     std::stringstream ss;
@@ -1047,24 +1047,23 @@ int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_create_policy_from_file_res(Create_Policy_From_File_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string& data)
 {
     Container::Value v, child, policy, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
-    if (res.policy.length())
+    if (res.policy_id >= 0)
     {
-        policy.type = Container::Value::CONTAINER_TYPE_STRING;
-        policy.s = res.policy;
+        policy.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        policy.l = res.policy_id;
         child.obj["policy"] = policy;
     }
-
-    if (res.nok)
+    else if (res.nok)
         child.obj["nok"] = serialize_generic_nok(res.nok->id, res.nok->error);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["CREATE_POLICY_FROM_FILE_RESULT"] = child;
+    v.obj["XSLT_POLICY_CREATE_FROM_FILE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -1422,7 +1421,7 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Create_Policy_From_File_Req *RESTAPI::parse_create_policy_from_file_req(const std::string& data)
+RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_from_file_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1432,7 +1431,7 @@ RESTAPI::Create_Policy_From_File_Req *RESTAPI::parse_create_policy_from_file_req
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "CREATE_POLICY_FROM_CHILD");
+    child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_FROM_CHILD");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1441,7 +1440,7 @@ RESTAPI::Create_Policy_From_File_Req *RESTAPI::parse_create_policy_from_file_req
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
-    Create_Policy_From_File_Req *req = new Create_Policy_From_File_Req;
+    XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
     req->id = id->l;
     return req;
 }
@@ -1582,9 +1581,9 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Create_Policy_From_File_Req *RESTAPI::parse_uri_create_policy_from_file_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create_from_file_req(const std::string& uri)
 {
-    Create_Policy_From_File_Req *req = new Create_Policy_From_File_Req;
+    XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
 
     size_t start = 0;
     start = uri.find("=");
@@ -2024,7 +2023,7 @@ RESTAPI::Default_Values_For_Type_Res *RESTAPI::parse_default_values_for_type_res
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Create_Policy_From_File_Res *RESTAPI::parse_create_policy_from_file_res(const std::string& data)
+RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_from_file_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -2034,18 +2033,18 @@ RESTAPI::Create_Policy_From_File_Res *RESTAPI::parse_create_policy_from_file_res
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "CREATE_POLICY_FROM_FILE_RESULT");
+    child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_FROM_FILE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
     Container::Value *policy;
     policy = model->get_value_by_key(*child, "policy");
 
-    if (!policy || policy->type != Container::Value::CONTAINER_TYPE_STRING)
+    if (!policy || policy->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
-    Create_Policy_From_File_Res *res = new Create_Policy_From_File_Res;
-    res->policy = policy->s;
+    XSLT_Policy_Create_From_File_Res *res = new XSLT_Policy_Create_From_File_Res;
+    res->policy_id = policy->l;
 
     return res;
 }

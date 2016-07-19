@@ -17,7 +17,6 @@
 #include "SQLLiteReport.h"
 #include "Configuration.h"
 #include "Json.h"
-#include "Common/Schematron.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
 #include "Common/PluginsManager.h"
@@ -475,15 +474,8 @@ bool Core::policies_check_contents(const std::vector<std::string>& files,
         std::string tmp;
         if (!validate_xslt_policy_from_memory(files, options, policies_contents[i], tmp))
         {
-            std::string retain = tmp;
-            tmp = std::string();
-            if (!validate_schematron_policy_from_memory(files, policies_contents[i], tmp))
-            {
-                Out << retain;
-                valid = false;
-            }
-            else
-                Out << tmp;
+            valid = false;
+            Out << tmp;
         }
         else
         {
@@ -505,47 +497,16 @@ bool Core::policies_check_files(const std::vector<std::string>& files,
     for (size_t i = 0; i < policies_names.size(); ++i)
     {
         std::string tmp;
-        if (is_schematron_file(policies_names[i]))
+        if (!validate_xslt_policy_from_file(files, options, policies_names[i], tmp))
         {
-            if (!validate_schematron_policy_from_file(files, policies_names[i], tmp))
-            {
-                std::string retain = tmp;
-                tmp = std::string();
-                if (!validate_xslt_policy_from_file(files, options, policies_names[i], tmp))
-                {
-                    Out << policies_names[i] << retain;
-                    valid = false;
-                }
-                else
-                {
-                    Out << tmp;
-                    if (!policy_is_valid(tmp))
-                        valid = false;
-                }
-            }
-            else
-                Out << policies_names[i] << ": "  << tmp;
+            valid = false;
+            Out << policies_names[i] << ": "  << tmp;
         }
         else
         {
-            if (!validate_xslt_policy_from_file(files, options, policies_names[i], tmp))
-            {
-                std::string retain = tmp;
-                tmp = std::string();
-                if (!validate_schematron_policy_from_file(files, policies_names[i], tmp))
-                {
-                    Out << retain;
-                    valid = false;
-                }
-                else
-                    Out << policies_names[i] << ": "  << tmp;
-            }
-            else
-            {
-                if (!policy_is_valid(tmp))
-                    valid = false;
-                Out << tmp;
-            }
+            if (!policy_is_valid(tmp))
+                valid = false;
+            Out << tmp;
         }
     }
     return valid;
@@ -656,84 +617,6 @@ int Core::transform_with_xslt_text_memory(const std::string& report, std::string
 //***************************************************************************
 // Policy validation
 //***************************************************************************
-
-//---------------------------------------------------------------------------
-bool Core::validate_schematron_policy(const std::vector<std::string>& files, int pos, std::string& report)
-{
-    std::string policyFile;
-    xmlDocPtr doc = NULL;
-    Schema *S = new Schematron(!accepts_https());
-    bool valid = true;
-
-    if (pos >= 0)
-        doc = policies.create_doc(pos);
-
-    if (doc && S->register_schema_from_doc(doc))
-        valid = validation(files, S, report);
-    else
-    {
-        valid = false;
-
-        std::stringstream Out;
-        std::vector<std::string> errors = S->get_errors();
-
-        Out << "internal error for parsing Policy" << endl;
-        for (size_t i = 0; i < errors.size(); i++)
-            Out << "\t" << errors[i].c_str();
-        report = Out.str();
-    }
-    xmlFreeDoc(doc);
-    delete S;
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::validate_schematron_policy_from_file(const std::vector<std::string>& files, const std::string& policy, std::string& report)
-{
-    bool valid = true;
-    Schema *S = new Schematron(!accepts_https());
-
-    if (S->register_schema_from_file(policy.c_str()))
-        valid = validation(files, S, report);
-    else
-    {
-        valid = false;
-
-        std::stringstream Out;
-        std::vector<std::string> errors = S->get_errors();
-
-        Out << "internal error for parsing Policy" << endl;
-        for (size_t i = 0; i < errors.size(); i++)
-            Out << "\t" << errors[i].c_str();
-        report = Out.str();
-    }
-    delete S;
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::validate_schematron_policy_from_memory(const std::vector<std::string>& files, const std::string& memory, std::string& report)
-{
-    bool valid = true;
-    Schema *S = new Schematron(!accepts_https());
-
-    if (S->register_schema_from_memory(memory))
-        valid = validation(files, S, report);
-    else
-    {
-        valid = false;
-
-        std::stringstream Out;
-        std::vector<std::string> errors = S->get_errors();
-
-        Out << "internal error for parsing Policy" << endl;
-        for (size_t i = 0; i < errors.size(); i++)
-            Out << "\t" << errors[i].c_str();
-        report = Out.str();
-    }
-    delete S;
-    return valid;
-}
 
 //---------------------------------------------------------------------------
 bool Core::validate_xslt_policy(const std::vector<std::string>& files,
@@ -851,15 +734,6 @@ bool Core::validation(const std::vector<std::string>& files, Schema* S, std::str
         valid = ret == 0 ? true : false;
     }
     return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::is_schematron_file(const std::string& file)
-{
-    if (file.compare(file.length() - 4, 4, ".sch"))
-        return false;
-
-    return true;
 }
 
 //---------------------------------------------------------------------------
@@ -1898,7 +1772,7 @@ bool Core::dpfmanager_report_is_valid(const std::string& report)
 }
 
 //---------------------------------------------------------------------------
-int Core::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+int Core::policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
 {
     const std::map<std::string, std::list<std::string> >& types = Policies::existing_type;
 
@@ -1913,7 +1787,7 @@ int Core::get_fields_for_type(const std::string& type, std::vector<std::string>&
 }
 
 //---------------------------------------------------------------------------
-int Core::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+int Core::policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
 {
     std::map<std::string, std::map<std::string, std::vector<std::string> > > vs;
     if (get_generated_values_from_csv(vs) < 0)

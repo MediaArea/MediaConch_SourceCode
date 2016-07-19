@@ -16,7 +16,6 @@
 #include "Help.h"
 #include <ZenLib/ZtringList.h>
 #include <ZenLib/Dir.h>
-#include "Common/Policy.h"
 
 #if !defined(WINDOWS)
     #include <unistd.h>
@@ -172,14 +171,13 @@ namespace MediaConch
             return MediaConchLib::errorHttp_INTERNAL;
         }
 
-        size_t pos = MCL.create_policy_from_file(files[0]);
-        Policy *p = NULL;
-        std::string policy;
-        if (pos == (size_t)-1 || (p = MCL.get_policy(pos)) == NULL || p->dump_schema(policy) < 0)
-        {
-            error = std::string("Cannot create policy from: ") + files[0];
+        size_t pos = MCL.xslt_policy_create_from_file(files[0], error);
+        if (pos == (size_t)-1)
             return MediaConchLib::errorHttp_INTERNAL;
-        }
+
+        std::string policy;
+        if (MCL.policy_dump_to_memory(pos, policy, error))
+            return MediaConchLib::errorHttp_INTERNAL;
 
         MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);
         STRINGOUT(policy_mil);
@@ -402,7 +400,7 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
     {
-        return MCL.get_values_for_type_field(type, field, values);
+        return MCL.policy_get_values_for_type_field(type, field, values);
     }
 
 }

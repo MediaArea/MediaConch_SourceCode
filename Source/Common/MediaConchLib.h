@@ -25,7 +25,7 @@ namespace MediaConch {
 class Core;
 class DaemonClient;
 class Policy;
-class XsltRule;
+class XsltPolicyRule;
 class Http;
 
 #ifdef _WIN32
@@ -177,35 +177,32 @@ public:
 
     // Policies
     //   Create policy
-    size_t                      create_policy_from_file(const std::string& file);
-    int                         create_xslt_policy(std::string& err);
-    int                         duplicate_policy(int id, std::string& err);
-    int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
-    int                         create_policy_rule(int policy_id, std::string& err);
-    int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
-    int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
-    int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);
-    //   Policy saved?
-    bool                        is_policies_saved() const;
-    bool                        is_policy_saved(size_t pos) const;
+    int                          policy_duplicate(int id, std::string& err);
+    int                          policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
+    int                          xslt_policy_create(std::string& err);
+    int                          xslt_policy_create_from_file(const std::string& file, std::string& err);
     //   Import policy
-    int                         import_policy_from_file(const std::string& filename, std::string& err);
-    int                         import_policy_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy=false);
+    int                          policy_import_from_file(const std::string& filename, std::string& err);
+    int                          policy_import_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy=false);
     //   Policy helper
-    size_t                      get_policies_count() const;
-    Policy*                     get_policy(size_t pos);
-    bool                        policy_exists(const std::string& title);
-    int                         save_policy(size_t pos, std::string& err);
-    void                        add_policy(Policy* p);
-    int                         remove_policy(size_t pos, std::string& err);
-    void                        save_policies();
-    int                         export_policy(const char* filename, size_t pos, std::string& err);
-    void                        clear_policies();
-    const std::vector<Policy *>& get_policies() const;
+    size_t                       policy_get_policies_count() const;
+    Policy*                      policy_get(int pos);
+    bool                         policy_exists(const std::string& title);
+    int                          policy_save(size_t pos, std::string& err);
+    int                          policy_remove(size_t pos, std::string& err);
+    int                          policy_export(const char* filename, size_t pos, std::string& err);
+    int                          policy_dump_to_memory(int id, std::string& memory, std::string& err);
+    void                         policy_clear_policies();
+
+    // XSLT Policy Rule
+    int                         xslt_policy_rule_create(int policy_id, std::string& err);
+    int                         xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int                         xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err);
+    int                         xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err);
 
     //Generated Values
-    int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
-    int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
+    int                         policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int                         policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
     // Daemon
     void set_use_daemon(bool use);

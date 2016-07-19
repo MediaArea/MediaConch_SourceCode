@@ -177,7 +177,7 @@ void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& 
     {
         working_files_mutex.unlock();
 
-        Policy *p = mainwindow->get_policy((size_t)policy);
+        Policy *p = mainwindow->policy_get(policy);
         if (p)
         {
             std::vector<std::string> policies_names, policies_contents;
@@ -363,7 +363,7 @@ void WorkerFiles::update_unfinished_files()
             res.clear();
             if (report_kind == MediaConchLib::report_MediaConch && fr->policy >= 0)
             {
-                Policy *p = mainwindow->get_policy((size_t)fr->policy);
+                Policy *p = mainwindow->policy_get(fr->policy);
                 if (p)
                 {
                     std::string policy_content;
@@ -538,7 +538,7 @@ void WorkerFiles::fill_registered_files_from_db()
         full_file += fr->filename;
 
         //check if policy still exists
-        Policy *p = mainwindow->get_policy(fr->policy);
+        Policy *p = mainwindow->policy_get(fr->policy);
         if (!p)
             fr->policy = -1;
 

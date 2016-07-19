@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <libxml/xmlerror.h>
 
 namespace MediaConch {
 
@@ -34,10 +35,10 @@ public:
     virtual ~Schema();
 
     bool         register_schema_from_file(const char* filename);
-    virtual bool register_schema_from_memory(const std::string& schem) = 0;
-    virtual bool register_schema_from_doc(void* doc) = 0;
+    virtual bool register_schema_from_memory(const std::string& schem);
+    virtual bool register_schema_from_doc(void* doc);
 
-    virtual int  validate_xml(const std::string& xml, bool silent=true) = 0;
+    virtual int  validate_xml(const std::string& xml, bool silent=true);
     virtual int  validate_xml_from_file(const char* file, bool silent=true);
 
     std::string  get_schema() const { return schema; }
@@ -46,6 +47,10 @@ public:
 
     void set_options(const std::map<std::string, std::string>& opt) { options = opt; }
     const std::map<std::string, std::string>& get_options() const { return options; }
+
+    // Callbacks
+    static void  manage_generic_error(void *userData, const char* msg, ...);
+    static void  manage_error(void *userData, xmlErrorPtr err);
 
 protected:
     std::string                        schema;

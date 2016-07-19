@@ -8,6 +8,10 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.6
+
+* Change the name of create policy from file
+
 #### Version 1.5
 
 * Add the create policy from file command
@@ -39,7 +43,7 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.5
+Current API version: $API_VERSION = 1.6
 
 #### Command
 
@@ -52,7 +56,7 @@ Current API version: $API_VERSION = 1.5
 * Validate:                HTTP POST
 * File_From_Id:            HTTP POST
 * Default_Values_For_type: HTTP GET
-* Create_Policy_From_File: HTTP GET
+* Policy_Create_From_File: HTTP GET
 
 #### Analyze
 
@@ -273,10 +277,10 @@ Parameters:
 
 * values:            Array of values (String)
 
-#### Create_Policy_From_File
+#### Policy_Create_From_File
 
 URI format for the parameters.
-URL: /$API_VERSION/create_policy_from_file
+URL: /$API_VERSION/policy_create_from_file
 
 ##### Request
 

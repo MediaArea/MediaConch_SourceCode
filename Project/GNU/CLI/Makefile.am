@@ -10,12 +10,10 @@ mediaconch_SOURCES = \
     ../../../Source/Common/Core.cpp \
     ../../../Source/Common/DaemonClient.cpp \
     ../../../Source/Common/Schema.cpp \
-    ../../../Source/Common/Schematron.cpp \
     ../../../Source/Common/Xslt.cpp \
     ../../../Source/Common/JS_Tree.cpp \
     ../../../Source/Common/Policies.cpp \
     ../../../Source/Common/Policy.cpp \
-    ../../../Source/Common/SchematronPolicy.cpp \
     ../../../Source/Common/XsltPolicy.cpp \
     ../../../Source/Common/UnknownPolicy.cpp \
     ../../../Source/Common/Database.cpp \
