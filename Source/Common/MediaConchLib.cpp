@@ -408,9 +408,9 @@ int MediaConchLib::get_ui_database_path(std::string& path) const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_create(std::string& err)
+int MediaConchLib::xslt_policy_create(std::string& err, int parent_id)
 {
-    return core->policies.create_xslt_policy(err);
+    return core->policies.create_xslt_policy(err, parent_id);
 }
 
 //---------------------------------------------------------------------------

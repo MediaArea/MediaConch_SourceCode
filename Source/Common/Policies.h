@@ -36,6 +36,7 @@ using namespace MediaInfoNameSpace;
 namespace MediaConch {
 
 class Policy;
+class XsltPolicy;
 class XsltPolicyRule;
 class Core;
 
@@ -57,20 +58,19 @@ public:
     ~Policies();
 
     // Policy
-    int         create_xslt_policy(std::string& err);
+    int         create_xslt_policy(std::string& err, int parent_id);
     int         import_policy(const std::string& filename);
     int         import_policy_from_memory(const char* filename, const char* memory, int len, bool is_system_policy);
     int         duplicate_policy(int id, std::string& err);
     int         create_xslt_policy_from_file(const std::string& file, std::string& err);
 
-    int         save_policy(size_t index, std::string& err);
-    int         export_policy(const char* filename, size_t pos, std::string& err);
+    int         save_policy(int id, std::string& err);
+    int         export_policy(const char* filename, int id, std::string& err);
     int         dump_policy_to_memory(int pos, std::string& memory, std::string& err);
-    /* int         policy_dump_to_memory(int id, std::string& memory, std::string& err); */
 
     int         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
 
-    int         erase_policy(size_t index, std::string& err);
+    int         erase_policy(int index, std::string& err);
     void        clear_policies();
 
     size_t      get_policies_size() const { return policies.size(); };
@@ -83,7 +83,7 @@ public:
     int         delete_xslt_policy_rule(int policy_id, int rule_id, std::string& err);
 
     bool        policy_exists(const std::string& policy);
-    xmlDocPtr   create_doc(size_t pos);
+    xmlDocPtr   create_doc(int id);
 
     std::string get_error() const { return error; }
     //***************************************************************************
@@ -113,11 +113,11 @@ public:
     size_t get_an_id() { return policy_global_id++; }
 
 private:
-    Core                  *core;
-    std::string            error;
-    std::vector<Policy *>  policies;
+    Core                       *core;
+    std::string                 error;
+    std::map<size_t, Policy*>   policies;
 
-    static size_t          policy_global_id;
+    static size_t               policy_global_id;
     //mutex?
 
     Policies (const Policies&);
@@ -127,6 +127,7 @@ private:
     void find_save_name(const char* base, std::string& save_name);
     void find_new_policy_name(std::string& title);
     void remove_saved_policy(const std::string& saved_name);
+    XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);
 };
 
 }
