@@ -75,6 +75,7 @@ public:
 
     size_t      get_policies_size() const { return policies.size(); };
     Policy*     get_policy(int pos);
+    void        get_policies(std::vector<std::pair<size_t, std::string> >& ps);
 
     // Rule
     int         create_xslt_policy_rule(int policy_id, std::string& err);

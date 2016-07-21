@@ -184,9 +184,11 @@ public:
     //   Import policy
     int                          policy_import_from_file(const std::string& filename, std::string& err);
     int                          policy_import_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy=false);
+
     //   Policy helper
     size_t                       policy_get_policies_count() const;
     Policy*                      policy_get(int pos);
+    void                         policy_get_policies(std::vector<std::pair<size_t, std::string> >&);
     bool                         policy_exists(const std::string& title);
     int                          policy_save(size_t pos, std::string& err);
     int                          policy_remove(size_t pos, std::string& err);

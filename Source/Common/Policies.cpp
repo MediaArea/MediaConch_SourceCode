@@ -243,6 +243,26 @@ Policy* Policies::get_policy(int id)
     return it->second;
 }
 
+void Policies::get_policies(std::vector<std::pair<size_t, std::string> >& ps)
+{
+    std::map<size_t, Policy *>::iterator it = policies.begin();
+    for (; it != policies.end(); ++it)
+    {
+        if (it->second)
+            continue;
+
+        if (it->second->type != POLICY_XSLT)
+            ps.push_back(std::make_pair(it->first, it->second->name));
+        else
+        {
+            if (((XsltPolicyNode*)it->second)->kind == XSLT_POLICY_RULE)
+                ps.push_back(std::make_pair(it->first, it->second->name));
+            else if (((XsltPolicyNode*)it->second)->parent_id == (size_t)-1)
+                ps.push_back(std::make_pair(it->first, it->second->name));
+        }
+    }
+}
+
 int Policies::erase_policy(int id, std::string& err)
 {
     std::map<size_t, Policy *>::iterator it = policies.find(id);

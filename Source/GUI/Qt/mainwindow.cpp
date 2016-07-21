@@ -369,19 +369,9 @@ void MainWindow::clear_file_list()
 }
 
 //---------------------------------------------------------------------------
-const std::vector<Policy *>& MainWindow::get_all_policies() const
+void MainWindow::get_policies(std::vector<std::pair<size_t, std::string> >& policies)
 {
-    return std::vector<Policy *>();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::get_policies(std::vector<std::pair<QString, QString> >& policies)
-{
-    const std::vector<Policy *>& list = get_all_policies();
-
-    for (size_t i = 0; i < list.size(); ++i)
-        policies.push_back(std::make_pair(QString().fromUtf8(list[i]->filename.c_str(), list[i]->filename.length()),
-                                          QString().fromUtf8(list[i]->name.c_str(), list[i]->name.length())));
+    MCL.policy_get_policies(policies);
 }
 
 //---------------------------------------------------------------------------
@@ -802,12 +792,13 @@ Policy* MainWindow::policy_get(int pos)
 //---------------------------------------------------------------------------
 int MainWindow::get_policy_index_by_filename(const std::string& filename)
 {
-    const std::vector<Policy *>&  policies = get_all_policies();
+    std::vector<std::pair<size_t, std::string> > policies;
+    get_policies(policies);
 
     for (size_t i = 0; i < policies.size(); ++i)
     {
-        if (policies[i] && policies[i]->filename == filename)
-            return i;
+        if (policies[i].second == filename)
+            return policies[i].first;
     }
 
     return -1;

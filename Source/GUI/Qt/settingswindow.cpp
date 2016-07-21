@@ -148,7 +148,8 @@ void SettingsWindow::fill_html(QString& html)
 //---------------------------------------------------------------------------
 void SettingsWindow::create_policy_options(QString& policies)
 {
-    const std::vector<Policy *>& list = parent->get_all_policies();
+    std::vector<std::pair<size_t, std::string> > p;
+    parent->get_policies(p);
 
     QString system_policy;
     QString user_policy;
@@ -160,15 +161,15 @@ void SettingsWindow::create_policy_options(QString& policies)
     else
         selected_policy = parent->get_policy_index_by_filename(policy_str);
 
-    for (size_t i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < p.size(); ++i)
     {
-        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
+        if (p[i].second.length() && p[i].second.find(":/") == 0)
         {
             system_policy += QString("<option ");
             if ((int)i == selected_policy)
                 system_policy += QString("selected=\"selected\" ");
             system_policy += QString("value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->name.c_str(), list[i]->name.length()));
+                .arg(p[i].first).arg(QString().fromUtf8(p[i].second.c_str(), p[i].second.length()));
         }
         else
         {
@@ -176,7 +177,7 @@ void SettingsWindow::create_policy_options(QString& policies)
             if ((int)i == selected_policy)
                 user_policy += QString("selected=\"selected\" ");
             user_policy += QString("value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->name.c_str(), list[i]->name.length()));
+                .arg(p[i].first).arg(QString().fromUtf8(p[i].second.c_str(), p[i].second.length()));
         }
     }
 

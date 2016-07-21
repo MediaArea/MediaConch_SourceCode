@@ -495,6 +495,12 @@ Policy* MediaConchLib::policy_get(int pos)
 }
 
 //---------------------------------------------------------------------------
+void MediaConchLib::policy_get_policies(std::vector<std::pair<size_t, std::string> >& policies)
+{
+    core->policies.get_policies(policies);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::policy_save(size_t pos, std::string& err)
 {
     return core->policies.save_policy(pos, err);

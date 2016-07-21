@@ -147,8 +147,7 @@ public:
     int                         get_ui_database_path(std::string& path);
     void                        set_error_http(MediaConchLib::errorHttp code);
 
-    const std::vector<Policy *>&  get_all_policies() const;
-    void                          get_policies(std::vector<std::pair<QString, QString> >&);
+    void                          get_policies(std::vector<std::pair<size_t, std::string> >&);
     QString                       get_local_folder() const;
     void                          get_registered_files(std::map<std::string, FileRegistered>& files);
 
