@@ -857,16 +857,16 @@ namespace MediaConch
             if (!p)
                 continue;
 
-            QString type = QString().fromUtf8(p->name.c_str(), p->name.length());
+            QString name = QString().fromUtf8(p->name.c_str(), p->name.length());
             QString description = QString().fromUtf8(p->description.c_str(), p->description.length());
-            string_to_json(type);
+            string_to_json(name);
             string_to_json(description);
             if (p->is_system)
             {
                 if (has_system)
                     system += ",";
                 system += QString("{\"text\":\"%1\",\"type\":\"s\",\"data\":{\"policyId\":%2,\"description\":\"%3\", \"isEditable\": false}")
-                              .arg(type)
+                              .arg(name)
                               .arg(i)
                               .arg(description);
                 if (p->type==Policies::POLICY_XSLT)
@@ -884,7 +884,7 @@ namespace MediaConch
                 if (has_user)
                     user += ",";
                 user += QString("{\"text\":\"%1\",\"type\":\"u\",\"data\":{\"policyId\":%2,\"description\":\"%3\"")
-                            .arg(type)
+                            .arg(name)
                             .arg(i)
                             .arg(description);
                 if (p->type==Policies::POLICY_XSLT)

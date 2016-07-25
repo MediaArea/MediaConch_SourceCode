@@ -112,6 +112,8 @@ int Policies::import_policy(const std::string& filename)
 
     if (ret < 0)
         delete p;
+    else
+        policies[p->id] = p;
 
     return ret;
 }
@@ -147,6 +149,8 @@ int Policies::import_policy_from_memory(const char* filename, const char* buffer
 
     if (ret > 0)
         delete p;
+    else
+        policies[p->id] = p;
 
     p->is_system = is_system_policy;
     return ret;

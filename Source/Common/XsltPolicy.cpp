@@ -103,7 +103,6 @@ XsltPolicy::XsltPolicy(const XsltPolicy* s) : Policy(s), XsltPolicyNode(s)
 {
     type = Policies::POLICY_XSLT;
 
-    this->description = s->description;
     this->ope         = s->ope;
     this->parent_id   = s->parent_id;
     this->name        = this->node_name;
@@ -156,15 +155,10 @@ int XsltPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& filenam
     //try the root if the XML is badly formated
     if (run_over_siblings_nodes(root, true, NULL) < 0)
     {
-        XsltPolicyNode *node = new XsltPolicy(policies, no_https);
-        nodes.push_back(node);
-        if (run_over_siblings_nodes(root->children, false, (XsltPolicy*)node) < 0)
-        {
-            for (size_t i = 0; i < nodes.size(); ++i)
-                delete nodes[i];
-            nodes.clear();
-            return -1;
-        }
+        for (size_t i = 0; i < nodes.size(); ++i)
+            delete nodes[i];
+        nodes.clear();
+        return -1;
     }
 
     return 0;
@@ -209,11 +203,13 @@ int XsltPolicy::find_policy_node(xmlNodePtr node, bool is_root, XsltPolicy* curr
 //---------------------------------------------------------------------------
 int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* current)
 {
-    XsltPolicyNode *new_node = new XsltPolicy(policies, no_https);
+    XsltPolicyNode *new_node = NULL;
+
     if (is_root)
-        nodes.push_back(new_node);
+        new_node = this;
     else
     {
+        new_node = new XsltPolicy(policies, no_https);;
         new_node->parent_id = current->id;
         current->nodes.push_back(new_node);
     }
@@ -268,11 +264,13 @@ int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* c
 //---------------------------------------------------------------------------
 int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* current)
 {
-    XsltPolicyNode *new_node = new XsltPolicyRule;
+    XsltPolicyNode *new_node = NULL;
+
     if (is_root)
-        nodes.push_back(new_node);
+        new_node = this;
     else
     {
+        new_node = new XsltPolicyRule;
         new_node->parent_id = current->id;
         current->nodes.push_back(new_node);
     }
