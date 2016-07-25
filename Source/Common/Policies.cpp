@@ -284,8 +284,7 @@ int Policies::erase_policy(int id, std::string& err)
             }
         }
 
-        if (it->second->filename.length())
-            remove_saved_policy(it->second->filename);
+        remove_saved_policy(it->second);
 
         delete it->second;
     }
@@ -296,11 +295,11 @@ int Policies::erase_policy(int id, std::string& err)
 
 void Policies::clear_policies()
 {
-    std::map<size_t, Policy *>::iterator it = policies.begin();
+    std::map<size_t, Policy*>::iterator it = policies.begin();
     for (; it != policies.end(); ++it)
     {
         if (it->second)
-            remove_saved_policy(it->second->filename);
+            remove_saved_policy(it->second);
         delete it->second;
     }
     policies.clear();
@@ -413,30 +412,6 @@ int Policies::create_xslt_policy_rule(int policy_id, std::string& err)
     return (int)rule->id;
 }
 
-XsltPolicyRule* Policies::get_xslt_policy_rule(XsltPolicy* policy, int id)
-{
-    if (!policy)
-        return NULL;
-
-    for (size_t i = 0; i < policy->nodes.size(); ++i)
-    {
-        if (!policy->nodes[i])
-            continue;
-
-        if (policy->nodes[i]->kind == XSLT_POLICY_RULE && ((XsltPolicyRule*)policy->nodes[i])->id == id)
-            return (XsltPolicyRule*)policy->nodes[i];
-
-        if (policy->nodes[i]->kind == XSLT_POLICY_POLICY)
-        {
-            XsltPolicyRule* r = get_xslt_policy_rule((XsltPolicy*)policy->nodes[i], id);
-            if (r)
-                return r;
-        }
-    }
-
-    return NULL;
-}
-
 int Policies::edit_xslt_policy_rule(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
 {
     Policy *p = get_policy(policy_id);
@@ -454,25 +429,14 @@ int Policies::edit_xslt_policy_rule(int policy_id, int rule_id, const XsltPolicy
     }
 
     XsltPolicy *policy = (XsltPolicy*)p;
-    XsltPolicyRule *r = get_xslt_policy_rule(policy, rule_id);
+    XsltPolicyRule *r = policy->get_policy_rule(rule_id);
     if (!r)
     {
         err = "rule id is not existing";
         return -1;
     }
 
-    // if (rule_id < 0 || rule_id > (int)p->rules.size())
-    // {
-    //     err = "rule id is not existing";
-    //     return -1;
-    // }
-
-    // if (p->rules[rule_id])
-    //     *p->rules[rule_id] = *rule;
-    // else
-    //     p->rules[rule_id] = new XsltRule(*rule);
-
-    return 0;
+    return r->edit_policy_rule(rule, err);
 }
 
 int Policies::duplicate_xslt_policy_rule(int policy_id, int rule_id, std::string& err)
@@ -491,7 +455,7 @@ int Policies::duplicate_xslt_policy_rule(int policy_id, int rule_id, std::string
         return -1;
     }
     XsltPolicy *policy = (XsltPolicy*)p;
-    XsltPolicyRule *rule = get_xslt_policy_rule(policy, rule_id);
+    XsltPolicyRule *rule = policy->get_policy_rule(rule_id);
     if (!rule)
     {
         err = "rule id is not existing";
@@ -537,7 +501,7 @@ int Policies::delete_xslt_policy_rule(int policy_id, int rule_id, std::string& e
     }
 
     XsltPolicy *policy = (XsltPolicy*)p;
-    XsltPolicyRule *rule = get_xslt_policy_rule(policy, rule_id);
+    XsltPolicyRule *rule = policy->get_policy_rule(rule_id);
     if (!rule)
     {
         err = "rule id is not existing";
@@ -736,9 +700,15 @@ void Policies::find_new_policy_name(std::string& name)
     }
 }
 
-void Policies::remove_saved_policy(const std::string& saved_name)
+void Policies::remove_saved_policy(const Policy* policy)
 {
-    ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(saved_name);
+    if (!policy->filename.length())
+        return;
+
+    if (policy->type == POLICY_XSLT && ((const XsltPolicy*)policy)->parent_id == (size_t)-1)
+        return;
+
+    ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(policy->filename);
     if (!ZenLib::File::Exists(z_path))
         return;
 

@@ -76,6 +76,19 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule* r) : XsltPolicyNode(r)
     this->id         = rule_id++;
 }
 
+//---------------------------------------------------------------------------
+int XsltPolicyRule::edit_policy_rule(const XsltPolicyRule* rule, std::string&)
+{
+    this->node_name  = rule->node_name;
+    this->ope        = rule->ope;
+    this->track_type = rule->track_type;
+    this->field      = rule->field;
+    this->occurrence = rule->occurrence;
+    this->value      = rule->value;
+
+    return 0;
+}
+
 //***************************************************************************
 // XsltPolicy
 //***************************************************************************
@@ -588,6 +601,27 @@ int XsltPolicy::create_policy_from_mi(const std::string& report)
 
     xmlFreeDoc(doc);
     return 0;
+}
+
+XsltPolicyRule* XsltPolicy::get_policy_rule(int id)
+{
+    for (size_t i = 0; i < nodes.size(); ++i)
+    {
+        if (!nodes[i])
+            continue;
+
+        if (nodes[i]->kind == XSLT_POLICY_RULE && ((XsltPolicyRule*)nodes[i])->id == (size_t)id)
+            return (XsltPolicyRule*)nodes[i];
+
+        if (nodes[i]->kind == XSLT_POLICY_POLICY)
+        {
+            XsltPolicyRule* r = ((XsltPolicy*)nodes[i])->get_policy_rule(id);
+            if (r)
+                return r;
+        }
+    }
+
+    return NULL;
 }
 
 }

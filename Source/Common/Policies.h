@@ -127,7 +127,7 @@ private:
     //Helper
     void find_save_name(const char* base, std::string& save_name);
     void find_new_policy_name(std::string& title);
-    void remove_saved_policy(const std::string& saved_name);
+    void remove_saved_policy(const Policy* policy);
     XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);
 };
 

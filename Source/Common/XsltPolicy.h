@@ -77,6 +77,8 @@ public:
     virtual ~XsltPolicyRule();
     XsltPolicyRule(const XsltPolicyRule*);
 
+    int edit_policy_rule(const XsltPolicyRule* rule, std::string&);
+
     size_t        id;
     std::string   ope;
     std::string   track_type;
@@ -106,9 +108,10 @@ public:
     XsltPolicy(const XsltPolicy*);
 
     int create_policy_from_mi(const std::string& report);
+    XsltPolicyRule* get_policy_rule(int id);
 
     //TODO
-    std::vector<XsltPolicyNode *> nodes;
+    std::vector<XsltPolicyNode*>  nodes;
     std::string                   description;
     std::string                   ope;
 private:
@@ -118,6 +121,8 @@ private:
 
     xmlDocPtr create_doc();
     int       import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
+
+    int       edit_policy_rule(int rule_id, const XsltPolicyRule *rule, std::string& err);
 
     //parse
     int run_over_siblings_nodes(xmlNodePtr node, bool is_root, XsltPolicy* current);
