@@ -354,16 +354,17 @@ int Policies::create_xslt_policy_from_file(const std::string& file, std::string&
     std::bitset<MediaConchLib::report_Max> report_set;
     std::vector<std::string> files;
     std::map<std::string, std::string> options;
-    std::vector<std::string> policies_vec;
-    MediaConchLib::ReportRes result;
+    std::vector<size_t> policies_ids;
+    std::vector<std::string> policies_contents;
+    MediaConchLib::Checker_ReportRes result;
 
     report_set.set(MediaConchLib::report_MediaInfo);
     files.push_back(file);
 
-    core->get_report(report_set, MediaConchLib::format_Xml, files,
-                     policies_vec, policies_vec,
-                     options, &result,
-                     NULL, NULL);
+    core->checker_get_report(report_set, MediaConchLib::format_Xml, files,
+                             policies_ids, policies_contents,
+                             options, &result,
+                             NULL, NULL);
     if (!result.valid || !result.report.length())
     {
         err = "Implementation report not found";

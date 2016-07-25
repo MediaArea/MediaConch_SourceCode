@@ -180,14 +180,15 @@ void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& 
         Policy *p = mainwindow->policy_get(policy);
         if (p)
         {
-            std::vector<std::string> policies_names, policies_contents;
-            std::vector<MediaConchLib::ValidateRes*> res;
+            std::vector<size_t> policies_ids;
+            std::vector<std::string> policies_contents;
+            std::vector<MediaConchLib::Checker_ValidateRes*> res;
             std::string policy_content;
             p->dump_schema(policy_content);
             policies_contents.push_back(policy_content);
 
             if (mainwindow->validate(MediaConchLib::report_Max, file,
-                                     policies_names, policies_contents, res) == 0 && res.size() == 1)
+                                     policies_ids, policies_contents, res) == 0 && res.size() == 1)
             {
                 policy_valid = res[0]->valid;
                 for (size_t j = 0; j < res.size() ; ++j)
@@ -350,11 +351,12 @@ void WorkerFiles::update_unfinished_files()
         {
             fr->analyzed = true;
             fr->report_kind = report_kind;
-            std::vector<std::string> policies_names, policies_contents;
-            std::vector<MediaConchLib::ValidateRes*> res;
+            std::vector<size_t> policies_ids;
+            std::vector<std::string> policies_contents;
+            std::vector<MediaConchLib::Checker_ValidateRes*> res;
 
             if (mainwindow->validate(report_kind, files[i],
-                                     policies_names, policies_contents, res) == 0
+                                     policies_ids, policies_contents, res) == 0
                 && res.size() == 1)
                 fr->implementation_valid = res[0]->valid;
 
@@ -372,7 +374,7 @@ void WorkerFiles::update_unfinished_files()
                 }
 
                 if (p && mainwindow->validate(MediaConchLib::report_Max, files[i],
-                                              policies_names, policies_contents, res) == 0 && res.size() == 1)
+                                              policies_ids, policies_contents, res) == 0 && res.size() == 1)
                     fr->policy_valid = res[0]->valid;
                 for (size_t j = 0; j < res.size() ; ++j)
                     delete res[j];

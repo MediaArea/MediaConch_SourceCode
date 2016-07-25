@@ -63,26 +63,26 @@ namespace MediaConch
         int parse_other(const std::string& argument);
 
         // Request received callbacks
-        static int on_analyze_command(const RESTAPI::Analyze_Req* req,
-                                    RESTAPI::Analyze_Res& res, void *arg);
-        static int on_status_command(const RESTAPI::Status_Req* req,
-                                     RESTAPI::Status_Res& res, void *arg);
-        static int on_report_command(const RESTAPI::Report_Req* req,
-                                     RESTAPI::Report_Res& res, void *arg);
-        static int on_retry_command(const RESTAPI::Retry_Req* req,
-                                    RESTAPI::Retry_Res& res, void *arg);
-        static int on_clear_command(const RESTAPI::Clear_Req* req,
-                                    RESTAPI::Clear_Res& res, void *arg);
-        static int on_list_command(const RESTAPI::List_Req* req,
-                                   RESTAPI::List_Res& res, void *arg);
-        static int on_validate_command(const RESTAPI::Validate_Req* req,
-                                       RESTAPI::Validate_Res& res, void *arg);
-        static int on_file_from_id_command(const RESTAPI::File_From_Id_Req* req,
-                                           RESTAPI::File_From_Id_Res& res, void *arg);
+        static int on_analyze_command(const RESTAPI::Checker_Analyze_Req* req,
+                                      RESTAPI::Checker_Analyze_Res& res, void *arg);
+        static int on_status_command(const RESTAPI::Checker_Status_Req* req,
+                                     RESTAPI::Checker_Status_Res& res, void *arg);
+        static int on_report_command(const RESTAPI::Checker_Report_Req* req,
+                                     RESTAPI::Checker_Report_Res& res, void *arg);
+        static int on_retry_command(const RESTAPI::Checker_Retry_Req* req,
+                                    RESTAPI::Checker_Retry_Res& res, void *arg);
+        static int on_clear_command(const RESTAPI::Checker_Clear_Req* req,
+                                    RESTAPI::Checker_Clear_Res& res, void *arg);
+        static int on_list_command(const RESTAPI::Checker_List_Req* req,
+                                   RESTAPI::Checker_List_Res& res, void *arg);
+        static int on_validate_command(const RESTAPI::Checker_Validate_Req* req,
+                                       RESTAPI::Checker_Validate_Res& res, void *arg);
+        static int on_file_from_id_command(const RESTAPI::Checker_File_From_Id_Req* req,
+                                           RESTAPI::Checker_File_From_Id_Res& res, void *arg);
         static int on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void *arg);
-        static int on_create_policy_from_file_command(const RESTAPI::Create_Policy_From_File_Req* req,
-                                                      RESTAPI::Create_Policy_From_File_Res& res, void *arg);
+        static int on_xslt_policy_create_from_file_command(const RESTAPI::XSLT_Policy_Create_From_File_Req* req,
+                                                           RESTAPI::XSLT_Policy_Create_From_File_Res& res, void *arg);
 
         size_t get_first_free_slot();
         bool id_is_existing(int id) const;

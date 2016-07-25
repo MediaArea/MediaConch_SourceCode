@@ -34,7 +34,7 @@ namespace MediaConch
         void set_report_reset();
         int  set_format(MediaConchLib::format f);
         int  set_format(const std::string& f);
-        void add_policy(const std::string& policy);
+        int  add_policy(const std::string& filename);
         void set_display_file(const std::string& file);
         int  register_option(const std::string& opt);
         void set_use_daemon(bool use) { use_daemon = use; }

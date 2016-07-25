@@ -37,14 +37,14 @@ public:
     virtual int stop() = 0;
     virtual int finish() = 0;
 
-    int send_request(RESTAPI::Analyze_Req& req);
-    int send_request(RESTAPI::Status_Req& req);
-    int send_request(RESTAPI::Report_Req& req);
-    int send_request(RESTAPI::Retry_Req& req);
-    int send_request(RESTAPI::Clear_Req& req);
-    int send_request(RESTAPI::List_Req& req);
-    int send_request(RESTAPI::Validate_Req& req);
-    int send_request(RESTAPI::File_From_Id_Req& req);
+    int send_request(RESTAPI::Checker_Analyze_Req& req);
+    int send_request(RESTAPI::Checker_Status_Req& req);
+    int send_request(RESTAPI::Checker_Report_Req& req);
+    int send_request(RESTAPI::Checker_Retry_Req& req);
+    int send_request(RESTAPI::Checker_Clear_Req& req);
+    int send_request(RESTAPI::Checker_List_Req& req);
+    int send_request(RESTAPI::Checker_Validate_Req& req);
+    int send_request(RESTAPI::Checker_File_From_Id_Req& req);
     int send_request(RESTAPI::Default_Values_For_Type_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Create_From_File_Req& req);
 

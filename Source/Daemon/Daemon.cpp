@@ -91,7 +91,7 @@ namespace MediaConch
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
-        httpd->commands.policy_create_from_file_cb = on_policy_create_from_file_command;
+        httpd->commands.xslt_policy_create_from_file_cb = on_xslt_policy_create_from_file_command;
         return 0;
     }
 
@@ -416,14 +416,14 @@ namespace MediaConch
 #endif
 
     //--------------------------------------------------------------------------
-    int Daemon::on_analyze_command(const RESTAPI::Analyze_Req* req, RESTAPI::Analyze_Res& res, void *arg)
+    int Daemon::on_analyze_command(const RESTAPI::Checker_Analyze_Req* req, RESTAPI::Checker_Analyze_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received an analyze command: ";
+        std::clog << d->get_date() << "Daemon received a checker_analyze command: ";
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->args.size(); ++i)
         {
@@ -431,17 +431,17 @@ namespace MediaConch
             if (req->args[i].has_force_analyze)
                 force = req->args[i].force_analyze;
             bool registered = false;
-            int ret = d->MCL->analyze(req->args[i].file, registered, force);
+            int ret = d->MCL->checker_analyze(req->args[i].file, registered, force);
             if (ret < 0)
             {
-                RESTAPI::Analyze_Nok *nok = new RESTAPI::Analyze_Nok;
+                RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;
                 nok->id = req->args[i].id;
                 nok->error = RESTAPI::FILE_NOT_EXISTING;
                 res.nok.push_back(nok);
                 continue;
             }
 
-            RESTAPI::Analyze_Ok *ok = new RESTAPI::Analyze_Ok;
+            RESTAPI::Checker_Analyze_Ok *ok = new RESTAPI::Checker_Analyze_Ok;
             ok->inId = req->args[i].id;
             if (registered)
             {
@@ -466,26 +466,26 @@ namespace MediaConch
             ok->create = !registered;
             res.ok.push_back(ok);
         }
-        std::clog << d->get_date() << "Daemon send analyze result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker analyze result: " << res.to_str() << std::endl;
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_status_command(const RESTAPI::Status_Req* req, RESTAPI::Status_Res& res, void *arg)
+    int Daemon::on_status_command(const RESTAPI::Checker_Status_Req* req, RESTAPI::Checker_Status_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a status command: ";
+        std::clog << d->get_date() << "Daemon received a checker_status command: ";
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
             if (!d->id_is_existing(id))
             {
-                RESTAPI::Status_Nok *nok = new RESTAPI::Status_Nok;
+                RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::ID_NOT_EXISTING;
                 res.nok.push_back(nok);
@@ -494,17 +494,17 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
 
             if (is_done < 0)
             {
-                RESTAPI::Status_Nok *nok = new RESTAPI::Status_Nok;
+                RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::NO_REASON;
                 res.nok.push_back(nok);
                 continue;
             }
-            RESTAPI::Status_Ok *ok = new RESTAPI::Status_Ok;
+            RESTAPI::Checker_Status_Ok *ok = new RESTAPI::Checker_Status_Ok;
 
             ok->id = id;
             if (is_done == MediaConchLib::errorHttp_TRUE)
@@ -530,19 +530,19 @@ namespace MediaConch
             }
             res.ok.push_back(ok);
         }
-        std::clog << d->get_date() << "Daemon send status result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker status result: " << res.to_str() << std::endl;
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_report_command(const RESTAPI::Report_Req* req, RESTAPI::Report_Res& res, void *arg)
+    int Daemon::on_report_command(const RESTAPI::Checker_Report_Req* req, RESTAPI::Checker_Report_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a report command: ";
+        std::clog << d->get_date() << "Daemon received a checker_report command: ";
         std::clog << req->to_str() << std::endl;
         MediaConchLib::format format = MediaConchLib::format_Xml;
         if (req->display_name == MediaConchLib::display_text_name)
@@ -588,7 +588,7 @@ namespace MediaConch
             int id = req->ids[i];
             if (!d->id_is_existing(id))
             {
-                RESTAPI::Report_Nok *nok = new RESTAPI::Report_Nok;
+                RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::ID_NOT_EXISTING;
                 res.nok.push_back(nok);
@@ -597,10 +597,10 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
             if (is_done != MediaConchLib::errorHttp_TRUE)
             {
-                RESTAPI::Report_Nok *nok = new RESTAPI::Report_Nok;
+                RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::NOT_READY;
                 res.nok.push_back(nok);
@@ -620,10 +620,10 @@ namespace MediaConch
         options["verbosity"] = verbosity.str();
 
         // Output
-        MediaConchLib::ReportRes result;
-        d->MCL->get_report(report_set, format, files,
-                           req->policies_names, req->policies_contents,
-                           options, &result, display_name, display_content);
+        MediaConchLib::Checker_ReportRes result;
+        d->MCL->checker_get_report(report_set, format, files,
+                                   req->policies_ids, req->policies_contents,
+                                   options, &result, display_name, display_content);
         res.ok.report = result.report;
         if (result.has_valid)
         {
@@ -633,26 +633,26 @@ namespace MediaConch
         }
         res.ok.has_valid = has_valid;
         res.ok.valid = valid;
-        std::clog << d->get_date() << "Daemon send report result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker report result: " << res.to_str() << std::endl;
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_retry_command(const RESTAPI::Retry_Req* req, RESTAPI::Retry_Res& res, void *arg)
+    int Daemon::on_retry_command(const RESTAPI::Checker_Retry_Req* req, RESTAPI::Checker_Retry_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a retry command: ";
+        std::clog << d->get_date() << "Daemon received a checker retry command: ";
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
             if (!d->id_is_existing(id))
             {
-                RESTAPI::Retry_Nok *nok = new RESTAPI::Retry_Nok;
+                RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::ID_NOT_EXISTING;
                 res.nok.push_back(nok);
@@ -663,10 +663,10 @@ namespace MediaConch
             files.push_back(*d->current_files[id]);
             d->MCL->remove_report(files);
             bool registered = false;
-            int ret = d->MCL->analyze(*d->current_files[id], registered);
+            int ret = d->MCL->checker_analyze(*d->current_files[id], registered);
             if (ret < 0)
             {
-                RESTAPI::Retry_Nok *nok = new RESTAPI::Retry_Nok;
+                RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::FILE_NOT_EXISTING;
                 res.nok.push_back(nok);
@@ -674,26 +674,26 @@ namespace MediaConch
             }
             res.ok.push_back(id);
         }
-        std::clog << d->get_date() << "Daemon send retry result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker retry result: " << res.to_str() << std::endl;
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_clear_command(const RESTAPI::Clear_Req* req, RESTAPI::Clear_Res& res, void *arg)
+    int Daemon::on_clear_command(const RESTAPI::Checker_Clear_Req* req, RESTAPI::Checker_Clear_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a clear command: ";
+        std::clog << d->get_date() << "Daemon received a checker clear command: ";
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
             if (!d->id_is_existing(id))
             {
-                RESTAPI::Clear_Nok *nok = new RESTAPI::Clear_Nok;
+                RESTAPI::Checker_Clear_Nok *nok = new RESTAPI::Checker_Clear_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::ID_NOT_EXISTING;
                 res.nok.push_back(nok);
@@ -707,24 +707,24 @@ namespace MediaConch
             d->current_files[id] = NULL;
             res.ok.push_back(id);
         }
-        std::clog << d->get_date() << "Daemon send clear result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker clear result: " << res.to_str() << std::endl;
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_list_command(const RESTAPI::List_Req* req, RESTAPI::List_Res& res, void *arg)
+    int Daemon::on_list_command(const RESTAPI::Checker_List_Req* req, RESTAPI::Checker_List_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a list command" << std::endl;
+        std::clog << d->get_date() << "Daemon received a checker list command" << std::endl;
         std::vector<std::string> vec;
-        d->MCL->list(vec);
+        d->MCL->checker_list(vec);
         for (size_t i = 0; i < vec.size(); ++i)
         {
-            RESTAPI::List_File *file = new RESTAPI::List_File;
+            RESTAPI::Checker_List_File *file = new RESTAPI::Checker_List_File;
             file->file = vec[i];
 
             size_t id = 0;
@@ -737,19 +737,19 @@ namespace MediaConch
             file->id = id;
             res.files.push_back(file);
         }
-        std::clog << d->get_date() << "Daemon send list result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_validate_command(const RESTAPI::Validate_Req* req, RESTAPI::Validate_Res& res, void *arg)
+    int Daemon::on_validate_command(const RESTAPI::Checker_Validate_Req* req, RESTAPI::Checker_Validate_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a validate command: ";
+        std::clog << d->get_date() << "Daemon received a checker validate command: ";
         std::clog << req->to_str() << std::endl;
 
         MediaConchLib::report report;
@@ -771,7 +771,7 @@ namespace MediaConch
             int id = req->ids[i];
             if (!d->id_is_existing(id))
             {
-                RESTAPI::Validate_Nok *nok = new RESTAPI::Validate_Nok;
+                RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::ID_NOT_EXISTING;
                 res.nok.push_back(nok);
@@ -780,10 +780,10 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
             if (is_done != MediaConchLib::errorHttp_TRUE)
             {
-                RESTAPI::Validate_Nok *nok = new RESTAPI::Validate_Nok;
+                RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
                 nok->id = id;
                 nok->error = RESTAPI::NOT_READY;
                 res.nok.push_back(nok);
@@ -795,37 +795,37 @@ namespace MediaConch
             saved_ids[*d->current_files[id]] = id;
         }
 
-        std::vector<MediaConchLib::ValidateRes*> result;
-        if (d->MCL->validate(report, files, req->policies_names, req->policies_contents,
-                             result))
+        std::vector<MediaConchLib::Checker_ValidateRes*> result;
+        if (d->MCL->checker_validate(report, files, req->policies_ids, req->policies_contents,
+                                     result))
             return -1;
 
         for (size_t i = 0; i < result.size(); ++i)
         {
-            RESTAPI::Validate_Ok* ok = new RESTAPI::Validate_Ok;
+            RESTAPI::Checker_Validate_Ok* ok = new RESTAPI::Checker_Validate_Ok;
             ok->id = saved_ids[result[i]->file];
             ok->valid = result[i]->valid;
             res.ok.push_back(ok);
         }
-        std::clog << d->get_date() << "Daemon send validate result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker validate result: " << res.to_str() << std::endl;
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_file_from_id_command(const RESTAPI::File_From_Id_Req* req, RESTAPI::File_From_Id_Res& res, void *arg)
+    int Daemon::on_file_from_id_command(const RESTAPI::Checker_File_From_Id_Req* req, RESTAPI::Checker_File_From_Id_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a file_from_id command" << std::endl;
+        std::clog << d->get_date() << "Daemon received a checker_file_from_id command" << std::endl;
         std::clog << req->to_str() << std::endl;
 
         if (d->id_is_existing(req->id))
             res.file = *d->current_files[req->id];
 
-        std::clog << d->get_date() << "Daemon send file_from_id result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send checker_file_from_id result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -851,19 +851,19 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_create_from_file_command(const RESTAPI::Policy_Create_From_File_Req* req, RESTAPI::Policy_Create_From_File_Res& res, void *arg)
+    int Daemon::on_xslt_policy_create_from_file_command(const RESTAPI::XSLT_Policy_Create_From_File_Req* req, RESTAPI::XSLT_Policy_Create_From_File_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a policy_create_from_file command: ";
+        std::clog << d->get_date() << "Daemon received a xslt_policy_create_from_file command: ";
         std::clog << req->to_str() << std::endl;
 
         if (!d->id_is_existing(req->id))
         {
-            RESTAPI::Policy_Create_From_File_Nok *nok = new RESTAPI::Policy_Create_From_File_Nok;
+            RESTAPI::XSLT_Policy_Create_From_File_Nok *nok = new RESTAPI::XSLT_Policy_Create_From_File_Nok;
             nok->id = req->id;
             nok->error = RESTAPI::ID_NOT_EXISTING;
             res.nok = nok;
@@ -871,30 +871,20 @@ namespace MediaConch
         else
         {
             std::string err;
-            int pos = d->MCL->policy_create_from_file(*d->current_files[req->id], err);
+            int pos = d->MCL->xslt_policy_create_from_file(*d->current_files[req->id], err);
 
             if (pos == -1)
             {
-                RESTAPI::Policy_Create_From_File_Nok *nok = new RESTAPI::Policy_Create_From_File_Nok;
+                RESTAPI::XSLT_Policy_Create_From_File_Nok *nok = new RESTAPI::XSLT_Policy_Create_From_File_Nok;
                 nok->id = req->id;
                 nok->error = RESTAPI::NO_REASON;
                 res.nok = nok;
             }
             else
-            {
-                int pos = d->MCL->policy_dump_to_memory(pos, res.policy, err);
-
-                if (pos == -1)
-                {
-                    RESTAPI::Policy_Create_From_File_Nok *nok = new RESTAPI::Policy_Create_From_File_Nok;
-                    nok->id = req->id;
-                    nok->error = RESTAPI::NO_REASON;
-                    res.nok = nok;
-                }
-            }
+                res.policy_id = pos;
         }
 
-        std::clog << d->get_date() << "Daemon send policy_create_from_file result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send xslt_policy_create_from_file result: " << res.to_str() << std::endl;
         return 0;
     }
 

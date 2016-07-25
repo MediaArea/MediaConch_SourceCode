@@ -64,31 +64,31 @@ public:
 
 
 //---------------------------------------------------------------------------
-    bool        is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
+    bool        checker_is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
     int         open_file(const std::string& filename, bool& registered, const std::vector<std::string>& options, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
-    int         get_report(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
-                           const std::vector<std::string>& files,
-                           const std::vector<std::string>& policies_names,
-                           const std::vector<std::string>& policies_contents,
-                           const std::map<std::string, std::string>& options,
-                           MediaConchLib::ReportRes* res,
-                           const std::string* display_names = NULL,
-                           const std::string* display_contents = NULL);
+    int         checker_get_report(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
+                                   const std::vector<std::string>& files,
+                                   const std::vector<size_t>& policies_ids,
+                                   const std::vector<std::string>& policies_contents,
+                                   const std::map<std::string, std::string>& options,
+                                   MediaConchLib::Checker_ReportRes* res,
+                                   const std::string* display_names = NULL,
+                                   const std::string* display_contents = NULL);
     int         get_reports_output_JStree(const std::vector<std::string>& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         get_reports_output_Html(const std::vector<std::string>& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    int         policies_check(const std::vector<std::string>& files,
+    int         check_policies(const std::vector<std::string>& files,
                                const std::map<std::string, std::string>& options,
-                               MediaConchLib::ReportRes *result,
-                               const std::vector<std::string>* policies_names = NULL,
+                               MediaConchLib::Checker_ReportRes *result,
+                               const std::vector<size_t>* policies_ids = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
 
-    void        list(std::vector<std::string>& vec);
+    void        checker_list(std::vector<std::string>& vec);
 
-    int         validate(MediaConchLib::report report, const std::vector<std::string>& file,
-                         const std::vector<std::string>& policies_names,
+    int         checker_validate(MediaConchLib::report report, const std::vector<std::string>& file,
+                         const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
-                         std::vector<MediaConchLib::ValidateRes*>& result);
+                         std::vector<MediaConchLib::Checker_ValidateRes*>& result);
 
     // Apply display
     int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);
@@ -157,13 +157,13 @@ private:
     PluginsManager                    *pluginsManager;
     MediaConchLib::compression         compression_mode;
 
-    bool policies_check_contents(const std::vector<std::string>& files,
+    bool check_policies_contents(const std::vector<std::string>& files,
                                  const std::map<std::string, std::string>& options,
                                  const std::vector<std::string>& policies_contents,
                                  std::stringstream& Out);
-    bool policies_check_files(const std::vector<std::string>& files,
+    bool check_policies_files(const std::vector<std::string>& files,
                               const std::map<std::string, std::string>& options,
-                              const std::vector<std::string>& policies_names,
+                              const std::vector<size_t>& policies_ids,
                               std::stringstream& Out);
     bool policy_is_valid(const std::string& report);
     bool verapdf_report_is_valid(const std::string& report);
@@ -172,7 +172,7 @@ private:
     //Helper
     bool validation(const std::vector<std::string>& files, Schema* S, std::string& report);
     bool validate_xslt_policy(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, int pos, std::string& report);
-    bool validate_xslt_policy_from_memory(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& memory, std::string& report, bool is_implem=false);
+    bool validate_xslt_from_memory(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& memory, std::string& report, bool is_implem=false);
     bool validate_xslt_policy_from_file(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& policy, std::string& report);
     void unify_implementation_options(std::map<std::string, std::string>& opts);
 
@@ -192,7 +192,7 @@ private:
                             const std::map<std::string, std::string>& options,
                             MediaConchLib::format f,
                             std::bitset<MediaConchLib::report_Max> report_set,
-                            MediaConchLib::ReportRes* result);
+                            MediaConchLib::Checker_ReportRes* result);
     bool get_implementation_report(const std::vector<std::string>& file, const std::map<std::string, std::string>& options, std::string& report);
     bool get_verapdf_report(const std::string& file, std::string& report);
     bool get_dpfmanager_report(const std::string& file, std::string& report);

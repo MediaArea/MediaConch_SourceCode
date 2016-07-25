@@ -56,7 +56,7 @@ RESTAPI::~RESTAPI()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-RESTAPI::Analyze_Res::~Analyze_Res()
+RESTAPI::Checker_Analyze_Res::~Checker_Analyze_Res()
 {
     for (size_t i = 0; i < ok.size(); ++i)
         delete ok[i];
@@ -68,7 +68,7 @@ RESTAPI::Analyze_Res::~Analyze_Res()
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Status_Res::~Status_Res()
+RESTAPI::Checker_Status_Res::~Checker_Status_Res()
 {
     for (size_t i = 0; i < ok.size(); ++i)
         delete ok[i];
@@ -80,7 +80,7 @@ RESTAPI::Status_Res::~Status_Res()
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Report_Res::~Report_Res()
+RESTAPI::Checker_Report_Res::~Checker_Report_Res()
 {
     for (size_t i = 0; i < nok.size(); ++i)
         delete nok[i];
@@ -88,7 +88,7 @@ RESTAPI::Report_Res::~Report_Res()
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Retry_Res::~Retry_Res()
+RESTAPI::Checker_Retry_Res::~Checker_Retry_Res()
 {
     for (size_t i = 0; i < nok.size(); ++i)
         delete nok[i];
@@ -96,7 +96,7 @@ RESTAPI::Retry_Res::~Retry_Res()
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Clear_Res::~Clear_Res()
+RESTAPI::Checker_Clear_Res::~Checker_Clear_Res()
 {
     for (size_t i = 0; i < nok.size(); ++i)
         delete nok[i];
@@ -104,7 +104,7 @@ RESTAPI::Clear_Res::~Clear_Res()
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::List_Res::~List_Res()
+RESTAPI::Checker_List_Res::~Checker_List_Res()
 {
     for (size_t i = 0; i < files.size(); ++i)
         delete files[i];
@@ -112,7 +112,7 @@ RESTAPI::List_Res::~List_Res()
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Validate_Res::~Validate_Res()
+RESTAPI::Checker_Validate_Res::~Checker_Validate_Res()
 {
     for (size_t i = 0; i < ok.size(); ++i)
         delete ok[i];
@@ -127,7 +127,7 @@ RESTAPI::Validate_Res::~Validate_Res()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Analyze_Arg::to_str() const
+std::string RESTAPI::Checker_Analyze_Arg::to_str() const
 {
     std::stringstream out;
 
@@ -141,7 +141,7 @@ std::string RESTAPI::Analyze_Arg::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Analyze_Req::to_str() const
+std::string RESTAPI::Checker_Analyze_Req::to_str() const
 {
     std::stringstream out;
 
@@ -155,7 +155,7 @@ std::string RESTAPI::Analyze_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Status_Req::to_str() const
+std::string RESTAPI::Checker_Status_Req::to_str() const
 {
     std::stringstream out;
 
@@ -171,7 +171,7 @@ std::string RESTAPI::Status_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Report_Req::to_str() const
+std::string RESTAPI::Checker_Report_Req::to_str() const
 {
     std::stringstream out;
 
@@ -190,7 +190,7 @@ std::string RESTAPI::Report_Req::to_str() const
         RESTAPI api;
         out << api.get_Report_string(reports[i]);
     }
-    out << "], policies_names_size: [" << policies_names.size();
+    out << "], policies_ids_size: [" << policies_ids.size();
     out << "], policies_contents_size: [" << policies_contents.size();
     out << "], display_name: [" << display_name;
     out << "], display_content_length: [" << display_content.size();
@@ -202,7 +202,7 @@ std::string RESTAPI::Report_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Retry_Req::to_str() const
+std::string RESTAPI::Checker_Retry_Req::to_str() const
 {
     std::stringstream out;
 
@@ -218,7 +218,7 @@ std::string RESTAPI::Retry_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Clear_Req::to_str() const
+std::string RESTAPI::Checker_Clear_Req::to_str() const
 {
     std::stringstream out;
 
@@ -234,7 +234,7 @@ std::string RESTAPI::Clear_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Validate_Req::to_str() const
+std::string RESTAPI::Checker_Validate_Req::to_str() const
 {
     std::stringstream out;
 
@@ -247,13 +247,13 @@ std::string RESTAPI::Validate_Req::to_str() const
     }
     RESTAPI api;
     out << "], report: " << api.get_Report_string(report);
-    out << ", policies_names_size: [" << policies_names.size();
+    out << ", policies_ids_size: [" << policies_ids.size();
     out << "], policies_contents_size: [" << policies_contents.size() << "] ]";
     return out.str();
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::File_From_Id_Req::to_str() const
+std::string RESTAPI::Checker_File_From_Id_Req::to_str() const
 {
     std::stringstream out;
 
@@ -285,7 +285,7 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Req::to_str() const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Analyze_Ok::to_str() const
+std::string RESTAPI::Checker_Analyze_Ok::to_str() const
 {
     std::stringstream out;
 
@@ -296,7 +296,7 @@ std::string RESTAPI::Analyze_Ok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Analyze_Nok::to_str() const
+std::string RESTAPI::Checker_Analyze_Nok::to_str() const
 {
     std::stringstream out;
 
@@ -307,7 +307,7 @@ std::string RESTAPI::Analyze_Nok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Analyze_Res::to_str() const
+std::string RESTAPI::Checker_Analyze_Res::to_str() const
 {
     std::stringstream out;
 
@@ -330,7 +330,7 @@ std::string RESTAPI::Analyze_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Status_Ok::to_str() const
+std::string RESTAPI::Checker_Status_Ok::to_str() const
 {
     std::stringstream out;
 
@@ -348,7 +348,7 @@ std::string RESTAPI::Status_Ok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Status_Nok::to_str() const
+std::string RESTAPI::Checker_Status_Nok::to_str() const
 {
     std::stringstream out;
 
@@ -359,7 +359,7 @@ std::string RESTAPI::Status_Nok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Status_Res::to_str() const
+std::string RESTAPI::Checker_Status_Res::to_str() const
 {
     std::stringstream out;
 
@@ -382,7 +382,7 @@ std::string RESTAPI::Status_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Report_Ok::to_str() const
+std::string RESTAPI::Checker_Report_Ok::to_str() const
 {
     std::stringstream out;
 
@@ -394,7 +394,7 @@ std::string RESTAPI::Report_Ok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Report_Nok::to_str() const
+std::string RESTAPI::Checker_Report_Nok::to_str() const
 {
     std::stringstream out;
 
@@ -405,7 +405,7 @@ std::string RESTAPI::Report_Nok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Report_Res::to_str() const
+std::string RESTAPI::Checker_Report_Res::to_str() const
 {
     std::stringstream out;
 
@@ -421,7 +421,7 @@ std::string RESTAPI::Report_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Retry_Nok::to_str() const
+std::string RESTAPI::Checker_Retry_Nok::to_str() const
 {
     std::stringstream out;
 
@@ -432,7 +432,7 @@ std::string RESTAPI::Retry_Nok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Retry_Res::to_str() const
+std::string RESTAPI::Checker_Retry_Res::to_str() const
 {
     std::stringstream out;
 
@@ -455,7 +455,7 @@ std::string RESTAPI::Retry_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Clear_Nok::to_str() const
+std::string RESTAPI::Checker_Clear_Nok::to_str() const
 {
     std::stringstream out;
 
@@ -466,7 +466,7 @@ std::string RESTAPI::Clear_Nok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Clear_Res::to_str() const
+std::string RESTAPI::Checker_Clear_Res::to_str() const
 {
     std::stringstream out;
 
@@ -489,7 +489,7 @@ std::string RESTAPI::Clear_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::List_Res::to_str() const
+std::string RESTAPI::Checker_List_Res::to_str() const
 {
     std::stringstream out;
 
@@ -506,7 +506,7 @@ std::string RESTAPI::List_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Validate_Ok::to_str() const
+std::string RESTAPI::Checker_Validate_Ok::to_str() const
 {
     std::stringstream out;
 
@@ -515,7 +515,7 @@ std::string RESTAPI::Validate_Ok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Validate_Nok::to_str() const
+std::string RESTAPI::Checker_Validate_Nok::to_str() const
 {
     std::stringstream out;
 
@@ -526,7 +526,7 @@ std::string RESTAPI::Validate_Nok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Validate_Res::to_str() const
+std::string RESTAPI::Checker_Validate_Res::to_str() const
 {
     std::stringstream out;
 
@@ -549,7 +549,7 @@ std::string RESTAPI::Validate_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::File_From_Id_Res::to_str() const
+std::string RESTAPI::Checker_File_From_Id_Res::to_str() const
 {
     std::stringstream out;
 
@@ -601,7 +601,7 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Res::to_str() const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_analyze_req(Analyze_Req& req, std::string& data)
+int RESTAPI::serialize_analyze_req(Checker_Analyze_Req& req, std::string& data)
 {
     Container::Value v, child;
 
@@ -609,7 +609,7 @@ int RESTAPI::serialize_analyze_req(Analyze_Req& req, std::string& data)
     child.obj["args"] = serialize_analyze_args(req.args);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["ANALYZE"] = child;
+    v.obj["CHECKER_ANALYZE"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -621,7 +621,7 @@ int RESTAPI::serialize_analyze_req(Analyze_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_status_req(Status_Req& req, std::string& data)
+int RESTAPI::serialize_status_req(Checker_Status_Req& req, std::string& data)
 {
     //URI
     std::stringstream ss;
@@ -640,7 +640,7 @@ int RESTAPI::serialize_status_req(Status_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_report_req(Report_Req& req, std::string& data)
+int RESTAPI::serialize_report_req(Checker_Report_Req& req, std::string& data)
 {
     Container::Value v, child;
 
@@ -648,8 +648,8 @@ int RESTAPI::serialize_report_req(Report_Req& req, std::string& data)
     child.obj["ids"] = serialize_ids(req.ids);
     child.obj["reports"] = serialize_report_reports(req.reports);
 
-    if (req.policies_names.size())
-        child.obj["policies_names"] = serialize_report_arr_str(req.policies_names);
+    if (req.policies_ids.size())
+        child.obj["policies_ids"] = serialize_report_arr_long_u(req.policies_ids);
     if (req.policies_contents.size())
         child.obj["policies_contents"] = serialize_report_arr_str(req.policies_contents);
 
@@ -662,7 +662,7 @@ int RESTAPI::serialize_report_req(Report_Req& req, std::string& data)
         child.obj["verbosity"] = serialize_report_int(req.verbosity);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["REPORT"] = child;
+    v.obj["CHECKER_REPORT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -674,7 +674,7 @@ int RESTAPI::serialize_report_req(Report_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_retry_req(Retry_Req& req, std::string& data)
+int RESTAPI::serialize_retry_req(Checker_Retry_Req& req, std::string& data)
 {
     Container::Value v, child;
 
@@ -682,7 +682,7 @@ int RESTAPI::serialize_retry_req(Retry_Req& req, std::string& data)
     child.obj["ids"] = serialize_ids(req.ids);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["RETRY"] = child;
+    v.obj["CHECKER_RETRY"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -694,7 +694,7 @@ int RESTAPI::serialize_retry_req(Retry_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_clear_req(Clear_Req& req, std::string& data)
+int RESTAPI::serialize_clear_req(Checker_Clear_Req& req, std::string& data)
 {
     //URI
     std::stringstream ss;
@@ -713,14 +713,14 @@ int RESTAPI::serialize_clear_req(Clear_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_list_req(List_Req&, std::string& data)
+int RESTAPI::serialize_list_req(Checker_List_Req&, std::string& data)
 {
     data = std::string();
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_validate_req(Validate_Req& req, std::string& data)
+int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data)
 {
     Container::Value v, child, report;
 
@@ -731,13 +731,13 @@ int RESTAPI::serialize_validate_req(Validate_Req& req, std::string& data)
     report.s = get_Report_string(req.report);
     child.obj["report"] = report;
 
-    if (req.policies_names.size())
-        child.obj["policies_names"] = serialize_report_arr_str(req.policies_names);
+    if (req.policies_ids.size())
+        child.obj["policies_ids"] = serialize_report_arr_long_u(req.policies_ids);
     if (req.policies_contents.size())
         child.obj["policies_contents"] = serialize_report_arr_str(req.policies_contents);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["VALIDATE"] = child;
+    v.obj["CHECKER_VALIDATE"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -749,7 +749,7 @@ int RESTAPI::serialize_validate_req(Validate_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_file_from_id_req(File_From_Id_Req& req, std::string& data)
+int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::string& data)
 {
     Container::Value v, child, id;
 
@@ -761,7 +761,7 @@ int RESTAPI::serialize_file_from_id_req(File_From_Id_Req& req, std::string& data
     child.obj["id"] = id;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["FILE_FROM_ID"] = child;
+    v.obj["CHECKER_FILE_FROM_ID"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -818,7 +818,7 @@ int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_analyze_res(Analyze_Res& res, std::string& data)
+int RESTAPI::serialize_analyze_res(Checker_Analyze_Res& res, std::string& data)
 {
     Container::Value v, child, nok;
 
@@ -831,7 +831,7 @@ int RESTAPI::serialize_analyze_res(Analyze_Res& res, std::string& data)
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["ANALYZE_RESULT"] = child;
+    v.obj["CHECKER_ANALYZE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -842,7 +842,7 @@ int RESTAPI::serialize_analyze_res(Analyze_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_status_res(Status_Res& res, std::string& data)
+int RESTAPI::serialize_status_res(Checker_Status_Res& res, std::string& data)
 {
     Container::Value v, child, nok;
 
@@ -855,7 +855,7 @@ int RESTAPI::serialize_status_res(Status_Res& res, std::string& data)
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["STATUS_RESULT"] = child;
+    v.obj["CHECKER_STATUS_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -867,7 +867,7 @@ int RESTAPI::serialize_status_res(Status_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_report_res(Report_Res& res, std::string& data)
+int RESTAPI::serialize_report_res(Checker_Report_Res& res, std::string& data)
 {
     Container::Value v, child, nok;
 
@@ -880,7 +880,7 @@ int RESTAPI::serialize_report_res(Report_Res& res, std::string& data)
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["REPORT_RESULT"] = child;
+    v.obj["CHECKER_REPORT_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -892,7 +892,7 @@ int RESTAPI::serialize_report_res(Report_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_retry_res(Retry_Res& res, std::string& data)
+int RESTAPI::serialize_retry_res(Checker_Retry_Res& res, std::string& data)
 {
     Container::Value v, child, nok;
 
@@ -905,7 +905,7 @@ int RESTAPI::serialize_retry_res(Retry_Res& res, std::string& data)
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["RETRY_RESULT"] = child;
+    v.obj["CHECKER_RETRY_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -917,7 +917,7 @@ int RESTAPI::serialize_retry_res(Retry_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_clear_res(Clear_Res& res, std::string& data)
+int RESTAPI::serialize_clear_res(Checker_Clear_Res& res, std::string& data)
 {
     Container::Value v, child, nok;
 
@@ -930,7 +930,7 @@ int RESTAPI::serialize_clear_res(Clear_Res& res, std::string& data)
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["CLEAR_RESULT"] = child;
+    v.obj["CHECKER_CLEAR_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -942,7 +942,7 @@ int RESTAPI::serialize_clear_res(Clear_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_list_res(List_Res& res, std::string& data)
+int RESTAPI::serialize_list_res(Checker_List_Res& res, std::string& data)
 {
     Container::Value v, child, files;
 
@@ -954,7 +954,7 @@ int RESTAPI::serialize_list_res(List_Res& res, std::string& data)
     child.obj["files"] = files;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["LIST_RESULT"] = child;
+    v.obj["CHECKER_LIST_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -966,7 +966,7 @@ int RESTAPI::serialize_list_res(List_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_validate_res(Validate_Res& res, std::string& data)
+int RESTAPI::serialize_validate_res(Checker_Validate_Res& res, std::string& data)
 {
     Container::Value v, child, ok, nok;
 
@@ -983,7 +983,7 @@ int RESTAPI::serialize_validate_res(Validate_Res& res, std::string& data)
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["VALIDATE_RESULT"] = child;
+    v.obj["CHECKER_VALIDATE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -995,7 +995,7 @@ int RESTAPI::serialize_validate_res(Validate_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_file_from_id_res(File_From_Id_Res& res, std::string& data)
+int RESTAPI::serialize_file_from_id_res(Checker_File_From_Id_Res& res, std::string& data)
 {
     Container::Value v, child, file;
 
@@ -1006,7 +1006,7 @@ int RESTAPI::serialize_file_from_id_res(File_From_Id_Res& res, std::string& data
     child.obj["file"] = file;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["FILE_FROM_ID_RESULT"] = child;
+    v.obj["CHECKER_FILE_FROM_ID_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -1079,7 +1079,7 @@ int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-RESTAPI::Analyze_Req *RESTAPI::parse_analyze_req(const std::string& data)
+RESTAPI::Checker_Analyze_Req *RESTAPI::parse_analyze_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1089,10 +1089,10 @@ RESTAPI::Analyze_Req *RESTAPI::parse_analyze_req(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "ANALYZE");
+    child = model->get_value_by_key(v, "CHECKER_ANALYZE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
-    Analyze_Req *req = new Analyze_Req;
+    Checker_Analyze_Req *req = new Checker_Analyze_Req;
 
     Container::Value *args;
     args = model->get_value_by_key(*child, "args");
@@ -1106,7 +1106,7 @@ RESTAPI::Analyze_Req *RESTAPI::parse_analyze_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Status_Req *RESTAPI::parse_status_req(const std::string& data)
+RESTAPI::Checker_Status_Req *RESTAPI::parse_status_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1116,11 +1116,11 @@ RESTAPI::Status_Req *RESTAPI::parse_status_req(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "STATUS");
+    child = model->get_value_by_key(v, "CHECKER_STATUS");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Status_Req *req = new Status_Req;
+    Checker_Status_Req *req = new Checker_Status_Req;
 
     Container::Value *ids;
     ids = model->get_value_by_key(*child, "ids");
@@ -1146,7 +1146,7 @@ RESTAPI::Status_Req *RESTAPI::parse_status_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Report_Req *RESTAPI::parse_report_req(const std::string& data)
+RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1156,14 +1156,14 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "REPORT");
+    child = model->get_value_by_key(v, "CHECKER_REPORT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *reports, *policies_names, *policies_contents, *display_name, *display_content, *verbosity;
+    Container::Value *ids, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *verbosity;
     ids = model->get_value_by_key(*child, "ids");
     reports = model->get_value_by_key(*child, "reports");
-    policies_names = model->get_value_by_key(*child, "policies_names");
+    policies_ids = model->get_value_by_key(*child, "policies_ids");
     policies_contents = model->get_value_by_key(*child, "policies_contents");
     display_name = model->get_value_by_key(*child, "display_name");
     display_content = model->get_value_by_key(*child, "display_content");
@@ -1172,7 +1172,7 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(const std::string& data)
     if (!ids || !reports || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
 
-    Report_Req *req = new Report_Req;
+    Checker_Report_Req *req = new Checker_Report_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
     {
         Container::Value *id = &ids->array[i];
@@ -1190,11 +1190,11 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(const std::string& data)
         return NULL;
     }
 
-    if (policies_names && policies_names->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    if (policies_ids && policies_ids->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
-        for (size_t i = 0; i < policies_names->array.size(); ++i)
-            if (policies_names->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
-                req->policies_names.push_back(policies_names->array[i].s);
+        for (size_t i = 0; i < policies_ids->array.size(); ++i)
+            if (policies_ids->array[i].type == Container::Value::CONTAINER_TYPE_INTEGER)
+                req->policies_ids.push_back(policies_ids->array[i].l);
     }
     if (policies_contents && policies_contents->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
@@ -1217,7 +1217,7 @@ RESTAPI::Report_Req *RESTAPI::parse_report_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
+RESTAPI::Checker_Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1227,7 +1227,7 @@ RESTAPI::Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "RETRY");
+    child = model->get_value_by_key(v, "CHECKER_RETRY");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1237,7 +1237,7 @@ RESTAPI::Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
     if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
 
-    Retry_Req *req = new Retry_Req;
+    Checker_Retry_Req *req = new Checker_Retry_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
     {
         Container::Value *id = &ids->array[i];
@@ -1253,7 +1253,7 @@ RESTAPI::Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
+RESTAPI::Checker_Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1263,7 +1263,7 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "CLEAR");
+    child = model->get_value_by_key(v, "CHECKER_CLEAR");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1273,7 +1273,7 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
     if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
 
-    Clear_Req *req = new Clear_Req;
+    Checker_Clear_Req *req = new Checker_Clear_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
     {
         Container::Value *id = &ids->array[i];
@@ -1289,7 +1289,7 @@ RESTAPI::Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::List_Req *RESTAPI::parse_list_req(const std::string& data)
+RESTAPI::Checker_List_Req *RESTAPI::parse_list_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1299,15 +1299,15 @@ RESTAPI::List_Req *RESTAPI::parse_list_req(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "LIST");
+    child = model->get_value_by_key(v, "CHECKER_LIST");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
-    List_Req *req = new List_Req;
+    Checker_List_Req *req = new Checker_List_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Validate_Req *RESTAPI::parse_validate_req(const std::string& data)
+RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1317,20 +1317,20 @@ RESTAPI::Validate_Req *RESTAPI::parse_validate_req(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "VALIDATE");
+    child = model->get_value_by_key(v, "CHECKER_VALIDATE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *report, *policies_names, *policies_contents;
+    Container::Value *ids, *report, *policies_ids, *policies_contents;
     ids = model->get_value_by_key(*child, "ids");
     report = model->get_value_by_key(*child, "report");
-    policies_names = model->get_value_by_key(*child, "policies_names");
+    policies_ids = model->get_value_by_key(*child, "policies_ids");
     policies_contents = model->get_value_by_key(*child, "policies_contents");
 
     if (!ids || !report || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
 
-    Validate_Req *req = new Validate_Req;
+    Checker_Validate_Req *req = new Checker_Validate_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
     {
         Container::Value *id = &ids->array[i];
@@ -1350,11 +1350,11 @@ RESTAPI::Validate_Req *RESTAPI::parse_validate_req(const std::string& data)
     }
     req->report = string_to_Report(report->s);
 
-    if (policies_names && policies_names->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    if (policies_ids && policies_ids->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
-        for (size_t i = 0; i < policies_names->array.size(); ++i)
-            if (policies_names->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
-                req->policies_names.push_back(policies_names->array[i].s);
+        for (size_t i = 0; i < policies_ids->array.size(); ++i)
+            if (policies_ids->array[i].type == Container::Value::CONTAINER_TYPE_INTEGER)
+                req->policies_ids.push_back(policies_ids->array[i].l);
     }
     if (policies_contents && policies_contents->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
@@ -1367,7 +1367,7 @@ RESTAPI::Validate_Req *RESTAPI::parse_validate_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::string& data)
+RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1377,7 +1377,7 @@ RESTAPI::File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::string& da
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "FILE_FROM_ID");
+    child = model->get_value_by_key(v, "CHECKER_FILE_FROM_ID");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1386,7 +1386,7 @@ RESTAPI::File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::string& da
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
-    File_From_Id_Req *req = new File_From_Id_Req;
+    Checker_File_From_Id_Req *req = new Checker_File_From_Id_Req;
     req->id = id->l;
     return req;
 }
@@ -1446,17 +1446,17 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_fro
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
+RESTAPI::Checker_Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
 {
-    Analyze_Req *req = new Analyze_Req;
+    Checker_Analyze_Req *req = new Checker_Analyze_Req;
     //TODO
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Status_Req *RESTAPI::parse_uri_status_req(const std::string& uri)
+RESTAPI::Checker_Status_Req *RESTAPI::parse_uri_status_req(const std::string& uri)
 {
-    Status_Req *req = new Status_Req;
+    Checker_Status_Req *req = new Checker_Status_Req;
 
     size_t end, start = 0;
     while (1)
@@ -1483,25 +1483,25 @@ finish:
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Report_Req *RESTAPI::parse_uri_report_req(const std::string&)
+RESTAPI::Checker_Report_Req *RESTAPI::parse_uri_report_req(const std::string&)
 {
-    Report_Req *req = new Report_Req;
+    Checker_Report_Req *req = new Checker_Report_Req;
     //TODO
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Retry_Req *RESTAPI::parse_uri_retry_req(const std::string&)
+RESTAPI::Checker_Retry_Req *RESTAPI::parse_uri_retry_req(const std::string&)
 {
-    Retry_Req *req = new Retry_Req;
+    Checker_Retry_Req *req = new Checker_Retry_Req;
     //TODO
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
+RESTAPI::Checker_Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
 {
-    Clear_Req *req = new Clear_Req;
+    Checker_Clear_Req *req = new Checker_Clear_Req;
     size_t end, start = 0;
     while (1)
     {
@@ -1527,23 +1527,23 @@ finish:
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::List_Req *RESTAPI::parse_uri_list_req(const std::string&)
+RESTAPI::Checker_List_Req *RESTAPI::parse_uri_list_req(const std::string&)
 {
-    List_Req *req = new List_Req;
+    Checker_List_Req *req = new Checker_List_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Validate_Req *RESTAPI::parse_uri_validate_req(const std::string&)
+RESTAPI::Checker_Validate_Req *RESTAPI::parse_uri_validate_req(const std::string&)
 {
-    Validate_Req *req = new Validate_Req;
+    Checker_Validate_Req *req = new Checker_Validate_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::File_From_Id_Req *RESTAPI::parse_uri_file_from_id_req(const std::string&)
+RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_uri_file_from_id_req(const std::string&)
 {
-    File_From_Id_Req *req = new File_From_Id_Req;
+    Checker_File_From_Id_Req *req = new Checker_File_From_Id_Req;
     return req;
 }
 
@@ -1601,7 +1601,7 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
+RESTAPI::Checker_Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1611,7 +1611,7 @@ RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "ANALYZE_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_ANALYZE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1619,7 +1619,7 @@ RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
-    Analyze_Res *res = new Analyze_Res;
+    Checker_Analyze_Res *res = new Checker_Analyze_Res;
 
     if (ok && parse_analyze_ok(ok, res->ok))
     {
@@ -1638,7 +1638,7 @@ RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Analyze_Nok *tmp = new Analyze_Nok;
+        Checker_Analyze_Nok *tmp = new Checker_Analyze_Nok;
 
         if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
@@ -1651,7 +1651,7 @@ RESTAPI::Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Status_Res *RESTAPI::parse_status_res(const std::string& data)
+RESTAPI::Checker_Status_Res *RESTAPI::parse_status_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1661,7 +1661,7 @@ RESTAPI::Status_Res *RESTAPI::parse_status_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "STATUS_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_STATUS_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1669,7 +1669,7 @@ RESTAPI::Status_Res *RESTAPI::parse_status_res(const std::string& data)
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
-    Status_Res *res = new Status_Res;
+    Checker_Status_Res *res = new Checker_Status_Res;
     if (ok && parse_status_ok(ok, res->ok))
     {
         delete res;
@@ -1687,7 +1687,7 @@ RESTAPI::Status_Res *RESTAPI::parse_status_res(const std::string& data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Status_Nok *tmp = new Status_Nok;
+        Checker_Status_Nok *tmp = new Checker_Status_Nok;
 
         if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
@@ -1700,7 +1700,7 @@ RESTAPI::Status_Res *RESTAPI::parse_status_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Report_Res *RESTAPI::parse_report_res(const std::string& data)
+RESTAPI::Checker_Report_Res *RESTAPI::parse_report_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1710,7 +1710,7 @@ RESTAPI::Report_Res *RESTAPI::parse_report_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "REPORT_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_REPORT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1718,7 +1718,7 @@ RESTAPI::Report_Res *RESTAPI::parse_report_res(const std::string& data)
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
-    Report_Res *res = new Report_Res;
+    Checker_Report_Res *res = new Checker_Report_Res;
     if (ok && parse_report_ok(ok, res->ok))
     {
         delete res;
@@ -1736,7 +1736,7 @@ RESTAPI::Report_Res *RESTAPI::parse_report_res(const std::string& data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Report_Nok *tmp = new Report_Nok;
+        Checker_Report_Nok *tmp = new Checker_Report_Nok;
 
         if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
@@ -1749,7 +1749,7 @@ RESTAPI::Report_Res *RESTAPI::parse_report_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
+RESTAPI::Checker_Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1759,7 +1759,7 @@ RESTAPI::Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "RETRY_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_RETRY_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1767,7 +1767,7 @@ RESTAPI::Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
-    Retry_Res *res = new Retry_Res;
+    Checker_Retry_Res *res = new Checker_Retry_Res;
     if (ok)
     {
         if (ok->type != Container::Value::CONTAINER_TYPE_ARRAY)
@@ -1799,7 +1799,7 @@ RESTAPI::Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Retry_Nok *tmp = new Retry_Nok;
+        Checker_Retry_Nok *tmp = new Checker_Retry_Nok;
 
         if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
@@ -1812,7 +1812,7 @@ RESTAPI::Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
+RESTAPI::Checker_Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1822,7 +1822,7 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "CLEAR_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_CLEAR_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1830,7 +1830,7 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
-    Clear_Res *res = new Clear_Res;
+    Checker_Clear_Res *res = new Checker_Clear_Res;
     if (ok)
     {
         if (ok->type != Container::Value::CONTAINER_TYPE_ARRAY)
@@ -1862,7 +1862,7 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Clear_Nok *tmp = new Clear_Nok;
+        Checker_Clear_Nok *tmp = new Checker_Clear_Nok;
 
         if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
@@ -1875,7 +1875,7 @@ RESTAPI::Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::List_Res *RESTAPI::parse_list_res(const std::string& data)
+RESTAPI::Checker_List_Res *RESTAPI::parse_list_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1885,14 +1885,14 @@ RESTAPI::List_Res *RESTAPI::parse_list_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "LIST_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_LIST_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
     Container::Value *files;
     files = model->get_value_by_key(*child, "files");
 
-    List_Res *res = new List_Res;
+    Checker_List_Res *res = new Checker_List_Res;
     if (files->type != Container::Value::CONTAINER_TYPE_ARRAY)
     {
         delete res;
@@ -1901,7 +1901,7 @@ RESTAPI::List_Res *RESTAPI::parse_list_res(const std::string& data)
 
     for (size_t i = 0; i < files->array.size(); ++i)
     {
-        List_File *tmp = new List_File;
+        Checker_List_File *tmp = new Checker_List_File;
 
         if (parse_list_file(&files->array[i], tmp->file, tmp->id))
         {
@@ -1914,7 +1914,7 @@ RESTAPI::List_Res *RESTAPI::parse_list_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
+RESTAPI::Checker_Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1924,7 +1924,7 @@ RESTAPI::Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "VALIDATE_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_VALIDATE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1932,7 +1932,7 @@ RESTAPI::Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
-    Validate_Res *res = new Validate_Res;
+    Checker_Validate_Res *res = new Checker_Validate_Res;
     if (ok && parse_validate_ok(ok, res->ok))
     {
         delete res;
@@ -1950,7 +1950,7 @@ RESTAPI::Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Validate_Nok *tmp = new Validate_Nok;
+        Checker_Validate_Nok *tmp = new Checker_Validate_Nok;
 
         if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
         {
@@ -1963,7 +1963,7 @@ RESTAPI::Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::File_From_Id_Res *RESTAPI::parse_file_from_id_res(const std::string& data)
+RESTAPI::Checker_File_From_Id_Res *RESTAPI::parse_file_from_id_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -1973,7 +1973,7 @@ RESTAPI::File_From_Id_Res *RESTAPI::parse_file_from_id_res(const std::string& da
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "FILE_FROM_ID_RESULT");
+    child = model->get_value_by_key(v, "CHECKER_FILE_FROM_ID_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1983,7 +1983,7 @@ RESTAPI::File_From_Id_Res *RESTAPI::parse_file_from_id_res(const std::string& da
     if (!file || file->type != Container::Value::CONTAINER_TYPE_STRING)
         return NULL;
 
-    File_From_Id_Res *res = new File_From_Id_Res;
+    Checker_File_From_Id_Res *res = new Checker_File_From_Id_Res;
     res->file = file->s;
 
     return res;
@@ -2054,7 +2054,7 @@ RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_fro
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_analyze_args(std::vector<Analyze_Arg>& args)
+Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg>& args)
 {
     Container::Value args_val;
 
@@ -2165,6 +2165,24 @@ Container::Value RESTAPI::serialize_report_arr_str(const std::vector<std::string
 }
 
 //---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_report_arr_long_u(const std::vector<size_t>& reports)
+{
+    Container::Value arr_val;
+
+    arr_val.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        Container::Value str_val;
+
+        str_val.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        str_val.l = reports[i];
+        arr_val.array.push_back(str_val);
+    }
+
+    return arr_val;
+}
+
+//---------------------------------------------------------------------------
 Container::Value RESTAPI::serialize_generic_nok(int id, Reason error)
 {
     Container::Value nok, id_v, error_v;
@@ -2182,7 +2200,7 @@ Container::Value RESTAPI::serialize_generic_nok(int id, Reason error)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_analyze_oks(std::vector<Analyze_Ok*>& array)
+Container::Value RESTAPI::serialize_analyze_oks(std::vector<Checker_Analyze_Ok*>& array)
 {
     Container::Value ok;
 
@@ -2216,7 +2234,7 @@ Container::Value RESTAPI::serialize_analyze_oks(std::vector<Analyze_Ok*>& array)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok*>& array)
+Container::Value RESTAPI::serialize_status_oks(std::vector<Checker_Status_Ok*>& array)
 {
     Container::Value ok;
 
@@ -2260,7 +2278,7 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Status_Ok*>& array)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_ok(Report_Ok& obj)
+Container::Value RESTAPI::serialize_report_ok(Checker_Report_Ok& obj)
 {
     Container::Value ok;
 
@@ -2301,7 +2319,7 @@ Container::Value RESTAPI::serialize_list_file(const std::string& filename, int i
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_validate_ok(Validate_Ok* obj)
+Container::Value RESTAPI::serialize_validate_ok(Checker_Validate_Ok* obj)
 {
     Container::Value ok;
     ok.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2323,7 +2341,7 @@ Container::Value RESTAPI::serialize_validate_ok(Validate_Ok* obj)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& args)
+int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -2345,7 +2363,7 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Analyze_Arg>& ar
             id->type != Container::Value::CONTAINER_TYPE_INTEGER)
             return -1;
 
-        Analyze_Arg arg;
+        Checker_Analyze_Arg arg;
         arg.file = file->s;
         arg.id = id->l;
 
@@ -2401,7 +2419,7 @@ int RESTAPI::parse_generic_nok(Container::Value *v, int& id, Reason& error)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Analyze_Ok*>& oks)
+int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Checker_Analyze_Ok*>& oks)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -2423,7 +2441,7 @@ int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Analyze_Ok*>& oks
             !outId || outId->type != Container::Value::CONTAINER_TYPE_INTEGER)
             return -1;
 
-        Analyze_Ok *ok = new Analyze_Ok;
+        Checker_Analyze_Ok *ok = new Checker_Analyze_Ok;
         ok->inId = inId->l;
         ok->outId = outId->l;
         if (create && create->type == Container::Value::CONTAINER_TYPE_BOOL)
@@ -2436,7 +2454,7 @@ int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Analyze_Ok*>& oks
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& oks)
+int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*>& oks)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -2459,7 +2477,7 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& oks)
             !finished || finished->type != Container::Value::CONTAINER_TYPE_BOOL)
             return -1;
 
-        Status_Ok *ok = new Status_Ok;
+        Checker_Status_Ok *ok = new Checker_Status_Ok;
         ok->id = id->l;
         ok->finished = finished->b;
 
@@ -2493,7 +2511,7 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Status_Ok*>& oks)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_report_ok(Container::Value *v, Report_Ok& ok)
+int RESTAPI::parse_report_ok(Container::Value *v, Checker_Report_Ok& ok)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return -1;
@@ -2542,14 +2560,14 @@ int RESTAPI::parse_list_file(Container::Value *v, std::string& file, int& id)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_validate_ok(Container::Value *v, std::vector<Validate_Ok*>& oks)
+int RESTAPI::parse_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
 
     for (size_t i = 0; i < v->array.size(); ++i)
     {
-        Validate_Ok* ok = new Validate_Ok;
+        Checker_Validate_Ok* ok = new Checker_Validate_Ok;
         Container::Value *id, *valid;
         id = model->get_value_by_key(v->array[i], "id");
         valid = model->get_value_by_key(v->array[i], "valid");

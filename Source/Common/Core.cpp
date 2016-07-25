@@ -295,7 +295,7 @@ int Core::open_file(const std::string& file, bool& registered,
 }
 
 //---------------------------------------------------------------------------
-bool Core::is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
+bool Core::checker_is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
 {
     bool is_done = scheduler->element_is_finished(file, percent_done);
     int ret = MediaConchLib::errorHttp_NONE;
@@ -313,7 +313,7 @@ bool Core::is_done(const std::string& file, double& percent_done, MediaConchLib:
 }
 
 //---------------------------------------------------------------------------
-void Core::list(std::vector<std::string>& vec)
+void Core::checker_list(std::vector<std::string>& vec)
 {
     scheduler->get_elements(vec);
     db_mutex.Enter();
@@ -322,19 +322,19 @@ void Core::list(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
-                     const std::vector<std::string>& files,
-                     const std::vector<std::string>& policies_names,
-                     const std::vector<std::string>& policies_contents,
-                     const std::map<std::string, std::string>& options,
-                     MediaConchLib::ReportRes* result,
-                     const std::string* display_name,
-                     const std::string* display_content)
+int Core::checker_get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
+                             const std::vector<std::string>& files,
+                             const std::vector<size_t>& policies_ids,
+                             const std::vector<std::string>& policies_contents,
+                             const std::map<std::string, std::string>& options,
+                             MediaConchLib::Checker_ReportRes* result,
+                             const std::string* display_name,
+                             const std::string* display_content)
 {
-    if (!policies_names.empty() || !policies_contents.empty())
+    if (!policies_ids.empty() || !policies_contents.empty())
     {
-        if (policies_check(files, options, result,
-                           policies_names.size() ? &policies_names : NULL,
+        if (check_policies(files, options, result,
+                           policies_ids.size() ? &policies_ids : NULL,
                            policies_contents.size() ? &policies_contents : NULL) < 0)
             return -1;
         if (f == MediaConchLib::format_Text)
@@ -368,12 +368,12 @@ int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, M
 }
 
 //---------------------------------------------------------------------------
-int Core::validate(MediaConchLib::report report, const std::vector<std::string>& files,
-                   const std::vector<std::string>& policies_names,
-                   const std::vector<std::string>& policies_contents,
-                   std::vector<MediaConchLib::ValidateRes*>& result)
+int Core::checker_validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                           const std::vector<size_t>& policies_ids,
+                           const std::vector<std::string>& policies_contents,
+                           std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
-    if (report != MediaConchLib::report_MediaConch && !policies_names.size() && !policies_contents.size() &&
+    if (report != MediaConchLib::report_MediaConch && !policies_ids.size() && !policies_contents.size() &&
         report != MediaConchLib::report_MediaVeraPdf && report != MediaConchLib::report_MediaDpfManager)
         return -1;
 
@@ -383,7 +383,7 @@ int Core::validate(MediaConchLib::report report, const std::vector<std::string>&
         file_tmp.clear();
         file_tmp.push_back(files[i]);
 
-        MediaConchLib::ValidateRes* res = new MediaConchLib::ValidateRes;
+        MediaConchLib::Checker_ValidateRes* res = new MediaConchLib::Checker_ValidateRes;
         res->file = files[i];
         if (report == MediaConchLib::report_MediaConch)
         {
@@ -402,12 +402,12 @@ int Core::validate(MediaConchLib::report report, const std::vector<std::string>&
             std::string report;
             res->valid = get_dpfmanager_report(files[i], report);
         }
-        else if (!policies_names.empty() || !policies_contents.empty())
+        else if (!policies_ids.empty() || !policies_contents.empty())
         {
-            MediaConchLib::ReportRes tmp_res;
+            MediaConchLib::Checker_ReportRes tmp_res;
             std::map<std::string, std::string> options;
-            if (policies_check(file_tmp, options, &tmp_res,
-                               policies_names.size() ? &policies_names : NULL,
+            if (check_policies(file_tmp, options, &tmp_res,
+                               policies_ids.size() ? &policies_ids : NULL,
                                policies_contents.size() ? &policies_contents : NULL) < 0)
                 continue;
             res->valid = tmp_res.has_valid ? tmp_res.valid : true;
@@ -463,7 +463,7 @@ int Core::get_reports_output_JStree(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::policies_check_contents(const std::vector<std::string>& files,
+bool Core::check_policies_contents(const std::vector<std::string>& files,
                                    const std::map<std::string, std::string>& options,
                                    const std::vector<std::string>& policies_contents,
                                    std::stringstream& Out)
@@ -472,7 +472,7 @@ bool Core::policies_check_contents(const std::vector<std::string>& files,
     for (size_t i = 0; i < policies_contents.size(); ++i)
     {
         std::string tmp;
-        if (!validate_xslt_policy_from_memory(files, options, policies_contents[i], tmp))
+        if (!validate_xslt_from_memory(files, options, policies_contents[i], tmp))
         {
             valid = false;
             Out << tmp;
@@ -488,35 +488,36 @@ bool Core::policies_check_contents(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::policies_check_files(const std::vector<std::string>& files,
+bool Core::check_policies_files(const std::vector<std::string>& files,
                                 const std::map<std::string, std::string>& options,
-                                const std::vector<std::string>& policies_names,
+                                const std::vector<size_t>& policies_ids,
                                 std::stringstream& Out)
 {
     bool valid = true;
-    for (size_t i = 0; i < policies_names.size(); ++i)
+    for (size_t i = 0; i < policies_ids.size(); ++i)
     {
         std::string tmp;
-        if (!validate_xslt_policy_from_file(files, options, policies_names[i], tmp))
-        {
-            valid = false;
-            Out << policies_names[i] << ": "  << tmp;
-        }
-        else
-        {
-            if (!policy_is_valid(tmp))
-                valid = false;
-            Out << tmp;
-        }
+        //TODO
+        // if (!validate_xslt_policy_from_file(files, options, policies_ids[i], tmp))
+        // {
+        //     valid = false;
+        //     Out << policies_names[i] << ": "  << tmp;
+        // }
+        // else
+        // {
+        //     if (!policy_is_valid(tmp))
+        //         valid = false;
+        //     Out << tmp;
+        // }
     }
     return valid;
 }
 
 //---------------------------------------------------------------------------
-int Core::policies_check(const std::vector<std::string>& files,
+int Core::check_policies(const std::vector<std::string>& files,
                          const std::map<std::string, std::string>& options,
-                         MediaConchLib::ReportRes* result,
-                         const std::vector<std::string>* policies_names,
+                         MediaConchLib::Checker_ReportRes* result,
+                         const std::vector<size_t>* policies_ids,
                          const std::vector<std::string>* policies_contents)
 {
     if (!files.size())
@@ -525,7 +526,7 @@ int Core::policies_check(const std::vector<std::string>& files,
         return -1;
     }
 
-    if (!policies_names && !policies_contents)
+    if (!policies_ids && !policies_contents)
     {
         result->report = "No policy to apply";
         return -1;
@@ -533,11 +534,11 @@ int Core::policies_check(const std::vector<std::string>& files,
 
     std::stringstream Out;
     bool valid = true;
-    if (policies_names)
-        if (!policies_check_files(files, options, *policies_names, Out))
+    if (policies_ids)
+        if (!check_policies_files(files, options, *policies_ids, Out))
             valid = false;
     if (policies_contents)
-        if (!policies_check_contents(files, options, *policies_contents, Out))
+        if (!check_policies_contents(files, options, *policies_contents, Out))
             valid = false;
     result->report = Out.str();
     result->has_valid = true;
@@ -624,7 +625,6 @@ bool Core::validate_xslt_policy(const std::vector<std::string>& files,
                                 int pos, std::string& report)
 {
     bool valid = true;
-    std::string policyFile;
     xmlDocPtr doc = NULL;
     Schema *S = new Xslt(!accepts_https());
 
@@ -676,10 +676,10 @@ bool Core::validate_xslt_policy_from_file(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::validate_xslt_policy_from_memory(const std::vector<std::string>& files,
-                                            const std::map<std::string, std::string>& opts,
-                                            const std::string& memory, std::string& report,
-                                            bool is_implem)
+bool Core::validate_xslt_from_memory(const std::vector<std::string>& files,
+                                     const std::map<std::string, std::string>& opts,
+                                     const std::string& memory, std::string& report,
+                                     bool is_implem)
 {
     bool valid = true;
     Schema *S = new Xslt(!accepts_https());
@@ -1302,7 +1302,7 @@ void Core::get_reports_output(const std::vector<std::string>& files,
                               const std::map<std::string, std::string>& options,
                               MediaConchLib::format f,
                               std::bitset<MediaConchLib::report_Max> report_set,
-                              MediaConchLib::ReportRes* result)
+                              MediaConchLib::Checker_ReportRes* result)
 {
     if (f == MediaConchLib::format_MaXml)
     {
@@ -1393,7 +1393,7 @@ bool Core::get_implementation_report(const std::vector<std::string>& files,
 {
     std::string memory(implementation_report_xsl);
     std::string r;
-    bool valid = validate_xslt_policy_from_memory(files, options, memory, r, true);
+    bool valid = validate_xslt_from_memory(files, options, memory, r, true);
     report += r;
     return valid;
 }

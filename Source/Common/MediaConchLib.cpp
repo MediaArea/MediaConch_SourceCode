@@ -159,12 +159,12 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::analyze(const std::vector<std::string>& files, bool force_analyze)
+int MediaConchLib::checker_analyze(const std::vector<std::string>& files, bool force_analyze)
 {
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
     {
-        int ret = analyze(files[i], registered, force_analyze);
+        int ret = checker_analyze(files[i], registered, force_analyze);
         if (ret < 0)
             return ret;
     }
@@ -172,19 +172,19 @@ int MediaConchLib::analyze(const std::vector<std::string>& files, bool force_ana
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::analyze(const std::string& file, bool& registered, bool force_analyze)
+int MediaConchLib::checker_analyze(const std::string& file, bool& registered, bool force_analyze)
 {
     if (!file.length())
         return errorHttp_INVALID_DATA;
 
     // Send Options by API
     if (use_daemon)
-        return daemon_client->analyze(file, registered, force_analyze);
+        return daemon_client->checker_analyze(file, registered, force_analyze);
     return core->open_file(file, registered, Options, force_analyze);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::is_done(const std::vector<std::string>& files, double& percent)
+int MediaConchLib::checker_is_done(const std::vector<std::string>& files, double& percent)
 {
     if (!files.size())
         return errorHttp_TRUE;
@@ -196,7 +196,7 @@ int MediaConchLib::is_done(const std::vector<std::string>& files, double& percen
     for (size_t i = 0; i < files.size(); ++i)
     {
         double percent_done;
-        int ret = is_done(files[i], percent_done, report_kind);
+        int ret = checker_is_done(files[i], percent_done, report_kind);
         if (ret == errorHttp_TRUE)
             percent += unit_percent;
         else if (ret == errorHttp_NONE)
@@ -211,33 +211,33 @@ int MediaConchLib::is_done(const std::vector<std::string>& files, double& percen
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::is_done(const std::string& file, double& percent, MediaConchLib::report& report_kind)
+int MediaConchLib::checker_is_done(const std::string& file, double& percent, MediaConchLib::report& report_kind)
 {
     if (!file.length())
         return errorHttp_NONE;
 
     if (use_daemon)
-        return daemon_client->is_done(file, percent, report_kind);
-    return core->is_done(file, percent, report_kind);
+        return daemon_client->checker_is_done(file, percent, report_kind);
+    return core->checker_is_done(file, percent, report_kind);
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::list(std::vector<std::string>& vec)
+void MediaConchLib::checker_list(std::vector<std::string>& vec)
 {
     if (use_daemon)
     {
-        daemon_client->list(vec);
+        daemon_client->checker_list(vec);
         return;
     }
-    core->list(vec);
+    core->checker_list(vec);
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::file_from_id(int id, std::string& filename)
+void MediaConchLib::checker_file_from_id(int id, std::string& filename)
 {
     if (use_daemon)
     {
-        daemon_client->file_from_id(id, filename);
+        daemon_client->checker_file_from_id(id, filename);
         return;
     }
 }
@@ -247,48 +247,48 @@ void MediaConchLib::file_from_id(int id, std::string& filename)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::get_report(const std::bitset<report_Max>& report_set, format f,
-                              const std::vector<std::string>& files,
-                              const std::vector<std::string>& policies_names,
-                              const std::vector<std::string>& policies_contents,
-                              const std::map<std::string, std::string>& options,
-                              MediaConchLib::ReportRes* result,
-                              const std::string* display_name,
-                              const std::string* display_content)
+int MediaConchLib::checker_get_report(const std::bitset<report_Max>& report_set, format f,
+                                      const std::vector<std::string>& files,
+                                      const std::vector<size_t>& policies_ids,
+                                      const std::vector<std::string>& policies_contents,
+                                      const std::map<std::string, std::string>& options,
+                                      Checker_ReportRes* result,
+                                      const std::string* display_name,
+                                      const std::string* display_content)
 {
     if (!files.size())
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)
-        return daemon_client->get_report(report_set, f, files,
-                                         policies_names, policies_contents,
-                                         options, result,
-                                         display_name, display_content);
-    return core->get_report(report_set, f, files,
-                            policies_names, policies_contents,
-                            options, result,
-                            display_name, display_content);
+        return daemon_client->checker_get_report(report_set, f, files,
+                                                 policies_ids, policies_contents,
+                                                 options, result,
+                                                 display_name, display_content);
+    return core->checker_get_report(report_set, f, files,
+                                    policies_ids, policies_contents,
+                                    options, result,
+                                    display_name, display_content);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::validate(report report, const std::vector<std::string>& files,
-                            const std::vector<std::string>& policies_names,
-                            const std::vector<std::string>& policies_contents,
-                            std::vector<ValidateRes*>& result)
+int MediaConchLib::checker_validate(report report, const std::vector<std::string>& files,
+                                    const std::vector<size_t>& policies_ids,
+                                    const std::vector<std::string>& policies_contents,
+                                    std::vector<Checker_ValidateRes*>& result)
 {
     if (!files.size())
         return errorHttp_INVALID_DATA;
 
-    if (report != report_MediaConch && !policies_names.size() && !policies_contents.size() &&
+    if (report != report_MediaConch && !policies_ids.size() && !policies_contents.size() &&
         report != report_MediaVeraPdf && report != report_MediaDpfManager)
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)
-        return daemon_client->validate(report, files, policies_names, policies_contents,
-                                       result);
+        return daemon_client->checker_validate(report, files, policies_ids, policies_contents,
+                                               result);
 
-    return core->validate(report, files, policies_names, policies_contents,
-                          result);
+    return core->checker_validate(report, files, policies_ids, policies_contents,
+                                  result);
 }
 
 //---------------------------------------------------------------------------

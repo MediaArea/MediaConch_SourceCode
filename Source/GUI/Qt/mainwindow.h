@@ -79,13 +79,13 @@ public:
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
     int                         is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
     int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,
-                                         const std::vector<std::string>& policies_names,
+                                         const std::vector<size_t>& policies_ids,
                                          const std::vector<std::string>& policies_contents,
-                                         std::vector<MediaConchLib::ValidateRes*>& result);
+                                         std::vector<MediaConchLib::Checker_ValidateRes*>& result);
     int                         validate(MediaConchLib::report report, const std::string& file,
-                                         const std::vector<std::string>& policies_names,
+                                         const std::vector<size_t>& policies_ids,
                                          const std::vector<std::string>& policies_contents,
-                                         std::vector<MediaConchLib::ValidateRes*>& result);
+                                         std::vector<MediaConchLib::Checker_ValidateRes*>& result);
 
     QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);

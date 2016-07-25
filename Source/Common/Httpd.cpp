@@ -75,11 +75,11 @@ int Httpd::send_result()
             error = rest.get_error();                                     \
     }
 
-    MAKE_REQ_FUNC(analyze, Analyze)
-    MAKE_REQ_FUNC(report, Report)
-    MAKE_REQ_FUNC(validate, Validate)
-    MAKE_REQ_FUNC(retry, Retry)
-    MAKE_REQ_FUNC(file_from_id, File_From_Id)
+    MAKE_REQ_FUNC(analyze, Checker_Analyze)
+    MAKE_REQ_FUNC(report, Checker_Report)
+    MAKE_REQ_FUNC(validate, Checker_Validate)
+    MAKE_REQ_FUNC(retry, Checker_Retry)
+    MAKE_REQ_FUNC(file_from_id, Checker_File_From_Id)
 
 #undef MAKE_REQ_FUNC
 
@@ -93,9 +93,9 @@ int Httpd::send_result()
             error = rest.get_error();                                      \
     }
 
-    MAKE_URI_REQ_FUNC(status, Status)
-    MAKE_URI_REQ_FUNC(clear, Clear)
-    MAKE_URI_REQ_FUNC(list, List)
+    MAKE_URI_REQ_FUNC(status, Checker_Status)
+    MAKE_URI_REQ_FUNC(clear, Checker_Clear)
+    MAKE_URI_REQ_FUNC(list, Checker_List)
     MAKE_URI_REQ_FUNC(default_values_for_type, Default_Values_For_Type)
     MAKE_URI_REQ_FUNC(xslt_policy_create_from_file, XSLT_Policy_Create_From_File)
 

@@ -37,95 +37,95 @@ Http::~Http()
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Analyze_Req& req)
+int Http::send_request(RESTAPI::Checker_Analyze_Req& req)
 {
     std::string cmd;
     rest.serialize_analyze_req(req, cmd);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/"<< "analyze";
+    uri << "/" << RESTAPI::API_VERSION << "/checker_analyze";
     std::string uri_str = uri.str();
     return send_request_post(uri_str, cmd);
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Status_Req& req)
+int Http::send_request(RESTAPI::Checker_Status_Req& req)
 {
     std::string query;
     rest.serialize_status_req(req, query);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/"<< "status" << query;
+    uri << "/" << RESTAPI::API_VERSION << "/checker_status" << query;
 
     std::string uri_str = uri.str();
     return send_request_get(uri_str);
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Report_Req& req)
+int Http::send_request(RESTAPI::Checker_Report_Req& req)
 {
     std::string cmd;
     rest.serialize_report_req(req, cmd);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/"<< "report";
+    uri << "/" << RESTAPI::API_VERSION << "/checker_report";
     std::string uri_str = uri.str();
     return send_request_post(uri_str, cmd);
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Retry_Req& req)
+int Http::send_request(RESTAPI::Checker_Retry_Req& req)
 {
     std::string cmd;
     rest.serialize_retry_req(req, cmd);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/"<< "retry";
+    uri << "/" << RESTAPI::API_VERSION << "/checker_retry";
     std::string uri_str = uri.str();
     return send_request_put(uri_str, cmd);
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Clear_Req& req)
+int Http::send_request(RESTAPI::Checker_Clear_Req& req)
 {
     std::string query;
     rest.serialize_clear_req(req, query);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/" << "clear" << query;
+    uri << "/" << RESTAPI::API_VERSION << "/checker_clear" << query;
 
     std::string uri_str = uri.str();
     return send_request_delete(uri_str);
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::List_Req&)
+int Http::send_request(RESTAPI::Checker_List_Req&)
 {
     std::string uri("/");
-    uri +=  RESTAPI::API_VERSION + "/list";
+    uri +=  RESTAPI::API_VERSION + "/checker_list";
     return send_request_get(uri);
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Validate_Req& req)
+int Http::send_request(RESTAPI::Checker_Validate_Req& req)
 {
     std::string cmd;
     rest.serialize_validate_req(req, cmd);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/"<< "validate";
+    uri << "/" << RESTAPI::API_VERSION << "/checker_validate";
     std::string uri_str = uri.str();
     return send_request_post(uri_str, cmd);
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::File_From_Id_Req& req)
+int Http::send_request(RESTAPI::Checker_File_From_Id_Req& req)
 {
     std::string cmd;
     rest.serialize_file_from_id_req(req, cmd);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/file_from_id";
+    uri << "/" << RESTAPI::API_VERSION << "/checker_file_from_id";
     std::string uri_str = uri.str();
     return send_request_post(uri_str, cmd);
 }

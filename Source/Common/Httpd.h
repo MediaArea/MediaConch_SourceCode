@@ -42,19 +42,19 @@ public:
 #define REQ_FUNC(type) \
     void get_request(std::string& json, RESTAPI::type##_Req** req);
 
-    REQ_FUNC(Analyze);
-    REQ_FUNC(Report);
-    REQ_FUNC(Validate);
-    REQ_FUNC(File_From_Id);
-    REQ_FUNC(Retry);
+    REQ_FUNC(Checker_Analyze);
+    REQ_FUNC(Checker_Report);
+    REQ_FUNC(Checker_Validate);
+    REQ_FUNC(Checker_File_From_Id);
+    REQ_FUNC(Checker_Retry);
 #undef REQ_FUNC
 
 #define URI_REQ_FUNC(type) \
     void get_uri_request(std::string& uri, RESTAPI::type##_Req** req);
 
-    URI_REQ_FUNC(Status);
-    URI_REQ_FUNC(Clear);
-    URI_REQ_FUNC(List);
+    URI_REQ_FUNC(Checker_Status);
+    URI_REQ_FUNC(Checker_Clear);
+    URI_REQ_FUNC(Checker_List);
     URI_REQ_FUNC(Default_Values_For_Type);
     URI_REQ_FUNC(XSLT_Policy_Create_From_File);
 #undef URI_REQ_FUNC
@@ -70,22 +70,22 @@ public:
     std::string get_result() const;
 
     // On command received and parsed
-    typedef int (*on_analyze_command)(const RESTAPI::Analyze_Req* req,
-                                      RESTAPI::Analyze_Res& res, void* arg);
-    typedef int (*on_status_command)(const RESTAPI::Status_Req* req,
-                                     RESTAPI::Status_Res& res, void* arg);
-    typedef int (*on_report_command)(const RESTAPI::Report_Req* req,
-                                     RESTAPI::Report_Res& res, void* arg);
-    typedef int (*on_retry_command)(const RESTAPI::Retry_Req* req,
-                                    RESTAPI::Retry_Res& res, void* arg);
-    typedef int (*on_clear_command)(const RESTAPI::Clear_Req* req,
-                                    RESTAPI::Clear_Res& res, void* arg);
-    typedef int (*on_list_command)(const RESTAPI::List_Req* req,
-                                   RESTAPI::List_Res& res, void* arg);
-    typedef int (*on_validate_command)(const RESTAPI::Validate_Req* req,
-                                       RESTAPI::Validate_Res& res, void* arg);
-    typedef int (*on_file_from_id_command)(const RESTAPI::File_From_Id_Req* req,
-                                           RESTAPI::File_From_Id_Res& res, void* arg);
+    typedef int (*on_analyze_command)(const RESTAPI::Checker_Analyze_Req* req,
+                                      RESTAPI::Checker_Analyze_Res& res, void* arg);
+    typedef int (*on_status_command)(const RESTAPI::Checker_Status_Req* req,
+                                     RESTAPI::Checker_Status_Res& res, void* arg);
+    typedef int (*on_report_command)(const RESTAPI::Checker_Report_Req* req,
+                                     RESTAPI::Checker_Report_Res& res, void* arg);
+    typedef int (*on_retry_command)(const RESTAPI::Checker_Retry_Req* req,
+                                    RESTAPI::Checker_Retry_Res& res, void* arg);
+    typedef int (*on_clear_command)(const RESTAPI::Checker_Clear_Req* req,
+                                    RESTAPI::Checker_Clear_Res& res, void* arg);
+    typedef int (*on_list_command)(const RESTAPI::Checker_List_Req* req,
+                                   RESTAPI::Checker_List_Res& res, void* arg);
+    typedef int (*on_validate_command)(const RESTAPI::Checker_Validate_Req* req,
+                                       RESTAPI::Checker_Validate_Res& res, void* arg);
+    typedef int (*on_file_from_id_command)(const RESTAPI::Checker_File_From_Id_Req* req,
+                                           RESTAPI::Checker_File_From_Id_Res& res, void* arg);
     typedef int (*on_default_values_for_type_command)(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void* arg);
     typedef int (*on_xslt_policy_create_from_file_command)(const RESTAPI::XSLT_Policy_Create_From_File_Req* req,

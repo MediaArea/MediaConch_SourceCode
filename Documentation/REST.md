@@ -10,6 +10,8 @@ It is used above an HTTP connection.
 
 #### Version 1.6
 
+* Use id for policy instead of files
+* Make scope (checker) for all checker commands
 * Change the name of create policy from file
 
 #### Version 1.5
@@ -47,21 +49,21 @@ Current API version: $API_VERSION = 1.6
 
 #### Command
 
-* Analyze:                 HTTP POST
-* Status:                  HTTP GET
-* Report:                  HTTP POST
-* Retry:                   HTTP PUT
-* Clear:                   HTTP DELETE
-* List:                    HTTP GET
-* Validate:                HTTP POST
-* File_From_Id:            HTTP POST
+* Checker_Analyze:         HTTP POST
+* Checker_Status:          HTTP GET
+* Checker_Report:          HTTP POST
+* Checker_Retry:           HTTP PUT
+* Checker_Clear:           HTTP DELETE
+* Checker_List:            HTTP GET
+* Checker_Validate:        HTTP POST
+* Checker_File_From_Id:    HTTP POST
 * Default_Values_For_type: HTTP GET
 * Policy_Create_From_File: HTTP GET
 
-#### Analyze
+#### Checker_Analyze
 
 JSON format for the parameters.
-URL: /$API_VERSION/analyze
+URL: /$API_VERSION/checker_analyze
 
 ##### Request
 
@@ -88,10 +90,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Status
+#### Checker_Status
 
 URI format for the parameters.
-URL: /$API_VERSION/status
+URL: /$API_VERSION/checker_status
 
 ##### Request
 
@@ -117,10 +119,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Report
+#### Checker_Report
 
 JSON format for the parameters.
-URL: /$API_VERSION/report
+URL: /$API_VERSION/checker_report
 
 ##### Request
 
@@ -131,7 +133,7 @@ Parameters:
 - id:                Integer: id given by the Analyze command
 - reports:           Array of report kinds
 - policies_contents: Array of policies contents (Strings)
-- policies_names:    Array of policies names (Strings)
+- policies_ids:      Array of policies ids (Integer)
 - display_content:   String:  display content
 - display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE)
 - verbosity:         Integer: verbosity of the implementation report wanted, optionnal. Value between -1 and 5. If -1 or not given, takes the one from the server (since API v1.3)
@@ -150,10 +152,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Retry
+#### Checker_Retry
 
 JSON format for the parameters.
-URL: /$API_VERSION/retry
+URL: /$API_VERSION/checker_retry
 
 ##### Request
 
@@ -172,10 +174,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Clear
+#### Checker_Clear
 
 URI format for the parameters.
-URL: /$API_VERSION/clear
+URL: /$API_VERSION/checker_clear
 
 ##### Request
 
@@ -196,9 +198,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### List
+#### Checker_List
 
 No Parameter
+URL: /$API_VERSION/checker_list
 
 ##### Request
 
@@ -213,10 +216,10 @@ Parameters:
 - file:              Filename of the file
 - id:                Internal id, id to be used by other request
 
-#### Validate
+#### Checker_Validate
 
 JSON format for the parameters.
-URL: /$API_VERSION/validate
+URL: /$API_VERSION/checker_validate
 
 ##### Request
 
@@ -243,10 +246,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### File_From_Id
+#### Checker_File_From_Id
 
 JSON format for the parameters.
-URL: /$API_VERSION/file_from_id
+URL: /$API_VERSION/checker_file_from_id
 
 ##### Request
 

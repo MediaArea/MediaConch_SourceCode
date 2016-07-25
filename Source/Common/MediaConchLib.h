@@ -93,19 +93,19 @@ public:
         PLUGIN_MAX,
     };
 
-    struct ReportRes
+    struct Checker_ReportRes
     {
-        std::string       report;
-        bool              has_valid;
-        bool              valid;
-        ReportRes() :     has_valid(false), valid(true) {}
+        std::string           report;
+        bool                  has_valid;
+        bool                  valid;
+        Checker_ReportRes() : has_valid(false), valid(true) {}
     };
 
-    struct ValidateRes
+    struct Checker_ValidateRes
     {
-        std::string     file;
-        bool            valid;
-        ValidateRes() : valid(true) {}
+        std::string             file;
+        bool                    valid;
+        Checker_ValidateRes() : valid(true) {}
     };
 
     static const std::string display_xml_name;
@@ -122,27 +122,27 @@ public:
     int add_option(const std::string& option, std::string& report);
 
     // Analyze
-    int  analyze(const std::vector<std::string>& files, bool force_analyze = false);
-    int  analyze(const std::string& file, bool& registered, bool force_analyze = false);
-    int  is_done(const std::vector<std::string>& files, double& percent);
-    int  is_done(const std::string& file, double& percent, report& report_kind);
+    int  checker_analyze(const std::vector<std::string>& files, bool force_analyze = false);
+    int  checker_analyze(const std::string& file, bool& registered, bool force_analyze = false);
+    int  checker_is_done(const std::vector<std::string>& files, double& percent);
+    int  checker_is_done(const std::string& file, double& percent, report& report_kind);
 
-    void list(std::vector<std::string>& vec);
-    void file_from_id(int id, std::string& filename);
+    void checker_list(std::vector<std::string>& vec);
+    void checker_file_from_id(int id, std::string& filename);
 
     // Output
-    int  get_report(const std::bitset<report_Max>& Report, format f,
-                    const std::vector<std::string>& files,
-                    const std::vector<std::string>& policies_names,
-                    const std::vector<std::string>& policies_contents,
-                    const std::map<std::string, std::string>& options,
-                    MediaConchLib::ReportRes* result,
-                    const std::string* display_name = NULL,
-                    const std::string* display_content = NULL);
-    int validate(MediaConchLib::report report, const std::vector<std::string>& files,
-                 const std::vector<std::string>& policies_names,
-                 const std::vector<std::string>& policies_contents,
-                 std::vector<ValidateRes*>& result);
+    int  checker_get_report(const std::bitset<report_Max>& Report, format f,
+                            const std::vector<std::string>& files,
+                            const std::vector<size_t>& policies_ids,
+                            const std::vector<std::string>& policies_contents,
+                            const std::map<std::string, std::string>& options,
+                            Checker_ReportRes* result,
+                            const std::string* display_name = NULL,
+                            const std::string* display_content = NULL);
+    int checker_validate(MediaConchLib::report report, const std::vector<std::string>& files,
+                         const std::vector<size_t>& policies_ids,
+                         const std::vector<std::string>& policies_contents,
+                         std::vector<Checker_ValidateRes*>& result);
 
     //Clear
     int remove_report(const std::vector<std::string>& files);

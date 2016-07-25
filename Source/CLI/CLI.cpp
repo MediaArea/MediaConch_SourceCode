@@ -15,6 +15,7 @@
 #include "CommandLine_Parser.h"
 #include "Help.h"
 #include <ZenLib/ZtringList.h>
+#include <ZenLib/File.h>
 #include <ZenLib/Dir.h>
 
 #if !defined(WINDOWS)
@@ -112,7 +113,7 @@ namespace MediaConch
         for (size_t i = 0; i < files.size(); ++i)
         {
             bool registered = false;
-            int ret = MCL.analyze(files[i], registered, force_analyze);
+            int ret = MCL.checker_analyze(files[i], registered, force_analyze);
             if (ret < 0)
                 return ret;
 
@@ -147,12 +148,12 @@ namespace MediaConch
             return run_create_policy();
 
         //Output
-        MediaConchLib::ReportRes result;
-        std::vector<std::string> policies_contents;
+        MediaConchLib::Checker_ReportRes result;
+        std::vector<size_t> policies_ids;
         std::map<std::string, std::string> options;
         options["verbosity"] = MCL.get_implementation_verbosity();
-        MCL.get_report(report_set, format, file_to_report, policies,
-                       policies_contents, options, &result, &display_file, NULL);
+        MCL.checker_get_report(report_set, format, file_to_report, policies_ids,
+                               policies, options, &result, &display_file, NULL);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
         STRINGOUT(report_mi);
@@ -234,9 +235,31 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    void CLI::add_policy(const std::string& policy)
+    int CLI::add_policy(const std::string& filename)
     {
-        policies.push_back(policy);
+        ZenLib::Ztring z_filename = ZenLib::Ztring().From_UTF8(filename);
+        if (!ZenLib::File::Exists(z_filename))
+            return -1;
+
+        ZenLib::File file(z_filename);
+
+        ZenLib::int64u size = file.Size_Get();
+        if (size == (ZenLib::int64u)-1)
+            return -1;
+
+        ZenLib::int8u* Buffer = new ZenLib::int8u[size + 1];
+
+        size_t len = file.Read(Buffer, size);
+        Buffer[len] = '\0';
+
+        ZenLib::Ztring FromFile;
+        FromFile.From_UTF8((char*)Buffer);
+        if (FromFile.empty())
+            FromFile.From_Local((char*)Buffer);
+
+        file.Close();
+        policies.push_back(FromFile.To_UTF8());
+        return 0;
     }
 
     //--------------------------------------------------------------------------
@@ -305,7 +328,7 @@ namespace MediaConch
     {
         double percent_done = 0;
 
-        int ret = MCL.is_done(files[i], percent_done, report_kind);
+        int ret = MCL.checker_is_done(files[i], percent_done, report_kind);
         if (use_daemon && asynchronous)
         {
             if (ret == MediaConchLib::errorHttp_NONE)
@@ -328,7 +351,7 @@ namespace MediaConch
                 #else
                 usleep(500000);
                 #endif
-                ret = MCL.is_done(files[i], percent_done, report_kind);
+                ret = MCL.checker_is_done(files[i], percent_done, report_kind);
             }
         }
         return MediaConchLib::errorHttp_TRUE;
