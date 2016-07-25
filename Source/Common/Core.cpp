@@ -21,19 +21,19 @@
 #include "Common/JS_Tree.h"
 #include "Common/PluginsManager.h"
 #include "Common/PluginsConfig.h"
-#include "Common/ImplementationReportXsl.h"
+#include "Common/generated/ImplementationReportXsl.h"
 #if defined(_WIN32) || defined(WIN32)
-#include "Common/ImplementationReportDisplayTextXsl.h"
+#include "Common/generated/ImplementationReportDisplayTextXsl.h"
 #include <Shlobj.h>
 #else //defined(_WIN32) || defined(WIN32)
-#include "Common/ImplementationReportDisplayTextUnicodeXsl.h"
+#include "Common/generated/ImplementationReportDisplayTextUnicodeXsl.h"
 #endif //defined(_WIN32) || defined(WIN32)
-#include "Common/ImplementationReportDisplayHtmlXsl.h"
-#include "Common/ImplementationReportMatroskaSchema.h"
-#include "Common/MediaTraceDisplayTextXsl.h"
-#include "Common/MediaTraceDisplayHtmlXsl.h"
-#include "Common/MicroMediaTraceToMediaTraceXsl.h"
-#include "Common/GeneratedCSVVideos.h"
+#include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/generated/ImplementationReportMatroskaSchema.h"
+#include "Common/generated/MediaTraceDisplayTextXsl.h"
+#include "Common/generated/MediaTraceDisplayHtmlXsl.h"
+#include "Common/generated/MicroMediaTraceToMediaTraceXsl.h"
+#include "Common/generated/GeneratedCSVVideos.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"

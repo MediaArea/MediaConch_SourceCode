@@ -5,7 +5,7 @@
  */
 
 #include "Common/Policy.h"
-#include "Common/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "mainwindow.h"
 #include "checkerwindow.h"
 #include "ui_mainwindow.h"

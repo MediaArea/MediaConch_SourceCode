@@ -92,12 +92,13 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Policy.h \
                     ../../Source/Common/XsltPolicy.h \
                     ../../Source/Common/UnknownPolicy.h \
-                    ../../Source/Common/ImplementationReportXsl.h \
-                    ../../Source/Common/ImplementationReportDisplayTextUnicodeXsl.h \
-                    ../../Source/Common/ImplementationReportDisplayTextXsl.h \
-                    ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
-                    ../../Source/Common/ImplementationReportMatroskaSchema.h \
-                    ../../Source/Common/MicroMediaTraceToMediaTraceXsl.h \
+                    ../../Source/Common/generated/ImplementationReportXsl.h \
+                    ../../Source/Common/generated/ImplementationReportDisplayTextUnicodeXsl.h \
+                    ../../Source/Common/generated/ImplementationReportDisplayTextXsl.h \
+                    ../../Source/Common/generated/ImplementationReportDisplayHtmlXsl.h \
+                    ../../Source/Common/generated/ImplementationReportMatroskaSchema.h \
+                    ../../Source/Common/generated/MicroMediaTraceToMediaTraceXsl.h \
+                    ../../Source/Common/generated/PolicyTransformXml.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/DatabaseReport.h \
                     ../../Source/Common/NoDatabaseReport.h \
@@ -122,7 +123,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/PluginFormat.h \
                     ../../Source/Common/VeraPDF.h \
                     ../../Source/Common/DpfManager.h \
-                    ../../Source/Common/GeneratedCSVVideos.h \
+                    ../../Source/Common/generated/GeneratedCSVVideos.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \

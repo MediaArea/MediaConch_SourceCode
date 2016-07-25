@@ -12,7 +12,7 @@
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
-#include "Common/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
 #include "SQLLiteUi.h"
