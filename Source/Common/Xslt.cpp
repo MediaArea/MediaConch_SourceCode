@@ -49,6 +49,7 @@ Xslt::~Xslt()
         xmlFreeDoc(doc_ctx);
         doc_ctx = NULL;
     }
+    xsltCleanupGlobals();
 }
 
 //---------------------------------------------------------------------------
@@ -78,7 +79,8 @@ bool Xslt::register_schema_from_doc(void* data)
     xslt_ctx = xsltParseStylesheetDoc(doc_ctx);
 
     xsltSetGenericErrorFunc(NULL, NULL);
-    return xslt_ctx != NULL;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------

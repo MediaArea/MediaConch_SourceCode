@@ -488,8 +488,6 @@ int XsltPolicy::write_root_nodes_children(xmlDocPtr doc)
 xmlDocPtr XsltPolicy::create_doc()
 {
     xmlDocPtr doc = xmlNewDoc((const xmlChar *)"1.0");
-    xmlNodePtr root_node = xmlNewNode(NULL, (const xmlChar *)"stylesheet");
-    xmlDocSetRootElement(doc, root_node);
 
     if (write_root_nodes_children(doc) < 0)
     {
