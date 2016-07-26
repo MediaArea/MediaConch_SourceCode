@@ -39,6 +39,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QTimer>
+#include <QTextStream>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -146,19 +147,12 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
-    int policy_i = policy.toInt();
     int display_i = display.toInt();
     int verbosity_i = v.toInt();
 
     // Save configuration used
     std::string policy_str;
-    if (policy_i >= 0)
-    {
-        Policy *p = policy_get(policy_i);
-        if (p)
-            policy_str = p->filename;
-    }
-    uisettings.change_last_policy(policy_str);
+    uisettings.change_last_policy(policy.toUtf8().data());
     uisettings.change_last_display(displays_list[display_i].toUtf8().data());
     uisettings.change_last_verbosity(verbosity_i);
 
@@ -167,7 +161,7 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
         full_path += "/";
     full_path += filename;
 
-    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i, verbosity_i);
+    workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i);
     checkerView->add_file_to_result_table(full_path);
 }
 
@@ -308,7 +302,7 @@ void MainWindow::add_default_policy()
         QByteArray schema = file.readAll();
         std::string memory(schema.constData(), schema.length());
         std::string err;
-        MCL.policy_import_from_memory(list[i].absoluteFilePath().toUtf8().data(), memory, err, true);
+        MCL.policy_import(memory, err, list[i].absoluteFilePath().toUtf8().data(), true);
     }
 
     QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
@@ -323,7 +317,7 @@ void MainWindow::add_default_policy()
     for (int i = 0; i < list.count(); ++i)
     {
         std::string err;
-        MCL.policy_import_from_file(list[i].absoluteFilePath().toUtf8().data(), err);
+        policy_import(list[i].absoluteFilePath(), err);
     }
 }
 
@@ -506,43 +500,13 @@ void MainWindow::on_actionChooseSchema_triggered()
         return;
 
     std::string err;
-    if (MCL.policy_import_from_file(file.toUtf8().data(), err) < 0)
+    if (policy_import(file, err) < 0)
         set_msg_to_status_bar("Policy not valid");
 
     if (!ui->actionPolicies->isChecked())
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
     Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    // if (!is_all_policies_saved())
-    // {
-    //     QMessageBox msgBox(QMessageBox::Warning, tr("MediaConch"),
-    //                        tr("All policy changes not saved will be discarded?"),
-    //                        QMessageBox::Ok | QMessageBox::Save | QMessageBox::Cancel, this);
-    //     QString info("Policies not saved:");
-    //     for (size_t i = 0; i < MCL.policy_get_policies_count(); ++i)
-    //         if (!MCL.policy_get(i)->saved)
-    //         {
-    //             info += "\r\n\t";
-    //             info += QString().fromUtf8(MCL.policy_get(i)->name.c_str());
-    //         }
-
-    //     msgBox.setInformativeText(info);
-
-    //     int ret = msgBox.exec();
-    //     if (ret == QMessageBox::Save)
-    //         MCL.save_policies();
-    //     else if (ret == QMessageBox::Cancel)
-    //     {
-    //         event->ignore();
-    //         return;
-    //     }
-    // }
-    QMainWindow::closeEvent(event);
 }
 
 //***************************************************************************
@@ -730,9 +694,21 @@ void MainWindow::settings_selected()
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::policy_import(const QString& file, std::string& err)
+int MainWindow::policy_import(const QString& filename, std::string& err)
 {
-    return MCL.policy_import_from_file(file.toUtf8().data(), err);
+    QFile file(filename);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        err = "Policy cannot be read";
+        return -1;
+    }
+
+    QByteArray schema = file.readAll();
+    file.close();
+
+    std::string memory(schema.constData(), schema.length());
+    return MCL.policy_import(memory, err);
 }
 
 //---------------------------------------------------------------------------
@@ -778,30 +754,10 @@ int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, std::string&
 }
 
 //---------------------------------------------------------------------------
-bool MainWindow::policy_exists(const std::string& title)
-{
-    return MCL.policy_exists(title);
-}
-
-//---------------------------------------------------------------------------
 Policy* MainWindow::policy_get(int pos)
 {
-    return MCL.policy_get(pos);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::get_policy_index_by_filename(const std::string& filename)
-{
-    std::vector<std::pair<size_t, std::string> > policies;
-    get_policies(policies);
-
-    for (size_t i = 0; i < policies.size(); ++i)
-    {
-        if (policies[i].second == filename)
-            return policies[i].first;
-    }
-
-    return -1;
+    std::string err;
+    return MCL.policy_get(pos, err);
 }
 
 //---------------------------------------------------------------------------
@@ -826,7 +782,7 @@ int MainWindow::policy_export(int pos, std::string& err)
     if (!dir.exists())
         dir.mkpath(dir.absolutePath());
 
-    Policy* p = MCL.policy_get(pos);
+    Policy* p = MCL.policy_get(pos, err);
     if (!p)
         return -1;
 
@@ -842,7 +798,23 @@ int MainWindow::policy_export(int pos, std::string& err)
     QDir info(QFileInfo(filename).absoluteDir());
     set_last_save_policy_path(info.absolutePath().toUtf8().data());
 
-    return MCL.policy_export(filename.toUtf8().data(), pos, err);
+    std::string policy;
+    if (MCL.policy_dump(pos, policy, err))
+        return -1;
+
+    QFile file(filename);
+    if (file.open(QIODevice::ReadWrite))
+    {
+        QTextStream stream(&file);
+        stream << QString().fromUtf8(policy.c_str(), policy.length());
+    }
+    else
+    {
+        err = "Cannot write to file";
+        return -1;
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -867,7 +839,8 @@ int MainWindow::select_correct_policy()
 
     if (!policy.length())
         return -1;
-    return get_policy_index_by_filename(policy);
+
+    return QString().fromUtf8(policy.c_str(), policy.length()).toInt();
 }
 
 //---------------------------------------------------------------------------

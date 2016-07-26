@@ -109,10 +109,8 @@ public:
     int                         policy_import(const QString& file, std::string& err);
     int                         xslt_policy_create(std::string& err);
     int                         policy_duplicate(int id, std::string& err);
-    bool                        policy_exists(const std::string& title);
     int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
     Policy                     *policy_get(int pos);
-    int                         get_policy_index_by_filename(const std::string& filename);
     int                         policy_save(int pos, std::string& err);
     int                         policy_remove(int pos, std::string& err);
     int                         policy_export(int pos, std::string& err);
@@ -191,7 +189,6 @@ private:
     void                        createPoliciesView();
     void                        createDisplayView();
     void                        createSettingsView();
-    void                        closeEvent(QCloseEvent *event);
 
     void                        fill_display_used(int *policy_i,
                                                   std::string& display_name, std::string& display_content,

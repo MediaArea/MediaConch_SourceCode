@@ -182,18 +182,16 @@ public:
     int                          xslt_policy_create(std::string& err, int parent_id=-1);
     int                          xslt_policy_create_from_file(const std::string& file, std::string& err);
     //   Import policy
-    int                          policy_import_from_file(const std::string& filename, std::string& err);
-    int                          policy_import_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy=false);
+    int                          policy_import(const std::string& memory, std::string& err, const char* filename=NULL, bool is_system_policy=false);
 
     //   Policy helper
     size_t                       policy_get_policies_count() const;
-    Policy*                      policy_get(int pos);
+    Policy*                      policy_get(int pos, std::string& err);
+    int                          policy_get_name(int pos, std::string& name, std::string& err);
     void                         policy_get_policies(std::vector<std::pair<size_t, std::string> >&);
-    bool                         policy_exists(const std::string& title);
-    int                          policy_save(size_t pos, std::string& err);
-    int                          policy_remove(size_t pos, std::string& err);
-    int                          policy_export(const char* filename, size_t pos, std::string& err);
-    int                          policy_dump_to_memory(int id, std::string& memory, std::string& err);
+    int                          policy_save(int pos, std::string& err);
+    int                          policy_remove(int pos, std::string& err);
+    int                          policy_dump(int id, std::string& memory, std::string& err);
     void                         policy_clear_policies();
 
     // XSLT Policy Rule

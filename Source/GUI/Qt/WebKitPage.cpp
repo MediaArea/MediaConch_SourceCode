@@ -257,16 +257,8 @@ namespace MediaConch
         //policy
         if (policy == "-2")
             settings.change_default_policy("last");
-        else if (policy == "-1")
-            settings.change_default_policy("");
         else
-        {
-            Policy* p = mainwindow->policy_get(policy.toInt());
-            if (p)
-                settings.change_default_policy(p->filename);
-            else
-                settings.change_default_policy("");
-        }
+            settings.change_default_policy(policy.toUtf8().data());
 
         //display
         if (display == "-1")

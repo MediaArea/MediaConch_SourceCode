@@ -159,14 +159,14 @@ void SettingsWindow::create_policy_options(QString& policies)
     if (policy_str == "last")
         selected_policy = -2;
     else
-        selected_policy = parent->get_policy_index_by_filename(policy_str);
+        selected_policy = QString().fromUtf8(policy_str.c_str(), policy_str.length()).toInt();
 
     for (size_t i = 0; i < p.size(); ++i)
     {
         if (p[i].second.length() && p[i].second.find(":/") == 0)
         {
             system_policy += QString("<option ");
-            if ((int)i == selected_policy)
+            if ((int)p[i].first == selected_policy)
                 system_policy += QString("selected=\"selected\" ");
             system_policy += QString("value=\"%1\">%2</option>")
                 .arg(p[i].first).arg(QString().fromUtf8(p[i].second.c_str(), p[i].second.length()));
@@ -174,7 +174,7 @@ void SettingsWindow::create_policy_options(QString& policies)
         else
         {
             user_policy += QString("<option ");
-            if ((int)i == selected_policy)
+            if ((int)p[i].first == selected_policy)
                 user_policy += QString("selected=\"selected\" ");
             user_policy += QString("value=\"%1\">%2</option>")
                 .arg(p[i].first).arg(QString().fromUtf8(p[i].second.c_str(), p[i].second.length()));

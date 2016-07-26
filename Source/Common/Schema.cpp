@@ -98,7 +98,7 @@ int Schema::validate_xml_from_file(const char* filename, bool silent)
 }
 
 //---------------------------------------------------------------------------
-int Schema::validate_xml(const std::string& xml, bool silent)
+int Schema::validate_xml(const std::string&, bool)
 {
     return -1;
 }

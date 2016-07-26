@@ -58,9 +58,8 @@ public:
     ~Policies();
 
     // Policy
-    int         create_xslt_policy(std::string& err, int parent_id);
-    int         import_policy(const std::string& filename);
-    int         import_policy_from_memory(const char* filename, const char* memory, int len, bool is_system_policy);
+    int         create_xslt_policy(int parent_id, std::string& err);
+    int         import_policy_from_memory(const std::string& memory, std::string& err, const char* filename, bool is_system_policy);
     int         duplicate_policy(int id, std::string& err);
     int         create_xslt_policy_from_file(const std::string& file, std::string& err);
 
@@ -74,7 +73,7 @@ public:
     void        clear_policies();
 
     size_t      get_policies_size() const { return policies.size(); };
-    Policy*     get_policy(int pos);
+    Policy*     get_policy(int pos, std::string& err);
     void        get_policies(std::vector<std::pair<size_t, std::string> >& ps);
 
     int         policy_get_policies(const std::vector<size_t>* policies_ids,
