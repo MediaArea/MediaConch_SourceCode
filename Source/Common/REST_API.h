@@ -128,6 +128,10 @@ public:
         return NO_REASON;
     }
 
+//***************************************************************************
+// Checker
+//***************************************************************************
+
     // Analyze
     struct Checker_Analyze_Arg
     {
@@ -361,25 +365,264 @@ public:
         std::string              to_str() const;
     };
 
+//***************************************************************************
+// Policy
+//***************************************************************************
+
+    // Generic Policy error
+    struct Policy_Nok
+    {
+        std::string  error;
+        std::string  to_str() const;
+    };
+
+    struct XSLT_Policy_Create_Req
+    {
+        int         parent_id;
+        std::string to_str() const;
+    };
+
+    struct XSLT_Policy_Create_Res
+    {
+        XSLT_Policy_Create_Res() : nok(NULL) {}
+        int          id;
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Import_Req
+    {
+        std::string xml;
+        std::string to_str() const;
+    };
+
+    struct Policy_Import_Res
+    {
+        Policy_Import_Res() : nok(NULL) {}
+        int          id;
+        Policy_Nok  *nok;
+        std::string to_str() const;
+    };
+
+    struct Policy_Remove_Req
+    {
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct Policy_Remove_Res
+    {
+        Policy_Remove_Res() : nok(NULL) {}
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Dump_Req
+    {
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct Policy_Dump_Res
+    {
+        Policy_Dump_Res() : nok(NULL) {}
+        std::string  xml;
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Save_Req
+    {
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct Policy_Save_Res
+    {
+        Policy_Save_Res() : nok(NULL) {}
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Duplicate_Req
+    {
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct Policy_Duplicate_Res
+    {
+        Policy_Duplicate_Res() : nok(NULL) {}
+        int         id;
+        Policy_Nok *nok;
+        std::string to_str() const;
+    };
+
+    struct Policy_Change_Name_Req
+    {
+        int          id;
+        std::string  name;
+        std::string  description;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Change_Name_Res
+    {
+        Policy_Change_Name_Res() : nok(NULL) {}
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Get_Req
+    {
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct Policy_Get_Res
+    {
+        Policy_Get_Res() : nok(NULL) {}
+        //TODO
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Get_Name_Req
+    {
+        int          id;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Get_Name_Res
+    {
+        Policy_Get_Name_Res() : nok(NULL) {}
+        std::string  name;
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Get_Policies_Count_Req
+    {
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct Policy_Get_Policies_Count_Res
+    {
+        Policy_Get_Policies_Count_Res() : nok(NULL) {}
+        int          size;
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Clear_Policies_Req
+    {
+    };
+
+    struct Policy_Clear_Policies_Res
+    {
+        Policy_Clear_Policies_Res() : nok(NULL) {}
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Get_Policies_Req
+    {
+    };
+
+    struct Policy_Get_Policies_Ok
+    {
+        int         id;
+        std::string name;
+        std::string to_str() const;
+    };
+
+    struct Policy_Get_Policies_Res
+    {
+        Policy_Get_Policies_Res() : nok(NULL) {}
+        std::vector<Policy_Get_Policies_Ok*>  policies;
+        Policy_Nok                           *nok;
+        std::string                           to_str() const;
+    };
+
     struct XSLT_Policy_Create_From_File_Req
     {
-        int                          id;
-        std::string                  to_str() const;
+        int         id;
+        std::string to_str() const;
     };
 
     struct XSLT_Policy_Create_From_File_Nok
     {
-        int                          id;
-        Reason                       error;
-        std::string                  to_str() const;
+        int         id;
+        Reason      error;
+        std::string to_str() const;
     };
 
     struct XSLT_Policy_Create_From_File_Res
     {
-        XSLT_Policy_Create_From_File_Res() :  nok(NULL) {}
-        int                              policy_id;
-        XSLT_Policy_Create_From_File_Nok     *nok;
-        std::string                      to_str() const;
+        XSLT_Policy_Create_From_File_Res() : nok(NULL) {}
+        int                               policy_id;
+        XSLT_Policy_Create_From_File_Nok *nok;
+        std::string                       to_str() const;
+    };
+
+    // XSLT Rule
+    struct XSLT_Policy_Rule_Create_Req
+    {
+        int         policy_id;
+        std::string to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Create_Res
+    {
+        XSLT_Policy_Rule_Create_Res() : nok(NULL) {}
+        int          id;
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Edit_Req
+    {
+        int         policy_id;
+        int         id;
+        //RULE
+        std::string to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Edit_Res
+    {
+        XSLT_Policy_Rule_Edit_Res() : nok(NULL) {}
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Duplicate_Req
+    {
+        int         policy_id;
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Duplicate_Res
+    {
+        XSLT_Policy_Rule_Duplicate_Res() : nok(NULL) {}
+        int          id;
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Delete_Req
+    {
+        int         policy_id;
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Delete_Res
+    {
+        XSLT_Policy_Rule_Delete_Res() : nok(NULL) {}
+        Policy_Nok  *nok;
+        std::string  to_str() const;
     };
 
 public:
@@ -397,6 +640,7 @@ public:
     int serialize_validate_req(Checker_Validate_Req& req, std::string&);
     int serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::string&);
     int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&);
+
     int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&);
 
     // Serialize: Result
