@@ -77,6 +77,10 @@ public:
     Policy*     get_policy(int pos);
     void        get_policies(std::vector<std::pair<size_t, std::string> >& ps);
 
+    int         policy_get_policies(const std::vector<size_t>* policies_ids,
+                                    const std::vector<std::string>* policies_contents,
+                                    std::vector<std::string>& xslt_policies, std::string& err);
+
     // Rule
     int         create_xslt_policy_rule(int policy_id, std::string& err);
     int         edit_xslt_policy_rule(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
@@ -113,6 +117,13 @@ public:
 
     size_t get_an_id() { return policy_global_id++; }
 
+    //***************************************************************************
+    // HELPER
+    //***************************************************************************
+
+    int transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                   std::string& result);
+
 private:
     Core                       *core;
     std::string                 error;
@@ -129,6 +140,8 @@ private:
     void find_new_policy_name(std::string& title);
     void remove_saved_policy(const Policy* policy);
     XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);
+    int policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_policies, std::string& err);
+    int policy_get_policy_content(const std::string& policy, std::vector<std::string>& xslt_policies, std::string& err);
 };
 
 }

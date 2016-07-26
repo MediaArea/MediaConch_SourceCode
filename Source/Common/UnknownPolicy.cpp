@@ -50,16 +50,11 @@ int UnknownPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& file
         return -1;
     }
 
-    if (!filename.length())
-    {
-        error = "Cannot copy the policy";
-        return -1;
-    }
-
     this->filename = filename;
+
     std::string name = filename;
     size_t pos = name.rfind("/");
-    this->name = name.substr(pos == std::string::npos? 0 : pos + 1);
+    this->name = name.substr(pos == std::string::npos ? 0 : pos + 1);
 
     size_t ext_pos;
     if ((ext_pos = this->name.rfind(".")) != std::string::npos)
@@ -68,7 +63,7 @@ int UnknownPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& file
     if (!this->name.length())
         this->name = "Policy example";
 
-    if (filename.find(":/") == 0)
+    if (!filename.size() || filename.find(":/") == 0)
     {
         system_doc = xmlCopyDoc(doc, 1);
         return 0;

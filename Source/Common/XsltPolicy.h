@@ -107,8 +107,9 @@ public:
     // use by duplicate
     XsltPolicy(const XsltPolicy*);
 
-    int create_policy_from_mi(const std::string& report);
+    int             create_policy_from_mi(const std::string& report);
     XsltPolicyRule* get_policy_rule(int id);
+    int             get_final_xslt(std::string& xslt);
 
     //TODO
     std::vector<XsltPolicyNode*>  nodes;
@@ -140,6 +141,10 @@ private:
     int find_media_track_node(xmlNodePtr node);
     int find_media_track_node(xmlNodePtr node, std::string& type);
     int create_rule_from_media_track_child(xmlNodePtr node, const std::string& type);
+
+    // HELPER
+    void replace_xlmns_in_policy(std::string& xslt);
+    void replace_aliasxsl_in_policy(std::string& xslt);
 };
 
 }

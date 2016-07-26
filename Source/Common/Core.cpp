@@ -463,16 +463,16 @@ int Core::get_reports_output_JStree(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::check_policies_contents(const std::vector<std::string>& files,
-                                   const std::map<std::string, std::string>& options,
-                                   const std::vector<std::string>& policies_contents,
-                                   std::stringstream& Out)
+bool Core::check_policies_xslts(const std::vector<std::string>& files,
+                                const std::map<std::string, std::string>& options,
+                                const std::vector<std::string>& policies,
+                                std::stringstream& Out)
 {
     bool valid = true;
-    for (size_t i = 0; i < policies_contents.size(); ++i)
+    for (size_t i = 0; i < policies.size(); ++i)
     {
         std::string tmp;
-        if (!validate_xslt_from_memory(files, options, policies_contents[i], tmp))
+        if (!validate_xslt_from_memory(files, options, policies[i], tmp))
         {
             valid = false;
             Out << tmp;
@@ -483,32 +483,6 @@ bool Core::check_policies_contents(const std::vector<std::string>& files,
             if (!policy_is_valid(tmp))
                 valid = false;
         }
-    }
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::check_policies_files(const std::vector<std::string>& files,
-                                const std::map<std::string, std::string>& options,
-                                const std::vector<size_t>& policies_ids,
-                                std::stringstream& Out)
-{
-    bool valid = true;
-    for (size_t i = 0; i < policies_ids.size(); ++i)
-    {
-        std::string tmp;
-        //TODO
-        // if (!validate_xslt_policy_from_file(files, options, policies_ids[i], tmp))
-        // {
-        //     valid = false;
-        //     Out << policies_names[i] << ": "  << tmp;
-        // }
-        // else
-        // {
-        //     if (!policy_is_valid(tmp))
-        //         valid = false;
-        //     Out << tmp;
-        // }
     }
     return valid;
 }
@@ -526,23 +500,17 @@ int Core::check_policies(const std::vector<std::string>& files,
         return -1;
     }
 
-    if (!policies_ids && !policies_contents)
-    {
-        result->report = "No policy to apply";
+    std::vector<std::string> policies;
+    if (this->policies.policy_get_policies(policies_ids, policies_contents, policies, result->report) < 0)
         return -1;
-    }
 
     std::stringstream Out;
-    bool valid = true;
-    if (policies_ids)
-        if (!check_policies_files(files, options, *policies_ids, Out))
-            valid = false;
-    if (policies_contents)
-        if (!check_policies_contents(files, options, *policies_contents, Out))
-            valid = false;
-    result->report = Out.str();
     result->has_valid = true;
-    result->valid = valid;
+    result->valid = true;
+    if (!check_policies_xslts(files, options, policies, Out))
+        result->valid = false;
+
+    result->report = Out.str();
     return 0;
 }
 
@@ -558,6 +526,7 @@ int Core::transform_with_xslt_file(const std::string& report, const std::string&
     if (!S->register_schema_from_file(xslt.c_str()))
     {
         result = report;
+        delete S;
         return -1;
     }
 
@@ -565,6 +534,7 @@ int Core::transform_with_xslt_file(const std::string& report, const std::string&
     if (valid < 0)
     {
         result = report;
+        delete S;
         return -1;
     }
 
@@ -729,10 +699,7 @@ bool Core::validation(const std::vector<std::string>& files, Schema* S, std::str
         valid = false;
     }
     else
-    {
         report = S->get_report();
-        valid = ret == 0 ? true : false;
-    }
     return valid;
 }
 
@@ -1348,7 +1315,7 @@ void Core::get_reports_output(const std::vector<std::string>& files,
             std::string tmp;
             bool is_valid = true;
             if (get_implementation_report(files, options, tmp))
-                is_valid = policy_is_valid(tmp);
+                is_valid = implementation_is_valid(tmp);
             else
                 is_valid = false;
 
@@ -1394,6 +1361,8 @@ bool Core::get_implementation_report(const std::vector<std::string>& files,
     std::string memory(implementation_report_xsl);
     std::string r;
     bool valid = validate_xslt_from_memory(files, options, memory, r, true);
+    if (valid)
+        valid = implementation_is_valid(r);
     report += r;
     return valid;
 }
@@ -1745,12 +1714,37 @@ void Core::get_daemon_address(std::string& addr, int& port) const
 }
 
 //---------------------------------------------------------------------------
-bool Core::policy_is_valid(const std::string& report)
+bool Core::has_outcome_fail(const std::string& report)
 {
     size_t pos = report.find(" outcome=\"fail\"");
     if (pos != std::string::npos)
         return false;
     return true;
+}
+
+//---------------------------------------------------------------------------
+bool Core::implementation_is_valid(const std::string& report)
+{
+    return has_outcome_fail(report);
+}
+
+//---------------------------------------------------------------------------
+bool Core::policy_is_valid(const std::string& report)
+{
+    size_t pos = report.find(" fail_count=\"");
+
+    //if not present, no report, Unknown policy or only one rule
+    if (pos == std::string::npos)
+        return has_outcome_fail(report);
+
+    pos += 13;
+    if (pos + 2 >= report.size())
+        return false;
+
+    if (report[pos] == '0' && report[pos + 1] == '"')
+        return true;
+
+    return false;
 }
 
 //---------------------------------------------------------------------------

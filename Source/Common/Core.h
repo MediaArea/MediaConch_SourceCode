@@ -157,14 +157,12 @@ private:
     PluginsManager                    *pluginsManager;
     MediaConchLib::compression         compression_mode;
 
-    bool check_policies_contents(const std::vector<std::string>& files,
-                                 const std::map<std::string, std::string>& options,
-                                 const std::vector<std::string>& policies_contents,
-                                 std::stringstream& Out);
-    bool check_policies_files(const std::vector<std::string>& files,
+    bool check_policies_xslts(const std::vector<std::string>& files,
                               const std::map<std::string, std::string>& options,
-                              const std::vector<size_t>& policies_ids,
+                              const std::vector<std::string>& policies,
                               std::stringstream& Out);
+    bool has_outcome_fail(const std::string& report);
+    bool implementation_is_valid(const std::string& report);
     bool policy_is_valid(const std::string& report);
     bool verapdf_report_is_valid(const std::string& report);
     bool dpfmanager_report_is_valid(const std::string& report);

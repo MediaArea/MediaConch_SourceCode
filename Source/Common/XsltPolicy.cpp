@@ -18,6 +18,7 @@
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include "generated/PolicyTransformXml.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -128,6 +129,20 @@ XsltPolicy::~XsltPolicy()
     for (size_t i = 0; i < nodes.size(); ++i)
         delete nodes[i];
     nodes.clear();
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::get_final_xslt(std::string& xslt)
+{
+    if (dump_schema(xslt) < 0)
+        return -1;
+
+    if (policies->transform_with_xslt_memory(xslt, policy_transform_xml, xslt) < 0)
+        return -1;
+
+    replace_aliasxsl_in_policy(xslt);
+    replace_xlmns_in_policy(xslt);
+    return 0;
 }
 
 //***************************************************************************
@@ -267,7 +282,10 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
     XsltPolicyNode *new_node = NULL;
 
     if (is_root)
-        new_node = this;
+    {
+        error = "Policy has to start with a policy node";
+        return -1;
+    }
     else
     {
         new_node = new XsltPolicyRule;
@@ -443,31 +461,25 @@ int XsltPolicy::write_nodes_children(xmlNodePtr node, XsltPolicy *current)
 //---------------------------------------------------------------------------
 int XsltPolicy::write_root_nodes_children(xmlDocPtr doc)
 {
-    for (size_t i = 0; i < nodes.size(); ++i)
+    xmlNodePtr node = NULL;
+    if (this->kind == XSLT_POLICY_POLICY)
     {
-        if (!nodes[i])
-            continue;
-
-        xmlNodePtr root_node = NULL;
-        if (nodes[i]->kind == XSLT_POLICY_POLICY)
-        {
-            if (create_node_policy_child(root_node, (XsltPolicy*)nodes[i]))
-                return -1;
-        }
-        else
-        {
-            if (create_node_rule_child(root_node, (XsltPolicyRule*)nodes[i]))
-                return -1;
-        }
-
-        if (!root_node)
-        {
-            error = "Cannot create the policy children";
+        if (create_node_policy_child(node, this) < 0)
             return -1;
-        }
-
-        xmlDocSetRootElement(doc, root_node);
     }
+    else
+    {
+        if (create_node_rule_child(node, (XsltPolicyRule*)this) < 0)
+            return -1;
+    }
+
+    if (!node)
+    {
+        error = "Cannot create the policy children";
+        return -1;
+    }
+
+    xmlDocSetRootElement(doc, node);
 
     return 0;
 }
@@ -620,6 +632,23 @@ XsltPolicyRule* XsltPolicy::get_policy_rule(int id)
     }
 
     return NULL;
+}
+
+// HELPER
+void XsltPolicy::replace_xlmns_in_policy(std::string& xslt)
+{
+    //replace xmlns:xsl=\"my:namespace\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"
+    size_t pos;
+    while ((pos = xslt.find("xmlns:xsl=\"my:namespace\"")) != std::string::npos)
+        xslt.replace(pos, 24, "xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"");
+}
+
+void XsltPolicy::replace_aliasxsl_in_policy(std::string& xslt)
+{
+    //replace aliasxsl by xsl
+    size_t pos;
+    while ((pos = xslt.find("aliasxsl")) != std::string::npos)
+        xslt.replace(pos, 8, "xsl");
 }
 
 }

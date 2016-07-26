@@ -38,9 +38,9 @@ public:
 
 private:
     // HELPER
-    int import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
+    int        import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
 
-    xmlDocPtr         system_doc;
+    xmlDocPtr  system_doc;
 };
 
 }

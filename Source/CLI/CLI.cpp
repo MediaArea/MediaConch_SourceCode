@@ -259,6 +259,7 @@ namespace MediaConch
 
         file.Close();
         policies.push_back(FromFile.To_UTF8());
+        delete [] Buffer;
         return 0;
     }
 
