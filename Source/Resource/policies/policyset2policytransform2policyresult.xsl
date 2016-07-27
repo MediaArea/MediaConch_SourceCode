@@ -19,20 +19,21 @@
                   <xsl:with-param name="policy" select="."/>
                 </xsl:call-template>
               </xsl:for-each>
-              <xsl:for-each select="test">
-                <xsl:call-template name="testcheck">
-                  <xsl:with-param name="test" select="."/>
+              <xsl:for-each select="rule">
+                <xsl:call-template name="rulecheck">
+                  <xsl:with-param name="rule" select="."/>
                 </xsl:call-template>
               </xsl:for-each>
             </media>
           </aliasxsl:for-each>
         </MediaConch>
       </aliasxsl:template>
-      <aliasxsl:template name="test">
+      <aliasxsl:template name="rule">
+        <aliasxsl:param name="name"/>
         <aliasxsl:param name="xpath"/>
         <aliasxsl:param name="outcome"/>
         <aliasxsl:param name="actual"/>
-        <test>
+        <rule>
           <aliasxsl:if test="../@type">
             <aliasxsl:attribute name="tracktype">
               <aliasxsl:value-of select="../@type"/>
@@ -59,7 +60,7 @@
           <aliasxsl:attribute name="outcome">
             <aliasxsl:value-of select="$outcome"/>
           </aliasxsl:attribute>
-        </test>
+        </rule>
       </aliasxsl:template>
       <aliasxsl:template name="check">
         <aliasxsl:param name="name"/>
@@ -67,8 +68,8 @@
         <aliasxsl:param name="type"/>
         <aliasxsl:param name="context"/>
         <aliasxsl:param name="value"/>
-        <aliasxsl:param name="test"/>
-        <aliasxsl:param name="testresults"/>
+        <aliasxsl:param name="rule"/>
+        <aliasxsl:param name="ruleresults"/>
         <aliasxsl:param name="morechecks"/>
         <policy>
           <aliasxsl:attribute name="name">
@@ -77,17 +78,17 @@
           <aliasxsl:attribute name="type">
             <aliasxsl:value-of select="$type"/>
           </aliasxsl:attribute>
-          <aliasxsl:variable name="tests_run">
-            <aliasxsl:value-of select="count(ealiasxsl:node-set($testresults)/mc:test) + count(ealiasxsl:node-set($morechecks)/mc:check)"/>
+          <aliasxsl:variable name="rules_run">
+            <aliasxsl:value-of select="count(ealiasxsl:node-set($ruleresults)/mc:rule) + count(ealiasxsl:node-set($morechecks)/mc:check)"/>
           </aliasxsl:variable>
           <aliasxsl:variable name="fail_count">
-            <aliasxsl:value-of select="count(ealiasxsl:node-set($testresults)/mc:test[@outcome='fail']) + count(ealiasxsl:node-set($morechecks)/mc:check[@outcome='fail'])"/>
+            <aliasxsl:value-of select="count(ealiasxsl:node-set($ruleresults)/mc:rule[@outcome='fail']) + count(ealiasxsl:node-set($morechecks)/mc:check[@outcome='fail'])"/>
           </aliasxsl:variable>
           <aliasxsl:variable name="pass_count">
-            <aliasxsl:value-of select="count(ealiasxsl:node-set($testresults)/mc:test[@outcome='pass']) + count(ealiasxsl:node-set($morechecks)/mc:check[@outcome='pass'])"/>
+            <aliasxsl:value-of select="count(ealiasxsl:node-set($ruleresults)/mc:rule[@outcome='pass']) + count(ealiasxsl:node-set($morechecks)/mc:check[@outcome='pass'])"/>
           </aliasxsl:variable>
-          <aliasxsl:attribute name="tests_run">
-            <aliasxsl:value-of select="$tests_run"/>
+          <aliasxsl:attribute name="rules_run">
+            <aliasxsl:value-of select="$rules_run"/>
           </aliasxsl:attribute>
           <aliasxsl:attribute name="fail_count">
             <aliasxsl:value-of select="$fail_count"/>
@@ -108,11 +109,11 @@
             </description>
           </aliasxsl:if>
           <aliasxsl:copy-of select="$context"/>
-          <aliasxsl:copy-of select="$testresults"/>
+          <aliasxsl:copy-of select="$ruleresults"/>
           <aliasxsl:copy-of select="$morechecks"/>
           <aliasxsl:choose>
-            <aliasxsl:when test="count(ealiasxsl:node-set($testresults)/mc:test)+count(ealiasxsl:node-set($morechecks)/mc:check)='0'">
-              <test outcome="N/A"/>
+            <aliasxsl:when test="count(ealiasxsl:node-set($ruleresults)/mc:rule)+count(ealiasxsl:node-set($morechecks)/mc:check)='0'">
+              <rule outcome="N/A"/>
             </aliasxsl:when>
           </aliasxsl:choose>
         </policy>
@@ -131,10 +132,10 @@
         <aliasxsl:with-param name="type">
           <xsl:value-of select="@type"/>
         </aliasxsl:with-param>
-        <aliasxsl:with-param name="testresults">
-          <xsl:for-each select="test">
-            <xsl:call-template name="testcheck">
-              <xsl:with-param name="test" select="."/>
+        <aliasxsl:with-param name="ruleresults">
+          <xsl:for-each select="rule">
+            <xsl:call-template name="rulecheck">
+              <xsl:with-param name="rule" select="."/>
             </xsl:call-template>
           </xsl:for-each>
         </aliasxsl:with-param>
@@ -148,8 +149,8 @@
       </aliasxsl:call-template>
     </xsl:for-each>
   </xsl:template>
-  <xsl:template name="testcheck">
-    <xsl:param name="test"/>
+  <xsl:template name="rulecheck">
+    <xsl:param name="rule"/>
     <xsl:variable name="equationfull">
       <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
       <xsl:value-of select="@tracktype"/>
@@ -168,7 +169,7 @@
       <xsl:text>]/mi:</xsl:text>
       <xsl:value-of select="@value"/>
     </xsl:variable>
-    <aliasxsl:call-template name="test">
+    <aliasxsl:call-template name="rule">
       <aliasxsl:with-param name="xpath">
         <xsl:value-of select="$equationfull"/>
       </aliasxsl:with-param>
