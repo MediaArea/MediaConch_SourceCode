@@ -49,6 +49,11 @@
               <aliasxsl:value-of select="../mi:ID"/>
             </aliasxsl:attribute>
           </aliasxsl:if>
+          <aliasxsl:if test="$name">
+            <aliasxsl:attribute name="name">
+              <aliasxsl:value-of select="$name"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
           <aliasxsl:attribute name="xpath">
             <aliasxsl:value-of select="$xpath"/>
           </aliasxsl:attribute>
@@ -170,6 +175,9 @@
       <xsl:value-of select="@value"/>
     </xsl:variable>
     <aliasxsl:call-template name="rule">
+      <aliasxsl:with-param name="name">
+        <xsl:value-of select="@name"/>
+      </aliasxsl:with-param>
       <aliasxsl:with-param name="xpath">
         <xsl:value-of select="$equationfull"/>
       </aliasxsl:with-param>
