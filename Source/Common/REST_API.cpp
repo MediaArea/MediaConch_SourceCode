@@ -122,6 +122,49 @@ RESTAPI::Checker_Validate_Res::~Checker_Validate_Res()
     nok.clear();
 }
 
+//---------------------------------------------------------------------------
+#define DESTRUCTOR_POLICY(NAME) \
+    RESTAPI::NAME::~NAME()   \
+    {                           \
+        if (nok)                \
+        {                       \
+            delete nok;         \
+            nok = NULL;         \
+        }                       \
+    }
+
+DESTRUCTOR_POLICY(XSLT_Policy_Create_Res)
+DESTRUCTOR_POLICY(Policy_Import_Res)
+DESTRUCTOR_POLICY(Policy_Remove_Res)
+DESTRUCTOR_POLICY(Policy_Dump_Res)
+DESTRUCTOR_POLICY(Policy_Save_Res)
+DESTRUCTOR_POLICY(Policy_Duplicate_Res)
+DESTRUCTOR_POLICY(Policy_Change_Name_Res)
+DESTRUCTOR_POLICY(Policy_Get_Res)
+DESTRUCTOR_POLICY(Policy_Get_Name_Res)
+DESTRUCTOR_POLICY(Policy_Get_Policies_Count_Res)
+DESTRUCTOR_POLICY(Policy_Clear_Policies_Res)
+DESTRUCTOR_POLICY(XSLT_Policy_Create_From_File_Res)
+DESTRUCTOR_POLICY(XSLT_Policy_Rule_Create_Res)
+DESTRUCTOR_POLICY(XSLT_Policy_Rule_Edit_Res)
+DESTRUCTOR_POLICY(XSLT_Policy_Rule_Duplicate_Res)
+DESTRUCTOR_POLICY(XSLT_Policy_Rule_Delete_Res)
+
+#undef DESTRUCTOR_POLICY
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Res::~Policy_Get_Policies_Res()
+{
+    for (size_t i = 0; i < policies.size(); ++i)
+        delete policies[i];
+    policies.clear();
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+}
+
 //***************************************************************************
 // Request: to_str()
 //***************************************************************************
@@ -802,6 +845,161 @@ int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& 
 }
 
 //---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?parent_id=" << req.parent_id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_import_req(Policy_Import_Req& req, std::string& data)
+{
+    Container::Value v, child, xml;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    xml.type = Container::Value::CONTAINER_TYPE_STRING;
+    xml.s = req.xml;
+
+    child.obj["xml"] = xml;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_IMPORT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_remove_req(Policy_Remove_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?id=" << req.id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_dump_req(Policy_Dump_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?id=" << req.id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_save_req(Policy_Save_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?id=" << req.id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?id=" << req.id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_change_name_req(Policy_Change_Name_Req& req, std::string& data)
+{
+    Container::Value v, child, name, description;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    name.type = Container::Value::CONTAINER_TYPE_STRING;
+    name.s = req.name;
+
+    child.obj["name"] = name;
+
+    description.type = Container::Value::CONTAINER_TYPE_STRING;
+    description.s = req.description;
+
+    child.obj["description"] = description;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_CHANGE_NAME"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?id=" << req.id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?id=" << req.id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req&, std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_clear_policies_req(Policy_Clear_Policies_Req&, std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req&, std::string&)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string& data)
 {
     //URI
@@ -812,6 +1010,74 @@ int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_
 
     return 0;
 }
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?policy_id=" << req.policy_id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string& data)
+{
+    Container::Value v, child, policy_id, id, rule;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    policy_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    policy_id.l = req.policy_id;
+    child.obj["policy_id"] = policy_id;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = req.id;
+    child.obj["id"] = id;
+
+    // rule.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    // rule.l = req.rule;
+    // child.obj["rule"] = rule;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_RULE_EDIT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?policy_id=" << req.policy_id << "&id=" << req.id;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?policy_id=" << req.policy_id;
+    data = ss.str();
+
+    return 0;
+}
+
 
 //***************************************************************************
 // Serialize: Result
@@ -1047,17 +1313,314 @@ int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string& data)
+{
+    Container::Value v, child, id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_CREATE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_import_res(Policy_Import_Res& res, std::string& data)
+{
+    Container::Value v, child, id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.id >= 0)
+    {
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+        child.obj["id"] = id;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_IMPORT_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_remove_res(Policy_Remove_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_REMOVE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_dump_res(Policy_Dump_Res& res, std::string& data)
+{
+    Container::Value v, child, xml, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.xml.size())
+    {
+        xml.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        xml.s = res.xml;
+        child.obj["xml"] = xml;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_DUMP_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_save_res(Policy_Save_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_SAVE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string& data)
+{
+    Container::Value v, child, id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.id >= 0)
+    {
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+        child.obj["id"] = id;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_DUPLICATE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_change_name_res(Policy_Change_Name_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_CHANGE_NAME_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data)
 {
     Container::Value v, child, policy, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
+    // policy.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    // policy.obj = res.policy;
+    // child.obj["policy"] = policy;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_GET_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string& data)
+{
+    Container::Value v, child, name, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    name.type = Container::Value::CONTAINER_TYPE_STRING;
+    name.s = res.name;
+    child.obj["name"] = name;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_GET_NAME_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string& data)
+{
+    Container::Value v, child, size, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    size.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    size.l = res.size;
+    child.obj["size"] = size;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_GET_POLICIES_COUNT_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_CLEAR_POLICIES_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string& data)
+{
+    Container::Value v, child, policies, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    serialize_policies_get_policies(res.policies, policies);
+    child.obj["policies"] = policies;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_GET_POLICIES_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string& data)
+{
+    Container::Value v, child, policy_id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
     if (res.policy_id >= 0)
     {
-        policy.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        policy.l = res.policy_id;
-        child.obj["policy"] = policy;
+        policy_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        policy_id.l = res.policy_id;
+        child.obj["policy_id"] = policy_id;
     }
     else if (res.nok)
         child.obj["nok"] = serialize_generic_nok(res.nok->id, res.nok->error);
@@ -1074,8 +1637,108 @@ int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_
     return 0;
 }
 
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string& data)
+{
+    Container::Value v, child, id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.id >= 0)
+    {
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+        child.obj["id"] = id;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_RULE_CREATE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_RULE_EDIT_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string& data)
+{
+    Container::Value v, child, id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.id >= 0)
+    {
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+        child.obj["id"] = id;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_RULE_DUPLICATE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_RULE_DELETE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
 //***************************************************************************
-// Serialize: Result
+// Parse: Request
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -1421,6 +2084,297 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_xslt_policy_create_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_CREATE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *parent_id;
+    parent_id = model->get_value_by_key(*child, "parent_id");
+    if (!parent_id || parent_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Create_Req *req = new XSLT_Policy_Create_Req;
+    req->parent_id = parent_id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Import_Req *RESTAPI::parse_policy_import_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_IMPORT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *xml;
+    xml = model->get_value_by_key(*child, "xml");
+    if (!xml || xml->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Policy_Import_Req *req = new Policy_Import_Req;
+    req->xml = xml->s;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Remove_Req *RESTAPI::parse_policy_remove_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_REMOVE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Remove_Req *req = new Policy_Remove_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Dump_Req *RESTAPI::parse_policy_dump_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_DUMP");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Dump_Req *req = new Policy_Dump_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Save_Req *RESTAPI::parse_policy_save_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_SAVE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Save_Req *req = new Policy_Save_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_DUPLICATE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Duplicate_Req *req = new Policy_Duplicate_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_policy_change_name_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_CHANGE_NAME");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Container::Value *name = model->get_value_by_key(*child, "name");
+    if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Container::Value *desc = model->get_value_by_key(*child, "description");
+    if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Policy_Change_Name_Req *req = new Policy_Change_Name_Req;
+    req->id = id->l;
+    req->name = name->s;
+    req->description = desc->s;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Get_Req *req = new Policy_Get_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_policy_get_name_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET_NAME");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Get_Name_Req *req = new Policy_Get_Name_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_policy_get_policies_count_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET_POLICIES_COUNT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Get_Policies_Count_Req *req = new Policy_Get_Policies_Count_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_policy_clear_policies_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_CLEAR_POLICIES");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Clear_Policies_Req *req = new Policy_Clear_Policies_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET_POLICIES");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Get_Policies_Req *req = new Policy_Get_Policies_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_from_file_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -1431,7 +2385,7 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_fro
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_FROM_CHILD");
+    child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_FROM_FILE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -1441,6 +2395,118 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_fro
         return NULL;
 
     XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_xslt_policy_rule_create_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_CREATE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policy_id;
+    policy_id = model->get_value_by_key(*child, "policy_id");
+    if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Rule_Create_Req *req = new XSLT_Policy_Rule_Create_Req;
+    req->policy_id = policy_id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_xslt_policy_rule_edit_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_EDIT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
+    if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Rule_Edit_Req *req = new XSLT_Policy_Rule_Edit_Req;
+    req->policy_id = policy_id->l;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_xslt_policy_rule_duplicate_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DUPLICATE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
+    if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Rule_Duplicate_Req *req = new XSLT_Policy_Rule_Duplicate_Req;
+    req->policy_id = policy_id->l;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DELETE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
+    if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Rule_Delete_Req *req = new XSLT_Policy_Rule_Delete_Req;
+    req->policy_id = policy_id->l;
     req->id = id->l;
     return req;
 }
@@ -1581,6 +2647,226 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const std::string& uri)
+{
+    XSLT_Policy_Create_Req *req = new XSLT_Policy_Create_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "parent_id")
+        return req;
+    ++start;
+
+    std::string parent_id = uri.substr(start, std::string::npos);
+    if (!parent_id.length())
+    {
+        req->parent_id = -1;
+        return req;
+    }
+
+    req->parent_id = strtoll(parent_id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Import_Req *RESTAPI::parse_uri_policy_import_req(const std::string&)
+{
+    Policy_Import_Req *req = new Policy_Import_Req;
+    //todo
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Remove_Req *RESTAPI::parse_uri_policy_remove_req(const std::string& uri)
+{
+    Policy_Remove_Req *req = new Policy_Remove_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "id")
+        return req;
+    ++start;
+
+    std::string id = uri.substr(start, std::string::npos);
+    if (!id.length())
+        return req;
+
+    req->id = strtoll(id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& uri)
+{
+    Policy_Dump_Req *req = new Policy_Dump_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "id")
+        return req;
+    ++start;
+
+    std::string id = uri.substr(start, std::string::npos);
+    if (!id.length())
+        return req;
+
+    req->id = strtoll(id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& uri)
+{
+    Policy_Save_Req *req = new Policy_Save_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "id")
+        return req;
+    ++start;
+
+    std::string id = uri.substr(start, std::string::npos);
+    if (!id.length())
+        return req;
+
+    req->id = strtoll(id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std::string& uri)
+{
+    Policy_Duplicate_Req *req = new Policy_Duplicate_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "id")
+        return req;
+    ++start;
+
+    std::string id = uri.substr(start, std::string::npos);
+    if (!id.length())
+        return req;
+
+    req->id = strtoll(id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_uri_policy_change_name_req(const std::string& uri)
+{
+    Policy_Change_Name_Req *req = new Policy_Change_Name_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "name")
+        {
+            if (!val.length())
+                continue;
+
+            req->name = val;
+        }
+        else if (substr == "description")
+        {
+            if (!val.length())
+                continue;
+
+            req->description = val;
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& uri)
+{
+    Policy_Get_Req *req = new Policy_Get_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "id")
+        return req;
+    ++start;
+
+    std::string id = uri.substr(start, std::string::npos);
+    if (!id.length())
+        return req;
+
+    req->id = strtoll(id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_uri_policy_get_name_req(const std::string& uri)
+{
+    Policy_Get_Name_Req *req = new Policy_Get_Name_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "id")
+        return req;
+    ++start;
+
+    std::string id = uri.substr(start, std::string::npos);
+    if (!id.length())
+        return req;
+
+    req->id = strtoll(id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_count_req(const std::string&)
+{
+    Policy_Get_Policies_Count_Req *req = new Policy_Get_Policies_Count_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req(const std::string&)
+{
+    Policy_Clear_Policies_Req *req = new Policy_Clear_Policies_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(const std::string&)
+{
+    Policy_Get_Policies_Req *req = new Policy_Get_Policies_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create_from_file_req(const std::string& uri)
 {
     XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
@@ -1599,6 +2885,153 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create
 
     return req;
 }
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create_req(const std::string& uri)
+{
+    XSLT_Policy_Rule_Create_Req *req = new XSLT_Policy_Rule_Create_Req;
+
+    size_t start = 0;
+    start = uri.find("=");
+    if (start == std::string::npos || uri.substr(0, start) != "policy_id")
+        return req;
+    ++start;
+
+    std::string policy_id = uri.substr(start, std::string::npos);
+    if (!policy_id.length())
+        return req;
+
+    req->policy_id = strtoll(policy_id.c_str(), NULL, 10);
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_uri_xslt_policy_rule_edit_req(const std::string& uri)
+{
+    XSLT_Policy_Rule_Edit_Req *req = new XSLT_Policy_Rule_Edit_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_duplicate_req(const std::string& uri)
+{
+    XSLT_Policy_Rule_Duplicate_Req *req = new XSLT_Policy_Rule_Duplicate_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete_req(const std::string& uri)
+{
+    XSLT_Policy_Rule_Delete_Req *req = new XSLT_Policy_Rule_Delete_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//***************************************************************************
+// Parse: Result
+//***************************************************************************
 
 //---------------------------------------------------------------------------
 RESTAPI::Checker_Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
@@ -2023,6 +3456,369 @@ RESTAPI::Default_Values_For_Type_Res *RESTAPI::parse_default_values_for_type_res
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Create_Res *RESTAPI::parse_xslt_policy_create_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Create_Res *res = new XSLT_Policy_Create_Res;
+    res->id = id->l;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Import_Res *RESTAPI::parse_policy_import_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_IMPORT_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Import_Res *res = new Policy_Import_Res;
+    res->id = id->l;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Remove_Res *RESTAPI::parse_policy_remove_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_REMOVE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Remove_Res *res = new Policy_Remove_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Dump_Res *RESTAPI::parse_policy_dump_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_DUMP_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *xml = model->get_value_by_key(*child, "xml");
+    if (!xml || xml->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Policy_Dump_Res *res = new Policy_Dump_Res;
+    res->xml = xml->s;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Save_Res *RESTAPI::parse_policy_save_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_SAVE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Save_Res *res = new Policy_Save_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_DUPLICATE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Duplicate_Res *res = new Policy_Duplicate_Res;
+    res->id = id->l;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Name_Res *RESTAPI::parse_policy_change_name_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_CHANGE_NAME_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Change_Name_Res *res = new Policy_Change_Name_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_GET_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Get_Res *res = new Policy_Get_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Name_Res *RESTAPI::parse_policy_get_name_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_GET_NAME_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *name = model->get_value_by_key(*child, "name");
+    if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Policy_Get_Name_Res *res = new Policy_Get_Name_Res;
+    res->name = name->s;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Count_Res *RESTAPI::parse_policy_get_policies_count_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_GET_POLICIES_COUNT_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *size = model->get_value_by_key(*child, "size");
+    if (!size || size->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Get_Policies_Count_Res *res = new Policy_Get_Policies_Count_Res;
+    res->size = size->l;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Clear_Policies_Res *RESTAPI::parse_policy_clear_policies_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_CLEAR_POLICIES_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Clear_Policies_Res *res = new Policy_Clear_Policies_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_GET_POLICIES_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policies = model->get_value_by_key(*child, "policies");
+    if (!policies || policies->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return NULL;
+
+    Policy_Get_Policies_Res *res = new Policy_Get_Policies_Res;
+    if (parse_policies_get_policies(policies, res->policies) < 0)
+    {
+        delete res;
+        return NULL;;
+    }
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_from_file_res(const std::string& data)
 {
     Container::Value v, *child;
@@ -2037,15 +3833,124 @@ RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_fro
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *policy;
-    policy = model->get_value_by_key(*child, "policy");
+    Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
 
-    if (!policy || policy->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
     XSLT_Policy_Create_From_File_Res *res = new XSLT_Policy_Create_From_File_Res;
-    res->policy_id = policy->l;
+    res->policy_id = policy_id->l;
 
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Create_Res *RESTAPI::parse_xslt_policy_rule_create_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_CREATE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    XSLT_Policy_Rule_Create_Res *res = new XSLT_Policy_Rule_Create_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Edit_Res *RESTAPI::parse_xslt_policy_rule_edit_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_EDIT_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    XSLT_Policy_Rule_Edit_Res *res = new XSLT_Policy_Rule_Edit_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Duplicate_Res *RESTAPI::parse_xslt_policy_rule_duplicate_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DUPLICATE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Rule_Duplicate_Res *res = new XSLT_Policy_Rule_Duplicate_Res;
+    res->id = id->l;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Delete_Res *RESTAPI::parse_xslt_policy_rule_delete_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DELETE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    XSLT_Policy_Rule_Delete_Res *res = new XSLT_Policy_Rule_Delete_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
     return res;
 }
 
@@ -2341,6 +4246,41 @@ Container::Value RESTAPI::serialize_validate_ok(Checker_Validate_Ok* obj)
 }
 
 //---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
+{
+    Container::Value nok_v, error_v;
+
+    nok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    error_v.type = Container::Value::CONTAINER_TYPE_STRING;
+    error_v.s = nok->error;
+    nok_v.obj["error"] = error_v;
+    return nok_v;
+}
+
+//---------------------------------------------------------------------------
+void RESTAPI::serialize_policies_get_policies(std::vector<Policy_Get_Policies_Ok *> policies, Container::Value &p)
+{
+    p.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < policies.size(); ++i)
+    {
+        Container::Value ok_v, id, name;
+
+        ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = policies[i]->id;
+        ok_v.obj["id"] = id;
+
+        name.type = Container::Value::CONTAINER_TYPE_STRING;
+        name.s = policies[i]->name;
+        ok_v.obj["name"] = name;
+
+        p.array.push_back(ok_v);
+    }
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
@@ -2588,6 +4528,62 @@ int RESTAPI::parse_validate_ok(Container::Value *v, std::vector<Checker_Validate
         oks.push_back(ok);
     }
 
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_policy_nok(Container::Value *nok_v, RESTAPI::Policy_Nok **nok)
+{
+    if (!nok_v)
+        return 0;
+
+    *nok = new Policy_Nok;
+    if (nok_v->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        delete *nok;
+        *nok = NULL;
+        return -1;
+    }
+
+    Container::Value *error = model->get_value_by_key(*nok_v, "error");
+    if (!error || error->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        delete *nok;
+        *nok = NULL;
+        return -1;
+    }
+
+    (*nok)->error = error->s;
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<Policy_Get_Policies_Ok *> policies)
+{
+    if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < p->array.size(); ++i)
+    {
+        Container::Value *policy = &p->array[i];
+
+        if (policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
+            return -1;
+
+        Container::Value *id = model->get_value_by_key(*policy, "id");
+        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            return -1;
+
+        Container::Value *name = model->get_value_by_key(*policy, "name");
+        if (name->type != Container::Value::CONTAINER_TYPE_STRING)
+            return -1;
+
+        Policy_Get_Policies_Ok *ok = new Policy_Get_Policies_Ok;
+        ok->id = id->l;
+        ok->name = name->s;
+        policies.push_back(ok);
+    }
     return 0;
 }
 

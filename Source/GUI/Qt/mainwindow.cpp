@@ -818,9 +818,9 @@ int MainWindow::policy_export(int pos, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::clear_policies()
+int MainWindow::clear_policies(std::string& err)
 {
-    return MCL.policy_clear_policies();
+    return MCL.policy_clear_policies(err);
 }
 
 //---------------------------------------------------------------------------

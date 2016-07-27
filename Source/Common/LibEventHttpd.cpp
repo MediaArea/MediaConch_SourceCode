@@ -208,6 +208,197 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_default_values_for_type_res(res, result) < 0)
             error = rest.get_error();
     }
+
+    else if (query_str && !std::string("/xslt_policy_create").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Create_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Create_Res res;
+        if (commands.xslt_policy_create_cb && commands.xslt_policy_create_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_create_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_remove").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Remove_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Remove_Res res;
+        if (commands.policy_remove_cb && commands.policy_remove_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_remove_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_dump").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Dump_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Dump_Res res;
+        if (commands.policy_dump_cb && commands.policy_dump_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_dump_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_save").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Save_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Save_Res res;
+        if (commands.policy_save_cb && commands.policy_save_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_save_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_duplicate").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Duplicate_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Duplicate_Res res;
+        if (commands.policy_duplicate_cb && commands.policy_duplicate_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_duplicate_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_get").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Get_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Res res;
+        if (commands.policy_get_cb && commands.policy_get_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_get_name").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Get_Name_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Name_Res res;
+        if (commands.policy_get_name_cb && commands.policy_get_name_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_name_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_get_policies_count").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Get_Policies_Count_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Policies_Count_Res res;
+        if (commands.policy_get_policies_count_cb && commands.policy_get_policies_count_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_policies_count_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_clear_policies").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Clear_Policies_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Clear_Policies_Res res;
+        if (commands.policy_clear_policies_cb && commands.policy_clear_policies_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_clear_policies_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_get_policies").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Get_Policies_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Policies_Res res;
+        if (commands.policy_get_policies_cb && commands.policy_get_policies_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_policies_res(res, result) < 0)
+            error = rest.get_error();
+    }
     else if (query_str && !std::string("/xslt_policy_create_from_file").compare(uri_path))
     {
         std::string query(query_str);
@@ -227,6 +418,64 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_create_from_file_res(res, result) < 0)
             error = rest.get_error();
     }
+    else if (query_str && !std::string("/xslt_policy_rule_create").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Create_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Create_Res res;
+        if (commands.xslt_policy_rule_create_cb && commands.xslt_policy_rule_create_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_create_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_duplicate").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Duplicate_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Duplicate_Res res;
+        if (commands.xslt_policy_rule_duplicate_cb && commands.xslt_policy_rule_duplicate_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_duplicate_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_delete").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Delete_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Delete_Res res;
+        if (commands.xslt_policy_rule_delete_cb && commands.xslt_policy_rule_delete_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_delete_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else
     {
         code = HTTP_NOTFOUND;
@@ -349,6 +598,78 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
 
         delete r;
         if (rest.serialize_file_from_id_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_import").compare(uri_path))
+    {
+        RESTAPI::Policy_Import_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Import_Res res;
+        if (commands.policy_import_cb && commands.policy_import_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_import_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_change_name").compare(uri_path))
+    {
+        RESTAPI::Policy_Change_Name_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Change_Name_Res res;
+        if (commands.policy_change_name_cb && commands.policy_change_name_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_change_name_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/xslt_policy_rule_edit").compare(uri_path))
+    {
+        RESTAPI::XSLT_Policy_Rule_Edit_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::XSLT_Policy_Rule_Edit_Res res;
+        if (commands.xslt_policy_rule_edit_cb && commands.xslt_policy_rule_edit_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_edit_res(res, result) < 0)
             error = rest.get_error();
     }
     else

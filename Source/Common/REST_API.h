@@ -384,7 +384,8 @@ public:
 
     struct XSLT_Policy_Create_Res
     {
-        XSLT_Policy_Create_Res() : nok(NULL) {}
+        XSLT_Policy_Create_Res() : id(-1), nok(NULL) {}
+        ~XSLT_Policy_Create_Res();
         int          id;
         Policy_Nok  *nok;
         std::string  to_str() const;
@@ -398,7 +399,8 @@ public:
 
     struct Policy_Import_Res
     {
-        Policy_Import_Res() : nok(NULL) {}
+        Policy_Import_Res() : id(-1), nok(NULL) {}
+        ~Policy_Import_Res();
         int          id;
         Policy_Nok  *nok;
         std::string to_str() const;
@@ -413,6 +415,7 @@ public:
     struct Policy_Remove_Res
     {
         Policy_Remove_Res() : nok(NULL) {}
+        ~Policy_Remove_Res();
         Policy_Nok  *nok;
         std::string  to_str() const;
     };
@@ -426,6 +429,7 @@ public:
     struct Policy_Dump_Res
     {
         Policy_Dump_Res() : nok(NULL) {}
+        ~Policy_Dump_Res();
         std::string  xml;
         Policy_Nok  *nok;
         std::string  to_str() const;
@@ -440,6 +444,7 @@ public:
     struct Policy_Save_Res
     {
         Policy_Save_Res() : nok(NULL) {}
+        ~Policy_Save_Res();
         Policy_Nok  *nok;
         std::string  to_str() const;
     };
@@ -452,7 +457,8 @@ public:
 
     struct Policy_Duplicate_Res
     {
-        Policy_Duplicate_Res() : nok(NULL) {}
+        Policy_Duplicate_Res() : id(-1), nok(NULL) {}
+        ~Policy_Duplicate_Res();
         int         id;
         Policy_Nok *nok;
         std::string to_str() const;
@@ -469,6 +475,7 @@ public:
     struct Policy_Change_Name_Res
     {
         Policy_Change_Name_Res() : nok(NULL) {}
+        ~Policy_Change_Name_Res();
         Policy_Nok  *nok;
         std::string  to_str() const;
     };
@@ -482,6 +489,7 @@ public:
     struct Policy_Get_Res
     {
         Policy_Get_Res() : nok(NULL) {}
+        ~Policy_Get_Res();
         //TODO
         Policy_Nok  *nok;
         std::string  to_str() const;
@@ -496,6 +504,7 @@ public:
     struct Policy_Get_Name_Res
     {
         Policy_Get_Name_Res() : nok(NULL) {}
+        ~Policy_Get_Name_Res();
         std::string  name;
         Policy_Nok  *nok;
         std::string  to_str() const;
@@ -503,13 +512,12 @@ public:
 
     struct Policy_Get_Policies_Count_Req
     {
-        int         id;
-        std::string to_str() const;
     };
 
     struct Policy_Get_Policies_Count_Res
     {
-        Policy_Get_Policies_Count_Res() : nok(NULL) {}
+        Policy_Get_Policies_Count_Res() : size(0), nok(NULL) {}
+        ~Policy_Get_Policies_Count_Res();
         int          size;
         Policy_Nok  *nok;
         std::string  to_str() const;
@@ -522,6 +530,7 @@ public:
     struct Policy_Clear_Policies_Res
     {
         Policy_Clear_Policies_Res() : nok(NULL) {}
+        ~Policy_Clear_Policies_Res();
         Policy_Nok  *nok;
         std::string  to_str() const;
     };
@@ -540,6 +549,7 @@ public:
     struct Policy_Get_Policies_Res
     {
         Policy_Get_Policies_Res() : nok(NULL) {}
+        ~Policy_Get_Policies_Res();
         std::vector<Policy_Get_Policies_Ok*>  policies;
         Policy_Nok                           *nok;
         std::string                           to_str() const;
@@ -560,7 +570,8 @@ public:
 
     struct XSLT_Policy_Create_From_File_Res
     {
-        XSLT_Policy_Create_From_File_Res() : nok(NULL) {}
+        XSLT_Policy_Create_From_File_Res() : policy_id(-1), nok(NULL) {}
+        ~XSLT_Policy_Create_From_File_Res();
         int                               policy_id;
         XSLT_Policy_Create_From_File_Nok *nok;
         std::string                       to_str() const;
@@ -576,6 +587,7 @@ public:
     struct XSLT_Policy_Rule_Create_Res
     {
         XSLT_Policy_Rule_Create_Res() : nok(NULL) {}
+        ~XSLT_Policy_Rule_Create_Res();
         int          id;
         Policy_Nok  *nok;
         std::string  to_str() const;
@@ -592,6 +604,7 @@ public:
     struct XSLT_Policy_Rule_Edit_Res
     {
         XSLT_Policy_Rule_Edit_Res() : nok(NULL) {}
+        ~XSLT_Policy_Rule_Edit_Res();
         Policy_Nok  *nok;
         std::string  to_str() const;
     };
@@ -605,7 +618,8 @@ public:
 
     struct XSLT_Policy_Rule_Duplicate_Res
     {
-        XSLT_Policy_Rule_Duplicate_Res() : nok(NULL) {}
+        XSLT_Policy_Rule_Duplicate_Res() : id(-1), nok(NULL) {}
+        ~XSLT_Policy_Rule_Duplicate_Res();
         int          id;
         Policy_Nok  *nok;
         std::string  to_str() const;
@@ -621,6 +635,7 @@ public:
     struct XSLT_Policy_Rule_Delete_Res
     {
         XSLT_Policy_Rule_Delete_Res() : nok(NULL) {}
+        ~XSLT_Policy_Rule_Delete_Res();
         Policy_Nok  *nok;
         std::string  to_str() const;
     };
@@ -641,7 +656,23 @@ public:
     int serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::string&);
     int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&);
 
+    int serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string&);
+    int serialize_policy_import_req(Policy_Import_Req& req, std::string&);
+    int serialize_policy_remove_req(Policy_Remove_Req& req, std::string&);
+    int serialize_policy_dump_req(Policy_Dump_Req& req, std::string&);
+    int serialize_policy_save_req(Policy_Save_Req& req, std::string&);
+    int serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string&);
+    int serialize_policy_change_name_req(Policy_Change_Name_Req& req, std::string&);
+    int serialize_policy_get_req(Policy_Get_Req& req, std::string&);
+    int serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string&);
+    int serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string&);
+    int serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req, std::string&);
+    int serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string&);
     int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&);
+    int serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string&);
+    int serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string&);
+    int serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string&);
+    int serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string&);
 
     // Serialize: Result
     int serialize_analyze_res(Checker_Analyze_Res& res, std::string&);
@@ -653,7 +684,24 @@ public:
     int serialize_validate_res(Checker_Validate_Res& res, std::string&);
     int serialize_file_from_id_res(Checker_File_From_Id_Res& res, std::string&);
     int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&);
+
+    int serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string&);
+    int serialize_policy_import_res(Policy_Import_Res& res, std::string&);
+    int serialize_policy_remove_res(Policy_Remove_Res& res, std::string&);
+    int serialize_policy_dump_res(Policy_Dump_Res& res, std::string&);
+    int serialize_policy_save_res(Policy_Save_Res& res, std::string&);
+    int serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string&);
+    int serialize_policy_change_name_res(Policy_Change_Name_Res& res, std::string&);
+    int serialize_policy_get_res(Policy_Get_Res& res, std::string&);
+    int serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string&);
+    int serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string&);
+    int serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res, std::string&);
+    int serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string&);
     int serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string&);
+    int serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string&);
+    int serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string&);
+    int serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string&);
+    int serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string&);
 
     // Parse: Request
     Checker_Analyze_Req              *parse_analyze_req(const std::string& data);
@@ -665,7 +713,24 @@ public:
     Checker_Validate_Req             *parse_validate_req(const std::string& data);
     Checker_File_From_Id_Req         *parse_file_from_id_req(const std::string& data);
     Default_Values_For_Type_Req      *parse_default_values_for_type_req(const std::string& data);
-    XSLT_Policy_Create_From_File_Req *parse_xslt_policy_create_from_file_req(const std::string& data);
+
+    XSLT_Policy_Create_Req           *parse_xslt_policy_create_req(const std::string&);
+    Policy_Import_Req                *parse_policy_import_req(const std::string&);
+    Policy_Remove_Req                *parse_policy_remove_req(const std::string&);
+    Policy_Dump_Req                  *parse_policy_dump_req(const std::string&);
+    Policy_Save_Req                  *parse_policy_save_req(const std::string&);
+    Policy_Duplicate_Req             *parse_policy_duplicate_req(const std::string&);
+    Policy_Change_Name_Req           *parse_policy_change_name_req(const std::string&);
+    Policy_Get_Req                   *parse_policy_get_req(const std::string&);
+    Policy_Get_Name_Req              *parse_policy_get_name_req(const std::string&);
+    Policy_Get_Policies_Count_Req    *parse_policy_get_policies_count_req(const std::string&);
+    Policy_Clear_Policies_Req        *parse_policy_clear_policies_req(const std::string&);
+    Policy_Get_Policies_Req          *parse_policy_get_policies_req(const std::string&);
+    XSLT_Policy_Create_From_File_Req *parse_xslt_policy_create_from_file_req(const std::string&);
+    XSLT_Policy_Rule_Create_Req      *parse_xslt_policy_rule_create_req(const std::string&);
+    XSLT_Policy_Rule_Edit_Req        *parse_xslt_policy_rule_edit_req(const std::string&);
+    XSLT_Policy_Rule_Duplicate_Req   *parse_xslt_policy_rule_duplicate_req(const std::string&);
+    XSLT_Policy_Rule_Delete_Req      *parse_xslt_policy_rule_delete_req(const std::string&);
 
     // Parse: URI Request
     Checker_Analyze_Req              *parse_uri_analyze_req(const std::string& uri);
@@ -677,9 +742,26 @@ public:
     Checker_Validate_Req             *parse_uri_validate_req(const std::string& uri);
     Checker_File_From_Id_Req         *parse_uri_file_from_id_req(const std::string& uri);
     Default_Values_For_Type_Req      *parse_uri_default_values_for_type_req(const std::string& uri);
-    XSLT_Policy_Create_From_File_Req *parse_uri_xslt_policy_create_from_file_req(const std::string& uri);
 
-    // Parse: Request
+    XSLT_Policy_Create_Req           *parse_uri_xslt_policy_create_req(const std::string&);
+    Policy_Import_Req                *parse_uri_policy_import_req(const std::string&);
+    Policy_Remove_Req                *parse_uri_policy_remove_req(const std::string&);
+    Policy_Dump_Req                  *parse_uri_policy_dump_req(const std::string&);
+    Policy_Save_Req                  *parse_uri_policy_save_req(const std::string&);
+    Policy_Duplicate_Req             *parse_uri_policy_duplicate_req(const std::string&);
+    Policy_Change_Name_Req           *parse_uri_policy_change_name_req(const std::string&);
+    Policy_Get_Req                   *parse_uri_policy_get_req(const std::string&);
+    Policy_Get_Name_Req              *parse_uri_policy_get_name_req(const std::string&);
+    Policy_Get_Policies_Count_Req    *parse_uri_policy_get_policies_count_req(const std::string&);
+    Policy_Clear_Policies_Req        *parse_uri_policy_clear_policies_req(const std::string&);
+    Policy_Get_Policies_Req          *parse_uri_policy_get_policies_req(const std::string&);
+    XSLT_Policy_Create_From_File_Req *parse_uri_xslt_policy_create_from_file_req(const std::string&);
+    XSLT_Policy_Rule_Create_Req      *parse_uri_xslt_policy_rule_create_req(const std::string&);
+    XSLT_Policy_Rule_Edit_Req        *parse_uri_xslt_policy_rule_edit_req(const std::string&);
+    XSLT_Policy_Rule_Duplicate_Req   *parse_uri_xslt_policy_rule_duplicate_req(const std::string&);
+    XSLT_Policy_Rule_Delete_Req      *parse_uri_xslt_policy_rule_delete_req(const std::string&);
+
+    // Parse: Result
     Checker_Analyze_Res              *parse_analyze_res(const std::string& data);
     Checker_Status_Res               *parse_status_res(const std::string& data);
     Checker_Report_Res               *parse_report_res(const std::string& data);
@@ -689,7 +771,24 @@ public:
     Checker_Validate_Res             *parse_validate_res(const std::string& data);
     Checker_File_From_Id_Res         *parse_file_from_id_res(const std::string& data);
     Default_Values_For_Type_Res      *parse_default_values_for_type_res(const std::string& data);
-    XSLT_Policy_Create_From_File_Res *parse_xslt_policy_create_from_file_res(const std::string& data);
+
+    XSLT_Policy_Create_Res           *parse_xslt_policy_create_res(const std::string&);
+    Policy_Import_Res                *parse_policy_import_res(const std::string&);
+    Policy_Remove_Res                *parse_policy_remove_res(const std::string&);
+    Policy_Dump_Res                  *parse_policy_dump_res(const std::string&);
+    Policy_Save_Res                  *parse_policy_save_res(const std::string&);
+    Policy_Duplicate_Res             *parse_policy_duplicate_res(const std::string&);
+    Policy_Change_Name_Res           *parse_policy_change_name_res(const std::string&);
+    Policy_Get_Res                   *parse_policy_get_res(const std::string&);
+    Policy_Get_Name_Res              *parse_policy_get_name_res(const std::string&);
+    Policy_Get_Policies_Count_Res    *parse_policy_get_policies_count_res(const std::string&);
+    Policy_Clear_Policies_Res        *parse_policy_clear_policies_res(const std::string&);
+    Policy_Get_Policies_Res          *parse_policy_get_policies_res(const std::string&);
+    XSLT_Policy_Create_From_File_Res *parse_xslt_policy_create_from_file_res(const std::string&);
+    XSLT_Policy_Rule_Create_Res      *parse_xslt_policy_rule_create_res(const std::string&);
+    XSLT_Policy_Rule_Edit_Res        *parse_xslt_policy_rule_edit_res(const std::string&);
+    XSLT_Policy_Rule_Duplicate_Res   *parse_xslt_policy_rule_duplicate_res(const std::string&);
+    XSLT_Policy_Rule_Delete_Res      *parse_xslt_policy_rule_delete_res(const std::string&);
 
     std::string get_error() const { return error; }
 
@@ -712,6 +811,8 @@ private:
     Container::Value serialize_report_ok(Checker_Report_Ok& ok);
     Container::Value serialize_list_file(const std::string& file, int id);
     Container::Value serialize_validate_ok(Checker_Validate_Ok* ok);
+    Container::Value serialize_policy_nok(Policy_Nok* nok);
+    void serialize_policies_get_policies(std::vector<Policy_Get_Policies_Ok*>, Container::Value& policies);
 
     int parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args);
     int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
@@ -721,6 +822,8 @@ private:
     int parse_report_ok(Container::Value *v, Checker_Report_Ok& ok);
     int parse_list_file(Container::Value *v, std::string& file, int& id);
     int parse_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks);
+    int parse_policy_nok(Container::Value *v, Policy_Nok** n);
+    int parse_policies_get_policies(Container::Value* policies, std::vector<Policy_Get_Policies_Ok*>);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

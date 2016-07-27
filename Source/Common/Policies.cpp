@@ -268,7 +268,7 @@ int Policies::erase_policy(int id, std::string& err)
     return 0;
 }
 
-void Policies::clear_policies()
+int Policies::clear_policies(std::string&)
 {
     std::map<size_t, Policy*>::iterator it = policies.begin();
     for (; it != policies.end(); ++it)
@@ -278,6 +278,7 @@ void Policies::clear_policies()
         delete it->second;
     }
     policies.clear();
+    return 0;
 }
 
 int Policies::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)

@@ -70,7 +70,7 @@ public:
     int         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
 
     int         erase_policy(int index, std::string& err);
-    void        clear_policies();
+    int         clear_policies(std::string& err);
 
     size_t      get_policies_size() const { return policies.size(); };
     Policy*     get_policy(int pos, std::string& err);

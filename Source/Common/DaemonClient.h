@@ -108,7 +108,7 @@ public:
     size_t policy_get_policies_count();
 
     // clear policies
-    void policy_clear_policies();
+    int policy_clear_policies(std::string& err);
 
     // get all policies with ID && name
     void policy_get_policies(std::vector<std::pair<size_t, std::string> >&);

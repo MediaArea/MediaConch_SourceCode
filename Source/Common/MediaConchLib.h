@@ -192,7 +192,7 @@ public:
     int                          policy_save(int pos, std::string& err);
     int                          policy_remove(int pos, std::string& err);
     int                          policy_dump(int id, std::string& memory, std::string& err);
-    void                         policy_clear_policies();
+    int                          policy_clear_policies(std::string& err);
 
     // XSLT Policy Rule
     int                         xslt_policy_rule_create(int policy_id, std::string& err);

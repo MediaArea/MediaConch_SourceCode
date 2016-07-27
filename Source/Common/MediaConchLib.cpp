@@ -536,12 +536,12 @@ int MediaConchLib::policy_save(int pos, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::policy_clear_policies()
+int MediaConchLib::policy_clear_policies(std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_clear_policies();
+        return daemon_client->policy_clear_policies(err);
 
-    core->policies.clear_policies();
+    return core->policies.clear_policies(err);
 }
 
 //---------------------------------------------------------------------------

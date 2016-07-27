@@ -81,6 +81,10 @@ int Httpd::send_result()
     MAKE_REQ_FUNC(retry, Checker_Retry)
     MAKE_REQ_FUNC(file_from_id, Checker_File_From_Id)
 
+    MAKE_REQ_FUNC(policy_import, Policy_Import);
+    MAKE_REQ_FUNC(policy_change_name, Policy_Change_Name);
+    MAKE_REQ_FUNC(xslt_policy_rule_edit, XSLT_Policy_Rule_Edit);
+
 #undef MAKE_REQ_FUNC
 
 //---------------------------------------------------------------------------
@@ -97,7 +101,21 @@ int Httpd::send_result()
     MAKE_URI_REQ_FUNC(clear, Checker_Clear)
     MAKE_URI_REQ_FUNC(list, Checker_List)
     MAKE_URI_REQ_FUNC(default_values_for_type, Default_Values_For_Type)
+
+    MAKE_URI_REQ_FUNC(xslt_policy_create, XSLT_Policy_Create)
+    MAKE_URI_REQ_FUNC(policy_remove, Policy_Remove)
+    MAKE_URI_REQ_FUNC(policy_dump, Policy_Dump)
+    MAKE_URI_REQ_FUNC(policy_save, Policy_Save)
+    MAKE_URI_REQ_FUNC(policy_duplicate, Policy_Duplicate)
+    MAKE_URI_REQ_FUNC(policy_get, Policy_Get)
+    MAKE_URI_REQ_FUNC(policy_get_name, Policy_Get_Name)
+    MAKE_URI_REQ_FUNC(policy_get_policies_count, Policy_Get_Policies_Count)
+    MAKE_URI_REQ_FUNC(policy_clear_policies, Policy_Clear_Policies)
+    MAKE_URI_REQ_FUNC(policy_get_policies, Policy_Get_Policies)
     MAKE_URI_REQ_FUNC(xslt_policy_create_from_file, XSLT_Policy_Create_From_File)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_create, XSLT_Policy_Rule_Create)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_duplicate, XSLT_Policy_Rule_Duplicate)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_delete, XSLT_Policy_Rule_Delete)
 
 #undef MAKE_URI_REQ_FUNC
 

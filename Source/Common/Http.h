@@ -37,6 +37,7 @@ public:
     virtual int stop() = 0;
     virtual int finish() = 0;
 
+    // Checker
     int send_request(RESTAPI::Checker_Analyze_Req& req);
     int send_request(RESTAPI::Checker_Status_Req& req);
     int send_request(RESTAPI::Checker_Report_Req& req);
@@ -46,7 +47,25 @@ public:
     int send_request(RESTAPI::Checker_Validate_Req& req);
     int send_request(RESTAPI::Checker_File_From_Id_Req& req);
     int send_request(RESTAPI::Default_Values_For_Type_Req& req);
+
+    // Policy
+    int send_request(RESTAPI::XSLT_Policy_Create_Req& req);
+    int send_request(RESTAPI::Policy_Import_Req& req);
+    int send_request(RESTAPI::Policy_Remove_Req& req);
+    int send_request(RESTAPI::Policy_Dump_Req& req);
+    int send_request(RESTAPI::Policy_Save_Req& req);
+    int send_request(RESTAPI::Policy_Duplicate_Req& req);
+    int send_request(RESTAPI::Policy_Change_Name_Req& req);
+    int send_request(RESTAPI::Policy_Get_Req& req);
+    int send_request(RESTAPI::Policy_Get_Name_Req& req);
+    int send_request(RESTAPI::Policy_Get_Policies_Count_Req& req);
+    int send_request(RESTAPI::Policy_Clear_Policies_Req& req);
+    int send_request(RESTAPI::Policy_Get_Policies_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Create_From_File_Req& req);
+    int send_request(RESTAPI::XSLT_Policy_Rule_Create_Req& req);
+    int send_request(RESTAPI::XSLT_Policy_Rule_Edit_Req& req);
+    int send_request(RESTAPI::XSLT_Policy_Rule_Duplicate_Req& req);
+    int send_request(RESTAPI::XSLT_Policy_Rule_Delete_Req& req);
 
     void set_port(int port);
     void set_address(std::string& address);
