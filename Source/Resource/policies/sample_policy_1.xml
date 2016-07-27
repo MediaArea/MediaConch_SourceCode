@@ -1,5 +1,7 @@
 <policy type="or" name="Do I like these frames?">
     <description>NTSC is nice, so is PAL, also 320x240 cuz it's my sample file</description>
+    <rule scope="mt" value="EBML/EBMLVersion/Data" operator="=">2</rule>
+    <rule scope="mt" value="Segment/Cluster/SimpleBlock/Data/keyframe" operator="=">Yes</rule>
     <policy type="and" name="Does this use framesize and framerates that I like?">
         <policy type="or" name="I like frame heights like 240, 480, 486">
             <rule name="ntsc height" value="Height" tracktype="Video" occurrence="1" operator="=">486</rule>

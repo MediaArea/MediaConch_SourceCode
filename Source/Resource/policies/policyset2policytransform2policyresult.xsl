@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" version="1.0" exclude-result-prefixes="aliasxsl">
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
   <xsl:template match="/">
-    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
+    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
       <aliasxsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
       <aliasxsl:template match="ma:MediaArea">
         <MediaConch>
@@ -10,6 +10,12 @@
             <aliasxsl:text>0.3</aliasxsl:text>
           </aliasxsl:attribute>
           <aliasxsl:for-each select="ma:media">
+            <test>
+              <xsl:call-template name="tokenize">
+                <xsl:with-param name="list">EBML/EBMLVersion/OK</xsl:with-param>
+                <xsl:with-param name="delimiter" select="'/'"/>
+              </xsl:call-template>
+            </test>
             <media>
               <aliasxsl:attribute name="ref">
                 <aliasxsl:value-of select="./@ref"/>
@@ -157,22 +163,47 @@
   <xsl:template name="rulecheck">
     <xsl:param name="rule"/>
     <xsl:variable name="equationfull">
-      <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
-      <xsl:value-of select="@tracktype"/>
-      <xsl:text>'][</xsl:text>
-      <xsl:value-of select="@occurrence"/>
-      <xsl:text>]/mi:</xsl:text>
-      <xsl:value-of select="@value"/>
-      <xsl:value-of select="@operator"/>
-      <xsl:value-of select="."/>
+      <xsl:choose>
+        <xsl:when test="@scope='mt'">
+          <xsl:text>mt:MediaTrace</xsl:text>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
+          <xsl:value-of select="@operator"/>
+          <xsl:text>'</xsl:text>
+          <xsl:value-of select="."/>
+          <xsl:text>'</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
+          <xsl:value-of select="@tracktype"/>
+          <xsl:text>'][</xsl:text>
+          <xsl:value-of select="@occurrence"/>
+          <xsl:text>]/mi:</xsl:text>
+          <xsl:value-of select="@value"/>
+          <xsl:value-of select="@operator"/>
+          <xsl:value-of select="."/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="equationbase">
-      <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
-      <xsl:value-of select="@tracktype"/>
-      <xsl:text>'][</xsl:text>
-      <xsl:value-of select="@occurrence"/>
-      <xsl:text>]/mi:</xsl:text>
-      <xsl:value-of select="@value"/>
+    <xsl:variable name="equationbase"><xsl:choose>
+        <xsl:when test="@scope='mt'">
+          <xsl:text>mt:MediaTrace</xsl:text>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
+          <xsl:value-of select="@tracktype"/>
+          <xsl:text>'][</xsl:text>
+          <xsl:value-of select="@occurrence"/>
+          <xsl:text>]/mi:</xsl:text>
+          <xsl:value-of select="@value"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <aliasxsl:call-template name="rule">
       <aliasxsl:with-param name="name">
@@ -198,5 +229,48 @@
         </aliasxsl:choose>
       </aliasxsl:with-param>
     </aliasxsl:call-template>
+  </xsl:template>
+  <xsl:template name="tokenize">
+    <xsl:param name="list"/>
+    <xsl:param name="delimiter"/>
+    <xsl:variable name="newlist">
+      <xsl:choose>
+        <xsl:when test="contains($list, $delimiter)">
+          <xsl:value-of select="normalize-space($list)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat(normalize-space($list), $delimiter)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="first" select="substring-before($newlist, $delimiter)"/>
+    <xsl:variable name="remaining" select="substring-after($newlist, $delimiter)"/>
+    <xsl:variable name="count" select="position()"/>
+
+    <xsl:choose>
+      <xsl:when test="$remaining">
+        <xsl:text>/mt:block[@name='</xsl:text>
+        <xsl:value-of select="$first"/>
+        <xsl:text>']</xsl:text>
+        <xsl:call-template name="tokenize">
+          <xsl:with-param name="list" select="$remaining"/>
+          <xsl:with-param name="delimiter">
+            <xsl:value-of select="$delimiter"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="@first='data'">
+            <xsl:text>/mt:dataHI</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>/mt:data[@name='</xsl:text>
+            <xsl:value-of select="$first"/>
+            <xsl:text>']</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>
