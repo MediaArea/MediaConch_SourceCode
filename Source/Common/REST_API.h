@@ -578,6 +578,18 @@ public:
     };
 
     // XSLT Rule
+    struct XSLT_Policy_Rule
+    {
+        int          id;
+        std::string  name;
+        std::string  tracktype;
+        std::string  field;
+        int          occurrence;
+        std::string  ope;
+        std::string  value;
+        std::string  to_str() const;
+    };
+
     struct XSLT_Policy_Rule_Create_Req
     {
         int         policy_id;
@@ -595,9 +607,8 @@ public:
 
     struct XSLT_Policy_Rule_Edit_Req
     {
-        int         policy_id;
-        int         id;
-        //RULE
+        int              policy_id;
+        XSLT_Policy_Rule rule;
         std::string to_str() const;
     };
 
@@ -670,6 +681,7 @@ public:
     int serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string&);
     int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&);
     int serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string&);
+    int serialize_xslt_policy_rule(XSLT_Policy_Rule& rule, Container::Value&);
     int serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string&);
     int serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string&);
     int serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string&);
@@ -728,6 +740,7 @@ public:
     Policy_Get_Policies_Req          *parse_policy_get_policies_req(const std::string&);
     XSLT_Policy_Create_From_File_Req *parse_xslt_policy_create_from_file_req(const std::string&);
     XSLT_Policy_Rule_Create_Req      *parse_xslt_policy_rule_create_req(const std::string&);
+    int                               parse_xslt_policy_rule(Container::Value *val, XSLT_Policy_Rule *);
     XSLT_Policy_Rule_Edit_Req        *parse_xslt_policy_rule_edit_req(const std::string&);
     XSLT_Policy_Rule_Duplicate_Req   *parse_xslt_policy_rule_duplicate_req(const std::string&);
     XSLT_Policy_Rule_Delete_Req      *parse_xslt_policy_rule_delete_req(const std::string&);

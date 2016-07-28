@@ -408,6 +408,23 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    out << "id: " << id;
+    out << ",\"name\": " << name;
+    out << ",\"tracktype\": " << tracktype;
+    out << ",\"field\": " << field;
+    out << ",occurrence: " << occurrence;
+    out << ",\"ope\": " << ope;
+    out << ",\"value\": " << value;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::XSLT_Policy_Rule_Create_Req::to_str() const
 {
     std::stringstream out;
@@ -422,8 +439,7 @@ std::string RESTAPI::XSLT_Policy_Rule_Edit_Req::to_str() const
     std::stringstream out;
 
     out << "{\"policy_id\": " << policy_id;
-    out << ", \"id\":" << id;
-    //TODO
+    out << ", " << rule.to_str();
     out << "}";
     return out.str();
 }
@@ -1363,6 +1379,44 @@ int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_
     return 0;
 }
 
+// XSLT Rule
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule(XSLT_Policy_Rule& rule, Container::Value& val)
+{
+    Container::Value id, name, tracktype, field, occurrence, ope, value;
+    val.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = rule.id;
+    val.obj["id"] = id;
+
+    name.type = Container::Value::CONTAINER_TYPE_STRING;
+    name.s = rule.name;
+    val.obj["name"] = name;
+
+    tracktype.type = Container::Value::CONTAINER_TYPE_STRING;
+    tracktype.s = rule.tracktype;
+    val.obj["tracktype"] = tracktype;
+
+    field.type = Container::Value::CONTAINER_TYPE_STRING;
+    field.s = rule.field;
+    val.obj["field"] = field;
+
+    occurrence.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    occurrence.l = rule.occurrence;
+    val.obj["occurrence"] = occurrence;
+
+    ope.type = Container::Value::CONTAINER_TYPE_STRING;
+    ope.s = rule.ope;
+    val.obj["ope"] = ope;
+
+    value.type = Container::Value::CONTAINER_TYPE_STRING;
+    value.s = rule.value;
+    val.obj["value"] = value;
+
+    return 0;
+}
+
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string& data)
 {
@@ -1378,7 +1432,7 @@ int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string& data)
 {
-    Container::Value v, child, policy_id, id, rule;
+    Container::Value v, child, policy_id, rule;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -1386,13 +1440,8 @@ int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req,
     policy_id.l = req.policy_id;
     child.obj["policy_id"] = policy_id;
 
-    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    id.l = req.id;
-    child.obj["id"] = id;
-
-    // rule.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    // rule.l = req.rule;
-    // child.obj["rule"] = rule;
+    serialize_xslt_policy_rule(req.rule, rule);
+    child.obj["rule"] = rule;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_RULE_EDIT"] = child;
@@ -2752,6 +2801,57 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_fro
 }
 
 //---------------------------------------------------------------------------
+int RESTAPI::parse_xslt_policy_rule(Container::Value *val, RESTAPI::XSLT_Policy_Rule *rule)
+{
+    if (!val || val->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return -1;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*val, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return -1;
+    rule->id = id->l;
+
+    Container::Value *name;
+    name = model->get_value_by_key(*val, "name");
+    if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+    rule->name = name->s;
+
+    Container::Value *tracktype;
+    tracktype = model->get_value_by_key(*val, "tracktype");
+    if (!tracktype || tracktype->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+    rule->tracktype = tracktype->s;
+
+    Container::Value *field;
+    field = model->get_value_by_key(*val, "field");
+    if (!field || field->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+    rule->field = field->s;
+
+    Container::Value *occurrence;
+    occurrence = model->get_value_by_key(*val, "occurrence");
+    if (!occurrence || occurrence->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return -1;
+    rule->occurrence = occurrence->l;
+
+    Container::Value *ope;
+    ope = model->get_value_by_key(*val, "ope");
+    if (!ope || ope->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+    rule->ope = ope->s;
+
+    Container::Value *value;
+    value = model->get_value_by_key(*val, "value");
+    if (!value || value->type != Container::Value::CONTAINER_TYPE_STRING)
+        return -1;
+    rule->value = value->s;
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_xslt_policy_rule_create_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -2795,13 +2895,17 @@ RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_xslt_policy_rule_edit_req(con
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
-    Container::Value *id = model->get_value_by_key(*child, "id");
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    Container::Value *rule = model->get_value_by_key(*child, "rule");
+    if (!rule || rule->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
     XSLT_Policy_Rule_Edit_Req *req = new XSLT_Policy_Rule_Edit_Req;
     req->policy_id = policy_id->l;
-    req->id = id->l;
+    if (parse_xslt_policy_rule(rule, &req->rule) < 0)
+    {
+        delete req;
+        return NULL;
+    }
     return req;
 }
 
@@ -3259,42 +3363,10 @@ RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_uri_xslt_policy_rule_edit_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_uri_xslt_policy_rule_edit_req(const std::string&)
 {
     XSLT_Policy_Rule_Edit_Req *req = new XSLT_Policy_Rule_Edit_Req;
-
-    size_t start = 0;
-    size_t and_pos = 0;
-    while (start != std::string::npos)
-    {
-        start = uri.find("=", start);
-        if (start == std::string::npos)
-            continue;
-
-        std::string substr = uri.substr(0, start);
-        ++start;
-        and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
-
-        start = and_pos + 1;
-
-        if (substr == "id")
-        {
-            if (!val.length())
-                continue;
-
-            req->id = strtoll(val.c_str(), NULL, 10);
-        }
-        else if (substr == "policy_id")
-        {
-            if (!val.length())
-                continue;
-
-            req->policy_id = strtoll(val.c_str(), NULL, 10);
-        }
-        else
-            start = std::string::npos;
-    }
+    //TODO
 
     return req;
 }

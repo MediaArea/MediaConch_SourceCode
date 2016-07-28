@@ -16,6 +16,7 @@
 #include "Common/Httpd.h"
 #include "Common/LibEventHttpd.h"
 #include "Common/Policy.h"
+#include "Common/XsltPolicy.h"
 #include "Daemon.h"
 #include "Help.h"
 #include "Config.h"
@@ -1179,8 +1180,17 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        //TODO
-        if (d->MCL->xslt_policy_rule_edit(req->policy_id, req->id, NULL, err) < 0)
+        XsltPolicyRule rule;
+
+        rule.id = req->rule.id;
+        rule.node_name = req->rule.name;
+        rule.track_type = req->rule.tracktype;
+        rule.field = req->rule.field;
+        rule.occurrence = req->rule.occurrence;
+        rule.ope = req->rule.ope;
+        rule.value = req->rule.value;
+
+        if (d->MCL->xslt_policy_rule_edit(req->policy_id, req->rule.id, &rule, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;

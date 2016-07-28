@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 #include "DaemonClient.h"
 #include "MediaConchLib.h"
+#include "XsltPolicy.h"
 #include "Http.h"
 #include "LibEventHttp.h"
 #include "REST_API.h"
@@ -1013,8 +1014,14 @@ int DaemonClient::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPo
 
     RESTAPI::XSLT_Policy_Rule_Edit_Req req;
     req.policy_id = policy_id;
-    req.id = rule_id;
-    //TODO rule
+
+    req.rule.id = rule_id;
+    req.rule.name = rule->node_name;
+    req.rule.tracktype = rule->track_type;
+    req.rule.field = rule->field;
+    req.rule.occurrence = rule->occurrence;
+    req.rule.ope = rule->ope;
+    req.rule.value = rule->value;
 
     int ret = http_client->start();
     if (ret < 0)
