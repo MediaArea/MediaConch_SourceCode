@@ -862,6 +862,14 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a xslt_policy_create command: ";
         std::clog << req->to_str() << std::endl;
 
+        std::string err;
+        res.id = d->MCL->xslt_policy_create(err, req->parent_id);
+        if (res.id == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
         std::clog << d->get_date() << "Daemon send xslt_policy_create result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -877,6 +885,14 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a policy_import command: ";
         std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        res.id = d->MCL->policy_import(req->xml, err);
+        if (res.id == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
 
         std::clog << d->get_date() << "Daemon send policy_import result: " << res.to_str() << std::endl;
         return 0;
@@ -894,6 +910,13 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_remove command: ";
         std::clog << req->to_str() << std::endl;
 
+        std::string err;
+        if (d->MCL->policy_remove(req->id, err) == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
         std::clog << d->get_date() << "Daemon send policy_remove result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -909,6 +932,13 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a policy_dump command: ";
         std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        if (d->MCL->policy_dump(req->id, res.xml, err) == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
 
         std::clog << d->get_date() << "Daemon send policy_dump result: " << res.to_str() << std::endl;
         return 0;
@@ -926,6 +956,13 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_save command: ";
         std::clog << req->to_str() << std::endl;
 
+        std::string err;
+        if (d->MCL->policy_save(req->id, err) == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
         std::clog << d->get_date() << "Daemon send policy_save result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -941,6 +978,14 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a policy_duplicate command: ";
         std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        res.id = d->MCL->policy_duplicate(req->id, err);
+        if (res.id == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
 
         std::clog << d->get_date() << "Daemon send policy_duplicate result: " << res.to_str() << std::endl;
         return 0;
@@ -958,6 +1003,13 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_change_name command: ";
         std::clog << req->to_str() << std::endl;
 
+        std::string err;
+        if (d->MCL->policy_change_name(req->id, req->name, req->description, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
         std::clog << d->get_date() << "Daemon send policy_change_name result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -974,6 +1026,15 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_get command: ";
         std::clog << req->to_str() << std::endl;
 
+        std::string err;
+        Policy* p = d->MCL->policy_get(req->id, err);
+        if (!p)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+        //TODO
+
         std::clog << d->get_date() << "Daemon send policy_get result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -988,6 +1049,9 @@ namespace MediaConch
             return -1;
 
         std::clog << d->get_date() << "Daemon received a policy_get_policies_count command: ";
+
+        std::string err;
+        res.size = d->MCL->policy_get_policies_count();
 
         std::clog << d->get_date() << "Daemon send policy_get_policies_count result: " << res.to_str() << std::endl;
         return 0;
@@ -1004,6 +1068,13 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a policy_clear_policies command: ";
 
+        std::string err;
+        if (d->MCL->policy_clear_policies(err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
         std::clog << d->get_date() << "Daemon send policy_clear_policies result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -1018,6 +1089,16 @@ namespace MediaConch
             return -1;
 
         std::clog << d->get_date() << "Daemon received a policy_get_policies command: ";
+
+        std::vector<std::pair<size_t, std::string> > policies;
+        d->MCL->policy_get_policies(policies);
+        for (size_t i = 0; i < policies.size(); ++i)
+        {
+            RESTAPI::Policy_Get_Policies_Ok *ok = new RESTAPI::Policy_Get_Policies_Ok;
+            ok->id = policies[i].first;
+            ok->name = policies[i].second;
+            res.policies.push_back(ok);
+        }
 
         std::clog << d->get_date() << "Daemon send policy_get_policies result: " << res.to_str() << std::endl;
         return 0;
@@ -1073,6 +1154,14 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a xslt_policy_rule_create command: ";
         std::clog << req->to_str() << std::endl;
 
+        std::string err;
+        res.id = d->MCL->xslt_policy_rule_create(req->policy_id, err);
+        if (res.id == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
         std::clog << d->get_date() << "Daemon send xslt_policy_rule_create result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -1088,6 +1177,14 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a xslt_policy_rule_edit command: ";
         std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        //TODO
+        if (d->MCL->xslt_policy_rule_edit(req->policy_id, req->id, NULL, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
 
         std::clog << d->get_date() << "Daemon send xslt_policy_rule_edit result: " << res.to_str() << std::endl;
         return 0;
@@ -1105,6 +1202,13 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a xslt_policy_rule_duplicate command: ";
         std::clog << req->to_str() << std::endl;
 
+        std::string err;
+        if (d->MCL->xslt_policy_rule_duplicate(req->policy_id, req->id, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
         std::clog << d->get_date() << "Daemon send xslt_policy_rule_duplicate result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -1120,6 +1224,13 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a xslt_policy_rule_delete command: ";
         std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        if (d->MCL->xslt_policy_rule_delete(req->policy_id, req->id, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
 
         std::clog << d->get_date() << "Daemon send xslt_policy_rule_delete result: " << res.to_str() << std::endl;
         return 0;
