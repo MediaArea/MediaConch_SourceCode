@@ -851,6 +851,179 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_xslt_policy_create_command(const RESTAPI::XSLT_Policy_Create_Req* req,
+                                              RESTAPI::XSLT_Policy_Create_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a xslt_policy_create command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send xslt_policy_create result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_import_command(const RESTAPI::Policy_Import_Req* req,
+                                         RESTAPI::Policy_Import_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_import command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send policy_import result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_remove_command(const RESTAPI::Policy_Remove_Req* req,
+                                         RESTAPI::Policy_Remove_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_remove command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send policy_remove result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_dump_command(const RESTAPI::Policy_Dump_Req* req,
+                                       RESTAPI::Policy_Dump_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_dump command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send policy_dump result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_save_command(const RESTAPI::Policy_Save_Req* req,
+                                       RESTAPI::Policy_Save_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_save command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send policy_save result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_duplicate_command(const RESTAPI::Policy_Duplicate_Req* req,
+                                            RESTAPI::Policy_Duplicate_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_duplicate command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send policy_duplicate result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_change_name_command(const RESTAPI::Policy_Change_Name_Req* req,
+                                              RESTAPI::Policy_Change_Name_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_change_name command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send policy_change_name result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
+                                      RESTAPI::Policy_Get_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_get command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send policy_get result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_get_policies_count_command(const RESTAPI::Policy_Get_Policies_Count_Req* req,
+                                                     RESTAPI::Policy_Get_Policies_Count_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_get_policies_count command: ";
+
+        std::clog << d->get_date() << "Daemon send policy_get_policies_count result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_clear_policies_command(const RESTAPI::Policy_Clear_Policies_Req* req,
+                                                 RESTAPI::Policy_Clear_Policies_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_clear_policies command: ";
+
+        std::clog << d->get_date() << "Daemon send policy_clear_policies result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_get_policies_command(const RESTAPI::Policy_Get_Policies_Req* req,
+                                               RESTAPI::Policy_Get_Policies_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_get_policies command: ";
+
+        std::clog << d->get_date() << "Daemon send policy_get_policies result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_xslt_policy_create_from_file_command(const RESTAPI::XSLT_Policy_Create_From_File_Req* req, RESTAPI::XSLT_Policy_Create_From_File_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
@@ -885,6 +1058,70 @@ namespace MediaConch
         }
 
         std::clog << d->get_date() << "Daemon send xslt_policy_create_from_file result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_xslt_policy_rule_create_command(const RESTAPI::XSLT_Policy_Rule_Create_Req* req,
+                                                   RESTAPI::XSLT_Policy_Rule_Create_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_create command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send xslt_policy_rule_create result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_xslt_policy_rule_edit_command(const RESTAPI::XSLT_Policy_Rule_Edit_Req* req,
+                                                 RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_edit command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send xslt_policy_rule_edit result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_xslt_policy_rule_duplicate_command(const RESTAPI::XSLT_Policy_Rule_Duplicate_Req* req,
+                                                      RESTAPI::XSLT_Policy_Rule_Duplicate_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_duplicate command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send xslt_policy_rule_duplicate result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_xslt_policy_rule_delete_command(const RESTAPI::XSLT_Policy_Rule_Delete_Req* req,
+                                                   RESTAPI::XSLT_Policy_Rule_Delete_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_delete command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::clog << d->get_date() << "Daemon send xslt_policy_rule_delete result: " << res.to_str() << std::endl;
         return 0;
     }
 

@@ -315,11 +315,138 @@ std::string RESTAPI::Default_Values_For_Type_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Create_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"parent_id\": " << parent_id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Import_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{size(\"xml\"): " << xml.size() << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Remove_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Dump_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Save_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Duplicate_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Change_Name_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id;
+    out << "\"name\":" << name;
+    out << "\"description\":" << description;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Name_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::XSLT_Policy_Create_From_File_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{id: " << id << "}";
+    out << "{\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Create_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"policy_id\": " << policy_id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Edit_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"policy_id\": " << policy_id;
+    out << ", \"id\":" << id;
+    //TODO
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Duplicate_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"policy_id\": " << policy_id;
+    out << ", \"id\":" << id;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Delete_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"policy_id\": " << policy_id;
+    out << ", \"id\":" << id;
+    out << "}";
     return out.str();
 }
 
@@ -327,6 +454,7 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Req::to_str() const
 // Result: to_str()
 //***************************************************************************
 
+// Checker
 //---------------------------------------------------------------------------
 std::string RESTAPI::Checker_Analyze_Ok::to_str() const
 {
@@ -627,15 +755,239 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Nok::to_str() const
     return out.str();
 }
 
+//  Policy
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "\"" << error << "\"";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Create_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id;
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Import_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id;
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Remove_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Dump_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{size(\"xml\"):" << xml.size();
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Save_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Duplicate_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\": " << id;
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Change_Name_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    //TODO
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Name_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"name\": \"" << name;
+    out << "\"";
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Policies_Count_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"size\": " << size;
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Clear_Policies_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Policies_Ok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\":" << id << "\"name\":\"" << name << "\"}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Policies_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{[";
+    for (size_t i = 0; i < policies.size(); ++i)
+    {
+        if (!policies[i])
+            continue;
+
+        if (i)
+            out << ",";
+        out << policies[i]->to_str();
+    }
+
+    out << "]";
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
 //---------------------------------------------------------------------------
 std::string RESTAPI::XSLT_Policy_Create_From_File_Res::to_str() const
 {
     std::stringstream out;
 
     if (policy_id < 0)
-        out << "{policy: " << policy_id << "}";
+        out << "{\"policy\": " << policy_id << "}";
     else if (nok)
-        out << "{nok: " << nok->to_str() << "}";
+        out << "{\"nok\": " << nok->to_str() << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Create_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\":" << id;
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Edit_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Duplicate_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\":" << id;
+    if (nok)
+        out << "," << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Delete_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
     return out.str();
 }
 

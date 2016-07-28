@@ -63,6 +63,7 @@ namespace MediaConch
         int parse_other(const std::string& argument);
 
         // Request received callbacks
+        //  Checker
         static int on_analyze_command(const RESTAPI::Checker_Analyze_Req* req,
                                       RESTAPI::Checker_Analyze_Res& res, void *arg);
         static int on_status_command(const RESTAPI::Checker_Status_Req* req,
@@ -81,8 +82,40 @@ namespace MediaConch
                                            RESTAPI::Checker_File_From_Id_Res& res, void *arg);
         static int on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void *arg);
+
+        //  Policy
+        static int on_xslt_policy_create_command(const RESTAPI::XSLT_Policy_Create_Req* req,
+                                                 RESTAPI::XSLT_Policy_Create_Res& res, void *arg);
+        static int on_policy_import_command(const RESTAPI::Policy_Import_Req* req,
+                                            RESTAPI::Policy_Import_Res& res, void *arg);
+        static int on_policy_remove_command(const RESTAPI::Policy_Remove_Req* req,
+                                            RESTAPI::Policy_Remove_Res& res, void *arg);
+        static int on_policy_dump_command(const RESTAPI::Policy_Dump_Req* req,
+                                          RESTAPI::Policy_Dump_Res& res, void *arg);
+        static int on_policy_save_command(const RESTAPI::Policy_Save_Req* req,
+                                          RESTAPI::Policy_Save_Res& res, void *arg);
+        static int on_policy_duplicate_command(const RESTAPI::Policy_Duplicate_Req* req,
+                                               RESTAPI::Policy_Duplicate_Res& res, void *arg);
+        static int on_policy_change_name_command(const RESTAPI::Policy_Change_Name_Req* req,
+                                                 RESTAPI::Policy_Change_Name_Res& res, void *arg);
+        static int on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
+                                         RESTAPI::Policy_Get_Res& res, void *arg);
+        static int on_policy_get_policies_count_command(const RESTAPI::Policy_Get_Policies_Count_Req* req,
+                                                        RESTAPI::Policy_Get_Policies_Count_Res& res, void *arg);
+        static int on_policy_clear_policies_command(const RESTAPI::Policy_Clear_Policies_Req* req,
+                                                    RESTAPI::Policy_Clear_Policies_Res& res, void *arg);
+        static int on_policy_get_policies_command(const RESTAPI::Policy_Get_Policies_Req* req,
+                                                  RESTAPI::Policy_Get_Policies_Res& res, void *arg);
         static int on_xslt_policy_create_from_file_command(const RESTAPI::XSLT_Policy_Create_From_File_Req* req,
                                                            RESTAPI::XSLT_Policy_Create_From_File_Res& res, void *arg);
+        static int on_xslt_policy_rule_create_command(const RESTAPI::XSLT_Policy_Rule_Create_Req* req,
+                                                      RESTAPI::XSLT_Policy_Rule_Create_Res& res, void *arg);
+        static int on_xslt_policy_rule_edit_command(const RESTAPI::XSLT_Policy_Rule_Edit_Req* req,
+                                                    RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void *arg);
+        static int on_xslt_policy_rule_duplicate_command(const RESTAPI::XSLT_Policy_Rule_Duplicate_Req* req,
+                                                         RESTAPI::XSLT_Policy_Rule_Duplicate_Res& res, void *arg);
+        static int on_xslt_policy_rule_delete_command(const RESTAPI::XSLT_Policy_Rule_Delete_Req* req,
+                                                      RESTAPI::XSLT_Policy_Rule_Delete_Res& res, void *arg);
 
         size_t get_first_free_slot();
         bool id_is_existing(int id) const;
