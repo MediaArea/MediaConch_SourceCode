@@ -8,6 +8,11 @@ bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
 
+Version 16.07, 2016-07-29
+-------------
+New policy editor
+Minor fixes
+
 Version 16.06, 2016-06-30
 -------------
 Create a policy from MediaInfo report
