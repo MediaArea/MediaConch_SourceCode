@@ -639,7 +639,7 @@ namespace MediaConch
 
         // Output
         MediaConchLib::Checker_ReportRes result;
-        d->MCL->checker_get_report(report_set, format, files,
+        d->MCL->checker_get_report(req->user, report_set, format, files,
                                    req->policies_ids, req->policies_contents,
                                    options, &result, display_name, display_content);
         res.ok.report = result.report;
@@ -814,7 +814,7 @@ namespace MediaConch
         }
 
         std::vector<MediaConchLib::Checker_ValidateRes*> result;
-        if (d->MCL->checker_validate(report, files, req->policies_ids, req->policies_contents,
+        if (d->MCL->checker_validate(req->user, report, files, req->policies_ids, req->policies_contents,
                                      result))
             return -1;
 
@@ -881,7 +881,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->xslt_policy_create(err, req->parent_id);
+        res.id = d->MCL->xslt_policy_create(req->user, err, req->parent_id);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -905,7 +905,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->policy_import(req->xml, err);
+        res.id = d->MCL->policy_import(req->user, req->xml, err);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -929,7 +929,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_remove(req->id, err) == -1)
+        if (d->MCL->policy_remove(req->user, req->id, err) == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -952,7 +952,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_dump(req->id, res.xml, err) == -1)
+        if (d->MCL->policy_dump(req->user, req->id, res.xml, err) == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -975,7 +975,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_save(req->id, err) == -1)
+        if (d->MCL->policy_save(req->user, req->id, err) == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -998,7 +998,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->policy_duplicate(req->id, err);
+        res.id = d->MCL->policy_duplicate(req->user, req->id, err);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -1022,7 +1022,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_change_name(req->id, req->name, req->description, err) < 0)
+        if (d->MCL->policy_change_name(req->user, req->id, req->name, req->description, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1045,7 +1045,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        Policy* p = d->MCL->policy_get(req->id, err);
+        Policy* p = d->MCL->policy_get(req->user, req->id, err);
         if (!p)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -1070,7 +1070,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_get_name(req->id, res.name, err) < 0)
+        if (d->MCL->policy_get_name(req->user, req->id, res.name, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1092,7 +1092,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_get_policies_count command: ";
 
         std::string err;
-        res.size = d->MCL->policy_get_policies_count();
+        res.size = d->MCL->policy_get_policies_count(req->user);
 
         std::clog << d->get_date() << "Daemon send policy_get_policies_count result: " << res.to_str() << std::endl;
         return 0;
@@ -1110,7 +1110,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_clear_policies command: ";
 
         std::string err;
-        if (d->MCL->policy_clear_policies(err) < 0)
+        if (d->MCL->policy_clear_policies(req->user, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1132,7 +1132,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_get_policies command: ";
 
         std::vector<std::pair<size_t, std::string> > policies;
-        d->MCL->policy_get_policies(policies);
+        d->MCL->policy_get_policies(req->user, policies);
         for (size_t i = 0; i < policies.size(); ++i)
         {
             RESTAPI::Policy_Get_Policies_Ok *ok = new RESTAPI::Policy_Get_Policies_Ok;
@@ -1166,7 +1166,7 @@ namespace MediaConch
         else
         {
             std::string err;
-            int pos = d->MCL->xslt_policy_create_from_file(*d->current_files[req->id], err);
+            int pos = d->MCL->xslt_policy_create_from_file(req->user, *d->current_files[req->id], err);
 
             if (pos == -1)
             {
@@ -1196,7 +1196,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->xslt_policy_rule_create(req->policy_id, err);
+        res.id = d->MCL->xslt_policy_rule_create(req->user, req->policy_id, err);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -1230,7 +1230,7 @@ namespace MediaConch
         rule.ope = req->rule.ope;
         rule.value = req->rule.value;
 
-        if (d->MCL->xslt_policy_rule_edit(req->policy_id, req->rule.id, &rule, err) < 0)
+        if (d->MCL->xslt_policy_rule_edit(req->user, req->policy_id, req->rule.id, &rule, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1253,7 +1253,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->xslt_policy_rule_duplicate(req->policy_id, req->id, err) < 0)
+        if (d->MCL->xslt_policy_rule_duplicate(req->user, req->policy_id, req->id, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1276,7 +1276,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->xslt_policy_rule_delete(req->policy_id, req->id, err) < 0)
+        if (d->MCL->xslt_policy_rule_delete(req->user, req->policy_id, req->id, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;

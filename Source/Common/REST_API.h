@@ -209,7 +209,8 @@ public:
     // Report
     struct Checker_Report_Req
     {
-        Checker_Report_Req() :   has_verbosity(false) {}
+        Checker_Report_Req() :   user(-1), has_verbosity(false) {}
+        int                      user;
         std::vector<int>         ids;
         std::vector<Report>      reports;
         std::vector<size_t>      policies_ids;
@@ -310,6 +311,8 @@ public:
     // Validate
     struct Checker_Validate_Req
     {
+        Checker_Validate_Req() : user(-1) {}
+        int                        user;
         std::vector<int>           ids;
         Report                     report;
         std::vector<size_t>        policies_ids;
@@ -378,6 +381,8 @@ public:
 
     struct XSLT_Policy_Create_Req
     {
+        XSLT_Policy_Create_Req() : user(-1), parent_id(-1) {}
+        int         user;
         int         parent_id;
         std::string to_str() const;
     };
@@ -393,6 +398,8 @@ public:
 
     struct Policy_Import_Req
     {
+        Policy_Import_Req() : user(-1) {}
+        int         user;
         std::string xml;
         std::string to_str() const;
     };
@@ -408,6 +415,8 @@ public:
 
     struct Policy_Remove_Req
     {
+        Policy_Remove_Req() : user(-1), id(-1) {}
+        int         user;
         int         id;
         std::string to_str() const;
     };
@@ -422,6 +431,8 @@ public:
 
     struct Policy_Dump_Req
     {
+        Policy_Dump_Req() : user(-1), id(-1) {}
+        int         user;
         int         id;
         std::string to_str() const;
     };
@@ -437,6 +448,8 @@ public:
 
     struct Policy_Save_Req
     {
+        Policy_Save_Req() : user(-1), id(-1) {}
+        int         user;
         int         id;
         std::string to_str() const;
     };
@@ -451,6 +464,8 @@ public:
 
     struct Policy_Duplicate_Req
     {
+        Policy_Duplicate_Req() : user(-1), id(-1) {}
+        int         user;
         int         id;
         std::string to_str() const;
     };
@@ -466,6 +481,8 @@ public:
 
     struct Policy_Change_Name_Req
     {
+        Policy_Change_Name_Req() : user(-1), id(-1) {}
+        int          user;
         int          id;
         std::string  name;
         std::string  description;
@@ -482,6 +499,8 @@ public:
 
     struct Policy_Get_Req
     {
+        Policy_Get_Req() : user(-1), id(-1) {}
+        int         user;
         int         id;
         std::string to_str() const;
     };
@@ -497,6 +516,8 @@ public:
 
     struct Policy_Get_Name_Req
     {
+        Policy_Get_Name_Req() : user(-1), id(-1) {}
+        int          user;
         int          id;
         std::string  to_str() const;
     };
@@ -512,6 +533,9 @@ public:
 
     struct Policy_Get_Policies_Count_Req
     {
+        Policy_Get_Policies_Count_Req() : user(-1) {}
+        int         user;
+        std::string to_str() const;
     };
 
     struct Policy_Get_Policies_Count_Res
@@ -525,6 +549,9 @@ public:
 
     struct Policy_Clear_Policies_Req
     {
+        Policy_Clear_Policies_Req() : user(-1) {}
+        int         user;
+        std::string to_str() const;
     };
 
     struct Policy_Clear_Policies_Res
@@ -537,6 +564,9 @@ public:
 
     struct Policy_Get_Policies_Req
     {
+        Policy_Get_Policies_Req() : user(-1) {}
+        int         user;
+        std::string to_str() const;
     };
 
     struct Policy_Get_Policies_Ok
@@ -557,6 +587,8 @@ public:
 
     struct XSLT_Policy_Create_From_File_Req
     {
+        XSLT_Policy_Create_From_File_Req() : user(-1), id(-1) {}
+        int         user;
         int         id;
         std::string to_str() const;
     };
@@ -592,6 +624,8 @@ public:
 
     struct XSLT_Policy_Rule_Create_Req
     {
+        XSLT_Policy_Rule_Create_Req() : user(-1), policy_id(-1) {}
+        int         user;
         int         policy_id;
         std::string to_str() const;
     };
@@ -607,6 +641,8 @@ public:
 
     struct XSLT_Policy_Rule_Edit_Req
     {
+        XSLT_Policy_Rule_Edit_Req() : user(-1), policy_id(-1) {}
+        int              user;
         int              policy_id;
         XSLT_Policy_Rule rule;
         std::string to_str() const;
@@ -622,6 +658,8 @@ public:
 
     struct XSLT_Policy_Rule_Duplicate_Req
     {
+        XSLT_Policy_Rule_Duplicate_Req() : user(-1), policy_id(-1), id(-1) {}
+        int         user;
         int         policy_id;
         int         id;
         std::string to_str() const;
@@ -638,6 +676,8 @@ public:
 
     struct XSLT_Policy_Rule_Delete_Req
     {
+        XSLT_Policy_Rule_Delete_Req() : user(-1), policy_id(-1), id(-1) {}
+        int         user;
         int         policy_id;
         int         id;
         std::string to_str() const;

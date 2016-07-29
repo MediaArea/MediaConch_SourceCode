@@ -152,7 +152,7 @@ namespace MediaConch
         std::vector<size_t> policies_ids;
         std::map<std::string, std::string> options;
         options["verbosity"] = MCL.get_implementation_verbosity();
-        MCL.checker_get_report(report_set, format, file_to_report, policies_ids,
+        MCL.checker_get_report(-1, report_set, format, file_to_report, policies_ids,
                                policies, options, &result, &display_file, NULL);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
@@ -172,12 +172,12 @@ namespace MediaConch
             return MediaConchLib::errorHttp_INTERNAL;
         }
 
-        size_t pos = MCL.xslt_policy_create_from_file(files[0], error);
+        size_t pos = MCL.xslt_policy_create_from_file(-1, files[0], error);
         if (pos == (size_t)-1)
             return MediaConchLib::errorHttp_INTERNAL;
 
         std::string policy;
-        if (MCL.policy_dump(pos, policy, error))
+        if (MCL.policy_dump(-1, pos, policy, error))
             return MediaConchLib::errorHttp_INTERNAL;
 
         MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);

@@ -58,37 +58,37 @@ public:
     ~Policies();
 
     // Policy
-    int         create_xslt_policy(int parent_id, std::string& err);
-    int         import_policy_from_memory(const std::string& memory, std::string& err, const char* filename, bool is_system_policy);
-    int         duplicate_policy(int id, std::string& err);
-    int         create_xslt_policy_from_file(const std::string& file, std::string& err);
+    int         create_xslt_policy(int user, int parent_id, std::string& err);
+    int         import_policy_from_memory(int user, const std::string& memory, std::string& err, const char* filename, bool is_system_policy);
+    int         duplicate_policy(int user, int id, std::string& err);
+    int         create_xslt_policy_from_file(int user, const std::string& file, std::string& err);
 
-    int         save_policy(int id, std::string& err);
-    int         export_policy(const char* filename, int id, std::string& err);
-    int         dump_policy_to_memory(int pos, std::string& memory, std::string& err);
+    int         save_policy(int user, int id, std::string& err);
+    int         export_policy(int user, const char* filename, int id, std::string& err);
+    int         dump_policy_to_memory(int user, int pos, std::string& memory, std::string& err);
 
-    int         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
+    int         policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err);
 
-    int         erase_policy(int index, std::string& err);
-    int         clear_policies(std::string& err);
+    int         erase_policy(int user, int index, std::string& err);
+    int         clear_policies(int user, std::string& err);
 
-    size_t      get_policies_size() const { return policies.size(); };
-    Policy*     get_policy(int pos, std::string& err);
-    int         policy_get_name(int id, std::string& name, std::string& err);
-    void        get_policies(std::vector<std::pair<size_t, std::string> >& ps);
+    size_t      get_policies_size(int user) const;
+    Policy*     get_policy(int user, int pos, std::string& err);
+    int         policy_get_name(int user, int id, std::string& name, std::string& err);
+    void        get_policies(int user, std::vector<std::pair<size_t, std::string> >& ps);
 
-    int         policy_get_policies(const std::vector<size_t>* policies_ids,
+    int         policy_get_policies(int user, const std::vector<size_t>* policies_ids,
                                     const std::vector<std::string>* policies_contents,
                                     std::vector<std::string>& xslt_policies, std::string& err);
 
     // Rule
-    int         create_xslt_policy_rule(int policy_id, std::string& err);
-    int         edit_xslt_policy_rule(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
-    int         duplicate_xslt_policy_rule(int policy_id, int rule_id, std::string& err);
-    int         delete_xslt_policy_rule(int policy_id, int rule_id, std::string& err);
+    int         create_xslt_policy_rule(int user, int policy_id, std::string& err);
+    int         edit_xslt_policy_rule(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int         duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, std::string& err);
+    int         delete_xslt_policy_rule(int user, int policy_id, int rule_id, std::string& err);
 
-    bool        policy_exists(const std::string& policy);
-    xmlDocPtr   create_doc(int id);
+    bool        policy_exists(int user, const std::string& policy);
+    xmlDocPtr   create_doc(int user, int id);
 
     std::string get_error() const { return error; }
     //***************************************************************************
@@ -125,23 +125,24 @@ public:
                                    std::string& result);
 
 private:
-    Core                       *core;
-    std::string                 error;
-    std::map<size_t, Policy*>   policies;
+    Core                                      *core;
+    std::string                                error;
+    std::map<int, std::map<size_t, Policy*> >  policies;
 
-    static size_t               policy_global_id;
+    static size_t                              policy_global_id;
     //mutex?
 
     Policies (const Policies&);
     Policies& operator=(const Policies&);
 
     //Helper
-    void find_save_name(const char* base, std::string& save_name);
-    void find_new_policy_name(std::string& title);
+    void find_save_name(int user, const char* base, std::string& save_name);
+    void find_new_policy_name(int user, std::string& title);
     void remove_saved_policy(const Policy* policy);
     XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);
     int policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_policies, std::string& err);
     int policy_get_policy_content(const std::string& policy, std::vector<std::string>& xslt_policies, std::string& err);
+    int erase_xslt_policy(std::map<size_t, Policy *>& user_policies, int id, std::string& err);
 };
 
 }

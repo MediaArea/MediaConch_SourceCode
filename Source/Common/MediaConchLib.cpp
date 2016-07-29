@@ -247,7 +247,7 @@ void MediaConchLib::checker_file_from_id(int id, std::string& filename)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_get_report(const std::bitset<report_Max>& report_set, format f,
+int MediaConchLib::checker_get_report(int user, const std::bitset<report_Max>& report_set, format f,
                                       const std::vector<std::string>& files,
                                       const std::vector<size_t>& policies_ids,
                                       const std::vector<std::string>& policies_contents,
@@ -260,18 +260,18 @@ int MediaConchLib::checker_get_report(const std::bitset<report_Max>& report_set,
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)
-        return daemon_client->checker_get_report(report_set, f, files,
+        return daemon_client->checker_get_report(user, report_set, f, files,
                                                  policies_ids, policies_contents,
                                                  options, result,
                                                  display_name, display_content);
-    return core->checker_get_report(report_set, f, files,
+    return core->checker_get_report(user, report_set, f, files,
                                     policies_ids, policies_contents,
                                     options, result,
                                     display_name, display_content);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_validate(report report, const std::vector<std::string>& files,
+int MediaConchLib::checker_validate(int user, report report, const std::vector<std::string>& files,
                                     const std::vector<size_t>& policies_ids,
                                     const std::vector<std::string>& policies_contents,
                                     std::vector<Checker_ValidateRes*>& result)
@@ -284,10 +284,10 @@ int MediaConchLib::checker_validate(report report, const std::vector<std::string
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)
-        return daemon_client->checker_validate(report, files, policies_ids, policies_contents,
+        return daemon_client->checker_validate(user, report, files, policies_ids, policies_contents,
                                                result);
 
-    return core->checker_validate(report, files, policies_ids, policies_contents,
+    return core->checker_validate(user, report, files, policies_ids, policies_contents,
                                   result);
 }
 
@@ -301,7 +301,7 @@ int MediaConchLib::remove_report(const std::vector<std::string>& files)
 }
 
 //***************************************************************************
-// Policy
+// Implementation configuration
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -408,149 +408,149 @@ int MediaConchLib::get_ui_database_path(std::string& path) const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_create(std::string& err, int parent_id)
+int MediaConchLib::xslt_policy_create(int user, std::string& err, int parent_id)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_create(parent_id, err);
-    return core->policies.create_xslt_policy(parent_id, err);
+        return daemon_client->xslt_policy_create(user, parent_id, err);
+    return core->policies.create_xslt_policy(user, parent_id, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_duplicate(int id, std::string& err)
+int MediaConchLib::policy_import(int user, const std::string& memory, std::string& err, const char* filename, bool is_system_policy)
 {
     if (use_daemon)
-        return daemon_client->policy_duplicate(id, err);
-    return core->policies.duplicate_policy(id, err);
+        return daemon_client->policy_import(user, memory, err);
+
+    return core->policies.import_policy_from_memory(user, memory, err, filename, is_system_policy);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
+int MediaConchLib::policy_remove(int user, int pos, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_change_name(id, name, description, err);
-    return core->policies.policy_change_name(id, name, description, err);
+        return daemon_client->policy_remove(user, pos, err);
+
+    return core->policies.erase_policy(user, pos, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_rule_create(int policy_id, std::string& err)
+int MediaConchLib::policy_dump(int user, int id, std::string& memory, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_create(policy_id, err);
-    return core->policies.create_xslt_policy_rule(policy_id, err);
+        return daemon_client->policy_dump(user, id, memory, err);
+
+    return core->policies.dump_policy_to_memory(user, id, memory, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
+int MediaConchLib::policy_duplicate(int user, int id, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_rule_edit(policy_id, rule_id, rule, err);
-    return core->policies.edit_xslt_policy_rule(policy_id, rule_id, rule, err);
+        return daemon_client->policy_duplicate(user, id, err);
+    return core->policies.duplicate_policy(user, id, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err)
+int MediaConchLib::policy_save(int user, int pos, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_rule_duplicate(policy_id, rule_id, err);
-    return core->policies.duplicate_xslt_policy_rule(policy_id, rule_id, err);
+        return daemon_client->policy_save(user, pos, err);
+
+    return core->policies.save_policy(user, pos, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err)
+int MediaConchLib::policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_rule_delete(policy_id, rule_id, err);
-    return core->policies.delete_xslt_policy_rule(policy_id, rule_id, err);
+        return daemon_client->policy_change_name(user, id, name, description, err);
+    return core->policies.policy_change_name(user, id, name, description, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_create_from_file(const std::string& file, std::string& err)
+Policy* MediaConchLib::policy_get(int user, int id, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_create_from_file(file);
+        return daemon_client->policy_get(user, id, err);
 
-    return core->policies.create_xslt_policy_from_file(file, err);
+    return core->policies.get_policy(user, id, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_import(const std::string& memory, std::string& err, const char* filename, bool is_system_policy)
+int MediaConchLib::policy_get_name(int user, int id, std::string& name, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_import(memory, err);
+        return daemon_client->policy_get_name(user, id, name, err);
 
-    return core->policies.import_policy_from_memory(memory, err, filename, is_system_policy);
+    return core->policies.policy_get_name(user, id, name, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_remove(int pos, std::string& err)
+size_t MediaConchLib::policy_get_policies_count(int user) const
 {
     if (use_daemon)
-        return daemon_client->policy_remove(pos, err);
+        return daemon_client->policy_get_policies_count(user);
 
-    return core->policies.erase_policy(pos, err);
+    return core->policies.get_policies_size(user);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_dump(int id, std::string& memory, std::string& err)
+int MediaConchLib::policy_clear_policies(int user, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_dump(id, memory, err);
+        return daemon_client->policy_clear_policies(user, err);
 
-    return core->policies.dump_policy_to_memory(id, memory, err);
+    return core->policies.clear_policies(user, err);
 }
 
 //---------------------------------------------------------------------------
-size_t MediaConchLib::policy_get_policies_count() const
+void MediaConchLib::policy_get_policies(int user, std::vector<std::pair<size_t, std::string> >& policies)
 {
     if (use_daemon)
-        return daemon_client->policy_get_policies_count();
-
-    return core->policies.get_policies_size();
-}
-
-//---------------------------------------------------------------------------
-Policy* MediaConchLib::policy_get(int id, std::string& err)
-{
-    if (use_daemon)
-        return daemon_client->policy_get(id, err);
-
-    return core->policies.get_policy(id, err);
-}
-
-//---------------------------------------------------------------------------
-int MediaConchLib::policy_get_name(int id, std::string& name, std::string& err)
-{
-    if (use_daemon)
-        return daemon_client->policy_get_name(id, name, err);
-
-    return core->policies.policy_get_name(id, name, err);
-}
-
-//---------------------------------------------------------------------------
-void MediaConchLib::policy_get_policies(std::vector<std::pair<size_t, std::string> >& policies)
-{
-    if (use_daemon)
-        daemon_client->policy_get_policies(policies);
+        daemon_client->policy_get_policies(user, policies);
     else
-        core->policies.get_policies(policies);
+        core->policies.get_policies(user, policies);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_save(int pos, std::string& err)
+int MediaConchLib::xslt_policy_create_from_file(int user, const std::string& file, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_save(pos, err);
+        return daemon_client->xslt_policy_create_from_file(user, file);
 
-    return core->policies.save_policy(pos, err);
+    return core->policies.create_xslt_policy_from_file(user, file, err);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_clear_policies(std::string& err)
+int MediaConchLib::xslt_policy_rule_create(int user, int policy_id, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_clear_policies(err);
+        return daemon_client->xslt_policy_create(user, policy_id, err);
+    return core->policies.create_xslt_policy_rule(user, policy_id, err);
+}
 
-    return core->policies.clear_policies(err);
+//---------------------------------------------------------------------------
+int MediaConchLib::xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->xslt_policy_rule_edit(user, policy_id, rule_id, rule, err);
+    return core->policies.edit_xslt_policy_rule(user, policy_id, rule_id, rule, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->xslt_policy_rule_duplicate(user, policy_id, rule_id, err);
+    return core->policies.duplicate_xslt_policy_rule(user, policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->xslt_policy_rule_delete(user, policy_id, rule_id, err);
+    return core->policies.delete_xslt_policy_rule(user, policy_id, rule_id, err);
 }
 
 //---------------------------------------------------------------------------

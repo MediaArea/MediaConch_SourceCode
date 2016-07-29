@@ -218,14 +218,15 @@ std::string RESTAPI::Checker_Report_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[ids: [";
+    out << "{\"user\":" << user;
+    out << ",\"ids\": [";
     for (size_t i = 0; i < ids.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ids[i];
     }
-    out << "], reports: [";
+    out << "],reports:[";
     for (size_t i = 0; i < reports.size(); ++i)
     {
         if (i)
@@ -233,14 +234,13 @@ std::string RESTAPI::Checker_Report_Req::to_str() const
         RESTAPI api;
         out << api.get_Report_string(reports[i]);
     }
-    out << "], policies_ids_size: [" << policies_ids.size();
-    out << "], policies_contents_size: [" << policies_contents.size();
-    out << "], display_name: [" << display_name;
-    out << "], display_content_length: [" << display_content.size();
-    out << "]";
+    out << "],policies_ids_size:[" << policies_ids.size();
+    out << "],policies_contents_size:[" << policies_contents.size();
+    out << "],display_name:" << display_name;
+    out << ",display_content_length:" << display_content.size();
     if (has_verbosity)
-        out << ", verbosity: " << verbosity;
-    out << " ]";
+        out << ",verbosity:" << verbosity;
+    out << "}";
     return out.str();
 }
 
@@ -281,17 +281,18 @@ std::string RESTAPI::Checker_Validate_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[ids: [";
+    out << "{\"user\":" << user;
+    out << ",ids:[";
     for (size_t i = 0; i < ids.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ids[i];
     }
     RESTAPI api;
-    out << "], report: " << api.get_Report_string(report);
-    out << ", policies_ids_size: [" << policies_ids.size();
-    out << "], policies_contents_size: [" << policies_contents.size() << "] ]";
+    out << "],report: " << api.get_Report_string(report);
+    out << ",policies_ids_size:[" << policies_ids.size();
+    out << "],policies_contents_size:[" << policies_contents.size() << "]}";
     return out.str();
 }
 
@@ -319,7 +320,7 @@ std::string RESTAPI::XSLT_Policy_Create_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"parent_id\": " << parent_id << "}";
+    out << "{\"user\": " << user << ",\"parent_id\": " << parent_id << "}";
     return out.str();
 }
 
@@ -328,7 +329,7 @@ std::string RESTAPI::Policy_Import_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{size(\"xml\"): " << xml.size() << "}";
+    out << "{\"user\": " << user << ",size(\"xml\"): " << xml.size() << "}";
     return out.str();
 }
 
@@ -337,7 +338,7 @@ std::string RESTAPI::Policy_Remove_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << "}";
     return out.str();
 }
 
@@ -346,7 +347,7 @@ std::string RESTAPI::Policy_Dump_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << "}";
     return out.str();
 }
 
@@ -355,7 +356,7 @@ std::string RESTAPI::Policy_Save_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << "}";
     return out.str();
 }
 
@@ -364,7 +365,7 @@ std::string RESTAPI::Policy_Duplicate_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << "}";
     return out.str();
 }
 
@@ -373,7 +374,8 @@ std::string RESTAPI::Policy_Change_Name_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id;
+    out << "{\"user\": " << user;
+    out << ",\"id\": " << id;
     out << "\"name\":" << name;
     out << "\"description\":" << description;
     out << "}";
@@ -385,7 +387,7 @@ std::string RESTAPI::Policy_Get_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << "}";
     return out.str();
 }
 
@@ -394,7 +396,34 @@ std::string RESTAPI::Policy_Get_Name_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Policies_Count_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\": " << user << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Clear_Policies_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\": " << user << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Policies_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\": " << user << "}";
     return out.str();
 }
 
@@ -403,7 +432,7 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << "}";
     return out.str();
 }
 
@@ -429,7 +458,7 @@ std::string RESTAPI::XSLT_Policy_Rule_Create_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"policy_id\": " << policy_id << "}";
+    out << "{\"user\": " << user << ",\"policy_id\": " << policy_id << "}";
     return out.str();
 }
 
@@ -438,7 +467,7 @@ std::string RESTAPI::XSLT_Policy_Rule_Edit_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"policy_id\": " << policy_id;
+    out << "{\"user\": " << user << ",\"policy_id\": " << policy_id;
     out << ", " << rule.to_str();
     out << "}";
     return out.str();
@@ -449,7 +478,7 @@ std::string RESTAPI::XSLT_Policy_Rule_Duplicate_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"policy_id\": " << policy_id;
+    out << "{\"user\": " << user << ",\"policy_id\": " << policy_id;
     out << ", \"id\":" << id;
     out << "}";
     return out.str();
@@ -460,7 +489,7 @@ std::string RESTAPI::XSLT_Policy_Rule_Delete_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"policy_id\": " << policy_id;
+    out << "{\"user\": " << user << ",\"policy_id\": " << policy_id;
     out << ", \"id\":" << id;
     out << "}";
     return out.str();
@@ -1219,6 +1248,7 @@ int RESTAPI::serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::
     std::stringstream ss;
 
     ss << "?parent_id=" << req.parent_id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1227,14 +1257,17 @@ int RESTAPI::serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_import_req(Policy_Import_Req& req, std::string& data)
 {
-    Container::Value v, child, xml;
+    Container::Value v, child, xml, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     xml.type = Container::Value::CONTAINER_TYPE_STRING;
     xml.s = req.xml;
-
     child.obj["xml"] = xml;
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_IMPORT"] = child;
@@ -1255,6 +1288,7 @@ int RESTAPI::serialize_policy_remove_req(Policy_Remove_Req& req, std::string& da
     std::stringstream ss;
 
     ss << "?id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1267,6 +1301,7 @@ int RESTAPI::serialize_policy_dump_req(Policy_Dump_Req& req, std::string& data)
     std::stringstream ss;
 
     ss << "?id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1279,6 +1314,7 @@ int RESTAPI::serialize_policy_save_req(Policy_Save_Req& req, std::string& data)
     std::stringstream ss;
 
     ss << "?id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1291,6 +1327,7 @@ int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::stri
     std::stringstream ss;
 
     ss << "?id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1299,19 +1336,21 @@ int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::stri
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_change_name_req(Policy_Change_Name_Req& req, std::string& data)
 {
-    Container::Value v, child, name, description;
+    Container::Value v, child, name, description, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     name.type = Container::Value::CONTAINER_TYPE_STRING;
     name.s = req.name;
-
     child.obj["name"] = name;
 
     description.type = Container::Value::CONTAINER_TYPE_STRING;
     description.s = req.description;
-
     child.obj["description"] = description;
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_CHANGE_NAME"] = child;
@@ -1332,6 +1371,7 @@ int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data)
     std::stringstream ss;
 
     ss << "?id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1344,26 +1384,45 @@ int RESTAPI::serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string
     std::stringstream ss;
 
     ss << "?id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req&, std::string&)
+int RESTAPI::serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string& data)
 {
+    //URI
+    std::stringstream ss;
+
+    ss << "?user=" << req.user;
+    data = ss.str();
+
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_clear_policies_req(Policy_Clear_Policies_Req&, std::string&)
+int RESTAPI::serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req, std::string& data)
 {
+    //URI
+    std::stringstream ss;
+
+    ss << "?user=" << req.user;
+    data = ss.str();
+
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req&, std::string&)
+int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string& data)
 {
+    //URI
+    std::stringstream ss;
+
+    ss << "?user=" << req.user;
+    data = ss.str();
+
     return 0;
 }
 
@@ -1373,7 +1432,8 @@ int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_
     //URI
     std::stringstream ss;
 
-    ss << "?" << "id=" << req.id;
+    ss << "?id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1424,6 +1484,7 @@ int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& 
     std::stringstream ss;
 
     ss << "?policy_id=" << req.policy_id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1432,13 +1493,17 @@ int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string& data)
 {
-    Container::Value v, child, policy_id, rule;
+    Container::Value v, child, policy_id, rule, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     policy_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
     policy_id.l = req.policy_id;
     child.obj["policy_id"] = policy_id;
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
 
     serialize_xslt_policy_rule(req.rule, rule);
     child.obj["rule"] = rule;
@@ -1462,6 +1527,7 @@ int RESTAPI::serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate
     std::stringstream ss;
 
     ss << "?policy_id=" << req.policy_id << "&id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -1473,7 +1539,8 @@ int RESTAPI::serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& 
     //URI
     std::stringstream ss;
 
-    ss << "?policy_id=" << req.policy_id;
+    ss << "?policy_id=" << req.policy_id << "&id=" << req.id;
+    ss << "&user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -2506,13 +2573,17 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_xslt_policy_create_req(const std
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *parent_id;
-    parent_id = model->get_value_by_key(*child, "parent_id");
+    Container::Value *parent_id = model->get_value_by_key(*child, "parent_id");
     if (!parent_id || parent_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
     XSLT_Policy_Create_Req *req = new XSLT_Policy_Create_Req;
     req->parent_id = parent_id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2531,13 +2602,16 @@ RESTAPI::Policy_Import_Req *RESTAPI::parse_policy_import_req(const std::string& 
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *xml;
-    xml = model->get_value_by_key(*child, "xml");
+    Container::Value *xml = model->get_value_by_key(*child, "xml");
     if (!xml || xml->type != Container::Value::CONTAINER_TYPE_STRING)
         return NULL;
 
     Policy_Import_Req *req = new Policy_Import_Req;
     req->xml = xml->s;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
     return req;
 }
 
@@ -2556,13 +2630,17 @@ RESTAPI::Policy_Remove_Req *RESTAPI::parse_policy_remove_req(const std::string& 
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *id;
-    id = model->get_value_by_key(*child, "id");
+    Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
     Policy_Remove_Req *req = new Policy_Remove_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2581,13 +2659,17 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_policy_dump_req(const std::string& data
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *id;
-    id = model->get_value_by_key(*child, "id");
+    Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
     Policy_Dump_Req *req = new Policy_Dump_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2606,13 +2688,17 @@ RESTAPI::Policy_Save_Req *RESTAPI::parse_policy_save_req(const std::string& data
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *id;
-    id = model->get_value_by_key(*child, "id");
+    Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
     Policy_Save_Req *req = new Policy_Save_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2638,6 +2724,11 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::st
 
     Policy_Duplicate_Req *req = new Policy_Duplicate_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2672,6 +2763,11 @@ RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_policy_change_name_req(const std
     req->id = id->l;
     req->name = name->s;
     req->description = desc->s;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2697,6 +2793,11 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
 
     Policy_Get_Req *req = new Policy_Get_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2722,6 +2823,11 @@ RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_policy_get_name_req(const std::stri
 
     Policy_Get_Name_Req *req = new Policy_Get_Name_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2741,6 +2847,11 @@ RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_policy_get_policies_count
         return NULL;
 
     Policy_Get_Policies_Count_Req *req = new Policy_Get_Policies_Count_Req;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2760,6 +2871,11 @@ RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_policy_clear_policies_req(con
         return NULL;
 
     Policy_Clear_Policies_Req *req = new Policy_Clear_Policies_Req;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2779,6 +2895,11 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const s
         return NULL;
 
     Policy_Get_Policies_Req *req = new Policy_Get_Policies_Req;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2797,13 +2918,17 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_fro
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *id;
-    id = model->get_value_by_key(*child, "id");
+    Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
     XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2813,44 +2938,37 @@ int RESTAPI::parse_xslt_policy_rule(Container::Value *val, RESTAPI::XSLT_Policy_
     if (!val || val->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return -1;
 
-    Container::Value *id;
-    id = model->get_value_by_key(*val, "id");
+    Container::Value *id = model->get_value_by_key(*val, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return -1;
     rule->id = id->l;
 
-    Container::Value *name;
-    name = model->get_value_by_key(*val, "name");
+    Container::Value *name = model->get_value_by_key(*val, "name");
     if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
         return -1;
     rule->name = name->s;
 
-    Container::Value *tracktype;
-    tracktype = model->get_value_by_key(*val, "tracktype");
+    Container::Value *tracktype = model->get_value_by_key(*val, "tracktype");
     if (!tracktype || tracktype->type != Container::Value::CONTAINER_TYPE_STRING)
         return -1;
     rule->tracktype = tracktype->s;
 
-    Container::Value *field;
-    field = model->get_value_by_key(*val, "field");
+    Container::Value *field = model->get_value_by_key(*val, "field");
     if (!field || field->type != Container::Value::CONTAINER_TYPE_STRING)
         return -1;
     rule->field = field->s;
 
-    Container::Value *occurrence;
-    occurrence = model->get_value_by_key(*val, "occurrence");
+    Container::Value *occurrence = model->get_value_by_key(*val, "occurrence");
     if (!occurrence || occurrence->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return -1;
     rule->occurrence = occurrence->l;
 
-    Container::Value *ope;
-    ope = model->get_value_by_key(*val, "ope");
+    Container::Value *ope = model->get_value_by_key(*val, "ope");
     if (!ope || ope->type != Container::Value::CONTAINER_TYPE_STRING)
         return -1;
     rule->ope = ope->s;
 
-    Container::Value *value;
-    value = model->get_value_by_key(*val, "value");
+    Container::Value *value = model->get_value_by_key(*val, "value");
     if (!value || value->type != Container::Value::CONTAINER_TYPE_STRING)
         return -1;
     rule->value = value->s;
@@ -2880,6 +2998,11 @@ RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_xslt_policy_rule_create_req
 
     XSLT_Policy_Rule_Create_Req *req = new XSLT_Policy_Rule_Create_Req;
     req->policy_id = policy_id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2913,6 +3036,11 @@ RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_xslt_policy_rule_edit_req(con
         delete req;
         return NULL;
     }
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2942,6 +3070,11 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_xslt_policy_rule_duplica
     XSLT_Policy_Rule_Duplicate_Req *req = new XSLT_Policy_Rule_Duplicate_Req;
     req->policy_id = policy_id->l;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -2971,6 +3104,11 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req
     XSLT_Policy_Rule_Delete_Req *req = new XSLT_Policy_Rule_Delete_Req;
     req->policy_id = policy_id->l;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -3115,19 +3253,37 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const
     XSLT_Policy_Create_Req *req = new XSLT_Policy_Create_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "parent_id")
-        return req;
-    ++start;
-
-    std::string parent_id = uri.substr(start, std::string::npos);
-    if (!parent_id.length())
+    size_t and_pos = 0;
+    while (start != std::string::npos)
     {
-        req->parent_id = -1;
-        return req;
-    }
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    req->parent_id = strtoll(parent_id.c_str(), NULL, 10);
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "parent_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->parent_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3146,16 +3302,37 @@ RESTAPI::Policy_Remove_Req *RESTAPI::parse_uri_policy_remove_req(const std::stri
     Policy_Remove_Req *req = new Policy_Remove_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string id = uri.substr(start, std::string::npos);
-    if (!id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->id = strtoll(id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3166,16 +3343,37 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& 
     Policy_Dump_Req *req = new Policy_Dump_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string id = uri.substr(start, std::string::npos);
-    if (!id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->id = strtoll(id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3186,16 +3384,37 @@ RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& 
     Policy_Save_Req *req = new Policy_Save_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string id = uri.substr(start, std::string::npos);
-    if (!id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->id = strtoll(id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3206,16 +3425,37 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std
     Policy_Duplicate_Req *req = new Policy_Duplicate_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string id = uri.substr(start, std::string::npos);
-    if (!id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->id = strtoll(id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3247,6 +3487,13 @@ RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_uri_policy_change_name_req(const
 
             req->id = strtoll(val.c_str(), NULL, 10);
         }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
         else if (substr == "name")
         {
             if (!val.length())
@@ -3274,16 +3521,37 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& ur
     Policy_Get_Req *req = new Policy_Get_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string id = uri.substr(start, std::string::npos);
-    if (!id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->id = strtoll(id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3294,38 +3562,140 @@ RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_uri_policy_get_name_req(const std::
     Policy_Get_Name_Req *req = new Policy_Get_Name_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string id = uri.substr(start, std::string::npos);
-    if (!id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->id = strtoll(id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_count_req(const std::string&)
+RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_count_req(const std::string& uri)
 {
     Policy_Get_Policies_Count_Req *req = new Policy_Get_Policies_Count_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req(const std::string&)
+RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req(const std::string& uri)
 {
     Policy_Clear_Policies_Req *req = new Policy_Clear_Policies_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(const std::string&)
+RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(const std::string& uri)
 {
     Policy_Get_Policies_Req *req = new Policy_Get_Policies_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos + 1;
+
+        if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
     return req;
 }
 
@@ -3335,16 +3705,37 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create
     XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string id = uri.substr(start, std::string::npos);
-    if (!id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->id = strtoll(id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3355,16 +3746,37 @@ RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create
     XSLT_Policy_Rule_Create_Req *req = new XSLT_Policy_Rule_Create_Req;
 
     size_t start = 0;
-    start = uri.find("=");
-    if (start == std::string::npos || uri.substr(0, start) != "policy_id")
-        return req;
-    ++start;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    std::string policy_id = uri.substr(start, std::string::npos);
-    if (!policy_id.length())
-        return req;
+        std::string substr = uri.substr(0, start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
 
-    req->policy_id = strtoll(policy_id.c_str(), NULL, 10);
+        start = and_pos + 1;
+
+        if (substr == "policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -3412,6 +3824,13 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_dup
 
             req->policy_id = strtoll(val.c_str(), NULL, 10);
         }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
         else
             start = std::string::npos;
     }
@@ -3452,6 +3871,13 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete
                 continue;
 
             req->policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
         }
         else
             start = std::string::npos;

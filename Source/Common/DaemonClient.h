@@ -60,7 +60,7 @@ public:
     int checker_is_done(const std::string& file, double& done, MediaConchLib::report& report_kind);
 
     // Report
-    int checker_get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
+    int checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
                            const std::vector<std::string>& files,
                            const std::vector<size_t>& policies_names,
                            const std::vector<std::string>& policies_contents,
@@ -68,7 +68,7 @@ public:
                            MediaConchLib::Checker_ReportRes* result,
                            const std::string* display_name = NULL,
                            const std::string* display_content = NULL);
-    int checker_validate(MediaConchLib::report report, const std::vector<std::string>& files,
+    int checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
                          std::vector<MediaConchLib::Checker_ValidateRes*>& result);
@@ -78,55 +78,55 @@ public:
     // Policy
     //***************************************************************************
     // create XSLT
-    int xslt_policy_create(int parent_id, std::string& err);
+    int xslt_policy_create(int user, int parent_id, std::string& err);
 
     // import
-    int policy_import(const std::string& memory, std::string& err);
+    int policy_import(int user, const std::string& memory, std::string& err);
 
     // remove
-    int policy_remove(int id, std::string& err);
+    int policy_remove(int user, int id, std::string& err);
 
     // remove
-    int policy_dump(int id, std::string& memory, std::string& err);
+    int policy_dump(int user, int id, std::string& memory, std::string& err);
 
     // save
-    int policy_save(int pos, std::string& err);
+    int policy_save(int user, int pos, std::string& err);
 
     // duplicate
-    int policy_duplicate(int id, std::string& err);
+    int policy_duplicate(int user, int id, std::string& err);
 
     // change name && description
-    int policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
+    int policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err);
 
     // get policy
-    Policy* policy_get(int id, std::string& err);
+    Policy* policy_get(int user, int id, std::string& err);
 
     // get policy name
-    int policy_get_name(int id, std::string& name, std::string& err);
+    int policy_get_name(int user, int id, std::string& name, std::string& err);
 
     // get the number of policies
-    size_t policy_get_policies_count();
+    size_t policy_get_policies_count(int user);
 
     // clear policies
-    int policy_clear_policies(std::string& err);
+    int policy_clear_policies(int user, std::string& err);
 
     // get all policies with ID && name
-    void policy_get_policies(std::vector<std::pair<size_t, std::string> >&);
+    void policy_get_policies(int user, std::vector<std::pair<size_t, std::string> >&);
 
     // policy_create_from_file
-    int xslt_policy_create_from_file(const std::string& id);
+    int xslt_policy_create_from_file(int user, const std::string& id);
 
     // create XSLT rule
-    int xslt_policy_rule_create(int policy_id, std::string& err);
+    int xslt_policy_rule_create(int user, int policy_id, std::string& err);
 
     // edit XSLT rule
-    int xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
 
     // duplicate XSLT rule
-    int xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err);
+    int xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, std::string& err);
 
     // delete XSLT rule
-    int xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err);
+    int xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);
 
 
 private:

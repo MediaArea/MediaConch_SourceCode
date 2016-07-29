@@ -67,7 +67,7 @@ public:
     bool        checker_is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
     int         open_file(const std::string& filename, bool& registered, const std::vector<std::string>& options, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
-    int         checker_get_report(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
+    int         checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
                                    const std::vector<std::string>& files,
                                    const std::vector<size_t>& policies_ids,
                                    const std::vector<std::string>& policies_contents,
@@ -77,7 +77,7 @@ public:
                                    const std::string* display_contents = NULL);
     int         get_reports_output_JStree(const std::vector<std::string>& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         get_reports_output_Html(const std::vector<std::string>& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    int         check_policies(const std::vector<std::string>& files,
+    int         check_policies(int user, const std::vector<std::string>& files,
                                const std::map<std::string, std::string>& options,
                                MediaConchLib::Checker_ReportRes *result,
                                const std::vector<size_t>* policies_ids = NULL,
@@ -85,7 +85,7 @@ public:
 
     void        checker_list(std::vector<std::string>& vec);
 
-    int         checker_validate(MediaConchLib::report report, const std::vector<std::string>& file,
+    int         checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& file,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
                          std::vector<MediaConchLib::Checker_ValidateRes*>& result);
@@ -169,7 +169,7 @@ private:
 
     //Helper
     bool validation(const std::vector<std::string>& files, Schema* S, std::string& report);
-    bool validate_xslt_policy(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, int pos, std::string& report);
+    bool validate_xslt_policy(int user, const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, int pos, std::string& report);
     bool validate_xslt_from_memory(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& memory, std::string& report, bool is_implem=false);
     bool validate_xslt_policy_from_file(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& policy, std::string& report);
     void unify_implementation_options(std::map<std::string, std::string>& opts);

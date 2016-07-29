@@ -322,7 +322,7 @@ void Core::checker_list(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-int Core::checker_get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
+int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
                              const std::vector<std::string>& files,
                              const std::vector<size_t>& policies_ids,
                              const std::vector<std::string>& policies_contents,
@@ -333,7 +333,7 @@ int Core::checker_get_report(const std::bitset<MediaConchLib::report_Max>& repor
 {
     if (!policies_ids.empty() || !policies_contents.empty())
     {
-        if (check_policies(files, options, result,
+        if (check_policies(user, files, options, result,
                            policies_ids.size() ? &policies_ids : NULL,
                            policies_contents.size() ? &policies_contents : NULL) < 0)
             return -1;
@@ -368,7 +368,7 @@ int Core::checker_get_report(const std::bitset<MediaConchLib::report_Max>& repor
 }
 
 //---------------------------------------------------------------------------
-int Core::checker_validate(MediaConchLib::report report, const std::vector<std::string>& files,
+int Core::checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
                            const std::vector<size_t>& policies_ids,
                            const std::vector<std::string>& policies_contents,
                            std::vector<MediaConchLib::Checker_ValidateRes*>& result)
@@ -406,7 +406,7 @@ int Core::checker_validate(MediaConchLib::report report, const std::vector<std::
         {
             MediaConchLib::Checker_ReportRes tmp_res;
             std::map<std::string, std::string> options;
-            if (check_policies(file_tmp, options, &tmp_res,
+            if (check_policies(user, file_tmp, options, &tmp_res,
                                policies_ids.size() ? &policies_ids : NULL,
                                policies_contents.size() ? &policies_contents : NULL) < 0)
                 continue;
@@ -488,7 +488,7 @@ bool Core::check_policies_xslts(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-int Core::check_policies(const std::vector<std::string>& files,
+int Core::check_policies(int user, const std::vector<std::string>& files,
                          const std::map<std::string, std::string>& options,
                          MediaConchLib::Checker_ReportRes* result,
                          const std::vector<size_t>* policies_ids,
@@ -501,7 +501,7 @@ int Core::check_policies(const std::vector<std::string>& files,
     }
 
     std::vector<std::string> policies;
-    if (this->policies.policy_get_policies(policies_ids, policies_contents, policies, result->report) < 0)
+    if (this->policies.policy_get_policies(user, policies_ids, policies_contents, policies, result->report) < 0)
         return -1;
 
     std::stringstream Out;
@@ -590,7 +590,7 @@ int Core::transform_with_xslt_text_memory(const std::string& report, std::string
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool Core::validate_xslt_policy(const std::vector<std::string>& files,
+bool Core::validate_xslt_policy(int user, const std::vector<std::string>& files,
                                 const std::map<std::string, std::string>&,
                                 int pos, std::string& report)
 {
@@ -599,7 +599,7 @@ bool Core::validate_xslt_policy(const std::vector<std::string>& files,
     Schema *S = new Xslt(!accepts_https());
 
     if (pos >= 0)
-        doc = policies.create_doc(pos);
+        doc = policies.create_doc(user, pos);
 
     if (doc && S->register_schema_from_doc(doc))
         valid = validation(files, S, report);

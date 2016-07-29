@@ -319,7 +319,7 @@ int DaemonClient::checker_is_done(const std::string& file, double& done, MediaCo
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_get_report(const std::bitset<MediaConchLib::report_Max>& report_set,
+int DaemonClient::checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set,
                                      MediaConchLib::format f, const std::vector<std::string>& files,
                                      const std::vector<size_t>& policies_ids,
                                      const std::vector<std::string>& policies_contents,
@@ -333,6 +333,8 @@ int DaemonClient::checker_get_report(const std::bitset<MediaConchLib::report_Max
 
     // FILE
     RESTAPI::Checker_Report_Req req;
+    req.user = user;
+
     for (size_t i = 0; i < files.size(); ++i)
     {
         std::map<std::string, int>::iterator it = file_ids.find(files[i]);
@@ -424,7 +426,7 @@ int DaemonClient::checker_get_report(const std::bitset<MediaConchLib::report_Max
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_validate(MediaConchLib::report report,
+int DaemonClient::checker_validate(int user, MediaConchLib::report report,
                                    const std::vector<std::string>& files,
                                    const std::vector<size_t>& policies_ids,
                                    const std::vector<std::string>& policies_contents,
@@ -435,6 +437,8 @@ int DaemonClient::checker_validate(MediaConchLib::report report,
 
     // FILE
     RESTAPI::Checker_Validate_Req req;
+    req.user = user;
+
     std::map<int, std::string> saved_ids;
     for (size_t i = 0; i < files.size(); ++i)
     {
@@ -504,48 +508,15 @@ int DaemonClient::checker_validate(MediaConchLib::report report,
 //***************************************************************************
 // Policy
 //***************************************************************************
-//---------------------------------------------------------------------------
-int DaemonClient::policy_import(const std::string& memory, std::string& err)
-{
-    if (!http_client)
-        return MediaConchLib::errorHttp_INIT;
-
-    RESTAPI::Policy_Import_Req req;
-    req.xml = memory;
-
-    int ret = http_client->start();
-    if (ret < 0)
-        return ret;
-
-    ret = http_client->send_request(req);
-    if (ret < 0)
-        return ret;
-
-    std::string data = http_client->get_result();
-    http_client->stop();
-    if (!data.length())
-        return http_client->get_error();
-
-    RESTAPI rest;
-    RESTAPI::Policy_Import_Res *res = rest.parse_policy_import_res(data);
-    if (!res)
-        return MediaConchLib::errorHttp_INVALID_DATA;
-
-    ret = -1;
-    if (!res->nok)
-        ret = res->id;
-    else
-        err = res->nok->error;
-    return ret;
-}
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_create(int parent_id, std::string& err)
+int DaemonClient::xslt_policy_create(int user, int parent_id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::XSLT_Policy_Create_Req req;
+    req.user = user;
     req.parent_id = parent_id;
 
     int ret = http_client->start();
@@ -575,13 +546,50 @@ int DaemonClient::xslt_policy_create(int parent_id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_duplicate(int id, std::string& err)
+int DaemonClient::policy_import(int user, const std::string& memory, std::string& err)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Policy_Import_Req req;
+    req.xml = memory;
+    req.user = user;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Policy_Import_Res *res = rest.parse_policy_import_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    ret = -1;
+    if (!res->nok)
+        ret = res->id;
+    else
+        err = res->nok->error;
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::policy_duplicate(int user, int id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Duplicate_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -610,13 +618,14 @@ int DaemonClient::policy_duplicate(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_remove(int id, std::string& err)
+int DaemonClient::policy_remove(int user, int id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Remove_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -645,13 +654,14 @@ int DaemonClient::policy_remove(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_save(int id, std::string& err)
+int DaemonClient::policy_save(int user, int id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Save_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -680,13 +690,14 @@ int DaemonClient::policy_save(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_dump(int id, std::string& memory, std::string& err)
+int DaemonClient::policy_dump(int user, int id, std::string& memory, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Dump_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -718,7 +729,7 @@ int DaemonClient::policy_dump(int id, std::string& memory, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
+int DaemonClient::policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -727,6 +738,7 @@ int DaemonClient::policy_change_name(int id, const std::string& name, const std:
     req.id = id;
     req.name = name;
     req.description = description;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -755,13 +767,14 @@ int DaemonClient::policy_change_name(int id, const std::string& name, const std:
 }
 
 //---------------------------------------------------------------------------
-Policy* DaemonClient::policy_get(int id, std::string& err)
+Policy* DaemonClient::policy_get(int user, int id, std::string& err)
 {
     if (!http_client)
         return NULL;
 
     RESTAPI::Policy_Get_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -792,13 +805,14 @@ Policy* DaemonClient::policy_get(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_get_name(int id, std::string& name, std::string& err)
+int DaemonClient::policy_get_name(int user, int id, std::string& name, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Get_Name_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -830,12 +844,13 @@ int DaemonClient::policy_get_name(int id, std::string& name, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-void DaemonClient::policy_get_policies(std::vector<std::pair<size_t, std::string> >& policies)
+void DaemonClient::policy_get_policies(int user, std::vector<std::pair<size_t, std::string> >& policies)
 {
     if (!http_client)
         return;
 
     RESTAPI::Policy_Get_Policies_Req req;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -868,12 +883,13 @@ void DaemonClient::policy_get_policies(std::vector<std::pair<size_t, std::string
 }
 
 //---------------------------------------------------------------------------
-size_t DaemonClient::policy_get_policies_count()
+size_t DaemonClient::policy_get_policies_count(int user)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Get_Policies_Count_Req req;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -900,12 +916,13 @@ size_t DaemonClient::policy_get_policies_count()
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_clear_policies(std::string& err)
+int DaemonClient::policy_clear_policies(int user, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Clear_Policies_Req req;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -934,7 +951,7 @@ int DaemonClient::policy_clear_policies(std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_create_from_file(const std::string& file)
+int DaemonClient::xslt_policy_create_from_file(int user, const std::string& file)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -946,6 +963,7 @@ int DaemonClient::xslt_policy_create_from_file(const std::string& file)
 
     RESTAPI::XSLT_Policy_Create_From_File_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -971,13 +989,14 @@ int DaemonClient::xslt_policy_create_from_file(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_rule_create(int policy_id, std::string& err)
+int DaemonClient::xslt_policy_rule_create(int user, int policy_id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::XSLT_Policy_Rule_Create_Req req;
     req.policy_id = policy_id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -1007,7 +1026,7 @@ int DaemonClient::xslt_policy_rule_create(int policy_id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
+int DaemonClient::xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -1022,6 +1041,7 @@ int DaemonClient::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPo
     req.rule.occurrence = rule->occurrence;
     req.rule.ope = rule->ope;
     req.rule.value = rule->value;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -1051,7 +1071,7 @@ int DaemonClient::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPo
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err)
+int DaemonClient::xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -1059,6 +1079,7 @@ int DaemonClient::xslt_policy_rule_duplicate(int policy_id, int rule_id, std::st
     RESTAPI::XSLT_Policy_Rule_Duplicate_Req req;
     req.policy_id = policy_id;
     req.id = rule_id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -1088,7 +1109,7 @@ int DaemonClient::xslt_policy_rule_duplicate(int policy_id, int rule_id, std::st
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err)
+int DaemonClient::xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -1096,6 +1117,7 @@ int DaemonClient::xslt_policy_rule_delete(int policy_id, int rule_id, std::strin
     RESTAPI::XSLT_Policy_Rule_Delete_Req req;
     req.policy_id = policy_id;
     req.id = rule_id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
