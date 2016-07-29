@@ -92,7 +92,24 @@ namespace MediaConch
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
+
+        httpd->commands.xslt_policy_create_cb = on_xslt_policy_create_command;
+        httpd->commands.policy_import_cb = on_policy_import_command;
+        httpd->commands.policy_save_cb = on_policy_save_command;
+        httpd->commands.policy_dump_cb = on_policy_dump_command;
+        httpd->commands.policy_remove_cb = on_policy_remove_command;
+        httpd->commands.policy_duplicate_cb = on_policy_duplicate_command;
+        httpd->commands.policy_change_name_cb = on_policy_change_name_command;
+        httpd->commands.policy_get_cb = on_policy_get_command;
+        httpd->commands.policy_get_name_cb = on_policy_get_name_command;
+        httpd->commands.policy_get_policies_count_cb = on_policy_get_policies_count_command;
+        httpd->commands.policy_clear_policies_cb = on_policy_clear_policies_command;
+        httpd->commands.policy_get_policies_cb = on_policy_get_policies_command;
         httpd->commands.xslt_policy_create_from_file_cb = on_xslt_policy_create_from_file_command;
+        httpd->commands.xslt_policy_rule_create_cb = on_xslt_policy_rule_create_command;
+        httpd->commands.xslt_policy_rule_edit_cb = on_xslt_policy_rule_edit_command;
+        httpd->commands.xslt_policy_rule_duplicate_cb = on_xslt_policy_rule_duplicate_command;
+        httpd->commands.xslt_policy_rule_delete_cb = on_xslt_policy_rule_delete_command;
         return 0;
     }
 
@@ -1037,6 +1054,29 @@ namespace MediaConch
         //TODO
 
         std::clog << d->get_date() << "Daemon send policy_get result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_get_name_command(const RESTAPI::Policy_Get_Name_Req* req,
+                                           RESTAPI::Policy_Get_Name_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_get_name command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        if (d->MCL->policy_get_name(req->id, res.name, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
+        std::clog << d->get_date() << "Daemon send policy_get_name result: " << res.to_str() << std::endl;
         return 0;
     }
 

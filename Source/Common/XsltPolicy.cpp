@@ -56,6 +56,7 @@ size_t XsltPolicyRule::rule_id = 0;
 XsltPolicyRule::XsltPolicyRule() : XsltPolicyNode()
 {
     this->id = rule_id++;
+    kind = XSLT_POLICY_RULE;
 }
 
 //---------------------------------------------------------------------------
@@ -95,8 +96,9 @@ int XsltPolicyRule::edit_policy_rule(const XsltPolicyRule* rule, std::string&)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-XsltPolicy::XsltPolicy(Policies *p, bool no_https) : Policy(p, Policies::POLICY_XSLT, no_https)
+XsltPolicy::XsltPolicy(Policies *p, bool no_https) : Policy(p, Policies::POLICY_XSLT, no_https), XsltPolicyNode()
 {
+    kind = XSLT_POLICY_POLICY;
 }
 
 //---------------------------------------------------------------------------
@@ -462,7 +464,7 @@ int XsltPolicy::write_nodes_children(xmlNodePtr node, XsltPolicy *current)
 int XsltPolicy::write_root_nodes_children(xmlDocPtr doc)
 {
     xmlNodePtr node = NULL;
-    if (this->kind == XSLT_POLICY_POLICY)
+    if (kind == XSLT_POLICY_POLICY)
     {
         if (create_node_policy_child(node, this) < 0)
             return -1;

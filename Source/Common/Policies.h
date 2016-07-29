@@ -74,6 +74,7 @@ public:
 
     size_t      get_policies_size() const { return policies.size(); };
     Policy*     get_policy(int pos, std::string& err);
+    int         policy_get_name(int id, std::string& name, std::string& err);
     void        get_policies(std::vector<std::pair<size_t, std::string> >& ps);
 
     int         policy_get_policies(const std::vector<size_t>* policies_ids,

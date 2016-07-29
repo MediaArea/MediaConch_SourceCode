@@ -187,7 +187,7 @@ public:
     //   Policy helper
     size_t                       policy_get_policies_count() const;
     Policy*                      policy_get(int pos, std::string& err);
-    int                          policy_get_name(int pos, std::string& name, std::string& err);
+    int                          policy_get_name(int id, std::string& name, std::string& err);
     void                         policy_get_policies(std::vector<std::pair<size_t, std::string> >&);
     int                          policy_save(int pos, std::string& err);
     int                          policy_remove(int pos, std::string& err);

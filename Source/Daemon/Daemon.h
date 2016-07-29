@@ -100,6 +100,8 @@ namespace MediaConch
                                                  RESTAPI::Policy_Change_Name_Res& res, void *arg);
         static int on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
                                          RESTAPI::Policy_Get_Res& res, void *arg);
+        static int on_policy_get_name_command(const RESTAPI::Policy_Get_Name_Req* req,
+                                              RESTAPI::Policy_Get_Name_Res& res, void *arg);
         static int on_policy_get_policies_count_command(const RESTAPI::Policy_Get_Policies_Count_Req* req,
                                                         RESTAPI::Policy_Get_Policies_Count_Res& res, void *arg);
         static int on_policy_clear_policies_command(const RESTAPI::Policy_Clear_Policies_Req* req,

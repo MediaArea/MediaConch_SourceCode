@@ -61,7 +61,7 @@ int Policies::create_xslt_policy(int parent_id, std::string& err)
     if (parent_id != -1)
     {
         parent = get_policy(parent_id, err);
-        if (!parent || parent->type == POLICY_XSLT)
+        if (!parent || parent->type != POLICY_XSLT)
         {
             err = "Parent ID is not existing or understandable";
             return -1;
@@ -69,18 +69,18 @@ int Policies::create_xslt_policy(int parent_id, std::string& err)
     }
 
     XsltPolicy *p = new XsltPolicy(this, !core->accepts_https());
+    find_new_policy_name(p->name);
 
     // Policy filename
     if (!parent)
-    {
         find_save_name(NULL, p->filename);
-        find_new_policy_name(p->name);
-    }
     else
     {
         ((XsltPolicy*)parent)->nodes.push_back(p);
         p->parent_id = parent_id;
     }
+
+    policies[p->id] = p;
 
     return (int)p->id;
 }
@@ -218,6 +218,20 @@ Policy* Policies::get_policy(int id, std::string& err)
     return it->second;
 }
 
+int Policies::policy_get_name(int id, std::string& name, std::string& err)
+{
+    std::map<size_t, Policy *>::iterator it = policies.find(id);
+
+    if (id == -1 || it == policies.end() || !it->second)
+    {
+        err = "Policy not existing";
+        return -1;
+    }
+
+    name = it->second->name;
+    return 0;
+}
+
 void Policies::get_policies(std::vector<std::pair<size_t, std::string> >& ps)
 {
     std::map<size_t, Policy *>::iterator it = policies.begin();
@@ -255,11 +269,16 @@ int Policies::erase_policy(int id, std::string& err)
             for (size_t i = 0; i < policy->nodes.size(); ++i)
             {
                 if (policy->nodes[i] && policy->nodes[i]->kind == XSLT_POLICY_POLICY)
-                    erase_policy(((XsltPolicy*)policy->nodes[i])->id, err);
+                {
+                    if (erase_policy(((XsltPolicy*)policy->nodes[i])->id, err) < 0)
+                        return -1;
+                }
             }
+            policy->nodes.clear();
         }
 
-        remove_saved_policy(it->second);
+        if (it->second->type != POLICY_XSLT || ((XsltPolicy*)it->second)->parent_id == (size_t)-1)
+            remove_saved_policy(it->second);
 
         delete it->second;
     }

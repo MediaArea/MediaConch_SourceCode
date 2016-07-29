@@ -1716,11 +1716,18 @@ int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string& data)
 {
-    Container::Value v, child, id, nok;
+    Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
-    if (res.nok)
+    if (!res.nok)
+    {
+        Container::Value id;
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+        child.obj["id"] = id;
+    }
+    else
         child.obj["nok"] = serialize_policy_nok(res.nok);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;

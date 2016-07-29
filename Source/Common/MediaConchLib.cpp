@@ -518,6 +518,15 @@ Policy* MediaConchLib::policy_get(int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::policy_get_name(int id, std::string& name, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->policy_get_name(id, name, err);
+
+    return core->policies.policy_get_name(id, name, err);
+}
+
+//---------------------------------------------------------------------------
 void MediaConchLib::policy_get_policies(std::vector<std::pair<size_t, std::string> >& policies)
 {
     if (use_daemon)
