@@ -363,7 +363,7 @@ void MainWindow::clear_file_list()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::get_policies(std::vector<std::pair<size_t, std::string> >& policies)
+void MainWindow::get_policies(std::vector<MediaConchLib::Policy_Policy*>& policies)
 {
     MCL.policy_get_policies(-1, policies);
 }

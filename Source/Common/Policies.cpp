@@ -16,6 +16,7 @@
 #include <string.h>
 #include <ZenLib/Ztring.h>
 #include <ZenLib/ZtringList.h>
+#include <ZenLib/Dir.h>
 #include <ZenLib/File.h>
 #include "Policies.h"
 #include "Core.h"
@@ -782,10 +783,14 @@ void Policies::find_save_name(int user, const char* basename, std::string& save_
     data_path << Core::get_local_data_path();
     data_path << "policies/" << user << "/";
 
+    ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(data_path.str());
+    if (!ZenLib::Dir::Exists(z_path))
+        ZenLib::Dir::Create(z_path);
+
     if (basename)
     {
         std::string base(basename);
-        ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(base);
+        z_path = ZenLib::Ztring().From_UTF8(base);
         if (base.find(data_path.str()) == 0 && ZenLib::File::Exists(z_path))
         {
             save_name = basename;
