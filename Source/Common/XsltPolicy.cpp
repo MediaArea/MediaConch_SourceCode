@@ -44,6 +44,7 @@ XsltPolicyNode::XsltPolicyNode(const XsltPolicyNode* n)
         return;
 
     this->kind = n->kind;
+    this->parent_id = n->parent_id;
     this->node_name = n->node_name + "_copy";
 }
 
@@ -107,7 +108,6 @@ XsltPolicy::XsltPolicy(const XsltPolicy* s) : Policy(s), XsltPolicyNode(s)
     type = Policies::POLICY_XSLT;
 
     this->ope         = s->ope;
-    this->parent_id   = s->parent_id;
     this->name        = this->node_name;
 
     for (size_t i = 0; i < s->nodes.size(); ++i)

@@ -86,7 +86,6 @@ int Policies::create_xslt_policy(int user, int parent_id, std::string& err)
     }
 
     policies[user][p->id] = p;
-
     return (int)p->id;
 }
 
@@ -236,28 +235,65 @@ size_t Policies::get_policies_size(int user) const
     return it->second.size();
 }
 
-void Policies::get_policies(int user, std::vector<std::pair<size_t, std::string> >& ps)
+void Policies::get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>& ps)
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
 
     if (it == policies.end())
         return;
 
-    std::map<size_t, Policy *>::iterator it_p = it->second.begin();
+
+    std::map<size_t, Policy*>::iterator it_p = it->second.begin();
     for (; it_p != it->second.end(); ++it_p)
     {
         if (!it_p->second)
             continue;
 
+        MediaConchLib::Policy_Policy *p = NULL;
+
+        //Unknown...
         if (it_p->second->type != POLICY_XSLT)
-            ps.push_back(std::make_pair(it_p->first, it_p->second->name));
+        {
+            p = new MediaConchLib::Policy_Policy;
+            p->id = it_p->second->id;
+            p->name = it_p->second->name;
+        }
         else
         {
-            if (((XsltPolicyNode*)it_p->second)->kind == XSLT_POLICY_RULE)
-                ps.push_back(std::make_pair(it_p->first, it_p->second->name));
-            else if (((XsltPolicyNode*)it_p->second)->parent_id != (size_t)-1)
-                ps.push_back(std::make_pair(it_p->first, it_p->second->name));
+            if (((XsltPolicy*)it_p->second)->kind == XSLT_POLICY_POLICY && ((XsltPolicy*)it_p->second)->parent_id == (size_t)-1)
+            {
+                XsltPolicy* node = (XsltPolicy*)it_p->second;
+                // XSLT Policy
+                p = new MediaConchLib::Policy_Policy;
+                p->id = it_p->second->id;
+                p->type = node->ope;
+                p->name = node->name;
+                p->description = node->description;
+            }
+            else
+            {
+                XsltPolicyNode* node = (XsltPolicyNode*)it_p->second;
+                //TODO sub-nodes
+                if (node->kind == XSLT_POLICY_POLICY)
+                {
+                    // // XSLT Policy
+                    // REST_API::Policy_Policy *p = new REST_API::Policy_Policy;
+                    // p->id = node->id;
+                    // p->parent_id = node->parent_id;
+                    // p->type = node->ype;
+                    // p->name = node->name;
+                    // p->description = node->description;
+                }
+                else
+                {
+                    //TODO XSLT RULE
+                }
+                continue;
+            }
         }
+
+        if (p)
+            ps.push_back(p);
     }
 }
 
@@ -278,6 +314,7 @@ int Policies::erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, 
             if (erase_xslt_policy_node(user_policies, ((XsltPolicy*)policy->nodes[i])->id, err) < 0)
                 return -1;
         }
+
         delete policy->nodes[i];
         policy->nodes[i] = NULL;
     }
@@ -311,7 +348,7 @@ int Policies::erase_policy(int user, int id, std::string& err)
     return 0;
 }
 
-int Policies::clear_policies(int user, std::string& err)
+int Policies::clear_policies(int user, std::string&)
 {
     std::map<int, std::map<size_t, Policy*> >::iterator it = policies.find(user);
     if (it == policies.end())

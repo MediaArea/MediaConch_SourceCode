@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 #include "Container.h"
-
+#include "MediaConchLib.h"
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
@@ -569,20 +569,13 @@ public:
         std::string to_str() const;
     };
 
-    struct Policy_Get_Policies_Ok
-    {
-        int         id;
-        std::string name;
-        std::string to_str() const;
-    };
-
     struct Policy_Get_Policies_Res
     {
         Policy_Get_Policies_Res() : nok(NULL) {}
         ~Policy_Get_Policies_Res();
-        std::vector<Policy_Get_Policies_Ok*>  policies;
-        Policy_Nok                           *nok;
-        std::string                           to_str() const;
+        std::vector<MediaConchLib::Policy_Policy*>  policies;
+        Policy_Nok                                 *nok;
+        std::string                                 to_str() const;
     };
 
     struct XSLT_Policy_Create_From_File_Req
@@ -865,7 +858,7 @@ private:
     Container::Value serialize_list_file(const std::string& file, int id);
     Container::Value serialize_validate_ok(Checker_Validate_Ok* ok);
     Container::Value serialize_policy_nok(Policy_Nok* nok);
-    void serialize_policies_get_policies(std::vector<Policy_Get_Policies_Ok*>, Container::Value& policies);
+    void serialize_policies_get_policies(std::vector<MediaConchLib::Policy_Policy*>, Container::Value& policies);
 
     int parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args);
     int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
@@ -876,7 +869,7 @@ private:
     int parse_list_file(Container::Value *v, std::string& file, int& id);
     int parse_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks);
     int parse_policy_nok(Container::Value *v, Policy_Nok** n);
-    int parse_policies_get_policies(Container::Value* policies, std::vector<Policy_Get_Policies_Ok*>);
+    int parse_policies_get_policies(Container::Value* policies, std::vector<MediaConchLib::Policy_Policy*>);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

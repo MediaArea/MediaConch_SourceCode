@@ -1129,15 +1129,18 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a policy_get_policies command: ";
+        std::clog << d->get_date() << "Daemon received a policy_get_policies command" << std::endl;
 
-        std::vector<std::pair<size_t, std::string> > policies;
+        std::vector<MediaConchLib::Policy_Policy*> policies;
         d->MCL->policy_get_policies(req->user, policies);
         for (size_t i = 0; i < policies.size(); ++i)
         {
-            RESTAPI::Policy_Get_Policies_Ok *ok = new RESTAPI::Policy_Get_Policies_Ok;
-            ok->id = policies[i].first;
-            ok->name = policies[i].second;
+            MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy;
+            ok->id = policies[i]->id;
+            ok->parent_id = policies[i]->parent_id;
+            ok->type = policies[i]->type;
+            ok->name = policies[i]->name;
+            ok->description = policies[i]->description;
             res.policies.push_back(ok);
         }
 

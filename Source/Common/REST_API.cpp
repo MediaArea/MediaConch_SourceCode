@@ -945,15 +945,6 @@ std::string RESTAPI::Policy_Clear_Policies_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Policy_Get_Policies_Ok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{\"id\":" << id << "\"name\":\"" << name << "\"}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
 std::string RESTAPI::Policy_Get_Policies_Res::to_str() const
 {
     std::stringstream out;
@@ -5146,12 +5137,12 @@ Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
 }
 
 //---------------------------------------------------------------------------
-void RESTAPI::serialize_policies_get_policies(std::vector<Policy_Get_Policies_Ok *> policies, Container::Value &p)
+void RESTAPI::serialize_policies_get_policies(std::vector<MediaConchLib::Policy_Policy *> policies, Container::Value &p)
 {
     p.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < policies.size(); ++i)
     {
-        Container::Value ok_v, id, name;
+        Container::Value ok_v, id, parent_id, type, name, description;
 
         ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -5159,9 +5150,21 @@ void RESTAPI::serialize_policies_get_policies(std::vector<Policy_Get_Policies_Ok
         id.l = policies[i]->id;
         ok_v.obj["id"] = id;
 
+        parent_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        parent_id.l = policies[i]->parent_id;
+        ok_v.obj["parent_id"] = parent_id;
+
+        type.type = Container::Value::CONTAINER_TYPE_STRING;
+        type.s = policies[i]->type;
+        ok_v.obj["type"] = type;
+
         name.type = Container::Value::CONTAINER_TYPE_STRING;
         name.s = policies[i]->name;
         ok_v.obj["name"] = name;
+
+        description.type = Container::Value::CONTAINER_TYPE_STRING;
+        description.s = policies[i]->description;
+        ok_v.obj["description"] = description;
 
         p.array.push_back(ok_v);
     }
@@ -5446,7 +5449,7 @@ int RESTAPI::parse_policy_nok(Container::Value *nok_v, RESTAPI::Policy_Nok **nok
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<Policy_Get_Policies_Ok *> policies)
+int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaConchLib::Policy_Policy *> policies)
 {
     if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -5459,16 +5462,30 @@ int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<Policy
             return -1;
 
         Container::Value *id = model->get_value_by_key(*policy, "id");
-        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
             return -1;
+
+        MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy;
+        ok->id = id->l;
+
+        Container::Value *type = model->get_value_by_key(*policy, "type");
+        if (!type || type->type != Container::Value::CONTAINER_TYPE_STRING)
+            ok->type = type->s;
+        else
+            ok->type = "and";
+
+        Container::Value *parent_id = model->get_value_by_key(*policy, "parent_id");
+        if (parent_id && parent_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            ok->parent_id = parent_id->l;
 
         Container::Value *name = model->get_value_by_key(*policy, "name");
-        if (name->type != Container::Value::CONTAINER_TYPE_STRING)
-            return -1;
+        if (name && name->type == Container::Value::CONTAINER_TYPE_STRING)
+            ok->name = name->s;
 
-        Policy_Get_Policies_Ok *ok = new Policy_Get_Policies_Ok;
-        ok->id = id->l;
-        ok->name = name->s;
+        Container::Value *description = model->get_value_by_key(*policy, "description");
+        if (description && description->type == Container::Value::CONTAINER_TYPE_STRING)
+            ok->description = description->s;
+
         policies.push_back(ok);
     }
     return 0;

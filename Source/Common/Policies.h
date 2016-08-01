@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 #include <libxml/tree.h>
+#include "MediaConchLib.h"
 using namespace MediaInfoNameSpace;
 //---------------------------------------------------------------------------
 
@@ -75,7 +76,7 @@ public:
     size_t      get_policies_size(int user) const;
     Policy*     get_policy(int user, int pos, std::string& err);
     int         policy_get_name(int user, int id, std::string& name, std::string& err);
-    void        get_policies(int user, std::vector<std::pair<size_t, std::string> >& ps);
+    void        get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>& ps);
 
     int         policy_get_policies(int user, const std::vector<size_t>* policies_ids,
                                     const std::vector<std::string>* policies_contents,

@@ -111,7 +111,7 @@ public:
     int policy_clear_policies(int user, std::string& err);
 
     // get all policies with ID && name
-    void policy_get_policies(int user, std::vector<std::pair<size_t, std::string> >&);
+    void policy_get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>&);
 
     // policy_create_from_file
     int xslt_policy_create_from_file(int user, const std::string& id);

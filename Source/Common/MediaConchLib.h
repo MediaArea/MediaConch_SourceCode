@@ -108,6 +108,17 @@ public:
         Checker_ValidateRes() : valid(true) {}
     };
 
+    struct Policy_Policy
+    {
+        Policy_Policy() : id(-1), parent_id(-1) {}
+        int         id;
+        int         parent_id;
+        std::string type;
+        std::string name;
+        std::string description;
+        std::string to_str() const;
+    };
+
     static const std::string display_xml_name;
     static const std::string display_maxml_name;
     static const std::string display_text_name;
@@ -188,7 +199,7 @@ public:
     size_t                       policy_get_policies_count(int user) const;
     Policy*                      policy_get(int user, int pos, std::string& err);
     int                          policy_get_name(int user, int id, std::string& name, std::string& err);
-    void                         policy_get_policies(int user, std::vector<std::pair<size_t, std::string> >&);
+    void                         policy_get_policies(int user, std::vector<Policy_Policy*>&);
     int                          policy_save(int user, int pos, std::string& err);
     int                          policy_remove(int user, int pos, std::string& err);
     int                          policy_dump(int user, int id, std::string& memory, std::string& err);

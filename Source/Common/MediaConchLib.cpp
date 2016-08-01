@@ -504,7 +504,7 @@ int MediaConchLib::policy_clear_policies(int user, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::policy_get_policies(int user, std::vector<std::pair<size_t, std::string> >& policies)
+void MediaConchLib::policy_get_policies(int user, std::vector<Policy_Policy*>& policies)
 {
     if (use_daemon)
         daemon_client->policy_get_policies(user, policies);
@@ -563,6 +563,19 @@ int MediaConchLib::policy_get_values_for_type_field(const std::string& type, con
 int MediaConchLib::policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
 {
     return core->policy_get_fields_for_type(type, fields);
+}
+
+//---------------------------------------------------------------------------
+std::string MediaConchLib::Policy_Policy::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\":" << id;
+    out << ",\"parent_id\":\"" << parent_id;
+    out << ",\"type\":\"" << type;
+    out << ",\"name\":\"" << name;
+    out << ",\"description\":\"" << description << "\"}";
+    return out.str();
 }
 
 //---------------------------------------------------------------------------

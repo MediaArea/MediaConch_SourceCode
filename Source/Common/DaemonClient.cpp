@@ -542,6 +542,9 @@ int DaemonClient::xslt_policy_create(int user, int parent_id, std::string& err)
         ret = res->id;
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
@@ -578,6 +581,9 @@ int DaemonClient::policy_import(int user, const std::string& memory, std::string
         ret = res->id;
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
@@ -614,6 +620,9 @@ int DaemonClient::policy_duplicate(int user, int id, std::string& err)
         ret = res->id;
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
@@ -650,6 +659,9 @@ int DaemonClient::policy_remove(int user, int id, std::string& err)
         ret = 0;
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
@@ -686,6 +698,9 @@ int DaemonClient::policy_save(int user, int id, std::string& err)
         ret = 0;
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
@@ -725,6 +740,9 @@ int DaemonClient::policy_dump(int user, int id, std::string& memory, std::string
     }
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
@@ -763,6 +781,9 @@ int DaemonClient::policy_change_name(int user, int id, const std::string& name, 
         ret = 0;
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
@@ -801,6 +822,9 @@ Policy* DaemonClient::policy_get(int user, int id, std::string& err)
     }
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return p;
 }
 
@@ -840,11 +864,14 @@ int DaemonClient::policy_get_name(int user, int id, std::string& name, std::stri
     }
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
 //---------------------------------------------------------------------------
-void DaemonClient::policy_get_policies(int user, std::vector<std::pair<size_t, std::string> >& policies)
+void DaemonClient::policy_get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>& policies)
 {
     if (!http_client)
         return;
@@ -877,9 +904,18 @@ void DaemonClient::policy_get_policies(int user, std::vector<std::pair<size_t, s
             if (!res->policies[i])
                 continue;
 
-            policies.push_back(std::make_pair((size_t)res->policies[i]->id, res->policies[i]->name));
+            MediaConchLib::Policy_Policy* p = new MediaConchLib::Policy_Policy;
+            p->id = res->policies[i]->id;
+            p->parent_id = res->policies[i]->parent_id;
+            p->type = res->policies[i]->type;
+            p->name = res->policies[i]->name;
+            p->description = res->policies[i]->description;
+            policies.push_back(p);
         }
     }
+
+    delete res;
+    res = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -912,6 +948,9 @@ size_t DaemonClient::policy_get_policies_count(int user)
     ret = -1;
     if (!res->nok)
         ret = res->size;
+
+    delete res;
+    res = NULL;
     return (size_t)ret;
 }
 
@@ -947,6 +986,9 @@ int DaemonClient::policy_clear_policies(int user, std::string& err)
         ret = 0;
     else
         err = res->nok->error;
+
+    delete res;
+    res = NULL;
     return ret;
 }
 
