@@ -76,7 +76,8 @@ int NoDatabaseReport::update_report_table()
 //---------------------------------------------------------------------------
 int NoDatabaseReport::save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
                                   const std::string& filename, const std::string& file_last_modification,
-                                  const std::string& report, MediaConchLib::compression c)
+                                  const std::string& report, MediaConchLib::compression c,
+                                  bool has_mil_version)
 {
     Report* r = new Report;
     r->reportKind = reportKind;
@@ -84,6 +85,7 @@ int NoDatabaseReport::save_report(MediaConchLib::report reportKind, MediaConchLi
     r->file_last_modification = file_last_modification;
     r->report = report;
     r->compression = c;
+    r->has_mil_version = has_mil_version;
     std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
     if (it != reports_saved.end())
     {
@@ -175,6 +177,21 @@ bool NoDatabaseReport::file_is_registered(MediaConchLib::report reportKind, Medi
     return false;
 }
 
+bool NoDatabaseReport::has_version_registered(const std::string& filename)
+{
+    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
+
+    if (it == reports_saved.end())
+        return false;
+
+    for (size_t i = 0; i < it->second.size(); ++i)
+    {
+        if (it->second[i] && it->second[i]->has_mil_version)
+            return true;
+    }
+    return false;
+}
+
 //---------------------------------------------------------------------------
 void NoDatabaseReport::get_elements(std::vector<std::string>& vec)
 {
@@ -196,7 +213,7 @@ void NoDatabaseReport::get_element_report_kind(const std::string& file, MediaCon
                 continue;
 
             MediaConchLib::report tool_i = reports_saved[file][i]->reportKind;
-            if (tool_i == MediaConchLib::report_MediaInfo || tool_i == MediaConchLib::report_MediaTrace)
+            if (tool_i == MediaConchLib::report_MediaInfo || tool_i == MediaConchLib::report_MediaTrace || tool_i == MediaConchLib::report_MicroMediaTrace)
                 tool_i = MediaConchLib::report_MediaConch;
 
             report_kind = tool_i;
