@@ -47,6 +47,7 @@ Policies::Policies(Core *c) : core(c)
 Policies::~Policies()
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.begin();
+    for (; it != policies.end(); ++it)
     {
         std::map<size_t, Policy *>::iterator it_p = it->second.begin();
         for (; it_p != it->second.end(); ++it_p)
@@ -119,12 +120,12 @@ int Policies::import_policy_from_memory(int user, const std::string& memory, std
             err = p->get_error();
     }
 
+    p->is_system = is_system_policy;
     if (ret < 0)
         delete p;
     else
         policies[user][p->id] = p;
 
-    p->is_system = is_system_policy;
     return ret;
 }
 
