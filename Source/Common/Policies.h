@@ -142,7 +142,7 @@ private:
     XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);
     int policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_policies, std::string& err);
     int policy_get_policy_content(const std::string& policy, std::vector<std::string>& xslt_policies, std::string& err);
-    int erase_xslt_policy(std::map<size_t, Policy *>& user_policies, int id, std::string& err);
+    int erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, int id, std::string& err);
 };
 
 }

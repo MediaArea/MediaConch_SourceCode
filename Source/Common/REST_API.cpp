@@ -3265,7 +3265,9 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "parent_id")
         {
@@ -3314,7 +3316,9 @@ RESTAPI::Policy_Remove_Req *RESTAPI::parse_uri_policy_remove_req(const std::stri
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3355,7 +3359,9 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& 
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3396,7 +3402,9 @@ RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& 
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3437,7 +3445,9 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3478,7 +3488,9 @@ RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_uri_policy_change_name_req(const
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3533,7 +3545,9 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& ur
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3574,7 +3588,9 @@ RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_uri_policy_get_name_req(const std::
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3615,7 +3631,9 @@ RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_c
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "user")
         {
@@ -3649,7 +3667,9 @@ RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "user")
         {
@@ -3683,7 +3703,9 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(con
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "user")
         {
@@ -3717,7 +3739,9 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3758,7 +3782,9 @@ RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "policy_id")
         {
@@ -3808,7 +3834,9 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_dup
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -3856,7 +3884,9 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete
         and_pos = uri.find("&", start);
         std::string val = uri.substr(start, and_pos);
 
-        start = and_pos + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
         if (substr == "id")
         {
@@ -4355,7 +4385,7 @@ RESTAPI::Policy_Import_Res *RESTAPI::parse_policy_import_res(const std::string& 
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_IMPORT_RESULT");
+    child = model->get_value_by_key(v, "POLICY_IMPORT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4387,7 +4417,7 @@ RESTAPI::Policy_Remove_Res *RESTAPI::parse_policy_remove_res(const std::string& 
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_REMOVE_RESULT");
+    child = model->get_value_by_key(v, "POLICY_REMOVE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4414,7 +4444,7 @@ RESTAPI::Policy_Dump_Res *RESTAPI::parse_policy_dump_res(const std::string& data
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_DUMP_RESULT");
+    child = model->get_value_by_key(v, "POLICY_DUMP_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4446,7 +4476,7 @@ RESTAPI::Policy_Save_Res *RESTAPI::parse_policy_save_res(const std::string& data
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_SAVE_RESULT");
+    child = model->get_value_by_key(v, "POLICY_SAVE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4473,7 +4503,7 @@ RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::st
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_DUPLICATE_RESULT");
+    child = model->get_value_by_key(v, "POLICY_DUPLICATE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4505,7 +4535,7 @@ RESTAPI::Policy_Change_Name_Res *RESTAPI::parse_policy_change_name_res(const std
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_CHANGE_NAME_RESULT");
+    child = model->get_value_by_key(v, "POLICY_CHANGE_NAME_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4532,7 +4562,7 @@ RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_GET_RESULT");
+    child = model->get_value_by_key(v, "POLICY_GET_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4559,7 +4589,7 @@ RESTAPI::Policy_Get_Name_Res *RESTAPI::parse_policy_get_name_res(const std::stri
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_GET_NAME_RESULT");
+    child = model->get_value_by_key(v, "POLICY_GET_NAME_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4591,7 +4621,7 @@ RESTAPI::Policy_Get_Policies_Count_Res *RESTAPI::parse_policy_get_policies_count
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_GET_POLICIES_COUNT_RESULT");
+    child = model->get_value_by_key(v, "POLICY_GET_POLICIES_COUNT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4623,7 +4653,7 @@ RESTAPI::Policy_Clear_Policies_Res *RESTAPI::parse_policy_clear_policies_res(con
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_CLEAR_POLICIES_RESULT");
+    child = model->get_value_by_key(v, "POLICY_CLEAR_POLICIES_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -4650,7 +4680,7 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "XSLT_POLICY_GET_POLICIES_RESULT");
+    child = model->get_value_by_key(v, "POLICY_GET_POLICIES_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 

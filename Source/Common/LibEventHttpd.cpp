@@ -380,9 +380,12 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_clear_policies_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (query_str && !std::string("/policy_get_policies").compare(uri_path))
+    else if (!std::string("/policy_get_policies").compare(uri_path))
     {
-        std::string query(query_str);
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
         RESTAPI::Policy_Get_Policies_Req *r = NULL;
         get_uri_request(query, &r);
 

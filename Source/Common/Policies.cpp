@@ -261,7 +261,7 @@ void Policies::get_policies(int user, std::vector<std::pair<size_t, std::string>
     }
 }
 
-int Policies::erase_xslt_policy(std::map<size_t, Policy *>& user_policies, int id, std::string& err)
+int Policies::erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, int id, std::string& err)
 {
     std::map<size_t, Policy *>::iterator it = user_policies.find(id);
     if (it == user_policies.end())
@@ -275,7 +275,7 @@ int Policies::erase_xslt_policy(std::map<size_t, Policy *>& user_policies, int i
     {
         if (policy->nodes[i] && policy->nodes[i]->kind == XSLT_POLICY_POLICY)
         {
-            if (erase_xslt_policy(user_policies, ((XsltPolicy*)policy->nodes[i])->id, err) < 0)
+            if (erase_xslt_policy_node(user_policies, ((XsltPolicy*)policy->nodes[i])->id, err) < 0)
                 return -1;
         }
         delete policy->nodes[i];
@@ -283,8 +283,6 @@ int Policies::erase_xslt_policy(std::map<size_t, Policy *>& user_policies, int i
     }
 
     policy->nodes.clear();
-    delete policy;
-    user_policies.erase(it);
     return 0;
 }
 
@@ -305,12 +303,10 @@ int Policies::erase_policy(int user, int id, std::string& err)
         remove_saved_policy(p);
 
     if (p->type == POLICY_XSLT)
-        erase_xslt_policy(policies[user], p->id, err);
-    else
-    {
-        delete p;
-        policies[user].erase(policies[user].find(id));
-    }
+        erase_xslt_policy_node(policies[user], p->id, err);
+
+    delete p;
+    policies[user].erase(policies[user].find(id));
 
     return 0;
 }
