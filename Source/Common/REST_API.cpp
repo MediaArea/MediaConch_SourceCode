@@ -1948,7 +1948,7 @@ int RESTAPI::serialize_policy_change_name_res(Policy_Change_Name_Res& res, std::
         child.obj["nok"] = serialize_policy_nok(res.nok);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["XSLT_POLICY_CHANGE_NAME_RESULT"] = child;
+    v.obj["POLICY_CHANGE_NAME_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -2048,7 +2048,7 @@ int RESTAPI::serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res,
         child.obj["nok"] = serialize_policy_nok(res.nok);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["XSLT_POLICY_CLEAR_POLICIES_RESULT"] = child;
+    v.obj["POLICY_CLEAR_POLICIES_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -2073,7 +2073,7 @@ int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std
         child.obj["nok"] = serialize_policy_nok(res.nok);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["XSLT_POLICY_GET_POLICIES_RESULT"] = child;
+    v.obj["POLICY_GET_POLICIES_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {

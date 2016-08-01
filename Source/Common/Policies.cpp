@@ -315,13 +315,10 @@ int Policies::clear_policies(int user, std::string& err)
 {
     std::map<int, std::map<size_t, Policy*> >::iterator it = policies.find(user);
     if (it == policies.end())
-    {
-        err = "User policies are not exisiting";
-        return -1;
-    }
+        return 0;
 
     std::map<size_t, Policy*>::iterator it_p = it->second.begin();
-    for (; it_p != it->second.end(); ++it)
+    for (; it_p != it->second.end(); ++it_p)
     {
         if (it_p->second)
             remove_saved_policy(it_p->second);
