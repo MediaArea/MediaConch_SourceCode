@@ -91,6 +91,7 @@ function start() {
 
     $('#policiesTree').on('select_node.jstree', function (e, data) {
         data.instance.open_node(data.node);
+        closeMessage();
         switch (data.node.type) {
             case 'r':
                 if ('u' == data.instance.get_node(data.node.parent).type) {
@@ -554,6 +555,11 @@ function successMessage(message)
 function errorMessage(message)
 {
     $('#policyInfo div').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' + message + '</div>');
+}
+
+// Close message
+function closeMessage() {
+    $('#policyInfo div').alert('close');
 }
 
 // Handle fail ajax response
