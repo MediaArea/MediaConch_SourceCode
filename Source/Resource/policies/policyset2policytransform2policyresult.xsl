@@ -10,12 +10,6 @@
             <aliasxsl:text>0.3</aliasxsl:text>
           </aliasxsl:attribute>
           <aliasxsl:for-each select="ma:media">
-            <test>
-              <xsl:call-template name="tokenize">
-                <xsl:with-param name="list">EBML/EBMLVersion/OK</xsl:with-param>
-                <xsl:with-param name="delimiter" select="'/'"/>
-              </xsl:call-template>
-            </test>
             <media>
               <aliasxsl:attribute name="ref">
                 <aliasxsl:value-of select="./@ref"/>
