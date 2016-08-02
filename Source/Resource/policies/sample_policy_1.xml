@@ -18,6 +18,8 @@
                 <rule value="FrameRate_Num" tracktype="Video" occurrence="1" operator="=">2997</rule>
                 <rule value="FrameRate_Den" tracktype="Video" occurrence="1" operator="=">100</rule>
             </policy>
+            <policy type="and" name="empty">
+            </policy>
             <policy type="and" name="PAL, why not">
                 <rule value="FrameRate_Num" tracktype="Video" occurrence="1" operator="=">25</rule>
                 <rule value="FrameRate_Den" tracktype="Video" occurrence="1" operator="=">1</rule>
