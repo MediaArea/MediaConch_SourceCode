@@ -75,7 +75,7 @@
         <aliasxsl:param name="value"/>
         <aliasxsl:param name="rule"/>
         <aliasxsl:param name="ruleresults"/>
-        <aliasxsl:param name="morechecks"/>
+        <aliasxsl:param name="morepolicies"/>
         <policy>
           <aliasxsl:attribute name="name">
             <aliasxsl:value-of select="$name"/>
@@ -115,7 +115,7 @@
           </aliasxsl:if>
           <aliasxsl:copy-of select="$context"/>
           <aliasxsl:copy-of select="$ruleresults"/>
-          <aliasxsl:copy-of select="$morechecks"/>
+          <aliasxsl:copy-of select="$morepolicies"/>
           <aliasxsl:choose>
             <aliasxsl:when test="count(exsl:node-set($ruleresults)/mc:rule)+count(exsl:node-set($morepolicies)/mc:policy)='0'">
               <rule outcome="N/A"/>
@@ -144,7 +144,7 @@
             </xsl:call-template>
           </xsl:for-each>
         </aliasxsl:with-param>
-        <aliasxsl:with-param name="morechecks">
+        <aliasxsl:with-param name="morepolicies">
           <xsl:for-each select="policy">
             <xsl:call-template name="policycheck">
               <xsl:with-param name="policy" select="."/>
