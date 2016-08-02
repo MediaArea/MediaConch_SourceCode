@@ -84,13 +84,13 @@
             <aliasxsl:value-of select="$type"/>
           </aliasxsl:attribute>
           <aliasxsl:variable name="rules_run">
-            <aliasxsl:value-of select="count(ealiasxsl:node-set($ruleresults)/mc:rule) + count(ealiasxsl:node-set($morechecks)/mc:check)"/>
+            <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule) + count(exsl:node-set($morepolicies)/mc:policy)"/>
           </aliasxsl:variable>
           <aliasxsl:variable name="fail_count">
-            <aliasxsl:value-of select="count(ealiasxsl:node-set($ruleresults)/mc:rule[@outcome='fail']) + count(ealiasxsl:node-set($morechecks)/mc:check[@outcome='fail'])"/>
+            <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule[@outcome='fail']) + count(exsl:node-set($morepolicies)/mc:policy[@outcome='fail'])"/>
           </aliasxsl:variable>
           <aliasxsl:variable name="pass_count">
-            <aliasxsl:value-of select="count(ealiasxsl:node-set($ruleresults)/mc:rule[@outcome='pass']) + count(ealiasxsl:node-set($morechecks)/mc:check[@outcome='pass'])"/>
+            <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule[@outcome='pass']) + count(exsl:node-set($morepolicies)/mc:policy[@outcome='pass'])"/>
           </aliasxsl:variable>
           <aliasxsl:attribute name="rules_run">
             <aliasxsl:value-of select="$rules_run"/>
@@ -117,7 +117,7 @@
           <aliasxsl:copy-of select="$ruleresults"/>
           <aliasxsl:copy-of select="$morechecks"/>
           <aliasxsl:choose>
-            <aliasxsl:when test="count(ealiasxsl:node-set($ruleresults)/mc:rule)+count(ealiasxsl:node-set($morechecks)/mc:check)='0'">
+            <aliasxsl:when test="count(exsl:node-set($ruleresults)/mc:rule)+count(exsl:node-set($morepolicies)/mc:policy)='0'">
               <rule outcome="N/A"/>
             </aliasxsl:when>
           </aliasxsl:choose>
