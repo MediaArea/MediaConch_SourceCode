@@ -510,7 +510,7 @@ int DaemonClient::checker_validate(int user, MediaConchLib::report report,
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_create(int user, int parent_id, std::string& err)
+int DaemonClient::xslt_policy_create(int user, const std::string& type, int parent_id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -518,6 +518,7 @@ int DaemonClient::xslt_policy_create(int user, int parent_id, std::string& err)
     RESTAPI::XSLT_Policy_Create_Req req;
     req.user = user;
     req.parent_id = parent_id;
+    req.type = type;
 
     int ret = http_client->start();
     if (ret < 0)

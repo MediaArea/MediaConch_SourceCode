@@ -881,7 +881,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->xslt_policy_create(req->user, err, req->parent_id);
+        res.id = d->MCL->xslt_policy_create(req->user, err, req->type, req->parent_id);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -1089,7 +1089,7 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a policy_get_policies_count command: ";
+        std::clog << d->get_date() << "Daemon received a policy_get_policies_count command" << std::endl;
 
         std::string err;
         res.size = d->MCL->policy_get_policies_count(req->user);
@@ -1107,7 +1107,7 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a policy_clear_policies command: ";
+        std::clog << d->get_date() << "Daemon received a policy_clear_policies command" << std::endl;
 
         std::string err;
         if (d->MCL->policy_clear_policies(req->user, err) < 0)

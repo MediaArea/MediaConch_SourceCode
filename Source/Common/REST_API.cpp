@@ -320,7 +320,7 @@ std::string RESTAPI::XSLT_Policy_Create_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\": " << user << ",\"parent_id\": " << parent_id << "}";
+    out << "{\"user\":" << user << ",\"type\":\"" << type << "\",\"parent_id\":" << parent_id << "}";
     return out.str();
 }
 
@@ -376,8 +376,8 @@ std::string RESTAPI::Policy_Change_Name_Req::to_str() const
 
     out << "{\"user\": " << user;
     out << ",\"id\": " << id;
-    out << "\"name\":" << name;
-    out << "\"description\":" << description;
+    out << ",\"name\":" << name;
+    out << ",\"description\":" << description;
     out << "}";
     return out.str();
 }
@@ -1239,6 +1239,7 @@ int RESTAPI::serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::
     std::stringstream ss;
 
     ss << "?parent_id=" << req.parent_id;
+    ss << "&type=" << req.type;
     ss << "&user=" << req.user;
     data = ss.str();
 
@@ -2564,12 +2565,15 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_xslt_policy_create_req(const std
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *parent_id = model->get_value_by_key(*child, "parent_id");
-    if (!parent_id || parent_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
-
     XSLT_Policy_Create_Req *req = new XSLT_Policy_Create_Req;
-    req->parent_id = parent_id->l;
+
+    Container::Value *type = model->get_value_by_key(*child, "type");
+    if (type && type->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->type = type->s;
+
+    Container::Value *parent_id = model->get_value_by_key(*child, "parent_id");
+    if (parent_id && parent_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->parent_id = parent_id->l;
 
     Container::Value *user = model->get_value_by_key(*child, "user");
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
@@ -3266,6 +3270,13 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const
                 continue;
 
             req->parent_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "type")
+        {
+            if (!val.length())
+                req->type = "and";
+            else
+                req->type = val;
         }
         else if (substr == "user")
         {
@@ -5469,7 +5480,7 @@ int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaC
         ok->id = id->l;
 
         Container::Value *type = model->get_value_by_key(*policy, "type");
-        if (!type || type->type != Container::Value::CONTAINER_TYPE_STRING)
+        if (type && type->type == Container::Value::CONTAINER_TYPE_STRING)
             ok->type = type->s;
         else
             ok->type = "and";

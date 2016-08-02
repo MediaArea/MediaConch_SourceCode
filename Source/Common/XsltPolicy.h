@@ -113,7 +113,6 @@ public:
 
     //TODO
     std::vector<XsltPolicyNode*>  nodes;
-    std::string                   description;
     std::string                   ope;
 private:
 

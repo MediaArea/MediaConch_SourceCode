@@ -190,7 +190,7 @@ public:
     //   Create policy
     int                          policy_duplicate(int user, int id, std::string& err);
     int                          policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err);
-    int                          xslt_policy_create(int user, std::string& err, int parent_id=-1);
+    int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);
     int                          xslt_policy_create_from_file(int user, const std::string& file, std::string& err);
     //   Import policy
     int                          policy_import(int user, const std::string& memory, std::string& err, const char* filename=NULL, bool is_system_policy=false);

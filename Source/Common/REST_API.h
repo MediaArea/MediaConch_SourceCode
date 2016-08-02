@@ -384,6 +384,7 @@ public:
         XSLT_Policy_Create_Req() : user(-1), parent_id(-1) {}
         int         user;
         int         parent_id;
+        std::string type;
         std::string to_str() const;
     };
 

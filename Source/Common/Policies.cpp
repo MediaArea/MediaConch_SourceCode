@@ -61,7 +61,7 @@ Policies::~Policies()
 }
 
 // Policy
-int Policies::create_xslt_policy(int user, int parent_id, std::string& err)
+int Policies::create_xslt_policy(int user, const std::string& type, int parent_id, std::string& err)
 {
     Policy *parent = NULL;
     if (parent_id != -1)
@@ -76,6 +76,7 @@ int Policies::create_xslt_policy(int user, int parent_id, std::string& err)
 
     XsltPolicy *p = new XsltPolicy(this, !core->accepts_https());
     find_new_policy_name(user, p->name);
+    p->ope = type;
 
     // Policy filename
     if (!parent)
@@ -267,7 +268,10 @@ void Policies::get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>
                 // XSLT Policy
                 p = new MediaConchLib::Policy_Policy;
                 p->id = it_p->second->id;
-                p->type = node->ope;
+                if (node->ope.length())
+                    p->type = node->ope;
+                else
+                    p->type = "and";
                 p->name = node->name;
                 p->description = node->description;
             }

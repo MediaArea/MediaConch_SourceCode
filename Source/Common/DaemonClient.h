@@ -78,7 +78,7 @@ public:
     // Policy
     //***************************************************************************
     // create XSLT
-    int xslt_policy_create(int user, int parent_id, std::string& err);
+    int xslt_policy_create(int user, const std::string& type, int parent_id, std::string& err);
 
     // import
     int policy_import(int user, const std::string& memory, std::string& err);

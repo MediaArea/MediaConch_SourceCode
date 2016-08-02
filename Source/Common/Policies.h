@@ -59,7 +59,7 @@ public:
     ~Policies();
 
     // Policy
-    int         create_xslt_policy(int user, int parent_id, std::string& err);
+    int         create_xslt_policy(int user, const std::string& type, int parent_id, std::string& err);
     int         import_policy_from_memory(int user, const std::string& memory, std::string& err, const char* filename, bool is_system_policy);
     int         duplicate_policy(int user, int id, std::string& err);
     int         create_xslt_policy_from_file(int user, const std::string& file, std::string& err);

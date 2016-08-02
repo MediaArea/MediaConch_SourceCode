@@ -408,11 +408,11 @@ int MediaConchLib::get_ui_database_path(std::string& path) const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::xslt_policy_create(int user, std::string& err, int parent_id)
+int MediaConchLib::xslt_policy_create(int user, std::string& err, const std::string& type, int parent_id)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_create(user, parent_id, err);
-    return core->policies.create_xslt_policy(user, parent_id, err);
+        return daemon_client->xslt_policy_create(user, type, parent_id, err);
+    return core->policies.create_xslt_policy(user, type, parent_id, err);
 }
 
 //---------------------------------------------------------------------------
@@ -525,7 +525,7 @@ int MediaConchLib::xslt_policy_create_from_file(int user, const std::string& fil
 int MediaConchLib::xslt_policy_rule_create(int user, int policy_id, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->xslt_policy_create(user, policy_id, err);
+        return daemon_client->xslt_policy_rule_create(user, policy_id, err);
     return core->policies.create_xslt_policy_rule(user, policy_id, err);
 }
 
@@ -571,10 +571,10 @@ std::string MediaConchLib::Policy_Policy::to_str() const
     std::stringstream out;
 
     out << "{\"id\":" << id;
-    out << ",\"parent_id\":\"" << parent_id;
+    out << ",\"parent_id\":" << parent_id;
     out << ",\"type\":\"" << type;
-    out << ",\"name\":\"" << name;
-    out << ",\"description\":\"" << description << "\"}";
+    out << "\",\"name\":\"" << name;
+    out << "\",\"description\":\"" << description << "\"}";
     return out.str();
 }
 
