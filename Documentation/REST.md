@@ -12,6 +12,7 @@ It is used above an HTTP connection.
 
 * create the command for policies
   * XSLT_Add_Policy
+  * Policy_Import
   * Policy_Save
   * Policy_Get_Name
   * Policy_Change_Name
@@ -318,6 +319,26 @@ Parameters:
 - if command is ok, return an object with the id of the created policy: '{"XSLT_POLICY_CREATE_RESULT": {"id": 0}}'
 - otherwise, return a "nok" object with a Policy_Error
 {"XSLT_POLICY_CREATE_RESULT": {"nok": {"error"="ERROR"}}}
+
+#### Policy_Import
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_import
+
+##### Request
+
+Parameters:
+
+user:  User ID
+xml:   XML corresponding to the policy
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the id of the created policy: '{"POLICY_IMPORT_RESULT": {"id": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_IMPORT_RESULT": {"nok": {"error"="ERROR"}}}
 
 #### Policy_Save
 

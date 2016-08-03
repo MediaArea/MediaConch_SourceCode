@@ -127,7 +127,7 @@ int Policies::import_policy_from_memory(int user, const std::string& memory, std
     else
         policies[user][p->id] = p;
 
-    return ret;
+    return (int)p->id;
 }
 
 int Policies::save_policy(int user, int id, std::string& err)
