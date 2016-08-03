@@ -789,7 +789,7 @@ int DaemonClient::policy_change_name(int user, int id, const std::string& name, 
 }
 
 //---------------------------------------------------------------------------
-Policy* DaemonClient::policy_get(int user, int id, std::string& err)
+MediaConchLib::Policy_Policy* DaemonClient::policy_get(int user, int id, std::string& err)
 {
     if (!http_client)
         return NULL;
@@ -816,11 +816,9 @@ Policy* DaemonClient::policy_get(int user, int id, std::string& err)
     if (!res)
         return NULL;
 
-    Policy *p = NULL;
+    MediaConchLib::Policy_Policy *p = NULL;
     if (!res->nok)
-    {
-        //TODO
-    }
+        p = new MediaConchLib::Policy_Policy(res->policy);
     else
         err = res->nok->error;
 

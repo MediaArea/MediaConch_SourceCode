@@ -110,9 +110,11 @@ public:
 
     struct Policy_Policy
     {
-        Policy_Policy() : id(-1), parent_id(-1) {}
+        Policy_Policy() : id(-1), parent_id(-1), is_system(false) {}
+        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), type(p->type), name(p->name), description(p->description) {}
         int         id;
         int         parent_id;
+        bool        is_system;
         std::string type;
         std::string name;
         std::string description;
@@ -197,7 +199,7 @@ public:
 
     //   Policy helper
     size_t                       policy_get_policies_count(int user) const;
-    Policy*                      policy_get(int user, int pos, std::string& err);
+    Policy_Policy*               policy_get(int user, int pos, std::string& err);
     int                          policy_get_name(int user, int id, std::string& name, std::string& err);
     void                         policy_get_policies(int user, std::vector<Policy_Policy*>&);
     int                          policy_save(int user, int pos, std::string& err);

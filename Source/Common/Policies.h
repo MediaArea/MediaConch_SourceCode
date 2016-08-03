@@ -77,6 +77,7 @@ public:
     Policy*     get_policy(int user, int pos, std::string& err);
     int         policy_get_name(int user, int id, std::string& name, std::string& err);
     void        get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>& ps);
+    MediaConchLib::Policy_Policy* policy_get(int user, int pos, std::string& err);
 
     int         policy_get_policies(int user, const std::vector<size_t>* policies_ids,
                                     const std::vector<std::string>* policies_contents,
@@ -145,6 +146,7 @@ private:
     int policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_policies, std::string& err);
     int policy_get_policy_content(const std::string& policy, std::vector<std::string>& xslt_policies, std::string& err);
     int erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, int id, std::string& err);
+    MediaConchLib::Policy_Policy *policy_to_mcl_policy(Policy *p, std::string& err);
 };
 
 }

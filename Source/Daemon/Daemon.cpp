@@ -1046,13 +1046,18 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        Policy* p = d->MCL->policy_get(req->user, req->id, err);
+        MediaConchLib::Policy_Policy* p = d->MCL->policy_get(req->user, req->id, err);
         if (!p)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
         }
-        //TODO
+        else
+        {
+            res.policy = new MediaConchLib::Policy_Policy(p);
+            delete p;
+            p = NULL;
+        }
 
         std::clog << d->get_date() << "Daemon send policy_get result: " << res.to_str() << std::endl;
         return 0;
@@ -1136,12 +1141,9 @@ namespace MediaConch
         d->MCL->policy_get_policies(req->user, policies);
         for (size_t i = 0; i < policies.size(); ++i)
         {
-            MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy;
-            ok->id = policies[i]->id;
-            ok->parent_id = policies[i]->parent_id;
-            ok->type = policies[i]->type;
-            ok->name = policies[i]->name;
-            ok->description = policies[i]->description;
+            MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy(policies[i]);
+            delete policies[i];
+            policies[i] = NULL;
             res.policies.push_back(ok);
         }
 

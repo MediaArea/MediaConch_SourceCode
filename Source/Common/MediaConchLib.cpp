@@ -468,12 +468,12 @@ int MediaConchLib::policy_change_name(int user, int id, const std::string& name,
 }
 
 //---------------------------------------------------------------------------
-Policy* MediaConchLib::policy_get(int user, int id, std::string& err)
+MediaConchLib::Policy_Policy* MediaConchLib::policy_get(int user, int id, std::string& err)
 {
     if (use_daemon)
         return daemon_client->policy_get(user, id, err);
 
-    return core->policies.get_policy(user, id, err);
+    return core->policies.policy_get(user, id, err);
 }
 
 //---------------------------------------------------------------------------
@@ -580,6 +580,7 @@ std::string MediaConchLib::Policy_Policy::to_str() const
 
     out << "{\"id\":" << id;
     out << ",\"parent_id\":" << parent_id;
+    out << ",\"is_system\":" << std::boolalpha << is_system;
     out << ",\"type\":\"" << type;
     out << "\",\"name\":\"" << name;
     out << "\",\"description\":\"" << description << "\"}";

@@ -99,7 +99,7 @@ public:
     int policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err);
 
     // get policy
-    Policy* policy_get(int user, int id, std::string& err);
+    MediaConchLib::Policy_Policy* policy_get(int user, int id, std::string& err);
 
     // get policy name
     int policy_get_name(int user, int id, std::string& name, std::string& err);

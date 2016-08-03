@@ -508,10 +508,10 @@ public:
 
     struct Policy_Get_Res
     {
-        Policy_Get_Res() : nok(NULL) {}
+        Policy_Get_Res() : policy(NULL), nok(NULL) {}
         ~Policy_Get_Res();
-        //TODO
-        Policy_Nok  *nok;
+        MediaConchLib::Policy_Policy *policy;
+        Policy_Nok                   *nok;
         std::string  to_str() const;
     };
 
@@ -885,6 +885,7 @@ private:
     Container::Value serialize_validate_ok(Checker_Validate_Ok* ok);
     Container::Value serialize_policy_nok(Policy_Nok* nok);
     void serialize_policies_get_policies(std::vector<MediaConchLib::Policy_Policy*>, Container::Value& policies);
+    void serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v);
 
     int parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args);
     int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
@@ -896,6 +897,7 @@ private:
     int parse_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks);
     int parse_policy_nok(Container::Value *v, Policy_Nok** n);
     int parse_policies_get_policies(Container::Value* policies, std::vector<MediaConchLib::Policy_Policy*>);
+    MediaConchLib::Policy_Policy* parse_a_policy(Container::Value* policy);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

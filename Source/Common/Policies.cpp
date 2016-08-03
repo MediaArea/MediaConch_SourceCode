@@ -218,6 +218,67 @@ Policy* Policies::get_policy(int user, int id, std::string& err)
     return it_p->second;
 }
 
+MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std::string&)
+{
+    if (!policy)
+        return NULL;
+
+    MediaConchLib::Policy_Policy* p = NULL;
+    //Unknown...
+    if (policy->type != POLICY_XSLT)
+    {
+        p = new MediaConchLib::Policy_Policy;
+        p->id = policy->id;
+        p->name = policy->name;
+        p->is_system = policy->is_system;
+    }
+    else
+    {
+        if (((XsltPolicy*)policy)->kind == XSLT_POLICY_POLICY && ((XsltPolicy*)policy)->parent_id == (size_t)-1)
+        {
+            XsltPolicy* node = (XsltPolicy*)policy;
+            // XSLT Policy
+            p = new MediaConchLib::Policy_Policy;
+            p->id = policy->id;
+            if (node->ope.length())
+                p->type = node->ope;
+            else
+                p->type = "and";
+            p->name = node->name;
+            p->description = node->description;
+            p->is_system = policy->is_system;
+        }
+        else
+        {
+            XsltPolicyNode* node = (XsltPolicyNode*)policy;
+            //TODO sub-nodes
+            if (node->kind == XSLT_POLICY_POLICY)
+            {
+                // // XSLT Policy
+                // REST_API::Policy_Policy *p = new REST_API::Policy_Policy;
+                // p->id = node->id;
+                // p->parent_id = node->parent_id;
+                // p->type = node->ype;
+                // p->name = node->name;
+                // p->description = node->description;
+            }
+            else
+            {
+                //TODO XSLT RULE
+            }
+        }
+    }
+
+    return p;
+}
+
+MediaConchLib::Policy_Policy* Policies::policy_get(int user, int id, std::string& err)
+{
+    Policy *p = get_policy(user, id, err);
+
+    return policy_to_mcl_policy(p, err);
+}
+
 int Policies::policy_get_name(int user, int id, std::string& name, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
@@ -252,51 +313,8 @@ void Policies::get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>
         if (!it_p->second)
             continue;
 
-        MediaConchLib::Policy_Policy *p = NULL;
-
-        //Unknown...
-        if (it_p->second->type != POLICY_XSLT)
-        {
-            p = new MediaConchLib::Policy_Policy;
-            p->id = it_p->second->id;
-            p->name = it_p->second->name;
-        }
-        else
-        {
-            if (((XsltPolicy*)it_p->second)->kind == XSLT_POLICY_POLICY && ((XsltPolicy*)it_p->second)->parent_id == (size_t)-1)
-            {
-                XsltPolicy* node = (XsltPolicy*)it_p->second;
-                // XSLT Policy
-                p = new MediaConchLib::Policy_Policy;
-                p->id = it_p->second->id;
-                if (node->ope.length())
-                    p->type = node->ope;
-                else
-                    p->type = "and";
-                p->name = node->name;
-                p->description = node->description;
-            }
-            else
-            {
-                XsltPolicyNode* node = (XsltPolicyNode*)it_p->second;
-                //TODO sub-nodes
-                if (node->kind == XSLT_POLICY_POLICY)
-                {
-                    // // XSLT Policy
-                    // REST_API::Policy_Policy *p = new REST_API::Policy_Policy;
-                    // p->id = node->id;
-                    // p->parent_id = node->parent_id;
-                    // p->type = node->ype;
-                    // p->name = node->name;
-                    // p->description = node->description;
-                }
-                else
-                {
-                    //TODO XSLT RULE
-                }
-                continue;
-            }
-        }
+        std::string err;
+        MediaConchLib::Policy_Policy *p = policy_to_mcl_policy(it_p->second, err);
 
         if (p)
             ps.push_back(p);

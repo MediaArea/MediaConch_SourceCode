@@ -140,7 +140,6 @@ DESTRUCTOR_POLICY(Policy_Dump_Res)
 DESTRUCTOR_POLICY(Policy_Save_Res)
 DESTRUCTOR_POLICY(Policy_Duplicate_Res)
 DESTRUCTOR_POLICY(Policy_Change_Name_Res)
-DESTRUCTOR_POLICY(Policy_Get_Res)
 DESTRUCTOR_POLICY(Policy_Get_Name_Res)
 DESTRUCTOR_POLICY(Policy_Get_Policies_Count_Res)
 DESTRUCTOR_POLICY(Policy_Clear_Policies_Res)
@@ -159,6 +158,22 @@ RESTAPI::Policy_Get_Policies_Res::~Policy_Get_Policies_Res()
     for (size_t i = 0; i < policies.size(); ++i)
         delete policies[i];
     policies.clear();
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Res::~Policy_Get_Res()
+{
+    if (policy)
+    {
+        delete policy;
+        policy = NULL;
+    }
+
     if (nok)
     {
         delete nok;
@@ -377,9 +392,9 @@ std::string RESTAPI::Policy_Change_Name_Req::to_str() const
 
     out << "{\"user\": " << user;
     out << ",\"id\": " << id;
-    out << ",\"name\":" << name;
-    out << ",\"description\":" << description;
-    out << "}";
+    out << ",\"name\":\"" << name;
+    out << "\",\"description\":\"" << description;
+    out << "\"}";
     return out.str();
 }
 
@@ -910,9 +925,10 @@ std::string RESTAPI::Policy_Get_Res::to_str() const
     std::stringstream out;
 
     out << "{";
-    //TODO
     if (nok)
         out << nok->to_str();
+    else if (policy)
+        out << "\"policy\":" << policy->to_str();
     out << "}";
     return out.str();
 }
@@ -1996,12 +2012,13 @@ int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data)
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
-    // policy.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    // policy.obj = res.policy;
-    // child.obj["policy"] = policy;
-
     if (res.nok)
         child.obj["nok"] = serialize_policy_nok(res.nok);
+    else if (res.policy)
+    {
+        serialize_a_policy(res.policy, policy);
+        child.obj["policy"] = policy;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_GET_RESULT"] = child;
@@ -4731,7 +4748,13 @@ RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
     Policy_Get_Res *res = new Policy_Get_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (nok && parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+    Container::Value *policy = model->get_value_by_key(*child, "policy");
+    if ((res->policy = parse_a_policy(policy)) == NULL)
     {
         delete res;
         return NULL;
@@ -5350,35 +5373,49 @@ Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
 }
 
 //---------------------------------------------------------------------------
+void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v)
+{
+    Container::Value id, parent_id, is_system, type, name, description;
+
+    ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = policy->id;
+    ok_v.obj["id"] = id;
+
+    parent_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    parent_id.l = policy->parent_id;
+    ok_v.obj["parent_id"] = parent_id;
+
+    is_system.type = Container::Value::CONTAINER_TYPE_BOOL;
+    is_system.b = policy->is_system;
+    ok_v.obj["is_system"] = is_system;
+
+    type.type = Container::Value::CONTAINER_TYPE_STRING;
+    type.s = policy->type;
+    ok_v.obj["type"] = type;
+
+    name.type = Container::Value::CONTAINER_TYPE_STRING;
+    name.s = policy->name;
+    ok_v.obj["name"] = name;
+
+    description.type = Container::Value::CONTAINER_TYPE_STRING;
+    description.s = policy->description;
+    ok_v.obj["description"] = description;
+}
+
+//---------------------------------------------------------------------------
 void RESTAPI::serialize_policies_get_policies(std::vector<MediaConchLib::Policy_Policy *> policies, Container::Value &p)
 {
     p.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < policies.size(); ++i)
     {
-        Container::Value ok_v, id, parent_id, type, name, description;
+        Container::Value ok_v;
 
-        ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+        if (!policies[i])
+            continue;
 
-        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        id.l = policies[i]->id;
-        ok_v.obj["id"] = id;
-
-        parent_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        parent_id.l = policies[i]->parent_id;
-        ok_v.obj["parent_id"] = parent_id;
-
-        type.type = Container::Value::CONTAINER_TYPE_STRING;
-        type.s = policies[i]->type;
-        ok_v.obj["type"] = type;
-
-        name.type = Container::Value::CONTAINER_TYPE_STRING;
-        name.s = policies[i]->name;
-        ok_v.obj["name"] = name;
-
-        description.type = Container::Value::CONTAINER_TYPE_STRING;
-        description.s = policies[i]->description;
-        ok_v.obj["description"] = description;
-
+        serialize_a_policy(policies[i], ok_v);
         p.array.push_back(ok_v);
     }
 }
@@ -5669,39 +5706,50 @@ int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaC
 
     for (size_t i = 0; i < p->array.size(); ++i)
     {
-        Container::Value *policy = &p->array[i];
+        MediaConchLib::Policy_Policy *ok = parse_a_policy(&p->array[i]);
 
-        if (policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
-            return -1;
-
-        Container::Value *id = model->get_value_by_key(*policy, "id");
-        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-            return -1;
-
-        MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy;
-        ok->id = id->l;
-
-        Container::Value *type = model->get_value_by_key(*policy, "type");
-        if (type && type->type == Container::Value::CONTAINER_TYPE_STRING)
-            ok->type = type->s;
-        else
-            ok->type = "and";
-
-        Container::Value *parent_id = model->get_value_by_key(*policy, "parent_id");
-        if (parent_id && parent_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
-            ok->parent_id = parent_id->l;
-
-        Container::Value *name = model->get_value_by_key(*policy, "name");
-        if (name && name->type == Container::Value::CONTAINER_TYPE_STRING)
-            ok->name = name->s;
-
-        Container::Value *description = model->get_value_by_key(*policy, "description");
-        if (description && description->type == Container::Value::CONTAINER_TYPE_STRING)
-            ok->description = description->s;
-
-        policies.push_back(ok);
+        if (ok)
+            policies.push_back(ok);
     }
     return 0;
+}
+
+//---------------------------------------------------------------------------
+MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
+{
+    if (policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*policy, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy;
+    ok->id = id->l;
+
+    Container::Value *parent_id = model->get_value_by_key(*policy, "parent_id");
+    if (parent_id && parent_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        ok->parent_id = parent_id->l;
+
+    Container::Value *is_system = model->get_value_by_key(*policy, "is_system");
+    if (is_system && is_system->type == Container::Value::CONTAINER_TYPE_BOOL)
+        ok->is_system = is_system->b;
+
+    Container::Value *type = model->get_value_by_key(*policy, "type");
+    if (type && type->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->type = type->s;
+    else
+        ok->type = "and";
+
+    Container::Value *name = model->get_value_by_key(*policy, "name");
+    if (name && name->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->name = name->s;
+
+    Container::Value *description = model->get_value_by_key(*policy, "description");
+    if (description && description->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->description = description->s;
+
+    return ok;
 }
 
 }
