@@ -71,6 +71,7 @@ public:
     URI_REQ_FUNC(Policy_Get_Policies);
     URI_REQ_FUNC(XSLT_Policy_Create_From_File);
     URI_REQ_FUNC(XSLT_Policy_Rule_Create);
+    URI_REQ_FUNC(XSLT_Policy_Rule_Get);
     URI_REQ_FUNC(XSLT_Policy_Rule_Duplicate);
     URI_REQ_FUNC(XSLT_Policy_Rule_Delete);
 #undef URI_REQ_FUNC
@@ -133,6 +134,8 @@ public:
                                                            RESTAPI::XSLT_Policy_Create_From_File_Res& res, void* arg);
     typedef int (*on_xslt_policy_rule_create_command)(const RESTAPI::XSLT_Policy_Rule_Create_Req* req,
                                                       RESTAPI::XSLT_Policy_Rule_Create_Res& res, void* arg);
+    typedef int (*on_xslt_policy_rule_get_command)(const RESTAPI::XSLT_Policy_Rule_Get_Req* req,
+                                                   RESTAPI::XSLT_Policy_Rule_Get_Res& res, void* arg);
     typedef int (*on_xslt_policy_rule_edit_command)(const RESTAPI::XSLT_Policy_Rule_Edit_Req* req,
                                                     RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void* arg);
     typedef int (*on_xslt_policy_rule_duplicate_command)(const RESTAPI::XSLT_Policy_Rule_Duplicate_Req* req,
@@ -160,6 +163,7 @@ public:
                      policy_get_policies_cb(NULL),
                      xslt_policy_create_from_file_cb(NULL),
                      xslt_policy_rule_create_cb(NULL),
+                     xslt_policy_rule_get_cb(NULL),
                      xslt_policy_rule_edit_cb(NULL),
                      xslt_policy_rule_duplicate_cb(NULL),
                      xslt_policy_rule_delete_cb(NULL)
@@ -190,6 +194,7 @@ public:
         on_policy_get_policies_command policy_get_policies_cb;
         on_xslt_policy_create_from_file_command xslt_policy_create_from_file_cb;
         on_xslt_policy_rule_create_command xslt_policy_rule_create_cb;
+        on_xslt_policy_rule_get_command xslt_policy_rule_get_cb;
         on_xslt_policy_rule_edit_command xslt_policy_rule_edit_cb;
         on_xslt_policy_rule_duplicate_command xslt_policy_rule_duplicate_cb;
         on_xslt_policy_rule_delete_command xslt_policy_rule_delete_cb;

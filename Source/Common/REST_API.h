@@ -606,6 +606,8 @@ public:
     // XSLT Rule
     struct XSLT_Policy_Rule
     {
+        XSLT_Policy_Rule() : id(-1), occurrence(-1) {}
+
         int          id;
         std::string  name;
         std::string  tracktype;
@@ -630,6 +632,24 @@ public:
         ~XSLT_Policy_Rule_Create_Res();
         int          id;
         Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Get_Req
+    {
+        XSLT_Policy_Rule_Get_Req() : user(-1), policy_id(-1), id(-1) {}
+        int         user;
+        int         policy_id;
+        int         id;
+        std::string to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Get_Res
+    {
+        XSLT_Policy_Rule_Get_Res() : nok(NULL) {}
+        ~XSLT_Policy_Rule_Get_Res();
+        Policy_Nok       *nok;
+        XSLT_Policy_Rule  rule;
         std::string  to_str() const;
     };
 
@@ -715,6 +735,7 @@ public:
     int serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string&);
     int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&);
     int serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string&);
+    int serialize_xslt_policy_rule_get_req(XSLT_Policy_Rule_Get_Req& req, std::string&);
     int serialize_xslt_policy_rule(XSLT_Policy_Rule& rule, Container::Value&);
     int serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string&);
     int serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string&);
@@ -745,6 +766,7 @@ public:
     int serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string&);
     int serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string&);
     int serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string&);
+    int serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, std::string&);
     int serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string&);
     int serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string&);
     int serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string&);
@@ -774,6 +796,7 @@ public:
     Policy_Get_Policies_Req          *parse_policy_get_policies_req(const std::string&);
     XSLT_Policy_Create_From_File_Req *parse_xslt_policy_create_from_file_req(const std::string&);
     XSLT_Policy_Rule_Create_Req      *parse_xslt_policy_rule_create_req(const std::string&);
+    XSLT_Policy_Rule_Get_Req         *parse_xslt_policy_rule_get_req(const std::string&);
     int                               parse_xslt_policy_rule(Container::Value *val, XSLT_Policy_Rule *);
     XSLT_Policy_Rule_Edit_Req        *parse_xslt_policy_rule_edit_req(const std::string&);
     XSLT_Policy_Rule_Duplicate_Req   *parse_xslt_policy_rule_duplicate_req(const std::string&);
@@ -804,6 +827,7 @@ public:
     Policy_Get_Policies_Req          *parse_uri_policy_get_policies_req(const std::string&);
     XSLT_Policy_Create_From_File_Req *parse_uri_xslt_policy_create_from_file_req(const std::string&);
     XSLT_Policy_Rule_Create_Req      *parse_uri_xslt_policy_rule_create_req(const std::string&);
+    XSLT_Policy_Rule_Get_Req         *parse_uri_xslt_policy_rule_get_req(const std::string&);
     XSLT_Policy_Rule_Edit_Req        *parse_uri_xslt_policy_rule_edit_req(const std::string&);
     XSLT_Policy_Rule_Duplicate_Req   *parse_uri_xslt_policy_rule_duplicate_req(const std::string&);
     XSLT_Policy_Rule_Delete_Req      *parse_uri_xslt_policy_rule_delete_req(const std::string&);
@@ -833,6 +857,7 @@ public:
     Policy_Get_Policies_Res          *parse_policy_get_policies_res(const std::string&);
     XSLT_Policy_Create_From_File_Res *parse_xslt_policy_create_from_file_res(const std::string&);
     XSLT_Policy_Rule_Create_Res      *parse_xslt_policy_rule_create_res(const std::string&);
+    XSLT_Policy_Rule_Get_Res         *parse_xslt_policy_rule_get_res(const std::string&);
     XSLT_Policy_Rule_Edit_Res        *parse_xslt_policy_rule_edit_res(const std::string&);
     XSLT_Policy_Rule_Duplicate_Res   *parse_xslt_policy_rule_duplicate_res(const std::string&);
     XSLT_Policy_Rule_Delete_Res      *parse_xslt_policy_rule_delete_res(const std::string&);

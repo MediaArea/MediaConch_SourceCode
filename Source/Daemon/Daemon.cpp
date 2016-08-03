@@ -107,6 +107,7 @@ namespace MediaConch
         httpd->commands.policy_get_policies_cb = on_policy_get_policies_command;
         httpd->commands.xslt_policy_create_from_file_cb = on_xslt_policy_create_from_file_command;
         httpd->commands.xslt_policy_rule_create_cb = on_xslt_policy_rule_create_command;
+        httpd->commands.xslt_policy_rule_get_cb = on_xslt_policy_rule_get_command;
         httpd->commands.xslt_policy_rule_edit_cb = on_xslt_policy_rule_edit_command;
         httpd->commands.xslt_policy_rule_duplicate_cb = on_xslt_policy_rule_duplicate_command;
         httpd->commands.xslt_policy_rule_delete_cb = on_xslt_policy_rule_delete_command;
@@ -1211,6 +1212,41 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_xslt_policy_rule_get_command(const RESTAPI::XSLT_Policy_Rule_Get_Req* req,
+                                                RESTAPI::XSLT_Policy_Rule_Get_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_get command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        XsltPolicyRule *rule = d->MCL->xslt_policy_rule_get(req->user, req->policy_id, req->id, err);
+
+        if (!rule)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+        else
+        {
+            res.rule.id = rule->id;
+            res.rule.name = rule->node_name;
+            res.rule.tracktype = rule->track_type;
+            res.rule.field = rule->field;
+            res.rule.occurrence = rule->occurrence;
+            res.rule.ope = rule->ope;
+            res.rule.value = rule->value;
+        }
+
+        std::clog << d->get_date() << "Daemon send xslt_policy_rule_get result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_xslt_policy_rule_edit_command(const RESTAPI::XSLT_Policy_Rule_Edit_Req* req,
                                                  RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void *arg)
     {
@@ -1256,7 +1292,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->xslt_policy_rule_duplicate(req->user, req->policy_id, req->id, err) < 0)
+        if ((res.id = d->MCL->xslt_policy_rule_duplicate(req->user, req->policy_id, req->id, err)) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;

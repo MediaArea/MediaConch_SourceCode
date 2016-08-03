@@ -114,6 +114,7 @@ int Httpd::send_result()
     MAKE_URI_REQ_FUNC(policy_get_policies, Policy_Get_Policies)
     MAKE_URI_REQ_FUNC(xslt_policy_create_from_file, XSLT_Policy_Create_From_File)
     MAKE_URI_REQ_FUNC(xslt_policy_rule_create, XSLT_Policy_Rule_Create)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_get, XSLT_Policy_Rule_Get)
     MAKE_URI_REQ_FUNC(xslt_policy_rule_duplicate, XSLT_Policy_Rule_Duplicate)
     MAKE_URI_REQ_FUNC(xslt_policy_rule_delete, XSLT_Policy_Rule_Delete)
 

@@ -112,6 +112,8 @@ namespace MediaConch
                                                            RESTAPI::XSLT_Policy_Create_From_File_Res& res, void *arg);
         static int on_xslt_policy_rule_create_command(const RESTAPI::XSLT_Policy_Rule_Create_Req* req,
                                                       RESTAPI::XSLT_Policy_Rule_Create_Res& res, void *arg);
+        static int on_xslt_policy_rule_get_command(const RESTAPI::XSLT_Policy_Rule_Get_Req* req,
+                                                   RESTAPI::XSLT_Policy_Rule_Get_Res& res, void *arg);
         static int on_xslt_policy_rule_edit_command(const RESTAPI::XSLT_Policy_Rule_Edit_Req* req,
                                                     RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void *arg);
         static int on_xslt_policy_rule_duplicate_command(const RESTAPI::XSLT_Policy_Rule_Duplicate_Req* req,

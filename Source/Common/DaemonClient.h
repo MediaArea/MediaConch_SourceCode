@@ -119,6 +119,9 @@ public:
     // create XSLT rule
     int xslt_policy_rule_create(int user, int policy_id, std::string& err);
 
+    // get XSLT rule
+    XsltPolicyRule *xslt_policy_rule_get(int user, int policy_id, int id, std::string& err);
+
     // edit XSLT rule
     int xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
 

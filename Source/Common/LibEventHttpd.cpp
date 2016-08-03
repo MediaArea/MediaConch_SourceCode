@@ -449,6 +449,25 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_create_res(res, result) < 0)
             error = rest.get_error();
     }
+    else if (query_str && !std::string("/xslt_policy_rule_get").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Get_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Get_Res res;
+        if (commands.xslt_policy_rule_get_cb && commands.xslt_policy_rule_get_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_get_res(res, result) < 0)
+            error = rest.get_error();
+    }
     else if (query_str && !std::string("/xslt_policy_rule_duplicate").compare(uri_path))
     {
         std::string query(query_str);

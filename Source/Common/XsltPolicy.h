@@ -86,9 +86,8 @@ public:
     int           occurrence;
     std::string   value;
 
-private:
     static size_t rule_id;
-
+private:
     XsltPolicyRule(const XsltPolicyRule&);
     XsltPolicyRule& operator=(const XsltPolicyRule&);
 };
@@ -108,8 +107,9 @@ public:
     XsltPolicy(const XsltPolicy*);
 
     int             create_policy_from_mi(const std::string& report);
-    XsltPolicyRule* get_policy_rule(int id);
+    XsltPolicyRule* get_policy_rule(int id, std::string& err);
     int             get_final_xslt(std::string& xslt);
+    int             delete_policy_rule(int rule_id, std::string& err);
 
     //TODO
     std::vector<XsltPolicyNode*>  nodes;
@@ -144,6 +144,7 @@ private:
     // HELPER
     void replace_xlmns_in_policy(std::string& xslt);
     void replace_aliasxsl_in_policy(std::string& xslt);
+    int delete_policy_rule(int rule_id, bool& found, std::string& err);
 };
 
 }

@@ -56,8 +56,8 @@ size_t XsltPolicyRule::rule_id = 0;
 //---------------------------------------------------------------------------
 XsltPolicyRule::XsltPolicyRule() : XsltPolicyNode()
 {
-    this->id = rule_id++;
     kind = XSLT_POLICY_RULE;
+    this->occurrence = -1;
 }
 
 //---------------------------------------------------------------------------
@@ -76,7 +76,6 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule* r) : XsltPolicyNode(r)
     this->field      = r->field;
     this->occurrence = r->occurrence;
     this->value      = r->value;
-    this->id         = rule_id++;
 }
 
 //---------------------------------------------------------------------------
@@ -291,6 +290,7 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
     else
     {
         new_node = new XsltPolicyRule;
+        ((XsltPolicyRule*)new_node)->id = ((XsltPolicyRule*)new_node)->rule_id++;
         new_node->parent_id = current->id;
         current->nodes.push_back(new_node);
     }
@@ -529,6 +529,7 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
 
         XsltPolicyRule *rule = new XsltPolicyRule;
 
+        rule->id = rule->rule_id++;
         rule->track_type = type;
         rule->field = (const char*)child->name;
         rule->ope = "is_equal";
@@ -615,8 +616,14 @@ int XsltPolicy::create_policy_from_mi(const std::string& report)
     return 0;
 }
 
-XsltPolicyRule* XsltPolicy::get_policy_rule(int id)
+XsltPolicyRule* XsltPolicy::get_policy_rule(int id, std::string& err)
 {
+    if (id < 0)
+    {
+        err = "Policy Rule does not exist";
+        return NULL;
+    }
+
     for (size_t i = 0; i < nodes.size(); ++i)
     {
         if (!nodes[i])
@@ -627,13 +634,58 @@ XsltPolicyRule* XsltPolicy::get_policy_rule(int id)
 
         if (nodes[i]->kind == XSLT_POLICY_POLICY)
         {
-            XsltPolicyRule* r = ((XsltPolicy*)nodes[i])->get_policy_rule(id);
+            XsltPolicyRule* r = ((XsltPolicy*)nodes[i])->get_policy_rule(id, err);
             if (r)
                 return r;
         }
     }
 
+    err = "Policy Rule does not exist";
     return NULL;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::delete_policy_rule(int rule_id, bool& found, std::string& err)
+{
+    for (size_t i = 0; i < nodes.size(); ++i)
+    {
+        if (!nodes[i])
+            continue;
+
+        if (nodes[i]->kind == XSLT_POLICY_RULE && ((XsltPolicyRule*)nodes[i])->id == (size_t)rule_id)
+        {
+            found = true;
+            nodes.erase(nodes.begin() + i);
+            return 0;
+        }
+        else if (nodes[i]->kind == XSLT_POLICY_POLICY)
+        {
+            int ret = ((XsltPolicy*)nodes[i])->delete_policy_rule(rule_id, found, err);
+            if (found)
+                return ret;
+        }
+    }
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::delete_policy_rule(int rule_id, std::string& err)
+{
+    if (rule_id < 0)
+    {
+        err = "Policy rule does not exist";
+        return -1;
+    }
+
+    bool found = false;
+    int ret = delete_policy_rule(rule_id, found, err);
+
+    if (found)
+        return ret;
+
+    err = "Policy rule does not exist";
+    return -1;
 }
 
 // HELPER

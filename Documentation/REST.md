@@ -14,11 +14,19 @@ It is used above an HTTP connection.
   * XSLT_Add_Policy
   * Policy_Import
   * Policy_Save
+  * Policy_Remove
+  * Policy_Duplicate
+  * Policy_Dump
   * Policy_Get_Name
   * Policy_Change_Name
   * Policy_Get_Policies
   * Policy_Get_Policies_Count
   * Policy_Clear_Policies
+
+* create the policy object:
+  * Policy_Policy
+  * XSLT_Policy_Rule
+  * Policy_Error
 
 #### Version 1.6
 
@@ -72,6 +80,16 @@ Current API version: $API_VERSION = 1.6
 * Default_Values_For_type: HTTP GET
 
 * XSLT_Policy_Create: HTTP GET
+* Policy_Import: HTTP POST
+* Policy_Remove: HTTP GET
+* Policy_Duplicate: HTTP GET
+* Policy_Dump: HTTP GET
+* Policy_Save: HTTP GET
+* Policy_Get_Name: HTTP GET
+* Policy_Change_Name: HTTP POST
+* Policy_Get_Policies: HTTP GET
+* Policy_Get_Policies_Count: HTTP GET
+* Policy_Clear_Policies: HTTP GET
 * Policy_Create_From_File: HTTP GET
 
 #### Checker_Analyze
@@ -554,6 +572,30 @@ Parameters:
 
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
+
+#### XSLT_Policy_Rule_Create
+
+##### Request
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_create?policy_id=0
+
+##### Request
+
+Parameters:
+
+user:      User ID
+policy_id: Policy ID of the parent (XSLT) policy
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the id of the created rule: '{"XSLT_POLICY_RULE_CREATE_RESULT": {"id": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_CREATE_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### Policy_Policy
 

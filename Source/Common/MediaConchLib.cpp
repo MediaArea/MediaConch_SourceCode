@@ -530,6 +530,14 @@ int MediaConchLib::xslt_policy_rule_create(int user, int policy_id, std::string&
 }
 
 //---------------------------------------------------------------------------
+XsltPolicyRule *MediaConchLib::xslt_policy_rule_get(int user, int policy_id, int id, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->xslt_policy_rule_get(user, policy_id, id, err);
+    return core->policies.get_xslt_policy_rule(user, policy_id, id, err);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
 {
     if (use_daemon)

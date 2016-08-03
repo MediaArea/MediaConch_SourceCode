@@ -63,6 +63,7 @@ public:
     int send_request(RESTAPI::Policy_Get_Policies_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Create_From_File_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Rule_Create_Req& req);
+    int send_request(RESTAPI::XSLT_Policy_Rule_Get_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Rule_Edit_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Rule_Duplicate_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Rule_Delete_Req& req);

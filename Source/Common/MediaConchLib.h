@@ -207,6 +207,7 @@ public:
 
     // XSLT Policy Rule
     int                         xslt_policy_rule_create(int user, int policy_id, std::string& err);
+    XsltPolicyRule*             xslt_policy_rule_get(int user, int policy_id, int id, std::string& err);
     int                         xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
     int                         xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, std::string& err);
     int                         xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);

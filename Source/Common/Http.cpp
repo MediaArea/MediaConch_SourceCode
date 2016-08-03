@@ -308,6 +308,19 @@ int Http::send_request(RESTAPI::XSLT_Policy_Rule_Create_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::XSLT_Policy_Rule_Get_Req& req)
+{
+    std::string query;
+    rest.serialize_xslt_policy_rule_get_req(req, query);
+
+    std::stringstream uri;
+    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_get" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::XSLT_Policy_Rule_Edit_Req& req)
 {
     std::string cmd;

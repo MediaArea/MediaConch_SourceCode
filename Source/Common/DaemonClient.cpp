@@ -1069,6 +1069,53 @@ int DaemonClient::xslt_policy_rule_create(int user, int policy_id, std::string& 
 }
 
 //---------------------------------------------------------------------------
+XsltPolicyRule *DaemonClient::xslt_policy_rule_get(int user, int policy_id, int id, std::string& err)
+{
+    if (!http_client)
+        return NULL;
+
+    RESTAPI::XSLT_Policy_Rule_Get_Req req;
+    req.policy_id = policy_id;
+    req.id = id;
+    req.user = user;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return NULL;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return NULL;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return NULL;
+
+    RESTAPI rest;
+    RESTAPI::XSLT_Policy_Rule_Get_Res *res = rest.parse_xslt_policy_rule_get_res(data);
+    if (!res)
+        return NULL;
+
+    XsltPolicyRule *rule = NULL;
+    if (!res->nok)
+    {
+        rule = new XsltPolicyRule;
+        rule->id = res->rule.id;
+        rule->node_name = res->rule.name;
+        rule->track_type = res->rule.tracktype;
+        rule->field = res->rule.field;
+        rule->occurrence = res->rule.occurrence;
+        rule->ope = rule->ope;
+        rule->value = res->rule.value;
+    }
+    else
+        err = res->nok->error;
+    delete res;
+    return rule;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
 {
     if (!http_client)
