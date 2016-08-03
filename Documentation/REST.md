@@ -318,7 +318,7 @@ Parameters:
 
 - if command is ok, return an object with the id of the created policy: '{"XSLT_POLICY_CREATE_RESULT": {"id": 0}}'
 - otherwise, return a "nok" object with a Policy_Error
-{"XSLT_POLICY_CREATE_RESULT": {"nok": {"error"="ERROR"}}}
+{"XSLT_POLICY_CREATE_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### Policy_Import
 
@@ -338,7 +338,7 @@ Parameters:
 
 - if command is ok, return an object with the id of the created policy: '{"POLICY_IMPORT_RESULT": {"id": 0}}'
 - otherwise, return a "nok" object with a Policy_Error
-{"POLICY_IMPORT_RESULT": {"nok": {"error"="ERROR"}}}
+{"POLICY_IMPORT_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### Policy_Remove
 
@@ -358,7 +358,7 @@ Parameters:
 
 - If command is ok, return an Empty object '{"POLICY_REMOVE_RESULT": {}}'
 - Otherwise, return a "nok" object with a Policy_Error
-{"POLICY_REMOVE_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+{"POLICY_REMOVE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
 #### Policy_Dump
 
@@ -378,7 +378,7 @@ Parameters:
 
 - If command is ok, return an object with the XML of the policy '{"POLICY_DUMP_RESULT": {"xml": "POLICY_XML"}}'
 - Otherwise, return a "nok" object with a Policy_Error
-{"POLICY_DUMP_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+{"POLICY_DUMP_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
 #### Policy_Save
 
@@ -398,7 +398,7 @@ Parameters:
 
 - If command is ok, return an Empty object '{"POLICY_SAVE_RESULT": {}}'
 - Otherwise, return a "nok" object with a Policy_Error
-{"POLICY_SAVE_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+{"POLICY_SAVE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
 #### Policy_Duplicate
 
@@ -418,7 +418,7 @@ Parameters:
 
 - If command is ok, return an object with the new ID '{"POLICY_DUPLICATE_RESULT": {"id": 0}}'
 - Otherwise, return a "nok" object with a Policy_Error
-{"POLICY_DUPLICATE_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+{"POLICY_DUPLICATE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
 #### Policy_Get_Name
 
@@ -438,7 +438,7 @@ Parameters:
 
 - If command is ok, return an object with the name '{"POLICY_GET_NAME_RESULT": {"name": "New policy"}}'
 - Otherwise, return a "nok" object with a Policy_Error
-{"POLICY_GET_NAME_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+{"POLICY_GET_NAME_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
 #### Policy_Change_Name
 
@@ -461,7 +461,7 @@ Parameters:
 
 - If command is ok, return an empty object '{"POLICY_CHANGE_NAME_RESULT": {}}'
 - Otherwise, return a "nok" object with a Policy_Error
-{"POLICY_CHANGE_NAME": {"nok": {\"error\"=\"ERROR\"}}}
+{"POLICY_CHANGE_NAME": {"nok": {\"error\":\"ERROR\"}}}
 
 #### Policy_Get_Policies_Count
 
@@ -480,7 +480,7 @@ Parameters:
 
 - if command is ok, return an object with the number of policies for the user in size: '{"POLICY_GET_POLICIES_COUNT_RESULT": {"size": 0}}'
 - otherwise, return a "nok" object with a Policy_Error
-{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error"="ERROR"}}}
+{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### Policy_Get_Policies
 
@@ -501,7 +501,7 @@ Parameters:
 
 - if command is ok, return an object with an array of policies (Policy_Policy): '{"POLICY_GET_POLICIES_COUNT_RESULT": {"size": 0}}'
 - otherwise, return a "nok" object with a Policy_Error
-{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error"="ERROR"}}}
+{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### Policy_Clear_Policies
 
@@ -520,7 +520,7 @@ Parameters:
 
 - if command is ok, return an empty object: '{"POLICY_CLEAR_POLICIES_RESULT": {}}'
 - otherwise, return a "nok" object with a Policy_Error
-{"POLICY_CLEAR_POLICIES_RESULT": {"nok": {"error"="ERROR"}}}
+{"POLICY_CLEAR_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### XSLT_Policy_Create_From_File
 
@@ -567,8 +567,23 @@ Parameters:
 * type:  string containing the policy operator (optional; value: "and", "or"; default is "and")
 * description: string containing the name of the policy (optional)
 
-{id=0, parent_id=-1, "name": "NAME", description="", type="and"}
+{"id":0, "parent_id":-1, "name": "NAME", "description":"", "type":"and"}
 
+#### XSLT_Policy_Rule
+
+Policy Object
+
+Parameters:
+
+* id:         ID of the rule inside the policy
+* name:       Name of the rule
+* tracktype:  Track type of the rule
+* field:      Field of the rule
+* occurrence: Number of occurrence of the field
+* ope:        Operator of the Rule
+* value:      Value of the rule
+
+{"id":0, "name": "NAME", "tracktype": "TYPE", "field":"FIELD", "occurrence":-1, "ope":"is_existing", value=""}
 
 #### Policy_Error
 
