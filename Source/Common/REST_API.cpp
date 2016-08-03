@@ -1860,7 +1860,7 @@ int RESTAPI::serialize_policy_dump_res(Policy_Dump_Res& res, std::string& data)
 
     if (res.xml.size())
     {
-        xml.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        xml.type = Container::Value::CONTAINER_TYPE_STRING;
         xml.s = res.xml;
         child.obj["xml"] = xml;
     }

@@ -367,6 +367,8 @@ int XsltPolicy::create_node_policy_child(xmlNodePtr& node, XsltPolicy *current)
     //type ("and", "or")
     if (current->ope.size())
         xmlNewProp(node, (const xmlChar *)"type", (const xmlChar *)current->ope.c_str());
+    else
+        xmlNewProp(node, (const xmlChar *)"type", (const xmlChar *)"and");
 
     //name
     if (current->node_name.size())

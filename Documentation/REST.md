@@ -340,6 +340,46 @@ Parameters:
 - otherwise, return a "nok" object with a Policy_Error
 {"POLICY_IMPORT_RESULT": {"nok": {"error"="ERROR"}}}
 
+#### Policy_Remove
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_remove?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to remove
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an Empty object '{"POLICY_REMOVE_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_REMOVE_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+
+#### Policy_Dump
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_dump?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to dump
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the XML of the policy '{"POLICY_DUMP_RESULT": {"xml": "POLICY_XML"}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_DUMP_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+
 #### Policy_Save
 
 URI format for the parameters.
@@ -359,6 +399,26 @@ Parameters:
 - If command is ok, return an Empty object '{"POLICY_SAVE_RESULT": {}}'
 - Otherwise, return a "nok" object with a Policy_Error
 {"POLICY_SAVE_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+
+#### Policy_Duplicate
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_duplicate?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to duplicate
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the new ID '{"POLICY_DUPLICATE_RESULT": {"id": 0}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_DUPLICATE_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
 
 #### Policy_Get_Name
 

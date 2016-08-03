@@ -76,6 +76,7 @@ int Policies::create_xslt_policy(int user, const std::string& type, int parent_i
 
     XsltPolicy *p = new XsltPolicy(this, !core->accepts_https());
     find_new_policy_name(user, p->name);
+    p->node_name = p->name;
     p->ope = type;
 
     // Policy filename
