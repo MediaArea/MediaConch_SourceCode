@@ -8,6 +8,17 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.7
+
+* create the command for policies
+  * XSLT_Add_Policy
+  * Policy_Save
+  * Policy_Get_Name
+  * Policy_Change_Name
+  * Policy_Get_Policies
+  * Policy_Get_Policies_Count
+  * Policy_Clear_Policies
+
 #### Version 1.6
 
 * Use id for policy instead of files
@@ -58,6 +69,8 @@ Current API version: $API_VERSION = 1.6
 * Checker_Validate:        HTTP POST
 * Checker_File_From_Id:    HTTP POST
 * Default_Values_For_type: HTTP GET
+
+* XSLT_Policy_Create: HTTP GET
 * Policy_Create_From_File: HTTP GET
 
 #### Checker_Analyze
@@ -280,15 +293,174 @@ Parameters:
 
 * values:            Array of values (String)
 
-#### Policy_Create_From_File
 
-URI format for the parameters.
-URL: /$API_VERSION/policy_create_from_file
+#### XSLT_Policy_Create
 
 ##### Request
 
 Parameters:
 
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_create
+
+##### Request
+
+Parameters:
+
+user:      User ID
+parent_id: Policy ID of the parent
+type:      Policy operator ("and", "or"; default is "and")
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the id of the created policy: '{"XSLT_POLICY_CREATE_RESULT": {"id": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_CREATE_RESULT": {"nok": {"error"="ERROR"}}}
+
+#### Policy_Save
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_save?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to save
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an Empty object '{"POLICY_SAVE_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_SAVE_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+
+#### Policy_Get_Name
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_name?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to retrieve information
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the name '{"POLICY_GET_NAME_RESULT": {"name": "New policy"}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_NAME_RESULT": {"nok": {\"error\"=\"ERROR\"}}}
+
+#### Policy_Change_Name
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_change_name"
+
+##### Request
+
+Parameters:
+
+user:        User ID
+id:          Policy ID to retrieve information
+name:        New name for the policy
+description: New description for the policy
+'{"POLICY_CHANGE_NAME":{"id": 0, "name": "changed name", "description": "changed description"}}'
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an empty object '{"POLICY_CHANGE_NAME_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CHANGE_NAME": {"nok": {\"error\"=\"ERROR\"}}}
+
+#### Policy_Get_Policies_Count
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_policies_count
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the number of policies for the user in size: '{"POLICY_GET_POLICIES_COUNT_RESULT": {"size": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error"="ERROR"}}}
+
+#### Policy_Get_Policies
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_policies" '{"POLICY_GET_POLICIES_RESULT": {"policies": []}}' "pass get policies"
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with an array of policies (Policy_Policy): '{"POLICY_GET_POLICIES_COUNT_RESULT": {"size": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error"="ERROR"}}}
+
+#### Policy_Clear_Policies
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_clear_policies" '{"POLICY_CLEAR_POLICIES_RESULT": {}}'
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an empty object: '{"POLICY_CLEAR_POLICIES_RESULT": {}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CLEAR_POLICIES_RESULT": {"nok": {"error"="ERROR"}}}
+
+#### XSLT_Policy_Create_From_File
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_create_from_file
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+##### Request
+
+Parameters:
+
+* user:              Integer: User ID
 * id:                Integer: Id given by analyze for a file
 
 ##### Response
@@ -301,6 +473,30 @@ Parameters:
 
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
+
+#### Policy_Policy
+
+Policy Object
+
+Parameters:
+
+* id: ID of the policy
+* parent_id: ID of the parent policy (optional, root is -1)
+* name: string containing the name of the policy (optional)
+* type:  string containing the policy operator (optional; value: "and", "or"; default is "and")
+* description: string containing the name of the policy (optional)
+
+{id=0, parent_id=-1, "name": "NAME", description="", type="and"}
+
+
+#### Policy_Error
+
+Policy Object
+
+Parameters:
+
+* error: string corresponding to the error
+{\"error\"=\"ERROR\"}
 
 #### Report kinds
 
