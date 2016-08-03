@@ -110,8 +110,10 @@ public:
     int                         xslt_policy_create(std::string& err);
     int                         policy_duplicate(int id, std::string& err);
     int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
-    Policy                     *policy_get(int pos);
+    MediaConchLib::Policy_Policy* policy_get(int pos);
     int                         policy_save(int pos, std::string& err);
+    int                         policy_get_name(int pos, std::string& name, std::string& err);
+    int                         policy_dump(int pos, std::string& memory, std::string& err);
     int                         policy_remove(int pos, std::string& err);
     int                         policy_export(int pos, std::string& err);
     int                         clear_policies(std::string& err);

@@ -177,24 +177,18 @@ void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& 
     {
         working_files_mutex.unlock();
 
-        Policy *p = mainwindow->policy_get(policy);
-        if (p)
-        {
-            std::vector<size_t> policies_ids;
-            std::vector<std::string> policies_contents;
-            std::vector<MediaConchLib::Checker_ValidateRes*> res;
-            std::string policy_content;
-            p->dump_schema(policy_content);
-            policies_contents.push_back(policy_content);
+        std::vector<size_t> policies_ids;
+        std::vector<std::string> policies_contents;
+        std::vector<MediaConchLib::Checker_ValidateRes*> res;
+        policies_ids.push_back(policy);
 
-            if (mainwindow->validate(MediaConchLib::report_Max, file,
-                                     policies_ids, policies_contents, res) == 0 && res.size() == 1)
-            {
-                policy_valid = res[0]->valid;
-                for (size_t j = 0; j < res.size() ; ++j)
-                    delete res[j];
-                res.clear();
-            }
+        if (mainwindow->validate(MediaConchLib::report_Max, file,
+                                 policies_ids, policies_contents, res) == 0 && res.size() == 1)
+        {
+            policy_valid = res[0]->valid;
+            for (size_t j = 0; j < res.size() ; ++j)
+                delete res[j];
+            res.clear();
         }
 
         working_files_mutex.lock();
@@ -365,16 +359,10 @@ void WorkerFiles::update_unfinished_files()
             res.clear();
             if (report_kind == MediaConchLib::report_MediaConch && fr->policy >= 0)
             {
-                Policy *p = mainwindow->policy_get(fr->policy);
-                if (p)
-                {
-                    std::string policy_content;
-                    p->dump_schema(policy_content);
-                    policies_contents.push_back(policy_content);
-                }
+                policies_ids.push_back(fr->policy);
 
-                if (p && mainwindow->validate(MediaConchLib::report_Max, files[i],
-                                              policies_ids, policies_contents, res) == 0 && res.size() == 1)
+                if (mainwindow->validate(MediaConchLib::report_Max, files[i],
+                                         policies_ids, policies_contents, res) == 0 && res.size() == 1)
                     fr->policy_valid = res[0]->valid;
                 for (size_t j = 0; j < res.size() ; ++j)
                     delete res[j];
@@ -540,7 +528,7 @@ void WorkerFiles::fill_registered_files_from_db()
         full_file += fr->filename;
 
         //check if policy still exists
-        Policy *p = mainwindow->policy_get(fr->policy);
+        MediaConchLib::Policy_Policy *p = mainwindow->policy_get(fr->policy);
         if (!p)
             fr->policy = -1;
 

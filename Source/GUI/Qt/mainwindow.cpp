@@ -754,7 +754,7 @@ int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, std::string&
 }
 
 //---------------------------------------------------------------------------
-Policy* MainWindow::policy_get(int pos)
+MediaConchLib::Policy_Policy* MainWindow::policy_get(int pos)
 {
     std::string err;
     return MCL.policy_get(-1, pos, err);
@@ -773,6 +773,18 @@ int MainWindow::policy_save(int pos, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::policy_dump(int pos, std::string& memory, std::string& err)
+{
+    return MCL.policy_dump(-1, pos, memory, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_get_name(int pos, std::string& name, std::string& err)
+{
+    return MCL.policy_get_name(-1, pos, name, err);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::policy_export(int pos, std::string& err)
 {
     QString path = get_local_folder();
@@ -782,12 +794,12 @@ int MainWindow::policy_export(int pos, std::string& err)
     if (!dir.exists())
         dir.mkpath(dir.absolutePath());
 
-    Policy* p = MCL.policy_get(-1, pos, err);
-    if (!p)
+    std::string p_name;
+    if (MCL.policy_get_name(-1, pos, p_name, err) < 0)
         return -1;
 
     QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->name.c_str()) + ".xsl";
+    suggested += "/" + QString().fromUtf8(p_name.c_str()) + ".xsl";
 
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
                                                     suggested, tr("XSLT (*.xsl)"));
@@ -1171,16 +1183,6 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
         policy = fr->policy;
     }
 
-    Policy* p = policy_get(policy);
-    if (!p)
-    {
-        report = "Policy not found";
-        delete fr;
-        return 1;
-    }
-    std::string policy_content;
-    p->dump_schema(policy_content);
-
     std::string display_content;
     std::string display_name;
     const std::string* dname = NULL;
@@ -1193,15 +1195,15 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     MediaConchLib::Checker_ReportRes result;
     std::bitset<MediaConchLib::report_Max> report_set;
     std::vector<std::string> policies_contents;
-    policies_contents.push_back(policy_content);
-
-    std::vector<size_t> vec;
+    std::vector<size_t> policies_ids;
     std::map<std::string, std::string> options;
 
+    policies_ids.push_back(policy);
+
     if (MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
-                       vec, policies_contents,
-                       options,
-                       &result, dname, dcontent) < 0)
+                               policies_ids, policies_contents,
+                               options,
+                               &result, dname, dcontent) < 0)
         return 0;
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
