@@ -467,13 +467,13 @@ std::string RESTAPI::XSLT_Policy_Rule::to_str() const
 
     out << "{";
     out << "id: " << id;
-    out << ",\"name\": " << name;
-    out << ",\"tracktype\": " << tracktype;
-    out << ",\"field\": " << field;
-    out << ",occurrence: " << occurrence;
-    out << ",\"ope\": " << ope;
-    out << ",\"value\": " << value;
-    out << "}";
+    out << ",\"name\":\"" << name;
+    out << "\",\"tracktype\":\"" << tracktype;
+    out << "\",\"field\":\"" << field;
+    out << "\",occurrence:" << occurrence;
+    out << ",\"ope\":\"" << ope;
+    out << "\",\"value\":\"" << value;
+    out << "\"}";
     return out.str();
 }
 
