@@ -504,12 +504,12 @@ int MediaConchLib::policy_clear_policies(int user, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::policy_get_policies(int user, std::vector<Policy_Policy*>& policies)
+void MediaConchLib::policy_get_policies(int user, const std::vector<int>& ids, std::vector<Policy_Policy*>& policies)
 {
     if (use_daemon)
-        daemon_client->policy_get_policies(user, policies);
+        daemon_client->policy_get_policies(user, ids, policies);
     else
-        core->policies.get_policies(user, policies);
+        core->policies.get_policies(user, ids, policies);
 }
 
 //---------------------------------------------------------------------------

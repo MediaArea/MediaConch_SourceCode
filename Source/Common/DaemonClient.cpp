@@ -870,13 +870,14 @@ int DaemonClient::policy_get_name(int user, int id, std::string& name, std::stri
 }
 
 //---------------------------------------------------------------------------
-void DaemonClient::policy_get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>& policies)
+void DaemonClient::policy_get_policies(int user, const std::vector<int>& ids, std::vector<MediaConchLib::Policy_Policy*>& policies)
 {
     if (!http_client)
         return;
 
     RESTAPI::Policy_Get_Policies_Req req;
     req.user = user;
+    req.ids = ids;
 
     int ret = http_client->start();
     if (ret < 0)

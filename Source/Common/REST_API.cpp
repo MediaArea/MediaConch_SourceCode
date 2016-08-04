@@ -439,7 +439,15 @@ std::string RESTAPI::Policy_Get_Policies_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\": " << user << "}";
+    out << "{\"user\":" << user;
+    out << ",\"ids\":[";
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << ids[i];
+    }
+    out << "]}";
     return out.str();
 }
 
@@ -1453,6 +1461,8 @@ int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std
     std::stringstream ss;
 
     ss << "?user=" << req.user;
+    for (size_t i = 0; i < req.ids.size(); ++i)
+        ss << "&id=" << req.ids[i];
     data = ss.str();
 
     return 0;
@@ -2977,6 +2987,14 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const s
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
 
+    Container::Value *ids = model->get_value_by_key(*child, "ids");
+    if (ids && ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < ids->array.size(); ++i)
+            if (ids->array[i].type == Container::Value::CONTAINER_TYPE_INTEGER)
+                req->ids.push_back(ids->array[i].l);
+    }
+
     return req;
 }
 
@@ -3837,6 +3855,13 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(con
                 continue;
 
             req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->ids.push_back(strtoll(val.c_str(), NULL, 10));
         }
         else
             start = std::string::npos;

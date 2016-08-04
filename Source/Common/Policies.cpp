@@ -299,7 +299,7 @@ size_t Policies::get_policies_size(int user) const
     return it->second.size();
 }
 
-void Policies::get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>& ps)
+void Policies::get_policies(int user, const std::vector<int>& ids, std::vector<MediaConchLib::Policy_Policy*>& ps)
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
 
@@ -312,6 +312,19 @@ void Policies::get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>
     {
         if (!it_p->second)
             continue;
+
+        if (ids.size())
+        {
+            size_t i = 0;
+            for (; i < ids.size(); ++i)
+            {
+                if (ids[i] == (int)it_p->first)
+                    break;
+            }
+
+            if (i == ids.size())
+                continue;
+        }
 
         std::string err;
         MediaConchLib::Policy_Policy *p = policy_to_mcl_policy(it_p->second, err);

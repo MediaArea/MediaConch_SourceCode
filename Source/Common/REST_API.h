@@ -566,8 +566,9 @@ public:
     struct Policy_Get_Policies_Req
     {
         Policy_Get_Policies_Req() : user(-1) {}
-        int         user;
-        std::string to_str() const;
+        int              user;
+        std::vector<int> ids;
+        std::string      to_str() const;
     };
 
     struct Policy_Get_Policies_Res

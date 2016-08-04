@@ -535,13 +535,14 @@ Parameters:
 Parameters:
 
 URI format for the parameters.
-URL: /$API_VERSION/policy_get_policies
+URL: /$API_VERSION/policy_get_policies?id=0&id=1
 
 ##### Request
 
 Parameters:
 
 user:  User ID
+id:    Policy ID (can be cumulated), if not present, return all policies
 
 ##### Response
 

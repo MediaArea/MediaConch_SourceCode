@@ -1135,10 +1135,11 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a policy_get_policies command" << std::endl;
+        std::clog << d->get_date() << "Daemon received a policy_get_policies command: ";
+        std::clog << req->to_str() << std::endl;
 
         std::vector<MediaConchLib::Policy_Policy*> policies;
-        d->MCL->policy_get_policies(req->user, policies);
+        d->MCL->policy_get_policies(req->user, req->ids, policies);
         for (size_t i = 0; i < policies.size(); ++i)
         {
             MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy(policies[i]);

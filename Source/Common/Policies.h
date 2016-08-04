@@ -76,7 +76,7 @@ public:
     size_t      get_policies_size(int user) const;
     Policy*     get_policy(int user, int pos, std::string& err);
     int         policy_get_name(int user, int id, std::string& name, std::string& err);
-    void        get_policies(int user, std::vector<MediaConchLib::Policy_Policy*>& ps);
+    void        get_policies(int user, const std::vector<int>&, std::vector<MediaConchLib::Policy_Policy*>& ps);
     MediaConchLib::Policy_Policy* policy_get(int user, int pos, std::string& err);
 
     int         policy_get_policies(int user, const std::vector<size_t>* policies_ids,
