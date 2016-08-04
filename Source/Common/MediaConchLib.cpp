@@ -581,7 +581,8 @@ std::string MediaConchLib::Policy_Policy::to_str() const
     out << "{\"id\":" << id;
     out << ",\"parent_id\":" << parent_id;
     out << ",\"is_system\":" << std::boolalpha << is_system;
-    out << ",\"type\":\"" << type;
+    out << ",\"kind\":\"" << kind;
+    out << "\",\"type\":\"" << type;
     out << "\",\"name\":\"" << name;
     out << "\",\"description\":\"" << description << "\"}";
     return out.str();

@@ -736,10 +736,12 @@ Policy Object
 
 Parameters:
 
-* id: ID of the policy
-* parent_id: ID of the parent policy (optional, root is -1)
-* name: string containing the name of the policy (optional)
-* type:  string containing the policy operator (optional; value: "and", "or"; default is "and")
+* id:          ID of the policy
+* parent_id:   ID of the parent policy (optional, root is -1)
+* name:        string containing the name of the policy (optional)
+* kind:        string containing the policy kind ("UNKNOWN" or "XSLT")
+* type:        string containing the policy operator (optional; value: "and", "or"; default is "and")
+* is_system:   boolean set to true if it is a system policy
 * description: string containing the name of the policy (optional)
 
 {"id":0, "parent_id":-1, "name": "NAME", "description":"", "type":"and"}

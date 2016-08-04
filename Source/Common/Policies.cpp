@@ -231,6 +231,7 @@ MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std
         p->id = policy->id;
         p->name = policy->name;
         p->is_system = policy->is_system;
+        p->kind = "UNKNOWN";
     }
     else
     {
@@ -247,6 +248,7 @@ MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std
             p->name = node->name;
             p->description = node->description;
             p->is_system = policy->is_system;
+            p->kind = "XSLT";
         }
         else
         {

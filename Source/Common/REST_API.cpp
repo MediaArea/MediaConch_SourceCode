@@ -5400,7 +5400,7 @@ Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
 //---------------------------------------------------------------------------
 void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v)
 {
-    Container::Value id, parent_id, is_system, type, name, description;
+    Container::Value id, parent_id, is_system, kind, type, name, description;
 
     ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -5415,6 +5415,10 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
     is_system.type = Container::Value::CONTAINER_TYPE_BOOL;
     is_system.b = policy->is_system;
     ok_v.obj["is_system"] = is_system;
+
+    kind.type = Container::Value::CONTAINER_TYPE_STRING;
+    kind.s = policy->kind;
+    ok_v.obj["kind"] = kind;
 
     type.type = Container::Value::CONTAINER_TYPE_STRING;
     type.s = policy->type;
@@ -5759,6 +5763,10 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
     Container::Value *is_system = model->get_value_by_key(*policy, "is_system");
     if (is_system && is_system->type == Container::Value::CONTAINER_TYPE_BOOL)
         ok->is_system = is_system->b;
+
+    Container::Value *kind = model->get_value_by_key(*policy, "kind");
+    if (kind && kind->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->kind = kind->s;
 
     Container::Value *type = model->get_value_by_key(*policy, "type");
     if (type && type->type == Container::Value::CONTAINER_TYPE_STRING)

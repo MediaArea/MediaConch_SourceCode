@@ -111,10 +111,11 @@ public:
     struct Policy_Policy
     {
         Policy_Policy() : id(-1), parent_id(-1), is_system(false) {}
-        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), type(p->type), name(p->name), description(p->description) {}
+        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), kind(p->kind), type(p->type), name(p->name), description(p->description) {}
         int         id;
         int         parent_id;
         bool        is_system;
+        std::string kind;
         std::string type;
         std::string name;
         std::string description;
