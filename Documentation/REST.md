@@ -597,7 +597,7 @@ Parameters:
 
 Parameters:
 
-* policy:            String with the XSL policy
+* policy_id:         ID of the created XSL policy
 
 * nok:               Object
 
