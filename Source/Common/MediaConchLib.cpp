@@ -513,6 +513,15 @@ void MediaConchLib::policy_get_policies(int user, const std::vector<int>& ids, s
 }
 
 //---------------------------------------------------------------------------
+void MediaConchLib::policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& policies)
+{
+    if (use_daemon)
+        daemon_client->policy_get_policies_names_list(user, policies);
+    else
+        core->policies.get_policies_names_list(user, policies);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::xslt_policy_create_from_file(int user, const std::string& file, std::string& err)
 {
     if (use_daemon)

@@ -142,6 +142,7 @@ DESTRUCTOR_POLICY(Policy_Duplicate_Res)
 DESTRUCTOR_POLICY(Policy_Change_Name_Res)
 DESTRUCTOR_POLICY(Policy_Get_Name_Res)
 DESTRUCTOR_POLICY(Policy_Get_Policies_Count_Res)
+DESTRUCTOR_POLICY(Policy_Get_Policies_Names_List_Res)
 DESTRUCTOR_POLICY(Policy_Clear_Policies_Res)
 DESTRUCTOR_POLICY(XSLT_Policy_Create_From_File_Res)
 DESTRUCTOR_POLICY(XSLT_Policy_Rule_Create_Res)
@@ -448,6 +449,15 @@ std::string RESTAPI::Policy_Get_Policies_Req::to_str() const
         out << ids[i];
     }
     out << "]}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Policies_Names_List_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\":" << user << "}";
     return out.str();
 }
 
@@ -1002,6 +1012,28 @@ std::string RESTAPI::Policy_Get_Policies_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Policies_Names_List_Res::to_str() const
+{
+    std::stringstream out;
+
+    if (nok)
+        out << "{" << nok->to_str() << "}";
+    else
+    {
+        out << "{[";
+        for (size_t i = 0; i < policies.size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << "{\"id\":" << policies[i].first << ", \"name\":\"" << policies[i].second << "\"}";
+        }
+
+        out << "]}";
+    }
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::XSLT_Policy_Create_From_File_Res::to_str() const
 {
     std::stringstream out;
@@ -1463,6 +1495,18 @@ int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std
     ss << "?user=" << req.user;
     for (size_t i = 0; i < req.ids.size(); ++i)
         ss << "&id=" << req.ids[i];
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_policies_names_list_req(Policy_Get_Policies_Names_List_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?user=" << req.user;
     data = ss.str();
 
     return 0;
@@ -2131,6 +2175,33 @@ int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_GET_POLICIES_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Names_List_Res& res, std::string& data)
+{
+    Container::Value v, child, policies, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+    else
+    {
+        serialize_policies_get_policies_names(res.policies, policies);
+        child.obj["policies"] = policies;
+    }
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_GET_POLICIES_NAMES_LIST_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -2999,6 +3070,30 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const s
 }
 
 //---------------------------------------------------------------------------
+    RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_policy_get_policies_names_list_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET_POLICIES_NAMES_LIST");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Get_Policies_Names_List_Req *req = new Policy_Get_Policies_Names_List_Req;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_from_file_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -3862,6 +3957,43 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(con
                 continue;
 
             req->ids.push_back(strtoll(val.c_str(), NULL, 10));
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_uri_policy_get_policies_names_list_req(const std::string& uri)
+{
+    Policy_Get_Policies_Names_List_Req *req = new Policy_Get_Policies_Names_List_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
+
+        if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
         }
         else
             start = std::string::npos;
@@ -4916,6 +5048,42 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Policies_Names_List_Res *RESTAPI::parse_policy_get_policies_names_list_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET_POLICIES_NAMES_LIST_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policies = model->get_value_by_key(*child, "policies");
+    if (!policies || policies->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return NULL;
+
+    Policy_Get_Policies_Names_List_Res *res = new Policy_Get_Policies_Names_List_Res;
+    if (parse_policies_get_policies_names(policies, res->policies) < 0)
+    {
+        delete res;
+        return NULL;;
+    }
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_from_file_res(const std::string& data)
 {
     Container::Value v, *child;
@@ -5434,7 +5602,7 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
 }
 
 //---------------------------------------------------------------------------
-void RESTAPI::serialize_policies_get_policies(std::vector<MediaConchLib::Policy_Policy *> policies, Container::Value &p)
+void RESTAPI::serialize_policies_get_policies(const std::vector<MediaConchLib::Policy_Policy *>& policies, Container::Value &p)
 {
     p.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < policies.size(); ++i)
@@ -5446,6 +5614,28 @@ void RESTAPI::serialize_policies_get_policies(std::vector<MediaConchLib::Policy_
 
         serialize_a_policy(policies[i], ok_v);
         p.array.push_back(ok_v);
+    }
+}
+
+//---------------------------------------------------------------------------
+void RESTAPI::serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p)
+{
+    p.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < policies.size(); ++i)
+    {
+        Container::Value policy, id, name;
+
+        policy.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = policies[i].first;
+        policy.obj["id"] = id;
+
+        name.type = Container::Value::CONTAINER_TYPE_STRING;
+        name.s = policies[i].second;
+        policy.obj["name"] = name;
+
+        p.array.push_back(policy);
     }
 }
 
@@ -5728,7 +5918,7 @@ int RESTAPI::parse_policy_nok(Container::Value *nok_v, RESTAPI::Policy_Nok **nok
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaConchLib::Policy_Policy *> policies)
+int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaConchLib::Policy_Policy *>& policies)
 {
     if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return -1;
@@ -5739,6 +5929,32 @@ int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaC
 
         if (ok)
             policies.push_back(ok);
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_policies_get_policies_names(Container::Value *p, std::vector<std::pair<int, std::string> >& policies)
+{
+    if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < p->array.size(); ++i)
+    {
+        Container::Value *policy = &p->array[i];
+        if (policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
+            return -1;
+
+        Container::Value *id = model->get_value_by_key(*policy, "id");
+        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            return -1;
+
+        std::string n;
+        Container::Value *name = model->get_value_by_key(*policy, "name");
+        if (name && name->type == Container::Value::CONTAINER_TYPE_STRING)
+            n = name->s;
+
+        policies.push_back(std::make_pair(id->l, n));
     }
     return 0;
 }

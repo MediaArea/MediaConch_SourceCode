@@ -336,6 +336,26 @@ void Policies::get_policies(int user, const std::vector<int>& ids, std::vector<M
     }
 }
 
+void Policies::get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps)
+{
+    std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
+
+    if (it == policies.end())
+        return;
+
+    std::map<size_t, Policy*>::iterator it_p = it->second.begin();
+    for (; it_p != it->second.end(); ++it_p)
+    {
+        if (!it_p->second)
+            continue;
+
+        if (it_p->second->type == Policies::POLICY_XSLT && ((XsltPolicy*)it_p->second)->parent_id != (size_t)-1)
+            continue;
+
+        ps.push_back(std::make_pair(it_p->second->id, it_p->second->name));
+    }
+}
+
 int Policies::erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, int id, std::string& err)
 {
     std::map<size_t, Policy *>::iterator it = user_policies.find(id);

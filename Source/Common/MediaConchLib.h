@@ -203,6 +203,7 @@ public:
     Policy_Policy*               policy_get(int user, int pos, std::string& err);
     int                          policy_get_name(int user, int id, std::string& name, std::string& err);
     void                         policy_get_policies(int user, const std::vector<int>&, std::vector<Policy_Policy*>&);
+    void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
     int                          policy_save(int user, int pos, std::string& err);
     int                          policy_remove(int user, int pos, std::string& err);
     int                          policy_dump(int user, int id, std::string& memory, std::string& err);

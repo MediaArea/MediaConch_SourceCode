@@ -69,6 +69,7 @@ public:
     URI_REQ_FUNC(Policy_Get_Policies_Count);
     URI_REQ_FUNC(Policy_Clear_Policies);
     URI_REQ_FUNC(Policy_Get_Policies);
+    URI_REQ_FUNC(Policy_Get_Policies_Names_List);
     URI_REQ_FUNC(XSLT_Policy_Create_From_File);
     URI_REQ_FUNC(XSLT_Policy_Rule_Create);
     URI_REQ_FUNC(XSLT_Policy_Rule_Get);
@@ -130,6 +131,8 @@ public:
                                                     RESTAPI::Policy_Clear_Policies_Res& res, void* arg);
     typedef int (*on_policy_get_policies_command)(const RESTAPI::Policy_Get_Policies_Req* req,
                                                   RESTAPI::Policy_Get_Policies_Res& res, void* arg);
+    typedef int (*on_policy_get_policies_names_list_command)(const RESTAPI::Policy_Get_Policies_Names_List_Req* req,
+                                                             RESTAPI::Policy_Get_Policies_Names_List_Res& res, void* arg);
     typedef int (*on_xslt_policy_create_from_file_command)(const RESTAPI::XSLT_Policy_Create_From_File_Req* req,
                                                            RESTAPI::XSLT_Policy_Create_From_File_Res& res, void* arg);
     typedef int (*on_xslt_policy_rule_create_command)(const RESTAPI::XSLT_Policy_Rule_Create_Req* req,
@@ -161,6 +164,7 @@ public:
                      policy_get_policies_count_cb(NULL),
                      policy_clear_policies_cb(NULL),
                      policy_get_policies_cb(NULL),
+                     policy_get_policies_names_list_cb(NULL),
                      xslt_policy_create_from_file_cb(NULL),
                      xslt_policy_rule_create_cb(NULL),
                      xslt_policy_rule_get_cb(NULL),
@@ -192,6 +196,7 @@ public:
         on_policy_get_policies_count_command policy_get_policies_count_cb;
         on_policy_clear_policies_command policy_clear_policies_cb;
         on_policy_get_policies_command policy_get_policies_cb;
+        on_policy_get_policies_names_list_command policy_get_policies_names_list_cb;
         on_xslt_policy_create_from_file_command xslt_policy_create_from_file_cb;
         on_xslt_policy_rule_create_command xslt_policy_rule_create_cb;
         on_xslt_policy_rule_get_command xslt_policy_rule_get_cb;

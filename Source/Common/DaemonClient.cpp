@@ -919,6 +919,40 @@ void DaemonClient::policy_get_policies(int user, const std::vector<int>& ids, st
 }
 
 //---------------------------------------------------------------------------
+void DaemonClient::policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& policies)
+{
+    if (!http_client)
+        return;
+
+    RESTAPI::Policy_Get_Policies_Names_List_Req req;
+    req.user = user;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return;
+
+    RESTAPI rest;
+    RESTAPI::Policy_Get_Policies_Names_List_Res *res = rest.parse_policy_get_policies_names_list_res(data);
+    if (!res)
+        return;
+
+    if (!res->nok)
+        policies = res->policies;
+
+    delete res;
+    res = NULL;
+}
+
+//---------------------------------------------------------------------------
 size_t DaemonClient::policy_get_policies_count(int user)
 {
     if (!http_client)

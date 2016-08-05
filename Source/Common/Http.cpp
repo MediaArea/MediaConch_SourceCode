@@ -282,6 +282,13 @@ int Http::send_request(RESTAPI::Policy_Get_Policies_Req&)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Policy_Get_Policies_Names_List_Req&)
+{
+    std::string uri = "/" + RESTAPI::API_VERSION + "/policy_get_policies_names_list";
+    return send_request_get(uri);
+}
+
+//---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::XSLT_Policy_Create_From_File_Req& req)
 {
     std::string query;

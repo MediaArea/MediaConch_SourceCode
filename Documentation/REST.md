@@ -21,6 +21,7 @@ It is used above an HTTP connection.
   * Policy_Change_Name
   * Policy_Get
   * Policy_Get_Policies
+  * Policy_Get_Policies_Names_List
   * Policy_Get_Policies_Count
   * Policy_Clear_Policies
   * XSLT_Policy_Rule_Create
@@ -95,6 +96,7 @@ Current API version: $API_VERSION = 1.6
 * Policy_Change_Name: HTTP POST
 * Policy_Get: HTTP GET
 * Policy_Get_Policies: HTTP GET
+* Policy_Get_Policies_Names_List: HTTP GET
 * Policy_Get_Policies_Count: HTTP GET
 * Policy_Clear_Policies: HTTP GET
 * Policy_Create_From_File: HTTP GET
@@ -549,6 +551,27 @@ id:    Policy ID (can be cumulated), if not present, return all policies
 Parameters:
 
 - if command is ok, return an object with an array of policies (Policy_Policy): '{"POLICY_GET_POLICIES_RESULT": {"policies": []}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Get_Policies_Names_List
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_policies_names_list
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with an array of policies ids and names: '{"POLICY_GET_POLICIES_RESULT": {"policies": [{\"id\":0,\"name\":\"policy name\"}]}}'
 - otherwise, return a "nok" object with a Policy_Error
 {"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
 
