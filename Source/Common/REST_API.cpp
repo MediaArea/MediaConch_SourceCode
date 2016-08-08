@@ -404,7 +404,7 @@ std::string RESTAPI::Policy_Get_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\": " << user << ",\"id\": " << id << "}";
+    out << "{\"user\":" << user << ",\"id\":" << id << ",\"format\":\"" << format << "\"}";
     return out.str();
 }
 
@@ -448,7 +448,8 @@ std::string RESTAPI::Policy_Get_Policies_Req::to_str() const
             out << ",";
         out << ids[i];
     }
-    out << "]}";
+    out << "],\"format\":\"" << format;
+    out << "\"}";
     return out.str();
 }
 
@@ -467,23 +468,6 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Req::to_str() const
     std::stringstream out;
 
     out << "{\"user\": " << user << ",\"id\": " << id << "}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::XSLT_Policy_Rule::to_str() const
-{
-    std::stringstream out;
-
-    out << "{";
-    out << "id: " << id;
-    out << ",\"name\":\"" << name;
-    out << "\",\"tracktype\":\"" << tracktype;
-    out << "\",\"field\":\"" << field;
-    out << "\",occurrence:" << occurrence;
-    out << ",\"ope\":\"" << ope;
-    out << "\",\"value\":\"" << value;
-    out << "\"}";
     return out.str();
 }
 
@@ -993,21 +977,24 @@ std::string RESTAPI::Policy_Get_Policies_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "{[";
-    for (size_t i = 0; i < policies.size(); ++i)
+    if (policies.size())
     {
-        if (!policies[i])
-            continue;
+        out << "{\"policies\":[";
+        for (size_t i = 0; i < policies.size(); ++i)
+        {
+            if (!policies[i])
+                continue;
 
-        if (i)
-            out << ",";
-        out << policies[i]->to_str();
+            if (i)
+                out << ",";
+            out << policies[i]->to_str();
+        }
+        out << "]}";
     }
-
-    out << "]";
-    if (nok)
-        out << "," << nok->to_str();
-    out << "}";
+    else if (policiesTree.size())
+        out << policiesTree;
+    else if (nok)
+        out << "{" << nok->to_str() << "}";
     return out.str();
 }
 
@@ -1444,6 +1431,7 @@ int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data)
 
     ss << "?id=" << req.id;
     ss << "&user=" << req.user;
+    ss << "&format=" << req.format;
     data = ss.str();
 
     return 0;
@@ -1495,6 +1483,7 @@ int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std
     ss << "?user=" << req.user;
     for (size_t i = 0; i < req.ids.size(); ++i)
         ss << "&id=" << req.ids[i];
+    ss << "&format=" << req.format;
     data = ss.str();
 
     return 0;
@@ -1527,7 +1516,7 @@ int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_
 
 // XSLT Rule
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule(XSLT_Policy_Rule& rule, Container::Value& val)
+int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, Container::Value& val)
 {
     Container::Value id, name, tracktype, field, occurrence, ope, value;
     val.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2163,15 +2152,24 @@ int RESTAPI::serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res,
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string& data)
 {
-    Container::Value v, child, policies, nok;
+    Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
-    serialize_policies_get_policies(res.policies, policies);
-    child.obj["policies"] = policies;
-
     if (res.nok)
         child.obj["nok"] = serialize_policy_nok(res.nok);
+    else if (res.policies.size())
+    {
+        Container::Value policies;
+        serialize_policies_get_policies(res.policies, policies);
+        child.obj["policies"] = policies;
+    }
+    else if (res.policiesTree.size())
+    {
+        child.type = Container::Value::CONTAINER_TYPE_STRING;
+        child.s = res.policiesTree;
+    }
+
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_GET_POLICIES_RESULT"] = child;
@@ -2944,8 +2942,7 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *id;
-    id = model->get_value_by_key(*child, "id");
+    Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
@@ -2955,6 +2952,10 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
     Container::Value *user = model->get_value_by_key(*child, "user");
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
+
+    Container::Value *format = model->get_value_by_key(*child, "format");
+    if (format && format->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->format = format->s;
 
     return req;
 }
@@ -3066,6 +3067,10 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const s
                 req->ids.push_back(ids->array[i].l);
     }
 
+    Container::Value *format = model->get_value_by_key(*child, "format");
+    if (format && format->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->format = format->s;
+
     return req;
 }
 
@@ -3123,7 +3128,7 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_fro
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_xslt_policy_rule(Container::Value *val, RESTAPI::XSLT_Policy_Rule *rule)
+int RESTAPI::parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_Policy_Rule *rule)
 {
     if (!val || val->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return -1;
@@ -3796,6 +3801,13 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& ur
 
             req->user = strtoll(val.c_str(), NULL, 10);
         }
+        else if (substr == "format")
+        {
+            if (!val.length())
+                continue;
+
+            req->format = val;
+        }
         else
             start = std::string::npos;
     }
@@ -3957,6 +3969,13 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(con
                 continue;
 
             req->ids.push_back(strtoll(val.c_str(), NULL, 10));
+        }
+        else if (substr == "format")
+        {
+            if (!val.length())
+                continue;
+
+            req->format = val;
         }
         else
             start = std::string::npos;
@@ -5027,21 +5046,35 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
         return NULL;
 
     Container::Value *policies = model->get_value_by_key(*child, "policies");
-    if (!policies || policies->type != Container::Value::CONTAINER_TYPE_ARRAY)
-        return NULL;
+    Container::Value *policiesTree = model->get_value_by_key(*child, "policiesTree");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
 
     Policy_Get_Policies_Res *res = new Policy_Get_Policies_Res;
-    if (parse_policies_get_policies(policies, res->policies) < 0)
+    if (nok && parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+    else if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        if (policiesTree)
+        {
+            delete res;
+            return NULL;
+        }
+
+        if (parse_policies_get_policies(policies, res->policies) < 0)
+        {
+            delete res;
+            return NULL;;
+        }
+    }
+    else if (policiesTree && policiesTree->type == Container::Value::CONTAINER_TYPE_STRING)
+        res->policiesTree = policiesTree->s;
+    else
     {
         delete res;
         return NULL;;
-    }
-
-    Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
-    {
-        delete res;
-        return NULL;
     }
 
     return res;

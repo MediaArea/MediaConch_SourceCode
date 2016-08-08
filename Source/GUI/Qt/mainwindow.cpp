@@ -363,10 +363,10 @@ void MainWindow::clear_file_list()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::get_policies(std::vector<MediaConchLib::Policy_Policy*>& policies)
+void MainWindow::get_policies(const std::string& format, MediaConchLib::Get_Policies& policies)
 {
     std::vector<int> ids;
-    MCL.policy_get_policies(-1, ids, policies);
+    MCL.policy_get_policies(-1, ids, format, policies);
 }
 
 //---------------------------------------------------------------------------
@@ -758,7 +758,7 @@ int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, std::string&
 MediaConchLib::Policy_Policy* MainWindow::policy_get(int pos)
 {
     std::string err;
-    return MCL.policy_get(-1, pos, err);
+    return MCL.policy_get(-1, pos, "JSON", err);
 }
 
 //---------------------------------------------------------------------------

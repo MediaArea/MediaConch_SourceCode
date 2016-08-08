@@ -211,6 +211,18 @@ int XsltPolicy::find_policy_node(xmlNodePtr node, bool is_root, XsltPolicy* curr
         return parse_policy_policy(node, is_root, current);
     else if (name == "rule")
         return parse_policy_rule(node, is_root, current);
+    else if (name == "description")
+    {
+        // Get description
+        xmlChar *value = xmlNodeGetContent(node);
+        if (value)
+        {
+            current->description = std::string((const char*)value);
+            xmlFree(value);
+        }
+        return 0;
+    }
+
 
     error = "The XML policy tag accepted are 'policy' or 'rule'";
     return -1;
@@ -242,14 +254,6 @@ int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* c
         xmlFree(name);
     }
 
-    // Get description
-    xmlChar *description = xmlGetNoNsProp(node, (const unsigned char*)"description");
-    if (description)
-    {
-        p->description = std::string((const char*)description);
-        xmlFree(description);
-    }
-
     // Get type
     xmlChar *type = xmlGetNoNsProp(node, (const unsigned char*)"type");
     if (type)
@@ -272,9 +276,7 @@ int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* c
         return -1;
     }
 
-    run_over_siblings_nodes(node->children, false, p);
-
-    return 0;
+    return run_over_siblings_nodes(node->children, false, p);
 }
 
 //---------------------------------------------------------------------------
@@ -376,7 +378,21 @@ int XsltPolicy::create_node_policy_child(xmlNodePtr& node, XsltPolicy *current)
 
     //description
     if (current->description.size())
-        xmlNewProp(node, (const xmlChar *)"description", (const xmlChar *)current->description.c_str());
+    {
+        xmlNodePtr new_node = xmlNewNode(NULL, (const xmlChar*)"description");
+        if (!new_node)
+        {
+            error = "Cannot create the policy children";
+            return -1;
+        }
+
+        xmlNodeSetContent(new_node, (const xmlChar*)current->description.c_str());
+        if (!xmlAddChild(node, new_node))
+        {
+            error = "Cannot add child to policy children";
+            return -1;
+        }
+    }
 
     if (write_nodes_children(node, current) < 0)
     {

@@ -39,6 +39,7 @@ namespace MediaConch {
 class Policy;
 class XsltPolicy;
 class XsltPolicyRule;
+class XsltPolicyNode;
 class Core;
 
 //***************************************************************************
@@ -76,7 +77,7 @@ public:
     size_t      get_policies_size(int user) const;
     Policy*     get_policy(int user, int pos, std::string& err);
     int         policy_get_name(int user, int id, std::string& name, std::string& err);
-    void        get_policies(int user, const std::vector<int>&, std::vector<MediaConchLib::Policy_Policy*>& ps);
+    void        get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies& ps);
     void        get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps);
     MediaConchLib::Policy_Policy* policy_get(int user, int pos, std::string& err);
 
@@ -148,6 +149,9 @@ private:
     int policy_get_policy_content(const std::string& policy, std::vector<std::string>& xslt_policies, std::string& err);
     int erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, int id, std::string& err);
     MediaConchLib::Policy_Policy *policy_to_mcl_policy(Policy *p, std::string& err);
+    MediaConchLib::Policy_Policy* xslt_policy_to_mcl_policy(XsltPolicy *policy, std::string&);
+    int xslt_policy_child_to_mcl_policy(XsltPolicyNode *node, MediaConchLib::Policy_Policy *, std::string&);
+    MediaConchLib::XSLT_Policy_Rule* xslt_policy_rule_to_mcl_policy(XsltPolicyRule *rule, std::string& error);
 };
 
 }

@@ -213,32 +213,32 @@ void CheckerWindow::hide()
 //---------------------------------------------------------------------------
 void CheckerWindow::create_policy_options(QString& policies)
 {
-    std::vector<MediaConchLib::Policy_Policy*> list;
-    mainwindow->get_policies(list);
+    MediaConchLib::Get_Policies list;
+    mainwindow->get_policies("JSON", list);
 
     QString system_policy;
     QString user_policy;
     int selected_policy = mainwindow->select_correct_policy();
-    for (size_t i = 0; i < list.size(); ++i)
+    for (size_t i = 0; i < list.policies->size(); ++i)
     {
-        if (!list[i])
+        if (!list.policies->at(i))
             continue;
 
-        if (list[i]->name.length() && list[i]->name.find(":/") == 0)
+        if (list.policies->at(i)->name.length() && list.policies->at(i)->name.find(":/") == 0)
         {
             system_policy += QString("<option ");
-            if ((int)list[i]->id == selected_policy)
+            if ((int)list.policies->at(i)->id == selected_policy)
                 system_policy += QString("selected=\"selected\" ");
             system_policy += QString("value=\"%1\">%2</option>")
-                .arg(list[i]->id).arg(QString().fromUtf8(list[i]->name.c_str(), list[i]->name.length()));
+                .arg(list.policies->at(i)->id).arg(QString().fromUtf8(list.policies->at(i)->name.c_str(), list.policies->at(i)->name.length()));
         }
         else
         {
             user_policy += QString("<option ");
-            if ((int)list[i]->id == selected_policy)
+            if ((int)list.policies->at(i)->id == selected_policy)
                 user_policy += QString("selected=\"selected\" ");
             user_policy += QString("value=\"%1\">%2</option>")
-                .arg(list[i]->id).arg(QString().fromUtf8(list[i]->name.c_str(), list[i]->name.length()));
+                .arg(list.policies->at(i)->id).arg(QString().fromUtf8(list.policies->at(i)->name.c_str(), list.policies->at(i)->name.length()));
         }
     }
 

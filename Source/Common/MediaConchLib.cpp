@@ -468,10 +468,10 @@ int MediaConchLib::policy_change_name(int user, int id, const std::string& name,
 }
 
 //---------------------------------------------------------------------------
-MediaConchLib::Policy_Policy* MediaConchLib::policy_get(int user, int id, std::string& err)
+MediaConchLib::Policy_Policy* MediaConchLib::policy_get(int user, int id, const std::string& format, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_get(user, id, err);
+        return daemon_client->policy_get(user, id, format, err);
 
     return core->policies.policy_get(user, id, err);
 }
@@ -504,12 +504,12 @@ int MediaConchLib::policy_clear_policies(int user, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::policy_get_policies(int user, const std::vector<int>& ids, std::vector<Policy_Policy*>& policies)
+void MediaConchLib::policy_get_policies(int user, const std::vector<int>& ids, const std::string& format, MediaConchLib::Get_Policies& policies)
 {
     if (use_daemon)
-        daemon_client->policy_get_policies(user, ids, policies);
+        daemon_client->policy_get_policies(user, ids, format, policies);
     else
-        core->policies.get_policies(user, ids, policies);
+        core->policies.get_policies(user, ids, format, policies);
 }
 
 //---------------------------------------------------------------------------
@@ -580,6 +580,23 @@ int MediaConchLib::policy_get_values_for_type_field(const std::string& type, con
 int MediaConchLib::policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
 {
     return core->policy_get_fields_for_type(type, fields);
+}
+
+//---------------------------------------------------------------------------
+std::string MediaConchLib::XSLT_Policy_Rule::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    out << "id: " << id;
+    out << ",\"name\":\"" << name;
+    out << "\",\"tracktype\":\"" << tracktype;
+    out << "\",\"field\":\"" << field;
+    out << "\",occurrence:" << occurrence;
+    out << ",\"ope\":\"" << ope;
+    out << "\",\"value\":\"" << value;
+    out << "\"}";
+    return out.str();
 }
 
 //---------------------------------------------------------------------------

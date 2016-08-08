@@ -789,7 +789,7 @@ int DaemonClient::policy_change_name(int user, int id, const std::string& name, 
 }
 
 //---------------------------------------------------------------------------
-MediaConchLib::Policy_Policy* DaemonClient::policy_get(int user, int id, std::string& err)
+MediaConchLib::Policy_Policy* DaemonClient::policy_get(int user, int id, const std::string& format, std::string& err)
 {
     if (!http_client)
         return NULL;
@@ -797,6 +797,7 @@ MediaConchLib::Policy_Policy* DaemonClient::policy_get(int user, int id, std::st
     RESTAPI::Policy_Get_Req req;
     req.id = id;
     req.user = user;
+    req.format = format;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -870,7 +871,7 @@ int DaemonClient::policy_get_name(int user, int id, std::string& name, std::stri
 }
 
 //---------------------------------------------------------------------------
-void DaemonClient::policy_get_policies(int user, const std::vector<int>& ids, std::vector<MediaConchLib::Policy_Policy*>& policies)
+void DaemonClient::policy_get_policies(int user, const std::vector<int>& ids, const std::string& format, MediaConchLib::Get_Policies& policies)
 {
     if (!http_client)
         return;
@@ -878,6 +879,7 @@ void DaemonClient::policy_get_policies(int user, const std::vector<int>& ids, st
     RESTAPI::Policy_Get_Policies_Req req;
     req.user = user;
     req.ids = ids;
+    req.format = format;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -899,18 +901,23 @@ void DaemonClient::policy_get_policies(int user, const std::vector<int>& ids, st
 
     if (!res->nok)
     {
-        for (size_t i = 0; i < res->policies.size(); ++i)
+        policies.format = format;
+        if (format == "JSTREE")
         {
-            if (!res->policies[i])
-                continue;
+            policies.jstree = new std::string;
+            *policies.jstree = res->policiesTree;
+        }
+        else
+        {
+            policies.policies = new std::vector<MediaConchLib::Policy_Policy*>;
+            for (size_t i = 0; i < res->policies.size(); ++i)
+            {
+                if (!res->policies[i])
+                    continue;
 
-            MediaConchLib::Policy_Policy* p = new MediaConchLib::Policy_Policy;
-            p->id = res->policies[i]->id;
-            p->parent_id = res->policies[i]->parent_id;
-            p->type = res->policies[i]->type;
-            p->name = res->policies[i]->name;
-            p->description = res->policies[i]->description;
-            policies.push_back(p);
+                MediaConchLib::Policy_Policy* p = new MediaConchLib::Policy_Policy(res->policies[i]);
+                policies.policies->push_back(p);
+            }
         }
     }
 

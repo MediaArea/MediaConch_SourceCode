@@ -99,7 +99,7 @@ public:
     int policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err);
 
     // get policy
-    MediaConchLib::Policy_Policy* policy_get(int user, int id, std::string& err);
+    MediaConchLib::Policy_Policy* policy_get(int user, int id, const std::string& format, std::string& err);
 
     // get policy name
     int policy_get_name(int user, int id, std::string& name, std::string& err);
@@ -111,7 +111,7 @@ public:
     int policy_clear_policies(int user, std::string& err);
 
     // get all policies
-    void policy_get_policies(int user, const std::vector<int>&, std::vector<MediaConchLib::Policy_Policy*>&);
+    void policy_get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies&);
 
     // get all policies with ID && name
     void policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);

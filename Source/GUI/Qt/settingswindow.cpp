@@ -148,8 +148,8 @@ void SettingsWindow::fill_html(QString& html)
 //---------------------------------------------------------------------------
 void SettingsWindow::create_policy_options(QString& policies)
 {
-    std::vector<MediaConchLib::Policy_Policy*> p;
-    parent->get_policies(p);
+    MediaConchLib::Get_Policies p;
+    parent->get_policies("JSON", p);
 
     QString system_policy;
     QString user_policy;
@@ -161,26 +161,26 @@ void SettingsWindow::create_policy_options(QString& policies)
     else
         selected_policy = QString().fromUtf8(policy_str.c_str(), policy_str.length()).toInt();
 
-    for (size_t i = 0; i < p.size(); ++i)
+    for (size_t i = 0; i < p.policies->size(); ++i)
     {
-        if (!p[i])
+        if (!p.policies->at(i))
             continue;
 
-        if (p[i]->name.length() && p[i]->name.find(":/") == 0)
+        if (p.policies->at(i)->name.length() && p.policies->at(i)->name.find(":/") == 0)
         {
             system_policy += QString("<option ");
-            if ((int)p[i]->id == selected_policy)
+            if ((int)p.policies->at(i)->id == selected_policy)
                 system_policy += QString("selected=\"selected\" ");
             system_policy += QString("value=\"%1\">%2</option>")
-                .arg(p[i]->id).arg(QString().fromUtf8(p[i]->name.c_str(), p[i]->name.length()));
+                .arg(p.policies->at(i)->id).arg(QString().fromUtf8(p.policies->at(i)->name.c_str(), p.policies->at(i)->name.length()));
         }
         else
         {
             user_policy += QString("<option ");
-            if ((int)p[i]->id == selected_policy)
+            if ((int)p.policies->at(i)->id == selected_policy)
                 user_policy += QString("selected=\"selected\" ");
             user_policy += QString("value=\"%1\">%2</option>")
-                .arg(p[i]->id).arg(QString().fromUtf8(p[i]->name.c_str(), p[i]->name.length()));
+                .arg(p.policies->at(i)->id).arg(QString().fromUtf8(p.policies->at(i)->name.c_str(), p.policies->at(i)->name.length()));
         }
     }
 

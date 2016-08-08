@@ -543,14 +543,16 @@ URL: /$API_VERSION/policy_get_policies?id=0&id=1
 
 Parameters:
 
-user:  User ID
-id:    Policy ID (can be cumulated), if not present, return all policies
+user:   User ID
+id:     Policy ID (can be cumulated), if not present, return all policies
+format: output format, can be "JSTREE" or "JSON"
 
 ##### Response
 
 Parameters:
 
-- if command is ok, return an object with an array of policies (Policy_Policy): '{"POLICY_GET_POLICIES_RESULT": {"policies": []}}'
+- if command is ok, format is "JSON", return an object with an array of policies (Policy_Policy): '{"POLICY_GET_POLICIES_RESULT": {"policies": []}}'
+- if command is ok, format is "JSTREE", return an object with a jstree string policies: '{"POLICY_GET_POLICIES_RESULT": {"policiesTree": "[]"}}'
 - otherwise, return a "nok" object with a Policy_Error
 {"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
 

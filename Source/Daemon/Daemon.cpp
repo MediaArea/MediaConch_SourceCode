@@ -1047,7 +1047,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        MediaConchLib::Policy_Policy* p = d->MCL->policy_get(req->user, req->id, err);
+        MediaConchLib::Policy_Policy* p = d->MCL->policy_get(req->user, req->id, req->format, err);
         if (!p)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -1139,14 +1139,17 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a policy_get_policies command: ";
         std::clog << req->to_str() << std::endl;
 
-        std::vector<MediaConchLib::Policy_Policy*> policies;
-        d->MCL->policy_get_policies(req->user, req->ids, policies);
-        for (size_t i = 0; i < policies.size(); ++i)
+        MediaConchLib::Get_Policies policies;
+        d->MCL->policy_get_policies(req->user, req->ids, req->format, policies);
+        if (req->format == "JSTREE" && policies.jstree)
+            res.policiesTree = *policies.jstree;
+        else if (policies.policies)
         {
-            MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy(policies[i]);
-            delete policies[i];
-            policies[i] = NULL;
-            res.policies.push_back(ok);
+            for (size_t i = 0; i < policies.policies->size(); ++i)
+            {
+                MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy(policies.policies->at(i));
+                res.policies.push_back(ok);
+            }
         }
 
         std::clog << d->get_date() << "Daemon send policy_get_policies result: " << res.to_str() << std::endl;

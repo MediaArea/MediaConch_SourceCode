@@ -108,18 +108,65 @@ public:
         Checker_ValidateRes() : valid(true) {}
     };
 
+    union XSLT_Child;
+
+    struct XSLT_Policy_Rule
+    {
+        XSLT_Policy_Rule() : id(-1), occurrence(-1) {}
+
+        int          id;
+        std::string  name;
+        std::string  tracktype;
+        std::string  field;
+        int          occurrence;
+        std::string  ope;
+        std::string  value;
+        std::string  to_str() const;
+    };
+
     struct Policy_Policy
     {
         Policy_Policy() : id(-1), parent_id(-1), is_system(false) {}
         Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), kind(p->kind), type(p->type), name(p->name), description(p->description) {}
-        int         id;
-        int         parent_id;
-        bool        is_system;
-        std::string kind;
-        std::string type;
-        std::string name;
-        std::string description;
+        int                                       id;
+        int                                       parent_id;
+        bool                                      is_system;
+        std::string                               kind;
+        std::string                               type;
+        std::string                               name;
+        std::string                               description;
+        std::vector<std::pair<int, XSLT_Child> >  children;
         std::string to_str() const;
+    };
+
+    union XSLT_Child
+    {
+        XSLT_Policy_Rule *rule;
+        Policy_Policy    *policy;
+    };
+
+    struct Get_Policies
+    {
+        Get_Policies() : policies(NULL) {}
+        ~Get_Policies()
+        {
+            if (format == "JSTREE" && policies)
+            {
+                for (size_t i = 0; i < policies->size(); ++i)
+                    delete policies->at(i);
+                policies->clear();
+                delete policies;
+            }
+            else if (jstree)
+                delete jstree;
+        }
+
+        std::string                      format;
+        union
+        {
+            std::vector<Policy_Policy*>* policies;
+            std::string*                 jstree;
+        };
     };
 
     static const std::string display_xml_name;
@@ -200,9 +247,9 @@ public:
 
     //   Policy helper
     size_t                       policy_get_policies_count(int user) const;
-    Policy_Policy*               policy_get(int user, int pos, std::string& err);
+    Policy_Policy*               policy_get(int user, int pos, const std::string& format, std::string& err);
     int                          policy_get_name(int user, int id, std::string& name, std::string& err);
-    void                         policy_get_policies(int user, const std::vector<int>&, std::vector<Policy_Policy*>&);
+    void                         policy_get_policies(int user, const std::vector<int>&, const std::string& format, Get_Policies&);
     void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
     int                          policy_save(int user, int pos, std::string& err);
     int                          policy_remove(int user, int pos, std::string& err);
