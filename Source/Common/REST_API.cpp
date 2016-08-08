@@ -5962,7 +5962,7 @@ int RESTAPI::parse_policies_get_policies_names(Container::Value *p, std::vector<
 //---------------------------------------------------------------------------
 MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
 {
-    if (policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    if (!policy || policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
     Container::Value *id = model->get_value_by_key(*policy, "id");
