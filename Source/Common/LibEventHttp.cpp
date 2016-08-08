@@ -16,6 +16,7 @@
 #include "MediaConchLib.h"
 #include "LibEventHttp.h"
 #include <sstream>
+#include <stdlib.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -24,6 +25,8 @@ namespace MediaConch {
 //***************************************************************************
 // Httpd
 //***************************************************************************
+
+int LibEventHttp::current_daemon_id = -1;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -180,6 +183,22 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
             evHttp->error = MediaConchLib::errorHttp_CONNECT;
         event_base_loopexit(evHttp->base, 0);
         return;
+    }
+
+    struct evkeyvalq *headers = evhttp_request_get_input_headers(req);
+    for (struct evkeyval *header = headers->tqh_first; header; header = header->next.tqe_next)
+    {
+        if (header->key && std::string(header->key) == "X-App-MediaConch-Instance-ID")
+        {
+            int value = header->value ? strtol(header->value, NULL, 10) : -1;
+            if (current_daemon_id != -1 && current_daemon_id != value)
+            {
+                evHttp->error = MediaConchLib::errorHttp_CONNECT;
+                event_base_loopexit(evHttp->base, 0);
+                return;
+            }
+            current_daemon_id = value;
+        }
     }
 
     std::string data;

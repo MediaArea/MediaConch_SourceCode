@@ -54,6 +54,8 @@ private:
     struct evhttp              *http;
     struct evhttp_bound_socket *handle;
 
+    static int                  pid;
+
     static void request_coming(struct evhttp_request *req, void *arg);
     int get_body(struct evhttp_request *req, std::string& json, std::string& ret_msg);
     void request_get_coming(struct evhttp_request *req);

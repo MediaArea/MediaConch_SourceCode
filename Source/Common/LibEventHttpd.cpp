@@ -16,6 +16,13 @@
 #include "LibEventHttpd.h"
 #include "Common/MediaConchLib.h"
 #include <sstream>
+
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -24,7 +31,7 @@ namespace MediaConch {
 //***************************************************************************
 // Httpd
 //***************************************************************************
-
+int LibEventHttpd::pid = -1;
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -32,6 +39,11 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 LibEventHttpd::LibEventHttpd(void* arg) : Httpd(arg), base(NULL), http(NULL), handle(NULL)
 {
+    #ifdef _WIN32
+    pid = _getpid();
+    #else
+    pid = getpid();
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -113,22 +125,25 @@ int LibEventHttpd::send_result(int ret_code, std::string& ret_msg, void *arg)
         struct evkeyvalq *evOutHeaders;
         evOutHeaders = evhttp_request_get_output_headers(req);
         evhttp_add_header(evOutHeaders, "Host", address.c_str());
-        std::stringstream len_str;
+        std::stringstream ss;
+        ss << pid;
+        evhttp_add_header(evOutHeaders, "X-App-MediaConch-Instance-ID", ss.str().c_str());
 
+        ss.str("");
         if (error.length())
         {
-            len_str << error.length();
+            ss << error.length();
             evbuffer_add_printf(evOutBuf, "%s\n", error.c_str());
         }
         else if (result.length())
         {
-            len_str << result.length();
+            ss << result.length();
             evhttp_add_header(evOutHeaders, "Content-Type", "application/json");
             evbuffer_add_printf(evOutBuf, "%s\n", result.c_str());
         }
         else
-            len_str << 0;
-        evhttp_add_header(evOutHeaders, "Content-Length", len_str.str().c_str());
+            ss << 0;
+        evhttp_add_header(evOutHeaders, "Content-Length", ss.str().c_str());
     }
     evhttp_send_reply(req, ret_code, ret_msg.c_str(), evOutBuf);
     if (evOutBuf)
