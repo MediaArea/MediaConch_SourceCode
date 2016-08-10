@@ -18,7 +18,8 @@ It is used above an HTTP connection.
   * Policy_Duplicate
   * Policy_Dump
   * Policy_Get_Name
-  * Policy_Change_Name
+  * Policy_Change_Info
+  * Policy_Change_Type
   * Policy_Get
   * Policy_Get_Policies
   * Policy_Get_Policies_Names_List
@@ -93,7 +94,8 @@ Current API version: $API_VERSION = 1.6
 * Policy_Dump: HTTP GET
 * Policy_Save: HTTP GET
 * Policy_Get_Name: HTTP GET
-* Policy_Change_Name: HTTP POST
+* Policy_Change_Info: HTTP POST
+* Policy_Change_Type: HTTP POST
 * Policy_Get: HTTP GET
 * Policy_Get_Policies: HTTP GET
 * Policy_Get_Policies_Names_List: HTTP GET
@@ -468,10 +470,10 @@ Parameters:
 - Otherwise, return a "nok" object with a Policy_Error
 {"POLICY_GET_NAME_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
-#### Policy_Change_Name
+#### Policy_Change_Info
 
 JSON format for the parameters.
-URL: /$API_VERSION/policy_change_name"
+URL: /$API_VERSION/policy_change_info"
 
 ##### Request
 
@@ -481,15 +483,37 @@ user:        User ID
 id:          Policy ID to retrieve information
 name:        New name for the policy
 description: New description for the policy
-'{"POLICY_CHANGE_NAME":{"id": 0, "name": "changed name", "description": "changed description"}}'
+'{"POLICY_CHANGE_INFO":{"id": 0, "name": "changed name", "description": "changed description"}}'
 
 ##### Response
 
 Parameters:
 
-- If command is ok, return an empty object '{"POLICY_CHANGE_NAME_RESULT": {}}'
+- If command is ok, return an empty object '{"POLICY_CHANGE_INFO_RESULT": {}}'
 - Otherwise, return a "nok" object with a Policy_Error
-{"POLICY_CHANGE_NAME": {"nok": {\"error\":\"ERROR\"}}}
+{"POLICY_CHANGE_INFO_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Change_Type
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_change_type"
+
+##### Request
+
+Parameters:
+
+user:        User ID
+id:          Policy ID to retrieve information
+type:        New type for the policy
+'{"POLICY_CHANGE_TYPE":{"id": 0, "type": "or"}}'
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an empty object '{"POLICY_CHANGE_TYPE_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CHANGE_TYPE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
 #### Policy_Get
 

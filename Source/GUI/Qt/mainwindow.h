@@ -109,7 +109,8 @@ public:
     int                         policy_import(const QString& file, std::string& err);
     int                         xslt_policy_create(std::string& err);
     int                         policy_duplicate(int id, std::string& err);
-    int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
+    int                         policy_change_info(int id, const std::string& name, const std::string& description, std::string& err);
+    int                         policy_change_type(int id, const std::string& type, std::string& err);
     MediaConchLib::Policy_Policy* policy_get(int pos);
     int                         policy_save(int pos, std::string& err);
     int                         policy_get_name(int pos, std::string& name, std::string& err);

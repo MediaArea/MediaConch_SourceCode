@@ -480,9 +480,9 @@ public:
         std::string to_str() const;
     };
 
-    struct Policy_Change_Name_Req
+    struct Policy_Change_Info_Req
     {
-        Policy_Change_Name_Req() : user(-1), id(-1) {}
+        Policy_Change_Info_Req() : user(-1), id(-1) {}
         int          user;
         int          id;
         std::string  name;
@@ -490,10 +490,27 @@ public:
         std::string  to_str() const;
     };
 
-    struct Policy_Change_Name_Res
+    struct Policy_Change_Info_Res
     {
-        Policy_Change_Name_Res() : nok(NULL) {}
-        ~Policy_Change_Name_Res();
+        Policy_Change_Info_Res() : nok(NULL) {}
+        ~Policy_Change_Info_Res();
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Change_Type_Req
+    {
+        Policy_Change_Type_Req() : user(-1), id(-1) {}
+        int          user;
+        int          id;
+        std::string  type;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Change_Type_Res
+    {
+        Policy_Change_Type_Res() : nok(NULL) {}
+        ~Policy_Change_Type_Res();
         Policy_Nok  *nok;
         std::string  to_str() const;
     };
@@ -733,7 +750,8 @@ public:
     int serialize_policy_dump_req(Policy_Dump_Req& req, std::string&);
     int serialize_policy_save_req(Policy_Save_Req& req, std::string&);
     int serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string&);
-    int serialize_policy_change_name_req(Policy_Change_Name_Req& req, std::string&);
+    int serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string&);
+    int serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string&);
     int serialize_policy_get_req(Policy_Get_Req& req, std::string&);
     int serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string&);
     int serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string&);
@@ -765,7 +783,8 @@ public:
     int serialize_policy_dump_res(Policy_Dump_Res& res, std::string&);
     int serialize_policy_save_res(Policy_Save_Res& res, std::string&);
     int serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string&);
-    int serialize_policy_change_name_res(Policy_Change_Name_Res& res, std::string&);
+    int serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string&);
+    int serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string&);
     int serialize_policy_get_res(Policy_Get_Res& res, std::string&);
     int serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string&);
     int serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string&);
@@ -796,7 +815,8 @@ public:
     Policy_Dump_Req                     *parse_policy_dump_req(const std::string&);
     Policy_Save_Req                     *parse_policy_save_req(const std::string&);
     Policy_Duplicate_Req                *parse_policy_duplicate_req(const std::string&);
-    Policy_Change_Name_Req              *parse_policy_change_name_req(const std::string&);
+    Policy_Change_Info_Req              *parse_policy_change_info_req(const std::string&);
+    Policy_Change_Type_Req              *parse_policy_change_type_req(const std::string&);
     Policy_Get_Req                      *parse_policy_get_req(const std::string&);
     Policy_Get_Name_Req                 *parse_policy_get_name_req(const std::string&);
     Policy_Get_Policies_Count_Req       *parse_policy_get_policies_count_req(const std::string&);
@@ -828,7 +848,8 @@ public:
     Policy_Dump_Req                     *parse_uri_policy_dump_req(const std::string&);
     Policy_Save_Req                     *parse_uri_policy_save_req(const std::string&);
     Policy_Duplicate_Req                *parse_uri_policy_duplicate_req(const std::string&);
-    Policy_Change_Name_Req              *parse_uri_policy_change_name_req(const std::string&);
+    Policy_Change_Info_Req              *parse_uri_policy_change_info_req(const std::string&);
+    Policy_Change_Type_Req              *parse_uri_policy_change_type_req(const std::string&);
     Policy_Get_Req                      *parse_uri_policy_get_req(const std::string&);
     Policy_Get_Name_Req                 *parse_uri_policy_get_name_req(const std::string&);
     Policy_Get_Policies_Count_Req       *parse_uri_policy_get_policies_count_req(const std::string&);
@@ -859,7 +880,8 @@ public:
     Policy_Dump_Res                    *parse_policy_dump_res(const std::string&);
     Policy_Save_Res                    *parse_policy_save_res(const std::string&);
     Policy_Duplicate_Res               *parse_policy_duplicate_res(const std::string&);
-    Policy_Change_Name_Res             *parse_policy_change_name_res(const std::string&);
+    Policy_Change_Info_Res             *parse_policy_change_info_res(const std::string&);
+    Policy_Change_Type_Res             *parse_policy_change_type_res(const std::string&);
     Policy_Get_Res                     *parse_policy_get_res(const std::string&);
     Policy_Get_Name_Res                *parse_policy_get_name_res(const std::string&);
     Policy_Get_Policies_Count_Res      *parse_policy_get_policies_count_res(const std::string&);

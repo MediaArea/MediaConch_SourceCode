@@ -99,7 +99,8 @@ namespace MediaConch
         httpd->commands.policy_dump_cb = on_policy_dump_command;
         httpd->commands.policy_remove_cb = on_policy_remove_command;
         httpd->commands.policy_duplicate_cb = on_policy_duplicate_command;
-        httpd->commands.policy_change_name_cb = on_policy_change_name_command;
+        httpd->commands.policy_change_info_cb = on_policy_change_info_command;
+        httpd->commands.policy_change_type_cb = on_policy_change_type_command;
         httpd->commands.policy_get_cb = on_policy_get_command;
         httpd->commands.policy_get_name_cb = on_policy_get_name_command;
         httpd->commands.policy_get_policies_count_cb = on_policy_get_policies_count_command;
@@ -1012,25 +1013,48 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_change_name_command(const RESTAPI::Policy_Change_Name_Req* req,
-                                              RESTAPI::Policy_Change_Name_Res& res, void *arg)
+    int Daemon::on_policy_change_info_command(const RESTAPI::Policy_Change_Info_Req* req,
+                                              RESTAPI::Policy_Change_Info_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
 
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a policy_change_name command: ";
+        std::clog << d->get_date() << "Daemon received a policy_change_info command: ";
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_change_name(req->user, req->id, req->name, req->description, err) < 0)
+        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
         }
 
-        std::clog << d->get_date() << "Daemon send policy_change_name result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send policy_change_info result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_change_type_command(const RESTAPI::Policy_Change_Type_Req* req,
+                                              RESTAPI::Policy_Change_Type_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_change_type command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        if (d->MCL->policy_change_type(req->user, req->id, req->type, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
+        std::clog << d->get_date() << "Daemon send policy_change_type result: " << res.to_str() << std::endl;
         return 0;
     }
 

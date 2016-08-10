@@ -481,7 +481,7 @@ int Policies::clear_policies(int user, std::string&)
     return 0;
 }
 
-int Policies::policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err)
+int Policies::policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
@@ -491,6 +491,23 @@ int Policies::policy_change_name(int user, int id, const std::string& name, cons
     if (p->type == POLICY_XSLT)
         ((XsltPolicy*)p)->node_name = p->name;
     p->description = description;
+
+    return 0;
+}
+
+int Policies::policy_change_type(int user, int id, const std::string& type, std::string& err)
+{
+    Policy *p = get_policy(user, id, err);
+    if (!p)
+        return -1;
+
+    if (p->type != POLICY_XSLT)
+    {
+        err = "Not an XSLT policy";
+        return -1;
+    }
+
+    ((XsltPolicy*)p)->ope = type;
 
     return 0;
 }

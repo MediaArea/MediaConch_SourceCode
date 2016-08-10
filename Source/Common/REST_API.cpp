@@ -139,7 +139,8 @@ DESTRUCTOR_POLICY(Policy_Remove_Res)
 DESTRUCTOR_POLICY(Policy_Dump_Res)
 DESTRUCTOR_POLICY(Policy_Save_Res)
 DESTRUCTOR_POLICY(Policy_Duplicate_Res)
-DESTRUCTOR_POLICY(Policy_Change_Name_Res)
+DESTRUCTOR_POLICY(Policy_Change_Info_Res)
+DESTRUCTOR_POLICY(Policy_Change_Type_Res)
 DESTRUCTOR_POLICY(Policy_Get_Name_Res)
 DESTRUCTOR_POLICY(Policy_Get_Policies_Count_Res)
 DESTRUCTOR_POLICY(Policy_Get_Policies_Names_List_Res)
@@ -387,7 +388,7 @@ std::string RESTAPI::Policy_Duplicate_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Policy_Change_Name_Req::to_str() const
+std::string RESTAPI::Policy_Change_Info_Req::to_str() const
 {
     std::stringstream out;
 
@@ -395,6 +396,18 @@ std::string RESTAPI::Policy_Change_Name_Req::to_str() const
     out << ",\"id\": " << id;
     out << ",\"name\":\"" << name;
     out << "\",\"description\":\"" << description;
+    out << "\"}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Change_Type_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\": " << user;
+    out << ",\"id\": " << id;
+    out << ",\"type\":\"" << type;
     out << "\"}";
     return out.str();
 }
@@ -910,7 +923,19 @@ std::string RESTAPI::Policy_Duplicate_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Policy_Change_Name_Res::to_str() const
+std::string RESTAPI::Policy_Change_Info_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Change_Type_Res::to_str() const
 {
     std::stringstream out;
 
@@ -1393,9 +1418,9 @@ int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::stri
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_name_req(Policy_Change_Name_Req& req, std::string& data)
+int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string& data)
 {
-    Container::Value v, child, name, description, user;
+    Container::Value v, child, name, description, user, id;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -1411,8 +1436,43 @@ int RESTAPI::serialize_policy_change_name_req(Policy_Change_Name_Req& req, std::
     user.l = req.user;
     child.obj["user"] = user;
 
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = req.id;
+    child.obj["id"] = id;
+
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["POLICY_CHANGE_NAME"] = child;
+    v.obj["POLICY_CHANGE_INFO"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string& data)
+{
+    Container::Value v, child, id, type, user;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = req.id;
+    child.obj["id"] = id;
+
+    type.type = Container::Value::CONTAINER_TYPE_STRING;
+    type.s = req.type;
+    child.obj["type"] = type;
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_CHANGE_TYPE"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -2027,7 +2087,7 @@ int RESTAPI::serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::stri
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_name_res(Policy_Change_Name_Res& res, std::string& data)
+int RESTAPI::serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string& data)
 {
     Container::Value v, child, nok;
 
@@ -2037,7 +2097,29 @@ int RESTAPI::serialize_policy_change_name_res(Policy_Change_Name_Res& res, std::
         child.obj["nok"] = serialize_policy_nok(res.nok);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["POLICY_CHANGE_NAME_RESULT"] = child;
+    v.obj["POLICY_CHANGE_INFO_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_CHANGE_TYPE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -2889,7 +2971,7 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::st
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_policy_change_name_req(const std::string& data)
+RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -2899,7 +2981,7 @@ RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_policy_change_name_req(const std
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "POLICY_CHANGE_NAME");
+    child = model->get_value_by_key(v, "POLICY_CHANGE_INFO");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
@@ -2912,13 +2994,47 @@ RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_policy_change_name_req(const std
         return NULL;
 
     Container::Value *desc = model->get_value_by_key(*child, "description");
-    if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
+    if (!desc || desc->type != Container::Value::CONTAINER_TYPE_STRING)
         return NULL;
 
-    Policy_Change_Name_Req *req = new Policy_Change_Name_Req;
+    Policy_Change_Info_Req *req = new Policy_Change_Info_Req;
     req->id = id->l;
     req->name = name->s;
     req->description = desc->s;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_policy_change_type_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_CHANGE_TYPE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Container::Value *type = model->get_value_by_key(*child, "type");
+    if (!type || type->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Policy_Change_Type_Req *req = new Policy_Change_Type_Req;
+    req->id = id->l;
+    req->type = type->s;
 
     Container::Value *user = model->get_value_by_key(*child, "user");
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
@@ -3707,9 +3823,9 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_uri_policy_change_name_req(const std::string& uri)
+RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const std::string& uri)
 {
-    Policy_Change_Name_Req *req = new Policy_Change_Name_Req;
+    Policy_Change_Info_Req *req = new Policy_Change_Info_Req;
 
     size_t start = 0;
     size_t and_pos = 0;
@@ -3756,6 +3872,57 @@ RESTAPI::Policy_Change_Name_Req *RESTAPI::parse_uri_policy_change_name_req(const
                 continue;
 
             req->description = val;
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_uri_policy_change_type_req(const std::string& uri)
+{
+    Policy_Change_Type_Req *req = new Policy_Change_Type_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos);
+
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "type")
+        {
+            if (!val.length())
+                continue;
+
+            req->type = val;
         }
         else
             start = std::string::npos;
@@ -4880,7 +5047,7 @@ RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::st
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Name_Res *RESTAPI::parse_policy_change_name_res(const std::string& data)
+RESTAPI::Policy_Change_Info_Res *RESTAPI::parse_policy_change_info_res(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -4890,11 +5057,38 @@ RESTAPI::Policy_Change_Name_Res *RESTAPI::parse_policy_change_name_res(const std
         return NULL;
     }
 
-    child = model->get_value_by_key(v, "POLICY_CHANGE_NAME_RESULT");
+    child = model->get_value_by_key(v, "POLICY_CHANGE_INFO_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Policy_Change_Name_Res *res = new Policy_Change_Name_Res;
+    Policy_Change_Info_Res *res = new Policy_Change_Info_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Type_Res *RESTAPI::parse_policy_change_type_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_CHANGE_TYPE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Change_Type_Res *res = new Policy_Change_Type_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
     if (parse_policy_nok(nok, &res->nok))

@@ -55,7 +55,8 @@ public:
     int send_request(RESTAPI::Policy_Dump_Req& req);
     int send_request(RESTAPI::Policy_Save_Req& req);
     int send_request(RESTAPI::Policy_Duplicate_Req& req);
-    int send_request(RESTAPI::Policy_Change_Name_Req& req);
+    int send_request(RESTAPI::Policy_Change_Info_Req& req);
+    int send_request(RESTAPI::Policy_Change_Type_Req& req);
     int send_request(RESTAPI::Policy_Get_Req& req);
     int send_request(RESTAPI::Policy_Get_Name_Req& req);
     int send_request(RESTAPI::Policy_Get_Policies_Count_Req& req);

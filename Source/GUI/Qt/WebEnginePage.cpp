@@ -1104,12 +1104,12 @@ namespace MediaConch
         return json;
     }
 
-    QString WebPage::policy_change_name(int id, const QString& name, const QString& description)
+    QString WebPage::policy_change_info(int id, const QString& name, const QString& description)
     {
         //return: error?
         QString json;
         std::string err;
-        if (mainwindow->policy_change_name((size_t)id, name.toUtf8().data(), description.toUtf8().data(), err) < 0)
+        if (mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(), err) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1119,6 +1119,26 @@ namespace MediaConch
 
         mainwindow->policy_save(id, err);
         json = QString("{\"policyName\":\"%1\",\"policyDescription\":\"%2\"}").arg(name).arg(description);
+        return json;
+    }
+
+    QString WebPage::policy_change_type(int id, const QString& type)
+    {
+        //return: error?
+        QString json;
+        std::string err;
+        if (mainwindow->policy_change_type((size_t)id, type.toUtf8().data(), err) < 0)
+        {
+            QString error = QString().fromUtf8(err.c_str(), err.length());
+            string_to_json(error);
+            json = QString("{\"error\":\"%1\"}").arg(error);
+            return json;
+        }
+
+        mainwindow->policy_save(id, err);
+        QString n = type;
+        string_to_json(n);
+        json = QString("{\"policyType\":\"%1\"}").arg(n);
         return json;
     }
 

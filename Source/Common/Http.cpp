@@ -223,13 +223,25 @@ int Http::send_request(RESTAPI::Policy_Duplicate_Req& req)
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Change_Name_Req& req)
+int Http::send_request(RESTAPI::Policy_Change_Info_Req& req)
 {
     std::string cmd;
-    rest.serialize_policy_change_name_req(req, cmd);
+    rest.serialize_policy_change_info_req(req, cmd);
     std::stringstream uri;
 
-    uri << "/" << RESTAPI::API_VERSION << "/policy_change_name";
+    uri << "/" << RESTAPI::API_VERSION << "/policy_change_info";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Policy_Change_Type_Req& req)
+{
+    std::string cmd;
+    rest.serialize_policy_change_type_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/policy_change_type";
     std::string uri_str = uri.str();
     return send_request_post(uri_str, cmd);
 }

@@ -748,12 +748,12 @@ int DaemonClient::policy_dump(int user, int id, std::string& memory, std::string
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err)
+int DaemonClient::policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
-    RESTAPI::Policy_Change_Name_Req req;
+    RESTAPI::Policy_Change_Info_Req req;
     req.id = id;
     req.name = name;
     req.description = description;
@@ -773,7 +773,47 @@ int DaemonClient::policy_change_name(int user, int id, const std::string& name, 
         return http_client->get_error();
 
     RESTAPI rest;
-    RESTAPI::Policy_Change_Name_Res *res = rest.parse_policy_change_name_res(data);
+    RESTAPI::Policy_Change_Info_Res *res = rest.parse_policy_change_info_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    ret = -1;
+    if (!res->nok)
+        ret = 0;
+    else
+        err = res->nok->error;
+
+    delete res;
+    res = NULL;
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::policy_change_type(int user, int id, const std::string& type, std::string& err)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Policy_Change_Type_Req req;
+    req.id = id;
+    req.type = type;
+    req.user = user;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Policy_Change_Type_Res *res = rest.parse_policy_change_type_res(data);
     if (!res)
         return MediaConchLib::errorHttp_INVALID_DATA;
 

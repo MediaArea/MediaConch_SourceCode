@@ -48,7 +48,8 @@ public:
     REQ_FUNC(Checker_File_From_Id);
     REQ_FUNC(Checker_Retry);
     REQ_FUNC(Policy_Import);
-    REQ_FUNC(Policy_Change_Name);
+    REQ_FUNC(Policy_Change_Info);
+    REQ_FUNC(Policy_Change_Type);
     REQ_FUNC(XSLT_Policy_Rule_Edit);
 #undef REQ_FUNC
 
@@ -119,8 +120,10 @@ public:
                                           RESTAPI::Policy_Save_Res& res, void* arg);
     typedef int (*on_policy_duplicate_command)(const RESTAPI::Policy_Duplicate_Req* req,
                                                RESTAPI::Policy_Duplicate_Res& res, void* arg);
-    typedef int (*on_policy_change_name_command)(const RESTAPI::Policy_Change_Name_Req* req,
-                                                 RESTAPI::Policy_Change_Name_Res& res, void* arg);
+    typedef int (*on_policy_change_info_command)(const RESTAPI::Policy_Change_Info_Req* req,
+                                                 RESTAPI::Policy_Change_Info_Res& res, void* arg);
+    typedef int (*on_policy_change_type_command)(const RESTAPI::Policy_Change_Type_Req* req,
+                                                 RESTAPI::Policy_Change_Type_Res& res, void* arg);
     typedef int (*on_policy_get_command)(const RESTAPI::Policy_Get_Req* req,
                                          RESTAPI::Policy_Get_Res& res, void* arg);
     typedef int (*on_policy_get_name_command)(const RESTAPI::Policy_Get_Name_Req* req,
@@ -158,7 +161,8 @@ public:
                      policy_dump_cb(NULL),
                      policy_save_cb(NULL),
                      policy_duplicate_cb(NULL),
-                     policy_change_name_cb(NULL),
+                     policy_change_info_cb(NULL),
+                     policy_change_type_cb(NULL),
                      policy_get_cb(NULL),
                      policy_get_name_cb(NULL),
                      policy_get_policies_count_cb(NULL),
@@ -190,7 +194,8 @@ public:
         on_policy_dump_command policy_dump_cb;
         on_policy_save_command policy_save_cb;
         on_policy_duplicate_command policy_duplicate_cb;
-        on_policy_change_name_command policy_change_name_cb;
+        on_policy_change_info_command policy_change_info_cb;
+        on_policy_change_type_command policy_change_type_cb;
         on_policy_get_command policy_get_cb;
         on_policy_get_name_command policy_get_name_cb;
         on_policy_get_policies_count_command policy_get_policies_count_cb;

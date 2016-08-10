@@ -460,11 +460,19 @@ int MediaConchLib::policy_save(int user, int pos, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err)
+int MediaConchLib::policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_change_name(user, id, name, description, err);
-    return core->policies.policy_change_name(user, id, name, description, err);
+        return daemon_client->policy_change_info(user, id, name, description, err);
+    return core->policies.policy_change_info(user, id, name, description, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::policy_change_type(int user, int id, const std::string& type, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->policy_change_type(user, id, type, err);
+    return core->policies.policy_change_type(user, id, type, err);
 }
 
 //---------------------------------------------------------------------------

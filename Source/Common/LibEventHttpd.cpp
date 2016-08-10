@@ -692,9 +692,9 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_policy_import_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/policy_change_name").compare(uri_path))
+    else if (!std::string("/policy_change_info").compare(uri_path))
     {
-        RESTAPI::Policy_Change_Name_Req *r = NULL;
+        RESTAPI::Policy_Change_Info_Req *r = NULL;
         get_request(json, &r);
         if (!r)
         {
@@ -703,8 +703,8 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        RESTAPI::Policy_Change_Name_Res res;
-        if (commands.policy_change_name_cb && commands.policy_change_name_cb(r, res, parent) < 0)
+        RESTAPI::Policy_Change_Info_Res res;
+        if (commands.policy_change_info_cb && commands.policy_change_info_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -713,7 +713,31 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_change_name_res(res, result) < 0)
+        if (rest.serialize_policy_change_info_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_change_type").compare(uri_path))
+    {
+        RESTAPI::Policy_Change_Type_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Change_Type_Res res;
+        if (commands.policy_change_type_cb && commands.policy_change_type_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_change_type_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (!std::string("/xslt_policy_rule_edit").compare(uri_path))

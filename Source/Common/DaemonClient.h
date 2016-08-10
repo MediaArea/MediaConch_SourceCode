@@ -96,7 +96,10 @@ public:
     int policy_duplicate(int user, int id, std::string& err);
 
     // change name && description
-    int policy_change_name(int user, int id, const std::string& name, const std::string& description, std::string& err);
+    int policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
+
+    // change type
+    int policy_change_type(int user, int id, const std::string& type, std::string& err);
 
     // get policy
     MediaConchLib::Policy_Policy* policy_get(int user, int id, const std::string& format, std::string& err);
