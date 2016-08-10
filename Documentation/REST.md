@@ -520,20 +520,22 @@ Parameters:
 Parameters:
 
 URI format for the parameters.
-URL: /$API_VERSION/policy_get?id=0
+URL: /$API_VERSION/policy_get?id=0&format=JSTREE
 
 ##### Request
 
 Parameters:
 
-user:  User ID
-id:    Policy ID
+user:   User ID
+id:     Policy ID
+format: Output format, can be "JSTREE" or "JSON"
 
 ##### Response
 
 Parameters:
 
-- if command is ok, return a Policy_Policy: '{"POLICY_GET_RESULT": {"policy": {"type": "and", "id": 0, "description": "", "parent_id": -1, "name": "New policy", "is_system": false}}}'
+- if command is ok, if format is JSON, return a Policy_Policy: '{"POLICY_GET_RESULT": {"policy": {"type": "and", "id": 0, "description": "", "parent_id": -1, "name": "New policy", "is_system": false}}}'
+- if command is ok, if format is JSTREE, return a string with policy tree: '{"POLICY_GET_RESULT": "{\"policyTree\": {\"type\": \"p\", \"text\": \"New policy\", \"data\": {\"kind\":\"XSLT\",\"policyId\": 0, \"description\": \"\", \"parent_id\": -1, \"isEditable\": true,\"type\":\"or\"},\"children\":[]}}"}'
 - otherwise, return a "nok" object with a Policy_Error
 {"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error":"ERROR"}}}
 
@@ -569,7 +571,7 @@ Parameters:
 
 user:   User ID
 id:     Policy ID (can be cumulated), if not present, return all policies
-format: output format, can be "JSTREE" or "JSON"
+format: Output format, can be "JSTREE" or "JSON"
 
 ##### Response
 

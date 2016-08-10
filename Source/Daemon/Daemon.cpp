@@ -1071,18 +1071,16 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        MediaConchLib::Policy_Policy* p = d->MCL->policy_get(req->user, req->id, req->format, err);
-        if (!p)
+        MediaConchLib::Get_Policy p;
+        if (d->MCL->policy_get(req->user, req->id, req->format, p, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
         }
-        else
-        {
-            res.policy = new MediaConchLib::Policy_Policy(p);
-            delete p;
-            p = NULL;
-        }
+        else if (p.format == "JSTREE" && p.jstree)
+            res.policyTree = *p.jstree;
+        else if (p.policy)
+            res.policy = new MediaConchLib::Policy_Policy(p.policy);
 
         std::clog << d->get_date() << "Daemon send policy_get result: " << res.to_str() << std::endl;
         return 0;

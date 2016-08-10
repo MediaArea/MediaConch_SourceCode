@@ -476,12 +476,12 @@ int MediaConchLib::policy_change_type(int user, int id, const std::string& type,
 }
 
 //---------------------------------------------------------------------------
-MediaConchLib::Policy_Policy* MediaConchLib::policy_get(int user, int id, const std::string& format, std::string& err)
+int MediaConchLib::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_get(user, id, format, err);
+        return daemon_client->policy_get(user, id, format, policy, err);
 
-    return core->policies.policy_get(user, id, err);
+    return core->policies.policy_get(user, id, format, policy, err);
 }
 
 //---------------------------------------------------------------------------

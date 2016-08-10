@@ -147,18 +147,19 @@ public:
 
     struct Get_Policies
     {
-        Get_Policies() : policies(NULL) {}
+    Get_Policies() : policies(NULL) {}
+
         ~Get_Policies()
         {
-            if (format == "JSTREE" && policies)
+            if (format == "JSTREE" && jstree)
+                delete jstree;
+            else if (policies)
             {
                 for (size_t i = 0; i < policies->size(); ++i)
                     delete policies->at(i);
                 policies->clear();
                 delete policies;
             }
-            else if (jstree)
-                delete jstree;
         }
 
         std::string                      format;
@@ -166,6 +167,26 @@ public:
         {
             std::vector<Policy_Policy*>* policies;
             std::string*                 jstree;
+        };
+    };
+
+    struct Get_Policy
+    {
+        Get_Policy() : policy(NULL) {}
+
+        ~Get_Policy()
+        {
+            if (format == "JSTREE" && jstree)
+                delete jstree;
+            else if (policy)
+                delete policy;
+        }
+
+        std::string          format;
+        union
+        {
+            Policy_Policy   *policy;
+            std::string     *jstree;
         };
     };
 
@@ -248,7 +269,7 @@ public:
 
     //   Policy helper
     size_t                       policy_get_policies_count(int user) const;
-    Policy_Policy*               policy_get(int user, int pos, const std::string& format, std::string& err);
+    int                          policy_get(int user, int pos, const std::string& format, Get_Policy&, std::string& err);
     int                          policy_get_name(int user, int id, std::string& name, std::string& err);
     void                         policy_get_policies(int user, const std::vector<int>&, const std::string& format, Get_Policies&);
     void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);

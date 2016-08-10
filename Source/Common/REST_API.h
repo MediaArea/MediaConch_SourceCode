@@ -529,6 +529,7 @@ public:
         Policy_Get_Res() : policy(NULL), nok(NULL) {}
         ~Policy_Get_Res();
         MediaConchLib::Policy_Policy *policy;
+        std::string                   policyTree;
         Policy_Nok                   *nok;
         std::string  to_str() const;
     };

@@ -829,10 +829,10 @@ int DaemonClient::policy_change_type(int user, int id, const std::string& type, 
 }
 
 //---------------------------------------------------------------------------
-MediaConchLib::Policy_Policy* DaemonClient::policy_get(int user, int id, const std::string& format, std::string& err)
+int DaemonClient::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
 {
     if (!http_client)
-        return NULL;
+        return -1;
 
     RESTAPI::Policy_Get_Req req;
     req.id = id;
@@ -841,31 +841,42 @@ MediaConchLib::Policy_Policy* DaemonClient::policy_get(int user, int id, const s
 
     int ret = http_client->start();
     if (ret < 0)
-        return NULL;
+        return -1;
 
     ret = http_client->send_request(req);
     if (ret < 0)
-        return NULL;
+        return -1;
 
     std::string data = http_client->get_result();
     http_client->stop();
     if (!data.length())
-        return NULL;
+        return -1;
 
     RESTAPI rest;
     RESTAPI::Policy_Get_Res *res = rest.parse_policy_get_res(data);
     if (!res)
-        return NULL;
+        return -1;
 
-    MediaConchLib::Policy_Policy *p = NULL;
-    if (!res->nok)
-        p = new MediaConchLib::Policy_Policy(res->policy);
-    else
+    if (res->nok)
+    {
         err = res->nok->error;
+        delete res;
+        return -1;
+    }
+    else if (res->policy)
+    {
+        policy.format = format;
+        policy.policy = new MediaConchLib::Policy_Policy(res->policy);
+    }
+    else if (res->policyTree.size())
+    {
+        policy.jstree = new std::string;
+        *policy.jstree = res->policyTree;
+    }
 
     delete res;
     res = NULL;
-    return p;
+    return 0;
 }
 
 //---------------------------------------------------------------------------

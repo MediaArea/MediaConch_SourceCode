@@ -315,11 +315,25 @@ MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std
     return p;
 }
 
-MediaConchLib::Policy_Policy* Policies::policy_get(int user, int id, std::string& err)
+int Policies::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
 
-    return policy_to_mcl_policy(p, err);
+    MediaConchLib::Policy_Policy *pp = policy_to_mcl_policy(p, err);
+
+    policy.format = format;
+    if (format == "JSTREE")
+    {
+        std::string json;
+        if (JsTree::policy_to_js_tree(pp, json, err) < 0)
+            return -1;
+        policy.jstree = new std::string;
+        *policy.jstree = "{\"policyTree\":" + json + "}";
+    }
+    else
+        policy.policy = pp;
+
+    return 0;
 }
 
 int Policies::policy_get_name(int user, int id, std::string& name, std::string& err)
@@ -376,6 +390,7 @@ void Policies::get_policies(int user, const std::vector<int>& ids, const std::st
             vec.push_back(p);
     }
 
+    ps.format = format;
     if (format == "JSTREE")
     {
         std::string err;

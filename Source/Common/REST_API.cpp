@@ -160,6 +160,7 @@ RESTAPI::Policy_Get_Policies_Res::~Policy_Get_Policies_Res()
     for (size_t i = 0; i < policies.size(); ++i)
         delete policies[i];
     policies.clear();
+
     if (nok)
     {
         delete nok;
@@ -956,6 +957,8 @@ std::string RESTAPI::Policy_Get_Res::to_str() const
         out << nok->to_str();
     else if (policy)
         out << "\"policy\":" << policy->to_str();
+    else if (policyTree.size())
+        out << "\"policyTree\":\"" << policyTree << "\"";
     out << "}";
     return out.str();
 }
@@ -2133,7 +2136,7 @@ int RESTAPI::serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data)
 {
-    Container::Value v, child, policy, nok;
+    Container::Value v, child, policy, policyTree, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -2143,6 +2146,11 @@ int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data)
     {
         serialize_a_policy(res.policy, policy);
         child.obj["policy"] = policy;
+    }
+    else if (res.policyTree.size())
+    {
+        child.type = Container::Value::CONTAINER_TYPE_STRING;
+        child.s = res.policyTree;
     }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -3191,7 +3199,7 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const s
 }
 
 //---------------------------------------------------------------------------
-    RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_policy_get_policies_names_list_req(const std::string& data)
+RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_policy_get_policies_names_list_req(const std::string& data)
 {
     Container::Value v, *child;
 
@@ -5118,16 +5126,28 @@ RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
     Policy_Get_Res *res = new Policy_Get_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
+    Container::Value *policy = model->get_value_by_key(*child, "policy");
+    Container::Value *policyTree = model->get_value_by_key(*child, "policyTree");
+
     if (nok && parse_policy_nok(nok, &res->nok))
     {
         delete res;
         return NULL;
     }
-    Container::Value *policy = model->get_value_by_key(*child, "policy");
-    if ((res->policy = parse_a_policy(policy)) == NULL)
+
+    else if (policy && (res->policy = parse_a_policy(policy)) == NULL)
     {
         delete res;
         return NULL;
+    }
+
+    else if (policyTree && policyTree->type == Container::Value::CONTAINER_TYPE_STRING)
+        res->policyTree = policyTree->s;
+
+    else
+    {
+        delete res;
+        return NULL;;
     }
 
     return res;
