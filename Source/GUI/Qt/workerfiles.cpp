@@ -528,8 +528,8 @@ void WorkerFiles::fill_registered_files_from_db()
         full_file += fr->filename;
 
         //check if policy still exists
-        MediaConchLib::Policy_Policy *p = mainwindow->policy_get(fr->policy);
-        if (!p)
+        MediaConchLib::Get_Policy p;
+        if (mainwindow->policy_get(fr->policy, p) < 0)
             fr->policy = -1;
 
         fr->index = file_index++;

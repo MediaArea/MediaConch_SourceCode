@@ -618,7 +618,18 @@ std::string MediaConchLib::Policy_Policy::to_str() const
     out << ",\"kind\":\"" << kind;
     out << "\",\"type\":\"" << type;
     out << "\",\"name\":\"" << name;
-    out << "\",\"description\":\"" << description << "\"}";
+    out << "\",\"description\":\"" << description;
+    out << "\",\"children\":[";
+    for (size_t i = 0; i < children.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        if (children[i].first == 0 && children[i].second.policy)
+            out << children[i].second.policy->to_str();
+        else if (children[i].first == 1 && children[i].second.rule)
+            out << children[i].second.rule->to_str();
+    }
+    out << "]}";
     return out.str();
 }
 

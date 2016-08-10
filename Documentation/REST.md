@@ -534,7 +534,7 @@ format: Output format, can be "JSTREE" or "JSON"
 
 Parameters:
 
-- if command is ok, if format is JSON, return a Policy_Policy: '{"POLICY_GET_RESULT": {"policy": {"type": "and", "id": 0, "description": "", "parent_id": -1, "name": "New policy", "is_system": false}}}'
+- if command is ok, if format is JSON, return a Policy_Policy: '{"POLICY_GET_RESULT": {"policy": {"type": "and", "id": 0, "description": "", "parent_id": -1, "name": "New policy", "is_system": false, "children":[]}}}'
 - if command is ok, if format is JSTREE, return a string with policy tree: '{"POLICY_GET_RESULT": "{\"policyTree\": {\"type\": \"p\", \"text\": \"New policy\", \"data\": {\"kind\":\"XSLT\",\"policyId\": 0, \"description\": \"\", \"parent_id\": -1, \"isEditable\": true,\"type\":\"or\"},\"children\":[]}}"}'
 - otherwise, return a "nok" object with a Policy_Error
 {"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error":"ERROR"}}}
@@ -794,8 +794,9 @@ Parameters:
 * type:        string containing the policy operator (optional; value: "and", "or"; default is "and")
 * is_system:   boolean set to true if it is a system policy
 * description: string containing the name of the policy (optional)
+* children:    list of children of the policy (sub-policies, rules)
 
-{"id":0, "parent_id":-1, "name": "NAME", "description":"", "type":"and"}
+{"id":0, "parent_id":-1, "name": "NAME", "description":"", "type":"and", "children":[]}
 
 #### XSLT_Policy_Rule
 

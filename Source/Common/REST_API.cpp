@@ -5815,7 +5815,7 @@ Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
 //---------------------------------------------------------------------------
 void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v)
 {
-    Container::Value id, parent_id, is_system, kind, type, name, description;
+    Container::Value id, parent_id, is_system, kind, type, name, description, children;
 
     ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -5846,6 +5846,55 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
     description.type = Container::Value::CONTAINER_TYPE_STRING;
     description.s = policy->description;
     ok_v.obj["description"] = description;
+
+    children.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < policy->children.size(); ++i)
+    {
+        Container::Value v;
+        if (policy->children[i].first == 0)
+            serialize_a_policy(policy->children[i].second.policy, v);
+        else if (policy->children[i].first == 1)
+            serialize_a_xslt_policy_rule(policy->children[i].second.rule, v);
+
+        children.array.push_back(v);
+    }
+    ok_v.obj["children"] = children;
+}
+
+//---------------------------------------------------------------------------
+void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v)
+{
+    Container::Value id, name, tracktype, field, occurrence, ope, value;
+
+    ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = rule->id;
+    ok_v.obj["id"] = id;
+
+    name.type = Container::Value::CONTAINER_TYPE_STRING;
+    name.s = rule->name;
+    ok_v.obj["name"] = name;
+
+    tracktype.type = Container::Value::CONTAINER_TYPE_STRING;
+    tracktype.s = rule->tracktype;
+    ok_v.obj["tracktype"] = tracktype;
+
+    field.type = Container::Value::CONTAINER_TYPE_STRING;
+    field.s = rule->field;
+    ok_v.obj["field"] = field;
+
+    occurrence.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    occurrence.l = rule->occurrence;
+    ok_v.obj["occurrence"] = occurrence;
+
+    ope.type = Container::Value::CONTAINER_TYPE_STRING;
+    ope.s = rule->ope;
+    ok_v.obj["ope"] = ope;
+
+    value.type = Container::Value::CONTAINER_TYPE_STRING;
+    value.s = rule->value;
+    ok_v.obj["value"] = value;
 }
 
 //---------------------------------------------------------------------------
@@ -6244,6 +6293,79 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
     Container::Value *description = model->get_value_by_key(*policy, "description");
     if (description && description->type == Container::Value::CONTAINER_TYPE_STRING)
         ok->description = description->s;
+
+    Container::Value *children = model->get_value_by_key(*policy, "children");
+    if (children && children->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < children->array.size(); ++i)
+        {
+            if (children->array[i].type != Container::Value::CONTAINER_TYPE_OBJECT)
+                continue;
+
+            //If kind is not present, it is a rule
+            Container::Value *child_kind = model->get_value_by_key(children->array[i], "kind");
+            if (child_kind)
+            {
+                MediaConchLib::Policy_Policy* p = parse_a_policy(&children->array[i]);
+                if (!p)
+                    continue;
+
+                MediaConchLib::XSLT_Child child;
+                child.policy = p;
+                ok->children.push_back(std::make_pair(0, child));
+            }
+            else
+            {
+                MediaConchLib::XSLT_Policy_Rule* r = parse_a_xslt_policy_rule(&children->array[i]);
+                if (!r)
+                    continue;
+
+                MediaConchLib::XSLT_Child child;
+                child.rule = r;
+                ok->children.push_back(std::make_pair(0, child));
+            }
+        }
+    }
+
+    return ok;
+}
+
+//---------------------------------------------------------------------------
+MediaConchLib::XSLT_Policy_Rule* RESTAPI::parse_a_xslt_policy_rule(Container::Value *rule)
+{
+    if (!rule || rule->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*rule, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    MediaConchLib::XSLT_Policy_Rule *ok = new MediaConchLib::XSLT_Policy_Rule;
+    ok->id = id->l;
+
+    Container::Value *name = model->get_value_by_key(*rule, "name");
+    if (name && name->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->name = name->s;
+
+    Container::Value *tracktype = model->get_value_by_key(*rule, "tracktype");
+    if (tracktype && tracktype->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->tracktype = tracktype->s;
+
+    Container::Value *field = model->get_value_by_key(*rule, "field");
+    if (field && field->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->field = field->s;
+
+    Container::Value *occurrence = model->get_value_by_key(*rule, "occurrence");
+    if (occurrence && occurrence->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        ok->occurrence = occurrence->l;
+
+    Container::Value *ope = model->get_value_by_key(*rule, "ope");
+    if (ope && ope->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->ope = ope->s;
+
+    Container::Value *value = model->get_value_by_key(*rule, "value");
+    if (value && value->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->value = value->s;
 
     return ok;
 }

@@ -761,10 +761,10 @@ int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, std::string&
 }
 
 //---------------------------------------------------------------------------
-MediaConchLib::Policy_Policy* MainWindow::policy_get(int pos)
+int MainWindow::policy_get(int pos, MediaConchLib::Get_Policy& p)
 {
     std::string err;
-    return MCL.policy_get(-1, pos, "JSON", err);
+    return MCL.policy_get(-1, pos, "JSON", p, err);
 }
 
 //---------------------------------------------------------------------------

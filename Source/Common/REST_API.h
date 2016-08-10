@@ -921,6 +921,7 @@ private:
     void serialize_policies_get_policies(const std::vector<MediaConchLib::Policy_Policy*>&, Container::Value& policies);
     void serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p);
     void serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v);
+    void serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v);
 
     int parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args);
     int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
@@ -934,6 +935,7 @@ private:
     int parse_policies_get_policies(Container::Value* policies, std::vector<MediaConchLib::Policy_Policy*>&);
     int parse_policies_get_policies_names(Container::Value* policies, std::vector<std::pair<int, std::string> >&);
     MediaConchLib::Policy_Policy* parse_a_policy(Container::Value* policy);
+    MediaConchLib::XSLT_Policy_Rule* parse_a_xslt_policy_rule(Container::Value* rule);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

@@ -1027,8 +1027,8 @@ namespace MediaConch
             return json;
         }
 
-        MediaConchLib::Policy_Policy *p = mainwindow->policy_get(ret);
-        if (!p)
+        MediaConchLib::Get_Policy p;
+        if (mainwindow->policy_get(ret, p) < 0)
         {
             json = "{\"error\":\"Cannot duplicate the policy\"}";
             return json;
