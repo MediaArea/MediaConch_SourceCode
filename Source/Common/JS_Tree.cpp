@@ -492,7 +492,7 @@ int JsTree::rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& 
     ss << "\",\"occurrence\":" << rule->occurrence;
     ss << ",\"ope\":\"" << rule->ope;
     ss << "\",\"value\":\"" << rule->value;
-    ss <<"}}";
+    ss <<"\"}}";
 
     json = ss.str();
     return 0;
