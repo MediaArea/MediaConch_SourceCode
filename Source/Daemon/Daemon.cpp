@@ -69,6 +69,10 @@ namespace MediaConch
         if (!MCL->get_implementation_schema_file().length())
             MCL->create_default_implementation_schema();
 
+        // Load policy
+        MCL->load_system_policy();
+        MCL->load_existing_policy();
+
         httpd = new LibEventHttpd(this);
         int port = -1;
         std::string address;

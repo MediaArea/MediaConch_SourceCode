@@ -48,6 +48,17 @@ XsltPolicyNode::XsltPolicyNode(const XsltPolicyNode* n)
     this->node_name = n->node_name + "_copy";
 }
 
+//---------------------------------------------------------------------------
+XsltPolicyNode::XsltPolicyNode(const XsltPolicyNode& n)
+{
+    if (&n == this)
+        return;
+
+    this->kind = n.kind;
+    this->parent_id = n.parent_id;
+    this->node_name = n.node_name;
+}
+
 //***************************************************************************
 // XsltPolicyRule
 //***************************************************************************
@@ -76,6 +87,20 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule* r) : XsltPolicyNode(r)
     this->field      = r->field;
     this->occurrence = r->occurrence;
     this->value      = r->value;
+}
+
+//---------------------------------------------------------------------------
+XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule& r) : XsltPolicyNode(r)
+{
+    if (&r == this)
+        return;
+
+    this->id         = r.id;
+    this->ope        = r.ope;
+    this->track_type = r.track_type;
+    this->field      = r.field;
+    this->occurrence = r.occurrence;
+    this->value      = r.value;
 }
 
 //---------------------------------------------------------------------------
@@ -119,6 +144,32 @@ XsltPolicy::XsltPolicy(const XsltPolicy* s) : Policy(s), XsltPolicyNode(s)
             node = new XsltPolicy((XsltPolicy*)s->nodes[i]);
         else
             node = new XsltPolicyRule((XsltPolicyRule*)s->nodes[i]);
+        node->parent_id = this->id;
+        this->nodes.push_back(node);
+    }
+}
+
+//---------------------------------------------------------------------------
+XsltPolicy::XsltPolicy(const XsltPolicy& s) : Policy(s), XsltPolicyNode(s)
+{
+    if (&s == this)
+        return;
+
+    this->type        = Policies::POLICY_XSLT;
+
+    this->ope         = s.ope;
+    this->name        = this->node_name;
+
+    for (size_t i = 0; i < s.nodes.size(); ++i)
+    {
+        if (!s.nodes[i])
+            continue;
+
+        XsltPolicyNode *node = NULL;
+        if (s.nodes[i]->kind == XSLT_POLICY_POLICY)
+            node = new XsltPolicy(*(XsltPolicy*)s.nodes[i]);
+        else
+            node = new XsltPolicyRule(*(XsltPolicyRule*)s.nodes[i]);
         node->parent_id = this->id;
         this->nodes.push_back(node);
     }

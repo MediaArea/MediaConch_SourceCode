@@ -46,6 +46,20 @@ Policy::Policy(const Policy* p)
 }
 
 //---------------------------------------------------------------------------
+Policy::Policy(const Policy& p)
+{
+    if (&p == this)
+        return;
+
+    this->name = p.name;
+    this->description = p.description;
+    this->is_system = p.is_system;
+    this->no_https = p.no_https;
+    this->policies = p.policies;
+    this->id = p.id;
+}
+
+//---------------------------------------------------------------------------
 Policy::~Policy()
 {
 }

@@ -97,7 +97,6 @@ public:
     void                        policies_selected();
     void                        display_selected();
     void                        settings_selected();
-    void                        add_default_policy();
     void                        add_default_displays();
     void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);

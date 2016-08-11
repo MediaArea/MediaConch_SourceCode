@@ -62,6 +62,7 @@ public:
     // Policy
     int         create_xslt_policy(int user, const std::string& type, int parent_id, std::string& err);
     int         import_policy_from_memory(int user, const std::string& memory, std::string& err, const char* filename, bool is_system_policy);
+    int         import_policy_from_file(int user, const std::string& file, std::string& err);
     int         duplicate_policy(int user, int id, std::string& err);
     int         create_xslt_policy_from_file(int user, const std::string& file, std::string& err);
 
@@ -75,7 +76,7 @@ public:
     int         erase_policy(int user, int index, std::string& err);
     int         clear_policies(int user, std::string& err);
 
-    size_t      get_policies_size(int user) const;
+    size_t      get_policies_size(int user);
     Policy*     get_policy(int user, int pos, std::string& err);
     int         policy_get_name(int user, int id, std::string& name, std::string& err);
     void        get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies& ps);
@@ -129,11 +130,13 @@ public:
 
     int transform_with_xslt_memory(const std::string& report, const std::string& memory,
                                    std::string& result);
+    void add_system_policies_to_user_policies(int user);
 
 private:
     Core                                      *core;
     std::string                                error;
     std::map<int, std::map<size_t, Policy*> >  policies;
+    std::vector<Policy*>                       system_policies;
 
     static size_t                              policy_global_id;
     //mutex?

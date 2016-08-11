@@ -46,9 +46,6 @@
         <file alias="ajax-spinner-big.gif">Image/ajax-spinner-big.gif</file>
         <file alias="ajax-spinner-small.gif">Image/ajax-spinner-small.gif</file>
     </qresource>
-    <qresource prefix="/policies">
-        <file alias="sample_policy_1.xml">policies/sample_policy_1.xml</file>
-    </qresource>
     <qresource prefix="/displays">
         <file alias="MediaConchHtml.xsl">displays/MediaConchHtml.xsl</file>
         <file alias="MediaConchXml.xsl">displays/MediaConchXml.xsl</file>

@@ -10,13 +10,16 @@
 #endif
 
 //---------------------------------------------------------------------------
-#include "ZenLib/Ztring.h"
+#include <ZenLib/Dir.h>
+#include <ZenLib/Ztring.h>
+#include <ZenLib/ZtringList.h>
 #include "MediaConchLib.h"
 #include "Core.h"
 #include "DaemonClient.h"
 #include "Policy.h"
 #include "Http.h"
 #include "LibEventHttp.h"
+#include "generated/PolicySample1.h"
 
 namespace MediaConch {
 
@@ -653,6 +656,43 @@ bool MediaConchLib::get_use_daemon() const
 void MediaConchLib::get_daemon_address(std::string& addr, int& port) const
 {
     core->get_daemon_address(addr, port);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::load_system_policy()
+{
+    std::string path = Core::get_local_data_path();
+    path += "policies/";
+    path += "policy_sample_1.xml";
+
+    std::string memory(policy_sample_1);
+    std::string err;
+    core->policies.import_policy_from_memory(-1, memory, err, path.c_str(), true);
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::load_existing_policy()
+{
+    std::string path = Core::get_local_data_path();
+    path += "policies/";
+
+    ZenLib::Ztring Dir_Name = ZenLib::Ztring().From_UTF8(path);
+    ZenLib::ZtringList list = ZenLib::Dir::GetAllFileNames(Dir_Name);
+
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        std::string file = list[i].To_UTF8();
+        size_t pos = file.find("/", path.size());
+        std::string user_str = file.substr(path.size(), pos - path.size());
+        int user = strtol(user_str.c_str(), NULL, 10);
+        std::string err;
+
+        core->policies.import_policy_from_file(user, file, err);
+    }
+
+    return 0;
 }
 
 }

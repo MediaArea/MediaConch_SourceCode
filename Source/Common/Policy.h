@@ -45,6 +45,7 @@ public:
     virtual ~Policy();
 
     Policy(const Policy*);
+    Policy(const Policy&);
 
     int                  import_schema(const std::string& filename, const std::string& save_name);
     int                  import_schema_from_memory(const char* memory, int len, const std::string& save_name);

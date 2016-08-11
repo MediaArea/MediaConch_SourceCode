@@ -81,6 +81,13 @@ MainWindow::MainWindow(QWidget *parent) :
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
 
+    // Load policy
+    if (!MCL.get_use_daemon())
+    {
+        MCL.load_system_policy();
+        MCL.load_existing_policy();
+    }
+
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
@@ -122,7 +129,6 @@ MainWindow::MainWindow(QWidget *parent) :
     workerfiles.start();
 
     // Default
-    add_default_policy();
     add_default_displays();
     on_actionChecker_triggered();
 }
@@ -284,41 +290,6 @@ int MainWindow::xslt_policy_create_from_file(const QString& file)
                        QMessageBox::NoButton, this);
     msgBox.exec();
     return pos;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::add_default_policy()
-{
-    QDir policies_dir(":/policies");
-
-    policies_dir.setFilter(QDir::Files);
-    QFileInfoList list = policies_dir.entryInfoList();
-    for (int i = 0; i < list.count(); ++i)
-    {
-        QFile file(list[i].absoluteFilePath());
-
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            continue;
-        QByteArray schema = file.readAll();
-        std::string memory(schema.constData(), schema.length());
-        std::string err;
-        MCL.policy_import(-1, memory, err, list[i].absoluteFilePath().toUtf8().data(), true);
-    }
-
-    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
-    path += "policies/";
-    policies_dir = QDir(path);
-
-    if (!policies_dir.exists())
-        policies_dir.mkpath(path);
-
-    policies_dir.setFilter(QDir::Files);
-    list = policies_dir.entryInfoList();
-    for (int i = 0; i < list.count(); ++i)
-    {
-        std::string err;
-        policy_import(list[i].absoluteFilePath(), err);
-    }
 }
 
 //---------------------------------------------------------------------------

@@ -297,6 +297,8 @@ public:
     // Helper
     int init_http_client();
     int close_http_client();
+    int load_system_policy();
+    int load_existing_policy();
 
 private:
     MediaConchLib (const MediaConchLib&);

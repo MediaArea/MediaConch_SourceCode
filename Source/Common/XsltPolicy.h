@@ -56,13 +56,13 @@ public:
     virtual ~XsltPolicyNode();
 
     XsltPolicyNode(const XsltPolicyNode*);
+    XsltPolicyNode(const XsltPolicyNode&);
 
     XsltPolicyElement kind;
     std::string       node_name;
     size_t            parent_id;
 
 private:
-    XsltPolicyNode(const XsltPolicyNode&);
     XsltPolicyNode& operator=(const XsltPolicyNode&);
 };
 
@@ -76,6 +76,7 @@ public:
     XsltPolicyRule();
     virtual ~XsltPolicyRule();
     XsltPolicyRule(const XsltPolicyRule*);
+    XsltPolicyRule(const XsltPolicyRule&);
 
     int edit_policy_rule(const XsltPolicyRule* rule, std::string&);
 
@@ -88,7 +89,6 @@ public:
 
     static size_t rule_id;
 private:
-    XsltPolicyRule(const XsltPolicyRule&);
     XsltPolicyRule& operator=(const XsltPolicyRule&);
 };
 
@@ -105,6 +105,7 @@ public:
 
     // use by duplicate
     XsltPolicy(const XsltPolicy*);
+    XsltPolicy(const XsltPolicy&);
 
     int             create_policy_from_mi(const std::string& report);
     XsltPolicyRule* get_policy_rule(int id, std::string& err);
@@ -116,7 +117,6 @@ public:
     std::string                   ope;
 private:
 
-    XsltPolicy(const XsltPolicy&);
     XsltPolicy& operator=(const XsltPolicy&);
 
     xmlDocPtr create_doc();

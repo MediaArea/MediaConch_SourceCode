@@ -56,8 +56,12 @@ Policies::~Policies()
             delete it_p->second;
         it->second.clear();
     }
-
     policies.clear();
+
+    for (size_t i = 0; i < system_policies.size(); ++i)
+        delete system_policies[i];
+    system_policies.clear();
+
     xmlCleanupParser();
 }
 
@@ -88,6 +92,9 @@ int Policies::create_xslt_policy(int user, const std::string& type, int parent_i
         ((XsltPolicy*)parent)->nodes.push_back(p);
         p->parent_id = parent_id;
     }
+
+    if (policies.find(user) == policies.end())
+        add_system_policies_to_user_policies(user);
 
     policies[user][p->id] = p;
     return (int)p->id;
@@ -125,9 +132,59 @@ int Policies::import_policy_from_memory(int user, const std::string& memory, std
 
     p->is_system = is_system_policy;
     if (ret < 0)
+    {
         delete p;
+        return -1;
+    }
+    else if (is_system_policy)
+        system_policies.push_back(p);
     else
+    {
+        if (policies.find(user) == policies.end())
+            add_system_policies_to_user_policies(user);
         policies[user][p->id] = p;
+    }
+
+    return (int)p->id;
+}
+
+int Policies::import_policy_from_file(int user, const std::string& file, std::string& err)
+{
+    if (!file.length())
+    {
+        err = "The policy is not exiting";
+        return -1;
+    }
+
+    std::string save_name = file;
+
+    Policy *p = NULL;
+    int ret = -1;
+
+    p = new XsltPolicy(this, !core->accepts_https());
+    ret = p->import_schema(file, save_name);
+    if (ret < 0)
+    {
+        if (p)
+            delete p;
+
+        p = new UnknownPolicy(this, !core->accepts_https());
+        ret = p->import_schema(file, save_name);
+        if (ret < 0)
+            err = p->get_error();
+    }
+
+    p->is_system = false;
+    if (ret < 0)
+    {
+        delete p;
+        return -1;
+    }
+
+
+    if (policies.find(user) == policies.end())
+        add_system_policies_to_user_policies(user);
+    policies[user][p->id] = p;
 
     return (int)p->id;
 }
@@ -202,6 +259,12 @@ int Policies::dump_policy_to_memory(int user, int id, std::string& memory, std::
 Policy* Policies::get_policy(int user, int id, std::string& err)
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
+
+    // Add system policy
+    if (it == policies.end())
+        add_system_policies_to_user_policies(user);
+
+    it = policies.find(user);
 
     if (it == policies.end())
     {
@@ -318,6 +381,8 @@ MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std
 int Policies::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
+    if (!p)
+        return -1;
 
     MediaConchLib::Policy_Policy *pp = policy_to_mcl_policy(p, err);
 
@@ -346,20 +411,39 @@ int Policies::policy_get_name(int user, int id, std::string& name, std::string& 
     return 0;
 }
 
-size_t Policies::get_policies_size(int user) const
+size_t Policies::get_policies_size(int user)
 {
+    size_t count = 0;
     std::map<int, std::map<size_t, Policy *> >::const_iterator it = policies.find(user);
 
     if (it == policies.end())
-        return 0;
+        add_system_policies_to_user_policies(user);
 
-    return it->second.size();
+    it = policies.find(user);
+    if (it == policies.end())
+        return count;
+
+    std::map<size_t, Policy *>::const_iterator it_p = it->second.begin();
+    for (; it_p != it->second.end(); ++it_p)
+    {
+        if (!it_p->second)
+            continue;
+
+        if (it_p->second->type != POLICY_XSLT || ((XsltPolicy*)it_p->second)->parent_id == (size_t)-1)
+            ++count;
+    }
+
+    return count;
 }
 
 void Policies::get_policies(int user, const std::vector<int>& ids, const std::string& format, MediaConchLib::Get_Policies& ps)
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
 
+    if (it == policies.end())
+        add_system_policies_to_user_policies(user);
+
+    it = policies.find(user);
     if (it == policies.end())
         return;
 
@@ -411,6 +495,11 @@ void Policies::get_policies(int user, const std::vector<int>& ids, const std::st
 void Policies::get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps)
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
+
+    if (it == policies.end())
+        add_system_policies_to_user_policies(user);
+
+    it = policies.find(user);
 
     if (it == policies.end())
         return;
@@ -467,11 +556,14 @@ int Policies::erase_policy(int user, int id, std::string& err)
     if (!p)
         return -1;
 
-    if (p->type != POLICY_XSLT || ((XsltPolicy*)p)->parent_id == (size_t)-1)
-        remove_saved_policy(p);
+    if (p->is_system)
+        return 0;
 
     if (p->type == POLICY_XSLT)
         erase_xslt_policy_node(policies[user], p->id, err);
+
+    if (((XsltPolicy*)p)->parent_id == (size_t)-1)
+        remove_saved_policy(p);
 
     delete p;
     policies[user].erase(policies[user].find(id));
@@ -486,13 +578,20 @@ int Policies::clear_policies(int user, std::string&)
         return 0;
 
     std::map<size_t, Policy*>::iterator it_p = it->second.begin();
-    for (; it_p != it->second.end(); ++it_p)
+    while (it_p != it->second.end())
     {
-        if (it_p->second)
-            remove_saved_policy(it_p->second);
+        if (!it_p->second || it_p->second->is_system)
+        {
+            ++it_p;
+            continue;
+        }
+
+        remove_saved_policy(it_p->second);
         delete it_p->second;
+
+        it->second.erase(it_p);
+        it_p = it->second.begin();
     }
-    policies[user].clear();
     return 0;
 }
 
@@ -501,6 +600,12 @@ int Policies::policy_change_info(int user, int id, const std::string& name, cons
     Policy *p = get_policy(user, id, err);
     if (!p)
         return -1;
+
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
 
     p->name = name;
     if (p->type == POLICY_XSLT)
@@ -515,6 +620,12 @@ int Policies::policy_change_type(int user, int id, const std::string& type, std:
     Policy *p = get_policy(user, id, err);
     if (!p)
         return -1;
+
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
 
     if (p->type != POLICY_XSLT)
     {
@@ -541,6 +652,10 @@ bool Policies::policy_exists(int user, const std::string& policy)
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
 
+    if (it == policies.end())
+        add_system_policies_to_user_policies(user);
+
+    it = policies.find(user);
     if (it == policies.end())
         return false;
 
@@ -593,6 +708,9 @@ int Policies::create_xslt_policy_from_file(int user, const std::string& file, st
         delete p;
     else
     {
+        if (policies.find(user) == policies.end())
+            add_system_policies_to_user_policies(user);
+
         policies[user][p->id] = p;
         pos = p->id;
     }
@@ -688,6 +806,12 @@ int Policies::create_xslt_policy_rule(int user, int policy_id, std::string& err)
     if (!p)
         return -1;
 
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
+
     if (p->type != POLICY_XSLT)
     {
         err = "policy rule cannot be created";
@@ -725,6 +849,12 @@ int Policies::edit_xslt_policy_rule(int user, int policy_id, int rule_id, const 
     if (!p)
         return -1;
 
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
+
     if (p->type != POLICY_XSLT)
     {
         err = "policy rule cannot be created";
@@ -744,6 +874,12 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, s
     Policy *p = get_policy(user, policy_id, err);
     if (!p)
         return -1;
+
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
 
     if (p->type != POLICY_XSLT)
     {
@@ -769,6 +905,12 @@ int Policies::delete_xslt_policy_rule(int user, int policy_id, int rule_id, std:
     Policy *p = get_policy(user, policy_id, err);
     if (!p)
         return -1;
+
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
 
     if (p->type != POLICY_XSLT)
     {
@@ -980,7 +1122,7 @@ void Policies::remove_saved_policy(const Policy* policy)
     if (!policy->filename.length())
         return;
 
-    if (policy->type == POLICY_XSLT && ((const XsltPolicy*)policy)->parent_id == (size_t)-1)
+    if (policy->type == POLICY_XSLT && ((const XsltPolicy*)policy)->parent_id != (size_t)-1)
         return;
 
     ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(policy->filename);
@@ -988,6 +1130,24 @@ void Policies::remove_saved_policy(const Policy* policy)
         return;
 
     ZenLib::File::Delete(z_path);
+}
+
+void Policies::add_system_policies_to_user_policies(int user)
+{
+    for (size_t i = 0; i < system_policies.size(); ++i)
+    {
+        if (!system_policies[i])
+            continue;
+
+        Policy* p = NULL;
+        if (system_policies[i]->type == POLICY_XSLT)
+            p = new XsltPolicy(*(XsltPolicy*)system_policies[i]);
+        else if (system_policies[i]->type == POLICY_UNKNOWN)
+            p = new UnknownPolicy(*(UnknownPolicy*)system_policies[i]);
+
+        if (p)
+            policies[user][p->id] = p;
+    }
 }
 
 int Policies::transform_with_xslt_memory(const std::string& report, const std::string& memory,
