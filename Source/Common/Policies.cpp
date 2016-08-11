@@ -562,7 +562,7 @@ int Policies::erase_policy(int user, int id, std::string& err)
     if (p->type == POLICY_XSLT)
         erase_xslt_policy_node(policies[user], p->id, err);
 
-    if (((XsltPolicy*)p)->parent_id == (size_t)-1)
+    if (p->type != POLICY_XSLT || ((XsltPolicy*)p)->parent_id == (size_t)-1)
         remove_saved_policy(p);
 
     delete p;

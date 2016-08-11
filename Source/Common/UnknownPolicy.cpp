@@ -63,7 +63,7 @@ int UnknownPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& file
     if (!this->name.length())
         this->name = "Policy example";
 
-    if (!filename.size() || filename.find(":/") == 0)
+    if (!filename.size())
     {
         system_doc = xmlCopyDoc(doc, 1);
         return 0;
