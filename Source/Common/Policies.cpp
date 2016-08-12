@@ -328,6 +328,7 @@ MediaConchLib::Policy_Policy *Policies::xslt_policy_to_mcl_policy(XsltPolicy *po
 {
     MediaConchLib::Policy_Policy *p = new MediaConchLib::Policy_Policy;
     p->id = policy->id;
+    p->parent_id = policy->parent_id;
     if (policy->ope.length())
         p->type = policy->ope;
     else
@@ -364,8 +365,6 @@ MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std
         if (((XsltPolicy*)policy)->kind == XSLT_POLICY_POLICY)
         {
             XsltPolicy* node = (XsltPolicy*)policy;
-            if (node->parent_id != (size_t)-1)
-                return NULL;
 
             // XSLT Policy
             p = xslt_policy_to_mcl_policy(node, error);
@@ -463,6 +462,8 @@ void Policies::get_policies(int user, const std::vector<int>& ids, const std::st
             if (i == ids.size())
                 continue;
         }
+        else if (it_p->second && it_p->second->type == POLICY_XSLT && ((XsltPolicy*)it_p->second)->parent_id != (size_t)-1)
+            continue;
 
         std::string err;
         MediaConchLib::Policy_Policy *p = policy_to_mcl_policy(it_p->second, err);
