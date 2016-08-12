@@ -3612,7 +3612,7 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -3671,7 +3671,7 @@ RESTAPI::Policy_Remove_Req *RESTAPI::parse_uri_policy_remove_req(const std::stri
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -3715,7 +3715,7 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& 
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -3759,7 +3759,7 @@ RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& 
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -3803,7 +3803,7 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -3847,7 +3847,7 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -3905,7 +3905,7 @@ RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_uri_policy_change_type_req(const
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -3956,7 +3956,7 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& ur
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4007,7 +4007,7 @@ RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_uri_policy_get_name_req(const std::
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4051,7 +4051,7 @@ RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_c
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4088,7 +4088,7 @@ RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4125,7 +4125,7 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(con
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4176,7 +4176,7 @@ RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_uri_policy_get_polic
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4213,7 +4213,7 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4257,7 +4257,7 @@ RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4301,7 +4301,7 @@ RESTAPI::XSLT_Policy_Rule_Get_Req *RESTAPI::parse_uri_xslt_policy_rule_get_req(c
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4361,7 +4361,7 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_dup
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
@@ -4412,7 +4412,7 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete
         std::string substr = uri.substr(key_start, start - key_start);
         ++start;
         and_pos = uri.find("&", start);
-        std::string val = uri.substr(start, and_pos);
+        std::string val = uri.substr(start, and_pos - start);
 
         start = and_pos;
         if (start != std::string::npos)
