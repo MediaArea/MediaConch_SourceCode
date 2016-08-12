@@ -142,7 +142,7 @@ int Policies::import_policy_from_memory(int user, const std::string& memory, std
     {
         if (policies.find(user) == policies.end())
             add_system_policies_to_user_policies(user);
-        policies[user][p->id] = p;
+        add_recursively_policy_to_user_policies(user, p);
     }
 
     return (int)p->id;
@@ -184,7 +184,7 @@ int Policies::import_policy_from_file(int user, const std::string& file, std::st
 
     if (policies.find(user) == policies.end())
         add_system_policies_to_user_policies(user);
-    policies[user][p->id] = p;
+    add_recursively_policy_to_user_policies(user, p);
 
     return (int)p->id;
 }
@@ -531,6 +531,7 @@ int Policies::erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, 
         {
             if (erase_xslt_policy_node(user_policies, ((XsltPolicy*)policy->nodes[i])->id, err) < 0)
                 return -1;
+            user_policies.erase(user_policies.find(((XsltPolicy*)policy->nodes[i])->id));
         }
 
         delete policy->nodes[i];
@@ -1148,6 +1149,26 @@ void Policies::add_system_policies_to_user_policies(int user)
 
         if (p)
             policies[user][p->id] = p;
+    }
+}
+
+void Policies::add_recursively_policy_to_user_policies(int user, Policy* p)
+{
+    if (!p)
+        return;
+
+    policies[user][p->id] = p;
+    if (p->type != POLICY_XSLT)
+        return;
+
+    XsltPolicy *policy = (XsltPolicy*)p;
+    for (size_t i = 0; i < policy->nodes.size(); ++i)
+    {
+        if (!policy->nodes[i])
+            continue;
+
+        if (policy->nodes[i]->kind == XSLT_POLICY_POLICY)
+            add_recursively_policy_to_user_policies(user, (Policy*)(XsltPolicy*)policy->nodes[i]);
     }
 }
 

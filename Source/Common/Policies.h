@@ -131,6 +131,7 @@ public:
     int transform_with_xslt_memory(const std::string& report, const std::string& memory,
                                    std::string& result);
     void add_system_policies_to_user_policies(int user);
+    void add_recursively_policy_to_user_policies(int user, Policy* p);
 
 private:
     Core                                      *core;
