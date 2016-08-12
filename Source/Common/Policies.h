@@ -145,7 +145,7 @@ private:
     Policies& operator=(const Policies&);
 
     //Helper
-    void find_save_name(int user, const char* base, std::string& save_name);
+    void find_save_name(int user, const char* base, std::string& save_name, const char* filename = NULL);
     void find_new_policy_name(int user, std::string& title);
     void remove_saved_policy(const Policy* policy);
     XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);

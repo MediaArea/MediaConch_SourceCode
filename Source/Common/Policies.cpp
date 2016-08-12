@@ -214,14 +214,11 @@ int Policies::duplicate_policy(int user, int id, std::string& err)
 
     policies[user][p->id] = p;
 
-    // Policy filename
-    find_save_name(user, NULL, p->filename);
-    size_t pos = p->id;
+    find_save_name(user, NULL, p->filename, p->name.c_str());
+    if (p->type == POLICY_UNKNOWN)
+        export_policy(user, p->filename.c_str(), old->id, err);
 
-    if (old->type == POLICY_UNKNOWN)
-        save_policy(user, id, err);
-
-    return (int)pos;
+    return (int)p->id;
 }
 
 int Policies::export_policy(int user, const char* filename, int id, std::string& err)
@@ -1052,7 +1049,7 @@ std::string Policies::parse_test_field(std::string& sub, const std::string& befo
     return ret;
 }
 
-void Policies::find_save_name(int user, const char* basename, std::string& save_name)
+void Policies::find_save_name(int user, const char* basename, std::string& save_name, const char *filename)
 {
     std::stringstream data_path;
 
@@ -1077,7 +1074,10 @@ void Policies::find_save_name(int user, const char* basename, std::string& save_
     for (size_t i = 0; 1; ++i)
     {
         std::stringstream ss;
-        ss << data_path.str() << "policy";
+        if (filename)
+            ss << data_path.str() << filename;
+        else
+            ss << data_path.str() << "policy";
         if (i)
             ss << i;
         ss << ".xsl";
