@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" version="1.0" exclude-result-prefixes="aliasxsl">
+  <xsl:param name="compare" as="xsl:string"/>
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
   <xsl:template match="/">
     <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
@@ -14,6 +15,11 @@
               <aliasxsl:attribute name="ref">
                 <aliasxsl:value-of select="./@ref"/>
               </aliasxsl:attribute>
+              <xsl:if test="string-length($compare)>0">
+                <aliasxsl:attribute name="compare">
+                  <xsl:value-of select="$compare"/>
+                </aliasxsl:attribute>
+              </xsl:if>
               <xsl:for-each select="policy">
                 <xsl:call-template name="policycheck">
                   <xsl:with-param name="policy" select="."/>
@@ -33,6 +39,7 @@
         <aliasxsl:param name="xpath"/>
         <aliasxsl:param name="outcome"/>
         <aliasxsl:param name="actual"/>
+        <aliasxsl:param name="compared_to"/>
         <rule>
           <aliasxsl:if test="../@type">
             <aliasxsl:attribute name="tracktype">
@@ -61,6 +68,13 @@
             <aliasxsl:attribute name="actual">
               <aliasxsl:value-of select="$actual"/>
             </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$outcome='fail'">
+            <aliasxsl:if test="string-length($compared_to)>0">
+              <aliasxsl:attribute name="compared_to">
+                <aliasxsl:value-of select="$compared_to"/>
+              </aliasxsl:attribute>
+            </aliasxsl:if>
           </aliasxsl:if>
           <aliasxsl:attribute name="outcome">
             <aliasxsl:value-of select="$outcome"/>
@@ -164,20 +178,63 @@
             <xsl:with-param name="list" select="@value"/>
             <xsl:with-param name="delimiter" select="'/'"/>
           </xsl:call-template>
-          <xsl:value-of select="@operator"/>
-          <xsl:text>'</xsl:text>
-          <xsl:value-of select="."/>
-          <xsl:text>'</xsl:text>
+          <xsl:if test="@operator">
+            <xsl:value-of select="@operator"/>
+            <xsl:choose>
+              <xsl:when test=".='compare' and string-length($compare)>0">
+                <xsl:text>document('</xsl:text>
+                <xsl:value-of select="$compare"/>
+                <xsl:text>')//</xsl:text>
+                <xsl:text>mt:MediaTrace</xsl:text>
+                <xsl:call-template name="tokenize">
+                  <xsl:with-param name="list" select="@value"/>
+                  <xsl:with-param name="delimiter" select="'/'"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>'</xsl:text>
+                <xsl:value-of select="."/>
+                <xsl:text>'</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
           <xsl:value-of select="@tracktype"/>
-          <xsl:text>'][</xsl:text>
-          <xsl:value-of select="@occurrence"/>
-          <xsl:text>]/mi:</xsl:text>
+          <xsl:text>']</xsl:text>
+          <xsl:if test="@occurrence">
+            <xsl:text>[</xsl:text>
+            <xsl:value-of select="@occurrence"/>
+            <xsl:text>]</xsl:text>
+          </xsl:if>
+          <xsl:text>/mi:</xsl:text>
           <xsl:value-of select="@value"/>
-          <xsl:value-of select="@operator"/>
-          <xsl:value-of select="."/>
+          <xsl:if test="@operator">
+            <xsl:value-of select="@operator"/>
+            <xsl:choose>
+              <xsl:when test=".='compare' and string-length($compare)>0">
+                <xsl:text>document('</xsl:text>
+                <xsl:value-of select="$compare"/>
+                <xsl:text>')//</xsl:text>
+                <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
+                <xsl:value-of select="@tracktype"/>
+                <xsl:text>']</xsl:text>
+                <xsl:if test="@occurrence">
+                  <xsl:text>[</xsl:text>
+                  <xsl:value-of select="@occurrence"/>
+                  <xsl:text>]</xsl:text>
+                </xsl:if>
+                <xsl:text>/mi:</xsl:text>
+                <xsl:value-of select="@value"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>'</xsl:text>
+                <xsl:value-of select="."/>
+                <xsl:text>'</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -192,12 +249,40 @@
         <xsl:otherwise>
           <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
           <xsl:value-of select="@tracktype"/>
-          <xsl:text>'][</xsl:text>
-          <xsl:value-of select="@occurrence"/>
-          <xsl:text>]/mi:</xsl:text>
+          <xsl:text>']</xsl:text>
+          <xsl:if test="@occurrence">
+            <xsl:text>[</xsl:text>
+            <xsl:value-of select="@occurrence"/>
+            <xsl:text>]</xsl:text>
+          </xsl:if>
+          <xsl:text>/mi:</xsl:text>
           <xsl:value-of select="@value"/>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="compare_xpath">
+      <xsl:if test=".='compare' and string-length($compare)>0">
+        <xsl:text>document('</xsl:text>
+        <xsl:value-of select="$compare"/>
+        <xsl:text>')//</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@scope='mt'">
+            <xsl:text>mt:MediaTrace</xsl:text>
+            <xsl:call-template name="tokenize">
+              <xsl:with-param name="list" select="@value"/>
+              <xsl:with-param name="delimiter" select="'/'"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
+            <xsl:value-of select="@tracktype"/>
+            <xsl:text>'][</xsl:text>
+            <xsl:value-of select="@occurrence"/>
+            <xsl:text>]/mi:</xsl:text>
+            <xsl:value-of select="@value"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
     </xsl:variable>
     <aliasxsl:call-template name="rule">
       <aliasxsl:with-param name="name">
@@ -211,6 +296,13 @@
           <xsl:value-of select="$equationbase"/>
         </xsl:attribute>
       </aliasxsl:with-param>
+      <xsl:if test=".='compare' and string-length($compare)>0">
+        <aliasxsl:with-param name="compared_to">
+          <xsl:attribute name="select">
+            <xsl:value-of select="$compare_xpath"/>
+          </xsl:attribute>
+        </aliasxsl:with-param>
+      </xsl:if>
       <aliasxsl:with-param name="outcome">
         <aliasxsl:choose>
           <aliasxsl:when>
