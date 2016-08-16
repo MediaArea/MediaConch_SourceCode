@@ -25,6 +25,7 @@
 #include "Common/ImplementationReportXsl.h"
 #if defined(_WIN32) || defined(WIN32)
 #include "Common/ImplementationReportDisplayTextXsl.h"
+#include <Shlobj.h>
 #else //defined(_WIN32) || defined(WIN32)
 #include "Common/ImplementationReportDisplayTextUnicodeXsl.h"
 #endif //defined(_WIN32) || defined(WIN32)
@@ -1599,16 +1600,24 @@ std::string Core::get_local_config_path()
 {
     std::string local_path(".");
 #if defined(WINDOWS)
-    char username[UNLEN+1];
-    DWORD username_len = UNLEN+1;
-    GetUserNameA(username, &username_len);
+	PWSTR path = NULL;
 
-    std::string wuser(username, username_len-1);
-    std::string user_name(wuser.begin(), wuser.end());
-    std::stringstream path;
+	if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path) == S_OK)
+	{
+		local_path = Ztring(path).To_UTF8();
+		local_path += "/MediaConch/";
+		CoTaskMemFree(path);
 
-    path << "C:/Users/" << user_name << "/AppData/Roaming/MediaConch/";
-    local_path = path.str();
+		for (;;)
+		{
+			size_t pos = 0;
+			pos = local_path.find('\\');
+			if (pos == std::string::npos)
+				break;
+
+			local_path[pos] = '/';
+		}
+	}
 #elif defined(UNIX)
     const char* home = NULL;
 
@@ -1645,16 +1654,24 @@ std::string Core::get_local_data_path()
 {
     std::string local_path(".");
 #if defined(WINDOWS)
-    char username[UNLEN+1];
-    DWORD username_len = UNLEN+1;
-    GetUserNameA(username, &username_len);
+	PWSTR path = NULL;
 
-    std::string wuser(username, username_len-1);
-    std::string user_name(wuser.begin(), wuser.end());
-    std::stringstream path;
+	if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path) == S_OK)
+	{
+		local_path = Ztring(path).To_UTF8();
+		local_path += "/MediaConch/";
+		CoTaskMemFree(path);
 
-    path << "C:/Users/" << user_name << "/AppData/Roaming/MediaConch/";
-    local_path = path.str();
+		for (;;)
+		{
+			size_t pos = 0;
+			pos = local_path.find('\\');
+			if (pos == std::string::npos)
+				break;
+
+			local_path[pos] = '/';
+		}
+	}
 #elif defined(UNIX)
     const char* home;
 
