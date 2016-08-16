@@ -874,6 +874,8 @@ void LibEventHttpd::request_coming(struct evhttp_request *req, void *arg)
     LibEventHttpd    *evHttp = (LibEventHttpd*)arg;
     std::string       ret_msg("OK");
 
+    evHttp->error.clear();
+    evHttp->result.clear();
     switch (evhttp_request_get_command(req))
     {
         case EVHTTP_REQ_GET:
