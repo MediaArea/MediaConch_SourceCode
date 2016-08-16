@@ -45,9 +45,6 @@
     <ClCompile Include="..\..\..\Source\Common\Core.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\Schematron.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -58,9 +55,6 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Policy.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp">

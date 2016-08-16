@@ -1157,7 +1157,8 @@ namespace MediaConch
             return json;
         }
 
-        XsltPolicy* p = (XsltPolicy*)mainwindow->policy_get(policy_id);
+		MediaConchLib::Get_Policy policy;
+        mainwindow->policy_get(policy_id, policy);
         // XsltPolicyRule* r = p->rules[new_rule_id];
         // mainwindow->policy_save(policy_id, err);
 

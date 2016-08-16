@@ -192,8 +192,6 @@
     <ClCompile Include="..\..\..\Source\Common\REST_API.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Scheduler.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schema.cpp" />
-    <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
-    <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp" />
     <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp" />
@@ -256,8 +254,6 @@
     <ClInclude Include="..\..\..\Source\Common\PluginsManager.h" />
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
     <ClInclude Include="..\..\..\Source\Common\Policy.h" />
-    <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
-    <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h" />
     <ClInclude Include="..\..\..\Source\Common\SQLLite.h" />
     <ClInclude Include="..\..\..\Source\Common\SQLLiteReport.h" />
     <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h" />
