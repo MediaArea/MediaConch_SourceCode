@@ -16,6 +16,7 @@
 #include "Plugin.h"
 #include "VeraPDF.h"
 #include "DpfManager.h"
+#include "FFmpeg.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -55,6 +56,8 @@ namespace MediaConch {
             p = new VeraPDF;
         else if (obj.at("name").s == "DPFManager")
             p = new DPFManager;
+        else if (obj.at("name").s == "FFmpeg")
+            p = new FFmpeg;
         else
         {
             error += std::string("The plugin ") + obj.at("name").s + " is not managed yet.\n";
@@ -66,6 +69,8 @@ namespace MediaConch {
 
         if (p->get_type() == MediaConchLib::PLUGIN_FORMAT)
             format_plugins[((PluginFormat*)p)->get_format()] = p;
+        else if (p->get_type() == MediaConchLib::PLUGIN_PRE_HOOK)
+            pre_hook_plugins.push_back(p);
         return 0;
     }
 

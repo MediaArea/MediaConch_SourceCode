@@ -11,46 +11,41 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef PLUGINS_MANAGERH
-#define PLUGINS_MANAGERH
+#ifndef FFMPEGH
+#define FFMPEGH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include <vector>
 #include <map>
-#include "Container.h"
+#include "MediaConchLib.h"
+#include "PluginPreHook.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
 
-class Plugin;
-class Core;
-
 //***************************************************************************
-// Class Scheduler
+// Class FFmpeg
 //***************************************************************************
 
-class PluginsManager
+class FFmpeg : public PluginPreHook
 {
 public:
-    PluginsManager(Core *c);
-    ~PluginsManager();
+    FFmpeg();
+    virtual ~FFmpeg();
 
-    const std::vector<Plugin*>& get_plugins() const;
-    const std::map<std::string, Plugin*>& get_format_plugins() const { return format_plugins; }
-    const std::vector<Plugin*>& get_pre_hook_plugins() const { return pre_hook_plugins; }
-    int   load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
+    virtual int load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
+    virtual int run(std::string& error);
 
 private:
-    PluginsManager(const PluginsManager&);
-    PluginsManager&     operator=(const PluginsManager&);
+    FFmpeg(const FFmpeg&);
+    FFmpeg&    operator=(const FFmpeg&);
 
-    Core                           *core;
-    std::vector<Plugin*>            plugins;
-    std::map<std::string, Plugin*>  format_plugins;
-    std::vector<Plugin*>            pre_hook_plugins;
+    std::string               bin;
+    std::string               outputFile;
+    std::vector<std::string>  inputParams;
+    std::vector<std::string>  outputParams;
 };
 
 }
 
-#endif // !PLUGIN_MANAGERH
+#endif // !FFMPEGH

@@ -92,6 +92,7 @@ public:
     enum PluginType
     {
         PLUGIN_FORMAT = 0,
+        PLUGIN_PRE_HOOK,
         PLUGIN_MAX,
     };
 

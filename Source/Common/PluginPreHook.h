@@ -11,46 +11,33 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef PLUGINS_MANAGERH
-#define PLUGINS_MANAGERH
+#ifndef PLUGINPREHOOKH
+#define PLUGINPREHOOKH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include <vector>
-#include <map>
-#include "Container.h"
+#include "Plugin.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
 
-class Plugin;
-class Core;
-
 //***************************************************************************
-// Class Scheduler
+// Class Plugin
 //***************************************************************************
 
-class PluginsManager
+class PluginPreHook : public Plugin
 {
 public:
-    PluginsManager(Core *c);
-    ~PluginsManager();
+    PluginPreHook() {}
+    virtual ~PluginPreHook() {}
 
-    const std::vector<Plugin*>& get_plugins() const;
-    const std::map<std::string, Plugin*>& get_format_plugins() const { return format_plugins; }
-    const std::vector<Plugin*>& get_pre_hook_plugins() const { return pre_hook_plugins; }
-    int   load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
+protected:
 
 private:
-    PluginsManager(const PluginsManager&);
-    PluginsManager&     operator=(const PluginsManager&);
-
-    Core                           *core;
-    std::vector<Plugin*>            plugins;
-    std::map<std::string, Plugin*>  format_plugins;
-    std::vector<Plugin*>            pre_hook_plugins;
+    PluginPreHook(const PluginPreHook&);
+    PluginPreHook&         operator=(const PluginPreHook&);
 };
 
 }
 
-#endif // !PLUGIN_MANAGERH
+#endif // !PLUGINPREHOOKH
