@@ -105,7 +105,7 @@ public:
 
     // use by duplicate
     XsltPolicy(const XsltPolicy*);
-    XsltPolicy(const XsltPolicy&);
+    XsltPolicy(const XsltPolicy&, bool is_system);
 
     int             create_policy_from_mi(const std::string& report);
     XsltPolicyRule* get_policy_rule(int id, std::string& err);

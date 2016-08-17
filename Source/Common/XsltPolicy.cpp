@@ -150,7 +150,7 @@ XsltPolicy::XsltPolicy(const XsltPolicy* s) : Policy(s), XsltPolicyNode(s)
 }
 
 //---------------------------------------------------------------------------
-XsltPolicy::XsltPolicy(const XsltPolicy& s) : Policy(s), XsltPolicyNode(s)
+XsltPolicy::XsltPolicy(const XsltPolicy& s, bool is_system) : Policy(s), XsltPolicyNode(s)
 {
     if (&s == this)
         return;
@@ -159,6 +159,7 @@ XsltPolicy::XsltPolicy(const XsltPolicy& s) : Policy(s), XsltPolicyNode(s)
 
     this->ope         = s.ope;
     this->name        = this->node_name;
+    this->is_system   = is_system;
 
     for (size_t i = 0; i < s.nodes.size(); ++i)
     {
@@ -167,7 +168,7 @@ XsltPolicy::XsltPolicy(const XsltPolicy& s) : Policy(s), XsltPolicyNode(s)
 
         XsltPolicyNode *node = NULL;
         if (s.nodes[i]->kind == XSLT_POLICY_POLICY)
-            node = new XsltPolicy(*(XsltPolicy*)s.nodes[i]);
+            node = new XsltPolicy(*(XsltPolicy*)s.nodes[i], is_system);
         else
             node = new XsltPolicyRule(*(XsltPolicyRule*)s.nodes[i]);
         node->parent_id = this->id;

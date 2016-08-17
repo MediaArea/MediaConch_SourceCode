@@ -1143,7 +1143,7 @@ void Policies::add_system_policies_to_user_policies(int user)
 
         Policy* p = NULL;
         if (system_policies[i]->type == POLICY_XSLT)
-            p = new XsltPolicy(*(XsltPolicy*)system_policies[i]);
+            p = new XsltPolicy(*(XsltPolicy*)system_policies[i], true);
         else if (system_policies[i]->type == POLICY_UNKNOWN)
             p = new UnknownPolicy(*(UnknownPolicy*)system_policies[i]);
 
