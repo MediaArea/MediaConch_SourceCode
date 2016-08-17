@@ -117,7 +117,10 @@ public:
     void set_compression_mode(MediaConchLib::compression compress);
     int get_ui_poll_request() const;
     int get_ui_database_path(std::string& path) const;
+
+    //Plugins
     const std::map<std::string, Plugin*>& get_format_plugins() const;
+    const std::vector<Plugin*>&           get_pre_hook_plugins() const;
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;

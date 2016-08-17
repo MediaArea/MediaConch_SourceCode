@@ -81,19 +81,23 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int FFmpeg::run(std::string& error)
     {
-        // std::vector<std::string> exec_params;
+        if (!inputFile.length() || !outputFile.length())
+            return 0;
 
-        // exec_params.push_back(bin);
-        // for (size_t i = 0; i < params.size(); ++i)
-        //     exec_params.push_back(params[i]);
+        std::vector<std::string> exec_params;
 
-        // std::string file(filename);
-        // //unified_string(file);
-        // exec_params.push_back(file);
+        exec_params.push_back(bin);
+        for (size_t i = 0; i < inputParams.size(); ++i)
+            exec_params.push_back(inputParams[i]);
 
-        // report.clear();
-        // return exec_bin(exec_params, error);
-        return 0;
+        exec_params.push_back(inputFile);
+
+        for (size_t i = 0; i < outputParams.size(); ++i)
+            exec_params.push_back(outputParams[i]);
+
+        exec_params.push_back(outputFile);
+
+        return exec_bin(exec_params, error);
     }
 
 }

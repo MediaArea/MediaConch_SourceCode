@@ -36,11 +36,15 @@ public:
     virtual int load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
     virtual int run(std::string& error);
 
+    std::string get_output_file() const { return outputFile; }
+    void        set_input_file(const std::string& file) { inputFile = file; }
+
 private:
     FFmpeg(const FFmpeg&);
     FFmpeg&    operator=(const FFmpeg&);
 
     std::string               bin;
+    std::string               inputFile;
     std::string               outputFile;
     std::vector<std::string>  inputParams;
     std::vector<std::string>  outputParams;

@@ -59,6 +59,7 @@ public:
     void set_max_threads(size_t nb) { max_threads = nb; }
     void get_elements(std::vector<std::string>& vec);
     int another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
+    int execute_pre_hook_plugins(std::string& file, std::string& err);
 
 private:
     Scheduler(const Scheduler&);

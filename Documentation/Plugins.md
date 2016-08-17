@@ -33,6 +33,14 @@ It should be a struct named *Plugins* which contains an array of plugin.
 * **bin**: Full path to the Command Line Interface.
 * **params**: CLI parameters to be given to DPF Manager CLI.
 
+##### FFmpeg
+
+* **name**: Has to be *FFmpeg*.
+* **bin**: Full path to the Command Line Interface of ffmpeg.
+* **outputFile**: File created by ffmpeg and used to be analyzed
+* **inputParams**: CLI parameters to be given to ffmpeg for the input file.
+* **outputParams**: CLI parameters to be given to ffmpeg for the output file.
+
 
 ### Example
 
@@ -50,6 +58,13 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "format": "TIFF",
                 "bin": "$PATH_TO_DPF_MANAGER",
                 "params": ["-s"]
+            },
+            {
+                "name": "FFmpeg",
+                "bin": "$PATH_TO_FFMPEG",
+                "outputFile": "/tmp/new_file_wanted.mkv",
+                "inputParams": ["-y", "-i"],
+                "outputParams": ["-vcodec", "ffv1"]
             }
         ]
     }

@@ -52,6 +52,12 @@ void QueueElement::stop()
 //---------------------------------------------------------------------------
 void QueueElement::Entry()
 {
+    std::string file = filename;
+    std::string err;
+
+    //Pre hook plugins
+    scheduler->execute_pre_hook_plugins(file, err);
+
     // Currently avoiding to have a big trace
     if (options.find("parsespeed") == options.end())
         MI->Option(__T("ParseSpeed"), __T("0"));
@@ -69,7 +75,7 @@ void QueueElement::Entry()
     for (; it != options.end(); ++it)
         MI->Option(Ztring().From_UTF8(it->first), Ztring().From_UTF8(it->second));
 
-    MI->Open(ZenLib::Ztring().From_UTF8(filename));
+    MI->Open(ZenLib::Ztring().From_UTF8(file));
     scheduler->work_finished(this, MI);
     MI->Close();
     delete MI;

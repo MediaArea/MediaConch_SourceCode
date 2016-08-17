@@ -274,6 +274,12 @@ const std::map<std::string, Plugin*>& Core::get_format_plugins() const
     return pluginsManager->get_format_plugins();
 }
 
+//---------------------------------------------------------------------------
+const std::vector<Plugin*>& Core::get_pre_hook_plugins() const
+{
+    return pluginsManager->get_pre_hook_plugins();
+}
+
 //***************************************************************************
 // Tools
 //***************************************************************************

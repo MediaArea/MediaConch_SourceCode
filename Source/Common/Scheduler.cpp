@@ -17,6 +17,7 @@
 #include "Plugin.h"
 #include "PluginFormat.h"
 #include "PluginsManager.h"
+#include "FFmpeg.h"
 #include <ZenLib/Ztring.h>
 //---------------------------------------------------------------------------
 
@@ -186,6 +187,29 @@ namespace MediaConch {
         CS.Leave();
 
         run_element();
+        return 0;
+    }
+
+    int Scheduler::execute_pre_hook_plugins(std::string& file, std::string& err)
+    {
+        // Before registering, check the format
+        std::vector<Plugin*> plugins = core->get_pre_hook_plugins();
+
+        for (size_t i = 0; i < plugins.size(); ++i)
+        {
+            if (!plugins[i])
+                continue;
+
+            if (plugins[i]->get_name() == "FFmpeg")
+                ((FFmpeg*)plugins[i])->set_input_file(file);
+
+            if (plugins[i]->run(err) < 0)
+                return -1;
+
+            if (plugins[i]->get_name() == "FFmpeg")
+                file = ((FFmpeg*)plugins[i])->get_output_file();
+        }
+
         return 0;
     }
 
