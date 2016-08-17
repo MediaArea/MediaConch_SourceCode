@@ -1,6 +1,6 @@
 Format: 3.0 (native)
 Source: mediaconch
-Binary: mediaconch, mediaconch-server, mediaconch-gui
+Binary: mediaconch, mediaconch-dbg, mediaconch-server, mediaconch-server-dbg, mediaconch-gui, mediaconch-gui-dbg
 Architecture: any
 Version: 16.07
 Maintainer: MediaArea.net SARL <info@mediaarea.net>

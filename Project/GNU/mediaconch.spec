@@ -240,12 +240,12 @@ popd
 
 %install
 pushd Project/GNU/CLI
-    make install-strip DESTDIR=%{buildroot}
+    make install DESTDIR=%{buildroot}
 popd
 
 %if 0%{?build_server}
 pushd Project/GNU/Server
-    make install-strip DESTDIR=%{buildroot}
+    make install DESTDIR=%{buildroot}
 popd
 %endif # Server
 
