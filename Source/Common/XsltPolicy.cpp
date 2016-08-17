@@ -323,10 +323,7 @@ int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* c
     }
 
     if (!node->children)
-    {
-        error = "The XML policy must contain children";
-        return -1;
-    }
+        return 0;
 
     return run_over_siblings_nodes(node->children, false, p);
 }
