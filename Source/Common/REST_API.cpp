@@ -1168,11 +1168,15 @@ int RESTAPI::serialize_status_req(Checker_Status_Req& req, std::string& data)
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_report_req(Checker_Report_Req& req, std::string& data)
 {
-    Container::Value v, child;
+    Container::Value v, child, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
     child.obj["ids"] = serialize_ids(req.ids);
     child.obj["reports"] = serialize_report_reports(req.reports);
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
 
     if (req.policies_ids.size())
         child.obj["policies_ids"] = serialize_report_arr_long_u(req.policies_ids);
@@ -1248,7 +1252,7 @@ int RESTAPI::serialize_list_req(Checker_List_Req&, std::string& data)
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data)
 {
-    Container::Value v, child, report;
+    Container::Value v, child, report, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
     child.obj["ids"] = serialize_ids(req.ids);
@@ -1256,6 +1260,10 @@ int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data
     report.type = Container::Value::CONTAINER_TYPE_STRING;
     report.s = get_Report_string(req.report);
     child.obj["report"] = report;
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
 
     if (req.policies_ids.size())
         child.obj["policies_ids"] = serialize_report_arr_long_u(req.policies_ids);
@@ -2541,8 +2549,9 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *verbosity;
+    Container::Value *ids, *user, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *verbosity;
     ids = model->get_value_by_key(*child, "ids");
+    user = model->get_value_by_key(*child, "user");
     reports = model->get_value_by_key(*child, "reports");
     policies_ids = model->get_value_by_key(*child, "policies_ids");
     policies_contents = model->get_value_by_key(*child, "policies_contents");
@@ -2593,6 +2602,11 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
         req->has_verbosity = true;
         req->verbosity = verbosity->l;
     }
+
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+    else
+        req->user = -1;
 
     return req;
 }
@@ -2702,8 +2716,9 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *report, *policies_ids, *policies_contents;
+    Container::Value *ids, *report, *user, *policies_ids, *policies_contents;
     ids = model->get_value_by_key(*child, "ids");
+    user = model->get_value_by_key(*child, "user");
     report = model->get_value_by_key(*child, "report");
     policies_ids = model->get_value_by_key(*child, "policies_ids");
     policies_contents = model->get_value_by_key(*child, "policies_contents");
@@ -2743,6 +2758,11 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
             if (policies_contents->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
                 req->policies_contents.push_back(policies_contents->array[i].s);
     }
+
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+    else
+        req->user = -1;
 
     return req;
 }

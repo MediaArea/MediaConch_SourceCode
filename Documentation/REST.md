@@ -599,9 +599,9 @@ user:  User ID
 
 Parameters:
 
-- if command is ok, return an object with an array of policies ids and names: '{"POLICY_GET_POLICIES_RESULT": {"policies": [{\"id\":0,\"name\":\"policy name\"}]}}'
+- if command is ok, return an object with an array of policies ids and names: '{"POLICY_GET_POLICIES_NAMES_LIST_RESULT": {"policies": [{\"id\":0,\"name\":\"policy name\"}]}}'
 - otherwise, return a "nok" object with a Policy_Error
-{"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
+{"POLICY_GET_POLICIES_NAMES_LIST_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### Policy_Clear_Policies
 
