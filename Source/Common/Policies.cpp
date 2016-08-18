@@ -559,9 +559,28 @@ int Policies::erase_policy(int user, int id, std::string& err)
         return 0;
 
     if (p->type == POLICY_XSLT)
+    {
+        XsltPolicy* policy = (XsltPolicy*)p;
         erase_xslt_policy_node(policies[user], p->id, err);
+        if (policy->parent_id == (size_t)-1)
+            remove_saved_policy(p);
+        else
+        {
+            Policy* tmp = get_policy(user, policy->parent_id, err);
+            if (tmp)
+            {
+                size_t i = 0;
+                for (; i < ((XsltPolicy*)tmp)->nodes.size(); ++i)
+                    if (((XsltPolicy*)tmp)->nodes[i] && ((XsltPolicy*)tmp)->nodes[i]->kind == XSLT_POLICY_POLICY
+                        && ((XsltPolicy*)((XsltPolicy*)tmp)->nodes[i])->id == (size_t)id)
+                        break;
 
-    if (p->type != POLICY_XSLT || ((XsltPolicy*)p)->parent_id == (size_t)-1)
+                if (i != ((XsltPolicy*)tmp)->nodes.size())
+                    ((XsltPolicy*)tmp)->nodes.erase(((XsltPolicy*)tmp)->nodes.begin() + i);
+            }
+        }
+    }
+    else
         remove_saved_policy(p);
 
     delete p;
