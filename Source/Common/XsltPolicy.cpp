@@ -587,7 +587,6 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
          || name == "FrameCount"
          || name == "StreamSize"
          || name == "BitRate"
-         || name == "FrameCount"
          || name == "Delay"
          || name == "extra")
             continue;
@@ -597,7 +596,7 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
         rule->id = rule->rule_id++;
         rule->track_type = type;
         rule->field = (const char*)child->name;
-        rule->ope = "is_equal";
+        rule->ope = "=";
         rule->occurrence = -1;
         xmlChar *content = xmlNodeGetContent(child);
         if (content)

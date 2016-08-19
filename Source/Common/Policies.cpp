@@ -720,6 +720,7 @@ int Policies::create_xslt_policy_from_file(int user, const std::string& file, st
     else
         name_pos++;
     p->name = file.substr(name_pos, std::string::npos);
+    ((XsltPolicy*)p)->node_name = p->name;
 
     int pos = -1;
     if (((XsltPolicy*)p)->create_policy_from_mi(result.report) < 0)
