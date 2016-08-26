@@ -122,7 +122,9 @@ function addFile(sourceName, fileName, fileId, formValues) {
 
     // Close button
     $(node).find('.result-close').click(node, function (e) {
+        sourceName = $(result.cell(e.data, 0).node()).find('span').attr('title');
         result.row(e.data).remove().draw(false);
+        webpage.close_element(sourceName);
 
         // Remove close all button
         if (1 == $('table.checker-results tbody tr').length && $('table.checker-results tbody tr .dataTables_empty').length) {
