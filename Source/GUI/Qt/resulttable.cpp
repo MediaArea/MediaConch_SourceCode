@@ -59,16 +59,25 @@ void ResultTable::add_file_to_result_table(const std::string& full_path)
     else
         policyName = "N/A";
     // Make the javascript structure Arghh!
-    QString formValues = QString("{\"policy\":\"%1\",\"policyText\":\"%2\",\"display\":\"%3\",\"verbosity\":\"%4\"}")
-        .arg(file->policy)     // Policy
-        .arg(policyName)       // PolicyName/PolicyText
-        .arg(file->display)    // Display
-        .arg(file->verbosity); // Verbosity
-    QString script = QString("updateFileOrAddFile('%1', '%2', '%3', '%4');")
-        .arg(QString().fromUtf8(full_path.c_str(), full_path.length()))
-        .arg(info.fileName())
-        .arg(file->index)
-        .arg(formValues);
+    QString formValues = QString("{\"policy\":\"");
+    formValues += QString().number(file->policy);    // Policy
+    formValues += QString("\",\"policyText\":\"");
+    formValues += policyName;               // PolicyName/PolicyText
+    formValues += "\",\"display\":\"";
+    formValues += QString().number(file->display);            // Display
+    formValues += "\",\"verbosity\":\"";
+    formValues += QString().number(file->verbosity); // Verbosity
+    formValues += "\"}";
+
+    QString script = QString("updateFileOrAddFile('");
+    script += QString().fromUtf8(full_path.c_str(), full_path.length());
+    script += "', '";
+    script += info.fileName();
+    script += "', '";
+    script += QString().number(file->index);
+    script += "', '";
+    script += formValues;
+    script += "');";
     page->use_javascript(script);
 }
 
