@@ -255,9 +255,7 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
     if (copy_name)
         p->name += "_copy";
 
-    printf("copy name=%d  node=%s, name=%s\n", copy_name, ((XsltPolicy*)p)->node_name.c_str(), p->name.c_str());
-
-    policies[user][p->id] = p;
+    add_recursively_policy_to_user_policies(user, p);
 
     find_save_name(user, NULL, p->filename, p->name.c_str());
     if (p->type == POLICY_UNKNOWN)
