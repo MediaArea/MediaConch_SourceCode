@@ -16,6 +16,7 @@ It is used above an HTTP connection.
   * Policy_Save
   * Policy_Remove
   * Policy_Duplicate
+  * Policy_Move
   * Policy_Dump
   * Policy_Get_Name
   * Policy_Change_Info
@@ -28,7 +29,7 @@ It is used above an HTTP connection.
   * XSLT_Policy_Rule_Create
   * XSLT_Policy_Rule_Get
   * XSLT_Policy_Rule_Edit
-  * XSLT_Policy_Rule_Duplicate
+  * XSLT_Policy_Rule_Move
   * XSLT_Policy_Rule_Delete
 
 * create the policy object:
@@ -91,6 +92,7 @@ Current API version: $API_VERSION = 1.6
 * Policy_Import: HTTP POST
 * Policy_Remove: HTTP GET
 * Policy_Duplicate: HTTP GET
+* Policy_Move: HTTP GET
 * Policy_Dump: HTTP GET
 * Policy_Save: HTTP GET
 * Policy_Get_Name: HTTP GET
@@ -451,6 +453,27 @@ Parameters:
 - Otherwise, return a "nok" object with a Policy_Error
 {"POLICY_DUPLICATE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
+#### Policy_Move
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_move?id=0&dst_policy_id=41
+
+##### Request
+
+Parameters:
+
+user:          User ID
+id:            Policy ID to move (duplicate + delete)
+dst_policy_id: Policy ID used as new parent (default is -1, root node)
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the new ID '{"POLICY_MOVE_RESULT": {"id": 42}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_MOVE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
 #### Policy_Get_Name
 
 URI format for the parameters.
@@ -757,6 +780,32 @@ Parameters:
 - if command is ok, return an object with the new Rule ID: '{"XSLT_POLICY_RULE_DUPLICATE_RESULT": {"id": 17}}}'
 - otherwise, return a "nok" object with a Policy_Error
 {"XSLT_POLICY_RULE_DUPLICATE_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### XSLT_Policy_Rule_Move
+
+##### Request
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_move?policy_id=0&id=0&dst_policy_id=42
+
+##### Request
+
+Parameters:
+
+user:          User ID
+policy_id:     Policy ID of the parent (XSLT) policy
+id:            Rule ID of the rule to move
+dst_policy_id: Policy ID used as new parent (default is -1, root node)
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the new Rule ID: '{"XSLT_POLICY_RULE_MOVE_RESULT": {"id": 17}}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_MOVE_RESULT": {"nok": {"error":"ERROR"}}}
 
 #### XSLT_Policy_Rule_Delete
 

@@ -65,6 +65,7 @@ public:
     URI_REQ_FUNC(Policy_Dump);
     URI_REQ_FUNC(Policy_Save);
     URI_REQ_FUNC(Policy_Duplicate);
+    URI_REQ_FUNC(Policy_Move);
     URI_REQ_FUNC(Policy_Get);
     URI_REQ_FUNC(Policy_Get_Name);
     URI_REQ_FUNC(Policy_Get_Policies_Count);
@@ -75,6 +76,7 @@ public:
     URI_REQ_FUNC(XSLT_Policy_Rule_Create);
     URI_REQ_FUNC(XSLT_Policy_Rule_Get);
     URI_REQ_FUNC(XSLT_Policy_Rule_Duplicate);
+    URI_REQ_FUNC(XSLT_Policy_Rule_Move);
     URI_REQ_FUNC(XSLT_Policy_Rule_Delete);
 #undef URI_REQ_FUNC
 
@@ -120,6 +122,8 @@ public:
                                           RESTAPI::Policy_Save_Res& res, void* arg);
     typedef int (*on_policy_duplicate_command)(const RESTAPI::Policy_Duplicate_Req* req,
                                                RESTAPI::Policy_Duplicate_Res& res, void* arg);
+    typedef int (*on_policy_move_command)(const RESTAPI::Policy_Move_Req* req,
+                                          RESTAPI::Policy_Move_Res& res, void* arg);
     typedef int (*on_policy_change_info_command)(const RESTAPI::Policy_Change_Info_Req* req,
                                                  RESTAPI::Policy_Change_Info_Res& res, void* arg);
     typedef int (*on_policy_change_type_command)(const RESTAPI::Policy_Change_Type_Req* req,
@@ -146,6 +150,8 @@ public:
                                                     RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void* arg);
     typedef int (*on_xslt_policy_rule_duplicate_command)(const RESTAPI::XSLT_Policy_Rule_Duplicate_Req* req,
                                                          RESTAPI::XSLT_Policy_Rule_Duplicate_Res& res, void* arg);
+    typedef int (*on_xslt_policy_rule_move_command)(const RESTAPI::XSLT_Policy_Rule_Move_Req* req,
+                                                    RESTAPI::XSLT_Policy_Rule_Move_Res& res, void* arg);
     typedef int (*on_xslt_policy_rule_delete_command)(const RESTAPI::XSLT_Policy_Rule_Delete_Req* req,
                                                       RESTAPI::XSLT_Policy_Rule_Delete_Res& res, void* arg);
 
@@ -161,6 +167,7 @@ public:
                      policy_dump_cb(NULL),
                      policy_save_cb(NULL),
                      policy_duplicate_cb(NULL),
+                     policy_move_cb(NULL),
                      policy_change_info_cb(NULL),
                      policy_change_type_cb(NULL),
                      policy_get_cb(NULL),
@@ -174,6 +181,7 @@ public:
                      xslt_policy_rule_get_cb(NULL),
                      xslt_policy_rule_edit_cb(NULL),
                      xslt_policy_rule_duplicate_cb(NULL),
+                     xslt_policy_rule_move_cb(NULL),
                      xslt_policy_rule_delete_cb(NULL)
             {
             }
@@ -194,6 +202,7 @@ public:
         on_policy_dump_command policy_dump_cb;
         on_policy_save_command policy_save_cb;
         on_policy_duplicate_command policy_duplicate_cb;
+        on_policy_move_command policy_move_cb;
         on_policy_change_info_command policy_change_info_cb;
         on_policy_change_type_command policy_change_type_cb;
         on_policy_get_command policy_get_cb;
@@ -207,6 +216,7 @@ public:
         on_xslt_policy_rule_get_command xslt_policy_rule_get_cb;
         on_xslt_policy_rule_edit_command xslt_policy_rule_edit_cb;
         on_xslt_policy_rule_duplicate_command xslt_policy_rule_duplicate_cb;
+        on_xslt_policy_rule_move_command xslt_policy_rule_move_cb;
         on_xslt_policy_rule_delete_command xslt_policy_rule_delete_cb;
     };
 

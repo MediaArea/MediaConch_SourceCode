@@ -96,6 +96,8 @@ namespace MediaConch
                                           RESTAPI::Policy_Save_Res& res, void *arg);
         static int on_policy_duplicate_command(const RESTAPI::Policy_Duplicate_Req* req,
                                                RESTAPI::Policy_Duplicate_Res& res, void *arg);
+        static int on_policy_move_command(const RESTAPI::Policy_Move_Req* req,
+                                          RESTAPI::Policy_Move_Res& res, void *arg);
         static int on_policy_change_info_command(const RESTAPI::Policy_Change_Info_Req* req,
                                                  RESTAPI::Policy_Change_Info_Res& res, void *arg);
         static int on_policy_change_type_command(const RESTAPI::Policy_Change_Type_Req* req,
@@ -122,6 +124,8 @@ namespace MediaConch
                                                     RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void *arg);
         static int on_xslt_policy_rule_duplicate_command(const RESTAPI::XSLT_Policy_Rule_Duplicate_Req* req,
                                                          RESTAPI::XSLT_Policy_Rule_Duplicate_Res& res, void *arg);
+        static int on_xslt_policy_rule_move_command(const RESTAPI::XSLT_Policy_Rule_Move_Req* req,
+                                                    RESTAPI::XSLT_Policy_Rule_Move_Res& res, void *arg);
         static int on_xslt_policy_rule_delete_command(const RESTAPI::XSLT_Policy_Rule_Delete_Req* req,
                                                       RESTAPI::XSLT_Policy_Rule_Delete_Res& res, void *arg);
 

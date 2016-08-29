@@ -139,6 +139,7 @@ DESTRUCTOR_POLICY(Policy_Remove_Res)
 DESTRUCTOR_POLICY(Policy_Dump_Res)
 DESTRUCTOR_POLICY(Policy_Save_Res)
 DESTRUCTOR_POLICY(Policy_Duplicate_Res)
+DESTRUCTOR_POLICY(Policy_Move_Res)
 DESTRUCTOR_POLICY(Policy_Change_Info_Res)
 DESTRUCTOR_POLICY(Policy_Change_Type_Res)
 DESTRUCTOR_POLICY(Policy_Get_Name_Res)
@@ -150,6 +151,7 @@ DESTRUCTOR_POLICY(XSLT_Policy_Rule_Create_Res)
 DESTRUCTOR_POLICY(XSLT_Policy_Rule_Get_Res)
 DESTRUCTOR_POLICY(XSLT_Policy_Rule_Edit_Res)
 DESTRUCTOR_POLICY(XSLT_Policy_Rule_Duplicate_Res)
+DESTRUCTOR_POLICY(XSLT_Policy_Rule_Move_Res)
 DESTRUCTOR_POLICY(XSLT_Policy_Rule_Delete_Res)
 
 #undef DESTRUCTOR_POLICY
@@ -389,6 +391,15 @@ std::string RESTAPI::Policy_Duplicate_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Move_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\": " << user << ",\"id\": " << id << ",\"dst_policy_id\": " << dst_policy_id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::Policy_Change_Info_Req::to_str() const
 {
     std::stringstream out;
@@ -516,6 +527,19 @@ std::string RESTAPI::XSLT_Policy_Rule_Edit_Req::to_str() const
 
 //---------------------------------------------------------------------------
 std::string RESTAPI::XSLT_Policy_Rule_Duplicate_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\": " << user;
+    out << ",\"policy_id\": " << policy_id;
+    out << ", \"id\":" << id;
+    out << ",\"dst_policy_id\": " << dst_policy_id;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Move_Req::to_str() const
 {
     std::stringstream out;
 
@@ -928,6 +952,20 @@ std::string RESTAPI::Policy_Duplicate_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Move_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << "\"error\":\"" << nok->to_str() << "\"";
+    else
+        out << "\"id\": " << id;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::Policy_Change_Info_Res::to_str() const
 {
     std::stringstream out;
@@ -1104,6 +1142,20 @@ std::string RESTAPI::XSLT_Policy_Rule_Edit_Res::to_str() const
 
 //---------------------------------------------------------------------------
 std::string RESTAPI::XSLT_Policy_Rule_Duplicate_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << "\"error\":\"" << nok->to_str() << "\"";
+    else
+        out << "\"id\":" << id;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::XSLT_Policy_Rule_Move_Res::to_str() const
 {
     std::stringstream out;
 
@@ -1436,6 +1488,20 @@ int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::stri
 }
 
 //---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_move_req(Policy_Move_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?id=" << req.id;
+    ss << "&dst_policy_id=" << req.dst_policy_id;
+    ss << "&user=" << req.user;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string& data)
 {
     Container::Value v, child, name, description, user, id;
@@ -1689,6 +1755,20 @@ int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req,
 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    ss << "?policy_id=" << req.policy_id << "&id=" << req.id;
+    ss << "&dst_policy_id=" << req.dst_policy_id;
+    ss << "&user=" << req.user;
+    data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_move_req(XSLT_Policy_Rule_Move_Req& req, std::string& data)
 {
     //URI
     std::stringstream ss;
@@ -2106,6 +2186,34 @@ int RESTAPI::serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::stri
 }
 
 //---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_move_res(Policy_Move_Res& res, std::string& data)
+{
+    Container::Value v, child, id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.id >= 0)
+    {
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+        child.obj["id"] = id;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_MOVE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string& data)
 {
     Container::Value v, child, nok;
@@ -2439,6 +2547,34 @@ int RESTAPI::serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_RULE_DUPLICATE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res, std::string& data)
+{
+    Container::Value v, child, id, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.id >= 0)
+    {
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+        child.obj["id"] = id;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["XSLT_POLICY_RULE_MOVE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -3010,6 +3146,39 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::st
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Move_Req *RESTAPI::parse_policy_move_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_MOVE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Move_Req *req = new Policy_Move_Req;
+    req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
+    Container::Value *dst_policy_id = model->get_value_by_key(*child, "dst_policy_id");
+    if (dst_policy_id && dst_policy_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->dst_policy_id = dst_policy_id->l;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -3462,6 +3631,44 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_xslt_policy_rule_duplica
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_xslt_policy_rule_move_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_MOVE");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
+    if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Rule_Move_Req *req = new XSLT_Policy_Rule_Move_Req;
+    req->policy_id = policy_id->l;
+    req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
+    Container::Value *dst_policy_id = model->get_value_by_key(*child, "dst_policy_id");
+    if (dst_policy_id && dst_policy_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->dst_policy_id = dst_policy_id->l;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -3825,6 +4032,57 @@ RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& 
 RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std::string& uri)
 {
     Policy_Duplicate_Req *req = new Policy_Duplicate_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos - start);
+
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "dst_policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->dst_policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Move_Req *RESTAPI::parse_uri_policy_move_req(const std::string& uri)
+{
+    Policy_Move_Req *req = new Policy_Move_Req;
 
     size_t start = 0;
     size_t and_pos = 0;
@@ -4390,6 +4648,64 @@ RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_uri_xslt_policy_rule_edit_req
 RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_duplicate_req(const std::string& uri)
 {
     XSLT_Policy_Rule_Duplicate_Req *req = new XSLT_Policy_Rule_Duplicate_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos - start);
+
+        start = and_pos;
+        if (start != std::string::npos)
+            ++start;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "dst_policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->dst_policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_uri_xslt_policy_rule_move_req(const std::string& uri)
+{
+    XSLT_Policy_Rule_Move_Req *req = new XSLT_Policy_Rule_Move_Req;
 
     size_t start = 0;
     size_t and_pos = 0;
@@ -5104,6 +5420,38 @@ RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::st
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Move_Res *RESTAPI::parse_policy_move_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_MOVE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Policy_Move_Res *res = new Policy_Move_Res;
+    res->id = id->l;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Change_Info_Res *RESTAPI::parse_policy_change_info_res(const std::string& data)
 {
     Container::Value v, *child;
@@ -5520,6 +5868,38 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Res *RESTAPI::parse_xslt_policy_rule_duplica
         return NULL;
 
     XSLT_Policy_Rule_Duplicate_Res *res = new XSLT_Policy_Rule_Duplicate_Res;
+    res->id = id->l;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok))
+    {
+        delete res;
+        return NULL;
+    }
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::XSLT_Policy_Rule_Move_Res *RESTAPI::parse_xslt_policy_rule_move_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "XSLT_POLICY_RULE_MOVE_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    XSLT_Policy_Rule_Move_Res *res = new XSLT_Policy_Rule_Move_Res;
     res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");

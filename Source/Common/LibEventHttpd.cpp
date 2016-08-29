@@ -322,6 +322,25 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_duplicate_res(res, result) < 0)
             error = rest.get_error();
     }
+    else if (query_str && !std::string("/policy_move").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Move_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Move_Res res;
+        if (commands.policy_move_cb && commands.policy_move_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_move_res(res, result) < 0)
+            error = rest.get_error();
+    }
     else if (query_str && !std::string("/policy_get").compare(uri_path))
     {
         std::string query(query_str);
@@ -522,6 +541,25 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
 
         delete r;
         if (rest.serialize_xslt_policy_rule_duplicate_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_move").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Move_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Move_Res res;
+        if (commands.xslt_policy_rule_move_cb && commands.xslt_policy_rule_move_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_move_res(res, result) < 0)
             error = rest.get_error();
     }
     else if (query_str && !std::string("/xslt_policy_rule_delete").compare(uri_path))

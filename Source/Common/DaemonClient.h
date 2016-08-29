@@ -95,6 +95,9 @@ public:
     // duplicate
     int policy_duplicate(int user, int id, int dst_policy_id, std::string& err);
 
+    // policy move
+    int policy_move(int user, int id, int dst_policy_id, std::string& err);
+
     // change name && description
     int policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
 
@@ -133,6 +136,9 @@ public:
 
     // duplicate XSLT rule
     int xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
+
+    // move XSLT rule
+    int xslt_policy_rule_move(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
 
     // delete XSLT rule
     int xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);

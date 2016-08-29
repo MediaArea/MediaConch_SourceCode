@@ -481,6 +481,24 @@ public:
         std::string to_str() const;
     };
 
+    struct Policy_Move_Req
+    {
+        Policy_Move_Req() : user(-1), id(-1), dst_policy_id(-1) {}
+        int         user;
+        int         id;
+        int         dst_policy_id;
+        std::string to_str() const;
+    };
+
+    struct Policy_Move_Res
+    {
+        Policy_Move_Res() : id(-1), nok(NULL) {}
+        ~Policy_Move_Res();
+        int         id;
+        Policy_Nok *nok;
+        std::string to_str() const;
+    };
+
     struct Policy_Change_Info_Req
     {
         Policy_Change_Info_Req() : user(-1), id(-1) {}
@@ -714,6 +732,25 @@ public:
         std::string  to_str() const;
     };
 
+    struct XSLT_Policy_Rule_Move_Req
+    {
+        XSLT_Policy_Rule_Move_Req() : user(-1), policy_id(-1), id(-1), dst_policy_id(-1) {}
+        int         user;
+        int         policy_id;
+        int         id;
+        int         dst_policy_id;
+        std::string to_str() const;
+    };
+
+    struct XSLT_Policy_Rule_Move_Res
+    {
+        XSLT_Policy_Rule_Move_Res() : id(-1), nok(NULL) {}
+        ~XSLT_Policy_Rule_Move_Res();
+        int          id;
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
     struct XSLT_Policy_Rule_Delete_Req
     {
         XSLT_Policy_Rule_Delete_Req() : user(-1), policy_id(-1), id(-1) {}
@@ -753,6 +790,7 @@ public:
     int serialize_policy_dump_req(Policy_Dump_Req& req, std::string&);
     int serialize_policy_save_req(Policy_Save_Req& req, std::string&);
     int serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string&);
+    int serialize_policy_move_req(Policy_Move_Req& req, std::string&);
     int serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string&);
     int serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string&);
     int serialize_policy_get_req(Policy_Get_Req& req, std::string&);
@@ -767,6 +805,7 @@ public:
     int serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, Container::Value&);
     int serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string&);
     int serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string&);
+    int serialize_xslt_policy_rule_move_req(XSLT_Policy_Rule_Move_Req& req, std::string&);
     int serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string&);
 
     // Serialize: Result
@@ -786,6 +825,7 @@ public:
     int serialize_policy_dump_res(Policy_Dump_Res& res, std::string&);
     int serialize_policy_save_res(Policy_Save_Res& res, std::string&);
     int serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string&);
+    int serialize_policy_move_res(Policy_Move_Res& res, std::string&);
     int serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string&);
     int serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string&);
     int serialize_policy_get_res(Policy_Get_Res& res, std::string&);
@@ -799,6 +839,7 @@ public:
     int serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, std::string&);
     int serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string&);
     int serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string&);
+    int serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res, std::string&);
     int serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string&);
 
     // Parse: Request
@@ -818,6 +859,7 @@ public:
     Policy_Dump_Req                     *parse_policy_dump_req(const std::string&);
     Policy_Save_Req                     *parse_policy_save_req(const std::string&);
     Policy_Duplicate_Req                *parse_policy_duplicate_req(const std::string&);
+    Policy_Move_Req                     *parse_policy_move_req(const std::string&);
     Policy_Change_Info_Req              *parse_policy_change_info_req(const std::string&);
     Policy_Change_Type_Req              *parse_policy_change_type_req(const std::string&);
     Policy_Get_Req                      *parse_policy_get_req(const std::string&);
@@ -832,6 +874,7 @@ public:
     int                                  parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_Policy_Rule *);
     XSLT_Policy_Rule_Edit_Req           *parse_xslt_policy_rule_edit_req(const std::string&);
     XSLT_Policy_Rule_Duplicate_Req      *parse_xslt_policy_rule_duplicate_req(const std::string&);
+    XSLT_Policy_Rule_Move_Req           *parse_xslt_policy_rule_move_req(const std::string&);
     XSLT_Policy_Rule_Delete_Req         *parse_xslt_policy_rule_delete_req(const std::string&);
 
     // Parse: URI Request
@@ -851,6 +894,7 @@ public:
     Policy_Dump_Req                     *parse_uri_policy_dump_req(const std::string&);
     Policy_Save_Req                     *parse_uri_policy_save_req(const std::string&);
     Policy_Duplicate_Req                *parse_uri_policy_duplicate_req(const std::string&);
+    Policy_Move_Req                     *parse_uri_policy_move_req(const std::string&);
     Policy_Change_Info_Req              *parse_uri_policy_change_info_req(const std::string&);
     Policy_Change_Type_Req              *parse_uri_policy_change_type_req(const std::string&);
     Policy_Get_Req                      *parse_uri_policy_get_req(const std::string&);
@@ -864,6 +908,7 @@ public:
     XSLT_Policy_Rule_Get_Req            *parse_uri_xslt_policy_rule_get_req(const std::string&);
     XSLT_Policy_Rule_Edit_Req           *parse_uri_xslt_policy_rule_edit_req(const std::string&);
     XSLT_Policy_Rule_Duplicate_Req      *parse_uri_xslt_policy_rule_duplicate_req(const std::string&);
+    XSLT_Policy_Rule_Move_Req           *parse_uri_xslt_policy_rule_move_req(const std::string&);
     XSLT_Policy_Rule_Delete_Req         *parse_uri_xslt_policy_rule_delete_req(const std::string&);
 
     // Parse: Result
@@ -883,6 +928,7 @@ public:
     Policy_Dump_Res                    *parse_policy_dump_res(const std::string&);
     Policy_Save_Res                    *parse_policy_save_res(const std::string&);
     Policy_Duplicate_Res               *parse_policy_duplicate_res(const std::string&);
+    Policy_Move_Res                    *parse_policy_move_res(const std::string&);
     Policy_Change_Info_Res             *parse_policy_change_info_res(const std::string&);
     Policy_Change_Type_Res             *parse_policy_change_type_res(const std::string&);
     Policy_Get_Res                     *parse_policy_get_res(const std::string&);
@@ -896,6 +942,7 @@ public:
     XSLT_Policy_Rule_Get_Res           *parse_xslt_policy_rule_get_res(const std::string&);
     XSLT_Policy_Rule_Edit_Res          *parse_xslt_policy_rule_edit_res(const std::string&);
     XSLT_Policy_Rule_Duplicate_Res     *parse_xslt_policy_rule_duplicate_res(const std::string&);
+    XSLT_Policy_Rule_Move_Res          *parse_xslt_policy_rule_move_res(const std::string&);
     XSLT_Policy_Rule_Delete_Res        *parse_xslt_policy_rule_delete_res(const std::string&);
 
     std::string                         get_error() const { return error; }

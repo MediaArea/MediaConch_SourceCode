@@ -55,6 +55,7 @@ public:
     int send_request(RESTAPI::Policy_Dump_Req& req);
     int send_request(RESTAPI::Policy_Save_Req& req);
     int send_request(RESTAPI::Policy_Duplicate_Req& req);
+    int send_request(RESTAPI::Policy_Move_Req& req);
     int send_request(RESTAPI::Policy_Change_Info_Req& req);
     int send_request(RESTAPI::Policy_Change_Type_Req& req);
     int send_request(RESTAPI::Policy_Get_Req& req);
@@ -68,6 +69,7 @@ public:
     int send_request(RESTAPI::XSLT_Policy_Rule_Get_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Rule_Edit_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Rule_Duplicate_Req& req);
+    int send_request(RESTAPI::XSLT_Policy_Rule_Move_Req& req);
     int send_request(RESTAPI::XSLT_Policy_Rule_Delete_Req& req);
 
     void set_port(int port);

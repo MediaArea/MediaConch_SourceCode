@@ -629,6 +629,46 @@ int DaemonClient::policy_duplicate(int user, int id, int dst_policy_id, std::str
 }
 
 //---------------------------------------------------------------------------
+int DaemonClient::policy_move(int user, int id, int dst_policy_id, std::string& err)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Policy_Move_Req req;
+    req.id = id;
+    req.dst_policy_id = dst_policy_id;
+    req.user = user;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Policy_Move_Res *res = rest.parse_policy_move_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    ret = -1;
+    if (!res->nok)
+        ret = res->id;
+    else
+        err = res->nok->error;
+
+    delete res;
+    res = NULL;
+    return ret;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::policy_remove(int user, int id, std::string& err)
 {
     if (!http_client)
@@ -1279,6 +1319,45 @@ int DaemonClient::xslt_policy_rule_duplicate(int user, int policy_id, int rule_i
 
     RESTAPI rest;
     RESTAPI::XSLT_Policy_Rule_Duplicate_Res *res = rest.parse_xslt_policy_rule_duplicate_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    int rule = -1;
+    if (!res->nok)
+        rule = res->id;
+    else
+        err = res->nok->error;
+    delete res;
+    return rule;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::xslt_policy_rule_move(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::XSLT_Policy_Rule_Move_Req req;
+    req.policy_id = policy_id;
+    req.dst_policy_id = dst_policy_id;
+    req.id = rule_id;
+    req.user = user;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::XSLT_Policy_Rule_Move_Res *res = rest.parse_xslt_policy_rule_move_res(data);
     if (!res)
         return MediaConchLib::errorHttp_INVALID_DATA;
 

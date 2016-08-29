@@ -454,6 +454,14 @@ int MediaConchLib::policy_duplicate(int user, int id, int dst_policy_id, std::st
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::policy_move(int user, int id, int dst_policy_id, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->policy_move(user, id, dst_policy_id, err);
+    return core->policies.move_policy(user, id, dst_policy_id, err);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::policy_save(int user, int pos, std::string& err)
 {
     if (use_daemon)
@@ -571,6 +579,14 @@ int MediaConchLib::xslt_policy_rule_duplicate(int user, int policy_id, int rule_
     if (use_daemon)
         return daemon_client->xslt_policy_rule_duplicate(user, policy_id, rule_id, dst_policy_id, err);
     return core->policies.duplicate_xslt_policy_rule(user, policy_id, rule_id, dst_policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::xslt_policy_rule_move(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->xslt_policy_rule_move(user, policy_id, rule_id, dst_policy_id, err);
+    return core->policies.move_xslt_policy_rule(user, policy_id, rule_id, dst_policy_id, err);
 }
 
 //---------------------------------------------------------------------------

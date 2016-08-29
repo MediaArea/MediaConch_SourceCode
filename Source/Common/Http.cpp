@@ -223,6 +223,19 @@ int Http::send_request(RESTAPI::Policy_Duplicate_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Policy_Move_Req& req)
+{
+    std::string query;
+    rest.serialize_policy_move_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/policy_move" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Policy_Change_Info_Req& req)
 {
     std::string cmd;
@@ -359,6 +372,19 @@ int Http::send_request(RESTAPI::XSLT_Policy_Rule_Duplicate_Req& req)
 
     std::stringstream uri;
     uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_duplicate" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::XSLT_Policy_Rule_Move_Req& req)
+{
+    std::string query;
+    rest.serialize_xslt_policy_rule_move_req(req, query);
+
+    std::stringstream uri;
+    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_move" << query;
 
     std::string uri_str = uri.str();
     return send_request_get(uri_str);

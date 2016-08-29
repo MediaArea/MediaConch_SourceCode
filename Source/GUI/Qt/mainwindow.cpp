@@ -696,6 +696,12 @@ int MainWindow::policy_duplicate(int id, int dst_policy_id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::policy_move(int id, int dst_policy_id, std::string& err)
+{
+    return MCL.policy_move(-1, id, dst_policy_id, err);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::policy_change_info(int id, const std::string& name, const std::string& description, std::string& err)
 {
     return MCL.policy_change_info(-1, id, name, description, err);
@@ -723,6 +729,12 @@ int MainWindow::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPoli
 int MainWindow::xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id, std::string& err)
 {
     return MCL.xslt_policy_rule_duplicate(-1, policy_id, rule_id, dst_policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id, std::string& err)
+{
+    return MCL.xslt_policy_rule_move(-1, policy_id, rule_id, dst_policy_id, err);
 }
 
 //---------------------------------------------------------------------------

@@ -103,6 +103,7 @@ namespace MediaConch
         httpd->commands.policy_dump_cb = on_policy_dump_command;
         httpd->commands.policy_remove_cb = on_policy_remove_command;
         httpd->commands.policy_duplicate_cb = on_policy_duplicate_command;
+        httpd->commands.policy_move_cb = on_policy_move_command;
         httpd->commands.policy_change_info_cb = on_policy_change_info_command;
         httpd->commands.policy_change_type_cb = on_policy_change_type_command;
         httpd->commands.policy_get_cb = on_policy_get_command;
@@ -116,6 +117,7 @@ namespace MediaConch
         httpd->commands.xslt_policy_rule_get_cb = on_xslt_policy_rule_get_command;
         httpd->commands.xslt_policy_rule_edit_cb = on_xslt_policy_rule_edit_command;
         httpd->commands.xslt_policy_rule_duplicate_cb = on_xslt_policy_rule_duplicate_command;
+        httpd->commands.xslt_policy_rule_move_cb = on_xslt_policy_rule_move_command;
         httpd->commands.xslt_policy_rule_delete_cb = on_xslt_policy_rule_delete_command;
         return 0;
     }
@@ -1017,6 +1019,30 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_policy_move_command(const RESTAPI::Policy_Move_Req* req,
+                                       RESTAPI::Policy_Move_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_move command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        res.id = d->MCL->policy_move(req->user, req->id, req->dst_policy_id, err);
+        if (res.id == -1)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
+        std::clog << d->get_date() << "Daemon send policy_move result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_policy_change_info_command(const RESTAPI::Policy_Change_Info_Req* req,
                                               RESTAPI::Policy_Change_Info_Res& res, void *arg)
     {
@@ -1352,6 +1378,29 @@ namespace MediaConch
         }
 
         std::clog << d->get_date() << "Daemon send xslt_policy_rule_duplicate result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_xslt_policy_rule_move_command(const RESTAPI::XSLT_Policy_Rule_Move_Req* req,
+                                                 RESTAPI::XSLT_Policy_Rule_Move_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_move command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        if ((res.id = d->MCL->xslt_policy_rule_move(req->user, req->policy_id, req->id, req->dst_policy_id, err)) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
+        std::clog << d->get_date() << "Daemon send xslt_policy_rule_move result: " << res.to_str() << std::endl;
         return 0;
     }
 

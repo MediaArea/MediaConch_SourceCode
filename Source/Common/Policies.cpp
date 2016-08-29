@@ -246,6 +246,22 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
     return (int)p->id;
 }
 
+int Policies::move_policy(int user, int id, int dst_policy_id, std::string& err)
+{
+    int new_id = duplicate_policy(user, id, dst_policy_id, err);
+    if (new_id < 0)
+        return -1;
+
+    if (remove_policy(user, id, err) < 0)
+    {
+        std::string tmp;
+        remove_policy(user, new_id, tmp);
+        return -1;
+    }
+
+    return new_id;
+}
+
 int Policies::export_policy(int user, const char* filename, int id, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
@@ -958,6 +974,22 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, i
     ((XsltPolicy*)destination)->nodes.push_back(rule);
 
     return (int)rule->id;
+}
+
+int Policies::move_xslt_policy_rule(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err)
+{
+    int new_id = duplicate_xslt_policy_rule(user, policy_id, rule_id, dst_policy_id, err);
+    if (new_id < 0)
+        return -1;
+
+    if (delete_xslt_policy_rule(user, policy_id, rule_id, err) < 0)
+    {
+        std::string tmp;
+        delete_xslt_policy_rule(user, dst_policy_id, new_id, tmp);
+        return -1;
+    }
+
+    return new_id;
 }
 
 int Policies::delete_xslt_policy_rule(int user, int policy_id, int rule_id, std::string& err)
