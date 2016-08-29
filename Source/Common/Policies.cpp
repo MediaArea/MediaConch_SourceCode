@@ -973,7 +973,6 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, i
 
     XsltPolicyRule *rule = new XsltPolicyRule(r);
 
-    rule->id = rule->rule_id++;
     ((XsltPolicy*)destination)->nodes.push_back(rule);
 
     return (int)rule->id;

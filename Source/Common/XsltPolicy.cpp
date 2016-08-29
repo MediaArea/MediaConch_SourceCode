@@ -82,6 +82,7 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule* r) : XsltPolicyNode(r)
     if (r == this)
         return;
 
+    this->id         = rule_id++;
     this->ope        = r->ope;
     this->track_type = r->track_type;
     this->field      = r->field;
