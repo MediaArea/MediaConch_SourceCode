@@ -439,8 +439,9 @@ URL: /$API_VERSION/policy_duplicate?id=0
 
 Parameters:
 
-user:  User ID
-id:    Policy ID to duplicate
+user:          User ID
+id:            Policy ID to duplicate
+dst_policy_id: Policy ID used as parent (default is -1, root node)
 
 ##### Response
 
@@ -744,9 +745,10 @@ URL: /$API_VERSION/xslt_policy_rule_duplicate?policy_id=0&id=0
 
 Parameters:
 
-user:      User ID
-policy_id: Policy ID of the parent (XSLT) policy
-id:        Rule ID of the rule to duplicate
+user:          User ID
+policy_id:     Policy ID of the parent (XSLT) policy
+id:            Rule ID of the rule to duplicate
+dst_policy_id: Policy ID used as parent (default is -1, root node)
 
 ##### Response
 

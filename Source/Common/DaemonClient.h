@@ -93,7 +93,7 @@ public:
     int policy_save(int user, int pos, std::string& err);
 
     // duplicate
-    int policy_duplicate(int user, int id, std::string& err);
+    int policy_duplicate(int user, int id, int dst_policy_id, std::string& err);
 
     // change name && description
     int policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
@@ -132,7 +132,7 @@ public:
     int xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
 
     // duplicate XSLT rule
-    int xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, std::string& err);
+    int xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
 
     // delete XSLT rule
     int xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);

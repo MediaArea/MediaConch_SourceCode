@@ -1005,7 +1005,7 @@ namespace MediaConch
         return json;
     }
 
-    QString WebPage::duplicate_policy(int id)
+    QString WebPage::duplicate_policy(int id, int dst_policy_id)
     {
         //return: policyName, policyId, policyRules
         QString json;
@@ -1013,7 +1013,7 @@ namespace MediaConch
         size_t nb_policies = mainwindow->get_policies_count();
         int ret = -1;
 
-        if ((ret = mainwindow->policy_duplicate(id, err)) < 0)
+        if ((ret = mainwindow->policy_duplicate(id, dst_policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1199,13 +1199,13 @@ namespace MediaConch
         return json;
     }
 
-    QString WebPage::policy_rule_duplicate(int policy_id, int rule_id)
+    QString WebPage::policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id)
     {
         //return: rule
         std::string err;
         QString json;
         int new_rule_id = -1;
-        if ((new_rule_id = mainwindow->xslt_policy_rule_duplicate(policy_id, rule_id, err)) < 0)
+        if ((new_rule_id = mainwindow->xslt_policy_rule_duplicate(policy_id, rule_id, dst_policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);

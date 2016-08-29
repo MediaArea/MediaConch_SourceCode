@@ -384,7 +384,7 @@ std::string RESTAPI::Policy_Duplicate_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\": " << user << ",\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id << ",\"dst_policy_id\": " << dst_policy_id << "}";
     return out.str();
 }
 
@@ -519,8 +519,10 @@ std::string RESTAPI::XSLT_Policy_Rule_Duplicate_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\": " << user << ",\"policy_id\": " << policy_id;
+    out << "{\"user\": " << user;
+    out << ",\"policy_id\": " << policy_id;
     out << ", \"id\":" << id;
+    out << ",\"dst_policy_id\": " << dst_policy_id;
     out << "}";
     return out.str();
 }
@@ -916,9 +918,11 @@ std::string RESTAPI::Policy_Duplicate_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id;
+    out << "{";
     if (nok)
-        out << "," << nok->to_str();
+        out << "\"error\":\"" << nok->to_str() << "\"";
+    else
+        out << "\"id\": " << id;
     out << "}";
     return out.str();
 }
@@ -1103,9 +1107,11 @@ std::string RESTAPI::XSLT_Policy_Rule_Duplicate_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\":" << id;
+    out << "{";
     if (nok)
-        out << "," << nok->to_str();
+        out << "\"error\":\"" << nok->to_str() << "\"";
+    else
+        out << "\"id\":" << id;
     out << "}";
     return out.str();
 }
@@ -1422,6 +1428,7 @@ int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::stri
     std::stringstream ss;
 
     ss << "?id=" << req.id;
+    ss << "&dst_policy_id=" << req.dst_policy_id;
     ss << "&user=" << req.user;
     data = ss.str();
 
@@ -1687,6 +1694,7 @@ int RESTAPI::serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate
     std::stringstream ss;
 
     ss << "?policy_id=" << req.policy_id << "&id=" << req.id;
+    ss << "&dst_policy_id=" << req.dst_policy_id;
     ss << "&user=" << req.user;
     data = ss.str();
 
@@ -2983,8 +2991,7 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::st
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *id;
-    id = model->get_value_by_key(*child, "id");
+    Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         return NULL;
 
@@ -2994,6 +3001,10 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::st
     Container::Value *user = model->get_value_by_key(*child, "user");
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
+
+    Container::Value *dst_policy_id = model->get_value_by_key(*child, "dst_policy_id");
+    if (dst_policy_id && dst_policy_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->dst_policy_id = dst_policy_id->l;
 
     return req;
 }
@@ -3443,6 +3454,10 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_xslt_policy_rule_duplica
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
 
+    Container::Value *dst_policy_id = model->get_value_by_key(*child, "dst_policy_id");
+    if (dst_policy_id && dst_policy_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->dst_policy_id = dst_policy_id->l;
+
     return req;
 }
 
@@ -3835,6 +3850,13 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std
                 continue;
 
             req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "dst_policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->dst_policy_id = strtoll(val.c_str(), NULL, 10);
         }
         else if (substr == "user")
         {
@@ -4400,6 +4422,13 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_dup
                 continue;
 
             req->policy_id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "dst_policy_id")
+        {
+            if (!val.length())
+                continue;
+
+            req->dst_policy_id = strtoll(val.c_str(), NULL, 10);
         }
         else if (substr == "user")
         {

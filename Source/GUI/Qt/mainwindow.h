@@ -107,7 +107,7 @@ public:
     void                        remove_xslt_display();
     int                         policy_import(const QString& file, std::string& err);
     int                         xslt_policy_create(std::string& err);
-    int                         policy_duplicate(int id, std::string& err);
+    int                         policy_duplicate(int id, int dst_policy_id, std::string& err);
     int                         policy_change_info(int id, const std::string& name, const std::string& description, std::string& err);
     int                         policy_change_type(int id, const std::string& type, std::string& err);
     int                         policy_get(int pos, MediaConchLib::Get_Policy& p);
@@ -120,7 +120,7 @@ public:
     size_t                      get_policies_count() const;
     int                         xslt_policy_rule_create(int policy_id, std::string& err);
     int                         xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
-    int                         xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err);
+    int                         xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id, std::string& err);
     int                         xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err);
     int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
     int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);

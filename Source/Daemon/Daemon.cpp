@@ -1005,7 +1005,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->policy_duplicate(req->user, req->id, err);
+        res.id = d->MCL->policy_duplicate(req->user, req->id, req->dst_policy_id, err);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -1345,7 +1345,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if ((res.id = d->MCL->xslt_policy_rule_duplicate(req->user, req->policy_id, req->id, err)) < 0)
+        if ((res.id = d->MCL->xslt_policy_rule_duplicate(req->user, req->policy_id, req->id, req->dst_policy_id, err)) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;

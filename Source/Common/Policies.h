@@ -63,7 +63,7 @@ public:
     int         create_xslt_policy(int user, const std::string& type, int parent_id, std::string& err);
     int         import_policy_from_memory(int user, const std::string& memory, std::string& err, const char* filename, bool is_system_policy);
     int         import_policy_from_file(int user, const std::string& file, std::string& err);
-    int         duplicate_policy(int user, int id, std::string& err);
+    int         duplicate_policy(int user, int id, int dst_policy_id, std::string& err);
     int         create_xslt_policy_from_file(int user, const std::string& file, std::string& err);
 
     int         save_policy(int user, int id, std::string& err);
@@ -91,7 +91,7 @@ public:
     int         create_xslt_policy_rule(int user, int policy_id, std::string& err);
     XsltPolicyRule *get_xslt_policy_rule(int user, int policy_id, int id, std::string& err);
     int         edit_xslt_policy_rule(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
-    int         duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, std::string& err);
+    int         duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
     int         delete_xslt_policy_rule(int user, int policy_id, int rule_id, std::string& err);
 
     bool        policy_exists(int user, const std::string& policy);
@@ -148,6 +148,7 @@ private:
     //Helper
     void find_save_name(int user, const char* base, std::string& save_name, const char* filename = NULL);
     void find_new_policy_name(int user, std::string& title);
+    int remove_policy(int user, int id, std::string& err);
     void remove_saved_policy(const Policy* policy);
     XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);
     int policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_policies, std::string& err);

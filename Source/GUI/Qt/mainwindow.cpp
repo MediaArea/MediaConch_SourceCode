@@ -690,9 +690,9 @@ int MainWindow::xslt_policy_create(std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::policy_duplicate(int id, std::string& err)
+int MainWindow::policy_duplicate(int id, int dst_policy_id, std::string& err)
 {
-    return MCL.policy_duplicate(-1, id, err);
+    return MCL.policy_duplicate(-1, id, dst_policy_id, err);
 }
 
 //---------------------------------------------------------------------------
@@ -720,9 +720,9 @@ int MainWindow::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPoli
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::xslt_policy_rule_duplicate(int policy_id, int rule_id, std::string& err)
+int MainWindow::xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id, std::string& err)
 {
-    return MCL.xslt_policy_rule_duplicate(-1, policy_id, rule_id, err);
+    return MCL.xslt_policy_rule_duplicate(-1, policy_id, rule_id, dst_policy_id, err);
 }
 
 //---------------------------------------------------------------------------

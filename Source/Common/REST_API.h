@@ -465,9 +465,10 @@ public:
 
     struct Policy_Duplicate_Req
     {
-        Policy_Duplicate_Req() : user(-1), id(-1) {}
+        Policy_Duplicate_Req() : user(-1), id(-1), dst_policy_id(-1) {}
         int         user;
         int         id;
+        int         dst_policy_id;
         std::string to_str() const;
     };
 
@@ -696,10 +697,11 @@ public:
 
     struct XSLT_Policy_Rule_Duplicate_Req
     {
-        XSLT_Policy_Rule_Duplicate_Req() : user(-1), policy_id(-1), id(-1) {}
+        XSLT_Policy_Rule_Duplicate_Req() : user(-1), policy_id(-1), id(-1), dst_policy_id(-1) {}
         int         user;
         int         policy_id;
         int         id;
+        int         dst_policy_id;
         std::string to_str() const;
     };
 

@@ -194,21 +194,46 @@ int Policies::save_policy(int user, int id, std::string& err)
     return export_policy(user, NULL, id, err);
 }
 
-int Policies::duplicate_policy(int user, int id, std::string& err)
+int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string& err)
 {
     Policy *old = get_policy(user, id, err);
     if (!old)
         return -1;
 
     Policy *p = NULL;
-    if (old->type == POLICY_XSLT)
+    if (dst_policy_id == -1)
+    {
+        if (old->type == POLICY_XSLT)
+            p = new XsltPolicy((XsltPolicy*)old);
+        else if (old->type == POLICY_UNKNOWN)
+            p = new UnknownPolicy((UnknownPolicy*)old);
+    }
+    else
+    {
+        if (old->type != POLICY_XSLT)
+        {
+            error = "This kind of policy cannot be duplicated as a sub-policy.";
+            return -1;
+        }
+
+        Policy *destination = get_policy(user, dst_policy_id, err);
+        if (!destination)
+            return -1;
+
+        if (destination->is_system)
+        {
+            err = "Destination policy should not be a system policy";
+            return -1;
+        }
+
         p = new XsltPolicy((XsltPolicy*)old);
-    else if (old->type == POLICY_UNKNOWN)
-        p = new UnknownPolicy((UnknownPolicy*)old);
+        ((XsltPolicy*)p)->parent_id = destination->id;
+        ((XsltPolicy*)destination)->nodes.push_back((XsltPolicy*)p);
+    }
 
     if (!p)
     {
-        err = "policy cannot be duplicate";
+        err = "policy cannot be duplicated";
         return -1;
     }
 
@@ -551,6 +576,11 @@ int Policies::erase_policy(int user, int id, std::string& err)
         return -1;
     }
 
+    return remove_policy(user, id, err);
+}
+
+int Policies::remove_policy(int user, int id, std::string& err)
+{
     Policy *p = get_policy(user, id, err);
     if (!p)
         return -1;
@@ -589,7 +619,7 @@ int Policies::erase_policy(int user, int id, std::string& err)
     return 0;
 }
 
-int Policies::clear_policies(int user, std::string&)
+int Policies::clear_policies(int user, std::string& err)
 {
     std::map<int, std::map<size_t, Policy*> >::iterator it = policies.find(user);
     if (it == policies.end())
@@ -604,10 +634,9 @@ int Policies::clear_policies(int user, std::string&)
             continue;
         }
 
-        remove_saved_policy(it_p->second);
-        delete it_p->second;
+        if (remove_policy(user, (int)it_p->first, err) < 0)
+            return -1;
 
-        it->second.erase(it_p);
         it_p = it->second.begin();
     }
     return 0;
@@ -888,17 +917,11 @@ int Policies::edit_xslt_policy_rule(int user, int policy_id, int rule_id, const 
     return r->edit_policy_rule(rule, err);
 }
 
-int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, std::string& err)
+int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err)
 {
     Policy *p = get_policy(user, policy_id, err);
     if (!p)
         return -1;
-
-    if (p->is_system)
-    {
-        err = "Cannot change a system policy";
-        return -1;
-    }
 
     if (p->type != POLICY_XSLT)
     {
@@ -911,10 +934,28 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, s
     if (!r)
         return -1;
 
+    Policy *destination = NULL;
+
+    destination = get_policy(user, dst_policy_id, err);
+    if (!destination)
+        return -1;
+
+    if (destination->type != POLICY_XSLT)
+    {
+        err = "Destination policy is not an XSLT policy";
+        return -1;
+    }
+
+    if (destination->is_system)
+    {
+        err = "Destination policy should not be a system policy";
+        return -1;
+    }
+
     XsltPolicyRule *rule = new XsltPolicyRule(r);
 
     rule->id = rule->rule_id++;
-    policy->nodes.push_back(rule);
+    ((XsltPolicy*)destination)->nodes.push_back(rule);
 
     return (int)rule->id;
 }

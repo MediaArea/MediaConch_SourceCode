@@ -589,13 +589,14 @@ int DaemonClient::policy_import(int user, const std::string& memory, std::string
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_duplicate(int user, int id, std::string& err)
+int DaemonClient::policy_duplicate(int user, int id, int dst_policy_id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Policy_Duplicate_Req req;
     req.id = id;
+    req.dst_policy_id = dst_policy_id;
     req.user = user;
 
     int ret = http_client->start();
@@ -1252,13 +1253,14 @@ int DaemonClient::xslt_policy_rule_edit(int user, int policy_id, int rule_id, co
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, std::string& err)
+int DaemonClient::xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::XSLT_Policy_Rule_Duplicate_Req req;
     req.policy_id = policy_id;
+    req.dst_policy_id = dst_policy_id;
     req.id = rule_id;
     req.user = user;
 

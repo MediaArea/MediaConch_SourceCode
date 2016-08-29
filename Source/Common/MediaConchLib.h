@@ -259,7 +259,7 @@ public:
 
     // Policies
     //   Create policy
-    int                          policy_duplicate(int user, int id, std::string& err);
+    int                          policy_duplicate(int user, int id, int dst_policy_id, std::string& err);
     int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
     int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
     int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);
@@ -282,7 +282,7 @@ public:
     int                         xslt_policy_rule_create(int user, int policy_id, std::string& err);
     XsltPolicyRule*             xslt_policy_rule_get(int user, int policy_id, int id, std::string& err);
     int                         xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
-    int                         xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, std::string& err);
+    int                         xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
     int                         xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);
 
     //Generated Values
