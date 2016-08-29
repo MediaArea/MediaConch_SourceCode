@@ -204,7 +204,10 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
     if (dst_policy_id == -1)
     {
         if (old->type == POLICY_XSLT)
+        {
             p = new XsltPolicy((XsltPolicy*)old);
+            ((XsltPolicy*)p)->parent_id = -1;
+        }
         else if (old->type == POLICY_UNKNOWN)
             p = new UnknownPolicy((UnknownPolicy*)old);
     }
