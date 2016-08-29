@@ -1223,10 +1223,12 @@ void Core::create_report_mt_xml(const std::vector<std::string>& files, std::stri
     {
         vec.clear();
         vec.push_back(files[i]);
-        report += "<media ref=\"" + files[i] + "\">\n";
+        std::string file(files[i]);
+        xml_escape_attributes(file);
+        report += "<media ref=\"" + file + "\">\n";
 
         std::string tmp;
-        create_report_mmt_xml(files, tmp);
+        create_report_mmt_xml(vec, tmp);
         if (tmp.length())
         {
             std::string memory(micromediatrace_to_mediatrace_xsl);
@@ -1267,7 +1269,9 @@ void Core::create_report_mmt_xml(const std::vector<std::string>& files, std::str
     {
         vec.clear();
         vec.push_back(files[i]);
-        report += "<media ref=\"" + files[i] + "\">";
+        std::string file(files[i]);
+        xml_escape_attributes(file);
+        report += "<media ref=\"" + file + "\">";
 
         std::string trace;
         get_report_saved(vec, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml, trace);
@@ -1310,7 +1314,9 @@ void Core::create_report_ma_xml(const std::vector<std::string>& files,
     {
         vec.clear();
         vec.push_back(files[i]);
-        report += "<media ref=\"" + files[i] + "\">\n";
+        std::string file(files[i]);
+        xml_escape_attributes(file);
+        report += "<media ref=\"" + file + "\">\n";
 
         if (reports[MediaConchLib::report_MediaInfo])
         {
@@ -1761,6 +1767,45 @@ void Core::WaitRunIsFinished()
         #else
         usleep(50000);
         #endif
+    }
+}
+
+//---------------------------------------------------------------------------
+void Core::xml_escape_attributes(std::string& xml)
+{
+    size_t len = xml.length();
+    for (size_t i = 0; i < len; ++i)
+    {
+        switch(xml[i])
+        {
+            case '&':
+                xml.replace(i, 1, "&amp;");
+                len += 4;
+                i += 4;
+                break;
+            case '<':
+                xml.replace(i, 1, "&lt;");
+                len += 3;
+                i += 3;
+                break;
+            case '>':
+                xml.replace(i, 1, "&lg;");
+                len += 3;
+                i += 3;
+                break;
+            case '\'':
+                xml.replace(i, 1, "&apos;");
+                len += 5;
+                i += 5;
+                break;
+            case '"':
+                xml.replace(i, 1, "&quot;");
+                len += 5;
+                i += 5;
+                break;
+            default:
+                break;
+        }
     }
 }
 

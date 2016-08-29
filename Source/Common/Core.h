@@ -219,6 +219,7 @@ private:
     std::string get_config_file();
     std::string get_database_path();
     DatabaseReport *get_db();
+    void xml_escape_attributes(std::string& xml);
 };
 
 }
