@@ -1241,7 +1241,7 @@ void Policies::add_system_policies_to_user_policies(int user)
             p = new UnknownPolicy(*(UnknownPolicy*)system_policies[i]);
 
         if (p)
-            policies[user][p->id] = p;
+            add_recursively_policy_to_user_policies(user, p);
     }
 }
 
