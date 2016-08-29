@@ -32,7 +32,6 @@ namespace MediaConch {
 UnknownPolicy::UnknownPolicy(const UnknownPolicy* s) : Policy(s), system_doc(NULL)
 {
     type = Policies::POLICY_UNKNOWN;
-    name += "_copy";
 }
 
 //---------------------------------------------------------------------------

@@ -201,7 +201,7 @@ int Policies::save_policy(int user, int id, std::string& err)
     return export_policy(user, NULL, id, err);
 }
 
-int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string& err)
+int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string& err, bool copy_name)
 {
     Policy *old = get_policy(user, id, err);
     if (!old)
@@ -214,7 +214,8 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         {
             p = new XsltPolicy((XsltPolicy*)old);
             ((XsltPolicy*)p)->parent_id = -1;
-            find_save_name(user, NULL, p->filename);
+            if (copy_name)
+                ((XsltPolicy*)p)->node_name += "_copy";
         }
         else if (old->type == POLICY_UNKNOWN)
             p = new UnknownPolicy((UnknownPolicy*)old);
@@ -240,6 +241,8 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         p = new XsltPolicy((XsltPolicy*)old);
         ((XsltPolicy*)p)->parent_id = destination->id;
         ((XsltPolicy*)destination)->nodes.push_back((XsltPolicy*)p);
+        if (copy_name)
+            ((XsltPolicy*)p)->node_name += "_copy";
         p->filename = std::string();
     }
 
@@ -248,6 +251,11 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         err = "policy cannot be duplicated";
         return -1;
     }
+
+    if (copy_name)
+        p->name += "_copy";
+
+    printf("copy name=%d  node=%s, name=%s\n", copy_name, ((XsltPolicy*)p)->node_name.c_str(), p->name.c_str());
 
     policies[user][p->id] = p;
 
@@ -260,7 +268,7 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
 
 int Policies::move_policy(int user, int id, int dst_policy_id, std::string& err)
 {
-    int new_id = duplicate_policy(user, id, dst_policy_id, err);
+    int new_id = duplicate_policy(user, id, dst_policy_id, err, false);
     if (new_id < 0)
         return -1;
 
@@ -945,7 +953,7 @@ int Policies::edit_xslt_policy_rule(int user, int policy_id, int rule_id, const 
     return r->edit_policy_rule(rule, err);
 }
 
-int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err)
+int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err, bool copy_name)
 {
     Policy *p = get_policy(user, policy_id, err);
     if (!p)
@@ -981,6 +989,8 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, i
     }
 
     XsltPolicyRule *rule = new XsltPolicyRule(r);
+    if (copy_name)
+        rule->node_name += "_copy";
 
     ((XsltPolicy*)destination)->nodes.push_back(rule);
 
@@ -989,7 +999,7 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, i
 
 int Policies::move_xslt_policy_rule(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err)
 {
-    int new_id = duplicate_xslt_policy_rule(user, policy_id, rule_id, dst_policy_id, err);
+    int new_id = duplicate_xslt_policy_rule(user, policy_id, rule_id, dst_policy_id, err, false);
     if (new_id < 0)
         return -1;
 
