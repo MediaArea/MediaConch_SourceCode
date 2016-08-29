@@ -191,6 +191,13 @@ int Policies::import_policy_from_file(int user, const std::string& file, std::st
 
 int Policies::save_policy(int user, int id, std::string& err)
 {
+    Policy *policy = get_policy(user, id, err);
+    if (!policy)
+        return -1;
+
+    if (policy->type == POLICY_XSLT && ((XsltPolicy*)policy)->parent_id != (size_t)-1)
+        return save_policy(user, ((XsltPolicy*)policy)->parent_id, err);
+
     return export_policy(user, NULL, id, err);
 }
 
@@ -207,6 +214,7 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         {
             p = new XsltPolicy((XsltPolicy*)old);
             ((XsltPolicy*)p)->parent_id = -1;
+            find_save_name(user, NULL, p->filename);
         }
         else if (old->type == POLICY_UNKNOWN)
             p = new UnknownPolicy((UnknownPolicy*)old);
@@ -232,6 +240,7 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         p = new XsltPolicy((XsltPolicy*)old);
         ((XsltPolicy*)p)->parent_id = destination->id;
         ((XsltPolicy*)destination)->nodes.push_back((XsltPolicy*)p);
+        p->filename = std::string();
     }
 
     if (!p)
