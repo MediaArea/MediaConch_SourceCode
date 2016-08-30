@@ -7,6 +7,13 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 16.08, 2016-08-31
+-------------
+Policy Editor: close message when user change of policy/rule
+Checker: remove a node is not saved
+Checker: fix handling of files with special chars
+Add ctrl-q shortcut to quit
+Better handling of user path
 
 Version 16.07, 2016-07-29
 -------------
