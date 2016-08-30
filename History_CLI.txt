@@ -7,6 +7,10 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 16.08, 2016-08-31
+-------------
+Checker: fix handling of files with special chars
+Better handling of user path
 
 Version 16.07, 2016-07-29
 -------------
