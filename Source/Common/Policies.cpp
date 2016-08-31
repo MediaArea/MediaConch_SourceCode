@@ -214,11 +214,18 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         {
             p = new XsltPolicy((XsltPolicy*)old);
             ((XsltPolicy*)p)->parent_id = -1;
-            if (copy_name)
+            if (copy_name && ((XsltPolicy*)old)->parent_id == (size_t)-1)
+            {
                 ((XsltPolicy*)p)->node_name += "_copy";
+                p->name = ((XsltPolicy*)p)->node_name;
+            }
         }
         else if (old->type == POLICY_UNKNOWN)
+        {
             p = new UnknownPolicy((UnknownPolicy*)old);
+            if (copy_name)
+                p->name += "_copy";
+        }
     }
     else
     {
@@ -241,8 +248,9 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         p = new XsltPolicy((XsltPolicy*)old);
         ((XsltPolicy*)p)->parent_id = destination->id;
         ((XsltPolicy*)destination)->nodes.push_back((XsltPolicy*)p);
-        if (copy_name)
+        if (copy_name && ((XsltPolicy*)old)->parent_id == destination->id)
             ((XsltPolicy*)p)->node_name += "_copy";
+        p->name = ((XsltPolicy*)p)->node_name;
         p->filename = std::string();
     }
 
@@ -251,9 +259,6 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         err = "policy cannot be duplicated";
         return -1;
     }
-
-    if (copy_name)
-        p->name += "_copy";
 
     add_recursively_policy_to_user_policies(user, p);
 
@@ -968,9 +973,7 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, i
     if (!r)
         return -1;
 
-    Policy *destination = NULL;
-
-    destination = get_policy(user, dst_policy_id, err);
+    Policy *destination = get_policy(user, dst_policy_id, err);
     if (!destination)
         return -1;
 
@@ -987,7 +990,7 @@ int Policies::duplicate_xslt_policy_rule(int user, int policy_id, int rule_id, i
     }
 
     XsltPolicyRule *rule = new XsltPolicyRule(r);
-    if (copy_name)
+    if (copy_name && ((XsltPolicy*)destination)->parent_id == policy->parent_id)
         rule->node_name += "_copy";
 
     ((XsltPolicy*)destination)->nodes.push_back(rule);
