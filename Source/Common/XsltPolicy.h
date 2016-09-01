@@ -79,6 +79,7 @@ public:
     XsltPolicyRule(const XsltPolicyRule&);
 
     int edit_policy_rule(const XsltPolicyRule* rule, std::string&);
+    void create_default_name(std::string& name);
 
     size_t        id;
     std::string   ope;

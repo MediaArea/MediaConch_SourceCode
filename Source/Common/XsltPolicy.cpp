@@ -117,6 +117,25 @@ int XsltPolicyRule::edit_policy_rule(const XsltPolicyRule* rule, std::string&)
     return 0;
 }
 
+void XsltPolicyRule::create_default_name(std::string& name)
+{
+    name = track_type + "/" + field;
+    if (ope == "=")
+        name += " is ";
+    else if (ope == "!=")
+        name += " is not ";
+    else if (ope == ">")
+        name += " is greater than ";
+    else if (ope == "<")
+        name += " is less than ";
+    else if (ope == ">=")
+        name += " is greater or equal than ";
+    else if (ope == "<=")
+        name += " is less or equal than ";
+    else
+        name += " " + ope + "";
+    name += value;
+}
 //***************************************************************************
 // XsltPolicy
 //***************************************************************************
@@ -602,7 +621,7 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
         xmlChar *content = xmlNodeGetContent(child);
         if (content)
             rule->value = (const char*)content;
-        rule->node_name = rule->track_type + "/" + rule->field + " is " + rule->value;
+        rule->create_default_name(rule->node_name);
         nodes.push_back(rule);
     }
     return 0;
