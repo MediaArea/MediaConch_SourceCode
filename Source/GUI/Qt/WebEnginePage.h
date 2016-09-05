@@ -83,17 +83,17 @@ public Q_SLOTS:
     void         display_delete_id(const QString& name);
 
     QString      get_policies_tree();
-    void         create_rule_tree(XsltPolicyRule *r, int index, QString& rule_data);
+    void         create_rule_tree(XsltPolicyRule *r, QString& rule_data);
     QString      import_policy();
     QString      import_policy(const QString& file);
     int          import_policy(const QStringList& files);
     QString      xslt_policy_create(int parent_id);
-    QString      duplicate_policy(int id, int dst_policy_id);
-    QString      move_policy(int id, int dst_policy_id);
+    QString      policy_duplicate(int id, int dst_policy_id);
+    QString      policy_move(int id, int dst_policy_id);
     QString      policy_export(int id);
     QString      policy_remove(int id);
     QString      policy_edit(int id, const QString& name, const QString& description, const QString& type);
-    QString      policy_rule_create(int policy_id);
+    QString      xslt_policy_rule_create(int policy_id);
     QString      policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text);
     QString      policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id);
     QString      policy_rule_move(int policy_id, int rule_id, int dst_policy_id);

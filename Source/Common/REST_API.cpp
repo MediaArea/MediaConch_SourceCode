@@ -5780,6 +5780,13 @@ RESTAPI::XSLT_Policy_Rule_Create_Res *RESTAPI::parse_xslt_policy_rule_create_res
         delete res;
         return NULL;
     }
+
+    if (!nok)
+    {
+        Container::Value *id = model->get_value_by_key(*child, "id");
+        if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            res->id = id->l;
+    }
     return res;
 }
 

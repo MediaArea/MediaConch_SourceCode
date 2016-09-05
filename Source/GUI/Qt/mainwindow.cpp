@@ -720,6 +720,12 @@ int MainWindow::xslt_policy_rule_create(int policy_id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+XsltPolicyRule *MainWindow::xslt_policy_rule_get(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.xslt_policy_rule_get(-1, policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
 {
     return MCL.xslt_policy_rule_edit(-1, policy_id, rule_id, rule, err);

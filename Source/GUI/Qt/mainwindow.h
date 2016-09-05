@@ -120,6 +120,7 @@ public:
     int                         clear_policies(std::string& err);
     size_t                      get_policies_count() const;
     int                         xslt_policy_rule_create(int policy_id, std::string& err);
+    XsltPolicyRule             *xslt_policy_rule_get(int policy_id, int rule_id, std::string& err);
     int                         xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
     int                         xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id, std::string& err);
     int                         xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id, std::string& err);

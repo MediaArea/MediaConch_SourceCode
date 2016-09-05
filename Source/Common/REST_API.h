@@ -671,7 +671,7 @@ public:
 
     struct XSLT_Policy_Rule_Create_Res
     {
-        XSLT_Policy_Rule_Create_Res() : nok(NULL) {}
+        XSLT_Policy_Rule_Create_Res() : id(-1), nok(NULL) {}
         ~XSLT_Policy_Rule_Create_Res();
         int          id;
         Policy_Nok  *nok;
