@@ -1065,7 +1065,7 @@ namespace MediaConch
         return json;
     }
 
-    QString WebPage::policy_change_info(int id, const QString& name, const QString& description)
+    QString WebPage::policy_edit(int id, const QString& name, const QString& description, const QString& type)
     {
         //return: error?
         QString json;
@@ -1078,16 +1078,6 @@ namespace MediaConch
             return json;
         }
 
-        mainwindow->policy_save(id, err);
-        json = QString("{\"policyName\":\"%1\",\"policyDescription\":\"%2\"}").arg(name).arg(description);
-        return json;
-    }
-
-    QString WebPage::policy_change_type(int id, const QString& type)
-    {
-        //return: error?
-        QString json;
-        std::string err;
         if (mainwindow->policy_change_type((size_t)id, type.toUtf8().data(), err) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
@@ -1097,9 +1087,21 @@ namespace MediaConch
         }
 
         mainwindow->policy_save(id, err);
-        QString n = type;
-        string_to_json(n);
-        json = QString("{\"policyType\":\"%1\"}").arg(n);
+
+        MediaConchLib::Get_Policy p;
+        if (mainwindow->policy_get(id, "JSTREE", p) < 0)
+        {
+            json = "{\"error\":\"Cannot import the policy\"}";
+            return json;
+        }
+
+        if (p.format != "JSTREE")
+        {
+            json = "{\"error\":\"Cannot generate the policy\"}";
+            return json;
+        }
+
+        json = QString().fromUtf8(p.jstree->c_str(), p.jstree->length());
         return json;
     }
 

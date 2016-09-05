@@ -61,19 +61,25 @@ var policyTreeAjax = (function() {
          * @return json
          * {"policy":POLICY_JSTREE_JSON}
          */
-        // $.ajax({
-        //     type: form.attr('method'),
-        //         url: Routing.generate('app_xslpolicy_xslpolicytreeedit', {id: policyNode.data.policyId}),
-        //         data: new FormData(form[0]),
-        //         processData: false,
-        //         contentType: false
-        // })
-        // .done(function (data) {
-        //     policyTree.policyEdit(data.policy, policyNode);
-        // })
-        // .fail(function (jqXHR) {
-        //     mcoMessage.fail(jqXHR);
-        // })
+        var name = $("#xslPolicyInfo_policyName").val();
+        if (name === null)
+            name = "";
+
+        var description = $("#xslPolicyInfo_policyDescription").val();
+        if (description === null)
+            description = "";
+
+        var type = $("#xslPolicyInfo_policyType").val();
+        if (type === null)
+            type = "";
+
+        webpage.policy_edit(policyNode.data.policyId, name, description, type, function(res){
+            data = JSON.parse(res);
+            if (!data.error)
+                policyTree.policyEdit(data.policyTree, policyNode);
+            else
+                mcoMessage.error(data.error);
+        });
     }
 
     var policyDelete = function(policyNode) {
