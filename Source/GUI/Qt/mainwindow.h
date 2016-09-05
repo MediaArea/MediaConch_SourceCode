@@ -106,12 +106,12 @@ public:
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
     int                         policy_import(const QString& file, std::string& err);
-    int                         xslt_policy_create(std::string& err);
+    int                         xslt_policy_create(int parent_id, std::string& err);
     int                         policy_duplicate(int id, int dst_policy_id, std::string& err);
     int                         policy_move(int id, int dst_policy_id, std::string& err);
     int                         policy_change_info(int id, const std::string& name, const std::string& description, std::string& err);
     int                         policy_change_type(int id, const std::string& type, std::string& err);
-    int                         policy_get(int pos, MediaConchLib::Get_Policy& p);
+    int                         policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p);
     int                         policy_save(int pos, std::string& err);
     int                         policy_get_name(int pos, std::string& name, std::string& err);
     int                         policy_dump(int pos, std::string& memory, std::string& err);

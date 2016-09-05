@@ -5260,7 +5260,7 @@ RESTAPI::XSLT_Policy_Create_Res *RESTAPI::parse_xslt_policy_create_res(const std
     res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5292,7 +5292,7 @@ RESTAPI::Policy_Import_Res *RESTAPI::parse_policy_import_res(const std::string& 
     res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5319,7 +5319,7 @@ RESTAPI::Policy_Remove_Res *RESTAPI::parse_policy_remove_res(const std::string& 
     Policy_Remove_Res *res = new Policy_Remove_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5351,7 +5351,7 @@ RESTAPI::Policy_Dump_Res *RESTAPI::parse_policy_dump_res(const std::string& data
     res->xml = xml->s;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5378,7 +5378,7 @@ RESTAPI::Policy_Save_Res *RESTAPI::parse_policy_save_res(const std::string& data
     Policy_Save_Res *res = new Policy_Save_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5410,7 +5410,7 @@ RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::st
     res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5442,7 +5442,7 @@ RESTAPI::Policy_Move_Res *RESTAPI::parse_policy_move_res(const std::string& data
     res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5469,7 +5469,7 @@ RESTAPI::Policy_Change_Info_Res *RESTAPI::parse_policy_change_info_res(const std
     Policy_Change_Info_Res *res = new Policy_Change_Info_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5496,7 +5496,7 @@ RESTAPI::Policy_Change_Type_Res *RESTAPI::parse_policy_change_type_res(const std
     Policy_Change_Type_Res *res = new Policy_Change_Type_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5517,34 +5517,38 @@ RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_RESULT");
-    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    if (!child)
         return NULL;
 
-    Policy_Get_Res *res = new Policy_Get_Res;
+    Policy_Get_Res *res = NULL;
 
-    Container::Value *nok = model->get_value_by_key(*child, "nok");
-    Container::Value *policy = model->get_value_by_key(*child, "policy");
-    Container::Value *policyTree = model->get_value_by_key(*child, "policyTree");
-
-    if (nok && parse_policy_nok(nok, &res->nok))
+    if (child->type == Container::Value::CONTAINER_TYPE_OBJECT)
     {
-        delete res;
-        return NULL;
+        Container::Value *nok = model->get_value_by_key(*child, "nok");
+        Container::Value *policy = model->get_value_by_key(*child, "policy");
+
+        res = new Policy_Get_Res;
+
+        if (nok && parse_policy_nok(nok, &res->nok) < 0)
+        {
+            delete res;
+            return NULL;
+        }
+        else if (policy && (res->policy = parse_a_policy(policy)) == NULL)
+        {
+            delete res;
+            return NULL;
+        }
+        else
+        {
+            delete res;
+            return NULL;
+        }
     }
-
-    else if (policy && (res->policy = parse_a_policy(policy)) == NULL)
+    else if (child->type == Container::Value::CONTAINER_TYPE_STRING)
     {
-        delete res;
-        return NULL;
-    }
-
-    else if (policyTree && policyTree->type == Container::Value::CONTAINER_TYPE_STRING)
-        res->policyTree = policyTree->s;
-
-    else
-    {
-        delete res;
-        return NULL;;
+        res = new Policy_Get_Res;
+        res->policyTree = child->s;
     }
 
     return res;
@@ -5573,7 +5577,7 @@ RESTAPI::Policy_Get_Name_Res *RESTAPI::parse_policy_get_name_res(const std::stri
     res->name = name->s;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5605,7 +5609,7 @@ RESTAPI::Policy_Get_Policies_Count_Res *RESTAPI::parse_policy_get_policies_count
     res->size = size->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5632,7 +5636,7 @@ RESTAPI::Policy_Clear_Policies_Res *RESTAPI::parse_policy_clear_policies_res(con
     Policy_Clear_Policies_Res *res = new Policy_Clear_Policies_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5653,39 +5657,39 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_POLICIES_RESULT");
-    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    if (!child)
         return NULL;
 
-    Container::Value *policies = model->get_value_by_key(*child, "policies");
-    Container::Value *policiesTree = model->get_value_by_key(*child, "policiesTree");
-    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    Policy_Get_Policies_Res *res = NULL;
+    if (child->type == Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        Container::Value *policies = model->get_value_by_key(*child, "policies");
+        Container::Value *nok = model->get_value_by_key(*child, "nok");
 
-    Policy_Get_Policies_Res *res = new Policy_Get_Policies_Res;
-    if (nok && parse_policy_nok(nok, &res->nok))
-    {
-        delete res;
-        return NULL;
-    }
-    else if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
-    {
-        if (policiesTree)
+        res = new Policy_Get_Policies_Res;
+        if (nok && parse_policy_nok(nok, &res->nok) < 0)
         {
             delete res;
             return NULL;
         }
-
-        if (parse_policies_get_policies(policies, res->policies) < 0)
+        else if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            if (parse_policies_get_policies(policies, res->policies) < 0)
+            {
+                delete res;
+                return NULL;
+            }
+        }
+        else
         {
             delete res;
-            return NULL;;
+            return NULL;
         }
     }
-    else if (policiesTree && policiesTree->type == Container::Value::CONTAINER_TYPE_STRING)
-        res->policiesTree = policiesTree->s;
-    else
+    else if (child->type == Container::Value::CONTAINER_TYPE_STRING)
     {
-        delete res;
-        return NULL;;
+        res = new Policy_Get_Policies_Res;
+        res->policiesTree = child->s;
     }
 
     return res;
@@ -5718,7 +5722,7 @@ RESTAPI::Policy_Get_Policies_Names_List_Res *RESTAPI::parse_policy_get_policies_
     }
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5771,7 +5775,7 @@ RESTAPI::XSLT_Policy_Rule_Create_Res *RESTAPI::parse_xslt_policy_rule_create_res
     XSLT_Policy_Rule_Create_Res *res = new XSLT_Policy_Rule_Create_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5797,7 +5801,7 @@ RESTAPI::XSLT_Policy_Rule_Get_Res *RESTAPI::parse_xslt_policy_rule_get_res(const
     XSLT_Policy_Rule_Get_Res *res = new XSLT_Policy_Rule_Get_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5839,7 +5843,7 @@ RESTAPI::XSLT_Policy_Rule_Edit_Res *RESTAPI::parse_xslt_policy_rule_edit_res(con
     XSLT_Policy_Rule_Edit_Res *res = new XSLT_Policy_Rule_Edit_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5871,7 +5875,7 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Res *RESTAPI::parse_xslt_policy_rule_duplica
     res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5903,7 +5907,7 @@ RESTAPI::XSLT_Policy_Rule_Move_Res *RESTAPI::parse_xslt_policy_rule_move_res(con
     res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;
@@ -5929,7 +5933,7 @@ RESTAPI::XSLT_Policy_Rule_Delete_Res *RESTAPI::parse_xslt_policy_rule_delete_res
     XSLT_Policy_Rule_Delete_Res *res = new XSLT_Policy_Rule_Delete_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok))
+    if (parse_policy_nok(nok, &res->nok) < 0)
     {
         delete res;
         return NULL;

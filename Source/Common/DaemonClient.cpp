@@ -913,6 +913,7 @@ int DaemonClient::policy_get(int user, int id, const std::string& format, MediaC
     {
         policy.jstree = new std::string;
         *policy.jstree = res->policyTree;
+        policy.format = format;
     }
 
     delete res;

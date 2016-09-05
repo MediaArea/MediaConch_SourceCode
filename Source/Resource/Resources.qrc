@@ -25,8 +25,13 @@
         <file alias="select2.full.js">html/js/select2.full.min.js</file>
         <file alias="checker.js">html/js/checker.js</file>
         <file alias="policy.js">html/js/policy.js</file>
+        <file alias="policyTree.js">html/js/policyTree.js</file>
+        <file alias="policyTreePolicies.js">html/js/policyTreePolicies.js</file>
+        <file alias="policyTreeRules.js">html/js/policyTreeRules.js</file>
+        <file alias="policyTreeAffix.js">html/js/policyTreeAffix.js</file>
         <file alias="policyWebEngine.js">html/js/policyWebEngine.js</file>
         <file alias="policyWebKit.js">html/js/policyWebKit.js</file>
+        <file alias="message.js">html/js/message.js</file>
         <file alias="display.js">html/js/display.js</file>
         <file alias="settings.js">html/js/settings.js</file>
         <file alias="main.css">html/css/main.css</file>

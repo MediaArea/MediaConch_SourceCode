@@ -529,7 +529,7 @@ void WorkerFiles::fill_registered_files_from_db()
 
         //check if policy still exists
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(fr->policy, p) < 0)
+        if (mainwindow->policy_get(fr->policy, "JSON", p) < 0)
             fr->policy = -1;
 
         fr->index = file_index++;

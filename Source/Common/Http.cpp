@@ -300,10 +300,16 @@ int Http::send_request(RESTAPI::Policy_Clear_Policies_Req&)
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Get_Policies_Req&)
+int Http::send_request(RESTAPI::Policy_Get_Policies_Req& req)
 {
-    std::string uri = "/" + RESTAPI::API_VERSION + "/policy_get_policies";
-    return send_request_get(uri);
+    std::string query;
+    rest.serialize_policy_get_policies_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/policy_get_policies" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
 }
 
 //---------------------------------------------------------------------------

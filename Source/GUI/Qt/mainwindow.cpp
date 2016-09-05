@@ -684,9 +684,9 @@ int MainWindow::policy_import(const QString& filename, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::xslt_policy_create(std::string& err)
+int MainWindow::xslt_policy_create(int parent_id, std::string& err)
 {
-    return MCL.xslt_policy_create(-1, err);
+    return MCL.xslt_policy_create(-1, err, "and", parent_id);
 }
 
 //---------------------------------------------------------------------------
@@ -744,16 +744,16 @@ int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, std::string&
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::policy_get(int pos, MediaConchLib::Get_Policy& p)
+int MainWindow::policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p)
 {
     std::string err;
-    return MCL.policy_get(-1, pos, "JSON", p, err);
+    return MCL.policy_get(-1, pos, format, p, err);
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::policy_remove(int pos, std::string& err)
+int MainWindow::policy_remove(int id, std::string& err)
 {
-    return MCL.policy_remove(-1, pos, err);
+    return MCL.policy_remove(-1, id, err);
 }
 
 //---------------------------------------------------------------------------
