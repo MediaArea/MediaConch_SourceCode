@@ -777,22 +777,15 @@ int MainWindow::policy_get_name(int pos, std::string& name, std::string& err)
 //---------------------------------------------------------------------------
 int MainWindow::policy_export(int pos, std::string& err)
 {
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
     std::string p_name;
     if (MCL.policy_get_name(-1, pos, p_name, err) < 0)
         return -1;
 
     QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p_name.c_str()) + ".xsl";
+    suggested += "/" + QString().fromUtf8(p_name.c_str()) + ".xml";
 
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("XSLT (*.xsl)"));
+                                                    suggested, tr("XML (*.xml)"));
 
     if (!filename.length())
         return -1;

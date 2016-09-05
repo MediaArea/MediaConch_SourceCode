@@ -106,7 +106,11 @@ var policyTreeAjax = (function() {
         *
         * @return XML
         */
-        // window.location = Routing.generate('app_xslpolicy_xslpolicytreeexport', {id: policyNode.data.policyId});
+        webpage.policy_export(policyNode.data.policyId, function(res){
+            data = JSON.parse(res);
+            if (data.error)
+                mcoMessage.error(data.error);
+        });
     }
 
     var policyDuplicate = function(policyNode, dstNode) {

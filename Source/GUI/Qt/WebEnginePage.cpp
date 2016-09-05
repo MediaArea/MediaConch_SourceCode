@@ -1048,7 +1048,7 @@ namespace MediaConch
         return json;
     }
 
-    QString WebPage::export_policy(int id)
+    QString WebPage::policy_export(int id)
     {
         //return: error?
         QString json;

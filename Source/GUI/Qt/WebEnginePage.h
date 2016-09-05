@@ -90,7 +90,7 @@ public Q_SLOTS:
     QString      xslt_policy_create(int parent_id);
     QString      duplicate_policy(int id, int dst_policy_id);
     QString      move_policy(int id, int dst_policy_id);
-    QString      export_policy(int id);
+    QString      policy_export(int id);
     QString      policy_remove(int id);
     QString      policy_edit(int id, const QString& name, const QString& description, const QString& type);
     QString      policy_rule_create(int policy_id);
