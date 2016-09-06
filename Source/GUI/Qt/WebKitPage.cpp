@@ -1167,7 +1167,6 @@ namespace MediaConch
 
         QString rule_data;
         create_rule_tree(r, rule_data);
-        printf("%s\n", rule_data.toUtf8().data());
         json = QString("{\"rule\":");
         json += rule_data;
         json += "}";
@@ -1200,7 +1199,6 @@ namespace MediaConch
 
         QString rule_data;
         create_rule_tree(r, rule_data);
-        printf("%s\n", rule_data.toUtf8().data());
         json = QString("{\"rule\":");
         json += rule_data;
         json += "}";

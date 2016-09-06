@@ -275,7 +275,6 @@ var policyTreeAjax = (function() {
          */
         webpage.get_fields_list(trackType, field, function(res){
             data = JSON.parse(res);
-            // alert(data.fields);
             if (!data.error)
                 policyTreeRules.fieldsListOk(data.fields, field)
             else
