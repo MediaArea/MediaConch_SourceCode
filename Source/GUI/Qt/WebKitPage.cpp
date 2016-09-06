@@ -894,7 +894,7 @@ namespace MediaConch
             if (tmp.startsWith("{\"error\":"))
                 ret = -1;
             else
-                script += QString("policyImportDrag(%1);").arg(tmp);
+                script += QString("policyTreeAjax.policyDropped(%1);").arg(tmp);
         }
         if (script.length())
             use_javascript(script);

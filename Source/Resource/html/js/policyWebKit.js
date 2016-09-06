@@ -32,6 +32,15 @@ var policyTreeAjax = (function() {
             mcoMessage.error(data.error);
     }
 
+    var policyDropped = function(data)
+    {
+        // data = JSON.parse(res);
+        if (!data.error)
+            policyTree.policyImport(data.policyTree);
+        else
+            mcoMessage.error(data.error);
+    }
+
     var policyCreate = function(policyNode, parentId) {
         /**
          * Create a policy
@@ -285,6 +294,7 @@ var policyTreeAjax = (function() {
     return {
         getData: getData,
         policyImport: policyImport,
+        policyDropped: policyDropped,
         policyCreate: policyCreate,
         policyEdit: policyEdit,
         policyDelete: policyDelete,

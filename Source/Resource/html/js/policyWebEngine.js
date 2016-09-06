@@ -34,6 +34,15 @@ var policyTreeAjax = (function() {
         });
     }
 
+    var policyDropped = function(data)
+    {
+        // data = JSON.parse(res);
+        if (!data.error)
+            policyTree.policyImport(data.policyTree);
+        else
+            mcoMessage.error(data.error);
+    }
+
     var policyCreate = function(policyNode, parentId) {
         /**
          * Create a policy
@@ -313,5 +322,6 @@ var policyTreeAjax = (function() {
         ruleMove: ruleMove,
         getFieldsList: getFieldsList,
         getValuesList: getValuesList,
+        policyDropped: policyDropped,
     };
 })();
