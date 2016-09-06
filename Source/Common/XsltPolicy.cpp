@@ -405,8 +405,15 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
     xmlChar *occurrence = xmlGetNoNsProp(node, (const unsigned char*)"occurrence");
     if (occurrence)
     {
-        char *end;
-        r->occurrence = strtol((const char*)occurrence, &end, 10);
+        std::string occ((const char*)occurrence);
+
+        if (occ == "*")
+            r->occurrence = -1;
+        else
+        {
+            char *end;
+            r->occurrence = strtol(occ.c_str(), &end, 10);
+        }
         xmlFree(occurrence);
     }
 

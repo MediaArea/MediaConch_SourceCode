@@ -175,19 +175,38 @@ var policyTreeAjax = (function() {
          * @return json
          * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
          */
-        // $.ajax({
-        //     type: form.attr('method'),
-        //         url: Routing.generate('app_xslpolicy_xslpolicytreeruleedit', {id: ruleNode.data.ruleId, policyId: policyId}),
-        //         data: new FormData(form[0]),
-        //         processData: false,
-        //         contentType: false
-        // })
-        // .done(function (data) {
-        //     policyTree.ruleEdit(data.rule, ruleNode);
-        // })
-        // .fail(function (jqXHR) {
-        //     mcoMessage.fail(jqXHR);
-        // })
+
+        var name = $("#xslPolicyRule_title").val();
+        if (name === null)
+            name = "";
+
+        var tracktype = $("#xslPolicyRule_trackType").val();
+        if (tracktype === null)
+            tracktype = "";
+
+        var field = $("#xslPolicyRule_field").val();
+        if (field === null)
+            field = "";
+
+        var occurrence = $("#xslPolicyRule_occurrence").val();
+        if (occurrence === null || occurrence === "*")
+            occurrence = -1;
+
+        var ope = $("#xslPolicyRule_validator").val();
+        if (ope === null)
+            ope = "";
+
+        var value = $("#xslPolicyRule_value").val();
+        if (value === null)
+            value = "";
+
+        webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, value, function(res){
+            data = JSON.parse(res);
+            if (!data.error)
+                policyTree.ruleEdit(data.rule, ruleNode);
+            else
+                mcoMessage.error(data.error);
+        });
     }
 
     var ruleDelete = function(policyId, ruleNode) {
@@ -199,13 +218,13 @@ var policyTreeAjax = (function() {
          * @return json
          * {"id":RULE_ID}
          */
-        // $.get(Routing.generate('app_xslpolicy_xslpolicytreeruledelete', {id: ruleNode.data.ruleId, policyId: policyId}))
-        // .done(function (data) {
-        //     policyTree.ruleDelete(ruleNode);
-        // })
-        // .fail(function (jqXHR) {
-        //     mcoMessage.fail(jqXHR);
-        // })
+        webpage.xslt_policy_rule_delete(policyId, ruleNode.data.ruleId, function(res){
+            data = JSON.parse(res);
+            if (!data.error)
+                policyTree.ruleDelete(ruleNode);
+            else
+                mcoMessage.error(data.error);
+        });
     }
 
     var ruleDuplicate = function(policyId, ruleNode, dstNode) {
@@ -218,13 +237,14 @@ var policyTreeAjax = (function() {
          * @return json
          * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE,  "ope":OPERATOR}}
          */
-        // $.get(Routing.generate('app_xslpolicy_xslpolicytreeruleduplicate', {id: ruleNode.data.ruleId, policyId: policyId, dstPolicyId: dstNode.data.policyId}))
-        // .done(function (data) {
-        //     policyTree.ruleDuplicate(data.rule, dstNode);
-        // })
-        // .fail(function (jqXHR) {
-        //     mcoMessage.fail(jqXHR);
-        // })
+
+        webpage.xslt_policy_rule_duplicate(policyId, ruleNode.data.ruleId, dstNode.data.policyId, function(res){
+            data = JSON.parse(res);
+            if (!data.error)
+                policyTree.ruleDuplicate(data.rule, dstNode);
+            else
+                mcoMessage.error(data.error);
+        });
     }
 
     var ruleMove = function(policyId, ruleNode, dstNode) {
@@ -237,13 +257,14 @@ var policyTreeAjax = (function() {
          * @return json
          * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
          */
-        // $.get(Routing.generate('app_xslpolicy_xslpolicytreerulemove', {id: ruleNode.data.ruleId, policyId: policyId, dstPolicyId: policyTree.getPolicyId(dstNode)}))
-        // .done(function (data) {
-        //     policyTree.ruleMove(data.rule, dstNode, ruleNode);
-        // })
-        // .fail(function (jqXHR) {
-        //     mcoMessage.fail(jqXHR);
-        // })
+
+        webpage.xslt_policy_rule_move(policyId, ruleNode.data.ruleId, dstNode.data.policyId, function(res){
+            data = JSON.parse(res);
+            if (!data.error)
+                policyTree.ruleMove(data.rule, dstNode, ruleNode);
+            else
+                mcoMessage.error(data.error);
+        });
     }
 
     var getFieldsList = function(trackType, field) {
@@ -252,13 +273,14 @@ var policyTreeAjax = (function() {
          *
          * @return json
          */
-        // $.post(Routing.generate('app_xslpolicy_xslpolicyrulefieldslist'), {type: trackType, field: field})
-        // .done(function(data) {
-        //     policyTreeRules.fieldsListOk(data, field)
-        // })
-        // .fail(function () {
-        //     policyTreeRules.fieldsListError(field)
-        // });
+        webpage.get_fields_list(trackType, field, function(res){
+            data = JSON.parse(res);
+            // alert(data.fields);
+            if (!data.error)
+                policyTreeRules.fieldsListOk(data.fields, field)
+            else
+                policyTreeRules.fieldsListError(field);
+        });
     }
 
     var getValuesList = function(trackType, field, value) {
@@ -267,13 +289,13 @@ var policyTreeAjax = (function() {
          *
          * @return json
          */
-        // $.post(Routing.generate('app_xslpolicy_xslpolicyrulevalueslist'), {type: trackType, field: field, value: value})
-        // .done(function(data) {
-        //     policyTreeRules.valuesListOk(data.values, value);
-        // })
-        // .fail(function () {
-        //     policyTreeRules.valuesListError(value);
-        // });
+        webpage.get_values_list(trackType, field, value, function(res){
+            data = JSON.parse(res);
+            if (!data.error)
+                policyTreeRules.valuesListOk(data.values, value);
+            else
+                policyTreeRules.valuesListError(value);
+        });
     }
 
     return {

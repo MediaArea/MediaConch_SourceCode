@@ -219,12 +219,12 @@ void CheckerWindow::create_policy_options(QString& policies)
     QString system_policy;
     QString user_policy;
     int selected_policy = mainwindow->select_correct_policy();
-    for (size_t i = 0; i < list.policies->size(); ++i)
+    for (size_t i = 0; list.policies && i < list.policies->size(); ++i)
     {
         if (!list.policies->at(i))
             continue;
 
-        if (list.policies->at(i)->name.length() && list.policies->at(i)->name.find(":/") == 0)
+        if (list.policies->at(i)->is_system)
         {
             system_policy += QString("<option ");
             if ((int)list.policies->at(i)->id == selected_policy)

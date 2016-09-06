@@ -161,12 +161,12 @@ void SettingsWindow::create_policy_options(QString& policies)
     else
         selected_policy = QString().fromUtf8(policy_str.c_str(), policy_str.length()).toInt();
 
-    for (size_t i = 0; i < p.policies->size(); ++i)
+    for (size_t i = 0; p.policies && i < p.policies->size(); ++i)
     {
         if (!p.policies->at(i))
             continue;
 
-        if (p.policies->at(i)->name.length() && p.policies->at(i)->name.find(":/") == 0)
+        if (p.policies->at(i)->is_system)
         {
             system_policy += QString("<option ");
             if ((int)p.policies->at(i)->id == selected_policy)

@@ -111,6 +111,56 @@ function buttonBindings() {
     $('.policyCreate').on('click', function () {
         policyTreeAjax.policyCreate(policyTree.getSelectedNode(), policyTree.getPolicyId());
     });
+
+
+    // Create policy rules
+    $('#xslPolicyRule_validator').on('change', function() {
+        displayValueField($('#xslPolicyRule_validator').val());
+    })
+
+    $('#xslPolicyRule_trackType').on('change', function() {
+        loadFieldsList($('#xslPolicyRule_trackType').val(), $('#xslPolicyRule_field').val());
+        displayOccurenceField($('#xslPolicyRule_trackType').val());
+    });
+
+    $('#xslPolicyRule_field').on('change', function() {
+        loadValuesList($('#xslPolicyRule_trackType').val(), $('#xslPolicyRule_field').val(), $('#xslPolicyRule_value').val());
+    });
+}
+
+function displayValueField(validator) {
+    if ('exists' == validator || 'does_not_exist' == validator) {
+        $('#xslPolicyRule_value').parent().addClass('hidden');
+    }
+    else {
+        $('#xslPolicyRule_value').parent().removeClass('hidden');
+    }
+}
+
+function loadFieldsList(trackType, field) {
+    policyTreeAjax.getFieldsList(trackType, field);
+
+    if (field) {
+        $('#xslPolicyRule_field').trigger('change');
+    }
+}
+
+function displayOccurenceField(trackType) {
+    if ('General' == trackType) {
+        $('#xslPolicyRule_occurrence').prop('disabled', true);
+        $('#xslPolicyRule_occurrence').val('*');
+    }
+    else {
+        $('#xslPolicyRule_occurrence').prop('disabled', false);
+    }
+}
+
+function loadValuesList(trackType, field, value) {
+    if (trackType && field) {
+        policyTreeAjax.getValuesList(trackType, field, value);
+
+        $('#xslPolicyRule_value').trigger('change');
+    }
 }
 
 $(document).ready(function() {
