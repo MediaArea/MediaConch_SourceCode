@@ -200,7 +200,10 @@ XsltPolicy::XsltPolicy(const XsltPolicy& s, bool is_system) : Policy(s), XsltPol
 XsltPolicy::~XsltPolicy()
 {
     for (size_t i = 0; i < nodes.size(); ++i)
+    {
         delete nodes[i];
+        nodes[i] = NULL;
+    }
     nodes.clear();
 }
 

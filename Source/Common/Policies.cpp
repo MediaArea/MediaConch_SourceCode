@@ -51,9 +51,28 @@ Policies::~Policies()
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.begin();
     for (; it != policies.end(); ++it)
     {
-        std::map<size_t, Policy *>::iterator it_p = it->second.begin();
-        for (; it_p != it->second.end(); ++it_p)
-            delete it_p->second;
+        std::map<size_t, Policy*>::iterator it_p = it->second.begin();
+        while (it_p != it->second.end())
+        {
+            if (!it_p->second || it_p->second->is_system)
+            {
+                ++it_p;
+                continue;
+            }
+
+            if (it_p->second->type != POLICY_XSLT)
+            {
+                delete it_p->second;
+                it_p->second = NULL;
+                it->second.erase(it_p);
+            }
+            else if (((XsltPolicy*)it_p->second)->parent_id == (size_t)-1)
+                delete_xslt_sub_policy(it->second, (XsltPolicy*)it_p->second);
+            else
+                it->second.erase(it_p);
+
+            it_p = it->second.begin();
+        }
         it->second.clear();
     }
     policies.clear();
@@ -63,6 +82,26 @@ Policies::~Policies()
     system_policies.clear();
 
     xmlCleanupParser();
+}
+
+void Policies::delete_xslt_sub_policy(std::map<size_t, Policy*>& policies, XsltPolicy* p)
+{
+    for (size_t i = 0; i < p->nodes.size(); ++i)
+    {
+        if (!p->nodes[i])
+            continue;
+        if (p->nodes[i]->kind == XSLT_POLICY_RULE)
+            delete p->nodes[i];
+        else
+            delete_xslt_sub_policy(policies, (XsltPolicy*)p->nodes[i]);
+        p->nodes[i] = NULL;
+    }
+    p->nodes.clear();
+
+    std::map<size_t, Policy*>::iterator it = policies.find(p->id);
+    if (it != policies.end())
+        policies.erase(it);
+    delete p;
 }
 
 // Policy

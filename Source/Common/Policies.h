@@ -148,6 +148,7 @@ private:
     Policies& operator=(const Policies&);
 
     //Helper
+    void delete_xslt_sub_policy(std::map<size_t, Policy*>& policies, XsltPolicy* p);
     void find_save_name(int user, const char* base, std::string& save_name, const char* filename = NULL);
     void find_new_policy_name(int user, std::string& title);
     int remove_policy(int user, int id, std::string& err);
