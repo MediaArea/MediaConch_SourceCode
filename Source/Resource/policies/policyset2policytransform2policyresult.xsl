@@ -130,11 +130,13 @@
           <aliasxsl:copy-of select="$context"/>
           <aliasxsl:copy-of select="$ruleresults"/>
           <aliasxsl:copy-of select="$morepolicies"/>
+          <!-- disable this output for now
           <aliasxsl:choose>
             <aliasxsl:when test="count(exsl:node-set($ruleresults)/mc:rule)+count(exsl:node-set($morepolicies)/mc:policy)='0'">
               <rule outcome="N/A"/>
             </aliasxsl:when>
           </aliasxsl:choose>
+          -->
         </policy>
       </aliasxsl:template>
     </aliasxsl:stylesheet>
