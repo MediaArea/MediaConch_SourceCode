@@ -86,6 +86,7 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule* r) : XsltPolicyNode(r)
     this->ope        = r->ope;
     this->track_type = r->track_type;
     this->field      = r->field;
+    this->scope      = r->scope;
     this->occurrence = r->occurrence;
     this->value      = r->value;
 }
@@ -100,6 +101,7 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule& r) : XsltPolicyNode(r)
     this->ope        = r.ope;
     this->track_type = r.track_type;
     this->field      = r.field;
+    this->scope      = r.scope;
     this->occurrence = r.occurrence;
     this->value      = r.value;
 }
@@ -111,6 +113,7 @@ int XsltPolicyRule::edit_policy_rule(const XsltPolicyRule* rule, std::string&)
     this->ope        = rule->ope;
     this->track_type = rule->track_type;
     this->field      = rule->field;
+    this->scope      = rule->scope;
     this->occurrence = rule->occurrence;
     this->value      = rule->value;
 
@@ -119,7 +122,10 @@ int XsltPolicyRule::edit_policy_rule(const XsltPolicyRule* rule, std::string&)
 
 void XsltPolicyRule::create_default_name(std::string& name)
 {
-    name = track_type + "/" + field;
+    if (scope.size())
+        name = scope + " " + field;
+    else
+        name = track_type + "/" + field;
     if (ope == "=")
         name += " is ";
     else if (ope == "!=")
@@ -132,10 +138,13 @@ void XsltPolicyRule::create_default_name(std::string& name)
         name += " is greater or equal than ";
     else if (ope == "<=")
         name += " is less or equal than ";
+    else if (ope == "")
+        name += " exists";
     else
-        name += " " + ope + "";
+        name += " " + ope + " ";
     name += value;
 }
+
 //***************************************************************************
 // XsltPolicy
 //***************************************************************************

@@ -118,6 +118,7 @@ public:
         std::string  name;
         std::string  tracktype;
         std::string  field;
+        std::string  scope;
         int          occurrence;
         std::string  ope;
         std::string  value;

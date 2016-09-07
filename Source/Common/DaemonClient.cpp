@@ -1238,6 +1238,7 @@ XsltPolicyRule *DaemonClient::xslt_policy_rule_get(int user, int policy_id, int 
         rule->node_name = res->rule.name;
         rule->track_type = res->rule.tracktype;
         rule->field = res->rule.field;
+        rule->scope = res->rule.scope;
         rule->occurrence = res->rule.occurrence;
         rule->ope = rule->ope;
         rule->value = res->rule.value;
@@ -1261,6 +1262,7 @@ int DaemonClient::xslt_policy_rule_edit(int user, int policy_id, int rule_id, co
     req.rule.name = rule->node_name;
     req.rule.tracktype = rule->track_type;
     req.rule.field = rule->field;
+    req.rule.scope = rule->scope;
     req.rule.occurrence = rule->occurrence;
     req.rule.ope = rule->ope;
     req.rule.value = rule->value;

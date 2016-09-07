@@ -859,6 +859,7 @@ Parameters:
 * name:       Name of the rule
 * tracktype:  Track type of the rule
 * field:      Field of the rule
+* scope:      Scope of the rule, mt for MediaTrace, nothing for MediaInfo
 * occurrence: Number of occurrence of the field
 * ope:        Operator of the Rule
 * value:      Value of the rule

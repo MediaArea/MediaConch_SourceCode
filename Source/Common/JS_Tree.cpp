@@ -489,6 +489,7 @@ int JsTree::rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& 
     ss << "\"ruleId\":" << rule->id;
     ss << ",\"tracktype\":\"" << rule->tracktype;
     ss << "\",\"field\":\"" << rule->field;
+    ss << "\",\"scope\":\"" << rule->scope;
     ss << "\",\"occurrence\":" << rule->occurrence;
     ss << ",\"ope\":\"" << rule->ope;
     ss << "\",\"value\":\"" << rule->value;

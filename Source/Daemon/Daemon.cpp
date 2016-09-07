@@ -1316,6 +1316,7 @@ namespace MediaConch
             res.rule.name = rule->node_name;
             res.rule.tracktype = rule->track_type;
             res.rule.field = rule->field;
+            res.rule.scope = rule->scope;
             res.rule.occurrence = rule->occurrence;
             res.rule.ope = rule->ope;
             res.rule.value = rule->value;
@@ -1344,6 +1345,7 @@ namespace MediaConch
         rule.node_name = req->rule.name;
         rule.track_type = req->rule.tracktype;
         rule.field = req->rule.field;
+        rule.scope = req->rule.scope;
         rule.occurrence = req->rule.occurrence;
         rule.ope = req->rule.ope;
         rule.value = req->rule.value;

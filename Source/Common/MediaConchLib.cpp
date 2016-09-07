@@ -619,13 +619,20 @@ std::string MediaConchLib::XSLT_Policy_Rule::to_str() const
 
     out << "{";
     out << "id: " << id;
-    out << ",\"name\":\"" << name;
-    out << "\",\"tracktype\":\"" << tracktype;
-    out << "\",\"field\":\"" << field;
-    out << "\",occurrence:" << occurrence;
-    out << ",\"ope\":\"" << ope;
-    out << "\",\"value\":\"" << value;
-    out << "\"}";
+    if (name.size())
+        out << ",\"name\":\"" << name << "\"";
+    if (tracktype.size())
+        out << ",\"tracktype\":\"" << tracktype << "\"";
+    if (field.size())
+        out << ",\"field\":\"" << field << "\"";
+    if (scope.size())
+        out << ",\"scope\":\"" << scope << "\"";
+    out << ",occurrence:" << occurrence;
+    if (ope.size())
+        out << ",\"ope\":\"" << ope << "\"";
+    if (value.size())
+        out << ",\"value\":\"" << value << "\"";
+    out << "}";
     return out.str();
 }
 

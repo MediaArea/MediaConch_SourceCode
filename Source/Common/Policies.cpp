@@ -422,6 +422,7 @@ MediaConchLib::XSLT_Policy_Rule* Policies::xslt_policy_rule_to_mcl_policy(XsltPo
         rule->create_default_name(r->name);
     r->tracktype = rule->track_type;
     r->field = rule->field;
+    r->scope = rule->scope;
     r->occurrence = rule->occurrence;
     r->ope = rule->ope;
     r->value = rule->value;
