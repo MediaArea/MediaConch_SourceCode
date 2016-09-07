@@ -1184,7 +1184,9 @@ void Core::create_report_mi_xml(const std::vector<std::string>& files, std::stri
     {
         vec.clear();
         vec.push_back(files[i]);
-        report += "<media ref=\"" + files[i] + "\">\n";
+        std::string file(files[i]);
+        xml_escape_attributes(file);
+        report += "<media ref=\"" + file + "\">\n";
 
         std::string info;
         get_report_saved(vec, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, info);
