@@ -1,6 +1,11 @@
 <policy type="or" name="Do I like these frames?">
     <description>NTSC is nice, so is PAL, also 320x240 cuz it's my sample file</description>
-    <rule scope="mt" value="EBML/EBMLVersion/Data" operator="=">2</rule>
+    <rule name="Jerome's favorite test" value="Format" tracktype="General" occurrence="1" operator="=">Matroska</rule>
+    <policy type="and" name="Here is a mediatrace-based rule">
+      <rule scope="mt" value="EBML/EBMLVersion/Data" operator="=">2</rule>
+    </policy>
+    <policy type="and" name="This is an empty policy with no rules just to see what happens">
+    </policy>
     <rule scope="mt" value="Segment/Cluster/SimpleBlock/Data/keyframe" operator="=">Yes</rule>
     <policy type="and" name="Does this use framesize and framerates that I like?">
         <policy type="or" name="I like frame heights like 240, 480, 486">
@@ -13,6 +18,14 @@
             <policy type="and" name="NTSC 4EVA">
                 <rule value="FrameRate_Num" tracktype="Video" occurrence="1" operator="=">30000</rule>
                 <rule value="FrameRate_Den" tracktype="Video" occurrence="1" operator="=">1001</rule>
+                <rule value="FrameRate_Den" tracktype="Video" occurrence="1"/>
+                <rule value="FrameRate_Den" tracktype="Video" occurrence="1"/>
+            </policy>
+            <policy type="and" name="These next rules test for existance because they have no operator and no value.">
+                <rule value="FrameRate" tracktype="Video" occurrence="1"/>
+                <rule value="FrameRate_Num" tracktype="Video" occurrence="1"/>
+                <rule value="FrameRate_Den" tracktype="Video" occurrence="1"/>
+                <rule value="FrameRate_FakeValue" tracktype="Video" occurrence="1"/>
             </policy>
             <policy type="and" name="Or Fake NTSC">
                 <rule value="FrameRate_Num" tracktype="Video" occurrence="1" operator="=">2997</rule>
