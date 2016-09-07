@@ -85,6 +85,7 @@ public:
     std::string   ope;
     std::string   track_type;
     std::string   field;
+    std::string   scope;
     int           occurrence;
     std::string   value;
 

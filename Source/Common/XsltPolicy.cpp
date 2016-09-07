@@ -404,6 +404,14 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
         xmlFree(field);
     }
 
+    //Get scope
+    xmlChar *scope = xmlGetNoNsProp(node, (const unsigned char*)"scope");
+    if (scope)
+    {
+        r->scope = std::string((const char*)scope);
+        xmlFree(scope);
+    }
+
     //Get occurrence
     xmlChar *occurrence = xmlGetNoNsProp(node, (const unsigned char*)"occurrence");
     if (occurrence)
@@ -519,6 +527,10 @@ int XsltPolicy::create_node_rule_child(xmlNodePtr& node, XsltPolicyRule *current
     //operator
     if (current->ope.size())
         xmlNewProp(node, (const xmlChar *)"operator", (const xmlChar *)current->ope.c_str());
+
+    //operator
+    if (current->scope.size())
+        xmlNewProp(node, (const xmlChar *)"scope", (const xmlChar *)current->scope.c_str());
 
     //value
     if (current->value.size())
