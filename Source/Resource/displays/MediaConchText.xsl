@@ -65,56 +65,28 @@
               </xsl:for-each>
             </xsl:for-each>
           </xsl:for-each>
-          <xsl:for-each select="mc:policyChecks">
+          <xsl:for-each select="mc:policy">
             <xsl:text>*****************&#xa;</xsl:text>
             <xsl:text>* Policy Checks *&#xa;</xsl:text>
-            <xsl:text>*****************&#xa;</xsl:text>
-            <xsl:for-each select="mc:check">
-              <xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
-              <xsl:value-of select="@name"/>
-              <xsl:text>&#xa;</xsl:text>
-              <xsl:if test="mc:context/@field != ''">
-                <xsl:text>Context (field): </xsl:text>
-                <xsl:value-of select="mc:context/@field"/>
-                <xsl:text>&#xa;</xsl:text>
-              </xsl:if>
-              <xsl:if test="mc:context/@value != ''">
-                <xsl:text>Context (value): </xsl:text>
-                <xsl:value-of select="mc:context/@value"/>
-                <xsl:text>&#xa;</xsl:text>
-              </xsl:if>
-              <xsl:for-each select="mc:test">
-                <xsl:if test="@tracktype != ''">
-                  <xsl:text>Track type: </xsl:text>
-                  <xsl:value-of select="@tracktype"/>
-                  <xsl:text>&#xa;</xsl:text>
-                </xsl:if>
-                <xsl:if test="@tracktypeorder">
-                  <xsl:text>Track Type Order: </xsl:text>
-                  <xsl:value-of select="@tracktypeorder"/>
-                  <xsl:text>&#xa;</xsl:text>
-                </xsl:if>
-                <xsl:if test="@trackid">
-                  <xsl:text>Track ID: </xsl:text>
-                  <xsl:value-of select="@trackid"/>
-                  <xsl:text>&#xa;</xsl:text>
-                </xsl:if>
-                <xsl:if test="@actual != ''">
-                  <xsl:text>Actual: </xsl:text>
-                  <xsl:value-of select="@actual"/>
-                  <xsl:text>&#xa;</xsl:text>
-                </xsl:if>
-                <xsl:text>Outcome: </xsl:text>
-                <xsl:value-of select="@outcome"/>
-                <xsl:text>&#xa;</xsl:text>
-                <xsl:if test="@reason != ''">
-                  <xsl:text>Reason: </xsl:text>
-                  <xsl:value-of select="@reason"/>
-                  <xsl:text>&#xa;</xsl:text>
-                </xsl:if>
-              </xsl:for-each>
-            </xsl:for-each>
-          </xsl:for-each>
-        </xsl:for-each>
-    </xsl:template>
+            <xsl:text>*****************</xsl:text>
+Name: <xsl:value-of select="@name"/>
+Description: <xsl:value-of select="mc:description"/>
+Outcome: <xsl:value-of select="@outcome"/>
+Rules run: <xsl:value-of select="@rules_run"/>
+Fail count: <xsl:value-of select="@fail_count"/>
+Pass count: <xsl:value-of select="@pass_count"/>     
+<xsl:for-each select="mc:rule">
+<xsl:text>&#xa;------------------------------------------------------------------------------</xsl:text>
+Xpath: <xsl:value-of select="@xpath"/>
+Outcome: <xsl:value-of select="@outcome"/>
+<xsl:if test="@actual != ''">
+<xsl:text>&#xa;</xsl:text>
+  <xsl:text>Actual: </xsl:text>
+  <xsl:value-of select="@actual"/>
+</xsl:if>
+</xsl:for-each>
+</xsl:for-each>
+</xsl:for-each>
+<xsl:text>&#xa;******************************************************************************&#xa;</xsl:text>
+</xsl:template>
 </xsl:stylesheet>
