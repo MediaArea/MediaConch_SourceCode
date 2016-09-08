@@ -1731,20 +1731,18 @@ bool Core::implementation_is_valid(const std::string& report)
 //---------------------------------------------------------------------------
 bool Core::policy_is_valid(const std::string& report)
 {
-    size_t pos = report.find(" fail_count=\"");
-
-    //if not present, no report, Unknown policy or only one rule
+    size_t pos = report.find("outcome=\"");
     if (pos == std::string::npos)
-        return has_outcome_fail(report);
-
-    pos += 13;
-    if (pos + 2 >= report.size())
-        return false;
-
-    if (report[pos] == '0' && report[pos + 1] == '"')
         return true;
 
-    return false;
+    pos += 9;
+    if (report.size() - pos < 5)
+        return false;
+
+    if (report[pos] == 'f' && report[pos + 1] == 'a' && report[pos + 2] == 'i' && report[pos + 3] == 'l' && report[pos + 4] == '"')
+        return false;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
