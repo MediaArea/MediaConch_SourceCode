@@ -280,30 +280,27 @@
         </xsl:if>
       </xsl:for-each>
 
-      <xsl:for-each select="mc:policyChecks">
+      <xsl:for-each select="mc:policy">
         <div class="mc_header">
           <h2>
-            <xsl:value-of select="mc:name"/>
+            <xsl:value-of select="@name"/>
           </h2>
           <p>
             <xsl:value-of select="mc:description"/>
           </p>
+          <p>Rules run: <xsl:value-of select="@rules_run"/></p>
+          <p>Fail count: <xsl:value-of select="@fail_count"/></p>
+          <p>Pass count: <xsl:value-of select="@pass_count"/></p>   
         </div>
-        <xsl:if test="position() &lt; 2">
-          <span class="verbosity">Toggle all verbosity:  </span> 
-          <input id="policy-toggle-{generate-id()}" class="toggle toggle-round" type="checkbox"/>
-          <label for="policy-toggle-{generate-id()}"></label>
-        </xsl:if>
         <table class="mc">
-          <xsl:for-each select="mc:check/mc:test">
+          <xsl:for-each select="mc:rule">
             <tr>
               <td class="mc_element">
-                <input id="policy-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
-                <label for="policy-arrow-{generate-id()}"></label>
                 <xsl:text> </xsl:text>
                 <strong>
-                  <xsl:value-of select="../@name"/>
+                  <xsl:value-of select="@xpath"/>
                 </strong>
+                <br/>
                 <xsl:text> </xsl:text>
                 <xsl:if test="@outcome = 'pass'">
                   <xsl:text>&#x2705;  </xsl:text>
@@ -312,34 +309,14 @@
                 <xsl:if test="@outcome = 'fail'">
                   <xsl:text>&#x274C;  </xsl:text>
                 <xsl:value-of select="@outcome"/>
-                (Reason: <xsl:value-of select="@reason"/>
-                <xsl:text>)</xsl:text>
+                  <xsl:if test="@actual != ''">
+                    <br/>
+                    <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
+                  </xsl:if>
                 </xsl:if>
                 <xsl:if test="@outcome = 'N/A'">
                 <xsl:value-of select="@outcome"/>
                 </xsl:if>
-                <div class="extra">
-                    <xsl:if test="../mc:context/@field != ''">
-                        <strong><xsl:text>Context (field): </xsl:text></strong>
-                        <xsl:value-of select="../mc:context/@field"/><br/>
-                    </xsl:if>
-                    <xsl:if test="../mc:context/@value != ''">
-                        <strong><xsl:text>Context (value): </xsl:text></strong>
-                        <xsl:value-of select="../mc:context/@value"/><br/>
-                    </xsl:if>
-                    <xsl:if test="@tracktype != ''">
-                      <strong>Track type: </strong> <xsl:value-of select="@tracktype"/><br/>
-                    </xsl:if>
-                   <xsl:if test="@tracktypeorder != ''">
-                      <strong>Track type order: </strong>  <xsl:value-of select="@tracktypeorder"/><br/>
-                  </xsl:if>
-                  <xsl:if test="@trackid != ''">
-                    <strong>Track ID: </strong>  <xsl:value-of select="@trackid"/><br/>
-                  </xsl:if>
-                  <xsl:if test="@actual != ''">
-                    <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
-                  </xsl:if>
-                </div>
               </td>
             </tr>
           </xsl:for-each>

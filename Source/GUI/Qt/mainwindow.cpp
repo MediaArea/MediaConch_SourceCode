@@ -303,7 +303,7 @@ void MainWindow::add_default_displays()
         displays_list.push_back(list[i].absoluteFilePath());
 
     QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
-    path += "policies/";
+    path += "displays/";
 
     QDir dir(path);
     if (dir.exists())
