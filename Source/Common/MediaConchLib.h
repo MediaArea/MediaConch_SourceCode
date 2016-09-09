@@ -225,6 +225,7 @@ public:
     int checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
+                         const std::map<std::string, std::string>& options,
                          std::vector<Checker_ValidateRes*>& result);
 
     //Clear
@@ -239,9 +240,9 @@ public:
 
     // Xsl Transformation
     int  transform_with_xslt_file(const std::string& report, const std::string& file,
-                                  std::string& result);
+                                  const std::map<std::string, std::string>& opts, std::string& result);
     int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
-                                    std::string& result);
+                                    const std::map<std::string, std::string>& opts, std::string& result);
 
     // Configuration
     void               load_configuration();

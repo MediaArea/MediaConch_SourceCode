@@ -42,6 +42,7 @@ namespace MediaConch
         void set_plugins_configuration_file(const std::string& file);
         void set_implementation_schema_file(const std::string& file);
         void set_implementation_verbosity(const std::string& verbosity);
+        int  set_policy_reference_file(const std::string& file);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
         void set_asynchronous(bool async);
@@ -55,7 +56,8 @@ namespace MediaConch
         CLI& operator=(const CLI&);
 
         int  run_create_policy();
-        int  is_ready(size_t i, MediaConchLib::report& report_kind);
+        int  run_policy_reference_file();
+        int  is_ready(const std::string& file, MediaConchLib::report& report_kind);
         void add_files_recursively(const std::string& filename);
 
         MediaConchLib MCL;
@@ -65,6 +67,7 @@ namespace MediaConch
         std::string              display_file;
         std::string              configuration_file;
         std::string              plugins_configuration_file;
+        std::string              policy_reference_file;
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format   format;
         bool                    use_daemon;

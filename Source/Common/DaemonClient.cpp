@@ -389,11 +389,12 @@ int DaemonClient::checker_get_report(int user, const std::bitset<MediaConchLib::
     if (display_content)
         req.display_content = *display_content;
 
-    if (options.find("verbosity") != options.end() && options.at("verbosity").length())
+    std::map<std::string, std::string>::const_iterator it = options.begin();
+    for (; it != options.end(); ++it)
     {
-        req.has_verbosity = true;
-        const std::string& verbosity = options.at("verbosity");
-        req.verbosity = strtol(verbosity.c_str(), NULL, 10);
+        if (!it->first.size())
+            continue;
+        req.options[it->first.c_str()] = it->second;
     }
 
     http_client->start();
@@ -430,6 +431,7 @@ int DaemonClient::checker_validate(int user, MediaConchLib::report report,
                                    const std::vector<std::string>& files,
                                    const std::vector<size_t>& policies_ids,
                                    const std::vector<std::string>& policies_contents,
+                                   const std::map<std::string, std::string>& options,
                                    std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
     if (!http_client)
@@ -472,6 +474,14 @@ int DaemonClient::checker_validate(int user, MediaConchLib::report report,
     }
     else
         return -1;
+
+    std::map<std::string, std::string>::const_iterator it = options.begin();
+    for (; it != options.end(); ++it)
+    {
+        if (!it->first.size())
+            continue;
+        req.options[it->first.c_str()] = it->second;
+    }
 
     http_client->start();
     if (http_client->send_request(req) < 0)

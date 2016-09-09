@@ -180,10 +180,11 @@ void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& 
         std::vector<size_t> policies_ids;
         std::vector<std::string> policies_contents;
         std::vector<MediaConchLib::Checker_ValidateRes*> res;
+        std::map<std::string, std::string> options;
         policies_ids.push_back(policy);
 
         if (mainwindow->validate(MediaConchLib::report_Max, file,
-                                 policies_ids, policies_contents, res) == 0 && res.size() == 1)
+                                 policies_ids, policies_contents, options, res) == 0 && res.size() == 1)
         {
             policy_valid = res[0]->valid;
             for (size_t j = 0; j < res.size() ; ++j)
@@ -347,10 +348,11 @@ void WorkerFiles::update_unfinished_files()
             fr->report_kind = report_kind;
             std::vector<size_t> policies_ids;
             std::vector<std::string> policies_contents;
+            std::map<std::string, std::string> options;
             std::vector<MediaConchLib::Checker_ValidateRes*> res;
 
             if (mainwindow->validate(report_kind, files[i],
-                                     policies_ids, policies_contents, res) == 0
+                                     policies_ids, policies_contents, options, res) == 0
                 && res.size() == 1)
                 fr->implementation_valid = res[0]->valid;
 
@@ -362,7 +364,7 @@ void WorkerFiles::update_unfinished_files()
                 policies_ids.push_back(fr->policy);
 
                 if (mainwindow->validate(MediaConchLib::report_Max, files[i],
-                                         policies_ids, policies_contents, res) == 0 && res.size() == 1)
+                                         policies_ids, policies_contents, options, res) == 0 && res.size() == 1)
                     fr->policy_valid = res[0]->valid;
                 for (size_t j = 0; j < res.size() ; ++j)
                     delete res[j];

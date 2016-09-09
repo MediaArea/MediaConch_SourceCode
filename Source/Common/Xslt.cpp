@@ -143,6 +143,8 @@ int Xslt::validate_xml(const std::string& xml, bool)
         std::map<std::string, std::string>::iterator it = options.begin();
         for (; it != options.end(); ++it)
         {
+            if (!it->second.size())
+                continue;
             vec.push_back(std::string(it->first));
             vec.push_back(std::string(it->second));
         }

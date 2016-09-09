@@ -126,7 +126,7 @@ namespace MediaConch
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
             }
 
-            int ready = is_ready(i, report_kind);
+            int ready = is_ready(files[i], report_kind);
             if (ready == MediaConchLib::errorHttp_NONE)
                 continue;
             else if (ready < 0)
@@ -147,11 +147,23 @@ namespace MediaConch
         if (create_policy_mode)
             return run_create_policy();
 
+        // if compare two files
+        if (policy_reference_file.size())
+        {
+            bool registered = false;
+            int ret = MCL.checker_analyze(policy_reference_file, registered, false);
+            if (ret < 0)
+                return ret;
+            if ((ret = run_policy_reference_file()) != MediaConchLib::errorHttp_TRUE)
+                return ret;
+        }
+
         //Output
         MediaConchLib::Checker_ReportRes result;
         std::vector<size_t> policies_ids;
         std::map<std::string, std::string> options;
         options["verbosity"] = MCL.get_implementation_verbosity();
+        options["policy_reference_file"] = policy_reference_file;
         MCL.checker_get_report(-1, report_set, format, file_to_report, policies_ids,
                                policies, options, &result, &display_file, NULL);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
@@ -294,6 +306,13 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int CLI::set_policy_reference_file(const std::string& file)
+    {
+        policy_reference_file = file;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::set_compression_mode(const std::string& mode_str)
     {
         MediaConchLib::compression mode;
@@ -325,17 +344,17 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int CLI::is_ready(size_t i, MediaConchLib::report& report_kind)
+    int CLI::is_ready(const std::string& file, MediaConchLib::report& report_kind)
     {
         double percent_done = 0;
 
-        int ret = MCL.checker_is_done(files[i], percent_done, report_kind);
+        int ret = MCL.checker_is_done(file, percent_done, report_kind);
         if (use_daemon && asynchronous)
         {
             if (ret == MediaConchLib::errorHttp_NONE)
             {
                 std::stringstream str;
-                str << "Analyzing " << files[i] << " ; done: " << percent_done  << "%";
+                str << "Analyzing " << file << " ; done: " << percent_done  << "%";
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
                 return 1;
             }
@@ -352,7 +371,7 @@ namespace MediaConch
                 #else
                 usleep(500000);
                 #endif
-                ret = MCL.checker_is_done(files[i], percent_done, report_kind);
+                ret = MCL.checker_is_done(file, percent_done, report_kind);
             }
         }
         return MediaConchLib::errorHttp_TRUE;
@@ -425,6 +444,12 @@ namespace MediaConch
     int CLI::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
     {
         return MCL.policy_get_values_for_type_field(type, field, values);
+    }
+
+    int CLI::run_policy_reference_file()
+    {
+        MediaConchLib::report report_kind;
+        return is_ready(policy_reference_file, report_kind);
     }
 
 }

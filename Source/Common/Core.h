@@ -86,13 +86,16 @@ public:
     void        checker_list(std::vector<std::string>& vec);
 
     int         checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& file,
-                         const std::vector<size_t>& policies_ids,
-                         const std::vector<std::string>& policies_contents,
-                         std::vector<MediaConchLib::Checker_ValidateRes*>& result);
+                                 const std::vector<size_t>& policies_ids,
+                                 const std::vector<std::string>& policies_contents,
+                                 const std::map<std::string, std::string>& options,
+                                 std::vector<MediaConchLib::Checker_ValidateRes*>& result);
 
     // Apply display
-    int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);
-    int  transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
+    int  transform_with_xslt_file(const std::string& report, const std::string& Xslt,
+                                  const std::map<std::string, std::string>& opts, std::string& result);
+    int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                    const std::map<std::string, std::string>& opts, std::string& result);
 
     int  policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
     int  policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
@@ -173,6 +176,7 @@ private:
     bool validate_xslt_from_memory(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& memory, std::string& report, bool is_implem=false);
     bool validate_xslt_policy_from_file(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& policy, std::string& report);
     void unify_implementation_options(std::map<std::string, std::string>& opts);
+    void unify_policy_options(std::map<std::string, std::string>& opts);
 
     int transform_with_xslt_text_memory(const std::string& report, std::string& result);
     int transform_with_xslt_html_memory(const std::string& report, std::string& result);

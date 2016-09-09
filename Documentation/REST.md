@@ -8,6 +8,11 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.8
+
+* Add XSL's options in Checker_Get_Report and Checker_Validate
+* Put the verbosity to options
+
 #### Version 1.7
 
 * create the command for policies
@@ -181,7 +186,8 @@ Parameters:
 - policies_ids:      Array of policies ids (Integer)
 - display_content:   String:  display content
 - display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE)
-- verbosity:         Integer: verbosity of the implementation report wanted, optionnal. Value between -1 and 5. If -1 or not given, takes the one from the server (since API v1.3)
+- options:           Object of strings given to the XSL transformations: Verbosity should be defined here.
+                     Example: "options":{"verbosity": "5", "key":"value", ...}
 
 ##### Response
 
@@ -276,6 +282,8 @@ Parameters:
 - report:            report kind, only POLICY or IMPLEMENTATION are possible
 - policies_contents: Array of policies contents (Strings)
 - policies_names:    Array of policies names (Strings)
+- options:           Objects with strings (key, value) given to the XSL transformations: Verbosity should be defined here.
+                     Example: "options":{"verbosity": "5", "key":"value", ...}
 
 ##### Response
 

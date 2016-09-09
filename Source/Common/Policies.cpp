@@ -847,7 +847,8 @@ int Policies::create_xslt_policy_from_file(int user, const std::string& file, st
     return pos;
 }
 
-int Policies::policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_policies, std::string& err)
+int Policies::policy_get_policy_id(Policy* p, const std::map<std::string, std::string>& opts,
+                                   std::vector<std::string>& xslt_policies, std::string& err)
 {
     if (!p)
         return -1;
@@ -855,7 +856,7 @@ int Policies::policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_pol
     std::string policy;
     if (p->type == POLICY_XSLT)
     {
-        if (((XsltPolicy*)p)->get_final_xslt(policy) < 0)
+        if (((XsltPolicy*)p)->get_final_xslt(policy, opts) < 0)
         {
             err = "Policy cannot be dumped";
             return -1;
@@ -875,7 +876,8 @@ int Policies::policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_pol
     return 0;
 }
 
-int Policies::policy_get_policy_content(const std::string& policy, std::vector<std::string>& xslt_policies, std::string& err)
+int Policies::policy_get_policy_content(const std::string& policy, const std::map<std::string, std::string>& opts,
+                                        std::vector<std::string>& xslt_policies, std::string& err)
 {
     int ret = -1;
     Policy *p = new XsltPolicy(this, !core->accepts_https());
@@ -896,13 +898,14 @@ int Policies::policy_get_policy_content(const std::string& policy, std::vector<s
         }
     }
 
-    ret = policy_get_policy_id(p, xslt_policies, err);
+    ret = policy_get_policy_id(p, opts, xslt_policies, err);
     delete p;
     return ret;
 }
 
 int Policies::policy_get_policies(int user, const std::vector<size_t>* policies_ids,
                                   const std::vector<std::string>* policies_contents,
+                                  const std::map<std::string, std::string>& opts,
                                   std::vector<std::string>& xslt_policies, std::string& err)
 {
     if (!policies_ids && !policies_contents)
@@ -914,14 +917,14 @@ int Policies::policy_get_policies(int user, const std::vector<size_t>* policies_
     if (policies_ids)
     {
         for (size_t i = 0; i < policies_ids->size(); ++i)
-            if (policy_get_policy_id(get_policy(user, policies_ids->at(i), err), xslt_policies, err) < 0)
+            if (policy_get_policy_id(get_policy(user, policies_ids->at(i), err), opts, xslt_policies, err) < 0)
                 return -1;
     }
 
     if (policies_contents)
     {
         for (size_t i = 0; i < policies_contents->size(); ++i)
-            if (policy_get_policy_content(policies_contents->at(i), xslt_policies, err) < 0)
+            if (policy_get_policy_content(policies_contents->at(i), opts, xslt_policies, err) < 0)
                 return -1;
     }
 
@@ -1330,9 +1333,10 @@ void Policies::add_recursively_policy_to_user_policies(int user, Policy* p)
 }
 
 int Policies::transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                         const std::map<std::string, std::string>& opts,
                                          std::string& result)
 {
-    return core->transform_with_xslt_memory(report, memory, result);
+    return core->transform_with_xslt_memory(report, memory, opts, result);
 }
 
 }

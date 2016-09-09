@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.7";
+const std::string RESTAPI::API_VERSION = "1.8";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -259,9 +259,16 @@ std::string RESTAPI::Checker_Report_Req::to_str() const
     out << "],policies_contents_size:[" << policies_contents.size();
     out << "],display_name:" << display_name;
     out << ",display_content_length:" << display_content.size();
-    if (has_verbosity)
-        out << ",verbosity:" << verbosity;
-    out << "}";
+    out << ",options:[";
+
+    std::map<std::string, std::string>::const_iterator it = options.begin();
+    for (; it != options.end(); ++it)
+    {
+        if (it != options.begin())
+            out << ", ";
+        out << "{" << it->first << ":" << it->second << "}";
+    }
+    out << "]}";
     return out.str();
 }
 
@@ -313,7 +320,17 @@ std::string RESTAPI::Checker_Validate_Req::to_str() const
     RESTAPI api;
     out << "],report: " << api.get_Report_string(report);
     out << ",policies_ids_size:[" << policies_ids.size();
-    out << "],policies_contents_size:[" << policies_contents.size() << "]}";
+    out << "],policies_contents_size:[" << policies_contents.size();
+    out << ",options:[";
+
+    std::map<std::string, std::string>::const_iterator it = options.begin();
+    for (; it != options.end(); ++it)
+    {
+        if (it != options.begin())
+            out << ", ";
+        out << "{" << it->first << ":" << it->second << "}";
+    }
+    out << "]}";
     return out.str();
 }
 
@@ -1246,8 +1263,26 @@ int RESTAPI::serialize_report_req(Checker_Report_Req& req, std::string& data)
     if (req.display_content.length())
         child.obj["display_content"] = serialize_report_string(req.display_content);
 
-    if (req.has_verbosity)
-        child.obj["verbosity"] = serialize_report_int(req.verbosity);
+    if (req.options.size())
+    {
+        Container::Value options;
+        options.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        std::map<std::string, std::string>::iterator it = req.options.begin();
+        for (; it != req.options.end(); ++it)
+        {
+            if (!it->first.size())
+                continue;
+
+            Container::Value value;
+            value.type = Container::Value::CONTAINER_TYPE_STRING;
+            value.s = it->second;
+
+            options.obj[it->first.c_str()] = value;
+        }
+
+        child.obj["options"] = options;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_REPORT"] = child;
@@ -1327,6 +1362,27 @@ int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data
         child.obj["policies_ids"] = serialize_report_arr_long_u(req.policies_ids);
     if (req.policies_contents.size())
         child.obj["policies_contents"] = serialize_report_arr_str(req.policies_contents);
+
+    if (req.options.size())
+    {
+        Container::Value options;
+        options.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        std::map<std::string, std::string>::iterator it = req.options.begin();
+        for (; it != req.options.end(); ++it)
+        {
+            if (!it->first.size())
+                continue;
+
+            Container::Value value;
+            value.type = Container::Value::CONTAINER_TYPE_STRING;
+            value.s = it->second;
+
+            options.obj[it->first.c_str()] = value;
+        }
+
+        child.obj["options"] = options;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_VALIDATE"] = child;
@@ -2715,7 +2771,7 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *user, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *verbosity;
+    Container::Value *ids, *user, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *options;
     ids = model->get_value_by_key(*child, "ids");
     user = model->get_value_by_key(*child, "user");
     reports = model->get_value_by_key(*child, "reports");
@@ -2723,7 +2779,7 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
     policies_contents = model->get_value_by_key(*child, "policies_contents");
     display_name = model->get_value_by_key(*child, "display_name");
     display_content = model->get_value_by_key(*child, "display_content");
-    verbosity = model->get_value_by_key(*child, "verbosity");
+    options = model->get_value_by_key(*child, "options");
 
     if (!ids || !reports || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
@@ -2763,10 +2819,18 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
     if (display_content && display_content->type == Container::Value::CONTAINER_TYPE_STRING)
         req->display_content = display_content->s;
 
-    if (verbosity && verbosity->type == Container::Value::CONTAINER_TYPE_INTEGER)
+    if (options && options->type == Container::Value::CONTAINER_TYPE_OBJECT)
     {
-        req->has_verbosity = true;
-        req->verbosity = verbosity->l;
+        std::map<std::string, Container::Value>::iterator it = options->obj.begin();
+
+        for (; it != options->obj.end(); ++it)
+        {
+            Container::Value& object = it->second;
+            if (it->first.size() && object.type != Container::Value::CONTAINER_TYPE_STRING)
+                continue;
+
+            req->options[it->first.c_str()] = object.s;
+        }
     }
 
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
@@ -2882,12 +2946,13 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *ids, *report, *user, *policies_ids, *policies_contents;
+    Container::Value *ids, *report, *user, *policies_ids, *policies_contents, *options;
     ids = model->get_value_by_key(*child, "ids");
     user = model->get_value_by_key(*child, "user");
     report = model->get_value_by_key(*child, "report");
     policies_ids = model->get_value_by_key(*child, "policies_ids");
     policies_contents = model->get_value_by_key(*child, "policies_contents");
+    options = model->get_value_by_key(*child, "options");
 
     if (!ids || !report || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
         return NULL;
@@ -2923,6 +2988,20 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
         for (size_t i = 0; i < policies_contents->array.size(); ++i)
             if (policies_contents->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
                 req->policies_contents.push_back(policies_contents->array[i].s);
+    }
+
+    if (options && options->type == Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        std::map<std::string, Container::Value>::iterator it = options->obj.begin();
+
+        for (; it != options->obj.end(); ++it)
+        {
+            Container::Value& object = it->second;
+            if (it->first.size() && object.type != Container::Value::CONTAINER_TYPE_STRING)
+                continue;
+
+            req->options[it->first.c_str()] = object.s;
+        }
     }
 
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)

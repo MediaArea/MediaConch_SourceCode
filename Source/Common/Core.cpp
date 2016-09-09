@@ -361,9 +361,9 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
     }
 
     if (display_name)
-        transform_with_xslt_file(result->report, *display_name, result->report);
+        transform_with_xslt_file(result->report, *display_name, options, result->report);
     else if (display_content)
-        transform_with_xslt_memory(result->report, *display_content, result->report);
+        transform_with_xslt_memory(result->report, *display_content, options, result->report);
     return 0;
 }
 
@@ -371,6 +371,7 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
 int Core::checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
                            const std::vector<size_t>& policies_ids,
                            const std::vector<std::string>& policies_contents,
+                           const std::map<std::string, std::string>& options,
                            std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
     if (report != MediaConchLib::report_MediaConch && !policies_ids.size() && !policies_contents.size() &&
@@ -388,7 +389,6 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
         if (report == MediaConchLib::report_MediaConch)
         {
             //XXX
-            std::map<std::string, std::string> options;
             std::string report;
             res->valid = get_implementation_report(file_tmp, options, report);
         }
@@ -405,7 +405,6 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
         else if (!policies_ids.empty() || !policies_contents.empty())
         {
             MediaConchLib::Checker_ReportRes tmp_res;
-            std::map<std::string, std::string> options;
             if (check_policies(user, file_tmp, options, &tmp_res,
                                policies_ids.size() ? &policies_ids : NULL,
                                policies_contents.size() ? &policies_contents : NULL) < 0)
@@ -489,7 +488,7 @@ bool Core::check_policies_xslts(const std::vector<std::string>& files,
 
 //---------------------------------------------------------------------------
 int Core::check_policies(int user, const std::vector<std::string>& files,
-                         const std::map<std::string, std::string>& options,
+                         const std::map<std::string, std::string>& opts,
                          MediaConchLib::Checker_ReportRes* result,
                          const std::vector<size_t>* policies_ids,
                          const std::vector<std::string>* policies_contents)
@@ -500,8 +499,15 @@ int Core::check_policies(int user, const std::vector<std::string>& files,
         return -1;
     }
 
+    std::map<std::string, std::string> options;
+    std::map<std::string, std::string>::const_iterator it = opts.begin();
+    for (; it != opts.end(); ++it)
+        options[it->first] = it->second;
+
+    unify_policy_options(options);
+
     std::vector<std::string> policies;
-    if (this->policies.policy_get_policies(user, policies_ids, policies_contents, policies, result->report) < 0)
+    if (this->policies.policy_get_policies(user, policies_ids, policies_contents, options, policies, result->report) < 0)
         return -1;
 
     std::stringstream Out;
@@ -519,7 +525,8 @@ int Core::check_policies(int user, const std::vector<std::string>& files,
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int Core::transform_with_xslt_file(const std::string& report, const std::string& xslt, std::string& result)
+int Core::transform_with_xslt_file(const std::string& report, const std::string& xslt,
+                                   const std::map<std::string, std::string>& opts, std::string& result)
 {
     Schema *S = new Xslt(!accepts_https());
 
@@ -530,6 +537,7 @@ int Core::transform_with_xslt_file(const std::string& report, const std::string&
         return -1;
     }
 
+    S->set_options(opts);
     int valid = S->validate_xml(report);
     if (valid < 0)
     {
@@ -545,6 +553,7 @@ int Core::transform_with_xslt_file(const std::string& report, const std::string&
 
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                     const std::map<std::string, std::string>& opts,
                                      std::string& result)
 {
     Schema *S = new Xslt(!accepts_https());
@@ -555,6 +564,7 @@ int Core::transform_with_xslt_memory(const std::string& report, const std::strin
         return -1;
     }
 
+    S->set_options(opts);
     int valid = S->validate_xml(report);
     if (valid < 0)
     {
@@ -570,19 +580,21 @@ int Core::transform_with_xslt_memory(const std::string& report, const std::strin
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_html_memory(const std::string& report, std::string& result)
 {
+    std::map<std::string, std::string> opts;
     std::string memory(implementation_report_display_html_xsl);
-    return transform_with_xslt_memory(report, memory, result);
+    return transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_text_memory(const std::string& report, std::string& result)
 {
+    const std::map<std::string, std::string> opts;
 #if defined(_WIN32) || defined(WIN32)
     std::string memory(implementation_report_display_text_xsl);
 #else //defined(_WIN32) || defined(WIN32)
     std::string memory(implementation_report_display_textunicode_xsl);
 #endif //defined(_WIN32) || defined(WIN32)
-    return transform_with_xslt_memory(report, memory, result);
+    return transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //***************************************************************************
@@ -696,6 +708,9 @@ bool Core::validation(const std::vector<std::string>& files, Schema* S, std::str
     if (ret < 0)
     {
         report = "Validation generated an internal error";
+        std::vector<std::string> errors = S->get_errors();
+        for (size_t i = 0; i < errors.size(); ++i)
+            report += "\t" + errors[i];
         valid = false;
     }
     else
@@ -706,7 +721,6 @@ bool Core::validation(const std::vector<std::string>& files, Schema* S, std::str
 //---------------------------------------------------------------------------
 void Core::unify_implementation_options(std::map<std::string, std::string>& opts)
 {
-
     if (opts.find("verbosity") != opts.end() && opts["verbosity"].length() && opts["verbosity"] != "-1")
     {
         std::string& verbosity = opts["verbosity"];
@@ -717,6 +731,55 @@ void Core::unify_implementation_options(std::map<std::string, std::string>& opts
     }
     else
         opts["verbosity"] = "\"5\"";
+}
+
+//---------------------------------------------------------------------------
+void Core::unify_policy_options(std::map<std::string, std::string>& opts)
+{
+    std::map<std::string, std::string>::iterator it;
+    if ((it = opts.find("policy_reference_file")) != opts.end())
+    {
+        std::string file = it->second;
+        opts.erase(it);
+
+        if (!it->second.length())
+            return;
+
+        std::vector<std::string> files;
+        std::string report;
+
+        files.push_back(file);
+        create_report_ma_xml(files, opts, report, get_bitset_with_mi_mt());
+
+        std::string path = get_local_data_path();
+        path += "policies_references_files/";
+        if (!ZenLib::Dir::Exists(ZenLib::Ztring().From_UTF8(path)))
+            if (!ZenLib::Dir::Create(ZenLib::Ztring().From_UTF8(path)))
+                path = "./";
+
+        for (size_t i = 0; ; ++i)
+        {
+            std::stringstream ss;
+            ss << path << "reference";
+            if (i)
+                ss << i;
+            ss << ".xml";
+            if (ZenLib::File::Exists(ZenLib::Ztring().From_UTF8(ss.str())))
+                continue;
+
+            path = ss.str();
+            break;
+        }
+        ZenLib::File fd;
+
+        fd.Create(ZenLib::Ztring().From_UTF8(path));
+
+        fd.Open(ZenLib::Ztring().From_UTF8(path), ZenLib::File::Access_Write);
+        fd.Write(ZenLib::Ztring().From_UTF8(report));
+        fd.Close();
+
+        opts["compare"] = "\"" + path + "\"";
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1075,8 +1138,9 @@ void Core::create_report_mt_xml(const std::vector<std::string>& files, std::stri
         create_report_mmt_xml(vec, tmp);
         if (tmp.length())
         {
+            std::map<std::string, std::string> opts;
             std::string memory(micromediatrace_to_mediatrace_xsl);
-            transform_with_xslt_memory(tmp, memory, tmp);
+            transform_with_xslt_memory(tmp, memory, opts, tmp);
             get_content_of_media_in_xml(tmp);
             report += tmp;
         }
@@ -1297,14 +1361,16 @@ void Core::get_reports_output(const std::vector<std::string>& files,
             {
                 // Apply an XSLT to have HTML
                 std::string memory(media_trace_display_html_xsl);
-                transform_with_xslt_memory(tmp, memory, tmp);
+                std::map<std::string, std::string> opts;
+                transform_with_xslt_memory(tmp, memory, opts, tmp);
                 result->report += tmp;
             }
             else if (f == MediaConchLib::format_Text)
             {
                 // Apply an XSLT to have Text
                 std::string memory(media_trace_display_text_xsl);
-                transform_with_xslt_memory(tmp, memory, tmp);
+                std::map<std::string, std::string> opts;
+                transform_with_xslt_memory(tmp, memory, opts, tmp);
                 result->report += tmp;
             }
             result->report += "\r\n";

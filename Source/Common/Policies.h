@@ -86,6 +86,7 @@ public:
 
     int         policy_get_policies(int user, const std::vector<size_t>* policies_ids,
                                     const std::vector<std::string>* policies_contents,
+                                    const std::map<std::string, std::string>& opts,
                                     std::vector<std::string>& xslt_policies, std::string& err);
 
     // Rule
@@ -131,7 +132,7 @@ public:
     //***************************************************************************
 
     int transform_with_xslt_memory(const std::string& report, const std::string& memory,
-                                   std::string& result);
+                                   const std::map<std::string, std::string>& opts, std::string& result);
     void add_system_policies_to_user_policies(int user);
     void add_recursively_policy_to_user_policies(int user, Policy* p);
 
@@ -154,8 +155,10 @@ private:
     int remove_policy(int user, int id, std::string& err);
     void remove_saved_policy(const Policy* policy);
     XsltPolicyRule* get_xslt_policy_rule(XsltPolicy* policy, int id);
-    int policy_get_policy_id(Policy* p, std::vector<std::string>& xslt_policies, std::string& err);
-    int policy_get_policy_content(const std::string& policy, std::vector<std::string>& xslt_policies, std::string& err);
+    int policy_get_policy_id(Policy* p, const std::map<std::string, std::string>& opts,
+                             std::vector<std::string>& xslt_policies, std::string& err);
+    int policy_get_policy_content(const std::string& policy, const std::map<std::string, std::string>& opts,
+                                  std::vector<std::string>& xslt_policies, std::string& err);
     int erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, int id, std::string& err);
     MediaConchLib::Policy_Policy *policy_to_mcl_policy(Policy *p, std::string& err);
     MediaConchLib::Policy_Policy* xslt_policy_to_mcl_policy(XsltPolicy *policy, std::string&);

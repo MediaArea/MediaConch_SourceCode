@@ -111,7 +111,7 @@ public:
 
     int             create_policy_from_mi(const std::string& report);
     XsltPolicyRule* get_policy_rule(int id, std::string& err);
-    int             get_final_xslt(std::string& xslt);
+    int             get_final_xslt(std::string& xslt, const std::map<std::string, std::string>& opts);
     int             delete_policy_rule(int rule_id, std::string& err);
 
     //TODO
@@ -146,7 +146,7 @@ private:
     // HELPER
     void replace_xlmns_in_policy(std::string& xslt);
     void replace_aliasxsl_in_policy(std::string& xslt);
-    int delete_policy_rule(int rule_id, bool& found, std::string& err);
+    int  delete_policy_rule(int rule_id, bool& found, std::string& err);
 };
 
 }

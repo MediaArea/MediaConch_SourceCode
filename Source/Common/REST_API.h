@@ -209,17 +209,16 @@ public:
     // Report
     struct Checker_Report_Req
     {
-        Checker_Report_Req() :   user(-1), has_verbosity(false) {}
-        int                      user;
-        std::vector<int>         ids;
-        std::vector<Report>      reports;
-        std::vector<size_t>      policies_ids;
-        std::vector<std::string> policies_contents;
-        std::string              display_name;
-        std::string              display_content;
-        bool                     has_verbosity;
-        int                      verbosity;
-        std::string              to_str() const;
+        Checker_Report_Req() :             user(-1) {}
+        int                                user;
+        std::vector<int>                   ids;
+        std::vector<Report>                reports;
+        std::vector<size_t>                policies_ids;
+        std::vector<std::string>           policies_contents;
+        std::string                        display_name;
+        std::string                        display_content;
+        std::map<std::string, std::string> options;
+        std::string                        to_str() const;
     };
 
     struct Checker_Report_Ok
@@ -311,13 +310,14 @@ public:
     // Validate
     struct Checker_Validate_Req
     {
-        Checker_Validate_Req() : user(-1) {}
-        int                        user;
-        std::vector<int>           ids;
-        Report                     report;
-        std::vector<size_t>        policies_ids;
-        std::vector<std::string>   policies_contents;
-        std::string                to_str() const;
+        Checker_Validate_Req() :           user(-1) {}
+        int                                user;
+        std::vector<int>                   ids;
+        Report                             report;
+        std::vector<size_t>                policies_ids;
+        std::vector<std::string>           policies_contents;
+        std::map<std::string, std::string> options;
+        std::string                        to_str() const;
     };
 
     struct Checker_Validate_Ok

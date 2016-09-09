@@ -223,13 +223,15 @@ void MainWindow::Run()
 //---------------------------------------------------------------------------
 int MainWindow::transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result)
 {
-    return MCL.transform_with_xslt_file(report, file, result);
+    std::map<std::string, std::string> opts;
+    return MCL.transform_with_xslt_file(report, file, opts, result);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result)
 {
-    return MCL.transform_with_xslt_memory(report, memory, result);
+    std::map<std::string, std::string> opts;
+    return MCL.transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //---------------------------------------------------------------------------
@@ -988,21 +990,23 @@ int MainWindow::is_analyze_finished(const std::string& file, double& percent_don
 int MainWindow::validate(MediaConchLib::report report, const std::vector<std::string>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
+                         const std::map<std::string, std::string>& options,
                          std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
-    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, result);
+    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, options, result);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::validate(MediaConchLib::report report, const std::string& file,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
+                         const std::map<std::string, std::string>& options,
                          std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
     std::vector<std::string> files;
     files.push_back(file);
 
-    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, result);
+    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, options, result);
 }
 
 //---------------------------------------------------------------------------

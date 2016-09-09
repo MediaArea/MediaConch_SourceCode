@@ -637,14 +637,15 @@ namespace MediaConch
             files.push_back(*d->current_files[id]);
         }
 
-        std::stringstream verbosity;
-        if (req->has_verbosity && req->verbosity != -1)
-            verbosity << req->verbosity;
-        else
-            verbosity << d->MCL->get_implementation_verbosity();
-
         std::map<std::string, std::string> options;
-        options["verbosity"] = verbosity.str();
+        std::map<std::string, std::string>::const_iterator it = req->options.begin();
+        for (; it != req->options.end(); ++it)
+        {
+            if (!it->first.size())
+                continue;
+
+            options[it->first.c_str()] = it->second;
+        }
 
         // Output
         MediaConchLib::Checker_ReportRes result;
@@ -822,9 +823,20 @@ namespace MediaConch
             saved_ids[*d->current_files[id]] = id;
         }
 
+        std::map<std::string, std::string> options;
+        std::map<std::string, std::string>::const_iterator it = req->options.begin();
+        for (; it != req->options.end(); ++it)
+        {
+            if (!it->first.size())
+                continue;
+
+            options[it->first.c_str()] = it->second;
+        }
+
         std::vector<MediaConchLib::Checker_ValidateRes*> result;
-        if (d->MCL->checker_validate(req->user, report, files, req->policies_ids, req->policies_contents,
-                                     result))
+        if (d->MCL->checker_validate(req->user, report, files,
+                                     req->policies_ids, req->policies_contents,
+                                     options, result))
             return -1;
 
         for (size_t i = 0; i < result.size(); ++i)

@@ -217,12 +217,12 @@ XsltPolicy::~XsltPolicy()
 }
 
 //---------------------------------------------------------------------------
-int XsltPolicy::get_final_xslt(std::string& xslt)
+int XsltPolicy::get_final_xslt(std::string& xslt, const std::map<std::string, std::string>& opts)
 {
     if (dump_schema(xslt) < 0)
         return -1;
 
-    if (policies->transform_with_xslt_memory(xslt, policy_transform_xml, xslt) < 0)
+    if (policies->transform_with_xslt_memory(xslt, policy_transform_xml, opts, xslt) < 0)
         return -1;
 
     replace_aliasxsl_in_policy(xslt);

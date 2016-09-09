@@ -277,6 +277,7 @@ int MediaConchLib::checker_get_report(int user, const std::bitset<report_Max>& r
 int MediaConchLib::checker_validate(int user, report report, const std::vector<std::string>& files,
                                     const std::vector<size_t>& policies_ids,
                                     const std::vector<std::string>& policies_contents,
+                                    const std::map<std::string, std::string>& options,
                                     std::vector<Checker_ValidateRes*>& result)
 {
     if (!files.size())
@@ -287,10 +288,14 @@ int MediaConchLib::checker_validate(int user, report report, const std::vector<s
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)
-        return daemon_client->checker_validate(user, report, files, policies_ids, policies_contents,
+        return daemon_client->checker_validate(user, report, files,
+                                               policies_ids, policies_contents,
+                                               options,
                                                result);
 
-    return core->checker_validate(user, report, files, policies_ids, policies_contents,
+    return core->checker_validate(user, report, files,
+                                  policies_ids, policies_contents,
+                                  options,
                                   result);
 }
 
@@ -342,15 +347,17 @@ const std::string& MediaConchLib::get_implementation_verbosity()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result)
+int MediaConchLib::transform_with_xslt_file(const std::string& report, const std::string& file,
+                                            const std::map<std::string, std::string>& opts, std::string& result)
 {
-    return core->transform_with_xslt_file(report, file, result);
+    return core->transform_with_xslt_file(report, file, opts, result);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result)
+int MediaConchLib::transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                              const std::map<std::string, std::string>& opts, std::string& result)
 {
-    return core->transform_with_xslt_memory(report, memory, result);
+    return core->transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //***************************************************************************
