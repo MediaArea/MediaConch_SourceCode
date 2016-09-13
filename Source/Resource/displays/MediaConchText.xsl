@@ -64,7 +64,7 @@
           </xsl:for-each>
         </xsl:for-each>
       </xsl:for-each>
-      <xsl:apply-templates select="mc:policy"/>
+      <xsl:apply-templates select="mc:rule|mc:policy"/>
     </xsl:for-each>
     <xsl:text>******************************************************************************&#xa;</xsl:text>
   </xsl:template>
