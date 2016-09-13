@@ -292,7 +292,7 @@
       <p>
         <xsl:value-of select="mc:description"/>
       </p>
-      <p>Type: <xsl:value-of select="@t"/></p>
+      <p>Type: <xsl:value-of select="@type"/></p>
       <p>Rules run: <xsl:value-of select="@rules_run"/></p>
       <p>Fail count: <xsl:value-of select="@fail_count"/></p>
       <p>Pass count: <xsl:value-of select="@pass_count"/></p>   
