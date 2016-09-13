@@ -19,7 +19,7 @@ namespace MediaConch {
 
 class FileRegistered;
 class MainWindow;
-class Database;
+class DatabaseUi;
 
 class WorkerFiles : public QThread
 {
@@ -34,15 +34,15 @@ public:
 
     // Configuration
     void fill_registered_files_from_db();
-    void create_and_configure_database();
-    void load_database();
+    void set_database(DatabaseUi* database);
 
     // functions
-    void add_file_to_list(const std::string& file, const std::string& path, int policy, int display);
+    void add_file_to_list(const std::string& file, const std::string& path, int policy, int display, int verbosity);
     void clear_files();
     FileRegistered* get_file_registered_from_file(const std::string& file);
     void remove_file_registered_from_file(const std::string& file);
     void get_registered_files(std::map<std::string, FileRegistered>& files);
+    void update_policy_of_file_registered_from_file(const std::string& file, int policy);
 
 private:
     void add_registered_file_to_db(const FileRegistered* file);
@@ -64,8 +64,7 @@ private Q_SLOTS:
 
 private:
     MainWindow                             *mainwindow;
-    Database                               *db;
-    static const std::string                database_filename;
+    DatabaseUi                             *db;
     QTimer                                 *timer;
     size_t                                  file_index;
 

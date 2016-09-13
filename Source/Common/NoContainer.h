@@ -32,7 +32,7 @@ public:
     virtual ~NoContainer() {}
 
     virtual int parse(const std::string&, Value&) { return -1; } //TODO
-    virtual std::string serialize(Value &) { return std::string(); }
+    virtual int serialize(Value &, std::string&) { return -1; }
     virtual Value* get_value_by_key(Value&, const std::string&) { return NULL; }
     virtual Value* get_value_in_array_by_key(Value&, const std::string&) { return NULL; }
 

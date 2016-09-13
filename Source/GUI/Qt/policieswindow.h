@@ -7,16 +7,10 @@
 #ifndef POLICIESWINDOW_H
 #define POLICIESWINDOW_H
 
-#include "Common/Core.h"
-#include "Common/SchematronPolicy.h"
-#include "Common/UnknownPolicy.h"
-#include "Common/XsltPolicy.h"
-
 #include <QFileInfo>
 #include <QString>
 
 class QVBoxLayout;
-class QStatusBar;
 class QLabel;
 class QTreeWidgetItem;
 class QFile;
@@ -26,9 +20,8 @@ class QFrame;
 namespace MediaConch {
 
 class MainWindow;
-class PoliciesTree;
-class PoliciesMenu;
-class PolicyWindow;
+class WebView;
+class ProgressBar;
 
 class PoliciesWindow : public QObject
 {
@@ -38,60 +31,40 @@ public:
     explicit PoliciesWindow(MainWindow *parent = 0);
     ~PoliciesWindow();
 
-    // Helpers
-    void                        displayPoliciesTree();
-    int                         get_index_in_tree();
-    QTreeWidgetItem*            get_item_in_tree();
-    int                         get_index_of_item_backXX(QTreeWidgetItem* item, size_t back);
-    void                        new_policy_filename(Policy* policy);
-    void                        connectPoliciesTreeSelectionChanged();
-    void                        disconnectPoliciesTreeSelectionChanged();
-    void                        emphasis_policy_name_in_tree(QTreeWidgetItem *item);
-    void                        emphasis_tree_widget_and_children(QTreeWidgetItem *item, bool root=false);
-    void                        unemphasis_policy_name_in_tree(QTreeWidgetItem *item);
-
-    // Visual elements
-    void                        updatePoliciesTreeSchematronPattern(SchematronPattern *p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeSchematronRule(SchematronRule *rule, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeXsltRule(XsltRule* p, QTreeWidgetItem *parent);
-    void                        removeTreeChildren(QTreeWidgetItem* item);
-    QStatusBar*                 get_error_bar();
-    void                        set_widget_to_tree_layout(QWidget* w);
-    void                        remove_widget_from_tree_layout(QWidget* w);
-    QFrame*                     policyFrame();
-    void                        policy_deleted(QTreeWidgetItem* item, int row);
-    void                        save_policy();
-    int                         save_policy_to(Policies::PolicyType type);
-
-private:
-    MainWindow     *mainwindow;
-    PoliciesTree   *policiesTree;
-    PoliciesMenu   *policiesMenu;
-    PolicyWindow   *policywindow;
-
-    // Visual elements
-    void                        clearPoliciesElements();
-    void                        createPoliciesTree();
-    void                        displayPoliciesMenu();
-    void                        createPoliciesMenu();
-    void                        updatePoliciesTree();
-    void                        updatePoliciesTreeSchematronPolicy(SchematronPolicy* p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeUnknownPolicy(UnknownPolicy* p, QTreeWidgetItem *parent);
-    void                        updatePoliciesTreeXsltPolicy(XsltPolicy* p, QTreeWidgetItem *parent);
-
 //***************************************************************************
 // HELPER
 //***************************************************************************
-    void             add_new_schematron_policy(QTreeWidgetItem* parent);
-    void             add_new_xslt_policy(QTreeWidgetItem* parent);
+    void                        display_policies();
+    int                         add_new_policies(const QStringList& files);
 
+private:
+    MainWindow   *mainwindow;
+    WebView      *web_view;
+    ProgressBar  *progress_bar;
+
+//***************************************************************************
+// VISUAL
+//***************************************************************************
+    void clear_visual_elements();
+
+//***************************************************************************
+// WEB
+//***************************************************************************
+    void change_qt_scripts_in_template(QString& html);
+    void set_webmachine_script_in_template(QString& html);
+    void remove_result_in_template(QString& html);
+    void change_checker_in_template(const QString& policy, QString& html);
+    void create_html_base(const QString& policy, QString& base);
+    void create_html_policy(QString& policy);
+    void create_html();
+
+//***************************************************************************
+// SLOTS
+//***************************************************************************
 private Q_SLOTS:
-    void import_schema();
-    void add_new_policy();
-    void delete_all_policies();
-    void policiesTree_selectionChanged();
+    void create_web_view_finished(bool ok);
 };
 
 }
 
-#endif // MAINWINDOW_H
+#endif // POLICIESWINDOW_H

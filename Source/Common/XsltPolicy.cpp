@@ -29,17 +29,23 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 XsltRule::XsltRule(const XsltRule& r)
 {
+    *this = r;
+}
+
+XsltRule& XsltRule::operator=(const XsltRule& r)
+{
     if (&r == this)
-        return;
+        return *this;
 
     this->title = r.title;
+    this->ope = r.ope;
     this->use_free_text = r.use_free_text;
     this->type = r.type;
     this->field = r.field;
     this->occurrence = r.occurrence;
-    this->ope = r.ope;
     this->value = r.value;
-    this->text = r.text;
+    this->test = r.test;
+    return *this;
 }
 
 //***************************************************************************
@@ -138,7 +144,7 @@ bool XsltPolicy::find_call_template_xpath_node(xmlNodePtr node, std::string& xpa
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_call_template_free_text_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+bool XsltPolicy::find_call_template_test_node(xmlNodePtr node, XsltRule* rule, bool& valid)
 {
     std::string def("call-template");
     if (!node->name || def.compare((const char*)node->name))
@@ -147,29 +153,33 @@ bool XsltPolicy::find_call_template_free_text_node(xmlNodePtr node, XsltRule* ru
     xmlChar *name = xmlGetNoNsProp(node, (const unsigned char*)"name");
     if (name == NULL)
         return false;
-    rule->ope = std::string((const char*)name);
+
+    std::string operation((const char*)name);
+    if (operation != "is_true")
+        return false;
+
+    rule->ope = operation;
 
     xmlNodePtr child = node->children;
     while (child)
     {
-        std::string xpath;
-        if (find_call_template_xpath_node(child, xpath))
-            if (xpath != rule->value)
+        if (find_call_template_xpath_node(child, rule->test))
+            if (rule->test != rule->value)
                 valid = false;
         child = child->next;
     }
 
     if (valid)
     {
-        rule->text = rule->value;
         rule->value = std::string();
         rule->use_free_text = true;
     }
+
     return true;
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+bool XsltPolicy::find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, const std::string& test, bool& valid)
 {
     std::string def("call-template");
     if (!node->name || def.compare((const char*)node->name))
@@ -182,6 +192,10 @@ bool XsltPolicy::find_choose_call_template_node(xmlNodePtr node, XsltRule* rule,
         return true;
     }
     rule->ope = std::string((const char*)name);
+
+    valid = parse_test_for_rule(test, rule);
+    if (!valid)
+        return false;
 
     xmlNodePtr child = node->children;
     while (child)
@@ -210,7 +224,20 @@ bool XsltPolicy::find_choose_call_template_node(xmlNodePtr node, XsltRule* rule,
 }
 
 //---------------------------------------------------------------------------
-bool XsltPolicy::find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, bool& valid)
+bool XsltPolicy::validate_choose_for_each_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string def("text");
+    if (!def.compare((const char*)node->name))
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, const std::string& test, bool& valid)
 {
     std::string def("for-each");
     if (!node->name || def.compare((const char*)node->name))
@@ -219,22 +246,33 @@ bool XsltPolicy::find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, bool
     xmlChar *select_str = xmlGetNoNsProp(node, (const unsigned char*)"select");
     if (select_str == NULL)
         return false;
-    std::string select((const char*)select_str);
 
-    valid = parse_test_for_rule(select, rule);
-    if (!valid)
-        return true;
+    if (test != (const char*)select_str)
+        return false;
 
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_choose_call_template_node(child, rule, valid);
-        if (!valid)
-            return true;
+        if (!find_choose_call_template_node(child, rule, test, valid) || !valid)
+            if (!valid || !validate_choose_for_each_node(child))
+                return false;
         child = child->next;
     }
 
     return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::validate_choose_when_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string def("text");
+    if (!def.compare((const char*)node->name))
+        return true;
+
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -247,18 +285,35 @@ bool XsltPolicy::find_choose_when_node(xmlNodePtr node, XsltRule* rule, bool& va
     xmlChar *test_str = xmlGetNoNsProp(node, (const unsigned char*)"test");
     if (test_str == NULL)
         return false;
-    std::string test((const char*)test_str);
 
-    valid = parse_test_for_rule(test, rule);
+    std::string test((const char*)test_str);
 
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_choose_for_each_node(child, rule, valid);
+        if (!find_choose_for_each_node(child, rule, test, valid) || !valid)
+            if (!valid || !validate_choose_when_node(child))
+                return false;
         child = child->next;
     }
 
     return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::validate_choose_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char*)node->name);
+    if (name == "text")
+        return true;
+
+    if (name == "otherwise")
+        return true;
+
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -271,9 +326,9 @@ bool XsltPolicy::find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid)
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_choose_when_node(child, rule, valid);
-        if (!valid)
-            return true;
+        if (!find_choose_when_node(child, rule, valid) || !valid)
+            if (!valid || !validate_choose_node(child))
+                return false;
         child = child->next;
     }
 
@@ -323,6 +378,19 @@ bool XsltPolicy::find_context_attribute_node(xmlNodePtr node, XsltRule* rule)
 }
 
 //---------------------------------------------------------------------------
+bool XsltPolicy::validate_check_context_node(xmlNodePtr node)
+{
+    if (!node->name)
+        return false;
+
+    std::string name((const char *)node->name);
+    if (name == "text")
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
 bool XsltPolicy::find_context_node(xmlNodePtr node, XsltRule* rule)
 {
     std::string def("context");
@@ -332,7 +400,9 @@ bool XsltPolicy::find_context_node(xmlNodePtr node, XsltRule* rule)
     xmlNodePtr child = node->children;
     while (child)
     {
-        find_context_attribute_node(child, rule);
+        if (!find_context_attribute_node(child, rule))
+            if (!validate_check_context_node(child))
+                return false;
         child = child->next;
     }
     return true;
@@ -383,7 +453,7 @@ int XsltPolicy::find_check_node(xmlNodePtr node)
         if (!find_rule_title_node(child, r->title))
             if (!find_context_node(child, r))
                 if (!find_choose_node(child, r, valid))
-                    if (!find_call_template_free_text_node(child, r, valid))
+                    if (!find_call_template_test_node(child, r, valid))
                         validate_check_node(child, valid);
         if (!valid)
             break;
@@ -466,7 +536,7 @@ int XsltPolicy::find_policychecks_node(xmlNodePtr node)
         }
         else
             ret = 0;
-        
+
         child = child->next;
     }
     return ret;
@@ -607,7 +677,7 @@ bool XsltPolicy::validate_template_match_node(xmlNodePtr node)
 int XsltPolicy::find_template_match_node(xmlNodePtr node)
 {
     xmlChar *match = xmlGetNoNsProp(node, (const unsigned char*)"match");
-    
+
     if (match == NULL || std::string((const char*)match) != "ma:MediaArea")
         return 1;
 
@@ -639,36 +709,8 @@ int XsltPolicy::validate_template_match_name(xmlNodePtr node)
 
     std::string name((const char*)name_s);
 
-    if (name == "is_true")
+    if (operator_exists(name))
         return 0;
-
-    if (name == "is_equal")
-        return 0;
-
-    if (name == "is_not_equal")
-        return 0;
-
-    if (name == "is_greater_than")
-        return 0;
-
-    if (name == "is_less_than")
-        return 0;
-
-    if (name == "is_greater_or_equal_than")
-        return 0;
-
-    if (name == "is_less_or_equal_than")
-        return 0;
-
-    if (name == "exists")
-        return 0;
-
-    if (name == "does_not_exist")
-        return 0;
-
-    if (name == "contains_string")
-        return 0;
-
     return -1;
 }
 
@@ -699,7 +741,7 @@ int XsltPolicy::find_template_node(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-int XsltPolicy::import_schema_from_doc(const std::string& filename, xmlDocPtr doc)
+int XsltPolicy::import_schema_from_doc(xmlDocPtr doc, const std::string& filename)
 {
     if (!doc)
     {
@@ -770,12 +812,17 @@ xmlNsPtr XsltPolicy::create_namespace_xsl(xmlNodePtr node)
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_mc(xmlNodePtr node)
 {
+    if (no_https)
+        return xmlNewNs(node, (const xmlChar*)"http://mediaarea.net/mediaconch", NULL);
     return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaconch", NULL);
 }
 
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_ma(xmlNodePtr node)
 {
+    if (no_https)
+        return xmlNewNs(node, (const xmlChar*)"http://mediaarea.net/mediaarea",
+                        (const xmlChar *)"ma");
     return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediaarea",
                     (const xmlChar *)"ma");
 }
@@ -783,6 +830,9 @@ xmlNsPtr XsltPolicy::create_namespace_ma(xmlNodePtr node)
 //---------------------------------------------------------------------------
 xmlNsPtr XsltPolicy::create_namespace_mi(xmlNodePtr node)
 {
+    if (no_https)
+        return xmlNewNs(node, (const xmlChar*)"http://mediaarea.net/mediainfo",
+                        (const xmlChar *)"mi");
     return xmlNewNs(node, (const xmlChar*)"https://mediaarea.net/mediainfo",
                     (const xmlChar *)"mi");
 }
@@ -797,29 +847,41 @@ xmlNsPtr XsltPolicy::create_namespace_xsi(xmlNodePtr node)
 //---------------------------------------------------------------------------
 void XsltPolicy::create_test_from_rule(XsltRule *rule, std::string& xpath)
 {
-    std::stringstream ss;
-
-    ss << "mi:MediaInfo/mi:track[@type='";
-
-    if (!rule->type.length())
+    if (rule->ope == "is_true")
         return;
-    ss << rule->type << "']";
 
-    ss << "[";
-    if (rule->occurrence < 0)
-        ss << "*";
-    else
-        ss << rule->occurrence;
-    ss << "]";
-
-    if (!rule->field.length())
+    if (!rule->use_free_text)
     {
-        xpath = ss.str();
-        return;
-    }
-    ss << "/mi:" << rule->field;
+        std::stringstream ss;
 
-    xpath = ss.str();
+        ss << "mi:MediaInfo/mi:track[@type='";
+
+        if (rule->type.length())
+            ss << rule->type;
+        ss << "']";
+
+        ss << "[";
+        if (rule->occurrence < 0)
+            ss << "*";
+        else
+            ss << rule->occurrence;
+        ss << "]";
+
+        if (rule->field.length())
+            ss << "/mi:" << rule->field;
+
+        xpath = ss.str();
+    }
+    else
+        xpath = rule->test;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::parse_test_for_rule_free_text(const std::string& test, XsltRule *rule)
+{
+    rule->use_free_text = true;
+    rule->test = test;
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -829,22 +891,26 @@ bool XsltPolicy::parse_test_for_rule(const std::string& test, XsltRule *rule)
     std::string find("mi:MediaInfo/mi:track[@type='");
     size_t pos = 0;
     size_t end = 0;
-    // type
+
+    rule->use_free_text = false;
+
+    // Type
     if ((pos = ss.find(find)) != 0)
-        return false;
+        return parse_test_for_rule_free_text(test, rule);
 
     pos += find.length();
     find = "']";
     if ((end = ss.find(find, pos)) == std::string::npos)
-        return false;
+        return parse_test_for_rule_free_text(test, rule);
 
     rule->type = ss.substr(pos, end - pos);
     if (!rule->type.length())
-        return false;
+        return parse_test_for_rule_free_text(test, rule);
 
     end += find.length();
+    // Field and Occurrence are mandatory
     if (end == ss.length())
-        return true;
+        return parse_test_for_rule_free_text(test, rule);
 
     // occurrence
     pos = end;
@@ -854,7 +920,7 @@ bool XsltPolicy::parse_test_for_rule(const std::string& test, XsltRule *rule)
         pos += find.length();
         find = "]";
         if ((end = ss.find("]", pos)) == std::string::npos)
-            return false;
+            return parse_test_for_rule_free_text(test, rule);
 
         std::string occurrence = ss.substr(pos, end - pos);
         if (occurrence == "*")
@@ -866,23 +932,30 @@ bool XsltPolicy::parse_test_for_rule(const std::string& test, XsltRule *rule)
     else
         rule->occurrence = -1;
 
+    // Field is empty
     if (end == ss.length())
-        return true;
+    {
+        if (rule->field.length())
+            return parse_test_for_rule_free_text(test, rule);
+        else
+            return true;
+    }
 
-    // field
+    // Field
     pos = end;
     find = "/mi:";
     if ((pos = ss.find(find, end)) != end)
-        return false;
+        return parse_test_for_rule_free_text(test, rule);
 
     pos += find.length();
     end = ss.length();
 
     std::string field = ss.substr(pos, end - pos);
     if (!field.length())
-        return false;
-    rule->field = field;
+        return parse_test_for_rule_free_text(test, rule);
 
+    if (field != rule->field)
+        return false;
     return true;
 }
 
@@ -1248,32 +1321,19 @@ void XsltPolicy::write_operators(xmlNodePtr node)
 }
 
 //---------------------------------------------------------------------------
-void XsltPolicy::write_check_call_template_field_child(xmlNodePtr node, XsltRule *rule)
-{
-    if (rule->use_free_text || !rule->field.length() ||
-        (rule->ope != "is_greater_than" && rule->ope != "is_less_than" &&
-         rule->ope != "is_greater_or_equal_than" && rule->ope != "is_less_or_equal_than" &&
-         rule->ope != "exists" && rule->ope != "does_not_exist"))
-        return;
-
-    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
-    child->ns = node->ns;
-    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"field");
-    xmlNodeSetContent(child, (const xmlChar *)rule->field.c_str());
-
-    xmlAddChild(node, child);
-}
-
-//---------------------------------------------------------------------------
 void XsltPolicy::write_check_call_template_value_child(xmlNodePtr node, XsltRule *rule)
 {
-    if (rule->use_free_text || !rule->value.length())
+    if (rule->ope == "is_true" || !operator_need_value(rule->ope))
         return;
+
+    const char* value = "";
+    if (rule->value.length())
+        value = rule->value.c_str();
 
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
     child->ns = node->ns;
     xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"value");
-    xmlNodeSetContent(child, (const xmlChar *)rule->value.c_str());
+    xmlNodeSetContent(child, (const xmlChar *)value);
 
     xmlAddChild(node, child);
 }
@@ -1281,12 +1341,9 @@ void XsltPolicy::write_check_call_template_value_child(xmlNodePtr node, XsltRule
 //---------------------------------------------------------------------------
 void XsltPolicy::write_check_call_template_xpath_child(xmlNodePtr node, XsltRule *rule)
 {
-    if (rule->use_free_text && !rule->text.length())
-        return;
-
     const char *xpath_str = ".";
-    if (rule->use_free_text)
-        xpath_str = rule->text.c_str();
+    if (rule->ope == "is_true" && rule->test.length())
+        xpath_str = rule->test.c_str();
 
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"with-param");
     child->ns = node->ns;
@@ -1303,17 +1360,11 @@ void XsltPolicy::write_check_call_template_child(xmlNodePtr node, XsltRule *rule
     child->ns = create_namespace_xsl(NULL);
     xmlAddChild(node, child);
 
-    const char *operat = NULL;
-
-    if (!rule->use_free_text)
-        operat = rule->ope.c_str();
-    else
-        operat = "is_true";
+    const char *operat = rule->ope.c_str();
 
     xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)operat);
     write_check_call_template_xpath_child(child, rule);
     write_check_call_template_value_child(child, rule);
-    write_check_call_template_field_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
@@ -1364,7 +1415,7 @@ void XsltPolicy::write_check_otherwise_child(xmlNodePtr node, XsltRule *rule)
 //---------------------------------------------------------------------------
 void XsltPolicy::write_check_choose_child(xmlNodePtr node, XsltRule *rule)
 {
-    if (rule->use_free_text)
+    if (rule->ope == "is_true")
     {
         write_check_call_template_child(node, rule);
         return;
@@ -1378,15 +1429,26 @@ void XsltPolicy::write_check_choose_child(xmlNodePtr node, XsltRule *rule)
 }
 
 //---------------------------------------------------------------------------
+void XsltPolicy::write_check_context_value_is_true_child(xmlNodePtr node, XsltRule *rule)
+{
+    const char *value = "";
+    if (rule->test.length())
+        value = rule->test.c_str();
+
+    xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"attribute");
+    child->ns = create_namespace_xsl(NULL);
+    xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)"value");
+    xmlNodeSetContent(child, (const xmlChar *)value);
+
+    xmlAddChild(node, child);
+}
+
+//---------------------------------------------------------------------------
 void XsltPolicy::write_check_context_value_child(xmlNodePtr node, XsltRule *rule)
 {
-    const char *value = NULL;
-    if (!rule->use_free_text && rule->value.length())
+    const char *value = "";
+    if (rule->value.length())
         value = rule->value.c_str();
-    else if (rule->use_free_text && rule->text.length())
-        value = rule->text.c_str();
-    else
-        return;
 
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"attribute");
     child->ns = create_namespace_xsl(NULL);
@@ -1416,9 +1478,12 @@ void XsltPolicy::write_check_context_child(xmlNodePtr node, XsltRule *rule)
     xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"context");
     child->ns = node->ns;
     xmlAddChild(node, child);
-    
+
     write_check_context_field_child(child, rule);
-    write_check_context_value_child(child, rule);
+    if (operator_need_value(rule->ope))
+        write_check_context_value_child(child, rule);
+    else if (rule->ope == "is_true")
+        write_check_context_value_is_true_child(child, rule);
 }
 
 //---------------------------------------------------------------------------
@@ -1610,6 +1675,171 @@ xmlDocPtr XsltPolicy::create_doc()
     xmlNewProp(root_node, (const xmlChar *)"extension-element-prefixes", (const xmlChar *)"xsi ma");
     write_root_default_childs(root_node);
     return doc;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::operator_need_value(const std::string& ope)
+{
+    std::string tmp;
+    if (get_operator_value(ope, tmp) < 0)
+        return false;
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool XsltPolicy::operator_exists(const std::string& ope)
+{
+    std::list<std::string>::const_iterator it = Policies::existing_xsltOperator.begin();
+
+    for (; it != Policies::existing_xsltOperator.end(); ++it)
+    {
+        if (*it == ope)
+            return true;
+    }
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::get_operator_value(const std::string& ope, std::string& value)
+{
+    std::list<Policies::validatorType>::const_iterator it = Policies::existing_validator.begin();
+
+    for (; it != Policies::existing_validator.end(); ++it)
+    {
+        if (it->name == ope)
+        {
+            value = it->value;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::get_operator_pretty_name(const std::string& ope, std::string& pretty_name)
+{
+    std::list<Policies::validatorType>::const_iterator it = Policies::existing_validator.begin();
+
+    for (; it != Policies::existing_validator.end(); ++it)
+    {
+        if (it->name == ope)
+        {
+            pretty_name = it->pretty_name;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::string& type)
+{
+    for (xmlNodePtr child = node->children; child; child = child->next)
+    {
+        if (child->type != XML_ELEMENT_NODE || !child->name)
+            continue;
+
+        std::string name((const char*)child->name);
+        if (name == "FileSize"
+         || name == "Duration"
+         || name == "DURATION"
+         || name == "OverallBitRate"
+         || name == "FrameCount"
+         || name == "StreamSize"
+         || name == "BitRate"
+         || name == "FrameCount"
+         || name == "Delay"
+         || name == "extra")
+            continue;
+
+        XsltRule *rule = new XsltRule;
+
+        rule->type = type;
+        rule->field = (const char*)child->name;
+        rule->ope = "is_equal";
+        rule->occurrence = -1;
+        rule->value = (const char*)xmlNodeGetContent(child);
+        rule->title = rule->type + "/" + rule->field + " is " + rule->value;
+        rules.push_back(rule);
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_media_track_node(xmlNodePtr node, std::string& type)
+{
+    xmlChar *property = xmlGetNoNsProp(node, (const unsigned char*)"type");
+
+    if (property == NULL)
+        return -1;
+
+    type = std::string((const char*)property);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::find_media_track_node(xmlNodePtr node)
+{
+    for (xmlNodePtr child = node->children; child; child = child->next)
+    {
+        std::string def("track");
+        if (!child->name || def.compare((const char*)child->name))
+            continue;
+
+        std::string type;
+        if (find_media_track_node(child, type) < 0)
+            return -1;
+
+        if (create_rule_from_media_track_child(child, type) < 0)
+            return -1;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int XsltPolicy::create_policy_from_mi(const std::string& report)
+{
+    Xslt s(no_https);
+    xmlSetGenericErrorFunc(&s, &s.manage_generic_error);
+
+    xmlDocPtr doc = xmlParseMemory(report.c_str(), report.length());
+    xmlSetGenericErrorFunc(NULL, NULL);
+
+    if (!doc)
+    {
+        // maybe put the errors from s.errors
+        error = "The MediaInfo report given cannot be parsed";
+        return -1;
+    }
+
+    xmlNodePtr root = xmlDocGetRootElement(doc);
+    if (!root)
+    {
+        error = "No root node, leaving";
+        xmlFreeDoc(doc);
+        return 0;
+    }
+
+    for (xmlNodePtr child = root->children; child; child = child->next)
+    {
+        std::string def("media");
+        if (!child->name || def.compare((const char*)child->name))
+            continue;
+
+        if (find_media_track_node(child) < 0)
+        {
+            xmlFreeDoc(doc);
+            return -1;
+        }
+        break;
+    }
+
+    xmlFreeDoc(doc);
+    return 0;
 }
 
 }

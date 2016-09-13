@@ -55,6 +55,8 @@ public:
     URI_REQ_FUNC(Status);
     URI_REQ_FUNC(Clear);
     URI_REQ_FUNC(List);
+    URI_REQ_FUNC(Default_Values_For_Type);
+    URI_REQ_FUNC(Create_Policy_From_File);
 #undef URI_REQ_FUNC
 
     int send_result();
@@ -84,22 +86,29 @@ public:
                                        RESTAPI::Validate_Res& res, void* arg);
     typedef int (*on_file_from_id_command)(const RESTAPI::File_From_Id_Req* req,
                                            RESTAPI::File_From_Id_Res& res, void* arg);
+    typedef int (*on_default_values_for_type_command)(const RESTAPI::Default_Values_For_Type_Req* req,
+                                                      RESTAPI::Default_Values_For_Type_Res& res, void* arg);
+    typedef int (*on_create_policy_from_file_command)(const RESTAPI::Create_Policy_From_File_Req* req,
+                                                      RESTAPI::Create_Policy_From_File_Res& res, void* arg);
 
     struct Commands
     {
         Commands() : analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
                      retry_cb(NULL), clear_cb(NULL), list_cb(NULL),
-                     validate_cb(NULL), file_from_id_cb(NULL)
+                     validate_cb(NULL), file_from_id_cb(NULL),
+                     default_values_for_type_cb(NULL), create_policy_from_file_cb(NULL)
             {
             }
-        on_analyze_command      analyze_cb;
-        on_status_command       status_cb;
-        on_report_command       report_cb;
-        on_retry_command        retry_cb;
-        on_clear_command        clear_cb;
-        on_list_command         list_cb;
-        on_validate_command     validate_cb;
-        on_file_from_id_command file_from_id_cb;
+        on_analyze_command                 analyze_cb;
+        on_status_command                  status_cb;
+        on_report_command                  report_cb;
+        on_retry_command                   retry_cb;
+        on_clear_command                   clear_cb;
+        on_list_command                    list_cb;
+        on_validate_command                validate_cb;
+        on_file_from_id_command            file_from_id_cb;
+        on_default_values_for_type_command default_values_for_type_cb;
+        on_create_policy_from_file_command create_policy_from_file_cb;
     };
 
     Commands commands;

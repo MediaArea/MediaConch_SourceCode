@@ -23,7 +23,7 @@
     #include "MediaInfoDLL/MediaInfoDLL_Static.h"
     #define MediaInfoNameSpace MediaInfoDLL
 #else
-    #include "MediaInfo/MediaInfoList.h"
+    #include "MediaInfo/MediaInfo.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include "ZenLib/CriticalSection.h"
@@ -51,13 +51,14 @@ public:
     Scheduler(Core *c);
     virtual ~Scheduler();
 
-    int add_element_to_queue(const std::string& filename);
-    void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfoList* MI);
+    int add_element_to_queue(const std::string& filename, const std::vector<std::string>& options);
+    void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     bool is_finished();
     bool element_exists(const std::string& filename);
     bool element_is_finished(const std::string& filename, double& percent_done);
     void set_max_threads(size_t nb) { max_threads = nb; }
     void get_elements(std::vector<std::string>& vec);
+    int another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
 
 private:
     Scheduler(const Scheduler&);

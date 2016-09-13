@@ -14,6 +14,7 @@
 #include <libxml/tree.h>
 #include <libexslt/exslt.h>
 #include "Xslt.h"
+#include "Core.h"
 #include <fstream>
 #include <sstream>
 #include <string.h>
@@ -27,7 +28,7 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Xslt::Xslt() : Schema()
+Xslt::Xslt(bool no_https) : Schema(no_https)
 {
     xslt_ctx = NULL;
     doc_ctx = NULL;
@@ -90,7 +91,17 @@ bool Xslt::register_schema_from_memory(const std::string& schem)
 #ifdef XML_PARSE_BIG_LINES
     doc_flags =| XML_PARSE_BIG_LINES;
 #endif // !XML_PARSE_BIG_LINES
-    xmlDocPtr doc = xmlReadMemory(schem.c_str(), schem.length(), NULL, NULL, doc_flags);
+
+    xmlDocPtr doc = NULL;
+    if (no_https)
+    {
+        std::string memory = schem;
+        Core::unify_no_https(memory);
+        doc = xmlReadMemory(memory.c_str(), memory.length(), NULL, NULL, doc_flags);
+    }
+    else
+        doc = xmlReadMemory(schem.c_str(), schem.length(), NULL, NULL, doc_flags);
+
     if (doc == NULL)
         return false;
 
@@ -164,6 +175,7 @@ int Xslt::validate_xml(const std::string& xml, bool)
     if (doc_txt_len>3 && doc_txt_ptr[0]=='\n' && doc_txt_ptr[1]==' ' && doc_txt_ptr[2]==' ')
         Prefix=3; // TODO: we see such prefix in output, we need to understand the reason and remove it fro XSL instead of this hack
     report = std::string((const char*)doc_txt_ptr+Prefix, doc_txt_len);
+    free(doc_txt_ptr);
 
     xmlFreeDoc(doc);
     xmlFreeDoc(res);

@@ -8,6 +8,20 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.5
+
+* Add the create policy from file command
+
+#### Version 1.4
+
+* Add the default values for type command
+
+#### Version 1.3
+
+* Add verbosity in report request
+* Add tool in status ok
+* Add VERAPDF and DPFMANAGER report kinds
+
 #### Version 1.2
 
 * Add the List command
@@ -25,18 +39,20 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.2
+Current API version: $API_VERSION = 1.5
 
 #### Command
 
-* Analyze:      HTTP POST
-* Status:       HTTP GET
-* Report:       HTTP POST
-* Retry:        HTTP PUT
-* Clear:        HTTP DELETE
-* List:         HTTP GET
-* Validate:     HTTP POST
-* File_From_Id: HTTP POST
+* Analyze:                 HTTP POST
+* Status:                  HTTP GET
+* Report:                  HTTP POST
+* Retry:                   HTTP PUT
+* Clear:                   HTTP DELETE
+* List:                    HTTP GET
+* Validate:                HTTP POST
+* File_From_Id:            HTTP POST
+* Default_Values_For_type: HTTP GET
+* Create_Policy_From_File: HTTP GET
 
 #### Analyze
 
@@ -88,8 +104,9 @@ Parameters:
 * ok:                Array of valid arguments
 
 - id:                Integer: id given by the request
-- finish:            Boolean: if the file is finished to be analyzed
+- finished:          Boolean: if the file is finished to be analyzed
 - done:              Double: Percent done by the analysis
+- tool:              REPORT: give the report tool used to analyze, when it is finished, optionnal (Default is IMPLEMENTATION) (since API v1.3)
 
 * nok:               Array of invalid arguments
 
@@ -113,6 +130,7 @@ Parameters:
 - policies_names:    Array of policies names (Strings)
 - display_content:   String:  display content
 - display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE)
+- verbosity:         Integer: verbosity of the implementation report wanted, optionnal. Value between -1 and 5. If -1 or not given, takes the one from the server (since API v1.3)
 
 ##### Response
 
@@ -121,7 +139,7 @@ Parameters:
 * ok:                Structure of the following parameters
 
 - report:            String: Contain the report corresponding to all requested parameters
-- valid:             Boolean: true if all policies are valid
+- valid:             Boolean: true if all policies are valid (optionnal, depending on reports kind)
 
 * nok:               Array of invalid arguments
 
@@ -238,17 +256,58 @@ Parameter:
 
 * file:              String: File corresponding to the id, left empty if id not matching
 
+#### Default_Values_For_type
+
+URI format for the parameters.
+URL: /$API_VERSION/default_values_for_type
+
+##### Request
+
+Parameters:
+
+* type:              String: name of the type wanted
+
+##### Response
+
+Parameters:
+
+* values:            Array of values (String)
+
+#### Create_Policy_From_File
+
+URI format for the parameters.
+URL: /$API_VERSION/create_policy_from_file
+
+##### Request
+
+Parameters:
+
+* id:                Integer: Id given by analyze for a file
+
+##### Response
+
+Parameters:
+
+* policy:            String with the XSL policy
+
+* nok:               Object
+
+- id:                Integer: id given by the request
+- error:             Integer: Error code corresponding to the error
+
 #### Report kinds
 
-* NO\REPORT:      0
+* NO\_REPORT:      0
 * POLICY:         1
 * IMPLEMENTATION: 2
 * MEDIAINFO:      3
 * MEDIATRACE:     4
+* VERAPDF:        5
+* DPFMANAGER:     6
 
 #### Error reason
 
-* NOT\_REASON           0
+* NO\_REASON           0
 * FILE\_NOT\_EXISTING   1
 * ID\_NOT\_EXISTING     2
 * NOT\_READY            3

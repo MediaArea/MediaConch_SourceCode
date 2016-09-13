@@ -1,30 +1,41 @@
 <RCC>
     <qresource prefix="/icon">
         <file alias="icon.png">Image/MediaConch.png</file>
+        <file alias="icon-61x38.png">Image/MediaConch-61x38.png</file>
         <file alias="dropfiles.png">dropfiles_gray.png</file>
     </qresource>
     <qresource>
-        <file alias="baseEngine.html">html/baseEngine.html</file>
-        <file alias="baseKit.html">html/baseKit.html</file>
+        <file alias="base.html">html/base.html</file>
+        <file alias="webengine.js">html/js/webengine.js</file>
         <file alias="menu.html">html/menu.html</file>
+        <file alias="settings.html">html/settings.html</file>
         <file alias="checker.html">html/checker.html</file>
+        <file alias="result.html">html/result.html</file>
+        <file alias="resultTableRow.html">html/resultTableRow.html</file>
         <file alias="formUpload.html">html/formUpload.html</file>
         <file alias="formOnline.html">html/formOnline.html</file>
         <file alias="formRepository.html">html/formRepository.html</file>
-        <file alias="fileDetailChecker.html">html/fileDetailChecker.html</file>
-        <file alias="fileDetailChecker.js">html/js/fileDetailChecker.js</file>
-        <file alias="fileDetailCheckerTableStart.html">html/fileDetailCheckerTableStart.html</file>
-        <file alias="fileDetailCheckerTableElement.html">html/fileDetailCheckerTableElement.html</file>
-        <file alias="fileDetailCheckerTableModalEngine.html">html/fileDetailCheckerTableModalEngine.html</file>
-        <file alias="fileDetailCheckerTableModalKit.html">html/fileDetailCheckerTableModalKit.html</file>
-        <file alias="fileDetailCheckerTableEnd.html">html/fileDetailCheckerTableEnd.html</file>
-        <file alias="jquery.js">html/js/jquery-1.11.2.min.js</file>
+        <file alias="xsltPolicy.html">html/xslPolicy.html</file>
+        <file alias="display.html">html/display.html</file>
+        <file alias="jquery.js">html/js/jquery-1.12.4.min.js</file>
         <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
         <file alias="jstree.js">html/js/jstree.min.js</file>
         <file alias="jstreegrid.js">html/js/jstreegrid.js</file>
+        <file alias="datatables.js">html/js/datatables.min.js</file>
+        <file alias="select2.full.js">html/js/select2.full.min.js</file>
+        <file alias="checker.js">html/js/checker.js</file>
+        <file alias="policy.js">html/js/policy.js</file>
+        <file alias="policyWebEngine.js">html/js/policyWebEngine.js</file>
+        <file alias="policyWebKit.js">html/js/policyWebKit.js</file>
+        <file alias="display.js">html/js/display.js</file>
+        <file alias="settings.js">html/js/settings.js</file>
         <file alias="main.css">html/css/main.css</file>
+        <file alias="main-gui.css">html/css/main-gui.css</file>
         <file alias="bootstrap.css">html/css/bootstrap.min.css</file>
+        <file alias="select2.css">html/css/select2.min.css</file>
+        <file alias="select2-bootstrap.css">html/css/select2-bootstrap.min.css</file>
         <file alias="jstree.css">html/css/jstree.min.css</file>
+        <file alias="datatables.css">html/css/datatables.min.css</file>
         <file alias="32px.png">html/css/32px.png</file>
         <file alias="40px.png">html/css/40px.png</file>
         <file alias="glyphicons-halflings-regular.ttf">html/fonts/glyphicons-halflings-regular.ttf</file>
@@ -32,9 +43,13 @@
         <file alias="glyphicons-halflings-regular.svg">html/fonts/glyphicons-halflings-regular.svg</file>
         <file alias="glyphicons-halflings-regular.woff">html/fonts/glyphicons-halflings-regular.woff</file>
         <file alias="glyphicons-halflings-regular.woff2">html/fonts/glyphicons-halflings-regular.woff2</file>
+        <file alias="ajax-spinner-big.gif">Image/ajax-spinner-big.gif</file>
+        <file alias="ajax-spinner-small.gif">Image/ajax-spinner-small.gif</file>
     </qresource>
     <qresource prefix="/policies">
-        <file alias="General_Conformance.xsl">policies/General_Conformance.xsl</file>
+        <file alias="Policy_Set_Example.xsl">policies/Policy_Set_Example.xsl</file>
+        <file alias="CAVPP_Access_Video_Files.xsl">policies/CAVPP_Access_Video_Files.xsl</file>
+        <file alias="CAVPP_Preservation_Video_Files.xsl">policies/CAVPP_Preservation_Video_Files.xsl</file>
         <file alias="NYULibraries_MKVFFV1.xsl">policies/NYULibraries_MKVFFV1.xsl</file>
         <file alias="NYULibraries_QTv210.xsl">policies/NYULibraries_QTv210.xsl</file>
         <file alias="QTv210_to_MKVffv1.xsl">policies/QTv210_to_MKVffv1.xsl</file>
@@ -51,7 +66,7 @@
     <qresource prefix="/Help">
         <file alias="/About/About.html">../../License.html</file>
         <file alias="/Data Format/Data Format.html">html/Help/Data Format/Data Format.html</file>
-        <file alias="/Getting Started/Getting Started.html">html/Help/Getting Started/Getting Started.html</file>
+        <file alias="/FAQ/FAQ.html">html/Help/FAQ/FAQ.html</file>
         <file alias="/How To Use/How To Use.html">html/Help/How To Use/How To Use.html</file>
     </qresource>
 </RCC>

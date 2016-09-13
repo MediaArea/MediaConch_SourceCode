@@ -116,7 +116,9 @@ binary-arch: build install
 #	dh_installinfo
 	dh_installman
 	dh_link
-	dh_strip
+	dh_strip -p mediaconch --dbg-package=mediaconch-dbg
+	dh_strip -p mediaconch-server --dbg-package=mediaconch-server-dbg
+	dh_strip -p mediaconch-gui --dbg-package=mediaconch-gui-dbg
 	dh_compress
 	dh_fixperms
 #	dh_perl

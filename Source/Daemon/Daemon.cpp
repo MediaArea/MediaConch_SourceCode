@@ -15,6 +15,7 @@
 #include <ZenLib/Ztring.h>
 #include "Common/Httpd.h"
 #include "Common/LibEventHttpd.h"
+#include "Common/Policy.h"
 #include "Daemon.h"
 #include "Help.h"
 #include "Config.h"
@@ -38,7 +39,7 @@ namespace MediaConch
     //**************************************************************************
     // Daemon
     //**************************************************************************
-    std::string Daemon::version = "16.01.0";
+    std::string Daemon::version = "16.08.0";
 
     //--------------------------------------------------------------------------
     Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL)
@@ -67,10 +68,6 @@ namespace MediaConch
         if (!MCL->get_implementation_schema_file().length())
             MCL->create_default_implementation_schema();
 
-        // If no Implementation verbosity registered, use one by default
-        if (!MCL->get_implementation_verbosity().length())
-            MCL->set_implementation_verbosity("5");
-
         httpd = new LibEventHttpd(this);
         int port = -1;
         std::string address;
@@ -93,6 +90,8 @@ namespace MediaConch
         httpd->commands.list_cb = on_list_command;
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
+        httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
+        httpd->commands.create_policy_from_file_cb = on_create_policy_from_file_command;
         return 0;
     }
 
@@ -183,6 +182,11 @@ namespace MediaConch
             last_argument="--configuration=";
             return DAEMON_RETURN_NONE;
         }
+        if (argument=="-pc")
+        {
+            last_argument="--pluginsconfiguration=";
+            return DAEMON_RETURN_NONE;
+        }
         if (argument=="-i")
         {
             last_argument = "--implementationschema=";
@@ -208,6 +212,7 @@ namespace MediaConch
         OPTION("--version",                 version)
         OPTION("--fork",                    fork)
         OPTION("--configuration",           configuration)
+        OPTION("--pluginsconfiguration",    plugins_configuration)
         OPTION("--compression",             compression)
         OPTION("--implementationschema",    implementationschema)
         OPTION("--implementationverbosity", implementationverbosity)
@@ -260,6 +265,21 @@ namespace MediaConch
 
         std::string file = argument.substr(equal_pos + 1);
         MCL->set_configuration_file(file);
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_plugins_configuration(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string file = argument.substr(equal_pos + 1);
+        MCL->set_plugins_configuration_file(file);
         return DAEMON_RETURN_NONE;
     }
 
@@ -472,13 +492,39 @@ namespace MediaConch
                 continue;
             }
 
-            RESTAPI::Status_Ok *ok = new RESTAPI::Status_Ok;
+            MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
-            ok->id = id;
-            ok->finished = is_done;
-            if (!is_done)
+            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+
+            if (is_done < 0)
             {
+                RESTAPI::Status_Nok *nok = new RESTAPI::Status_Nok;
+                nok->id = id;
+                nok->error = RESTAPI::NO_REASON;
+                res.nok.push_back(nok);
+                continue;
+            }
+            RESTAPI::Status_Ok *ok = new RESTAPI::Status_Ok;
+
+            ok->id = id;
+            if (is_done == MediaConchLib::errorHttp_TRUE)
+            {
+                ok->finished = true;
+                ok->has_tool = false;
+                if (report_kind == MediaConchLib::report_MediaVeraPdf)
+                {
+                    ok->has_tool = true;
+                    ok->tool = RESTAPI::VERAPDF;
+                }
+                else if (report_kind == MediaConchLib::report_MediaDpfManager)
+                {
+                    ok->has_tool = true;
+                    ok->tool = RESTAPI::DPFMANAGER;
+                }
+            }
+            else
+            {
+                ok->finished = false;
                 ok->has_percent = true;
                 ok->done = percent_done;
             }
@@ -525,6 +571,10 @@ namespace MediaConch
                 report_set.set(MediaConchLib::report_MediaConch);
             if (req->reports[j] == RESTAPI::POLICY)
                 has_policy = true;
+            if (req->reports[j] == RESTAPI::VERAPDF)
+                report_set.set(MediaConchLib::report_MediaVeraPdf);
+            if (req->reports[j] == RESTAPI::DPFMANAGER)
+                report_set.set(MediaConchLib::report_MediaDpfManager);
         }
 
         if (!report_set.count() && !has_policy)
@@ -545,9 +595,10 @@ namespace MediaConch
                 continue;
             }
 
+            MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
-            if (!is_done)
+            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+            if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Report_Nok *nok = new RESTAPI::Report_Nok;
                 nok->id = id;
@@ -559,11 +610,20 @@ namespace MediaConch
             files.push_back(*d->current_files[id]);
         }
 
+        std::stringstream verbosity;
+        if (req->has_verbosity && req->verbosity != -1)
+            verbosity << req->verbosity;
+        else
+            verbosity << d->MCL->get_implementation_verbosity();
+
+        std::map<std::string, std::string> options;
+        options["verbosity"] = verbosity.str();
+
         // Output
         MediaConchLib::ReportRes result;
         d->MCL->get_report(report_set, format, files,
                            req->policies_names, req->policies_contents,
-                           &result, display_name, display_content);
+                           options, &result, display_name, display_content);
         res.ok.report = result.report;
         if (result.has_valid)
         {
@@ -695,6 +755,10 @@ namespace MediaConch
         MediaConchLib::report report;
         if (req->report == RESTAPI::IMPLEMENTATION)
             report = MediaConchLib::report_MediaConch;
+        else if (req->report == RESTAPI::VERAPDF)
+            report = MediaConchLib::report_MediaVeraPdf;
+        else if (req->report == RESTAPI::DPFMANAGER)
+            report = MediaConchLib::report_MediaDpfManager;
         else if (req->report != RESTAPI::POLICY)
             return -1;
         else
@@ -714,9 +778,10 @@ namespace MediaConch
                 continue;
             }
 
+            MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            bool is_done = d->MCL->is_done(*d->current_files[id], percent_done);
-            if (!is_done)
+            int is_done = d->MCL->is_done(*d->current_files[id], percent_done, report_kind);
+            if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Validate_Nok *nok = new RESTAPI::Validate_Nok;
                 nok->id = id;
@@ -761,6 +826,65 @@ namespace MediaConch
             res.file = *d->current_files[req->id];
 
         std::clog << d->get_date() << "Daemon send file_from_id result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req, RESTAPI::Default_Values_For_Type_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a default_values_for_type command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::vector<std::string> values;
+        if (d->MCL->get_values_for_type_field(req->type, req->field, values) >= 0)
+            for (size_t i = 0; i < values.size(); ++i)
+                res.values.push_back(values[i]);
+
+        std::clog << d->get_date() << "Daemon send default_values_for_type result: " << res.to_str() << std::endl;
+
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_create_policy_from_file_command(const RESTAPI::Create_Policy_From_File_Req* req, RESTAPI::Create_Policy_From_File_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a create_policy_from_file command: ";
+        std::clog << req->to_str() << std::endl;
+
+        if (!d->id_is_existing(req->id))
+        {
+            RESTAPI::Create_Policy_From_File_Nok *nok = new RESTAPI::Create_Policy_From_File_Nok;
+            nok->id = req->id;
+            nok->error = RESTAPI::ID_NOT_EXISTING;
+            res.nok = nok;
+        }
+        else
+        {
+            size_t pos = d->MCL->create_policy_from_file(*d->current_files[req->id]);
+            Policy *p = NULL;
+            std::string policy;
+            if (pos == (size_t)-1 || (p = d->MCL->get_policy(pos)) == NULL || p->dump_schema(policy) < 0)
+            {
+                RESTAPI::Create_Policy_From_File_Nok *nok = new RESTAPI::Create_Policy_From_File_Nok;
+                nok->id = req->id;
+                nok->error = RESTAPI::NO_REASON;
+                res.nok = nok;
+            }
+            else
+                res.policy = policy;
+        }
+
+        std::clog << d->get_date() << "Daemon send create_policy_from_file result: " << res.to_str() << std::endl;
         return 0;
     }
 

@@ -10,6 +10,8 @@
 #include <QWebView>
 namespace MediaConch {
 
+class MainWindow;
+
 class WebView : public QWebView
 {
     Q_OBJECT
@@ -19,7 +21,10 @@ public:
     virtual ~WebView();
 
 protected:
-    void dropEvent(QDropEvent *event);
+    virtual void dropEvent(QDropEvent *event);
+    virtual void dragEnterEvent(QDragEnterEvent *event);
+
+    MainWindow *mainwindow;
 };
 
 }

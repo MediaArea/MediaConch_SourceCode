@@ -1,10 +1,19 @@
 @rem Copyright (c) MediaArea.net SARL. All Rights Reserved.
 @rem
-@rem Use of this source code is governed by a BSD-style license that can
+@rem Use of this source code is governed by a GPL v3+ and MPL v2+ license that can
 @rem be found in the License.html file in the root of the source tree.
 @rem
 
 @echo off
+
+rem --- Search binaries ---
+set BPATH=
+if exist "%~dp0\..\..\..\MediaArea-Utils-Binaries" set BPATH="%~dp0\..\..\..\MediaArea-Utils-Binaries"
+if exist "%~dp0\..\..\MediaArea-Utils-Binaries" set BPATH="%~dp0\..\..\MediaArea-Utils-Binaries"
+if "%BPATH%"=="" (
+    echo "ERROR: binaries path not found"
+    exit /b 1
+)
 
 rem --- Clean up ---
 del MediaConch_CLI_GNU_Prepare.7z
@@ -67,7 +76,7 @@ xcopy ..\..\Shared\Project\WxWidgets\*.sh MediaConch_CLI_GNU_Prepare\Shared\Proj
 
 rem --- Compressing Archive ---
 if "%2"=="SkipCompression" goto SkipCompression
-..\..\Shared\Binary\Windows_i386\7-Zip\7z a -r -t7z -mx9 MediaConch_CLI_GNU_Prepare.7z MediaConch_CLI_GNU_Prepare\*
+%BPATH%\Windows\7-Zip\7z a -r -t7z -mx9 MediaConch_CLI_GNU_Prepare.7z MediaConch_CLI_GNU_Prepare\*
 :SkipCompression
 
 rem --- Clean up ---

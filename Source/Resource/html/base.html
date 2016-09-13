@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="qrc:/bootstrap.css"/>
+        <link rel="stylesheet" href="qrc:/select2.css"/>
+        <link rel="stylesheet" href="qrc:/select2-bootstrap.css"/>
+        <link rel="stylesheet" href="qrc:/jstree.css"/>
+        <link rel="stylesheet" href="qrc:/datatables.css"/>
+        <link rel="stylesheet" type="text/css" href="qrc:/main.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="qrc:/main-gui.css" media="screen"/>
+        <script src="qrc:/jquery.js"></script>
+        <script src="qrc:/bootstrap.js"></script>
+        <script src="qrc:/jstree.js"></script>
+        <script src="qrc:/jstreegrid.js"></script>
+        <script src="qrc:/datatables.js"></script>
+        <script src="qrc:/select2.full.js"></script>
+ {{ QT_SCRIPTS }}
+        <script type="text/javascript">
+          WEBMACHINE = '{{ webmachine }}';
+          webpage = undefined;
+        </script>
+    </head>
+    <body id="body">
+        <div class="container">
+            <div class="content">
+                <div class="row">
+                    <div class="col-lg-11 col-lg-offset-1">
+                        {% block checker %}{% endblock %}
+                        {% block result %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div> <!-- ends container -->
+    </body>
+</html>

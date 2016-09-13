@@ -181,7 +181,7 @@ int Configuration::get(const std::string& key, std::vector<Container::Value>& va
 }
 
 //---------------------------------------------------------------------------
-int Configuration::get(const std::string& key, std::vector<std::pair<std::string, Container::Value> >& val)
+int Configuration::get(const std::string& key, std::map<std::string, Container::Value>& val)
 {
     Container::Value *v = get_value_for_key(key);
 

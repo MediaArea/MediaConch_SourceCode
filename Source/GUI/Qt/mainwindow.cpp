@@ -7,18 +7,22 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "menumainwindow.h"
+#include "settingswindow.h"
 #include "checkerwindow.h"
-#include "resultwindow.h"
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
 #include "Common/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
+#include "DatabaseUi.h"
+#include "SQLLiteUi.h"
+#include "NoDatabaseUi.h"
 
 #include <QStringList>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QActionGroup>
+#include <QSpinBox>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QFileDialog>
@@ -48,6 +52,12 @@
 namespace MediaConch {
 
 //***************************************************************************
+// Constant
+//***************************************************************************
+
+const std::string MainWindow::database_filename = std::string("MediaConchUi.db");
+
+//***************************************************************************
 // Constructor / Desructor
 //***************************************************************************
 
@@ -60,61 +70,60 @@ MainWindow::MainWindow(QWidget *parent) :
 
     MCL.init();
 
-    // Local database
-    workerfiles.create_and_configure_database();
+    // GUI database
+    create_and_configure_ui_database();
+    workerfiles.set_database(db);
+    uisettings.set_database(db);
+    uisettings.init();
 
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
-    // Verbosity option
-    if (!MCL.get_implementation_verbosity().length())
-        MCL.set_implementation_verbosity("5");
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
     ToolGroup->addAction(ui->actionChecker);
-    ToolGroup->addAction(ui->actionResult);
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionDisplay);
-    
+    ToolGroup->addAction(ui->actionSettings);
+
     // Visual elements
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
     Layout->setContentsMargins(0, 0, 0, 0);
+    Layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     MenuView = new MenuMainWindow(this);
     checkerView=NULL;
-    resultView=NULL;
     policiesView = NULL;
     displayView = NULL;
+    settingsView = NULL;
 
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
     int left=70;
     int width=QApplication::desktop()->screenGeometry().width();
-    if (width>1170)
+    if (width>1366)
     {
-        left+=(width-1170)/2;
-        width=1170;
+        left+=(width-1366)/2;
+        width=1366;
     }
     move(left, 70);
     resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
     setAcceptDrops(false);
 
+    // Status bar
+    statusBar()->show();
+    clear_msg_in_status_bar();
+    connect(this, SIGNAL(status_bar_show_message(const QString&, int)),
+            statusBar(), SLOT(showMessage(const QString&, int)));
+
+    // worker load existing files
+    workerfiles.fill_registered_files_from_db();
+    workerfiles.start();
+
     // Default
     add_default_policy();
     add_default_displays();
     on_actionChecker_triggered();
-
-    // Status bar
-    statusBar()->show();
-    status_msg = new QLineEdit(statusBar());
-    status_msg->setReadOnly(true);
-    statusBar()->addWidget(status_msg, 2);
-    clear_msg_in_status_bar();
-
-    // Connect the signal 
-    connect(this, SIGNAL(setResultView()), this, SLOT(on_actionResult_triggered()));
-    workerfiles.fill_registered_files_from_db();
-    workerfiles.start();
 }
 
 MainWindow::~MainWindow()
@@ -132,13 +141,34 @@ MainWindow::~MainWindow()
 
 //---------------------------------------------------------------------------
 void MainWindow::add_file_to_list(const QString& file, const QString& path,
-                                  const QString& policy, const QString& display)
+                                  const QString& policy, const QString& display,
+                                  const QString& v)
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
     int policy_i = policy.toInt();
     int display_i = display.toInt();
-    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i);
+    int verbosity_i = v.toInt();
+
+    // Save configuration used
+    std::string policy_str;
+    if (policy_i >= 0)
+    {
+        Policy *p = get_policy(policy_i);
+        if (p)
+            policy_str = p->filename;
+    }
+    uisettings.change_last_policy(policy_str);
+    uisettings.change_last_display(displays_list[display_i].toUtf8().data());
+    uisettings.change_last_verbosity(verbosity_i);
+
+    std::string full_path = filepath;
+    if (full_path.length())
+        full_path += "/";
+    full_path += filename;
+
+    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i, verbosity_i);
+    checkerView->add_file_to_result_table(full_path);
 }
 
 //---------------------------------------------------------------------------
@@ -148,10 +178,19 @@ void MainWindow::remove_file_to_list(const QString& file)
     workerfiles.remove_file_registered_from_file(filename);
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::update_policy_of_file_in_list(const QString& file, const QString& policy)
+{
+    std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
+    int policy_i = policy.toInt();
+    workerfiles.update_policy_of_file_registered_from_file(filename, policy_i);
+}
+
 void MainWindow::policy_to_delete(int index)
 {
+    std::string err;
     //Delete policy
-    MCL.remove_policy((size_t)index);
+    MCL.remove_policy((size_t)index, err);
 }
 
 //***************************************************************************
@@ -166,14 +205,14 @@ void MainWindow::Run()
         case RUN_CHECKER_VIEW:
             createCheckerView();
             break;
-        case RUN_RESULT_VIEW:
-            createResultView();
-            break;
         case RUN_POLICIES_VIEW:
             createPoliciesView();
             break;
         case RUN_DISPLAY_VIEW:
             createDisplayView();
+            break;
+        case RUN_SETTINGS_VIEW:
+            createSettingsView();
             break;
         default:
             createCheckerView();
@@ -215,92 +254,41 @@ QString MainWindow::get_local_folder() const
 //---------------------------------------------------------------------------
 QString MainWindow::ask_for_schema_file()
 {
-    QString file=QFileDialog::getOpenFileName(this, "Open file", "", "XSL file (*.xsl);;Schematron file (*.sch);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QString suggested = QString().fromUtf8(select_correct_load_policy_path().c_str());
+    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+
+    if (file.length())
+    {
+        QDir info(QFileInfo(file).absoluteDir());
+        set_last_load_policy_path(info.absolutePath().toUtf8().data());
+    }
+
     return file;
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::exporting_to_schematron_file(size_t pos)
+size_t MainWindow::create_policy_from_file(const QString& file)
 {
-    QString path = get_local_folder();
-    path += "/policies";
+    std::string filename(file.toUtf8().data(), file.toUtf8().length());
+    size_t pos = MCL.create_policy_from_file(filename);
 
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
+    QMessageBox::Icon icon;
+    QString text;
+    if (pos != (size_t)-1)
+    {
+        icon = QMessageBox::Information;
+        text = QString("Policy from %1 is created, you can find it in the \"Policies\" tab").arg(file);
+    }
+    else
+    {
+        icon = QMessageBox::Critical;
+        text = QString("Cannot Create policy from %1").arg(file);
+    }
 
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    path += "/" + QString().fromStdString(p->title) + ".sch";
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                              path, tr("Schematron (*.sch)"));
-
-    if (!filename.length())
-        return -1;
-
-    std::string f = filename.toStdString();
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_unknown_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    path += "/" + QString().fromStdString(p->filename);
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                              path, tr("XML (*.xml)"));
-
-    if (!filename.length())
-        return -1;
-
-    std::string f = filename.toStdString();
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::exporting_to_xslt_file(size_t pos)
-{
-    QString path = get_local_folder();
-    path += "/policies";
-
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
-
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
-        return -1;
-
-    path += "/" + QString().fromStdString(p->title) + ".xsl";
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                              path, tr("XSLT (*.xsl)"));
-
-    if (!filename.length())
-        return -1;
-
-    std::string f = filename.toStdString();
-    MCL.save_policy(pos, &f);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::exporting_policy(size_t pos)
-{
-    MCL.save_policy(pos, NULL);
+    QMessageBox msgBox(icon, tr("Create policy"), text,
+                       QMessageBox::NoButton, this);
+    msgBox.exec();
+    return pos;
 }
 
 //---------------------------------------------------------------------------
@@ -316,30 +304,25 @@ void MainWindow::add_default_policy()
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
-        QByteArray schematron = file.readAll();
-        const std::string& file_str = list[i].absoluteFilePath().toStdString();
-        std::string memory(schematron.constData(), schematron.length());
+        QByteArray schema = file.readAll();
+        std::string memory(schema.constData(), schema.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, file_str, err);
+        MCL.import_policy_from_memory(list[i].absoluteFilePath().toUtf8().data(), memory, err, true);
     }
 
-    QString path = get_local_folder();
-    path += "/policies";
+    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
+    path += "policies/";
     policies_dir = QDir(path);
+
+    if (!policies_dir.exists())
+        policies_dir.mkpath(path);
 
     policies_dir.setFilter(QDir::Files);
     list = policies_dir.entryInfoList();
     for (int i = 0; i < list.count(); ++i)
     {
-        QFile file(list[i].absoluteFilePath());
-
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            continue;
-        QByteArray data = file.readAll();
-        std::string memory(data.constData(), data.length());
         std::string err;
-        MCL.import_policy_from_memory(memory, list[i].absoluteFilePath().toStdString(),
-                                      err);
+        MCL.import_policy_from_file(list[i].absoluteFilePath().toUtf8().data(), err);
     }
 }
 
@@ -353,8 +336,8 @@ void MainWindow::add_default_displays()
     for (int i = 0; i < list.count(); ++i)
         displays_list.push_back(list[i].absoluteFilePath());
 
-    QString path = get_local_folder();
-    path += "/displays";
+    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
+    path += "policies/";
 
     QDir dir(path);
     if (dir.exists())
@@ -391,9 +374,74 @@ const std::vector<Policy *>& MainWindow::get_all_policies() const
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::get_policies(std::vector<std::pair<QString, QString> >& policies)
+{
+    const std::vector<Policy *>& list = get_all_policies();
+
+    for (size_t i = 0; i < list.size(); ++i)
+        policies.push_back(std::make_pair(QString().fromUtf8(list[i]->filename.c_str(), list[i]->filename.length()),
+                                          QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length())));
+}
+
+//---------------------------------------------------------------------------
 std::vector<QString>& MainWindow::get_displays()
 {
     return displays_list;
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::display_add_file(const QString& name, const QString& filename)
+{
+    if (!displayView)
+        return -1;
+
+    return displayView->add_new_file(name, filename);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::display_export_id(const QString& name)
+{
+    if (!displayView)
+        return;
+
+    displayView->export_file(name);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::display_delete_id(const QString& name)
+{
+    if (!displayView)
+        return;
+
+    displayView->delete_file(name);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::get_display_index_by_filename(const std::string& filename)
+{
+    for (size_t i = 0; i < displays_list.size(); ++i)
+    {
+        if (filename == displays_list[i].toUtf8().data())
+            return i;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+UiSettings& MainWindow::get_settings()
+{
+    return uisettings;
+}
+
+int MainWindow::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+{
+    return MCL.get_values_for_type_field(type, field, values);
+}
+
+int MainWindow::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+{
+    return MCL.get_fields_for_type(type, fields);
 }
 
 //***************************************************************************
@@ -406,15 +454,6 @@ void MainWindow::on_actionOpen_triggered()
     QStringList list = QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
     if (list.empty())
         return;
-
-    for (int pos = 0; pos < list.size(); ++pos)
-    {
-        QFileInfo file(list[pos]);
-        QString filename = file.fileName();
-        QString filepath = file.absolutePath();
-
-        add_file_to_list(filename, filepath, "-1", "-1");
-    }
 
     current_view = RUN_CHECKER_VIEW;
     Run();
@@ -432,17 +471,6 @@ void MainWindow::on_actionChecker_triggered()
     if (clearVisualElements() < 0)
         return;
     current_view = RUN_CHECKER_VIEW;
-    Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::on_actionResult_triggered()
-{
-    if (!ui->actionResult->isChecked())
-        ui->actionResult->setChecked(true);
-    if (clearVisualElements() < 0)
-        return;
-    current_view = RUN_RESULT_VIEW;
     Run();
 }
 
@@ -469,6 +497,17 @@ void MainWindow::on_actionDisplay_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionSettings_triggered()
+{
+    if (!ui->actionSettings->isChecked())
+        ui->actionSettings->setChecked(true);
+    if (clearVisualElements() < 0)
+        return;
+    current_view = RUN_SETTINGS_VIEW;
+    Run();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionChooseSchema_triggered()
 {
     QString file = ask_for_schema_file();
@@ -476,19 +515,13 @@ void MainWindow::on_actionChooseSchema_triggered()
         return;
 
     std::string err;
-    if (MCL.import_policy_from_file(file.toStdString(), err) < 0)
-        set_msg_error_to_status_bar("Policy not valid");
+    if (MCL.import_policy_from_file(file.toUtf8().data(), err) < 0)
+        set_msg_to_status_bar("Policy not valid");
 
     if (!ui->actionPolicies->isChecked())
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
     Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::set_result_view()
-{
-    Q_EMIT setResultView();
 }
 
 //---------------------------------------------------------------------------
@@ -504,7 +537,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             if (!MCL.get_policy(i)->saved)
             {
                 info += "\r\n\t";
-                info += QString().fromStdString(MCL.get_policy(i)->title);
+                info += QString().fromUtf8(MCL.get_policy(i)->title.c_str());
             }
 
         msgBox.setInformativeText(info);
@@ -567,24 +600,27 @@ void MainWindow::on_actionDataFormat_triggered()
 int MainWindow::clearVisualElements()
 {
     if (checkerView)
-        checkerView->hide();
-
-    if (resultView)
     {
-        delete resultView;
-        resultView = NULL;
+        delete checkerView;
+        checkerView = NULL;
     }
 
     if (policiesView)
     {
         delete policiesView;
-        policiesView=NULL;
+        policiesView = NULL;
     }
 
     if (displayView)
     {
         delete displayView;
-        displayView=NULL;
+        displayView = NULL;
+    }
+
+    if (settingsView)
+    {
+        delete settingsView;
+        settingsView = NULL;
     }
 
     return 0;
@@ -593,26 +629,18 @@ int MainWindow::clearVisualElements()
 //---------------------------------------------------------------------------
 void MainWindow::createCheckerView()
 {
-    if (checkerView)
-    {
-        delete checkerView;
-        checkerView = NULL;
-    }
-
     if (clearVisualElements() < 0)
         return;
+
     checkerView = new CheckerWindow(this);
     checkerView->create_web_view();
-}
+    std::map<std::string, FileRegistered> files;
+    workerfiles.get_registered_files(files);
 
-//---------------------------------------------------------------------------
-void MainWindow::createResultView()
-{
-    if (clearVisualElements() < 0)
-        return;
-    resultView = new ResultWindow(this);
-    resultView->set_default_update_timer(MCL.get_ui_poll_request());
-    resultView->display_results();
+    std::map<std::string, FileRegistered>::iterator it = files.begin();
+    for (; it != files.end(); ++it)
+        checkerView->add_file_to_result_table(it->first);
+    checkerView->page_start_waiting_loop();
 }
 
 //---------------------------------------------------------------------------
@@ -620,8 +648,9 @@ void MainWindow::createPoliciesView()
 {
     if (clearVisualElements() < 0)
         return;
+
     policiesView = new PoliciesWindow(this);
-    policiesView->displayPoliciesTree();
+    policiesView->display_policies();
 }
 
 //---------------------------------------------------------------------------
@@ -630,132 +659,47 @@ void MainWindow::createDisplayView()
     if (clearVisualElements() < 0)
         return;
     displayView = new DisplayWindow(this);
-    displayView->displayDisplay();
+    displayView->display_display();
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::createSettingsView()
+{
+    if (clearVisualElements() < 0)
+        return;
+
+    settingsView = new SettingsWindow(this);
+    settingsView->display_settings();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::set_msg_to_status_bar(const QString& message)
 {
-    statusBar()->clearMessage();
-    status_msg->setText(message);
-    QTimer::singleShot(5000, this, SLOT(update_status_bar()));
+    Q_EMIT status_bar_show_message(message, 5000);
 }
 
-void MainWindow::set_msg_error_to_status_bar(const QString& message)
-{
-    statusBar()->clearMessage();
-
-    QPalette pal = status_msg->palette();
-    pal.setColor(QPalette::WindowText, Qt::red);
-    pal.setColor(QPalette::Text, Qt::red);
-    status_msg->setPalette(pal);
-    status_msg->setText(message);
-
-    QTimer::singleShot(5000, this, SLOT(update_status_bar()));
-}
-
+//---------------------------------------------------------------------------
 void MainWindow::clear_msg_in_status_bar()
 {
-    statusBar()->clearMessage();
-    QPalette pal = status_msg->palette();
-    pal.setColor(QPalette::WindowText, Qt::black);
-    status_msg->setPalette(pal);
-    status_msg->setText(QString());
-}
-
-QStatusBar *MainWindow::get_status_bar()
-{
-    return statusBar();
-}
-
-void MainWindow::update_status_bar()
-{
-    clear_msg_in_status_bar();
+    Q_EMIT status_bar_clear_message();
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::create_policy_options(QString& policies)
+void MainWindow::drag_and_drop_files_action(const QStringList& files)
 {
-    const std::vector<Policy *>& list = get_all_policies();
+    if (checkerView)
+        checkerView->change_local_files(files);
 
-    QString system_policy;
-    QString user_policy;
-    for (size_t i = 0; i < list.size(); ++i)
+    if (displayView)
+        displayView->add_new_files(files);
+
+    if (settingsView)
     {
-        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
-            system_policy += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
-        else
-            user_policy += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+        //nothing to do
     }
 
-    // Create default policy opt-group
-    if (system_policy.length())
-        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
-
-    // Create default policy opt-group
-    if (user_policy.length())
-        policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::create_displays_options(QString& displays)
-{
-    QString system_display;
-    QString user_display;
-    for (size_t i = 0; i < displays_list.size(); ++i)
-    {
-        QFileInfo file(displays_list[i]);
-        if (displays_list[i].startsWith(":/"))
-            system_display += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(file.baseName());
-        else
-            user_display += QString("<option value=\"%1\">%2</option>")
-                .arg((int)i).arg(file.baseName());
-    }
-
-    // Create default display opt-group
-    if (system_display.length())
-        displays += QString("<optgroup label=\"System displays\">%1</optgroup>").arg(system_display);
-
-    // Create user display opt-group
-    if (user_display.length())
-        displays += QString("<optgroup label=\"User displays\">%1</optgroup>").arg(user_display);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
-{
-    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a policy[\\n\\r\\t\\s]*</option>");
-    int pos = html.indexOf(selector);
-
-    reg.setMinimal(true);
-
-    if (pos == -1)
-        return;
-
-    if ((pos = reg.indexIn(html, pos)) != -1)
-    {
-        pos += reg.matchedLength();
-        html.insert(pos, policies);
-    }
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::add_display_to_html_selection(QString& displays, QString& html, const QString& selector)
-{
-    QRegExp reg("<option selected=\"selected\" value=\"-1\">[\\n\\r\\t\\s]*Choose a Display[\\n\\r\\t\\s]*</option>");
-    reg.setMinimal(true);
-
-    int pos = html.indexOf(selector);
-    if (pos == -1)
-        return;
-
-    if ((pos = reg.indexIn(html, pos)) != -1)
-    {
-        pos += reg.matchedLength();
-        html.insert(pos, displays);
-    }
+    if (policiesView)
+        policiesView->add_new_policies(files);
 }
 
 //***************************************************************************
@@ -765,6 +709,8 @@ void MainWindow::add_display_to_html_selection(QString& displays, QString& html,
 //---------------------------------------------------------------------------
 void MainWindow::set_widget_to_layout(QWidget* w)
 {
+    w->setSizePolicy(QSizePolicy::MinimumExpanding,
+                     QSizePolicy::MinimumExpanding);
     Layout->addWidget(w);
 }
 
@@ -781,12 +727,6 @@ void MainWindow::checker_selected()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::result_selected()
-{
-    on_actionResult_triggered();
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::policies_selected()
 {
     on_actionPolicies_triggered();
@@ -799,9 +739,57 @@ void MainWindow::display_selected()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::settings_selected()
+{
+    on_actionSettings_triggered();
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::import_policy(const QString& file, std::string& err)
 {
-    return MCL.import_policy_from_file(file.toStdString(), err);
+    return MCL.import_policy_from_file(file.toUtf8().data(), err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::create_xslt_policy(std::string& err)
+{
+    return MCL.create_xslt_policy(err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::duplicate_policy(int id, std::string& err)
+{
+    return MCL.duplicate_policy(id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
+{
+    return MCL.policy_change_name(id, name, description, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::create_policy_rule(int policy_id, std::string& err)
+{
+    return MCL.create_policy_rule(policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err)
+{
+    return MCL.edit_policy_rule(policy_id, rule_id, rule, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.duplicate_policy_rule(policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::delete_policy_rule(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.delete_policy_rule(policy_id, rule_id, err);
 }
 
 //---------------------------------------------------------------------------
@@ -817,15 +805,64 @@ Policy* MainWindow::get_policy(size_t pos)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::remove_policy(size_t pos)
+int MainWindow::get_policy_index_by_filename(const std::string& filename)
 {
-    return MCL.remove_policy(pos);
+    const std::vector<Policy *>&  policies = get_all_policies();
+
+    for (size_t i = 0; i < policies.size(); ++i)
+    {
+        if (policies[i] && policies[i]->filename == filename)
+            return i;
+    }
+
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::remove_policy(size_t pos, std::string& err)
+{
+    return MCL.remove_policy(pos, err);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::add_policy(Policy* policy)
 {
     return MCL.add_policy(policy);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::save_policy(size_t pos, std::string& err)
+{
+    return MCL.save_policy(pos, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::export_policy(size_t pos, std::string& err)
+{
+    QString path = get_local_folder();
+    path += "/policies";
+
+    QDir dir(path);
+    if (!dir.exists())
+        dir.mkpath(dir.absolutePath());
+
+    Policy* p = MCL.get_policy(pos);
+    if (!p)
+        return -1;
+
+    QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
+    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xsl";
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
+                                                    suggested, tr("XSLT (*.xsl)"));
+
+    if (!filename.length())
+        return -1;
+
+    QDir info(QFileInfo(filename).absoluteDir());
+    set_last_save_policy_path(info.absolutePath().toUtf8().data());
+
+    return MCL.export_policy(filename.toUtf8().data(), pos, err);
 }
 
 //---------------------------------------------------------------------------
@@ -841,6 +878,141 @@ size_t MainWindow::get_policies_count() const
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::select_correct_policy()
+{
+    // Policy
+    std::string policy = uisettings.get_default_policy();
+    if (policy == "last")
+        policy = uisettings.get_last_policy();
+
+    if (!policy.length())
+        return -1;
+    return get_policy_index_by_filename(policy);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::select_correct_display()
+{
+    // Display
+    std::string display = uisettings.get_default_display();
+    if (display == "last")
+        display = uisettings.get_last_display();
+    return get_display_index_by_filename(display);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::select_correct_verbosity()
+{
+    // Verbosity
+    int verbosity = uisettings.get_default_verbosity();
+    if (verbosity == -1)
+        verbosity = uisettings.get_last_verbosity();
+    return verbosity;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_save_report_path()
+{
+    // Save report path
+    std::string path = uisettings.get_default_save_report_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_save_report_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_save_policy_path()
+{
+    // Save policy path
+    std::string path = uisettings.get_default_save_policy_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_save_policy_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_save_display_path()
+{
+    // Save display path
+    std::string path = uisettings.get_default_save_display_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_save_display_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_load_files_path()
+{
+    // Load files path
+    std::string path = uisettings.get_default_load_files_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_load_files_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_load_policy_path()
+{
+    // Load policy path
+    std::string path = uisettings.get_default_load_policy_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_load_policy_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_load_display_path()
+{
+    // Load display path
+    std::string path = uisettings.get_default_load_display_path();
+    if (!path.length() || path == "last")
+        path = uisettings.get_last_load_display_path();
+    return path;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_save_report_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_save_report_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_save_policy_path(const std::string& path)
+{
+    // Save policy path
+    uisettings.change_last_save_policy_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_save_display_path(const std::string& path)
+{
+    // Save display path
+    uisettings.change_last_save_display_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_load_policy_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_load_policy_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_load_files_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_load_files_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_last_load_display_path(const std::string& path)
+{
+    // Save report path
+    uisettings.change_last_load_display_path(path);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::analyze(const std::vector<std::string>& files)
 {
     return MCL.analyze(files);
@@ -853,9 +1025,9 @@ int MainWindow::is_analyze_finished(const std::vector<std::string>& files, doubl
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::is_analyze_finished(const std::string& file, double& percent_done)
+int MainWindow::is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
 {
-    return MCL.is_done(file, percent_done);
+    return MCL.is_done(file, percent_done, report_kind);
 }
 
 //---------------------------------------------------------------------------
@@ -880,33 +1052,6 @@ int MainWindow::validate(MediaConchLib::report report, const std::string& file,
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_implementationreport_xml(const std::string& file,
-                                                 const std::string& display_name,
-                                                 const std::string& display_content,
-                                                 bool& is_valid)
-{
-    const std::string* dname = display_name.length() ? &display_name : NULL;
-    const std::string* dcontent = display_content.length() ? &display_content : NULL;
-
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaConch);
-    std::vector<std::string> files;
-    files.push_back(file);
-
-    MediaConchLib::ReportRes result;
-    std::vector<std::string> vec;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                   vec, vec,
-                   &result, dname, dcontent);
-    if (result.has_valid)
-        is_valid = result.valid;
-    else
-        is_valid = false;
-
-    return QString().fromUtf8(result.report.c_str(), result.report.length());
-}
-
-//---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
                                                      const std::string& display_name,
                                                      const std::string& display_content)
@@ -920,10 +1065,12 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
-    return QString().fromStdString(result.report);
+    return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
@@ -939,8 +1086,10 @@ QString MainWindow::get_mediainfo_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
@@ -956,8 +1105,9 @@ QString MainWindow::get_mediainfo_jstree(const std::string& file)
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
-                   vec, vec, &result);
+                   vec, vec, options, &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
@@ -974,8 +1124,10 @@ QString MainWindow::get_mediatrace_xml(const std::string& file,
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
@@ -991,14 +1143,16 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
     MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
                    vec, vec,
+                   options,
                    &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p)
+void MainWindow::get_implementation_report(const std::string& file, QString& report, int *display_p, int *verbosity)
 {
     FileRegistered *fr = get_file_registered_from_file(file);
     if (!fr)
@@ -1017,15 +1171,18 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
     fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
 
     std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaConch);
+    report_set.set(fr->report_kind);
 
     std::vector<std::string> files;
     files.push_back(file);
 
     MediaConchLib::ReportRes result;
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
+    fill_options_for_report(options, verbosity);
     MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                    vec, vec,
+                   options,
                    &result, dname, dcontent);
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1058,7 +1215,7 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     Policy* p = get_policy((size_t)policy);
     if (!p)
     {
-        report = QString("Policy not found");
+        report = "Policy not found";
         delete fr;
         return 1;
     }
@@ -1080,13 +1237,15 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     policies_contents.push_back(policy_content);
 
     std::vector<std::string> vec;
+    std::map<std::string, std::string> options;
 
     if (MCL.get_report(report_set, MediaConchLib::format_Xml, files,
                        vec, policies_contents,
+                       options,
                        &result, dname, dcontent) < 0)
         return 0;
 
-    report = QString().fromStdString(result.report);
+    report = QString().fromUtf8(result.report.c_str(), result.report.length());
 
     if (!result.has_valid)
         return 1;
@@ -1112,6 +1271,14 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
                                    const std::string*& dname, const std::string*& dcontent,
                                    FileRegistered* fr)
 {
+    if (fr && (fr->report_kind == MediaConchLib::report_MediaVeraPdf ||
+               fr->report_kind == MediaConchLib::report_MediaDpfManager))
+    {
+        dname = NULL;
+        dcontent = NULL;
+        return;
+    }
+
     if (display_p)
     {
         if (*display_p >= 0 && (size_t)*display_p < displays_list.size())
@@ -1120,7 +1287,7 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
             display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);
             QByteArray xsl = display_xsl.readAll();
             display_xsl.close();
-            display_content = QString(xsl).toStdString();
+            display_content = QString(xsl).toUtf8().data();
         }
         else
             display_content = std::string(implementation_report_display_html_xsl);
@@ -1131,7 +1298,7 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
         display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);
         QByteArray xsl = display_xsl.readAll();
         display_xsl.close();
-        display_content = QString(xsl).toStdString();
+        display_content = QString(xsl).toUtf8().data();
     }
     else
         display_content = std::string(implementation_report_display_html_xsl);
@@ -1158,13 +1325,71 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
             error_msg = "Error not known";
             break;
     }
-    set_msg_error_to_status_bar(error_msg);
+    set_msg_to_status_bar(error_msg);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::get_ui_database_path(std::string& path)
 {
     return MCL.get_ui_database_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::create_and_configure_ui_database()
+{
+#ifdef HAVE_SQLITE
+    std::string db_path;
+    if (get_ui_database_path(db_path) < 0)
+    {
+        db_path = Core::get_local_data_path();
+        QDir f(QString().fromUtf8(db_path.c_str(), db_path.length()));
+        if (!f.exists())
+            db_path = ".";
+    }
+
+    db = new SQLLiteUi;
+
+    db->set_database_directory(db_path);
+    db->set_database_filename(database_filename);
+    if (db->init_ui() < 0)
+    {
+        const std::vector<std::string>& errors = db->get_errors();
+        std::string error;
+        for (size_t i = 0; i < errors.size(); ++i)
+        {
+            if (i)
+                error += " ";
+            error += errors[i];
+        }
+        QString msg = QString().fromUtf8(error.c_str(), error.length());
+        set_msg_to_status_bar(msg);
+        delete db;
+        db = NULL;
+    }
+#endif
+
+    if (!db)
+    {
+        db = new NoDatabaseUi;
+        db->init_ui();
+    }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p)
+{
+    std::string verbosity = QString().setNum(uisettings.get_default_verbosity()).toUtf8().data();
+
+    if (verbosity_p && *verbosity_p != -1)
+        verbosity = QString().setNum(*verbosity_p).toUtf8().data();
+
+    if (verbosity.length())
+    {
+        if (verbosity == "-1")
+            opts["verbosity"] = "5";
+        else
+            opts["verbosity"] = verbosity;
+    }
 }
 
 }

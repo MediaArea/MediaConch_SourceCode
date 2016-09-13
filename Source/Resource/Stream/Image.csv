@@ -1,0 +1,35 @@
+Format;;FromStats;
+Format_Commercial_IfAny;;FromStats;
+Format_Version;Image:Format;FromStats;
+Format_Profile;Image:Format;FromStats;
+Format_Compression;;FromStats;
+Format_Settings_Wrapping;;FromStats;
+CodecID;;FromStats;
+Width;;FromList;720 / 1080 / 1920 / 3840 / 7680
+Width_Offset;;FromList;
+Width_Original;;FromList;720 / 1080 / 1920 / 3840 / 7680
+Height;;FromList;480 / 576 / 720 / 1080 / 2160 / 4320
+Height_Offset;;FromList;16 / 32
+Height_Original;;FromList;480 / 576 / 720 / 1080 / 2160 / 4320
+PixelAspectRatio;;FromList;1.000 / 1.067 / 1.126 / 1.422 / 1.500 / 1.501
+DisplayAspectRatio;;FromList;1.333 / 1.778
+ColorSpace;;FromStats;
+ChromaSubsampling;;FromStats;
+BitDepth;;FromStats;
+Compression_Mode;;FromStats;
+Encoded_Library_Name;;FromStats;
+Language;;FromStats;
+Language_More;;FromStats;
+Disabled;;FromStats;
+Default;;FromStats;
+Forced;;FromStats;
+AlternateGroup;;FromStats;
+Encryption;;FromStats;
+colour_description_present;;FromStats;
+colour_primaries;;FromStats;
+transfer_characteristics;;FromStats;
+matrix_coefficients;;FromStats;
+colour_description_present_Original;;FromStats;
+colour_primaries_Original;;FromStats;
+transfer_characteristics_Original;;FromStats;
+matrix_coefficients_Original;;FromStats;

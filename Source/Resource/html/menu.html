@@ -6,24 +6,27 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="qrc:/bootstrap.css">
         <link rel="stylesheet" type="text/css" href="qrc:/main.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="qrc:/main-gui.css" media="screen"/>
         <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     </head>
-    <body id="body">
-        <div class="container">
-            <div class="navbar-header page-scroll">
-                <a class="navbar-brand serif" href="">🐚<strong>MediaConch</strong></a>
-            </div>
-
-            <div class="collapse navbar-collapse">
-              <ul class="nav navbar navbar-nav navbar-right">
-                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Checker</a></li>
-                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Result</a></li>
-                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Policies</a></li>
-                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Display</a></li>
-                <li><a href="" onclick="webpage.menu_link_checker(this.text);">Help</a></li>
-              </ul>
-            </div>
-    </div> <!-- ends container -->
+    <body id="body" class="container">
+      <nav class="navbar-default page-scroll">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapse-1">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <span class="navbar-brand serif" href=""><img src="qrc:///icon/icon-61x38.png" alt="🐚" title="MediaConch" height="38" width="61"/> <strong>MediaConch</strong></span>
+      </nav>
+      <nav class="collapse navbar-collapse" id="collapse-1">
+        <ul class="nav navbar navbar-nav navbar-right">
+          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Checker</a></li>
+          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Policies</a></li>
+          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Display</a></li>
+          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Settings</a></li>
+          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Help</a></li>
+        </ul>
+      </nav>
 
         <script src="qrc:/jquery.js"></script>
         <script src="qrc:/bootstrap.js"></script>

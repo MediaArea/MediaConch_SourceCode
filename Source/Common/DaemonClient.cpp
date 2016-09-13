@@ -116,6 +116,8 @@ int DaemonClient::list(std::vector<std::string>& vec)
 
     for (size_t i = 0; i < res->files.size(); ++i)
         vec.push_back(res->files[i]->file);
+
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -147,6 +149,77 @@ int DaemonClient::file_from_id(int id, std::string& filename)
         return MediaConchLib::errorHttp_INVALID_DATA;
 
     filename = res->file;
+    delete res;
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::default_values_for_type(const std::string& type, std::vector<std::string>& values)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Default_Values_For_Type_Req req;
+    req.type = type;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Default_Values_For_Type_Res *res = rest.parse_default_values_for_type_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    for (size_t i = 0; i < res->values.size(); ++i)
+        values.push_back(res->values[i]);
+    delete res;
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::create_policy_from_file(const std::string& file, std::string& policy)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    std::map<std::string, int>::iterator it = file_ids.find(file);
+    if (it == file_ids.end())
+        return MediaConchLib::errorHttp_MAX;
+    int id = it->second;
+
+    RESTAPI::Create_Policy_From_File_Req req;
+    req.id = id;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Create_Policy_From_File_Res *res = rest.parse_create_policy_from_file_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    policy = res->policy;
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -166,10 +239,10 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
     ZenLib::Ztring path = ZenLib::Ztring().From_UTF8(real_file);
 
     DWORD path_size = GetFullPathName(path.c_str(), 0, NULL, NULL);
-    Char* tmp = new Char[path_size + 1];
+    ZenLib::Char* tmp = new ZenLib::Char[path_size + 1];
     if (GetFullPathName(path.c_str(), path_size + 1, tmp, NULL))
     {
-        path = ZenLib::ZTring(tmp);
+        path = ZenLib::Ztring(tmp);
         real_file = path.To_UTF8();
     }
     delete [] tmp;
@@ -204,17 +277,24 @@ int DaemonClient::analyze(const std::string& file, bool& registered, bool force_
 
     RESTAPI rest;
     RESTAPI::Analyze_Res *res = rest.parse_analyze_res(data);
-    if (!res || res->ok.size() != 1)
+    if (!res)
         return MediaConchLib::errorHttp_INVALID_DATA;
+
+    if (res->ok.size() != 1)
+    {
+        delete res;
+        return MediaConchLib::errorHttp_INVALID_DATA;
+    }
 
     registered = !res->ok[0]->create;
 
     file_ids[file] = res->ok[0]->outId;
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::is_done(const std::string& file, double& done)
+int DaemonClient::is_done(const std::string& file, double& done, MediaConchLib::report& report_kind)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -246,12 +326,27 @@ int DaemonClient::is_done(const std::string& file, double& done)
     RESTAPI::Status_Ok *ok = res->ok[0];
 
     if (ok->finished)
+    {
+        report_kind = MediaConchLib::report_MediaConch;
+        if (ok->has_tool)
+        {
+            if (ok->tool == RESTAPI::VERAPDF)
+                report_kind = MediaConchLib::report_MediaVeraPdf;
+            else if (ok->tool == RESTAPI::DPFMANAGER)
+                report_kind = MediaConchLib::report_MediaDpfManager;
+        }
+        delete res;
         return MediaConchLib::errorHttp_TRUE;
+    }
 
     if (ok->has_percent)
         done = ok->done;
     else
         done = 0.0;
+
+    report_kind = MediaConchLib::report_MediaConch;
+
+    delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
@@ -260,6 +355,7 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
                              MediaConchLib::format f, const std::vector<std::string>& files,
                              const std::vector<std::string>& policies_names,
                              const std::vector<std::string>& policies_contents,
+                             const std::map<std::string, std::string>& options,
                              MediaConchLib::ReportRes* result,
                              const std::string* display_name,
                              const std::string* display_content)
@@ -284,6 +380,10 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
         req.reports.push_back(RESTAPI::MEDIAINFO);
     if (report_set[MediaConchLib::report_MediaTrace])
         req.reports.push_back(RESTAPI::MEDIATRACE);
+    if (report_set[MediaConchLib::report_MediaVeraPdf])
+        req.reports.push_back(RESTAPI::VERAPDF);
+    if (report_set[MediaConchLib::report_MediaDpfManager])
+        req.reports.push_back(RESTAPI::DPFMANAGER);
 
     // POLICY
     if (policies_names.size())
@@ -319,6 +419,13 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
     if (display_content)
         req.display_content = *display_content;
 
+    if (options.find("verbosity") != options.end() && options.at("verbosity").length())
+    {
+        req.has_verbosity = true;
+        const std::string& verbosity = options.at("verbosity");
+        req.verbosity = strtol(verbosity.c_str(), NULL, 10);
+    }
+
     http_client->start();
     if (http_client->send_request(req) < 0)
         return -1;
@@ -330,8 +437,14 @@ int DaemonClient::get_report(const std::bitset<MediaConchLib::report_Max>& repor
 
     RESTAPI rest;
     RESTAPI::Report_Res *res = rest.parse_report_res(data);
-    if (!res || !res->ok.report.length())
+    if (!res)
         return -1;
+
+    if (!res->ok.report.length())
+    {
+        delete res;
+        return -1;
+    }
 
     result->report = res->ok.report;
 
@@ -367,6 +480,10 @@ int DaemonClient::validate(MediaConchLib::report report,
     // REPORT KIND
     if (report == MediaConchLib::report_MediaConch)
         req.report = RESTAPI::IMPLEMENTATION;
+    else if (report == MediaConchLib::report_MediaVeraPdf)
+        req.report = RESTAPI::VERAPDF;
+    else if (report == MediaConchLib::report_MediaDpfManager)
+        req.report = RESTAPI::DPFMANAGER;
     else if (policies_names.size())
     {
         // POLICY
@@ -395,8 +512,14 @@ int DaemonClient::validate(MediaConchLib::report report,
 
     RESTAPI rest;
     RESTAPI::Validate_Res *res = rest.parse_validate_res(data);
-    if (!res || !res->ok.size())
+    if (!res)
         return -1;
+
+    if (!res->ok.size())
+    {
+        delete res;
+        return -1;
+    }
 
     for (size_t i = 0; i < res->ok.size(); ++i)
     {

@@ -4,8 +4,8 @@ Section: utils
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Build-Depends: debhelper (>= 9),
                dh-autoreconf,
-               libmediainfo-dev (>= 0.7.82),
-               libzen-dev (>= 0.4.32),
+               libmediainfo-dev (>= 0.7.88),
+               libzen-dev (>= 0.4.33),
                libqt4-dev,
                libxml2-dev,
                libxslt-dev,
@@ -53,3 +53,36 @@ Description: Implementation checker, policy checker, reporter, and fixer
  This project is maintained by MediaArea and funded by PREFORMA.
  .
  This package contains the graphical user interface.
+
+Package: mediaconch-dbg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Implementation checker, policy checker, reporter, and fixer
+ that targets preservation-level audiovisual files (specifically Matroska,
+ Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
+ .
+ This project is maintained by MediaArea and funded by PREFORMA.
+ .
+ This package contains the debugging symbols of the command line interface.
+
+Package: mediaconch-server-dbg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Implementation checker, policy checker, reporter, and fixer
+ that targets preservation-level audiovisual files (specifically Matroska,
+ Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
+ .
+ This project is maintained by MediaArea and funded by PREFORMA.
+ .
+ This package contains the debugging symbols of the server.
+
+Package: mediaconch-gui-dbg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Implementation checker, policy checker, reporter, and fixer
+ that targets preservation-level audiovisual files (specifically Matroska,
+ Linear Pulse Code Modulation (LPCM) and FF Video Codec 1 (FFV1)).
+ .
+ This project is maintained by MediaArea and funded by PREFORMA.
+ .
+ This package contains the debugging symbols of the graphical user interface.

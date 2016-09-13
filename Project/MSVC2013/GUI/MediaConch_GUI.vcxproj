@@ -119,7 +119,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtGui;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtCore;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebEngine;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebEngineWidgets;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include/QtWebChannel;..\..\..\..\Qt5.5-msvc2013\5.5\msvc2013\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -143,7 +143,7 @@
     <ClCompile>
       <FunctionLevelLinking>
       </FunctionLevelLinking>
-      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;MEDIAINFO_LIBCURL_YES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>
       </SDLCheck>
       <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC12/Jansson;../../../Source/ThirdParty/sqlite;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtGui;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtCore;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKit;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebKitWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebEngine;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebEngineWidgets;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include/QtWebChannel;..\..\..\..\Qt5.5-msvc2013_64\5.5\msvc2013_64\include</AdditionalIncludeDirectories>
@@ -173,6 +173,8 @@
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Common\DaemonClient.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Database.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\DatabaseReport.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\DpfManager.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Http.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Httpd.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Json.cpp" />
@@ -180,7 +182,10 @@
     <ClCompile Include="..\..\..\Source\Common\LibEventHttp.cpp" />
     <ClCompile Include="..\..\..\Source\Common\LibEventHttpd.cpp" />
     <ClCompile Include="..\..\..\Source\Common\MediaConchLib.cpp" />
-    <ClCompile Include="..\..\..\Source\Common\NoDatabase.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Plugin.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\PluginsConfig.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\PluginsManager.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Queue.cpp" />
@@ -190,51 +195,57 @@
     <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp" />
     <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\VeraPDF.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaymenu.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\groupofrules.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\menumainwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\settingswindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policiesmenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policiestree.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policieswindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\resultwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\unknownwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\workerfiles.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltruleedit.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\xsltwindow.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
     <ClCompile Include="_Automated\moc_checkerwindow.cpp" />
-    <ClCompile Include="_Automated\moc_displaymenu.cpp" />
     <ClCompile Include="_Automated\moc_displaywindow.cpp" />
     <ClCompile Include="_Automated\moc_groupofrules.cpp" />
     <ClCompile Include="_Automated\moc_helpwindow.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
     <ClCompile Include="_Automated\moc_menumainwindow.cpp" />
+    <ClCompile Include="_Automated\moc_settingswindow.cpp" />
     <ClCompile Include="_Automated\moc_policiesmenu.cpp" />
     <ClCompile Include="_Automated\moc_policiestree.cpp" />
     <ClCompile Include="_Automated\moc_policieswindow.cpp" />
     <ClCompile Include="_Automated\moc_policymenu.cpp" />
     <ClCompile Include="_Automated\moc_policywindow.cpp" />
     <ClCompile Include="_Automated\moc_progressbar.cpp" />
-    <ClCompile Include="_Automated\moc_resultwindow.cpp" />
     <ClCompile Include="_Automated\moc_ruleedit.cpp" />
     <ClCompile Include="_Automated\moc_rulemenu.cpp" />
     <ClCompile Include="_Automated\moc_schematronwindow.cpp" />
@@ -254,6 +265,7 @@
     </ClCompile>
     <ClCompile Include="_Automated\moc_WebKitPage.cpp" />
     <ClCompile Include="_Automated\moc_WebKitView.cpp" />
+    <ClCompile Include="_Automated\moc_workerfiles.cpp" />
     <ClCompile Include="_Automated\moc_xsltpolicymenu.cpp" />
     <ClCompile Include="_Automated\moc_xsltruleedit.cpp" />
     <ClCompile Include="_Automated\moc_xsltwindow.cpp" />
@@ -261,28 +273,42 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Common\Core.h" />
+    <ClInclude Include="..\..\..\Source\Common\Database.h" />
+    <ClInclude Include="..\..\..\Source\Common\DpfManager.h" />
+    <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h" />
+    <ClInclude Include="..\..\..\Source\Common\Plugin.h" />
+    <ClInclude Include="..\..\..\Source\Common\PluginFormat.h" />
+    <ClInclude Include="..\..\..\Source\Common\PluginsConfig.h" />
+    <ClInclude Include="..\..\..\Source\Common\PluginsManager.h" />
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
     <ClInclude Include="..\..\..\Source\Common\Policy.h" />
     <ClInclude Include="..\..\..\Source\Common\Schematron.h" />
     <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h" />
     <ClInclude Include="..\..\..\Source\Common\SQLLite.h" />
+    <ClInclude Include="..\..\..\Source\Common\SQLLiteReport.h" />
     <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h" />
+    <ClInclude Include="..\..\..\Source\Common\VeraPDF.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\menumainwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\settingswindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policiesmenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policiestree.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\resultwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\uisettings.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\unknownwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h" />
@@ -291,10 +317,10 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitView.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\workerfiles.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\xsltruleedit.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
-    <ClInclude Include="_Automated\ui_displaymenu.h" />
     <ClInclude Include="_Automated\ui_groupofrules.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />
     <ClInclude Include="_Automated\ui_policiesmenu.h" />
@@ -334,9 +360,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\..\Source\GUI\Qt\displaymenu.ui">
-      <FileType>Document</FileType>
-    </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
       <FileType>Document</FileType>
     </Xml>
@@ -370,6 +393,12 @@
     <Xml Include="..\..\..\Source\Resource\Resources.qrc">
       <FileType>Document</FileType>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\..\License.html" />
+    <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html" />
+    <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html" />
+    <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

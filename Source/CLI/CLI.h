@@ -39,11 +39,14 @@ namespace MediaConch
         int  register_option(const std::string& opt);
         void set_use_daemon(bool use) { use_daemon = use; }
         void set_configuration_file(const std::string& file);
+        void set_plugins_configuration_file(const std::string& file);
         void set_implementation_schema_file(const std::string& file);
         void set_implementation_verbosity(const std::string& verbosity);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
         void set_asynchronous(bool async);
+        void set_create_policy_mode();
+        int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
 
         void print_error(MediaConchLib::errorHttp code);
 
@@ -51,18 +54,23 @@ namespace MediaConch
         CLI(const CLI&);
         CLI& operator=(const CLI&);
 
-        int is_ready(size_t i);
+        int  run_create_policy();
+        int  is_ready(size_t i, MediaConchLib::report& report_kind);
+        void add_files_recursively(const std::string& filename);
 
         MediaConchLib MCL;
         std::vector<std::string> files;
         std::vector<std::string> policies;
+        std::string              error;
         std::string              display_file;
         std::string              configuration_file;
+        std::string              plugins_configuration_file;
         std::bitset<MediaConchLib::report_Max> report_set;
-        MediaConchLib::format format;
-        bool use_daemon;
-        bool asynchronous;
-        bool force_analyze;
+        MediaConchLib::format   format;
+        bool                    use_daemon;
+        bool                    asynchronous;
+        bool                    force_analyze;
+        bool                    create_policy_mode;
     };
 
 }

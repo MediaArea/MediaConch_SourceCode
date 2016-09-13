@@ -1,0 +1,5 @@
+/* MC-GUI specific CSS */
+
+.navbar-default .navbar-brand, .navbar-default .navbar-brand:hover {
+    color: inherit;
+}

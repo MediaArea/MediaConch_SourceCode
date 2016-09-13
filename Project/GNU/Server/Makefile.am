@@ -18,8 +18,10 @@ mediaconchd_SOURCES = \
     ../../../Source/Common/XsltPolicy.cpp \
     ../../../Source/Common/UnknownPolicy.cpp \
     ../../../Source/Common/Database.cpp \
-    ../../../Source/Common/NoDatabase.cpp \
+    ../../../Source/Common/DatabaseReport.cpp \
+    ../../../Source/Common/NoDatabaseReport.cpp \
     ../../../Source/Common/SQLLite.cpp \
+    ../../../Source/Common/SQLLiteReport.cpp \
     ../../../Source/Common/Json.cpp \
     ../../../Source/Common/Configuration.cpp \
     ../../../Source/Common/REST_API.cpp \
@@ -28,7 +30,12 @@ mediaconchd_SOURCES = \
     ../../../Source/Common/Http.cpp \
     ../../../Source/Common/LibEventHttp.cpp \
     ../../../Source/Common/Queue.cpp \
-    ../../../Source/Common/Scheduler.cpp
+    ../../../Source/Common/Scheduler.cpp \
+    ../../../Source/Common/PluginsManager.cpp \
+    ../../../Source/Common/PluginsConfig.cpp \
+    ../../../Source/Common/Plugin.cpp \
+    ../../../Source/Common/VeraPDF.cpp \
+    ../../../Source/Common/DpfManager.cpp
 
 #mediaconchd_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconchd_CPPFLAGS = $(XML_CFLAGS)

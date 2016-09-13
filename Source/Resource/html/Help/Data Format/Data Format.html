@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
+        <title>MediaConch - Data format</title>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,13 +44,13 @@
 <li><a href="#mediaarea-xml-schema">MediaArea XML Schema</a></li>
 </ul>
 
-<h3><a name="mediainfo-xml">MediaInfo XML</a></h3>
+<h3 id="mediainfo-xml">MediaInfo XML</h3>
 
 <p>Using MediaArea’s principal software, MediaInfo, the MediaInfo XML presents a file’s basic metadata elements in the form of easily intelligible sets of track and stream information. These track types may include but are not limited to, “General,” or general container information; “Video” track or stream information; “Audio” track or stream information; and “Timecode” or other ancillary information. Additional information on MediaInfo general reporting is available <a href="https://mediaarea.net/en/MediaInfo">here</a>.</p>
 
-<h4><a name="structure-of-a-mediaconch-xml">Structure of a MediaConch XML</a></h4>
+<h4 id="structure-of-a-mediainfo-xml">Structure of a MediaInfo XML</h4>
 
-<p>The root element of the MediaInfo XML exists as <code>&lt;Mediainfo&gt;</code>. A nested <code>&lt;File&gt;</code> sub-element containing a <code>ref</code> attribute specifies the path and filename of the file reported on. A <code>&lt;track type&gt;</code> child element defines MediaInfo's track types, and within <code>&lt;track type&gt;</code> elements are various sub-child elements corresponding to associated field metadata. For example, a "General" track type element will include such sibling elements as <code>&lt;CompleteName&gt;</code>, <code>&lt;Format&gt;</code>, and <code>&lt;FileSize&gt;</code>; a "Video" track type element will include such sibling elements as <code>&lt;Width&gt;</code>, <Height>, and <PixelAspectRatio>; an "Audio" track type element will include such sibling elements as <code>&lt;Channels&gt;</code>, <code>&lt;SamplingRate&gt;</code>, and <code>&lt;SamplingCount&gt;</code>; and so on, and so forth. </p>
+<p>The root element of the MediaInfo XML exists as <code>&lt;Mediainfo&gt;</code>. A nested <code>&lt;File&gt;</code> sub-element containing a <code>ref</code> attribute specifies the path and filename of the file reported on. A <code>&lt;track type&gt;</code> child element defines MediaInfo's track types, and within <code>&lt;track type&gt;</code> elements are various sub-child elements corresponding to associated field metadata. For example, a "General" track type element will include such sibling elements as <code>&lt;CompleteName&gt;</code>, <code>&lt;Format&gt;</code>, and <code>&lt;FileSize&gt;</code>; a "Video" track type element will include such sibling elements as <code>&lt;Width&gt;</code>, <code>&lt;Height&gt;</code>, and <code>&lt;PixelAspectRatio&gt;</code>; an "Audio" track type element will include such sibling elements as <code>&lt;Channels&gt;</code>, <code>&lt;SamplingRate&gt;</code>, and <code>&lt;SamplingCount&gt;</code>; and so on, and so forth. </p>
 
 <p>The following is an example of a MediaInfo XML General type track element containing the sub-child elements "Format," "Format<em>profile," and "Codec</em>ID": </p>
 
@@ -61,7 +62,7 @@
     &lt;/track&gt;`
 </code></pre>
 
-<h4><a name="generating-a-mediaconch-xml">Generating a MediaConch XML</a></h4>
+<h4 id="generating-a-mediainfo-xml">Generating a MediaInfo XML</h4>
 
 <p>A MediaInfo XML can be generated using the following tools and associated commands:</p>
 
@@ -71,11 +72,11 @@
 <li><p>With MediaConch (GUI): Select View Mode in the <code>MediaInfo</code> tab from the resulting file Checker reports</p></li>
 </ul>
 
-<h3><a name="mediaconch-xml">MediaConch XML</a></h3>
+<h3 id="mediaconch-xml">MediaConch XML</h3>
 
 <p>The MediaConch XML is designed specifically for file conformance checking using MediaArea’s MediaConch software, and contains reportage pertaining to a user-defined policy or policies. Additional information on MediaConch is available <a href="https://mediaarea.net/MediaConch/">here</a>.</p>
 
-<h4><a name="structure-of-a-mediaconch-xml">Structure of a MediaConch XML</a></h4>
+<h4 id="structure-of-a-mediaconch-xml">Structure of a MediaConch XML</h4>
 
 <p>The root element of the MediaConch XML exists as <code>&lt;MediaConch&gt;</code>, and initially contains a <code>&lt;policyChecks&gt;</code> element which encapsulates all policy rules. The <code>&lt;title&gt;</code> element denotes the title of the policy, while the <code>&lt;media&gt;</code> element contains the checked filename its associated path:</p>
 
@@ -86,7 +87,7 @@
     &lt;media ref="/Users/mycomputer//files/ffv1.mkv"&gt;`
 </code></pre>
 
-<p>Within the <policyChecks> element are individual <policy> rules that contain the name of the policy rule, the associated track type and field, a user-declared value, the reported or “actual” value, and a “pass” or “fail” outcome:</p>
+<p>Within the <code>&lt;policyChecks&gt;</code> element are individual <code>&lt;policy&gt;</code> rules that contain the name of the policy rule, the associated track type and field, a user-declared value, the reported or “actual” value, and a “pass” or “fail” outcome:</p>
 
 <pre><code>    &lt;policy title="General Format equals Matroska"&gt;
     &lt;context field="Format" value="Matroska"/&gt;
@@ -94,23 +95,23 @@
     &lt;/policy&gt;
 </code></pre>
 
-<h4><a name="generating-a-mediaconch-xml">Generating a MediaConch XML</a></h4>
+<h4 id="generating-a-mediaconch-xml">Generating a MediaConch XML</h4>
 
 <p>A MediaConch XML can be generated using the following tools and associated commands:</p>
 
-<p>-With MediaConch (CLI): <code>mediaconch -mi -fx file.mov</code></p>
+<p>-With MediaConch (CLI): <code>mediaconch -mc -fx file.mov</code></p>
 
-<p>Note: The command mediaconch <code>-fx file.mov</code>will automatically default to <code>-mc</code>and produce equivalent results.</p>
+<p>Note: The command <code>mediaconch -fx file.mov</code> will automatically default to <code>-mc</code> and produce equivalent results.</p>
 
 <p>-With MediaConch (GUI): Select View Mode in the <code>Policy Report</code> tab from the resulting file Checker reports</p>
 
-<h3><a name="mediatrace-xml">MediaTrace XML</a></h3>
+<h3 id="mediatrace-xml">MediaTrace XML</h3>
 
 <p>The MediaTrace XML is a technical reporting tool that expresses the binary architecture of a file as interpreted by MediaArea’s principal software, MediaInfo. Additional information on MediaTrace is available <a href="https://mediaarea.net/mediatrace/">here</a>. A data dictionary is provided at the project’s Github repository <a href="https://github.com/MediaArea/MediaAreaXml/blob/master/DataDictionary.md">here</a>. </p>
 
-<h3><a name="structure-of-a-mediatrace-xml">Structure of a MediaTrace XML</a></h3>
+<h3 id="structure-of-a-mediatrace-xml">Structure of a MediaTrace XML</h3>
 
-<p>The root element of the MediaTrace XML exists as <MediaTrace>. This root element contains a <code>&lt;creatingLibrary&gt;</code> sub-element denoting the version of MediaInfo’s library used in generating the trace report:</p>
+<p>The root element of the MediaTrace XML exists as <code>&lt;MediaTrace&gt;</code>. This root element contains a <code>&lt;creatingLibrary&gt;</code> sub-element denoting the version of MediaInfo’s library used in generating the trace report:</p>
 
 <pre><code>    &lt;MediaTrace
     xmlns="https://mediaarea.net/mediatrace"
@@ -132,7 +133,7 @@
      &lt;/block&gt;`
 </code></pre>
 
-<h4><a name="generating-a-mediatrace-xml">Generating a MediaTrace XML</a></h4>
+<h4 id="generating-a-mediatrace-xml">Generating a MediaTrace XML</h4>
 
 <p>A MediaTrace XML can be generated using the following tools and associated commands:</p>
 
@@ -142,25 +143,25 @@
 
 <p>-With MediaConch (GUI): Select Select View Mode in the <code>MediaTrace</code> tab from the resulting file Checker reports</p>
 
-<h4><a name="mediatrace-xml-schema">MediaTrace XML Schema</a></h4>
+<h4 id="mediatrace-xml-schema">MediaTrace XML Schema</h4>
 
 <p>An XML Schema for MediaTrace is available <a href="https://mediaarea.net/mediatrace/mediatrace.xsd">here</a>.</p>
 
-<h3><a name="mediaarea-xml">MediaArea XML</a></h3>
+<h3 id="mediaarea-xml">MediaArea XML</h3>
 
 <p>The MediaArea XML (MAXML) is designed to bundle general reporting information from MediaInfo, binary file architecture reporting from MediaTrace, and conformance checking information from MediaConch into one condensed XML structure. </p>
 
-<h4><a name="structure-of-a-mediaarea-xml">Structure of a MediaArea XML</a></h4>
+<h4 id="structure-of-a-mediaarea-xml">Structure of a MediaArea XML</h4>
 
 <p>The root element of the MediaArea XML is <code>&lt;MediaArea&gt;</code>, followed by a <code>&lt;media&gt;</code> sibling element. A <code>&lt;MediaInfo&gt;</code> child element defines a MediaInfo general report. Sibling <code>&lt;track type&gt;</code> elements offer various sub-child elements corresponding to associated field metadata. </p>
 
-<h4><a name="generating-a-mediaarea-xml">Generating a MediaArea XML</a></h4>
+<h4 id="generating-a-mediaarea-xml">Generating a MediaArea XML</h4>
 
 <p>A MediaTrace XML can be generated using the following tools and associated commands:</p>
 
 <p>-With MediaInfo: <code>mediainfo --Details=1 --Output=MAXML file.mkv</code></p>
 
-<h4><a name="mediaarea-xml-schema">MediaArea XML Schema</a></h4>
+<h4 id="mediaarea-xml-schema">MediaArea XML Schema</h4>
 
 <p>An XML Schema for MediaAreaXML is available <a href="https://mediaarea.net/mediaarea/mediaarea_0_1.xsd">here</a>.</p>
 

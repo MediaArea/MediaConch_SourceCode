@@ -1,0 +1,156 @@
+<h1>Policy editor</h1>
+
+<div class="col-md-8">
+    <h2>Policy list:</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="jstreeSearch" id="policiesTreeSearch" placeholder="Search" />
+        </div>
+        <div class="col-md-12">
+            <div id="policiesTree"></div>
+        </div>
+    </div>
+</div>
+<div class="col-md-4 policyRightCol">
+    <div id="policyFix" class="row">
+        <div id="policyInfo" class="row">
+            <div></div>
+        </div>
+        <div class="row policyManage">
+            <div>
+              <h2>Import a policy</h2>
+              <form name="xslPolicyImport" method="post" action="" enctype="multipart/form-data">
+                <div id="xslPolicyImport">
+                  <div class="form-group">
+                    <label class="control-label required" for="xslPolicyImport_policyFile">Policy file</label>
+                    <input type="file" id="xslPolicyImport_policyFile" name="xslPolicyImport[policyFile]" required="required" accept=".xsl,.xml" onclick="webpage.on_input_changed(this.name);"/>
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" id="xslPolicyImport_ImportPolicy" name="xslPolicyImport[ImportPolicy]" class="btn-warning btn">Import policy</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div>
+                <h2>Create a policy</h2>
+                <form name="xslPolicyCreate" method="post" action="">
+                  <div id="xslPolicyCreate">
+                    <div class="form-group">
+                      <button type="submit" id="xslPolicyCreate_CreatePolicy" name="xslPolicyCreate[CreatePolicy]" class="btn-warning btn">Create policy</button>
+                    </div>
+                  </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row policyEdit hidden">
+          <div>
+            <h4>Policy edition:</h4>
+            <form name="xslPolicyName" method="post" action="">
+              <div id="xslPolicyName">
+                <div class="form-group">
+                  <label class="control-label required" for="xslPolicyName_policyName">Policy name</label>
+                  <input type="text" id="xslPolicyName_policyName" name="xslPolicyName[policyName]" required="required" maxlength="50" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="xslPolicyName_policyDescription">Policy description</label>
+                  <textarea id="xslPolicyName_policyDescription" name="xslPolicyName[policyDescription]" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                  <button type="submit" id="xslPolicyName_SavePolicyName" name="xslPolicyName[SavePolicyName]" class="btn-warning btn">Save</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+            <div class="policyEditActions">
+                <h4>Policy actions:</h4>
+                <button id="policyDuplicate" class="btn btn-warning">Duplicate</button>
+                <button id="policyExport" class="btn btn-warning">Export</button>
+                <button id="policyDelete" class="btn btn-danger">Delete</button>
+            </div>
+
+            <div id="policyRuleCreateContainer">
+                <h4>Policy rule actions:</h4>
+                <button id="policyRuleCreate" class="btn btn-warning">Add a new rule</button>
+            </div>
+        </div>
+
+        <div class="row policyEditRule hidden">
+          <form name="xslPolicyRule" method="post" action="">
+            <div id="xslPolicyRule">
+              <div class="form-group">
+                <label class="control-label required" for="xslPolicyRule_title">Rule name</label>
+                <input type="text" id="xslPolicyRule_title" name="xslPolicyRule[title]" required="required" class="form-control" value="New rule" />
+              </div>
+              <div class="form-group hidden">
+                <label class="control-label required">Editor type :</label>
+                <div id="xslPolicyRule_editor">
+                  <div class="radio">
+                    <label class="required"><input type="radio" id="xslPolicyRule_editor_0" name="xslPolicyRule[editor]" required="required" value="0" checked="checked" />Editor</label>
+                  </div>
+                  <!-- <div class="radio"> -->
+                  <!--   <label class="required"><input type="radio" id="xslPolicyRule_editor_1" name="xslPolicyRule[editor]" required="required" value="1" />Free text</label> -->
+                  <!-- </div> -->
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label required" for="xslPolicyRule_trackType">Track type</label>
+                <select id="xslPolicyRule_trackType" name="xslPolicyRule[trackType]" required="required" class="form-control">
+                  <option value="" selected="selected">Choose a track type</option>
+                  <option value="General">General</option>
+                  <option value="Video">Video</option>
+                  <option value="Audio">Audio</option>
+                  <option value="Text">Text</option>
+                  <option value="Other">Other</option>
+                  <option value="Image">Image</option>
+                  <option value="Menu">Menu</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label required" for="xslPolicyRule_field">Field</label>
+                <select id="xslPolicyRule_field" name="xslPolicyRule[field]" required="required" class="form-control">
+                  <option value="" selected="selected">Choose a field</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label required" for="xslPolicyRule_occurrence">Occurrence</label>
+                <input type="text" id="xslPolicyRule_occurrence" name="xslPolicyRule[occurrence]" required="required" class="form-control" value="1" />
+              </div>
+              <div class="form-group">
+                <label class="control-label required" for="xslPolicyRule_validator">Validator</label>
+                <select id="xslPolicyRule_validator" name="xslPolicyRule[validator]" required="required" class="form-control">
+                  <option value="" selected="selected">Choose a validator</option>
+                  <option value="is_equal" >Is equal (==)</option>
+                  <option value="is_not_equal" >Is not equal (!=)</option>
+                  <option value="is_less_than" >Is less than (&lt;)</option>
+                  <option value="is_less_or_equal_than" >Is less or equal than (&lt;=)</option>
+                  <option value="is_greater_than" >Is greater than (&gt;)</option>
+                  <option value="is_greater_or_equal_than" >Is greater or equal than (&gt;=)</option>
+                  <option value="exists" >Exists</option>
+                  <option value="does_not_exist" >Does not exist</option>
+                  <option value="contains_string" >Contains string</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="xslPolicyRule_value">Value</label>
+                <input type="text" id="xslPolicyRule_value" name="xslPolicyRule[value]" class="form-control" />
+              </div>
+              <!-- <div class="form-group"> -->
+              <!--   <label class="control-label required" for="xslPolicyRule_valueFreeText">Xpath expression</label> -->
+              <!--   <textarea id="xslPolicyRule_valueFreeText" name="xslPolicyRule[valueFreeText]" required="required" class="form-control"></textarea> -->
+              <!-- </div> -->
+              <div class="form-group">
+                <button type="submit" id="xslPolicyRule_SaveRule" name="xslPolicyRule[SaveRule]" class="btn-warning btn">Save rule</button>
+              </div>
+              <div class="form-group">
+                <button type="submit" id="xslPolicyRule_DuplicateRule" name="xslPolicyRule[DuplicateRule]" class="btn-warning btn">Duplicate rule</button>
+              </div>
+            </div>
+          </form>
+          <p>Fields marked by asterisks (*) are required</p>
+        </div>
+    </div>
+</div>

@@ -11,13 +11,15 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#ifndef WINDOWS
-#include <unistd.h>
-#endif //!WINDOWS
 #include "ZenLib/Ztring.h"
 #include "Queue.h"
 #include "Scheduler.h"
-//---------------------------------------------------------------------------
+
+#if !defined(WINDOWS)
+#include <unistd.h>
+#endif //!defined(WINDOWS)
+
+#include <algorithm>
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -25,7 +27,7 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s)
 {
-    MI = new MediaInfoNameSpace::MediaInfoList;
+    MI = new MediaInfoNameSpace::MediaInfo;
 }
 
 //---------------------------------------------------------------------------
@@ -51,15 +53,22 @@ void QueueElement::stop()
 void QueueElement::Entry()
 {
     // Currently avoiding to have a big trace
-    MI->Option(__T("ParseSpeed"), __T("0"));
-    
+    if (options.find("parsespeed") == options.end())
+        MI->Option(__T("ParseSpeed"), __T("0"));
+
     // Configuration of the parsing
-    MI->Option(__T("Details"), __T("1"));
+    if (options.find("details") == options.end())
+        MI->Option(__T("Details"), __T("1"));
 
     // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
     MI->Option(__T("ReadByHuman"), __T("1"));
     MI->Option(__T("Language"), __T("raw"));
-    MI->Option(__T("Inform"), __T("XML"));
+    MI->Option(__T("Inform"), __T("MICRO_XML"));
+
+    std::map<std::string, std::string>::iterator it = options.begin();
+    for (; it != options.end(); ++it)
+        MI->Option(Ztring().From_UTF8(it->first), Ztring().From_UTF8(it->second));
+
     MI->Open(ZenLib::Ztring().From_UTF8(filename));
     scheduler->work_finished(this, MI);
     MI->Close();
@@ -84,12 +93,29 @@ Queue::~Queue()
     clear();
 }
 
-int Queue::add_element(QueuePriority priority, int id, const std::string& filename)
+int Queue::add_element(QueuePriority priority, int id, const std::string& filename, const std::vector<std::string>& options)
 {
     QueueElement *el = new QueueElement(scheduler);
 
     el->id = id;
     el->filename = filename;
+    for (size_t i = 0; i < options.size(); ++i)
+    {
+        std::string option = options[i];
+        transform(option.begin(), option.end(), option.begin(), (int(*)(int))tolower);
+        size_t pos = option.find("=");
+        std::string key;
+        std::string value;
+
+        if (pos == std::string::npos)
+            key = option;
+        else
+        {
+            key.assign(option, 2, pos - 2);
+            value.assign(options[i], pos + 1, std::string::npos);
+        }
+        el->options[key] = value;
+    }
     queue[priority].push_back(el);
     return 0;
 }

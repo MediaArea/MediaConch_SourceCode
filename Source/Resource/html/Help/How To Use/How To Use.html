@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
+        <title>MediaConch - How To Use</title>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,71 +11,67 @@
 	<body id="body">
 
 <h1>How To Use</h1>
-
-<h2>Checker</h2>
-
+<h2 id="checker">Checker</h2>
 <ul>
-<li><a href="#check-local-file">Check local file</a></li>
-<li><a href="#check-online-file">Check online file</a></li>
-<li><a href="#check-local-folder">Check local folder</a></li>
-<li><a href="#reporting">Reporting</a></li>
-<li><a href="#policy-report">Policy Report</a></li>
-<li><a href="#implementation-report">Implementation Report</a></li>
-<li><a href="#mediainfo-report">MediaInfo Report</a></li>
-<li><a href="#mediatrace-report">MediaTrace Report</a></li>
-<li><a href="#exporting-reports">Exporting Reports</a></li>
+  <li><a href="#check-local-file">Check local file</a></li>
+  <li><a href="#check-online-file">Check online file</a></li>
+  <li><a href="#check-local-folder">Check local folder</a></li>
+  <li><a href="#reporting">Reporting</a></li>
+  <li><a href="#policy-report">Policy Report</a></li>
+  <li><a href="#implementation-report">Implementation Report</a></li>
+  <li><a href="#mediainfo-report">MediaInfo Report</a></li>
+  <li><a href="#mediatrace-report">MediaTrace Report</a></li>
+  <li><a href="#exporting-reports">Exporting Reports</a></li>
 </ul>
 
-<h2>Policies</h2>
-
+<h2 id="policies">Policies</h2>
 <ul>
-<li><a href="#type">Type</a></li>
-<li><a href="#field">Field</a></li>
-<li><a href="#occurrence">Occurrence</a></li>
-<li><a href="#validator">Validator</a></li>
-<li><a href="#value">Value</a></li>
-<li><a name="free-text-mode">Free Text Mode</a></li>
+  <li><a href="#type">Type</a></li>
+  <li><a href="#field">Field</a></li>
+  <li><a href="#occurrence">Occurrence</a></li>
+  <li><a href="#validator">Validator</a></li>
+  <li><a href="#value">Value</a></li>
+  <li><a href="#free-text-mode">Free Text Mode</a></li>
 </ul>
 
-<h2>Display</h2>
-
+<h2 id="display">Display</h2>
 <ul>
-<li><a href="#import-display-set">Import display set</a></li>
-<li><a href="#export-display-set">Export display set</a></li>
-<li><a href="#delete-selected-display-file">Delete selected display file</a></li>
+  <li><a href="#import-display-set">Import display set</a></li>
+  <li><a href="#export-display-set">Export display set</a></li>
+  <li><a href="#delete-selected-display-file">Delete selected display file</a></li>
 </ul>
 
-<p>MediaConch currently consists of three main sections, "Checker," "Policies," and "Display."</p>
+<p>MediaConch currently consists of three main sections, “Checker,” “Policies,” and “Display.”</p>
 
-<h2>Checker</h2>
+<h2 id="checker-1">Checker</h2>
 
-<p>In the "Checker" section, files may be checked for conformance using policies defined by the user. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. </p>
+<p>In the “Checker” section, files may be checked for conformance using policies defined by the user. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file.</p>
 
-<h3><a name="check-local-file">Check local file</a></h3>
+<h3 id="check-local-file">Check local file</h3>
 
-<p>“Check local file” allows a user to select a file or files from a local computer. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. Policies will be run when selecting the "Check files" button.</p>
+<p>“Check local file” allows a user to select a file or files from a local computer. A user may choose from either an existing policy and display in MediaConch or from an imported XSLT or Schematron policy file. Policies will be run when selecting the “Check files” button.</p>
 
 <p>Example: /Users/mycomputer/mediafiles/ffv1.mkv</p>
 
-<h3><a name="check-online-file">Check online file</a></h3>
+<h3 id="check-online-file">Check online file</h3>
 
-<p>“Check online file” allows a user to select a file using a URL path. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. Please note that this feature supports HTTP/HTTPS/FTP/FTPS application protocols. Policies will be run when selecting the "Check files" button.</p>
+<p>“Check online file” allows a user to select a file using a URL path. A user may choose from either an existing policy and display in MediaConch or from an imported XSLT or Schematron policy file. Please note that this feature supports HTTP/HTTPS/FTP/FTPS application protocols. Policies will be run when selecting the “Check files” button.</p>
 
 <p>Example: <em>http://www.mywebsite.com/media/ffv1.mkv</em></p>
 
-<h3><a name="check-local-folder">Check local folder</a></h3>
+<h3 id="check-local-folder">Check local folder</h3>
 
-<p>“Check local folder” allows a user to select a folder of files from a local computer or volume. A user may choose from either an existing policy in MediaConch or from an imported XSLT or Schematron policy file. Policies will be run when selecting the "Check files" button.</p>
+<p>“Check local folder” allows a user to select a folder of files from a local computer or volume. A user may choose from either an existing policy and display in MediaConch or from an imported XSLT or Schematron policy file. Policies will be run when selecting the “Check files” button.</p>
 
-<p>Example: <em>/Users/mycomputer/mediafiles/</em> </p>
+<p>Example: <em>/Users/mycomputer/mediafiles/</em></p>
 
-<h3><a name="reporting">Reporting</a></h3>
+<h3 id="reporting">Reporting</h3>
 
-<p>Once a file or files are “checked,” several conformance checking reports are generated. These reports are made viewable by clicking on the “eye” icon next to each report, where, in ”View Mode,” a report is overlaid onto the GUI for review. </p>
+<p>Once a file or files are “checked,” several conformance checking reports are generated. These reports are made viewable by clicking on the “eye” icon next to each report, where, in ”View Mode,” a report is overlaid onto the GUI for review.</p>
 
-<h3><a name="policy-report">Policy Report</a></h3>
+<h3 id="policy-report">Policy Report</h3>
 
-<p>A policy report will declare whether a particular file is either wholly VALID or NOT VALID according to the prescribed policy tests. A file will only be considered VALID if all rules and asserts are found to be true. When declared NON VALID, a text-based Policy Report (FileName_PolicyReport.txt) will list all failed rules and asserts. </p>
+<p>A policy report will declare whether a particular file is either wholly VALID or NOT VALID according to the prescribed policy tests. A file will only be considered VALID if all rules and asserts are found to be true. When declared NON VALID, a text-based Policy Report (FileName_PolicyReport.txt) will list all failed rules and asserts.</p>
 
 <p>For example, a line from a policy report states the following failed rule:</p>
 
@@ -82,62 +79,62 @@
 <code>&lt;context value="track[@type='General']/FileExtension = 'mkv'"/&gt;</code>
 <code>&lt;test outcome="fail" reason="is not true"/&gt;</code></p>
 
-<p>In this example, the stated policy rule (General FileExtension must be mkv) proved not to be true, causing a failed test outcome (in this case the file extension was .avi). </p>
+<p>In this example, the stated policy rule (General FileExtension must be mkv) proved not to be true, causing a failed test outcome (in this case the file extension was .avi).</p>
 
-<h3><a name="implementation-report">Implementation Report</a></h3>
+<h3 id="implementation-report">Implementation Report</h3>
 
 <p>An implementation report will declare whether a particular file is either VALID or NOT VALID according to specifications of Matroska, FFV1, and LPCM. Currently, a text-based Implementation Report (FileName_ConformanceReport.txt) will list a general readout of container and video streams, including whether a required field has either passed or failed specification.</p>
 
-<h3><a name="mediainfo-report">MediaInfo Report</a></h3>
+<h3 id="mediainfo-report">MediaInfo Report</h3>
 
-<p>In View Mode, a user may navigate through an interactive jstree-grid of a file's MediaInfo general report. This report may be exported in a well-formed XML format. </p>
+<p>In View Mode, a user may navigate through an interactive jstree-grid of a file’s MediaInfo general report. This report may be exported in a well-formed XML format.</p>
 
-<h3><a name="mediatrace-report">MediaTrace Report</a></h3>
+<h3 id="mediatrace-report">MediaTrace Report</h3>
 
-<p>In View Mode, a user may navigate through an interactive jstree-grid of a file's more verbose MediaTrace report. Like MediaInfo's general report, this report may be exported in a well-formed XML format.  </p>
+<p>In View Mode, a user may navigate through an interactive jstree-grid of a file’s more verbose MediaTrace report. Like MediaInfo’s general report, this report may be exported in a well-formed XML format.</p>
 
-<p>User Note: When opening MediaTrace in View Mode, offsets will be addressed in hexadecimal, or “hex” notation. This differs from the MediaTrace XML output, which addresses offset in decimal notation. </p>
+<p>User Note: When opening MediaTrace in View Mode, offsets will be addressed in hexadecimal, or “hex” notation. This differs from the MediaTrace XML output, which addresses offset in decimal notation.</p>
 
-<h3><a name="exporting-reports">Exporting Reports</a></h3>
+<h3 id="exporting-reports">Exporting Reports</h3>
 
-<p>Reports can be downloaded by either clicking on the down arrow (↓) found directly to the right of each report, or by clicking on the “Download” button located at the bottom right of each report in View Mode. </p>
+<p>Reports can be downloaded by either clicking on the down arrow (↓) found directly to the right of each report, or by clicking on the “Download” button located at the bottom right of each report in View Mode.</p>
 
-<p>User Note: When switching from Checker to Policies or Display modes, any analysis results will be discarded. An alert will prompt the user as a reminder to export all reports before the changeover. </p>
+<p>User Note: When switching from Checker to Policies or Display modes, any analysis results will be discarded. An alert will prompt the user as a reminder to export all reports before the changeover.</p>
 
-<h2>Policies</h2>
+<h2 id="policies-1">Policies</h2>
 
-<p>In the "Policies" section, a user can create policy tests as well as import previously generated policy sets in either XSL or Schematron format. </p>
+<p>In the “Policies” section, a user can create policy tests as well as import previously generated policy sets in either XSL or Schematron format.</p>
 
-<p>Policy sets consist of individual rules and asserts. A policy may contain one or more rules, and rules may consist of one or more asserts. Rules and asserts typically contain a metadata field (e.g., “Format”), that field’s associated metadata stream type (e.g., “General), a validator (e.g., “is_equal), and a desired value (e.g., “Matroska”). Rules and asserts are automatically saved during creation, but may be duplicated or deleted by the user using the associated buttons on each rule/assert window. </p>
+<p>Policy sets consist of individual rules and asserts. A policy may contain one or more rules, and rules may consist of one or more asserts. Rules and asserts typically contain a metadata field (e.g., “Format”), that field’s associated metadata stream type (e.g., “General), a validator (e.g., “is_equal), and a desired value (e.g., “Matroska”). Rules and asserts are automatically saved during creation, but may be duplicated or deleted by the user using the associated buttons on each rule/assert window.</p>
 
 <p>For example, the following rule/assert would ensure that all reported files must contain a frame rate associated with the NTSC broadcast standard:</p>
 
 <ul>
-<li>Type: General</li>
-<li>Field: FrameRate</li>
-<li>Validator: Equal</li>
-<li>Value: 29.970</li>
+  <li>Type: General</li>
+  <li>Field: FrameRate</li>
+  <li>Validator: Equal</li>
+  <li>Value: 29.970</li>
 </ul>
 
-<h3><a name="type">Type</a></h3>
+<h3 id="type">Type</h3>
 
-<p>Allows a user to select from a list of available metadata stream types. These streams include General, Video, Audio, Image, Text, Menu, or Other. </p>
+<p>Allows a user to select from a list of available metadata stream types. These streams include General, Video, Audio, Image, Text, Menu, or Other.</p>
 
 <p>Example: <em>General</em></p>
 
-<h3><a name="field">Field</a></h3>
+<h3 id="field">Field</h3>
 
-<p>Allows a user to select from a list of associated fields. Fields vary according to what type of metadata stream is selected. </p>
+<p>Allows a user to select from a list of associated fields. Fields vary according to what type of metadata stream is selected.</p>
 
 <p>Example: <em>General/UniqueID</em></p>
 
-<h3><a name="occurrence">Occurrence</a></h3>
+<h3 id="occurrence">Occurrence</h3>
 
-<p>Allows a user to select whether a rule or assert occurs more than once in reportage. </p>
+<p>Allows a user to select whether a rule or assert occurs more than once in reportage.</p>
 
 <p>Example: <em>Occurrence:1</em></p>
 
-<h3><a name="validator">Validator</a></h3>
+<h3 id="validator">Validator</h3>
 
 <p>Validators for MediaConch include <em>is_equal</em>; <em>is_not_equal</em>; <em>is_greater than</em>; <em>is_less_than</em>; <em>is_greater_or_equal_than</em>; <em>is_less_or_equal_than</em>; <em>exists</em>; <em>does_not_exist</em>; <em>contains_string</em>.</p>
 
@@ -145,7 +142,7 @@
 
 <p>Example: <em>General/Format is_equal to Matroska</em></p>
 
-<p><strong>is<em>not</em>equal</strong>: Requires the reported field value to be different as the associated policy value.</p>
+<p><strong>is_not_equal</strong>: Requires the reported field value to be different as the associated policy value.</p>
 
 <p>Example: <em>General/Format is_not_equal to MPEG-4</em></p>
 
@@ -153,23 +150,23 @@
 
 <p>Example: <em>General/Duration is_greater_than 1 mn</em></p>
 
-<p><strong>is<em>less</em>than</strong>: Requires the reported field value to be less than the associated policy value.</p>
+<p><strong>is_less_than</strong>: Requires the reported field value to be less than the associated policy value.</p>
 
 <p>Example: <em>Audio/Channels is_less_than 2 Channels</em></p>
 
-<p><strong>is<em>greater</em>or<em>equal</em>than</strong>: Requires the reported field value to be greater or equal than the associated policy value.</p>
+<p><strong>is_greater_or_equal_than</strong>: Requires the reported field value to be greater or equal than the associated policy value.</p>
 
 <p>Example: <em>Video/FrameCount is_greater_or_equal_than 1</em></p>
 
-<p><strong>is<em>less</em>or<em>equal</em>than</strong>: Requires the reported field value to be less or equal than the associated policy value.
-
-Example: <em>Video/FrameRate is_less_or_equal_than 29.970</em></p>
+<p><strong>is_less_or_equal_than</strong>: Requires the reported field value to be less or equal than the associated policy value.</p>
+
+<p>Example: <em>Video/FrameRate is_less_or_equal_than 29.970</em></p>
 
 <p><strong>exists</strong>: Requires the reported field value to exist.</p>
 
 <p>Example: <em>Video/Width_Original exists</em></p>
 
-<p><strong>does<em>not</em>exist</strong>: Requires the reported field value to not exist.</p>
+<p><strong>does_not_exist</strong>: Requires the reported field value to not exist.</p>
 
 <p>Example: <em>Video/Width_CleanAperture does_not_exist</em></p>
 
@@ -177,33 +174,33 @@ Example: <em>Video/FrameRate is_less_or_equal_than 29.970</em></p>
 
 <p>Example: <em>General/CompleteName contains_string ffv1</em></p>
 
-<h3><a name="value">Value</a></h3>
+<h3 id="value">Value</h3>
 
-<p>Allows a user may select a desired value . </p>
+<p>Allows a user may select a desired value .</p>
 
-<p>User note: When creating a value, do not include any associated strings (e.g., "pixels"). </p>
+<p>User note: When creating a value, do not include any associated strings (e.g., “pixels”).</p>
 
-<h3><a name="free-text-mode">Free Text mode</a></h3>
+<h3 id="free-text-mode">Free Text mode</h3>
 
 <p>In addition to the Editor, policies may also be edited in Free Text mode. Free Text uses the XML Path Language, or XPath. An example of a MediaConch XPath expression in Free Text mode includes the following:</p>
 
-<p>Example: <em>track[@type='General']/FileExtension = 'mkv'</em></p>
+<p>Example: <em>track[@type=’General’]/FileExtension = ‘mkv’</em></p>
 
-<h2>Display</h2>
+<h2 id="display-1">Display</h2>
 
-<p>The display section will allow a user to apply an XSL to any conformance output XMLs for HTML presentation. </p>
+<p>The Display section will allow a user to apply various display XSLs for use with policy and implementation check reports in the checker section. MediaConch has provided example HTML, XML and TXT displays. Once a display XSL is imported, it can be actived by selecting the display in the “Choose a Display” dropdown menu located in the Checker section.</p>
 
-<h3><a name="import-display-set">Import display set</a></h3>
+<h3 id="import-display-set">Import display set</h3>
 
-<p>Allows a user to import a display file to the display set. </p>
+<p>Allows a user to import a display XSL file to the display set.</p>
 
-<h3><a name="export-display-set">Export display set</a></h3>
+<h3 id="export-display-set">Export display set</h3>
 
-<p>Allows a user to export a display file to the display set. </p>
+<p>Allows a user to export a display XSL file to the display set.</p>
 
-<h3><a name="delete-selected-display-file">Delete selected display file</a></h3>
+<h3 id="delete-selected-display-file">Delete selected display file</h3>
 
-<p>Allows a user to delete a display file from the display set. </p>
+<p>Allows a user to delete a display XSL file from the display set.</p>
 
       <script src="qrc:/jquery.js"></script>
       <script src="qrc:/bootstrap.js"></script>

@@ -1,46 +1,50 @@
 <form name="checkerOnline" method="post" action="" enctype="multipart/form-data">
-  <div id="checkerOnline">
+  <div class="col-md-4" id="checkerOnline">
     <div class="form-group">
-      <label class="control-label required">
-        Policy
-      </label>
-      <div id="checkerOnline_step1">
-        <div class="form-group">
-          <label class="control-label" for="checkerOnline_step1_policy">
-            Choose a policy
-          </label>
-          <select id="checkerOnline_step1_policy" name="checkerOnline[step1][policy]" class="form-control">
-            <option selected="selected" value="-1">Choose a policy</option>
-          </select>
-        </div>
+      <label class="col-sm-2 control-label" for="checkerOnline_policy">Policy</label>
+      <div class="col-sm-10">
+        <select id="checkerOnline_policy" name="checkerOnline_policy" class="policyList form-control">
+        </select>
       </div>
     </div>
+  </div>
+
+  <div class="col-md-4">
     <div class="form-group">
-      <label class="control-label required">
-        Display
-        </label>
-      <div id="checkerOnline_display_step1">
-        <div class="form-group">
-          <label class="control-label" for="checkerOnline_step1_display_selector">
-            Choose a display
-          </label>
-          <select id="checkerOnline_step1_display_selector" name="checkerOnline[step1][display_selector]" class="form-control">
-            <option selected="selected" value="-1">Choose a Display</option>
-          </select>
-        </div>
+      <label class="col-sm-2 control-label" for="checkerOnline_display_selector">Display</label>
+      <div class="col-sm-10">
+        <select id="checkerOnline_display_selector" name="checkerOnline_display_selector" class="displayList form-control">
+        </select>
       </div>
     </div>
+  </div>
+
+  <div class="col-md-4">
     <div class="form-group">
-      <label class="control-label required" for="checkerOnline_file">
-        URL of file
-      </label>
-      <input id="checkerOnline_file" name="checkerOnline[file]" required="required"  maxlength="512" class="form-control" type="url" onclick="webpage.onInputChanged(this.name);">
+      <label class="col-sm-4 control-label" for="checkerOnline_verbosity_selector">Verbosity</label>
+      <div class="col-sm-8">
+        <select  id="checkerOnline_verbosity_selector" name="checkerOnline_verbosity_selector" class="verbosityList form-control">
+        </select>
+      </div>
     </div>
+  </div>
+
+  <div class="col-md-10">
     <div class="form-group">
-      <button type="submit" id="checkerOnline_Check file" name="checkerOnline[Check file]" class="btn-warning btn" onclick="event.preventDefault();webpage.onButtonClicked(this.id);">
-        Check file
-      </button>
+      <label class="col-sm-2 control-label required" for="checkerOnline_file">URL of file</label>
+      <div class="col-sm-10">
+        <input id="checkerOnline_file" name="checkerOnline_file" required="required"  maxlength="512" class="form-control" type="url">
+      </div>
     </div>
-    <input id="checkerOnline__token" name="checkerOnline[_token]" class="form-control" value="S9eZwOSY4f7x_w29AcjlWoFD9LqOKvhfuggIeESe5_o" type="hidden">
+  </div>
+
+  <div class="col-md-2">
+    <div class="form-group">
+      <div class="col-sm-2">
+      </div>
+      <div class="col-sm-10">
+        <button type="submit" id="checkerOnline_Check file" name="checkerOnline_Check file" class="btn-warning btn">Check URL</button>
+      </div>
+    </div>
   </div>
 </form>

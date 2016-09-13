@@ -1,0 +1,34 @@
+Format;;FromStats;
+Format_Commercial_IfAny;;FromStats;
+Format_Version;Text:Format;FromStats;
+Format_Profile;Text:Format;FromStats;
+Format_Compression;;FromStats;
+Format_Settings_Wrapping;;FromStats;
+MuxingMode;;FromStats;
+CodecID;;FromStats;
+BitRate_Mode;;FromStats;
+Width;;FromList;720 / 1080 / 1920 / 3840 / 7680
+Height;;FromList;480 / 576 / 720 / 1080 / 2160 / 4320
+PixelAspectRatio;;FromList;1.000 / 1.067 / 1.126 / 1.422 / 1.500 / 1.501
+DisplayAspectRatio;;FromList;1.333 / 1.778
+FrameRate_Mode;;FromStats;
+FrameRate;;FromList;25.000 / 29.970 / 30.000 / 50.000 / 59.940 / 60.000
+FrameRate_Num;;FromList;29970 / 30000 / 59940 / 60000
+FrameRate_Den;;FromList;1000 / 1001
+ColorSpace;;FromStats;
+ChromaSubsampling;;FromStats;
+BitDepth;;FromStats;
+Compression_Mode;;FromStats;
+Encoded_Application_CompanyName;;FromStats;
+Encoded_Application_Name;;FromStats;
+Encoded_Application_Version;Text:Encoded_Application_Name;FromStats;
+Encoded_Library_CompanyName;;FromStats;
+Encoded_Library_Name;;FromStats;
+Encoded_Library_Version;Text:Encoded_Library_Name;FromStats;
+Language;;FromStats;
+Language_More;;FromStats;
+Disabled;;FromStats;
+Default;;FromStats;
+Forced;;FromStats;
+AlternateGroup;;FromStats;
+Encryption;;FromStats;

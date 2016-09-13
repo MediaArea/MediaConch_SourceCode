@@ -8,21 +8,13 @@
 #include "mainwindow.h"
 #include "Common/FileRegistered.h"
 
-#include "Common/Database.h"
-#include "Common/NoDatabase.h"
-#include "Common/SQLLite.h"
+#include "DatabaseUi.h"
 
 #include <QString>
 #include <QDir>
 #include <QTimer>
 
 namespace MediaConch {
-
-//***************************************************************************
-// Constant
-//***************************************************************************
-
-const std::string WorkerFiles::database_filename = std::string("MediaConchUi.db");
 
 //***************************************************************************
 // Constructor / Desructor
@@ -43,8 +35,12 @@ WorkerFiles::~WorkerFiles()
         delete timer;
         timer = NULL;
     }
-    if (db)
-        delete db;
+}
+
+//---------------------------------------------------------------------------
+void WorkerFiles::set_database(DatabaseUi* database)
+{
+    db = database;
 }
 
 //---------------------------------------------------------------------------
@@ -96,7 +92,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
 
 //---------------------------------------------------------------------------
 void WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
-                                   int policy, int display)
+                                   int policy, int display, int verbosity)
 {
     std::string full_file(path);
     if (path.length())
@@ -110,7 +106,8 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     {
         exists = true;
         // nothing to do
-        if (policy == working_files[full_file]->policy && display == working_files[full_file]->display)
+        if (policy == working_files[full_file]->policy && display == working_files[full_file]->display
+            && verbosity == working_files[full_file]->verbosity)
         {
             working_files_mutex.unlock();
             return;
@@ -122,13 +119,19 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
         fr = new FileRegistered;
     working_files_mutex.unlock();
 
+    // Keep the old index for the same file
+    if (exists)
+        fr->index = working_files[full_file]->index;
+    else
+        fr->index = file_index++;
     fr->filename = file;
     fr->filepath = path;
     fr->policy = policy;
     fr->display = display;
-    fr->index = file_index++;
+    fr->verbosity = verbosity;
 
     working_files_mutex.lock();
+
     if (exists)
         delete working_files[full_file];
     working_files[full_file] = fr;
@@ -156,6 +159,54 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     int ret;
     if ((ret = mainwindow->analyze(vec)) < 0)
         mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
+}
+
+//---------------------------------------------------------------------------
+void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& file, int policy)
+{
+    working_files_mutex.lock();
+    if (working_files.find(file) == working_files.end() || !working_files[file])
+    {
+        // file is not existing
+        working_files_mutex.unlock();
+        return;
+    }
+
+    bool policy_valid = false;
+    if (working_files[file]->analyzed && working_files[file]->report_kind == MediaConchLib::report_MediaConch && policy >= 0)
+    {
+        working_files_mutex.unlock();
+
+        Policy *p = mainwindow->get_policy((size_t)policy);
+        if (p)
+        {
+            std::vector<std::string> policies_names, policies_contents;
+            std::vector<MediaConchLib::ValidateRes*> res;
+            std::string policy_content;
+            p->dump_schema(policy_content);
+            policies_contents.push_back(policy_content);
+
+            if (mainwindow->validate(MediaConchLib::report_Max, file,
+                                     policies_names, policies_contents, res) == 0 && res.size() == 1)
+            {
+                policy_valid = res[0]->valid;
+                for (size_t j = 0; j < res.size() ; ++j)
+                    delete res[j];
+                res.clear();
+            }
+        }
+
+        working_files_mutex.lock();
+    }
+
+    working_files[file]->policy = policy;
+    working_files[file]->policy_valid = policy_valid;
+    FileRegistered fr = *working_files[file];
+    working_files_mutex.unlock();
+
+    to_update_files_mutex.lock();
+    to_update_files[file] = new FileRegistered(fr);
+    to_update_files_mutex.unlock();
 }
 
 //---------------------------------------------------------------------------
@@ -286,7 +337,8 @@ void WorkerFiles::update_unfinished_files()
 
         double percent;
 
-        int ret = mainwindow->is_analyze_finished(files[i], percent);
+        MediaConchLib::report report_kind;
+        int ret = mainwindow->is_analyze_finished(files[i], percent, report_kind);
         if (ret < 0)
         {
             mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
@@ -297,10 +349,11 @@ void WorkerFiles::update_unfinished_files()
         if (ret == MediaConchLib::errorHttp_TRUE)
         {
             fr->analyzed = true;
+            fr->report_kind = report_kind;
             std::vector<std::string> policies_names, policies_contents;
             std::vector<MediaConchLib::ValidateRes*> res;
 
-            if (mainwindow->validate(MediaConchLib::report_MediaConch, files[i],
+            if (mainwindow->validate(report_kind, files[i],
                                      policies_names, policies_contents, res) == 0
                 && res.size() == 1)
                 fr->implementation_valid = res[0]->valid;
@@ -308,7 +361,7 @@ void WorkerFiles::update_unfinished_files()
             for (size_t j = 0; j < res.size() ; ++j)
                 delete res[j];
             res.clear();
-            if (fr->policy >= 0)
+            if (report_kind == MediaConchLib::report_MediaConch && fr->policy >= 0)
             {
                 Policy *p = mainwindow->get_policy((size_t)fr->policy);
                 if (p)
@@ -390,48 +443,6 @@ void WorkerFiles::remove_file_registered_from_file(const std::string& file)
     to_delete_files_mutex.lock();
     to_delete_files[file] = fr;
     to_delete_files_mutex.unlock();
-}
-
-//---------------------------------------------------------------------------
-void WorkerFiles::load_database()
-{
-#ifdef HAVE_SQLITE
-    std::string db_path;
-    if (mainwindow->get_ui_database_path(db_path) < 0)
-    {
-        db_path = Core::get_local_data_path();
-        QDir f(QString().fromStdString(db_path));
-        if (!f.exists())
-            db_path = ".";
-    }
-
-    db = new SQLLite;
-
-    db->set_database_directory(db_path);
-    db->set_database_filename(database_filename);
-    if (db->init_ui() < 0)
-    {
-        const std::vector<std::string>& errors = db->get_errors();
-        std::string error;
-        for (size_t i = 0; i < errors.size(); ++i)
-        {
-            if (i)
-                error += " ";
-            error += errors[i];
-        }
-        QString msg = QString().fromStdString(error);
-        mainwindow->set_msg_error_to_status_bar(msg);
-    }
-#else
-    db = new NoDatabase;
-    db->init_ui();
-#endif
-}
-
-//---------------------------------------------------------------------------
-void WorkerFiles::create_and_configure_database()
-{
-    load_database();
 }
 
 //---------------------------------------------------------------------------
@@ -526,7 +537,13 @@ void WorkerFiles::fill_registered_files_from_db()
             full_file += "/";
         full_file += fr->filename;
 
+        //check if policy still exists
+        Policy *p = mainwindow->get_policy(fr->policy);
+        if (!p)
+            fr->policy = -1;
+
         fr->index = file_index++;
+        fr->analyzed = false;
 
         working_files[full_file] = fr;
         files.push_back(full_file);

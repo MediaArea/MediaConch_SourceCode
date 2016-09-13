@@ -39,6 +39,9 @@ int Help()
     TEXTOUT("--Configuration=ConfigurationFile, -c ConfigurationFile");
     TEXTOUT("                    Use ConfigurationFile as configuration file");
     TEXTOUT("                    Default, it uses the one in the user data application file");
+    TEXTOUT("--PluginsConfiguration=PluginsConfigurationFile, -pc PluginsConfigurationFile");
+    TEXTOUT("                    Use PluginsConfigurationFile as plugins configuration file");
+    TEXTOUT("                    Default, it uses the struct in the configuration file or no plugins configured if not inside.");
     TEXTOUT("");
 
     TEXTOUT("Reporting Elements:");
@@ -54,6 +57,8 @@ int Help()
     TEXTOUT("Policy Checker:");
     TEXTOUT("--Policy=PolicyFileName, -p PolicyFileName");
     TEXTOUT("                    Apply the policy (XSL or Schematron) ");
+    TEXTOUT("--CreatePolicy");
+    TEXTOUT("                    Create a policy (XSL) from a file");
     TEXTOUT("");
 
     TEXTOUT("Output Formats:");
@@ -98,7 +103,7 @@ int Help_Advanced()
     TEXTOUT("                    Compress report in database using [Mode]");
     TEXTOUT("                    [Mode] can be None for no compression");
     TEXTOUT("                    [Mode] can be ZLib to use zlib");
-    TEXTOUT("--cz");
+    TEXTOUT("-cz");
     TEXTOUT("                    Same as --Compression=ZLib");
     TEXTOUT("");
     TEXTOUT("Implementation Checker:");
@@ -113,10 +118,15 @@ int Help_Advanced()
     TEXTOUT("                    Force to parse the file if registered in database");
     TEXTOUT("--Async=yes, -as");
     TEXTOUT("                    Analyze asynchronously the files, need to launch again the command to have the result");
+    TEXTOUT("--Https=0, --no-https");
+    TEXTOUT("                    XML output contains links in HTTP instead of HTTPS");
     TEXTOUT("--Help=Ssl");
     TEXTOUT("                    More details about SSL specific options (e.g. for HTTPS or FTPS)");
     TEXTOUT("--Help=Ssh");
     TEXTOUT("                    More details about SSH specific options (e.g. for SFTP)");
+    TEXTOUT("");
+    TEXTOUT("--DefaultValuesForType=Type,Field");
+    TEXTOUT("                    Give the default values for the field of the type given (separated by comma)");
 
     return CLI_RETURN_FINISH;
 }
@@ -215,7 +225,7 @@ int Help_Xslt()
 //---------------------------------------------------------------------------
 int Version()
 {
-    TEXTOUT("MediaConch Command Line Interface 16.01");
+    TEXTOUT("MediaConch Command Line Interface 16.08");
 
     return CLI_RETURN_FINISH;
 }

@@ -19,8 +19,10 @@ mediaconch_SOURCES = \
     ../../../Source/Common/XsltPolicy.cpp \
     ../../../Source/Common/UnknownPolicy.cpp \
     ../../../Source/Common/Database.cpp \
-    ../../../Source/Common/NoDatabase.cpp \
+    ../../../Source/Common/DatabaseReport.cpp \
+    ../../../Source/Common/NoDatabaseReport.cpp \
     ../../../Source/Common/SQLLite.cpp \
+    ../../../Source/Common/SQLLiteReport.cpp \
     ../../../Source/Common/Json.cpp \
     ../../../Source/Common/Configuration.cpp \
     ../../../Source/Common/REST_API.cpp \
@@ -29,10 +31,26 @@ mediaconch_SOURCES = \
     ../../../Source/Common/Http.cpp \
     ../../../Source/Common/LibEventHttp.cpp \
     ../../../Source/Common/Queue.cpp \
-    ../../../Source/Common/Scheduler.cpp
+    ../../../Source/Common/Scheduler.cpp \
+    ../../../Source/Common/PluginsConfig.cpp \
+    ../../../Source/Common/PluginsManager.cpp \
+    ../../../Source/Common/Plugin.cpp \
+    ../../../Source/Common/VeraPDF.cpp \
+    ../../../Source/Common/DpfManager.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)
 mediaconch_LDFLAGS= $(XML_LIBS)
 
 INCLUDES = -I../../../Source -I../../../../MediaInfoLib/Source -I../../../../ZenLib/Source
+
+TESTS = \
+    test/simple.sh \
+    test/test_ffv1.sh
+
+SAMPLES_DIR = test/SampleFiles
+
+clone_sample_files: $(SAMPLES_DIR)
+
+$(SAMPLES_DIR):
+	git clone https://github.com/MediaArea/MediaConch_SampleFiles test/SampleFiles

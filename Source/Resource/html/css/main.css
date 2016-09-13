@@ -17,13 +17,17 @@ footer {
     padding-right: 40px;
 }
 
+footer .navbar {
+    padding-right: 0;
+}
+
 .navbar-collapse {
     border-top: 6px solid #3472A1;
     margin-bottom: 0px;
     border-bottom: 2px solid #3472A1;
 }
 
-.navbar a {
+.navbar a, .navbar-default a.navbar-brand {
     color: black;
 }
 
@@ -36,13 +40,13 @@ footer {
     padding-bottom: 6px;
 }
 
-.navbar span {
-    position: relative;
-    display: block;
-    padding: 10px 15px;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    line-height: 20px;
+.navbar ul.dropdown-menu li {
+    border-left: none;
+    border-right: none;
+}
+
+.navbar-brand img {
+    display: inline;
 }
 
 .serif {
@@ -75,6 +79,9 @@ footer {
     padding-bottom: 80px;
 }
 
+.content .col-lg-offset-1 {
+    margin-left: 4.16666667%;
+}
 
 .panel {
     background-color: #F5F5F5;
@@ -98,71 +105,57 @@ footer {
     font-size: 16px;
 }
 
-.checker-results .list-group {
-    margin-bottom: 0;
+#checkerResults {
+    padding-right: 0;
+    padding-left: 0;
 }
 
-.report-blue {
-    color: #4383BD;
+#checkerResultTitle button {
+    padding-right: 15px;
 }
 
-.checker-results.panel {
-    margin-bottom: 5px;
-}
-
-.checker-results .panel-heading h4 {
-    display: inline-block;
-    width: 95%
-}
-
-.checker-results ul li p {
+.checker-results .btn {
+    font-size: inherit;
+    padding: 0 0 0 10px;
     float: right;
+    border: 0px;
 }
 
-.checker-result-text {
-    display: inline-block;
-    width: 90%;
+#result-table td p {
+    margin: 0;
 }
 
-.checker-result-buttons {
-    float: right;
+.tab-pane {
+    background-color: #F5F5F5;
+    padding-top: 10px;
 }
 
-.results-dld, .results-dld-trace, .results-dld-trace-ajax, .results-dld-info, .results-dld-info-ajax {
-    margin-left: 5px;
+.tab-pane .form-horizontal .control-label {
+    text-align: left;
+}
+
+#file label.col-sm-2, #url label.col-sm-2, #repository label.col-sm-2 {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+#file, #url, #repository {
+    padding-right: 0;
+}
+
+.results-dld, .implem-dld, .policy-dld, .mi-dld, .mt-dld {
+    margin-left: 10px;
 }
 
 .modal-body p {
     font-family: monospace;
 }
 
-#checkerResultTitle h1 {
+#checkerResultTitle h2 {
     display: inline-block;
 }
 
-#checkerResultTitle .close {
-    margin-top: 40px;
-}
-
-#checkerUpload > div:nth-child(1), #checkerUpload > div:nth-child(2) {
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    padding: 2px;
-}
-
-#checkerOnline > div:nth-child(1), #checkerOnline > div:nth-child(2) {
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    padding: 2px;
-}
-
-#checkerRepository > div:nth-child(1), #checkerRepository > div:nth-child(2) {
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    padding: 2px;
-}
-
-#fos_user_registration_form .required:after, #fos_user_profile_form .required:after {
+#fos_user_registration_form .required:after, #fos_user_profile_form .required:after, #xslPolicyRule .required:after {
     content: " *";
 }
 
@@ -186,4 +179,58 @@ p.registration {
 
 .jstree-grid-wrapper {
     margin-top: 10px;
+}
+
+#xslPolicyRule_editor {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+#xslPolicyRule_editor .radio {
+    display: inline-block;
+    margin: 0 10px 0 0;
+}
+
+.xslPolicyRuleSaveButton {
+    display: inline-block;
+}
+
+.xslPolicyRuleDuplicateButton, .xslPolicyRuleDeleteButton {
+    display: inline-block;
+    margin-left: 30px;
+}
+
+.policyEditActions .btn + .btn {
+    margin-left: 30px;
+}
+
+.panel-body a button.pull-right {
+    margin-left: 10px;
+}
+
+.spinner-cell, .spinner-status {
+    background: transparent url("qrc:/ajax-spinner-small.gif");
+    width: 16px;
+    height: 14px;
+    margin: 0 auto;
+}
+
+.spinner-modal {
+    background: transparent url("qrc:/ajax-spinner-big.gif");
+    width: 66px;
+    height: 66px;
+    display: block;
+    margin: 0 auto;
+}
+
+.alert-modal-create-policy {
+    display: inline-block;
+    margin-top: inherit;
+    margin-bottom: inherit;
+    font-size: 16px;
+    padding: 6px 12px;
+}
+
+.alert-modal-create-policy a {
+    text-decoration: underline;
 }

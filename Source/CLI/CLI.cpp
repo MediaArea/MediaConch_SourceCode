@@ -14,6 +14,9 @@
 #include "CLI.h"
 #include "CommandLine_Parser.h"
 #include "Help.h"
+#include <ZenLib/ZtringList.h>
+#include <ZenLib/Dir.h>
+#include "Common/Policy.h"
 
 #if !defined(WINDOWS)
     #include <unistd.h>
@@ -34,7 +37,7 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false)
+    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -59,10 +62,6 @@ namespace MediaConch
         if (!MCL.get_implementation_schema_file().length())
             MCL.create_default_implementation_schema();
 
-        // If no Implementation verbosity registered, use one by default
-        if (!MCL.get_implementation_verbosity().length())
-            MCL.set_implementation_verbosity("5");
-
         std::string reason;
         if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
                                                     format, reason))
@@ -72,6 +71,7 @@ namespace MediaConch
         }
 
         MCL.set_configuration_file(configuration_file);
+        MCL.set_plugins_configuration_file(plugins_configuration_file);
         MCL.init();
         use_daemon = MCL.get_use_daemon();
         return 0;
@@ -99,7 +99,7 @@ namespace MediaConch
                 return ret; //no more tasks to do
 
             if (ret == CLI_RETURN_FILE)
-                files.push_back(args[pos]); //Append the filename to the list of filenames to parse
+                add_files_recursively(args[pos]);
         }
         return CLI_RETURN_NONE;
     }
@@ -108,6 +108,8 @@ namespace MediaConch
     int CLI::run()
     {
         std::vector<std::string> file_to_report;
+        MediaConchLib::report report_kind;
+
         for (size_t i = 0; i < files.size(); ++i)
         {
             bool registered = false;
@@ -124,26 +126,64 @@ namespace MediaConch
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
             }
 
-            int ready = is_ready(i);
+            int ready = is_ready(i, report_kind);
             if (ready == MediaConchLib::errorHttp_NONE)
                 continue;
             else if (ready < 0)
                 //TODO: PROBLEM
                 return ready;
+
+            if (report_set[MediaConchLib::report_MediaConch] &&
+                report_kind > MediaConchLib::report_MediaTrace && report_kind != MediaConchLib::report_Max &&
+                files.size() == 1)
+            {
+                set_report_reset();
+                report_set.set(report_kind);
+            }
             file_to_report.push_back(files[i]);
         }
+
+        //Ensure to analyze before creating library
+        if (create_policy_mode)
+            return run_create_policy();
 
         //Output
         MediaConchLib::ReportRes result;
         std::vector<std::string> policies_contents;
+        std::map<std::string, std::string> options;
+        options["verbosity"] = MCL.get_implementation_verbosity();
         MCL.get_report(report_set, format, file_to_report, policies,
-                       policies_contents, &result, &display_file, NULL);
+                       policies_contents, options, &result, &display_file, NULL);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
         STRINGOUT(report_mi);
         //Output, in a file if needed
         if (!LogFile_FileName.empty())
             LogFile_Action(report_mi);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_create_policy()
+    {
+        if (files.size() != 1)
+        {
+            error = "Create a policy only with one file";
+            return MediaConchLib::errorHttp_INTERNAL;
+        }
+
+        size_t pos = MCL.create_policy_from_file(files[0]);
+        Policy *p = NULL;
+        std::string policy;
+        if (pos == (size_t)-1 || (p = MCL.get_policy(pos)) == NULL || p->dump_schema(policy) < 0)
+        {
+            error = std::string("Cannot create policy from: ") + files[0];
+            return MediaConchLib::errorHttp_INTERNAL;
+        }
+
+        MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);
+        STRINGOUT(policy_mil);
+
         return 0;
     }
 
@@ -214,6 +254,12 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    void CLI::set_plugins_configuration_file(const std::string& file)
+    {
+        plugins_configuration_file = file;
+    }
+
+    //--------------------------------------------------------------------------
     void CLI::set_implementation_schema_file(const std::string& file)
     {
         MCL.set_implementation_schema_file(file);
@@ -255,15 +301,13 @@ namespace MediaConch
         }
         return CLI_RETURN_NONE;
     }
-    
+
     //--------------------------------------------------------------------------
-    int CLI::is_ready(size_t i)
+    int CLI::is_ready(size_t i, MediaConchLib::report& report_kind)
     {
-        std::vector<std::string> vec;
-        vec.push_back(files[i]);
         double percent_done = 0;
 
-        int ret = MCL.is_done(files[i], percent_done);
+        int ret = MCL.is_done(files[i], percent_done, report_kind);
         if (use_daemon && asynchronous)
         {
             if (ret == MediaConchLib::errorHttp_NONE)
@@ -284,9 +328,9 @@ namespace MediaConch
                 #ifdef WINDOWS
                 ::Sleep((DWORD)5);
                 #else
-                usleep(5000);
+                usleep(500000);
                 #endif
-                ret = MCL.is_done(files[i], percent_done);
+                ret = MCL.is_done(files[i], percent_done, report_kind);
             }
         }
         return MediaConchLib::errorHttp_TRUE;
@@ -305,6 +349,31 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    void CLI::set_create_policy_mode()
+    {
+        create_policy_mode = true;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::add_files_recursively(const std::string& filename)
+    {
+        ZenLib::Ztring dirname = ZenLib::Ztring().From_UTF8(filename);
+        if (!ZenLib::Dir::Exists(dirname))
+        {
+            files.push_back(filename);
+            return;
+        }
+
+        ZenLib::ZtringList list = ZenLib::Dir::GetAllFileNames(dirname,
+                                                               (ZenLib::Dir::dirlist_t)(ZenLib::Dir::Include_Files |
+                                                                                        ZenLib::Dir::Include_Hidden |
+                                                                                        ZenLib::Dir::Parse_SubDirs));
+
+        for (size_t i =0; i < list.size(); ++i)
+            files.push_back(ZenLib::Ztring(list[i]).To_UTF8()); //Append the filename to the list of filenames to parse
+    }
+
+    //--------------------------------------------------------------------------
     void CLI::print_error(MediaConchLib::errorHttp code)
     {
         switch (code)
@@ -318,10 +387,22 @@ namespace MediaConch
             case MediaConchLib::errorHttp_CONNECT:
                 TEXTOUT("Cannot connect to the daemon");
                 break;
+            case MediaConchLib::errorHttp_INTERNAL:
+            {
+                MediaInfoLib::String error_mil = ZenLib::Ztring().From_UTF8(error);
+                STRINGOUT(error_mil);
+                break;
+            }
             default:
                 TEXTOUT("Internal error");
                 break;
         }
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+    {
+        return MCL.get_values_for_type_field(type, field, values);
     }
 
 }

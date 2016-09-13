@@ -47,6 +47,11 @@ bool Separator = false;
 
 static bool wait_for_another_argument(std::string& argument)
 {
+    if (argument=="-pc")
+    {
+        Last_Argument = "--pluginsconfiguration=";
+        return true;
+    }
     if (argument=="-p")
     {
         Last_Argument = "--policy=";
@@ -100,7 +105,7 @@ static void change_short_options_to_long(std::string& argument)
         argument = "-mi";
     if (argument=="--mediatrace")
         argument = "-mt";
-    
+
     // Report short options
     if (argument=="-mc")
         argument = "--report=MediaConch";
@@ -167,6 +172,9 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
     OPTION("--async",                                       Asynchronous)
+    OPTION("--pluginsconfiguration",                        PluginsConfiguration)
+    OPTION("--defaultvaluesfortype",                        DefaultValuesForType)
+    OPTION("--createpolicy",                                CreatePolicy)
     //Default
     OPTION("--",                                            Default)
     else
@@ -218,7 +226,7 @@ CL_OPTION(Report)
         Help();
         return CLI_RETURN_ERROR;
     }
-        
+
     // New requested reports
     std::string report_kind = argument.substr(egal_pos + 1);
     cli->set_report_set(report_kind);
@@ -380,6 +388,72 @@ CL_OPTION(Asynchronous)
         is_async = true;
 
     cli->set_asynchronous(is_async);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(PluginsConfiguration)
+{
+    //Form : --PluginsConfiguration=File
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string file;
+    file.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_plugins_configuration_file(file);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(DefaultValuesForType)
+{
+    //Form : --DefaultValuesForType=type,field
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    size_t comma_pos = argument.find(',');
+    if (comma_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string type, field;
+    type = argument.substr(egal_pos + 1, comma_pos - egal_pos - 1);
+    field.assign(argument, comma_pos + 1 , std::string::npos);
+
+    std::vector<std::string> values;
+    if (cli->get_values_for_type_field(type, field, values) < 0)
+        return CLI_RETURN_ERROR;
+
+    std::stringstream out;
+    for (size_t i = 0; i < values.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << values[i];
+    }
+    ZenLib::Ztring str;
+    str.From_UTF8(out.str());
+    STRINGOUT(str);
+
+    return CLI_RETURN_FINISH;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(CreatePolicy)
+{
+    (void)argument;
+    //Form : --CreatePolicy
+    cli->set_create_policy_mode();
     return CLI_RETURN_NONE;
 }
 

@@ -45,21 +45,21 @@ public:
     XsltRule() : use_free_text(false), occurrence(1) {}
     ~XsltRule() {}
     XsltRule(const XsltRule&);
+    XsltRule& operator=(const XsltRule&);
 
     std::string title;
+
+    std::string ope;
 
     bool   use_free_text;
 
     std::string type;
     std::string field;
     int         occurrence;
-    std::string ope;
+
     std::string value;
 
-    std::string text; // Free text
-
-private:
-    XsltRule& operator=(const XsltRule&);
+    std::string test; // Free text
 };
 
 //***************************************************************************
@@ -69,7 +69,7 @@ private:
 class XsltPolicy : public Policy
 {
 public:
-    XsltPolicy() : Policy(Policies::POLICY_XSLT) {}
+    XsltPolicy(bool no_https) : Policy(Policies::POLICY_XSLT, no_https) {}
     XsltPolicy(const XsltPolicy*);
     virtual ~XsltPolicy();
     std::vector<XsltRule *> rules;
@@ -77,9 +77,15 @@ public:
     /* std::vector<XsltOp *> operations; */
     xmlDocPtr  create_doc();
 
+    // HELPER
+    bool       parse_test_for_rule(const std::string& test, XsltRule *rule);
+    void       create_test_from_rule(XsltRule *rule, std::string& xpath);
+
+    int        create_policy_from_mi(const std::string& report);
+
 private:
     // HELPER
-    int        import_schema_from_doc(const std::string& filename, xmlDocPtr doc);
+    int        import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
 
     bool       find_xslt_header(xmlNodePtr node);
     bool       find_title_node(xmlNodePtr node, std::string& title);
@@ -103,17 +109,21 @@ private:
 
     bool       find_rule_title_node(xmlNodePtr node, std::string& title);
     bool       find_context_node(xmlNodePtr node, XsltRule* rule);
+    bool       validate_check_context_node(xmlNodePtr node);
     bool       find_context_attribute_node(xmlNodePtr node, XsltRule* rule);
     bool       find_context_attribute_value_node(xmlNodePtr node, std::string& value);
     bool       find_context_attribute_field_node(xmlNodePtr node, std::string& value);
     bool       find_choose_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       validate_choose_node(xmlNodePtr node);
     bool       find_choose_when_node(xmlNodePtr node, XsltRule* rule, bool& valid);
-    bool       find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, bool& valid);
-    bool       find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, bool& valid);
-    bool       find_call_template_free_text_node(xmlNodePtr node, XsltRule* rule, bool& valid);
+    bool       validate_choose_when_node(xmlNodePtr node);
+    bool       find_choose_for_each_node(xmlNodePtr node, XsltRule* rule, const std::string&, bool& valid);
+    bool       validate_choose_for_each_node(xmlNodePtr node);
+    bool       find_choose_call_template_node(xmlNodePtr node, XsltRule* rule, const std::string&, bool& valid);
+    bool       find_call_template_test_node(xmlNodePtr node, XsltRule* rule, bool& valid);
     bool       find_call_template_xpath_node(xmlNodePtr node, std::string& type);
     bool       find_call_template_value_node(xmlNodePtr node, std::string& field);
-    bool       parse_test_for_rule(const std::string& test, XsltRule *rule);
+    bool       parse_test_for_rule_free_text(const std::string& test, XsltRule *rule);
 
     void       write_root_default_childs(xmlNodePtr node);
     void       write_root_template_childs(xmlNodePtr node);
@@ -132,6 +142,7 @@ private:
     void       write_check_name_child(xmlNodePtr node, XsltRule *rule);
     void       write_check_context_child(xmlNodePtr node, XsltRule *rule);
     void       write_check_context_value_child(xmlNodePtr node, XsltRule *rule);
+    void       write_check_context_value_is_true_child(xmlNodePtr node, XsltRule *rule);
     void       write_check_context_field_child(xmlNodePtr node, XsltRule *rule);
     void       write_check_choose_child(xmlNodePtr node, XsltRule *rule);
     void       write_check_when_child(xmlNodePtr node, XsltRule *rule);
@@ -141,8 +152,6 @@ private:
     void       write_check_call_template_child(xmlNodePtr node, XsltRule *rule);
     void       write_check_call_template_xpath_child(xmlNodePtr node, XsltRule *rule);
     void       write_check_call_template_value_child(xmlNodePtr node, XsltRule *rule);
-    void       write_check_call_template_field_child(xmlNodePtr node, XsltRule *rule);
-    void       create_test_from_rule(XsltRule *rule, std::string& xpath);
     xmlNsPtr   create_namespace_xsl(xmlNodePtr node);
     xmlNsPtr   create_namespace_mc(xmlNodePtr node);
     xmlNsPtr   create_namespace_ma(xmlNodePtr node);
@@ -170,6 +179,15 @@ private:
     xmlNodePtr write_operator_new_node(xmlNodePtr node, const xmlChar* title,
                                        std::vector<std::pair<const xmlChar*, const xmlChar*> >& prop,
                                        const xmlChar* content = NULL, bool parentNs=true);
+
+    int        create_rule_from_media_track_child(xmlNodePtr node, const std::string& type);
+    int        find_media_track_node(xmlNodePtr node, std::string& type);
+    int        find_media_track_node(xmlNodePtr node);
+
+    bool       operator_need_value(const std::string& ope);
+    bool       operator_exists(const std::string& ope);
+    int        get_operator_value(const std::string& ope, std::string& value);
+    int        get_operator_pretty_name(const std::string& ope, std::string& pretty_name);
 };
 
 }

@@ -26,8 +26,8 @@ namespace MediaConch {
 class FileRegistered
 {
 public:
-    FileRegistered() : policy(-1), display(-1), analyze_percent(0), analyzed(false),
-        implementation_valid(false), policy_valid(false), need_update(true)
+    FileRegistered() : policy(-1), display(-1), verbosity(-1), analyze_percent(0), analyzed(false),
+        implementation_valid(false), policy_valid(false), report_kind(0), need_update(true)
     {
     }
 
@@ -39,11 +39,13 @@ public:
         this->filepath = f.filepath;
         this->policy = f.policy;
         this->display = f.display;
+        this->verbosity = f.verbosity;
         this->analyze_percent = f.analyze_percent;
         this->analyzed = f.analyzed;
         this->implementation_valid = f.implementation_valid;
         this->policy_valid = f.policy_valid;
         this->index = f.index;
+        this->report_kind = f.report_kind;
         this->need_update = f.need_update;
     }
 
@@ -51,11 +53,14 @@ public:
     std::string  filepath;
     int          policy;
     int          display;
+    int          verbosity;
 
     double       analyze_percent;
     bool         analyzed;
     bool         implementation_valid;
     bool         policy_valid;
+
+    int          report_kind;
 
     unsigned int index;
     bool need_update;

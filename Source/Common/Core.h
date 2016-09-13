@@ -23,7 +23,7 @@
     #include "MediaInfoDLL/MediaInfoDLL_Static.h"
     #define MediaInfoNameSpace MediaInfoDLL
 #else
-    #include "MediaInfo/MediaInfoList.h"
+    #include "MediaInfo/MediaInfo.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
 #include <ZenLib/CriticalSection.h>
@@ -43,7 +43,9 @@ using namespace std;
 namespace MediaConch {
 
 class Schema;
-class Database;
+class DatabaseReport;
+class PluginsManager;
+class Plugin;
 
 //***************************************************************************
 // Class Core
@@ -62,21 +64,21 @@ public:
 
 
 //---------------------------------------------------------------------------
-    bool        is_done(const std::string& file, double& percent_done);
-    int         open_file(const std::string& filename, bool& registered, bool force_analyze = false);
+    bool        is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
+    int         open_file(const std::string& filename, bool& registered, const std::vector<std::string>& options, bool force_analyze = false);
     int         remove_report(const std::vector<std::string>& files);
     int         get_report(const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
                            const std::vector<std::string>& files,
                            const std::vector<std::string>& policies_names,
                            const std::vector<std::string>& policies_contents,
+                           const std::map<std::string, std::string>& options,
                            MediaConchLib::ReportRes* res,
                            const std::string* display_names = NULL,
                            const std::string* display_contents = NULL);
-    int         get_reports_output_Text_Implementation(const std::vector<std::string>& files, std::string& report, bool& is_valid);
-    int         get_reports_output_Xml_Implementation(const std::vector<std::string>& files, std::string& report, bool& is_valid);
     int         get_reports_output_JStree(const std::vector<std::string>& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         get_reports_output_Html(const std::vector<std::string>& file, const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         policies_check(const std::vector<std::string>& files,
+                               const std::map<std::string, std::string>& options,
                                MediaConchLib::ReportRes *result,
                                const std::vector<std::string>* policies_names = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
@@ -92,6 +94,9 @@ public:
     int  transform_with_xslt_file(const std::string& report, const std::string& Xslt, std::string& result);
     int  transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
 
+    int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int  get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
+
     Policies policies;
     std::string xslt_display;
 
@@ -99,6 +104,8 @@ public:
     void load_configuration();
     void set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
+    void load_plugins_configuration();
+    void set_plugins_configuration_file(const std::string& file);
     void set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
     void create_default_implementation_schema();
@@ -107,17 +114,22 @@ public:
     void set_compression_mode(MediaConchLib::compression compress);
     int get_ui_poll_request() const;
     int get_ui_database_path(std::string& path) const;
+    const std::map<std::string, Plugin*>& get_format_plugins() const;
 
     bool is_using_daemon() const;
     void get_daemon_address(std::string& addr, int& port) const;
 
-    //General Database
+    //General Report Database
     void load_database();
     bool database_is_enabled() const;
-    void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfoList* MI);
+    void register_file_to_database(std::string& file, MediaInfoNameSpace::MediaInfo* MI);
+    void register_file_to_database(std::string& file, const std::string& report, MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfo* curMI);
     void create_report_mi_xml(const std::vector<std::string>& filename, std::string& report);
     void create_report_mt_xml(const std::vector<std::string>& filename, std::string& report);
-    void create_report_ma_xml(const std::vector<std::string>& files, std::string& report, bitset<MediaConchLib::report_Max> reports);
+    void create_report_mmt_xml(const std::vector<std::string>& filename, std::string& report);
+    void create_report_ma_xml(const std::vector<std::string>& files, const std::map<std::string, std::string>& options, std::string& report, bitset<MediaConchLib::report_Max> reports);
+    void create_report_verapdf_xml(const std::vector<std::string>& files, std::string& report);
+    void create_report_dpfmanager_xml(const std::vector<std::string>& files, std::string& report);
 
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
@@ -126,37 +138,47 @@ public:
     static std::string get_local_data_path();
     static std::string get_local_config_path();
 
+    bool        accepts_https();
+    static void unify_no_https(std::string& str);
+
 private:
     Core (const Core&);
 
-    MediaInfoNameSpace::MediaInfoList* MI;
-    Database*                          db;
+    MediaInfoNameSpace::MediaInfo     *MI;
+    DatabaseReport*                    db;
     CriticalSection                    db_mutex;
     static const std::string           database_name;
     Configuration*                     config;
     std::string                        configuration_file;
+    std::string                        plugins_configuration_file;
     std::map<std::string, std::string> implementation_options;
     //TODO: remove with the daemon
     Scheduler                         *scheduler;
+    PluginsManager                    *pluginsManager;
     MediaConchLib::compression         compression_mode;
 
     bool policies_check_contents(const std::vector<std::string>& files,
+                                 const std::map<std::string, std::string>& options,
                                  const std::vector<std::string>& policies_contents,
                                  std::stringstream& Out);
     bool policies_check_files(const std::vector<std::string>& files,
+                              const std::map<std::string, std::string>& options,
                               const std::vector<std::string>& policies_names,
                               std::stringstream& Out);
     bool policy_is_valid(const std::string& report);
+    bool verapdf_report_is_valid(const std::string& report);
+    bool dpfmanager_report_is_valid(const std::string& report);
 
     //Helper
     bool validation(const std::vector<std::string>& files, Schema* S, std::string& report);
     bool validate_schematron_policy(const std::vector<std::string>& files, int pos, std::string& report);
     bool validate_schematron_policy_from_memory(const std::vector<std::string>& files, const std::string& memory, std::string& report);
     bool validate_schematron_policy_from_file(const std::vector<std::string>& files, const std::string& policy, std::string& report);
-    bool validate_xslt_policy(const std::vector<std::string>& files, int pos, std::string& report);
-    bool validate_xslt_policy_from_memory(const std::vector<std::string>& files, const std::string& memory, std::string& report, bool is_implem=false);
-    bool validate_xslt_policy_from_file(const std::vector<std::string>& files, const std::string& policy, std::string& report);
+    bool validate_xslt_policy(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, int pos, std::string& report);
+    bool validate_xslt_policy_from_memory(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& memory, std::string& report, bool is_implem=false);
+    bool validate_xslt_policy_from_file(const std::vector<std::string>& files, const std::map<std::string, std::string>& opts, const std::string& policy, std::string& report);
     bool is_schematron_file(const std::string& file);
+    void unify_implementation_options(std::map<std::string, std::string>& opts);
 
     int transform_with_xslt_text_memory(const std::string& report, std::string& result);
     int transform_with_xslt_html_memory(const std::string& report, std::string& result);
@@ -165,32 +187,39 @@ private:
     bool   file_is_registered_in_db(const std::string& file);
     bool   file_is_registered_in_queue(const std::string& file);
     std::string get_last_modification_file(const std::string& file);
+    bool        file_is_existing(const std::string& filename);
     void compress_report(std::string& report, MediaConchLib::compression& compress);
+    void compress_report_copy(std::string& report, const char* src, size_t src_len, MediaConchLib::compression& compress);
     int  uncompress_report(std::string& report, MediaConchLib::compression compress);
     void get_report_saved(const std::vector<std::string>& file, MediaConchLib::report reportKind, MediaConchLib::format f, std::string& report);
-    void get_reports_output(const std::vector<std::string>& file, MediaConchLib::format f,
+    void get_reports_output(const std::vector<std::string>& files,
+                            const std::map<std::string, std::string>& options,
+                            MediaConchLib::format f,
                             std::bitset<MediaConchLib::report_Max> report_set,
                             MediaConchLib::ReportRes* result);
-    bool get_implementation_report(const std::vector<std::string>& file, std::string& report);
+    bool get_implementation_report(const std::vector<std::string>& file, const std::map<std::string, std::string>& options, std::string& report);
+    bool get_verapdf_report(const std::string& file, std::string& report);
+    bool get_dpfmanager_report(const std::string& file, std::string& report);
 
     void register_file_to_database(std::string& file);
+    void register_report_xml_to_database(std::string& file, const std::string& time,
+                                         const std::string& report,
+                                         MediaConchLib::report report_kind);
     void register_report_mediainfo_text_to_database(std::string& file, const std::string& time,
-                                                    MediaInfoNameSpace::MediaInfoList* MI);
+                                                    MediaInfoNameSpace::MediaInfo* MI);
     void register_report_mediainfo_xml_to_database(std::string& file, const std::string& time,
-                                                   MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediatrace_text_to_database(std::string& file, const std::string& time,
-                                                     MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_mediatrace_xml_to_database(std::string& file, const std::string& time,
-                                                    MediaInfoNameSpace::MediaInfoList* MI);
-    void register_report_implementation_xml_to_database(const std::string& file, const std::string& time,
-                                                        std::string& report);
+                                                   MediaInfoNameSpace::MediaInfo* MI);
+    void register_report_micromediatrace_xml_to_database(std::string& file, const std::string& time,
+                                                         MediaInfoNameSpace::MediaInfo* MI);
     void get_content_of_media_in_xml(std::string& report);
     //No idea how to do it better way
     bitset<MediaConchLib::report_Max> get_bitset_with_mi_mt();
+    bitset<MediaConchLib::report_Max> get_bitset_with_mi_mmt();
 
     std::string get_config_file();
     std::string get_database_path();
-    Database *get_db();
+    DatabaseReport *get_db();
+    void xml_escape_attributes(std::string& xml);
 };
 
 }

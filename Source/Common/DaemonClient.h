@@ -47,17 +47,24 @@ public:
     // file_from_id
     int file_from_id(int id, std::string& filename);
 
+    // default_values_for_type
+    int default_values_for_type(const std::string& type, std::vector<std::string>& values);
+
+    // create_policy_from_file
+    int create_policy_from_file(const std::string& id, std::string& policy);
+
     // Analyze
     int analyze(const std::string& file, bool& registered, bool force_analyze);
 
     // Status
-    int is_done(const std::string& file, double& done);
+    int is_done(const std::string& file, double& done, MediaConchLib::report& report_kind);
 
     // Report
     int get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
                    const std::vector<std::string>& files,
                    const std::vector<std::string>& policies_names,
                    const std::vector<std::string>& policies_contents,
+                   const std::map<std::string, std::string>& options,
                    MediaConchLib::ReportRes* result,
                    const std::string* display_name = NULL,
                    const std::string* display_content = NULL);
