@@ -69,33 +69,38 @@
     <xsl:text>******************************************************************************&#xa;</xsl:text>
   </xsl:template>
   <xsl:template match="mc:policy">
-    <xsl:text>*****************&#xa;</xsl:text>
+    <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
     <xsl:text>* Policy Checks *&#xa;</xsl:text>
-    <xsl:text>*****************&#xa;</xsl:text>
     <xsl:if test="@name != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Name: </xsl:text>
       <xsl:value-of select="@name"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="mc:description != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Description: </xsl:text>
       <xsl:value-of select="mc:description"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
+    <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
     <xsl:text>Outcome: </xsl:text>
     <xsl:value-of select="@outcome"/>
     <xsl:text>&#xa;</xsl:text>
     <xsl:if test="@rules_run != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Rules run: </xsl:text>
       <xsl:value-of select="@rules_run"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="@fail_count != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Fail count: </xsl:text>
       <xsl:value-of select="@fail_count"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="@pass_count != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Pass count: </xsl:text>
       <xsl:value-of select="@pass_count"/>  
       <xsl:text>&#xa;</xsl:text>
@@ -103,16 +108,21 @@
     <xsl:apply-templates select="mc:rule|mc:policy"/>
   </xsl:template>
   <xsl:template match="mc:rule">
-    <xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
+    <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+    <xsl:value-of select="substring('------------------------------------------------------------------------------',1,80-count(ancestor::*))"/>
+    <xsl:text>&#xa;</xsl:text>
     <xsl:if test="@xpath != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Xpath: </xsl:text>
       <xsl:value-of select="@xpath"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
+    <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
     <xsl:text>Outcome: </xsl:text>
     <xsl:value-of select="@outcome"/>
     <xsl:text>&#xa;</xsl:text>
     <xsl:if test="@actual != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Actual: </xsl:text>
       <xsl:value-of select="@actual"/>
       <xsl:text>&#xa;</xsl:text>
