@@ -83,6 +83,12 @@
       <xsl:value-of select="mc:description"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
+    <xsl:if test="@type != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Type: </xsl:text>
+      <xsl:value-of select="@type"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
     <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
     <xsl:text>Outcome: </xsl:text>
     <xsl:value-of select="@outcome"/>
