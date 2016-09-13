@@ -5,10 +5,13 @@ function initPage() {
     // Make buttons in policy rule form display inline
     // Duplicate button
     $('#xslPolicyRule_DuplicateRule').parent().addClass('xslPolicyRuleDuplicateButton');
+    $('#xslPolicyRuleMt_DuplicateRule').parent().addClass('xslPolicyRuleDuplicateButton');
     // Save button
     $('#xslPolicyRule_SaveRule').parent().addClass('xslPolicyRuleSaveButton');
+    $('#xslPolicyRuleMt_SaveRule').parent().addClass('xslPolicyRuleSaveButton');
     // Delete button
     $('#xslPolicyRule_DeleteRule').parent().addClass('xslPolicyRuleDeleteButton');
+    $('#xslPolicyRuleMt_DeleteRule').parent().addClass('xslPolicyRuleDeleteButton');
 
     policyTreeAffix.init();
     formBindings();
@@ -25,6 +28,12 @@ function setSelect2Plugin() {
     });
 
     $('#xslPolicyRule_validator').select2({
+        theme: 'bootstrap',
+        width: '100%',
+        minimumResultsForSearch: Infinity
+    });
+
+    $('#xslPolicyRuleMt_validator').select2({
         theme: 'bootstrap',
         width: '100%',
         minimumResultsForSearch: Infinity
@@ -78,6 +87,80 @@ function formBindings() {
         }
     });
 
+    // Policy rule MT edit form
+    $('form[name="xslPolicyRuleMt"]').on('submit', function (e) {
+        e.preventDefault();
+
+        // Duplicate
+        if ('xslPolicyRuleMt_DuplicateRule' == $('button[type=submit][clicked=true]').prop('id')) {
+            policyTreeAjax.ruleDuplicate(policyTree.getParentPolicyId(), policyTree.getSelectedNode(), policyTree.getParentPolicy());
+        }
+        // Delete
+        else if ('xslPolicyRuleMt_DeleteRule' == $('button[type=submit][clicked=true]').prop('id')) {
+            policyTreeAjax.ruleDelete(policyTree.getParentPolicyId(), policyTree.getSelectedNode());
+        }
+        // Edit
+        else {
+            policyTreeAjax.ruleEdit($(this), policyTree.getParentPolicyId(), policyTree.getSelectedNode());
+        }
+    });
+
+    // Policy rule duplicate
+    $('#xslPolicyRule_DuplicateRule').on('click', function (e) {
+        e.preventDefault();
+
+        policyTreeAjax.ruleDuplicate(policyTree.getParentPolicyId(), policyTree.getSelectedNode(), policyTree.getParentPolicy());
+    });
+
+    // Policy rule MT duplicate
+    $('#xslPolicyRuleMt_DuplicateRule').on('click', function (e) {
+        e.preventDefault();
+
+        policyTreeAjax.ruleDuplicate(policyTree.getParentPolicyId(), policyTree.getSelectedNode(), policyTree.getParentPolicy());
+    });
+
+    // Policy rule delete
+    $('#xslPolicyRule_DeleteRule').on('click', function (e) {
+        e.preventDefault();
+
+        policyTreeAjax.ruleDelete(policyTree.getParentPolicyId(), policyTree.getSelectedNode());
+    });
+
+    // Policy rule MT delete
+    $('#xslPolicyRuleMt_DeleteRule').on('click', function (e) {
+        e.preventDefault();
+
+        policyTreeAjax.ruleDelete(policyTree.getParentPolicyId(), policyTree.getSelectedNode());
+    });
+
+    // Policy rule edit form trackType select list
+    $('#xslPolicyRule_trackType').on('change', function() {
+        if ('undefined' === $('#xslPolicyRule_field').val()) {
+            var field = null;
+        }
+        else {
+            var field = $('#xslPolicyRule_field').val();
+        }
+
+        policyTreeRulesMI.loadFieldsList($('#xslPolicyRule_trackType').val(), field);
+        policyTreeRulesMI.displayOccurenceField($('#xslPolicyRule_trackType').val());
+    });
+
+    // Policy rule edit form field select list
+    $('#xslPolicyRule_field').on('change', function() {
+        policyTreeRulesMI.loadValuesList($('#xslPolicyRule_trackType').val(), $('#xslPolicyRule_field').val(), $('#xslPolicyRule_value').val());
+    });
+
+    // Policy rule edit form validator select list
+    $('#xslPolicyRule_validator').on('change', function() {
+        policyTreeRulesMI.displayValueField($('#xslPolicyRule_validator').val());
+    })
+
+    // Policy rule MT edit form validator select list
+    $('#xslPolicyRuleMt_validator').on('change', function() {
+        policyTreeRulesMT.displayValueField($('#xslPolicyRuleMt_validator').val());
+    })
+
     // Multiple form button click
     $('form[name="xslPolicyRule"] button[type=submit]').on('click', function() {
         $('form[name="xslPolicyRule"] button[type=submit]').removeAttr('clicked');
@@ -112,55 +195,15 @@ function buttonBindings() {
         policyTreeAjax.policyCreate(policyTree.getSelectedNode(), policyTree.getPolicyId());
     });
 
-
-    // Create policy rules
-    $('#xslPolicyRule_validator').on('change', function() {
-        displayValueField($('#xslPolicyRule_validator').val());
-    })
-
-    $('#xslPolicyRule_trackType').on('change', function() {
-        loadFieldsList($('#xslPolicyRule_trackType').val(), $('#xslPolicyRule_field').val());
-        displayOccurenceField($('#xslPolicyRule_trackType').val());
+    // MediaInfo rule
+    $('.ruleMediaInfo').on('click', function () {
+        policyTreeRulesMI.display(policyTree.getSelectedNode());
     });
 
-    $('#xslPolicyRule_field').on('change', function() {
-        loadValuesList($('#xslPolicyRule_trackType').val(), $('#xslPolicyRule_field').val(), $('#xslPolicyRule_value').val());
+    // MediaTrace rule
+    $('.ruleMediaTrace').on('click', function () {
+        policyTreeRulesMT.display(policyTree.getSelectedNode());
     });
-}
-
-function displayValueField(validator) {
-    if ('exists' == validator || 'does_not_exist' == validator) {
-        $('#xslPolicyRule_value').parent().addClass('hidden');
-    }
-    else {
-        $('#xslPolicyRule_value').parent().removeClass('hidden');
-    }
-}
-
-function loadFieldsList(trackType, field) {
-    policyTreeAjax.getFieldsList(trackType, field);
-
-    if (field) {
-        $('#xslPolicyRule_field').trigger('change');
-    }
-}
-
-function displayOccurenceField(trackType) {
-    if ('General' == trackType) {
-        $('#xslPolicyRule_occurrence').prop('disabled', true);
-        $('#xslPolicyRule_occurrence').val('*');
-    }
-    else {
-        $('#xslPolicyRule_occurrence').prop('disabled', false);
-    }
-}
-
-function loadValuesList(trackType, field, value) {
-    if (trackType && field) {
-        policyTreeAjax.getValuesList(trackType, field, value);
-
-        $('#xslPolicyRule_value').trigger('change');
-    }
 }
 
 $(document).ready(function() {

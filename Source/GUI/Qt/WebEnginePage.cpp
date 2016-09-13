@@ -827,6 +827,16 @@ namespace MediaConch
         else
             rule_data += ",\"value\":\"\"";
 
+        len = r->scope.length();
+        if (len > 0)
+        {
+            QString scope = QString().fromUtf8(r->scope.c_str(), r->scope.length());
+            string_to_json(scope);
+            rule_data += QString(",\"scope\":\"%1\"").arg(scope);
+        }
+        else
+            rule_data += ",\"scope\":\"\"";
+
         rule_data += "}";
     }
 
@@ -1115,7 +1125,7 @@ namespace MediaConch
         return json;
     }
 
-    QString WebPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value)
+    QString WebPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope)
     {
         std::string err;
         QString json;
@@ -1127,6 +1137,7 @@ namespace MediaConch
         rule.field         = field.toUtf8().data();
         rule.occurrence    = occurrence;
         rule.value         = value.toUtf8().data();
+        rule.scope         = scope.toUtf8().data();
 
         int code;
         if ((code = mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err)) < 0)

@@ -28,6 +28,8 @@
         <file alias="policyTree.js">html/js/policyTree.js</file>
         <file alias="policyTreePolicies.js">html/js/policyTreePolicies.js</file>
         <file alias="policyTreeRules.js">html/js/policyTreeRules.js</file>
+        <file alias="policyTreeRulesMI.js">html/js/policyTreeRulesMI.js</file>
+        <file alias="policyTreeRulesMT.js">html/js/policyTreeRulesMT.js</file>
         <file alias="policyTreeAffix.js">html/js/policyTreeAffix.js</file>
         <file alias="policyWebEngine.js">html/js/policyWebEngine.js</file>
         <file alias="policyWebKit.js">html/js/policyWebKit.js</file>

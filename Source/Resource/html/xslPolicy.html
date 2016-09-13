@@ -80,62 +80,110 @@
     </div>
 
     <div class="row policyEditRule hidden">
-      <form name="xslPolicyRule" method="post" action="">
-        <div id="xslPolicyRule">
-          <div class="form-group">
-            <label class="control-label" for="xslPolicyRule_title">Rule name</label>
-            <input type="text" id="xslPolicyRule_title" name="xslPolicyRule[title]" class="form-control" value="New rule" />
-          </div>
-          <div class="form-group">
-            <label class="control-label required" for="xslPolicyRule_trackType">Track type</label>
-            <select id="xslPolicyRule_trackType" name="xslPolicyRule[trackType]" required="required" class="form-control">
-              <option value="" selected="selected">Choose a track type</option>
-              <option value="General" >General</option>
-              <option value="Video" >Video</option>
-              <option value="Audio" >Audio</option>
-              <option value="Text" >Text</option>
-              <option value="Other" >Other</option>
-              <option value="Image" >Image</option>
-              <option value="Menu" >Menu</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="control-label required" for="xslPolicyRule_field">Field</label>
-            <select id="xslPolicyRule_field" name="xslPolicyRule[field]" required="required" class="form-control">
-              <option value="" selected="selected">Choose a field</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="control-label required" for="xslPolicyRule_occurrence">Occurrence</label>
-            <input type="text" id="xslPolicyRule_occurrence" name="xslPolicyRule[occurrence]" required="required" class="form-control" value="1" />
-          </div>
-          <div class="form-group">
-            <label class="control-label required" for="xslPolicyRule_validator">Validator</label>
-            <select id="xslPolicyRule_validator" name="xslPolicyRule[validator]" required="required" class="form-control">
-              <option value="" selected="selected">Choose a validator</option>
-              <option value="=" >Is equal (==)</option>
-              <option value="!=" >Is not equal (!=)</option>
-              <option value="&lt;" >Is less than (&lt;)</option>
-              <option value="&lt;=" >Is less or equal than (&lt;=)</option>
-              <option value="&gt;" >Is greater than (&gt;)</option>
-              <option value="&gt;=" >Is greater or equal than (&gt;=)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="control-label" for="xslPolicyRule_value">Value</label>
-            <input type="text" id="xslPolicyRule_value" name="xslPolicyRule[value]" class="form-control" />
-          </div>
-          <div class="form-group">
-            <button type="submit" id="xslPolicyRule_SaveRule" name="xslPolicyRule[SaveRule]" class="btn-warning btn">Save</button>
-          </div>
-          <div class="form-group">
-            <button type="submit" id="xslPolicyRule_DuplicateRule" name="xslPolicyRule[DuplicateRule]" class="btn-warning btn">Duplicate</button>
-          </div>
-          <div class="form-group">
-            <button type="submit" id="xslPolicyRule_DeleteRule" name="xslPolicyRule[DeleteRule]" class="btn-danger btn">Delete</button>
-          </div>
+      <div class="form-group">
+        <label class="control-label">Rule type</label>
+        <div class="btn-group btn-group-sm" role="group">
+          <button type="button" class="btn btn-default ruleMediaInfo active">MediaInfo</button>
+          <button type="button" class="btn btn-default ruleMediaTrace">MediaTrace</button>
         </div>
-      </form>
+      </div>
+      <div class="ruleMediaInfoActions">
+        <form name="xslPolicyRule" method="post" action="">
+          <div id="xslPolicyRule">
+            <div class="form-group">
+              <label class="control-label" for="xslPolicyRule_title">Rule name</label>
+              <input type="text" id="xslPolicyRule_title" name="xslPolicyRule[title]" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="control-label required" for="xslPolicyRule_trackType">Track type</label>
+              <select id="xslPolicyRule_trackType" name="xslPolicyRule[trackType]" required="required" class="form-control">
+                <option value="" selected="selected">Choose a track type</option>
+                <option value="General">General</option>
+                <option value="Video">Video</option>
+                <option value="Audio">Audio</option>
+                <option value="Text">Text</option>
+                <option value="Other">Other</option>
+                <option value="Image">Image</option>
+                <option value="Menu">Menu</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label required" for="xslPolicyRule_field">Field</label>
+              <select id="xslPolicyRule_field" name="xslPolicyRule[field]" required="required" class="form-control">
+                <option value="" selected="selected">Choose a field</option>
+            </select></div><div class="form-group">
+              <label class="control-label" for="xslPolicyRule_occurrence">Occurrence</label>
+              <input type="number" id="xslPolicyRule_occurrence" name="xslPolicyRule[occurrence]" min="1" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="xslPolicyRule_validator">Validator</label>
+              <select id="xslPolicyRule_validator" name="xslPolicyRule[validator]" class="form-control">
+                <option value="">Must exist</option>
+                <option value="=">Is equal (=)</option>
+                <option value="!=">Is not equal (!=)</option>
+                <option value="&lt;">Is less than (&lt;)</option>
+                <option value="&lt;=">Is less or equal than (&lt;=)</option>
+                <option value="&gt;">Is greater than (&gt;)</option>
+                <option value="&gt;=">Is greater or equal than (&gt;=)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label required" for="xslPolicyRule_value">Value</label>
+              <input type="text" id="xslPolicyRule_value" name="xslPolicyRule[value]" required="required" class="form-control" />
+            </div>
+            <input type="hidden" id="xslPolicyRule_scope" name="xslPolicyRule[scope]" />
+            <div class="form-group">
+              <button type="submit" id="xslPolicyRule_SaveRule" name="xslPolicyRule[SaveRule]" class="btn-warning btn">Save</button>
+            </div>
+            <div class="form-group">
+              <button type="submit" id="xslPolicyRule_DuplicateRule" name="xslPolicyRule[DuplicateRule]" class="btn-warning btn">Duplicate</button>
+            </div>
+            <div class="form-group">
+              <button type="submit" id="xslPolicyRule_DeleteRule" name="xslPolicyRule[DeleteRule]" class="btn-danger btn">Delete</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="ruleMediaTraceActions">
+        <form name="xslPolicyRuleMt" method="post" action="">
+          <div id="xslPolicyRuleMt">
+            <div class="form-group">
+              <label class="control-label" for="xslPolicyRuleMt_title">Rule name</label>
+              <input type="text" id="xslPolicyRuleMt_title" name="xslPolicyRuleMt[title]" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="control-label required" for="xslPolicyRuleMt_field">Field</label>
+              <input type="text" id="xslPolicyRuleMt_field" name="xslPolicyRuleMt[field]" required="required" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="xslPolicyRuleMt_validator">Validator</label>
+              <select id="xslPolicyRuleMt_validator" name="xslPolicyRuleMt[validator]" class="form-control">
+                <option value="">Must exist</option>
+                <option value="=">Is equal (=)</option>
+                <option value="!=">Is not equal (!=)</option>
+                <option value="&lt;">Is less than (&lt;)</option>
+                <option value="&lt;=">Is less or equal than (&lt;=)</option>
+                <option value="&gt;">Is greater than (&gt;)</option>
+                <option value="&gt;=">Is greater or equal than (&gt;=)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="xslPolicyRuleMt_value">Value</label>
+              <input type="text" id="xslPolicyRuleMt_value" name="xslPolicyRuleMt[value]" class="form-control" />
+            </div>
+            <input type="hidden" id="xslPolicyRuleMt_scope" name="xslPolicyRuleMt[scope]" value="mt" />
+            <div class="form-group">
+              <button type="submit" id="xslPolicyRuleMt_SaveRule" name="xslPolicyRuleMt[SaveRule]" class="btn-warning btn">Save</button>
+            </div>
+            <div class="form-group">
+              <button type="submit" id="xslPolicyRuleMt_DuplicateRule" name="xslPolicyRuleMt[DuplicateRule]" class="btn-warning btn">Duplicate</button>
+            </div>
+            <div class="form-group">
+              <button type="submit" id="xslPolicyRuleMt_DeleteRule" name="xslPolicyRuleMt[DeleteRule]" class="btn-danger btn">Delete</button>
+            </div>
+          </div>
+        </form>
+      </div>
       <p>Fields marked by asterisks (*) are required</p>
     </div>
   </div>

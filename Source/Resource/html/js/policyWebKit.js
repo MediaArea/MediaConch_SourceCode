@@ -176,31 +176,63 @@ var policyTreeAjax = (function() {
          * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
          */
 
-        var name = $("#xslPolicyRule_title").val();
-        if (name === null)
-            name = "";
+        var scope = "";
+        var name = "";
+        var tracktype = "";
+        var field = "";
+        var occurrence = -1;
+        var ope = "";
+        var value = "";
 
-        var tracktype = $("#xslPolicyRule_trackType").val();
-        if (tracktype === null)
-            tracktype = "";
+        if ($(".ruleMediaTrace").hasClass("active"))
+            scope = "mt";
 
-        var field = $("#xslPolicyRule_field").val();
-        if (field === null)
-            field = "";
+        if (scope === "mt")
+        {
+            name = $("#xslPolicyRuleMt_title").val();
+            if (name === null)
+                name = "";
 
-        var occurrence = $("#xslPolicyRule_occurrence").val();
-        if (occurrence === null || occurrence === "*")
-            occurrence = -1;
+            field = $("#xslPolicyRuleMt_field").val();
+            if (field === null)
+                field = "";
 
-        var ope = $("#xslPolicyRule_validator").val();
-        if (ope === null)
-            ope = "";
+            ope = $("#xslPolicyRuleMt_validator").val();
+            if (ope === null)
+                ope = "";
 
-        var value = $("#xslPolicyRule_value").val();
-        if (value === null)
-            value = "";
+            value = $("#xslPolicyRuleMt_value").val();
+            if (value === null)
+                value = "";
+        }
+        else
+        {
+            name = $("#xslPolicyRule_title").val();
+            if (name === null)
+                name = "";
 
-        res = webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, value);
+            tracktype = $("#xslPolicyRule_trackType").val();
+            if (tracktype === null)
+                tracktype = "";
+
+            field = $("#xslPolicyRule_field").val();
+            if (field === null)
+                field = "";
+
+            occurrence = $("#xslPolicyRule_occurrence").val();
+            if (occurrence === null || occurrence === "*" || occurrence === "")
+                occurrence = -1;
+
+            ope = $("#xslPolicyRule_validator").val();
+            if (ope === null)
+                ope = "";
+
+            value = $("#xslPolicyRule_value").val();
+            if (value === null)
+                value = "";
+        }
+
+        res = webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, value, scope);
         data = JSON.parse(res);
         if (!data.error)
             policyTree.ruleEdit(data.rule, ruleNode);
@@ -269,12 +301,17 @@ var policyTreeAjax = (function() {
          *
          * @return json
          */
+        if (trackType === null)
+            trackType = "";
+        if (field === null)
+            field = "";
+
         res = webpage.get_fields_list(trackType, field);
         data = JSON.parse(res);
         if (!data.error)
-            policyTreeRules.fieldsListOk(data.fields, field)
+            policyTreeRulesMI.fieldsListOk(data.fields, field)
         else
-            policyTreeRules.fieldsListError(field);
+            policyTreeRulesMI.fieldsListError(field);
     }
 
     var getValuesList = function(trackType, field, value) {
@@ -283,12 +320,19 @@ var policyTreeAjax = (function() {
          *
          * @return json
          */
+        if (trackType === null)
+            trackType = "";
+        if (field === null)
+            field = "";
+        if (value === null)
+            value = "";
+
         res = webpage.get_values_list(trackType, field, value);
         data = JSON.parse(res);
         if (!data.error)
-            policyTreeRules.valuesListOk(data.values, value);
+            policyTreeRulesMI.valuesListOk(data.values, value);
         else
-            policyTreeRules.valuesListError(value);
+            policyTreeRulesMI.valuesListError(value);
     }
 
     return {

@@ -93,7 +93,7 @@ public Q_SLOTS:
     QString      policy_remove(int id);
     QString      policy_edit(int id, const QString& name, const QString& description, const QString& type);
     QString      xslt_policy_rule_create(int policy_id);
-    QString      xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value);
+    QString      xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& mt);
     QString      xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id);
     QString      xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id);
     QString      xslt_policy_rule_delete(int policy_id, int rule_id);

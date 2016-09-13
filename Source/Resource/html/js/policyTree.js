@@ -330,12 +330,7 @@ var policyTree = (function() {
             mcoMessage.close();
             switch (data.node.type) {
                 case 'r':
-                    if ('u' == instance.get_node(data.node.parent).type) {
-                        policyTreeRules.display(data.node, false);
-                    }
-                    else {
-                        policyTreeRules.display(data.node, true);
-                    }
+                    policyTreeRules.display(data.node);
                     break;
                 case 'up':
                 case 'sp':
@@ -506,7 +501,7 @@ var policyTree = (function() {
         instance.rename_node(selectedRule, rule.name);
         selectedRule.data.tracktype = rule.tracktype;
         selectedRule.data.field = rule.field;
-        selectedRule.data.occurrence = rule.occurrence;
+        selectedRule.data.occurrence = (-1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence;
         selectedRule.data.ope = rule.ope;
         selectedRule.data.value = rule.value;
         mcoMessage.success('Rule successfuly edited');
@@ -543,7 +538,8 @@ var policyTree = (function() {
                 ruleId: rule.id,
                 tracktype: rule.tracktype,
                 field: rule.field,
-                occurrence: rule.occurrence,
+                occurrence: (-1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence,
+                scope: (undefined == rule.scope) ? '' : rule.scope,
                 ope: rule.ope,
                 value: rule.value
             }
@@ -572,4 +568,3 @@ var policyTree = (function() {
         ruleMove: ruleMove,
     };
 })();
-

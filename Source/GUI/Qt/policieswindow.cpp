@@ -122,6 +122,8 @@ void PoliciesWindow::change_qt_scripts_in_template(QString& html)
     script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreeAffix.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreePolicies.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreeRules.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreeRulesMI.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreeRulesMT.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/policy.js\"></script>\n";
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), script);
