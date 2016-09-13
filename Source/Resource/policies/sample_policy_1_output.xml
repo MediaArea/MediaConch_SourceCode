@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MediaConch xmlns="https://mediaarea.net/mediaconch" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mi="https://mediaarea.net/mediainfo" version="0.3">
   <media ref="test5.mp4">
-    <policy name="Do I like these frames?" type="or" rules_run="7" fail_count="3" pass_count="4" outcome="pass">
-      <description>NTSC is nice, so is PAL, also 320x240 cuz it's my sample file</description>
+    <policy name="Do I like these frames?" type="or" rules_run="10" fail_count="4" pass_count="6" outcome="pass">
+      <description>NTSC is nice, so is PAL, also 320x240 cuz its my sample file</description>
       <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='General'][1]/mi:Format='Matroska'" actual="MPEG-4" outcome="fail"/>
+      <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='Video']/mi:Format='AVC2'" outcome="pass"/>
+      <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Format='AVC2'" actual="AVC" outcome="fail"/>
+      <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='Video'][2]/mi:Format='AVC2'" outcome="pass"/>
       <rule xpath="mt:MediaTrace/mt:block[@name='Segment']/mt:block[@name='Cluster']/mt:block[@name='SimpleBlock']/mt:block[@name='Data']/mt:data[@name='keyframe']='Yes'" actual="" outcome="fail"/>
       <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:DisplayAspectRatio&gt;='1.0'" outcome="pass"/>
       <policy name="Here is a mediatrace-based rule" type="and" rules_run="1" fail_count="1" pass_count="0" outcome="fail">

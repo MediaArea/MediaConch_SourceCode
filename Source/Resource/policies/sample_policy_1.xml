@@ -1,6 +1,9 @@
 <policy type="or" name="Do I like these frames?">
-    <description>NTSC is nice, so is PAL, also 320x240 cuz it's my sample file</description>
+    <description>NTSC is nice, so is PAL, also 320x240 cuz its my sample file</description>
     <rule name="Jerome's favorite test" value="Format" tracktype="General" occurrence="1" operator="=">Matroska</rule>
+    <rule name="Jerome's favorite test" value="Format" tracktype="Video">AVC2</rule>
+    <rule name="Jerome's favorite test" value="Format" tracktype="Video" occurrence="1" operator="=">AVC2</rule>
+    <rule name="Jerome's favorite test" value="Format" tracktype="Video" occurrence="2" operator="=">AVC2</rule>
     <policy type="and" name="Here is a mediatrace-based rule">
       <rule scope="mt" value="EBML/EBMLVersion/Data" operator="=">2</rule>
     </policy>
