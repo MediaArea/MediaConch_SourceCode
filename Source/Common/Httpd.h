@@ -37,7 +37,7 @@ public:
     virtual int start() = 0;
     virtual int finish() = 0;
 
-    virtual int send_result(int ret_code, std::string& ret_msg, void *arg) = 0;
+    virtual int send_result(int ret_code, const std::string& ret_msg, void *arg) = 0;
 
 #define REQ_FUNC(type) \
     void get_request(std::string& json, RESTAPI::type##_Req** req);

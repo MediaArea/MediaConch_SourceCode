@@ -16,6 +16,7 @@
 #include "LibEventHttpd.h"
 #include "Common/MediaConchLib.h"
 #include <sstream>
+#include <stdlib.h>
 
 #ifdef _WIN32
 #include <process.h>
@@ -23,7 +24,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
-//---------------------------------------------------------------------------
+#include <event2/keyvalq_struct.h>
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -115,7 +116,7 @@ int LibEventHttpd::finish()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttpd::send_result(int ret_code, std::string& ret_msg, void *arg)
+int LibEventHttpd::send_result(int ret_code, const std::string& ret_msg, void *arg)
 {
     struct evhttp_request *req = (struct evhttp_request *)arg;
     struct evbuffer *evOutBuf = evbuffer_new();
@@ -914,6 +915,15 @@ void LibEventHttpd::request_coming(struct evhttp_request *req, void *arg)
 
     evHttp->error.clear();
     evHttp->result.clear();
+
+    struct evkeyvalq *kv = evhttp_request_get_input_headers(req);
+    if (evHttp->get_mediaconch_instance(kv) < 0)
+    {
+        evHttp->error = std::string("HTTP header X-App-MediaConch-Instance-ID not corresponding");
+        evHttp->send_result(410, "X-App-MediaConch-Instance-ID-INVALID", req);
+        return;
+    }
+
     switch (evhttp_request_get_command(req))
     {
         case EVHTTP_REQ_GET:
@@ -933,6 +943,31 @@ void LibEventHttpd::request_coming(struct evhttp_request *req, void *arg)
             evHttp->send_result(HTTP_BADREQUEST, ret_msg, req);
             return;
     }
+}
+
+int LibEventHttpd::get_mediaconch_instance(const struct evkeyvalq *headers)
+{
+    if (!headers)
+        return 0;
+
+    struct evkeyval *header = headers->tqh_first;
+    while (header)
+    {
+        if (header->key && !evutil_ascii_strcasecmp(header->key, "X-App-MediaConch-Instance-ID"))
+        {
+            if (!header->value)
+                return 0;
+
+            int value = strtol(header->value, NULL, 10);
+            if (value == -1)
+                return 0;
+            else if (pid != value)
+                return -1;
+        }
+        header = header->next.tqe_next;
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------

@@ -134,6 +134,10 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
     evOutHeaders = evhttp_request_get_output_headers(req);
     evhttp_add_header(evOutHeaders, "Host", address.c_str());
 
+    std::stringstream ss;
+    ss << current_daemon_id;
+    evhttp_add_header(evOutHeaders, "X-App-MediaConch-Instance-ID", ss.str().c_str());
+
     if (str.length())
     {
         struct evbuffer *evOutBuf = evhttp_request_get_output_buffer(req);;
@@ -189,16 +193,7 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
     for (struct evkeyval *header = headers->tqh_first; header; header = header->next.tqe_next)
     {
         if (header->key && std::string(header->key) == "X-App-MediaConch-Instance-ID")
-        {
-            int value = header->value ? strtol(header->value, NULL, 10) : -1;
-            if (current_daemon_id != -1 && current_daemon_id != value)
-            {
-                evHttp->error = MediaConchLib::errorHttp_CONNECT;
-                event_base_loopexit(evHttp->base, 0);
-                return;
-            }
-            current_daemon_id = value;
-        }
+            current_daemon_id = header->value ? strtol(header->value, NULL, 10) : -1;
     }
 
     std::string data;
