@@ -117,6 +117,12 @@
     <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
     <xsl:value-of select="substring('------------------------------------------------------------------------------',1,80-count(ancestor::*))"/>
     <xsl:text>&#xa;</xsl:text>
+    <xsl:if test="@name != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Name: </xsl:text>
+      <xsl:value-of select="@name"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
     <xsl:if test="@xpath != ''">
       <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Xpath: </xsl:text>
