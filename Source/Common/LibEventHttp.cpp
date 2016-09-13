@@ -181,7 +181,12 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
     int code = evhttp_request_get_response_code(req);
     if (code != HTTP_OK)
     {
-        if (code >= 400 && code < 500)
+        if (code == 410)
+        {
+            evHttp->error = MediaConchLib::errorHttp_DAEMON_RESTART;
+            current_daemon_id = -1;
+        }
+        else if (code >= 400 && code < 500)
             evHttp->error = MediaConchLib::errorHttp_INVALID_DATA;
         else
             evHttp->error = MediaConchLib::errorHttp_CONNECT;
@@ -190,10 +195,13 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
     }
 
     struct evkeyvalq *headers = evhttp_request_get_input_headers(req);
-    for (struct evkeyval *header = headers->tqh_first; header; header = header->next.tqe_next)
+    if (headers)
     {
-        if (header->key && std::string(header->key) == "X-App-MediaConch-Instance-ID")
-            current_daemon_id = header->value ? strtol(header->value, NULL, 10) : -1;
+        for (struct evkeyval *header = headers->tqh_first; header; header = header->next.tqe_next)
+        {
+            if (header->key && std::string(header->key) == "X-App-MediaConch-Instance-ID")
+                current_daemon_id = header->value ? strtol(header->value, NULL, 10) : -1;
+        }
     }
 
     std::string data;

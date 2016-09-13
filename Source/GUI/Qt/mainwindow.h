@@ -150,6 +150,7 @@ public:
     void                        remove_file_registered_from_file(const std::string& file);
 
     int                         get_ui_database_path(std::string& path);
+    void                        get_error_http(MediaConchLib::errorHttp code, QString& error_msg);
     void                        set_error_http(MediaConchLib::errorHttp code);
 
     void                          get_policies(const std::string&, MediaConchLib::Get_Policies&);

@@ -1128,9 +1128,12 @@ namespace MediaConch
         rule.occurrence    = occurrence;
         rule.value         = value.toUtf8().data();
 
-        if (mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err) < 0)
+        int code;
+        if ((code = mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;

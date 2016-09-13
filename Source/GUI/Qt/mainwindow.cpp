@@ -1261,9 +1261,8 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::set_error_http(MediaConchLib::errorHttp code)
+void MainWindow::get_error_http(MediaConchLib::errorHttp code, QString& error_msg)
 {
-    QString error_msg;
     switch (code)
     {
         case MediaConchLib::errorHttp_INVALID_DATA:
@@ -1275,10 +1274,20 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
         case MediaConchLib::errorHttp_CONNECT:
             error_msg = "Cannot connect to the daemon";
             break;
+        case MediaConchLib::errorHttp_DAEMON_RESTART:
+            error_msg = "Daemon has restarted, reload the page";
+            break;
         default:
             error_msg = "Error not known";
             break;
     }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_error_http(MediaConchLib::errorHttp code)
+{
+    QString error_msg;
+    get_error_http(code, error_msg);
     set_msg_to_status_bar(error_msg);
 }
 

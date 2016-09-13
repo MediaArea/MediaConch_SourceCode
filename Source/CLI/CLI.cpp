@@ -434,6 +434,9 @@ namespace MediaConch
                 STRINGOUT(error_mil);
                 break;
             }
+            case MediaConchLib::errorHttp_DAEMON_RESTART:
+                TEXTOUT("Daemon has restarted, try again");
+                break;
             default:
                 TEXTOUT("Internal error");
                 break;

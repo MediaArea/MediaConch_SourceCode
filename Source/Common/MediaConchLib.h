@@ -78,13 +78,14 @@ public:
 
     enum errorHttp
     {
-        errorHttp_TRUE         = 1,
-        errorHttp_NONE         = 0,
-        errorHttp_INVALID_DATA = -1,
-        errorHttp_INIT         = -2,
-        errorHttp_CONNECT      = -3,
-        errorHttp_INTERNAL     = -4,
-        errorHttp_MAX          = -5,
+        errorHttp_TRUE           = 1,
+        errorHttp_NONE           = 0,
+        errorHttp_INVALID_DATA   = -1,
+        errorHttp_INIT           = -2,
+        errorHttp_CONNECT        = -3,
+        errorHttp_INTERNAL       = -4,
+        errorHttp_DAEMON_RESTART = -5,
+        errorHttp_MAX            = -6,
     };
 
     enum PluginType
