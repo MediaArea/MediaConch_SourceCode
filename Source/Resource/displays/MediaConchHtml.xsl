@@ -279,51 +279,52 @@
           </table>
         </xsl:if>
       </xsl:for-each>
-
-      <xsl:for-each select="mc:policy">
-        <div class="mc_header">
-          <h2>
-            <xsl:value-of select="@name"/>
-          </h2>
-          <p>
-            <xsl:value-of select="mc:description"/>
-          </p>
-          <p>Rules run: <xsl:value-of select="@rules_run"/></p>
-          <p>Fail count: <xsl:value-of select="@fail_count"/></p>
-          <p>Pass count: <xsl:value-of select="@pass_count"/></p>   
-        </div>
-        <table class="mc">
-          <xsl:for-each select="mc:rule">
-            <tr>
-              <td class="mc_element">
-                <xsl:text> </xsl:text>
-                <strong>
-                  <xsl:value-of select="@xpath"/>
-                </strong>
-                <br/>
-                <xsl:text> </xsl:text>
-                <xsl:if test="@outcome = 'pass'">
-                  <xsl:text>&#x2705;  </xsl:text>
-                  <xsl:value-of select="@outcome"/>
-                </xsl:if>
-                <xsl:if test="@outcome = 'fail'">
-                  <xsl:text>&#x274C;  </xsl:text>
-                <xsl:value-of select="@outcome"/>
-                  <xsl:if test="@actual != ''">
-                    <br/>
-                    <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
-                  </xsl:if>
-                </xsl:if>
-                <xsl:if test="@outcome = 'N/A'">
-                <xsl:value-of select="@outcome"/>
-                </xsl:if>
-              </td>
-            </tr>
-          </xsl:for-each>
-        </table>
-      </xsl:for-each>
+      <xsl:apply-templates select="mc:rule|mc:policy"/>
     </xsl:for-each>
   </body>
   </html>
+  </xsl:template>
+  <xsl:template match="mc:policy">
+    <div class="mc_header">
+      <h2>
+        <xsl:value-of select="@name"/>
+      </h2>
+      <p>
+        <xsl:value-of select="mc:description"/>
+      </p>
+      <p>Rules run: <xsl:value-of select="@rules_run"/></p>
+      <p>Fail count: <xsl:value-of select="@fail_count"/></p>
+      <p>Pass count: <xsl:value-of select="@pass_count"/></p>   
+    </div>
+    <table class="mc">
+      <xsl:apply-templates select="mc:rule|mc:policy"/>
+    </table>
+  </xsl:template>
+  <xsl:template match="mc:rule">
+    <tr>
+      <td class="mc_element">
+        <xsl:text> </xsl:text>
+        <strong>
+          <xsl:value-of select="@xpath"/>
+        </strong>
+        <br/>
+        <xsl:text> </xsl:text>
+        <xsl:if test="@outcome = 'pass'">
+          <xsl:text>&#x2705;  </xsl:text>
+          <xsl:value-of select="@outcome"/>
+        </xsl:if>
+        <xsl:if test="@outcome = 'fail'">
+          <xsl:text>&#x274C;  </xsl:text>
+        <xsl:value-of select="@outcome"/>
+          <xsl:if test="@actual != ''">
+            <br/>
+            <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
+          </xsl:if>
+        </xsl:if>
+        <xsl:if test="@outcome = 'N/A'">
+        <xsl:value-of select="@outcome"/>
+        </xsl:if>
+      </td>
+    </tr>
   </xsl:template>
 </xsl:stylesheet>
