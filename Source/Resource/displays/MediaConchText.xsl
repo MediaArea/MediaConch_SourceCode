@@ -88,9 +88,11 @@
         <xsl:text>&#xa;</xsl:text>
         <xsl:for-each select="mc:rule">
           <xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
-          <xsl:text>Xpath: </xsl:text>
-          <xsl:value-of select="@xpath"/>
-          <xsl:text>&#xa;</xsl:text>
+          <xsl:if test="@xpath != ''">
+            <xsl:text>Xpath: </xsl:text>
+            <xsl:value-of select="@xpath"/>
+            <xsl:text>&#xa;</xsl:text>
+          </xsl:if>
           <xsl:text>Outcome: </xsl:text>
           <xsl:value-of select="@outcome"/>
           <xsl:text>&#xa;</xsl:text>
