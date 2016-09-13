@@ -68,24 +68,34 @@
         <xsl:text>*****************&#xa;</xsl:text>
         <xsl:text>* Policy Checks *&#xa;</xsl:text>
         <xsl:text>*****************&#xa;</xsl:text>
-        <xsl:text>Name: </xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:text>Description: </xsl:text>
-        <xsl:value-of select="mc:description"/>
-        <xsl:text>&#xa;</xsl:text>
+        <xsl:if test="@name != ''">
+          <xsl:text>Name: </xsl:text>
+          <xsl:value-of select="@name"/>
+          <xsl:text>&#xa;</xsl:text>
+        </xsl:if>
+        <xsl:if test="mc:description != ''">
+          <xsl:text>Description: </xsl:text>
+          <xsl:value-of select="mc:description"/>
+          <xsl:text>&#xa;</xsl:text>
+        </xsl:if>
         <xsl:text>Outcome: </xsl:text>
         <xsl:value-of select="@outcome"/>
         <xsl:text>&#xa;</xsl:text>
-        <xsl:text>Rules run: </xsl:text>
-        <xsl:value-of select="@rules_run"/>
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:text>Fail count: </xsl:text>
-        <xsl:value-of select="@fail_count"/>
-        <xsl:text>&#xa;</xsl:text>
-        <xsl:text>Pass count: </xsl:text>
-        <xsl:value-of select="@pass_count"/>  
-        <xsl:text>&#xa;</xsl:text>
+        <xsl:if test="@rules_run != ''">
+          <xsl:text>Rules run: </xsl:text>
+          <xsl:value-of select="@rules_run"/>
+          <xsl:text>&#xa;</xsl:text>
+        </xsl:if>
+        <xsl:if test="@fail_count != ''">
+          <xsl:text>Fail count: </xsl:text>
+          <xsl:value-of select="@fail_count"/>
+          <xsl:text>&#xa;</xsl:text>
+        </xsl:if>
+        <xsl:if test="@pass_count != ''">
+          <xsl:text>Pass count: </xsl:text>
+          <xsl:value-of select="@pass_count"/>  
+          <xsl:text>&#xa;</xsl:text>
+        </xsl:if>
         <xsl:for-each select="mc:rule">
           <xsl:text>------------------------------------------------------------------------------&#xa;</xsl:text>
           <xsl:if test="@xpath != ''">
