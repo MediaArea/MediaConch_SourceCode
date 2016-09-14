@@ -869,6 +869,8 @@ namespace MediaConch
         if ((id = mainwindow->policy_import(file, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)id, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -920,6 +922,8 @@ namespace MediaConch
         if ((id = mainwindow->xslt_policy_create(parent_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)id, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -953,6 +957,8 @@ namespace MediaConch
         if ((ret = mainwindow->policy_duplicate(id, dst_policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)ret, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -985,6 +991,8 @@ namespace MediaConch
         if ((ret = mainwindow->policy_move(id, dst_policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)ret, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -1015,9 +1023,12 @@ namespace MediaConch
         QString json;
 
         std::string err;
-        if (mainwindow->policy_remove(id, err) < 0)
+        int code;
+        if ((code = mainwindow->policy_remove(id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -1032,9 +1043,12 @@ namespace MediaConch
         //return: error?
         QString json;
         std::string err;
-        if (mainwindow->policy_export((size_t)id, err) < 0)
+        int code;
+        if ((code = mainwindow->policy_export((size_t)id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -1049,15 +1063,18 @@ namespace MediaConch
         //return: error?
         QString json;
         std::string err;
-        if (mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(), err) < 0)
+        int code;
+        if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(), err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
         }
 
-        if (mainwindow->policy_change_type((size_t)id, type.toUtf8().data(), err) < 0)
+        if ((code = mainwindow->policy_change_type((size_t)id, type.toUtf8().data(), err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             string_to_json(error);
@@ -1092,6 +1109,8 @@ namespace MediaConch
         if ((new_rule_id = mainwindow->xslt_policy_rule_create(policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)new_rule_id, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -1165,6 +1184,8 @@ namespace MediaConch
         if ((new_rule_id = mainwindow->xslt_policy_rule_duplicate(policy_id, rule_id, dst_policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)new_rule_id, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -1175,7 +1196,7 @@ namespace MediaConch
         XsltPolicyRule* r = mainwindow->xslt_policy_rule_get(dst_policy_id, new_rule_id, err);
         if (!r)
         {
-            json = "{\"error\":\"Cannot get the policy rule duplicated\"}";
+            json = "{\"error\":\"Cannot get the policy rule duplicated, please try to reload\"}";
             return json;
         }
 
@@ -1196,6 +1217,8 @@ namespace MediaConch
         if ((new_rule_id = mainwindow->xslt_policy_rule_move(policy_id, rule_id, dst_policy_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)new_rule_id, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -1207,7 +1230,7 @@ namespace MediaConch
         XsltPolicyRule* r = mainwindow->xslt_policy_rule_get(dst_policy_id, new_rule_id, err);
         if (!r)
         {
-            json = "{\"error\":\"Cannot get the policy rule moved\"}";
+            json = "{\"error\":\"Cannot get the policy rule moved, please try to reload\"}";
             return json;
         }
 
@@ -1223,9 +1246,12 @@ namespace MediaConch
     {
         std::string err;
         QString json;
-        if (mainwindow->xslt_policy_rule_delete(policy_id, rule_id, err) < 0)
+        int code;
+        if ((code = mainwindow->xslt_policy_rule_delete(policy_id, rule_id, err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
             string_to_json(error);
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
@@ -1245,7 +1271,7 @@ namespace MediaConch
         std::vector<std::string> fields;
         if (mainwindow->get_fields_for_type(type.toUtf8().data(), fields) < 0)
         {
-            json = "{\"error\":\"\"}";
+            json = "{\"error\":\"Cannot get the fields\"}";
             return json;
         }
 
@@ -1276,7 +1302,7 @@ namespace MediaConch
         std::vector<std::string> values;
         if (mainwindow->get_values_for_type_field(type.toUtf8().data(), field.toUtf8().data(), values) < 0)
         {
-            json = "{\"error\":\"\"}";
+            json = "{\"error\":\"Cannot get the values\"}";
             return json;
         }
 

@@ -30,7 +30,7 @@ public:
 protected:
     virtual bool acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request, QWebPage::NavigationType type);
     QString chooseFile(QWebFrame *frame, const QString& suggested);
-    bool    extension(Extension extension, const ExtensionOption * option = 0, ExtensionReturn * output = 0);
+    bool    extension(Extension extension, const ExtensionOption * option = 0, ExtensionReturn *output = 0);
     bool    supportsExtension(Extension extension) const;
 
     void    clean_forms();
@@ -107,7 +107,6 @@ protected:
     MainWindow                 *mainwindow;
     QMap<QString, QStringList>  file_selector;
     QString                     select_file_name;
-    QString                     button_clicked_id;
 };
 
 }
