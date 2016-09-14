@@ -75,11 +75,16 @@ int Httpd::send_result()
             error = rest.get_error();                                     \
     }
 
-    MAKE_REQ_FUNC(analyze, Analyze)
-    MAKE_REQ_FUNC(report, Report)
-    MAKE_REQ_FUNC(validate, Validate)
-    MAKE_REQ_FUNC(retry, Retry)
-    MAKE_REQ_FUNC(file_from_id, File_From_Id)
+    MAKE_REQ_FUNC(analyze, Checker_Analyze)
+    MAKE_REQ_FUNC(report, Checker_Report)
+    MAKE_REQ_FUNC(validate, Checker_Validate)
+    MAKE_REQ_FUNC(retry, Checker_Retry)
+    MAKE_REQ_FUNC(file_from_id, Checker_File_From_Id)
+
+    MAKE_REQ_FUNC(policy_import, Policy_Import);
+    MAKE_REQ_FUNC(policy_change_info, Policy_Change_Info);
+    MAKE_REQ_FUNC(policy_change_type, Policy_Change_Type);
+    MAKE_REQ_FUNC(xslt_policy_rule_edit, XSLT_Policy_Rule_Edit);
 
 #undef MAKE_REQ_FUNC
 
@@ -93,11 +98,29 @@ int Httpd::send_result()
             error = rest.get_error();                                      \
     }
 
-    MAKE_URI_REQ_FUNC(status, Status)
-    MAKE_URI_REQ_FUNC(clear, Clear)
-    MAKE_URI_REQ_FUNC(list, List)
+    MAKE_URI_REQ_FUNC(status, Checker_Status)
+    MAKE_URI_REQ_FUNC(clear, Checker_Clear)
+    MAKE_URI_REQ_FUNC(list, Checker_List)
     MAKE_URI_REQ_FUNC(default_values_for_type, Default_Values_For_Type)
-    MAKE_URI_REQ_FUNC(create_policy_from_file, Create_Policy_From_File)
+
+    MAKE_URI_REQ_FUNC(xslt_policy_create, XSLT_Policy_Create)
+    MAKE_URI_REQ_FUNC(policy_remove, Policy_Remove)
+    MAKE_URI_REQ_FUNC(policy_dump, Policy_Dump)
+    MAKE_URI_REQ_FUNC(policy_save, Policy_Save)
+    MAKE_URI_REQ_FUNC(policy_duplicate, Policy_Duplicate)
+    MAKE_URI_REQ_FUNC(policy_move, Policy_Move)
+    MAKE_URI_REQ_FUNC(policy_get, Policy_Get)
+    MAKE_URI_REQ_FUNC(policy_get_name, Policy_Get_Name)
+    MAKE_URI_REQ_FUNC(policy_get_policies_count, Policy_Get_Policies_Count)
+    MAKE_URI_REQ_FUNC(policy_clear_policies, Policy_Clear_Policies)
+    MAKE_URI_REQ_FUNC(policy_get_policies, Policy_Get_Policies)
+    MAKE_URI_REQ_FUNC(policy_get_policies_names_list, Policy_Get_Policies_Names_List)
+    MAKE_URI_REQ_FUNC(xslt_policy_create_from_file, XSLT_Policy_Create_From_File)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_create, XSLT_Policy_Rule_Create)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_get, XSLT_Policy_Rule_Get)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_duplicate, XSLT_Policy_Rule_Duplicate)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_move, XSLT_Policy_Rule_Move)
+    MAKE_URI_REQ_FUNC(xslt_policy_rule_delete, XSLT_Policy_Rule_Delete)
 
 #undef MAKE_URI_REQ_FUNC
 

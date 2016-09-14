@@ -42,3 +42,8 @@ See REST.md for more information about the API.
 If you have another need than the one provided by the CLI or GUI, feel free to implement a new one using this API.
 
 If you do so, please, send us an email to let us know (https://mediaarea.net/MediaConch/contact.html).
+
+### Restart
+
+The daemon is sending the HTTP Header X-App-MediaConch-Instance-ID with its PID.
+If the daemon is retarted, the client (Web/CLI/GUI/...) has to check if this value has change to restore the PID

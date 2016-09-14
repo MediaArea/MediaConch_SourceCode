@@ -12,7 +12,7 @@
 #include "policieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
-#include "Common/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
 #include "SQLLiteUi.h"
@@ -39,6 +39,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QTimer>
+#include <QTextStream>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -79,6 +80,13 @@ MainWindow::MainWindow(QWidget *parent) :
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
+
+    // Load policy
+    if (!MCL.get_use_daemon())
+    {
+        MCL.load_system_policy();
+        MCL.load_existing_policy();
+    }
 
     // Groups
     QActionGroup* ToolGroup = new QActionGroup(this);
@@ -121,7 +129,6 @@ MainWindow::MainWindow(QWidget *parent) :
     workerfiles.start();
 
     // Default
-    add_default_policy();
     add_default_displays();
     on_actionChecker_triggered();
 }
@@ -146,19 +153,12 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
-    int policy_i = policy.toInt();
     int display_i = display.toInt();
     int verbosity_i = v.toInt();
 
     // Save configuration used
     std::string policy_str;
-    if (policy_i >= 0)
-    {
-        Policy *p = get_policy(policy_i);
-        if (p)
-            policy_str = p->filename;
-    }
-    uisettings.change_last_policy(policy_str);
+    uisettings.change_last_policy(policy.toUtf8().data());
     uisettings.change_last_display(displays_list[display_i].toUtf8().data());
     uisettings.change_last_verbosity(verbosity_i);
 
@@ -167,7 +167,7 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
         full_path += "/";
     full_path += filename;
 
-    workerfiles.add_file_to_list(filename, filepath, policy_i, display_i, verbosity_i);
+    workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i);
     checkerView->add_file_to_result_table(full_path);
 }
 
@@ -190,7 +190,7 @@ void MainWindow::policy_to_delete(int index)
 {
     std::string err;
     //Delete policy
-    MCL.remove_policy((size_t)index, err);
+    MCL.policy_remove(-1, index, err);
 }
 
 //***************************************************************************
@@ -223,13 +223,15 @@ void MainWindow::Run()
 //---------------------------------------------------------------------------
 int MainWindow::transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result)
 {
-    return MCL.transform_with_xslt_file(report, file, result);
+    std::map<std::string, std::string> opts;
+    return MCL.transform_with_xslt_file(report, file, opts, result);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result)
 {
-    return MCL.transform_with_xslt_memory(report, memory, result);
+    std::map<std::string, std::string> opts;
+    return MCL.transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //---------------------------------------------------------------------------
@@ -267,14 +269,15 @@ QString MainWindow::ask_for_schema_file()
 }
 
 //---------------------------------------------------------------------------
-size_t MainWindow::create_policy_from_file(const QString& file)
+int MainWindow::xslt_policy_create_from_file(const QString& file)
 {
+    std::string err;
     std::string filename(file.toUtf8().data(), file.toUtf8().length());
-    size_t pos = MCL.create_policy_from_file(filename);
+    int pos = MCL.xslt_policy_create_from_file(-1, filename, err);
 
     QMessageBox::Icon icon;
     QString text;
-    if (pos != (size_t)-1)
+    if (pos != -1)
     {
         icon = QMessageBox::Information;
         text = QString("Policy from %1 is created, you can find it in the \"Policies\" tab").arg(file);
@@ -282,48 +285,13 @@ size_t MainWindow::create_policy_from_file(const QString& file)
     else
     {
         icon = QMessageBox::Critical;
-        text = QString("Cannot Create policy from %1").arg(file);
+        text = QString().fromUtf8(err.c_str(), err.size());
     }
 
     QMessageBox msgBox(icon, tr("Create policy"), text,
                        QMessageBox::NoButton, this);
     msgBox.exec();
     return pos;
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::add_default_policy()
-{
-    QDir policies_dir(":/policies");
-
-    policies_dir.setFilter(QDir::Files);
-    QFileInfoList list = policies_dir.entryInfoList();
-    for (int i = 0; i < list.count(); ++i)
-    {
-        QFile file(list[i].absoluteFilePath());
-
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            continue;
-        QByteArray schema = file.readAll();
-        std::string memory(schema.constData(), schema.length());
-        std::string err;
-        MCL.import_policy_from_memory(list[i].absoluteFilePath().toUtf8().data(), memory, err, true);
-    }
-
-    QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
-    path += "policies/";
-    policies_dir = QDir(path);
-
-    if (!policies_dir.exists())
-        policies_dir.mkpath(path);
-
-    policies_dir.setFilter(QDir::Files);
-    list = policies_dir.entryInfoList();
-    for (int i = 0; i < list.count(); ++i)
-    {
-        std::string err;
-        MCL.import_policy_from_file(list[i].absoluteFilePath().toUtf8().data(), err);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -337,7 +305,7 @@ void MainWindow::add_default_displays()
         displays_list.push_back(list[i].absoluteFilePath());
 
     QString path = QString().fromUtf8(Core::get_local_data_path().c_str());
-    path += "policies/";
+    path += "displays/";
 
     QDir dir(path);
     if (dir.exists())
@@ -368,19 +336,10 @@ void MainWindow::clear_file_list()
 }
 
 //---------------------------------------------------------------------------
-const std::vector<Policy *>& MainWindow::get_all_policies() const
+void MainWindow::get_policies(const std::string& format, MediaConchLib::Get_Policies& policies)
 {
-    return MCL.get_policies();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::get_policies(std::vector<std::pair<QString, QString> >& policies)
-{
-    const std::vector<Policy *>& list = get_all_policies();
-
-    for (size_t i = 0; i < list.size(); ++i)
-        policies.push_back(std::make_pair(QString().fromUtf8(list[i]->filename.c_str(), list[i]->filename.length()),
-                                          QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length())));
+    std::vector<int> ids;
+    MCL.policy_get_policies(-1, ids, format, policies);
 }
 
 //---------------------------------------------------------------------------
@@ -436,12 +395,12 @@ UiSettings& MainWindow::get_settings()
 
 int MainWindow::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
 {
-    return MCL.get_values_for_type_field(type, field, values);
+    return MCL.policy_get_values_for_type_field(type, field, values);
 }
 
 int MainWindow::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
 {
-    return MCL.get_fields_for_type(type, fields);
+    return MCL.policy_get_fields_for_type(type, fields);
 }
 
 //***************************************************************************
@@ -515,49 +474,13 @@ void MainWindow::on_actionChooseSchema_triggered()
         return;
 
     std::string err;
-    if (MCL.import_policy_from_file(file.toUtf8().data(), err) < 0)
+    if (policy_import(file, err) < 0)
         set_msg_to_status_bar("Policy not valid");
 
     if (!ui->actionPolicies->isChecked())
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
     Run();
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    if (!is_all_policies_saved())
-    {
-        QMessageBox msgBox(QMessageBox::Warning, tr("MediaConch"),
-                           tr("All policy changes not saved will be discarded?"),
-                           QMessageBox::Ok | QMessageBox::Save | QMessageBox::Cancel, this);
-        QString info("Policies not saved:");
-        for (size_t i = 0; i < MCL.get_policies_count(); ++i)
-            if (!MCL.get_policy(i)->saved)
-            {
-                info += "\r\n\t";
-                info += QString().fromUtf8(MCL.get_policy(i)->title.c_str());
-            }
-
-        msgBox.setInformativeText(info);
-
-        int ret = msgBox.exec();
-        if (ret == QMessageBox::Save)
-            MCL.save_policies();
-        else if (ret == QMessageBox::Cancel)
-        {
-            event->ignore();
-            return;
-        }
-    }
-    QMainWindow::closeEvent(event);
-}
-
-//---------------------------------------------------------------------------
-bool MainWindow::is_all_policies_saved()
-{
-    return MCL.is_policies_saved();
 }
 
 //***************************************************************************
@@ -649,6 +572,7 @@ void MainWindow::createPoliciesView()
     if (clearVisualElements() < 0)
         return;
 
+    MCL.reset_daemon_client();
     policiesView = new PoliciesWindow(this);
     policiesView->display_policies();
 }
@@ -745,116 +669,132 @@ void MainWindow::settings_selected()
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::import_policy(const QString& file, std::string& err)
+int MainWindow::policy_import(const QString& filename, std::string& err)
 {
-    return MCL.import_policy_from_file(file.toUtf8().data(), err);
-}
+    QFile file(filename);
 
-//---------------------------------------------------------------------------
-int MainWindow::create_xslt_policy(std::string& err)
-{
-    return MCL.create_xslt_policy(err);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::duplicate_policy(int id, std::string& err)
-{
-    return MCL.duplicate_policy(id, err);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::policy_change_name(int id, const std::string& name, const std::string& description, std::string& err)
-{
-    return MCL.policy_change_name(id, name, description, err);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::create_policy_rule(int policy_id, std::string& err)
-{
-    return MCL.create_policy_rule(policy_id, err);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err)
-{
-    return MCL.edit_policy_rule(policy_id, rule_id, rule, err);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::duplicate_policy_rule(int policy_id, int rule_id, std::string& err)
-{
-    return MCL.duplicate_policy_rule(policy_id, rule_id, err);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::delete_policy_rule(int policy_id, int rule_id, std::string& err)
-{
-    return MCL.delete_policy_rule(policy_id, rule_id, err);
-}
-
-//---------------------------------------------------------------------------
-bool MainWindow::policy_exists(const std::string& title)
-{
-    return MCL.policy_exists(title);
-}
-
-//---------------------------------------------------------------------------
-Policy* MainWindow::get_policy(size_t pos)
-{
-    return MCL.get_policy(pos);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::get_policy_index_by_filename(const std::string& filename)
-{
-    const std::vector<Policy *>&  policies = get_all_policies();
-
-    for (size_t i = 0; i < policies.size(); ++i)
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        if (policies[i] && policies[i]->filename == filename)
-            return i;
+        err = "Policy cannot be read";
+        return -1;
     }
 
-    return -1;
+    QByteArray schema = file.readAll();
+    file.close();
+
+    std::string memory(schema.constData(), schema.length());
+    return MCL.policy_import(-1, memory, err);
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::remove_policy(size_t pos, std::string& err)
+int MainWindow::xslt_policy_create(int parent_id, std::string& err)
 {
-    return MCL.remove_policy(pos, err);
+    return MCL.xslt_policy_create(-1, err, "and", parent_id);
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::add_policy(Policy* policy)
+int MainWindow::policy_duplicate(int id, int dst_policy_id, std::string& err)
 {
-    return MCL.add_policy(policy);
+    return MCL.policy_duplicate(-1, id, dst_policy_id, err);
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::save_policy(size_t pos, std::string& err)
+int MainWindow::policy_move(int id, int dst_policy_id, std::string& err)
 {
-    return MCL.save_policy(pos, err);
+    return MCL.policy_move(-1, id, dst_policy_id, err);
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::export_policy(size_t pos, std::string& err)
+int MainWindow::policy_change_info(int id, const std::string& name, const std::string& description, std::string& err)
 {
-    QString path = get_local_folder();
-    path += "/policies";
+    return MCL.policy_change_info(-1, id, name, description, err);
+}
 
-    QDir dir(path);
-    if (!dir.exists())
-        dir.mkpath(dir.absolutePath());
+//---------------------------------------------------------------------------
+int MainWindow::policy_change_type(int id, const std::string& type, std::string& err)
+{
+    return MCL.policy_change_type(-1, id, type, err);
+}
 
-    Policy* p = MCL.get_policy(pos);
-    if (!p)
+//---------------------------------------------------------------------------
+int MainWindow::xslt_policy_rule_create(int policy_id, std::string& err)
+{
+    return MCL.xslt_policy_rule_create(-1, policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+XsltPolicyRule *MainWindow::xslt_policy_rule_get(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.xslt_policy_rule_get(-1, policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err)
+{
+    return MCL.xslt_policy_rule_edit(-1, policy_id, rule_id, rule, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id, std::string& err)
+{
+    return MCL.xslt_policy_rule_duplicate(-1, policy_id, rule_id, dst_policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id, std::string& err)
+{
+    return MCL.xslt_policy_rule_move(-1, policy_id, rule_id, dst_policy_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err)
+{
+    return MCL.xslt_policy_rule_delete(-1, policy_id, rule_id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p)
+{
+    std::string err;
+    return MCL.policy_get(-1, pos, format, p, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_remove(int id, std::string& err)
+{
+    return MCL.policy_remove(-1, id, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_save(int pos, std::string& err)
+{
+    return MCL.policy_save(-1, pos, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_dump(int pos, std::string& memory, std::string& err)
+{
+    return MCL.policy_dump(-1, pos, memory, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_get_name(int pos, std::string& name, std::string& err)
+{
+    return MCL.policy_get_name(-1, pos, name, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::policy_export(int pos, std::string& err)
+{
+    std::string p_name;
+    if (MCL.policy_get_name(-1, pos, p_name, err) < 0)
         return -1;
 
     QString suggested = QString().fromUtf8(select_correct_save_policy_path().c_str());
-    suggested += "/" + QString().fromUtf8(p->title.c_str()) + ".xsl";
+    suggested += "/" + QString().fromUtf8(p_name.c_str()) + ".xml";
 
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Policy"),
-                                                    suggested, tr("XSLT (*.xsl)"));
+                                                    suggested, tr("XML (*.xml)"));
 
     if (!filename.length())
         return -1;
@@ -862,19 +802,35 @@ int MainWindow::export_policy(size_t pos, std::string& err)
     QDir info(QFileInfo(filename).absoluteDir());
     set_last_save_policy_path(info.absolutePath().toUtf8().data());
 
-    return MCL.export_policy(filename.toUtf8().data(), pos, err);
+    std::string policy;
+    if (MCL.policy_dump(-1, pos, policy, err))
+        return -1;
+
+    QFile file(filename);
+    if (file.open(QIODevice::ReadWrite))
+    {
+        QTextStream stream(&file);
+        stream << QString().fromUtf8(policy.c_str(), policy.length());
+    }
+    else
+    {
+        err = "Cannot write to file";
+        return -1;
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::clear_policies()
+int MainWindow::clear_policies(std::string& err)
 {
-    return MCL.clear_policies();
+    return MCL.policy_clear_policies(-1, err);
 }
 
 //---------------------------------------------------------------------------
 size_t MainWindow::get_policies_count() const
 {
-    return MCL.get_policies_count();
+    return MCL.policy_get_policies_count(-1);
 }
 
 //---------------------------------------------------------------------------
@@ -887,7 +843,8 @@ int MainWindow::select_correct_policy()
 
     if (!policy.length())
         return -1;
-    return get_policy_index_by_filename(policy);
+
+    return QString().fromUtf8(policy.c_str(), policy.length()).toInt();
 }
 
 //---------------------------------------------------------------------------
@@ -1015,40 +972,42 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 //---------------------------------------------------------------------------
 int MainWindow::analyze(const std::vector<std::string>& files)
 {
-    return MCL.analyze(files);
+    return MCL.checker_analyze(files);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::is_analyze_finished(const std::vector<std::string>& files, double& percent_done)
 {
-    return MCL.is_done(files, percent_done);
+    return MCL.checker_is_done(files, percent_done);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
 {
-    return MCL.is_done(file, percent_done, report_kind);
+    return MCL.checker_is_done(file, percent_done, report_kind);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::validate(MediaConchLib::report report, const std::vector<std::string>& files,
-                         const std::vector<std::string>& policies_names,
+                         const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
-                         std::vector<MediaConchLib::ValidateRes*>& result)
+                         const std::map<std::string, std::string>& options,
+                         std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
-    return MCL.validate(report, files, policies_names, policies_contents, result);
+    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, options, result);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::validate(MediaConchLib::report report, const std::string& file,
-                         const std::vector<std::string>& policies_names,
+                         const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
-                         std::vector<MediaConchLib::ValidateRes*>& result)
+                         const std::map<std::string, std::string>& options,
+                         std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
     std::vector<std::string> files;
     files.push_back(file);
 
-    return MCL.validate(report, files, policies_names, policies_contents, result);
+    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, options, result);
 }
 
 //---------------------------------------------------------------------------
@@ -1063,11 +1022,12 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
     std::vector<std::string> files;
     files.push_back(file);
 
-    MediaConchLib::ReportRes result;
+    MediaConchLib::Checker_ReportRes result;
+    std::vector<size_t> ids;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                   vec, vec,
+    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
+                   ids, vec,
                    options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1084,11 +1044,12 @@ QString MainWindow::get_mediainfo_xml(const std::string& file,
     std::vector<std::string> files;
     files.push_back(file);
 
-    MediaConchLib::ReportRes result;
+    MediaConchLib::Checker_ReportRes result;
+    std::vector<size_t> ids;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                   vec, vec,
+    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
+                   ids, vec,
                    options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1103,11 +1064,12 @@ QString MainWindow::get_mediainfo_jstree(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    MediaConchLib::ReportRes result;
+    MediaConchLib::Checker_ReportRes result;
+    std::vector<size_t> ids;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
-    MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
-                   vec, vec, options, &result);
+    MCL.checker_get_report(-1, report_set, MediaConchLib::format_JsTree, files,
+                   ids, vec, options, &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
@@ -1122,11 +1084,12 @@ QString MainWindow::get_mediatrace_xml(const std::string& file,
     std::vector<std::string> files;
     files.push_back(file);
 
-    MediaConchLib::ReportRes result;
+    MediaConchLib::Checker_ReportRes result;
+    std::vector<size_t> ids;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                   vec, vec,
+    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
+                   ids, vec,
                    options,
                    &result, &display_name, &display_content);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1141,11 +1104,12 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
     std::vector<std::string> files;
     files.push_back(file);
 
-    MediaConchLib::ReportRes result;
+    MediaConchLib::Checker_ReportRes result;
+    std::vector<size_t> ids;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
-    MCL.get_report(report_set, MediaConchLib::format_JsTree, files,
-                   vec, vec,
+    MCL.checker_get_report(-1, report_set, MediaConchLib::format_JsTree, files,
+                   ids, vec,
                    options,
                    &result);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1176,12 +1140,13 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
     std::vector<std::string> files;
     files.push_back(file);
 
-    MediaConchLib::ReportRes result;
+    MediaConchLib::Checker_ReportRes result;
+    std::vector<size_t> ids;
     std::vector<std::string> vec;
     std::map<std::string, std::string> options;
     fill_options_for_report(options, verbosity);
-    MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                   vec, vec,
+    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
+                   ids, vec,
                    options,
                    &result, dname, dcontent);
 
@@ -1212,16 +1177,6 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
         policy = fr->policy;
     }
 
-    Policy* p = get_policy((size_t)policy);
-    if (!p)
-    {
-        report = "Policy not found";
-        delete fr;
-        return 1;
-    }
-    std::string policy_content;
-    p->dump_schema(policy_content);
-
     std::string display_content;
     std::string display_name;
     const std::string* dname = NULL;
@@ -1231,18 +1186,18 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     files.push_back(file);
     delete fr;
 
-    MediaConchLib::ReportRes result;
+    MediaConchLib::Checker_ReportRes result;
     std::bitset<MediaConchLib::report_Max> report_set;
     std::vector<std::string> policies_contents;
-    policies_contents.push_back(policy_content);
-
-    std::vector<std::string> vec;
+    std::vector<size_t> policies_ids;
     std::map<std::string, std::string> options;
 
-    if (MCL.get_report(report_set, MediaConchLib::format_Xml, files,
-                       vec, policies_contents,
-                       options,
-                       &result, dname, dcontent) < 0)
+    policies_ids.push_back(policy);
+
+    if (MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
+                               policies_ids, policies_contents,
+                               options,
+                               &result, dname, dcontent) < 0)
         return 0;
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
@@ -1307,9 +1262,8 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::set_error_http(MediaConchLib::errorHttp code)
+void MainWindow::get_error_http(MediaConchLib::errorHttp code, QString& error_msg)
 {
-    QString error_msg;
     switch (code)
     {
         case MediaConchLib::errorHttp_INVALID_DATA:
@@ -1321,10 +1275,20 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
         case MediaConchLib::errorHttp_CONNECT:
             error_msg = "Cannot connect to the daemon";
             break;
+        case MediaConchLib::errorHttp_DAEMON_RESTART:
+            error_msg = "Daemon has restarted, please reload the page";
+            break;
         default:
             error_msg = "Error not known";
             break;
     }
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::set_error_http(MediaConchLib::errorHttp code)
+{
+    QString error_msg;
+    get_error_http(code, error_msg);
     set_msg_to_status_bar(error_msg);
 }
 

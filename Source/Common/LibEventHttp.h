@@ -48,7 +48,7 @@ public:
 
 private:
     struct event_base          *base;
-    struct evhttp_connection   *connection;    
+    struct evhttp_connection   *connection;
 
     static void result_coming(struct evhttp_request *req, void *arg);
 

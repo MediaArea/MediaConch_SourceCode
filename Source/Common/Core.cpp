@@ -17,24 +17,23 @@
 #include "SQLLiteReport.h"
 #include "Configuration.h"
 #include "Json.h"
-#include "Common/Schematron.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
 #include "Common/PluginsManager.h"
 #include "Common/PluginsConfig.h"
-#include "Common/ImplementationReportXsl.h"
+#include "Common/generated/ImplementationReportXsl.h"
 #if defined(_WIN32) || defined(WIN32)
-#include "Common/ImplementationReportDisplayTextXsl.h"
+#include "Common/generated/ImplementationReportDisplayTextXsl.h"
 #include <Shlobj.h>
 #else //defined(_WIN32) || defined(WIN32)
-#include "Common/ImplementationReportDisplayTextUnicodeXsl.h"
+#include "Common/generated/ImplementationReportDisplayTextUnicodeXsl.h"
 #endif //defined(_WIN32) || defined(WIN32)
-#include "Common/ImplementationReportDisplayHtmlXsl.h"
-#include "Common/ImplementationReportMatroskaSchema.h"
-#include "Common/MediaTraceDisplayTextXsl.h"
-#include "Common/MediaTraceDisplayHtmlXsl.h"
-#include "Common/MicroMediaTraceToMediaTraceXsl.h"
-#include "Common/GeneratedCSVVideos.h"
+#include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/generated/ImplementationReportMatroskaSchema.h"
+#include "Common/generated/MediaTraceDisplayTextXsl.h"
+#include "Common/generated/MediaTraceDisplayHtmlXsl.h"
+#include "Common/generated/MicroMediaTraceToMediaTraceXsl.h"
+#include "Common/generated/GeneratedCSVVideos.h"
 #include "ZenLib/Ztring.h"
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
@@ -296,7 +295,7 @@ int Core::open_file(const std::string& file, bool& registered,
 }
 
 //---------------------------------------------------------------------------
-bool Core::is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
+bool Core::checker_is_done(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
 {
     bool is_done = scheduler->element_is_finished(file, percent_done);
     int ret = MediaConchLib::errorHttp_NONE;
@@ -314,7 +313,7 @@ bool Core::is_done(const std::string& file, double& percent_done, MediaConchLib:
 }
 
 //---------------------------------------------------------------------------
-void Core::list(std::vector<std::string>& vec)
+void Core::checker_list(std::vector<std::string>& vec)
 {
     scheduler->get_elements(vec);
     db_mutex.Enter();
@@ -323,19 +322,19 @@ void Core::list(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
-                     const std::vector<std::string>& files,
-                     const std::vector<std::string>& policies_names,
-                     const std::vector<std::string>& policies_contents,
-                     const std::map<std::string, std::string>& options,
-                     MediaConchLib::ReportRes* result,
-                     const std::string* display_name,
-                     const std::string* display_content)
+int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
+                             const std::vector<std::string>& files,
+                             const std::vector<size_t>& policies_ids,
+                             const std::vector<std::string>& policies_contents,
+                             const std::map<std::string, std::string>& options,
+                             MediaConchLib::Checker_ReportRes* result,
+                             const std::string* display_name,
+                             const std::string* display_content)
 {
-    if (!policies_names.empty() || !policies_contents.empty())
+    if (!policies_ids.empty() || !policies_contents.empty())
     {
-        if (policies_check(files, options, result,
-                           policies_names.size() ? &policies_names : NULL,
+        if (check_policies(user, files, options, result,
+                           policies_ids.size() ? &policies_ids : NULL,
                            policies_contents.size() ? &policies_contents : NULL) < 0)
             return -1;
         if (f == MediaConchLib::format_Text)
@@ -362,19 +361,20 @@ int Core::get_report(const std::bitset<MediaConchLib::report_Max>& report_set, M
     }
 
     if (display_name)
-        transform_with_xslt_file(result->report, *display_name, result->report);
+        transform_with_xslt_file(result->report, *display_name, options, result->report);
     else if (display_content)
-        transform_with_xslt_memory(result->report, *display_content, result->report);
+        transform_with_xslt_memory(result->report, *display_content, options, result->report);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int Core::validate(MediaConchLib::report report, const std::vector<std::string>& files,
-                   const std::vector<std::string>& policies_names,
-                   const std::vector<std::string>& policies_contents,
-                   std::vector<MediaConchLib::ValidateRes*>& result)
+int Core::checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
+                           const std::vector<size_t>& policies_ids,
+                           const std::vector<std::string>& policies_contents,
+                           const std::map<std::string, std::string>& options,
+                           std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
-    if (report != MediaConchLib::report_MediaConch && !policies_names.size() && !policies_contents.size() &&
+    if (report != MediaConchLib::report_MediaConch && !policies_ids.size() && !policies_contents.size() &&
         report != MediaConchLib::report_MediaVeraPdf && report != MediaConchLib::report_MediaDpfManager)
         return -1;
 
@@ -384,12 +384,11 @@ int Core::validate(MediaConchLib::report report, const std::vector<std::string>&
         file_tmp.clear();
         file_tmp.push_back(files[i]);
 
-        MediaConchLib::ValidateRes* res = new MediaConchLib::ValidateRes;
+        MediaConchLib::Checker_ValidateRes* res = new MediaConchLib::Checker_ValidateRes;
         res->file = files[i];
         if (report == MediaConchLib::report_MediaConch)
         {
             //XXX
-            std::map<std::string, std::string> options;
             std::string report;
             res->valid = get_implementation_report(file_tmp, options, report);
         }
@@ -403,12 +402,11 @@ int Core::validate(MediaConchLib::report report, const std::vector<std::string>&
             std::string report;
             res->valid = get_dpfmanager_report(files[i], report);
         }
-        else if (!policies_names.empty() || !policies_contents.empty())
+        else if (!policies_ids.empty() || !policies_contents.empty())
         {
-            MediaConchLib::ReportRes tmp_res;
-            std::map<std::string, std::string> options;
-            if (policies_check(file_tmp, options, &tmp_res,
-                               policies_names.size() ? &policies_names : NULL,
+            MediaConchLib::Checker_ReportRes tmp_res;
+            if (check_policies(user, file_tmp, options, &tmp_res,
+                               policies_ids.size() ? &policies_ids : NULL,
                                policies_contents.size() ? &policies_contents : NULL) < 0)
                 continue;
             res->valid = tmp_res.has_valid ? tmp_res.valid : true;
@@ -464,26 +462,19 @@ int Core::get_reports_output_JStree(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::policies_check_contents(const std::vector<std::string>& files,
-                                   const std::map<std::string, std::string>& options,
-                                   const std::vector<std::string>& policies_contents,
-                                   std::stringstream& Out)
+bool Core::check_policies_xslts(const std::vector<std::string>& files,
+                                const std::map<std::string, std::string>& options,
+                                const std::vector<std::string>& policies,
+                                std::stringstream& Out)
 {
     bool valid = true;
-    for (size_t i = 0; i < policies_contents.size(); ++i)
+    for (size_t i = 0; i < policies.size(); ++i)
     {
         std::string tmp;
-        if (!validate_xslt_policy_from_memory(files, options, policies_contents[i], tmp))
+        if (!validate_xslt_from_memory(files, options, policies[i], tmp))
         {
-            std::string retain = tmp;
-            tmp = std::string();
-            if (!validate_schematron_policy_from_memory(files, policies_contents[i], tmp))
-            {
-                Out << retain;
-                valid = false;
-            }
-            else
-                Out << tmp;
+            valid = false;
+            Out << tmp;
         }
         else
         {
@@ -496,66 +487,10 @@ bool Core::policies_check_contents(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::policies_check_files(const std::vector<std::string>& files,
-                                const std::map<std::string, std::string>& options,
-                                const std::vector<std::string>& policies_names,
-                                std::stringstream& Out)
-{
-    bool valid = true;
-    for (size_t i = 0; i < policies_names.size(); ++i)
-    {
-        std::string tmp;
-        if (is_schematron_file(policies_names[i]))
-        {
-            if (!validate_schematron_policy_from_file(files, policies_names[i], tmp))
-            {
-                std::string retain = tmp;
-                tmp = std::string();
-                if (!validate_xslt_policy_from_file(files, options, policies_names[i], tmp))
-                {
-                    Out << policies_names[i] << retain;
-                    valid = false;
-                }
-                else
-                {
-                    Out << tmp;
-                    if (!policy_is_valid(tmp))
-                        valid = false;
-                }
-            }
-            else
-                Out << policies_names[i] << ": "  << tmp;
-        }
-        else
-        {
-            if (!validate_xslt_policy_from_file(files, options, policies_names[i], tmp))
-            {
-                std::string retain = tmp;
-                tmp = std::string();
-                if (!validate_schematron_policy_from_file(files, policies_names[i], tmp))
-                {
-                    Out << retain;
-                    valid = false;
-                }
-                else
-                    Out << policies_names[i] << ": "  << tmp;
-            }
-            else
-            {
-                if (!policy_is_valid(tmp))
-                    valid = false;
-                Out << tmp;
-            }
-        }
-    }
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-int Core::policies_check(const std::vector<std::string>& files,
-                         const std::map<std::string, std::string>& options,
-                         MediaConchLib::ReportRes* result,
-                         const std::vector<std::string>* policies_names,
+int Core::check_policies(int user, const std::vector<std::string>& files,
+                         const std::map<std::string, std::string>& opts,
+                         MediaConchLib::Checker_ReportRes* result,
+                         const std::vector<size_t>* policies_ids,
                          const std::vector<std::string>* policies_contents)
 {
     if (!files.size())
@@ -564,23 +499,24 @@ int Core::policies_check(const std::vector<std::string>& files,
         return -1;
     }
 
-    if (!policies_names && !policies_contents)
-    {
-        result->report = "No policy to apply";
+    std::map<std::string, std::string> options;
+    std::map<std::string, std::string>::const_iterator it = opts.begin();
+    for (; it != opts.end(); ++it)
+        options[it->first] = it->second;
+
+    unify_policy_options(options);
+
+    std::vector<std::string> policies;
+    if (this->policies.policy_get_policies(user, policies_ids, policies_contents, options, policies, result->report) < 0)
         return -1;
-    }
 
     std::stringstream Out;
-    bool valid = true;
-    if (policies_names)
-        if (!policies_check_files(files, options, *policies_names, Out))
-            valid = false;
-    if (policies_contents)
-        if (!policies_check_contents(files, options, *policies_contents, Out))
-            valid = false;
-    result->report = Out.str();
     result->has_valid = true;
-    result->valid = valid;
+    result->valid = true;
+    if (!check_policies_xslts(files, options, policies, Out))
+        result->valid = false;
+
+    result->report = Out.str();
     return 0;
 }
 
@@ -589,20 +525,24 @@ int Core::policies_check(const std::vector<std::string>& files,
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int Core::transform_with_xslt_file(const std::string& report, const std::string& xslt, std::string& result)
+int Core::transform_with_xslt_file(const std::string& report, const std::string& xslt,
+                                   const std::map<std::string, std::string>& opts, std::string& result)
 {
     Schema *S = new Xslt(!accepts_https());
 
     if (!S->register_schema_from_file(xslt.c_str()))
     {
         result = report;
+        delete S;
         return -1;
     }
 
+    S->set_options(opts);
     int valid = S->validate_xml(report);
     if (valid < 0)
     {
         result = report;
+        delete S;
         return -1;
     }
 
@@ -613,6 +553,7 @@ int Core::transform_with_xslt_file(const std::string& report, const std::string&
 
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_memory(const std::string& report, const std::string& memory,
+                                     const std::map<std::string, std::string>& opts,
                                      std::string& result)
 {
     Schema *S = new Xslt(!accepts_https());
@@ -623,6 +564,7 @@ int Core::transform_with_xslt_memory(const std::string& report, const std::strin
         return -1;
     }
 
+    S->set_options(opts);
     int valid = S->validate_xml(report);
     if (valid < 0)
     {
@@ -638,19 +580,21 @@ int Core::transform_with_xslt_memory(const std::string& report, const std::strin
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_html_memory(const std::string& report, std::string& result)
 {
+    std::map<std::string, std::string> opts;
     std::string memory(implementation_report_display_html_xsl);
-    return transform_with_xslt_memory(report, memory, result);
+    return transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //---------------------------------------------------------------------------
 int Core::transform_with_xslt_text_memory(const std::string& report, std::string& result)
 {
+    const std::map<std::string, std::string> opts;
 #if defined(_WIN32) || defined(WIN32)
     std::string memory(implementation_report_display_text_xsl);
 #else //defined(_WIN32) || defined(WIN32)
     std::string memory(implementation_report_display_textunicode_xsl);
 #endif //defined(_WIN32) || defined(WIN32)
-    return transform_with_xslt_memory(report, memory, result);
+    return transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //***************************************************************************
@@ -658,95 +602,16 @@ int Core::transform_with_xslt_text_memory(const std::string& report, std::string
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool Core::validate_schematron_policy(const std::vector<std::string>& files, int pos, std::string& report)
-{
-    std::string policyFile;
-    xmlDocPtr doc = NULL;
-    Schema *S = new Schematron(!accepts_https());
-    bool valid = true;
-
-    if (pos >= 0)
-        doc = policies.create_doc(pos);
-
-    if (doc && S->register_schema_from_doc(doc))
-        valid = validation(files, S, report);
-    else
-    {
-        valid = false;
-
-        std::stringstream Out;
-        std::vector<std::string> errors = S->get_errors();
-
-        Out << "internal error for parsing Policy" << endl;
-        for (size_t i = 0; i < errors.size(); i++)
-            Out << "\t" << errors[i].c_str();
-        report = Out.str();
-    }
-    xmlFreeDoc(doc);
-    delete S;
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::validate_schematron_policy_from_file(const std::vector<std::string>& files, const std::string& policy, std::string& report)
-{
-    bool valid = true;
-    Schema *S = new Schematron(!accepts_https());
-
-    if (S->register_schema_from_file(policy.c_str()))
-        valid = validation(files, S, report);
-    else
-    {
-        valid = false;
-
-        std::stringstream Out;
-        std::vector<std::string> errors = S->get_errors();
-
-        Out << "internal error for parsing Policy" << endl;
-        for (size_t i = 0; i < errors.size(); i++)
-            Out << "\t" << errors[i].c_str();
-        report = Out.str();
-    }
-    delete S;
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::validate_schematron_policy_from_memory(const std::vector<std::string>& files, const std::string& memory, std::string& report)
-{
-    bool valid = true;
-    Schema *S = new Schematron(!accepts_https());
-
-    if (S->register_schema_from_memory(memory))
-        valid = validation(files, S, report);
-    else
-    {
-        valid = false;
-
-        std::stringstream Out;
-        std::vector<std::string> errors = S->get_errors();
-
-        Out << "internal error for parsing Policy" << endl;
-        for (size_t i = 0; i < errors.size(); i++)
-            Out << "\t" << errors[i].c_str();
-        report = Out.str();
-    }
-    delete S;
-    return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::validate_xslt_policy(const std::vector<std::string>& files,
+bool Core::validate_xslt_policy(int user, const std::vector<std::string>& files,
                                 const std::map<std::string, std::string>&,
                                 int pos, std::string& report)
 {
     bool valid = true;
-    std::string policyFile;
     xmlDocPtr doc = NULL;
     Schema *S = new Xslt(!accepts_https());
 
     if (pos >= 0)
-        doc = policies.create_doc(pos);
+        doc = policies.create_doc(user, pos);
 
     if (doc && S->register_schema_from_doc(doc))
         valid = validation(files, S, report);
@@ -793,10 +658,10 @@ bool Core::validate_xslt_policy_from_file(const std::vector<std::string>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::validate_xslt_policy_from_memory(const std::vector<std::string>& files,
-                                            const std::map<std::string, std::string>& opts,
-                                            const std::string& memory, std::string& report,
-                                            bool is_implem)
+bool Core::validate_xslt_from_memory(const std::vector<std::string>& files,
+                                     const std::map<std::string, std::string>& opts,
+                                     const std::string& memory, std::string& report,
+                                     bool is_implem)
 {
     bool valid = true;
     Schema *S = new Xslt(!accepts_https());
@@ -843,29 +708,19 @@ bool Core::validation(const std::vector<std::string>& files, Schema* S, std::str
     if (ret < 0)
     {
         report = "Validation generated an internal error";
+        std::vector<std::string> errors = S->get_errors();
+        for (size_t i = 0; i < errors.size(); ++i)
+            report += "\t" + errors[i];
         valid = false;
     }
     else
-    {
         report = S->get_report();
-        valid = ret == 0 ? true : false;
-    }
     return valid;
-}
-
-//---------------------------------------------------------------------------
-bool Core::is_schematron_file(const std::string& file)
-{
-    if (file.compare(file.length() - 4, 4, ".sch"))
-        return false;
-
-    return true;
 }
 
 //---------------------------------------------------------------------------
 void Core::unify_implementation_options(std::map<std::string, std::string>& opts)
 {
-
     if (opts.find("verbosity") != opts.end() && opts["verbosity"].length() && opts["verbosity"] != "-1")
     {
         std::string& verbosity = opts["verbosity"];
@@ -876,6 +731,55 @@ void Core::unify_implementation_options(std::map<std::string, std::string>& opts
     }
     else
         opts["verbosity"] = "\"5\"";
+}
+
+//---------------------------------------------------------------------------
+void Core::unify_policy_options(std::map<std::string, std::string>& opts)
+{
+    std::map<std::string, std::string>::iterator it;
+    if ((it = opts.find("policy_reference_file")) != opts.end())
+    {
+        std::string file = it->second;
+        opts.erase(it);
+
+        if (!it->second.length())
+            return;
+
+        std::vector<std::string> files;
+        std::string report;
+
+        files.push_back(file);
+        create_report_ma_xml(files, opts, report, get_bitset_with_mi_mt());
+
+        std::string path = get_local_data_path();
+        path += "policies_references_files/";
+        if (!ZenLib::Dir::Exists(ZenLib::Ztring().From_UTF8(path)))
+            if (!ZenLib::Dir::Create(ZenLib::Ztring().From_UTF8(path)))
+                path = "./";
+
+        for (size_t i = 0; ; ++i)
+        {
+            std::stringstream ss;
+            ss << path << "reference";
+            if (i)
+                ss << i;
+            ss << ".xml";
+            if (ZenLib::File::Exists(ZenLib::Ztring().From_UTF8(ss.str())))
+                continue;
+
+            path = ss.str();
+            break;
+        }
+        ZenLib::File fd;
+
+        fd.Create(ZenLib::Ztring().From_UTF8(path));
+
+        fd.Open(ZenLib::Ztring().From_UTF8(path), ZenLib::File::Access_Write);
+        fd.Write(ZenLib::Ztring().From_UTF8(report));
+        fd.Close();
+
+        opts["compare"] = "\"" + path + "\"";
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1234,8 +1138,9 @@ void Core::create_report_mt_xml(const std::vector<std::string>& files, std::stri
         create_report_mmt_xml(vec, tmp);
         if (tmp.length())
         {
+            std::map<std::string, std::string> opts;
             std::string memory(micromediatrace_to_mediatrace_xsl);
-            transform_with_xslt_memory(tmp, memory, tmp);
+            transform_with_xslt_memory(tmp, memory, opts, tmp);
             get_content_of_media_in_xml(tmp);
             report += tmp;
         }
@@ -1428,7 +1333,7 @@ void Core::get_reports_output(const std::vector<std::string>& files,
                               const std::map<std::string, std::string>& options,
                               MediaConchLib::format f,
                               std::bitset<MediaConchLib::report_Max> report_set,
-                              MediaConchLib::ReportRes* result)
+                              MediaConchLib::Checker_ReportRes* result)
 {
     if (f == MediaConchLib::format_MaXml)
     {
@@ -1456,14 +1361,16 @@ void Core::get_reports_output(const std::vector<std::string>& files,
             {
                 // Apply an XSLT to have HTML
                 std::string memory(media_trace_display_html_xsl);
-                transform_with_xslt_memory(tmp, memory, tmp);
+                std::map<std::string, std::string> opts;
+                transform_with_xslt_memory(tmp, memory, opts, tmp);
                 result->report += tmp;
             }
             else if (f == MediaConchLib::format_Text)
             {
                 // Apply an XSLT to have Text
                 std::string memory(media_trace_display_text_xsl);
-                transform_with_xslt_memory(tmp, memory, tmp);
+                std::map<std::string, std::string> opts;
+                transform_with_xslt_memory(tmp, memory, opts, tmp);
                 result->report += tmp;
             }
             result->report += "\r\n";
@@ -1474,7 +1381,7 @@ void Core::get_reports_output(const std::vector<std::string>& files,
             std::string tmp;
             bool is_valid = true;
             if (get_implementation_report(files, options, tmp))
-                is_valid = policy_is_valid(tmp);
+                is_valid = implementation_is_valid(tmp);
             else
                 is_valid = false;
 
@@ -1519,7 +1426,9 @@ bool Core::get_implementation_report(const std::vector<std::string>& files,
 {
     std::string memory(implementation_report_xsl);
     std::string r;
-    bool valid = validate_xslt_policy_from_memory(files, options, memory, r, true);
+    bool valid = validate_xslt_from_memory(files, options, memory, r, true);
+    if (valid)
+        valid = implementation_is_valid(r);
     report += r;
     return valid;
 }
@@ -1871,11 +1780,34 @@ void Core::get_daemon_address(std::string& addr, int& port) const
 }
 
 //---------------------------------------------------------------------------
-bool Core::policy_is_valid(const std::string& report)
+bool Core::has_outcome_fail(const std::string& report)
 {
     size_t pos = report.find(" outcome=\"fail\"");
     if (pos != std::string::npos)
         return false;
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool Core::implementation_is_valid(const std::string& report)
+{
+    return has_outcome_fail(report);
+}
+
+//---------------------------------------------------------------------------
+bool Core::policy_is_valid(const std::string& report)
+{
+    size_t pos = report.find("outcome=\"");
+    if (pos == std::string::npos)
+        return true;
+
+    pos += 9;
+    if (report.size() - pos < 5)
+        return false;
+
+    if (report[pos] == 'f' && report[pos + 1] == 'a' && report[pos + 2] == 'i' && report[pos + 3] == 'l' && report[pos + 4] == '"')
+        return false;
+
     return true;
 }
 
@@ -1898,7 +1830,7 @@ bool Core::dpfmanager_report_is_valid(const std::string& report)
 }
 
 //---------------------------------------------------------------------------
-int Core::get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+int Core::policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
 {
     const std::map<std::string, std::list<std::string> >& types = Policies::existing_type;
 
@@ -1913,7 +1845,7 @@ int Core::get_fields_for_type(const std::string& type, std::vector<std::string>&
 }
 
 //---------------------------------------------------------------------------
-int Core::get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+int Core::policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
 {
     std::map<std::string, std::map<std::string, std::vector<std::string> > > vs;
     if (get_generated_values_from_csv(vs) < 0)

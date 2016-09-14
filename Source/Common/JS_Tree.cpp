@@ -14,7 +14,6 @@
 #include <string>
 #include <sstream>
 #include "JS_Tree.h"
-using namespace ZenLib;
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
@@ -475,6 +474,116 @@ std::string JsTree::decimal_to_hexa(std::string str)
 
     ss << std::hex << val;
     return ss.str();
+}
+
+//---------------------------------------------------------------------------
+int JsTree::rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& json, std::string&)
+{
+    if (!rule)
+        return 0;
+
+    std::stringstream ss;
+    ss << "{\"text\":\"" << rule->name;
+    ss << "\",\"type\":\"r\"";
+    ss << ",\"data\":{";
+    ss << "\"ruleId\":" << rule->id;
+    ss << ",\"tracktype\":\"" << rule->tracktype;
+    ss << "\",\"field\":\"" << rule->field;
+    ss << "\",\"scope\":\"" << rule->scope;
+    ss << "\",\"occurrence\":" << rule->occurrence;
+    ss << ",\"ope\":\"" << rule->ope;
+    ss << "\",\"value\":\"" << rule->value;
+    ss <<"\"}}";
+
+    json = ss.str();
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int JsTree::policy_to_js_tree(MediaConchLib::Policy_Policy* policy, std::string& json, std::string& error)
+{
+    if (!policy)
+        return 0;
+
+    std::stringstream ss;
+    ss << "{\"text\":\"" << policy->name;
+    if (policy->kind == "XSLT")
+        ss << " (" << policy->type << ")";
+    ss << "\",\"type\":\"" << (policy->is_system ? "s" : "u");
+    ss << "\",\"data\":{";
+    ss << "\"policyId\":" << policy->id;
+    ss << ",\"kind\":\"" << policy->kind;
+    ss << "\",\"type\":\"" << policy->type << "\"";
+    if (policy->kind == "XSLT")
+    {
+        ss << ",\"isEditable\":true";
+        ss << ",\"description\":\"" << policy->description << "\"";
+    }
+    else
+        ss << ",\"isEditable\":false";
+    ss <<"}";
+
+    std::stringstream children;
+    for (size_t i = 0; i < policy->children.size(); ++i)
+    {
+        if (!policy->children[i].second.policy)
+            continue;
+
+        if (i)
+            children << ",";
+        std::string child;
+        if (policy->children[i].first == 0)
+            policy_to_js_tree(policy->children[i].second.policy, child, error);
+        else if (policy->children[i].first == 1)
+            rule_to_js_tree(policy->children[i].second.rule, child, error);
+
+        children << child;
+    }
+
+    ss << ",\"children\":[" << children.str() << "]";
+    ss << "}";
+
+    json = ss.str();
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int JsTree::policies_to_js_tree(std::vector<MediaConchLib::Policy_Policy*> vec, std::string& jstree, std::string& error)
+{
+    std::stringstream ss;
+    ss << "{\"policiesTree\":[";
+
+    std::stringstream users, systems;
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        if (!vec[i])
+            continue;
+
+        if (vec[i]->is_system)
+        {
+            std::string json;
+            if (policy_to_js_tree(vec[i], json, error) < 0)
+                return -1;
+            if (systems.str().size())
+                systems << ",";
+            systems << json;
+        }
+        else
+        {
+            std::string json;
+            if (policy_to_js_tree(vec[i], json, error) < 0)
+                return -1;
+            if (users.str().size())
+                users << ",";
+            users << json;
+        }
+    }
+    ss << "{\"id\":\"u_p\",\"text\":\"User policies\",\"type\":\"up\",\"state\":{\"opened\":true,\"selected\":true},\"children\":[" << users.str() << "]}";
+    ss << ",{\"id\":\"s_p\",\"text\":\"System policies\",\"type\":\"sp\",\"state\":{\"opened\":true},\"children\":[" << systems.str() << "]}";
+    ss << "]}";
+
+    jstree = ss.str();
+    return 0;
 }
 
 }

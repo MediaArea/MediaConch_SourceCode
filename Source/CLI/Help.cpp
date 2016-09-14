@@ -59,6 +59,8 @@ int Help()
     TEXTOUT("                    Apply the policy (XSL or Schematron) ");
     TEXTOUT("--CreatePolicy");
     TEXTOUT("                    Create a policy (XSL) from a file");
+    TEXTOUT("--PolicyReferenceFile=VideoFile, -prf VideoFile");
+    TEXTOUT("                    Use the VideoFile as reference to compare in policy");
     TEXTOUT("");
 
     TEXTOUT("Output Formats:");

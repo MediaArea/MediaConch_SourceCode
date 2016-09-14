@@ -47,12 +47,14 @@ public:
     int start();
     int finish();
 
-    virtual int send_result(int ret_code, std::string& ret_msg, void *arg);
+    virtual int send_result(int ret_code, const std::string& ret_msg, void *arg);
 
 private:
     struct event_base          *base;
     struct evhttp              *http;
     struct evhttp_bound_socket *handle;
+
+    static int                  pid;
 
     static void request_coming(struct evhttp_request *req, void *arg);
     int get_body(struct evhttp_request *req, std::string& json, std::string& ret_msg);
@@ -61,6 +63,7 @@ private:
     void request_put_coming(struct evhttp_request *req);
     void request_delete_coming(struct evhttp_request *req);
     int  uri_api_version_is_valid(std::string& uri, struct evhttp_request *req);
+    int  get_mediaconch_instance(const struct evkeyvalq *headers);
 
     LibEventHttpd (const LibEventHttpd&);
     LibEventHttpd& operator=(const LibEventHttpd&);

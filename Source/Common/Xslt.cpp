@@ -49,6 +49,7 @@ Xslt::~Xslt()
         xmlFreeDoc(doc_ctx);
         doc_ctx = NULL;
     }
+    xsltCleanupGlobals();
 }
 
 //---------------------------------------------------------------------------
@@ -78,7 +79,8 @@ bool Xslt::register_schema_from_doc(void* data)
     xslt_ctx = xsltParseStylesheetDoc(doc_ctx);
 
     xsltSetGenericErrorFunc(NULL, NULL);
-    return xslt_ctx != NULL;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
@@ -141,6 +143,8 @@ int Xslt::validate_xml(const std::string& xml, bool)
         std::map<std::string, std::string>::iterator it = options.begin();
         for (; it != options.end(); ++it)
         {
+            if (!it->second.size())
+                continue;
             vec.push_back(std::string(it->first));
             vec.push_back(std::string(it->second));
         }
@@ -191,17 +195,7 @@ int Xslt::validate_xml(const std::string& xml, bool)
         report = Out.str();
         return 1;
     }
-    else if (outcome_has_fail(report))
-        return 1;
     return 0;
-}
-
-//---------------------------------------------------------------------------
-bool Xslt::outcome_has_fail(std::string& report)
-{
-    if (report.find(" outcome=\"fail\"") != std::string::npos)
-        return true;
-    return false;
 }
 
 //***************************************************************************

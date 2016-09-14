@@ -13,23 +13,9 @@
 //---------------------------------------------------------------------------
 #ifndef JsTreeH
 #define JsTreeH
-
-//---------------------------------------------------------------------------
-#ifdef MEDIAINFO_DLL_RUNTIME
-    #include "MediaInfoDLL/MediaInfoDLL.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#elif defined MEDIAINFO_DLL_STATIC
-    #include "MediaInfoDLL/MediaInfoDLL_Static.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#else
-    #include "MediaInfo/MediaInfoList.h"
-    #define MediaInfoNameSpace MediaInfoLib
-#endif
 //---------------------------------------------------------------------------
 #include <libxml/tree.h>
-
-//---------------------------------------------------------------------------
-using namespace MediaInfoNameSpace;
+#include "MediaConchLib.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -47,6 +33,11 @@ public:
 
     std::string  format_from_trace_XML(const std::string& xml);
     std::string  format_from_inform_XML(const std::string& xml);
+
+    static int   policies_to_js_tree(std::vector<MediaConchLib::Policy_Policy*> vec, std::string& jstree, std::string& error);
+    static int   policy_to_js_tree(MediaConchLib::Policy_Policy* policy, std::string& json, std::string& error);
+    static int   rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& json, std::string&);
+
 
     std::string  get_error() const { return error; }
 

@@ -16,7 +16,15 @@
 #include "LibEventHttpd.h"
 #include "Common/MediaConchLib.h"
 #include <sstream>
-//---------------------------------------------------------------------------
+#include <stdlib.h>
+
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+#include <event2/keyvalq_struct.h>
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -24,7 +32,7 @@ namespace MediaConch {
 //***************************************************************************
 // Httpd
 //***************************************************************************
-
+int LibEventHttpd::pid = -1;
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -32,6 +40,11 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 LibEventHttpd::LibEventHttpd(void* arg) : Httpd(arg), base(NULL), http(NULL), handle(NULL)
 {
+    #ifdef _WIN32
+    pid = _getpid();
+    #else
+    pid = getpid();
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -103,7 +116,7 @@ int LibEventHttpd::finish()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttpd::send_result(int ret_code, std::string& ret_msg, void *arg)
+int LibEventHttpd::send_result(int ret_code, const std::string& ret_msg, void *arg)
 {
     struct evhttp_request *req = (struct evhttp_request *)arg;
     struct evbuffer *evOutBuf = evbuffer_new();
@@ -113,22 +126,25 @@ int LibEventHttpd::send_result(int ret_code, std::string& ret_msg, void *arg)
         struct evkeyvalq *evOutHeaders;
         evOutHeaders = evhttp_request_get_output_headers(req);
         evhttp_add_header(evOutHeaders, "Host", address.c_str());
-        std::stringstream len_str;
+        std::stringstream ss;
+        ss << pid;
+        evhttp_add_header(evOutHeaders, "X-App-MediaConch-Instance-ID", ss.str().c_str());
 
+        ss.str("");
         if (error.length())
         {
-            len_str << error.length();
+            ss << error.length();
             evbuffer_add_printf(evOutBuf, "%s\n", error.c_str());
         }
         else if (result.length())
         {
-            len_str << result.length();
+            ss << result.length();
             evhttp_add_header(evOutHeaders, "Content-Type", "application/json");
             evbuffer_add_printf(evOutBuf, "%s\n", result.c_str());
         }
         else
-            len_str << 0;
-        evhttp_add_header(evOutHeaders, "Content-Length", len_str.str().c_str());
+            ss << 0;
+        evhttp_add_header(evOutHeaders, "Content-Length", ss.str().c_str());
     }
     evhttp_send_reply(req, ret_code, ret_msg.c_str(), evOutBuf);
     if (evOutBuf)
@@ -151,13 +167,13 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
     if (uri_api_version_is_valid(uri_path, req) < 0)
         return;
     const char* query_str = evhttp_uri_get_query(uri);
-    if (query_str && !std::string("/status").compare(uri_path))
+    if (query_str && !std::string("/checker_status").compare(uri_path))
     {
         std::string query(query_str);
-        RESTAPI::Status_Req *r = NULL;
+        RESTAPI::Checker_Status_Req *r = NULL;
         get_uri_request(query, &r);
 
-        RESTAPI::Status_Res res;
+        RESTAPI::Checker_Status_Res res;
         if (commands.status_cb && commands.status_cb(r, res, parent) < 0)
         {
             delete r;
@@ -170,13 +186,13 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_status_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/list").compare(uri_path))
+    else if (!std::string("/checker_list").compare(uri_path))
     {
         std::string query;
-        RESTAPI::List_Req *r = NULL;
+        RESTAPI::Checker_List_Req *r = NULL;
         get_uri_request(query, &r);
 
-        RESTAPI::List_Res res;
+        RESTAPI::Checker_List_Res res;
         if (commands.list_cb && commands.list_cb(r, res, parent) < 0)
         {
             delete r;
@@ -208,14 +224,18 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_default_values_for_type_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (query_str && !std::string("/create_policy_from_file").compare(uri_path))
+
+    else if (!std::string("/xslt_policy_create").compare(uri_path))
     {
-        std::string query(query_str);
-        RESTAPI::Create_Policy_From_File_Req *r = NULL;
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
+        RESTAPI::XSLT_Policy_Create_Req *r = NULL;
         get_uri_request(query, &r);
 
-        RESTAPI::Create_Policy_From_File_Res res;
-        if (commands.create_policy_from_file_cb && commands.create_policy_from_file_cb(r, res, parent) < 0)
+        RESTAPI::XSLT_Policy_Create_Res res;
+        if (commands.xslt_policy_create_cb && commands.xslt_policy_create_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -224,9 +244,345 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_create_policy_from_file_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_create_res(res, result) < 0)
             error = rest.get_error();
     }
+    else if (query_str && !std::string("/policy_remove").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Remove_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Remove_Res res;
+        if (commands.policy_remove_cb && commands.policy_remove_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_remove_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_dump").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Dump_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Dump_Res res;
+        if (commands.policy_dump_cb && commands.policy_dump_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_dump_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_save").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Save_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Save_Res res;
+        if (commands.policy_save_cb && commands.policy_save_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_save_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_duplicate").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Duplicate_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Duplicate_Res res;
+        if (commands.policy_duplicate_cb && commands.policy_duplicate_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_duplicate_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_move").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Move_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Move_Res res;
+        if (commands.policy_move_cb && commands.policy_move_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_move_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_get").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Get_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Res res;
+        if (commands.policy_get_cb && commands.policy_get_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/policy_get_name").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::Policy_Get_Name_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Name_Res res;
+        if (commands.policy_get_name_cb && commands.policy_get_name_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_name_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_get_policies_count").compare(uri_path))
+    {
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
+        RESTAPI::Policy_Get_Policies_Count_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Policies_Count_Res res;
+        if (commands.policy_get_policies_count_cb && commands.policy_get_policies_count_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_policies_count_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_clear_policies").compare(uri_path))
+    {
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
+        RESTAPI::Policy_Clear_Policies_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Clear_Policies_Res res;
+        if (commands.policy_clear_policies_cb && commands.policy_clear_policies_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_clear_policies_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_get_policies").compare(uri_path))
+    {
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
+        RESTAPI::Policy_Get_Policies_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Policies_Res res;
+        if (commands.policy_get_policies_cb && commands.policy_get_policies_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_policies_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_get_policies_names_list").compare(uri_path))
+    {
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
+        RESTAPI::Policy_Get_Policies_Names_List_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Policies_Names_List_Res res;
+        if (commands.policy_get_policies_names_list_cb && commands.policy_get_policies_names_list_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_policies_names_list_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_create_from_file").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Create_From_File_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Create_From_File_Res res;
+        if (commands.xslt_policy_create_from_file_cb && commands.xslt_policy_create_from_file_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_create_from_file_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_create").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Create_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Create_Res res;
+        if (commands.xslt_policy_rule_create_cb && commands.xslt_policy_rule_create_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_create_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_get").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Get_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Get_Res res;
+        if (commands.xslt_policy_rule_get_cb && commands.xslt_policy_rule_get_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_get_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_duplicate").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Duplicate_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Duplicate_Res res;
+        if (commands.xslt_policy_rule_duplicate_cb && commands.xslt_policy_rule_duplicate_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_duplicate_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_move").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Move_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Move_Res res;
+        if (commands.xslt_policy_rule_move_cb && commands.xslt_policy_rule_move_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_move_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (query_str && !std::string("/xslt_policy_rule_delete").compare(uri_path))
+    {
+        std::string query(query_str);
+        RESTAPI::XSLT_Policy_Rule_Delete_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::XSLT_Policy_Rule_Delete_Res res;
+        if (commands.xslt_policy_rule_delete_cb && commands.xslt_policy_rule_delete_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_delete_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else
     {
         code = HTTP_NOTFOUND;
@@ -255,9 +611,9 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
 
     if (uri_api_version_is_valid(uri_path, req) < 0)
         return;
-    if (!std::string("/analyze").compare(uri_path))
+    if (!std::string("/checker_analyze").compare(uri_path))
     {
-        RESTAPI::Analyze_Req *r = NULL;
+        RESTAPI::Checker_Analyze_Req *r = NULL;
         get_request(json, &r);
         if (!r)
         {
@@ -266,7 +622,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        RESTAPI::Analyze_Res res;
+        RESTAPI::Checker_Analyze_Res res;
         if (commands.analyze_cb && commands.analyze_cb(r, res, parent) < 0)
         {
             delete r;
@@ -279,9 +635,9 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_analyze_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/report").compare(uri_path))
+    else if (!std::string("/checker_report").compare(uri_path))
     {
-        RESTAPI::Report_Req *r = NULL;
+        RESTAPI::Checker_Report_Req *r = NULL;
         get_request(json, &r);
         if (!r)
         {
@@ -290,7 +646,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        RESTAPI::Report_Res res;
+        RESTAPI::Checker_Report_Res res;
         if (commands.report_cb && commands.report_cb(r, res, parent) < 0)
         {
             delete r;
@@ -303,9 +659,9 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_report_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/validate").compare(uri_path))
+    else if (!std::string("/checker_validate").compare(uri_path))
     {
-        RESTAPI::Validate_Req *r = NULL;
+        RESTAPI::Checker_Validate_Req *r = NULL;
         get_request(json, &r);
         if (!r)
         {
@@ -314,7 +670,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        RESTAPI::Validate_Res res;
+        RESTAPI::Checker_Validate_Res res;
         if (commands.validate_cb && commands.validate_cb(r, res, parent) < 0)
         {
             delete r;
@@ -327,9 +683,9 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_validate_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/file_from_id").compare(uri_path))
+    else if (!std::string("/checker_file_from_id").compare(uri_path))
     {
-        RESTAPI::File_From_Id_Req *r = NULL;
+        RESTAPI::Checker_File_From_Id_Req *r = NULL;
         get_request(json, &r);
         if (!r)
         {
@@ -338,7 +694,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             goto send;
         }
 
-        RESTAPI::File_From_Id_Res res;
+        RESTAPI::Checker_File_From_Id_Res res;
         if (commands.file_from_id_cb && commands.file_from_id_cb(r, res, parent) < 0)
         {
             delete r;
@@ -349,6 +705,102 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
 
         delete r;
         if (rest.serialize_file_from_id_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_import").compare(uri_path))
+    {
+        RESTAPI::Policy_Import_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Import_Res res;
+        if (commands.policy_import_cb && commands.policy_import_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_import_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_change_info").compare(uri_path))
+    {
+        RESTAPI::Policy_Change_Info_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Change_Info_Res res;
+        if (commands.policy_change_info_cb && commands.policy_change_info_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_change_info_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/policy_change_type").compare(uri_path))
+    {
+        RESTAPI::Policy_Change_Type_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Change_Type_Res res;
+        if (commands.policy_change_type_cb && commands.policy_change_type_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_change_type_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/xslt_policy_rule_edit").compare(uri_path))
+    {
+        RESTAPI::XSLT_Policy_Rule_Edit_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::XSLT_Policy_Rule_Edit_Res res;
+        if (commands.xslt_policy_rule_edit_cb && commands.xslt_policy_rule_edit_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_xslt_policy_rule_edit_res(res, result) < 0)
             error = rest.get_error();
     }
     else
@@ -379,9 +831,9 @@ void LibEventHttpd::request_put_coming(struct evhttp_request *req)
 
     if (uri_api_version_is_valid(uri_path, req) < 0)
         return;
-    if (!std::string("/retry").compare(uri_path))
+    if (!std::string("/checker_retry").compare(uri_path))
     {
-        RESTAPI::Retry_Req *r = NULL;
+        RESTAPI::Checker_Retry_Req *r = NULL;
         get_request(json, &r);
         if (!r)
         {
@@ -390,7 +842,7 @@ void LibEventHttpd::request_put_coming(struct evhttp_request *req)
             goto send;
         }
 
-        RESTAPI::Retry_Res res;
+        RESTAPI::Checker_Retry_Res res;
         if (commands.retry_cb && commands.retry_cb(r, res, parent) < 0)
         {
             delete r;
@@ -426,13 +878,13 @@ void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
         return;
 
     const char* query_str = evhttp_uri_get_query(uri);
-    if (query_str && !std::string("/clear").compare(uri_path))
+    if (query_str && !std::string("/checker_clear").compare(uri_path))
     {
         std::string query(query_str);
-        RESTAPI::Clear_Req *r = NULL;
+        RESTAPI::Checker_Clear_Req *r = NULL;
         get_uri_request(query, &r);
 
-        RESTAPI::Clear_Res res;
+        RESTAPI::Checker_Clear_Res res;
         if (commands.clear_cb && commands.clear_cb(r, res, parent) < 0)
         {
             delete r;
@@ -461,6 +913,17 @@ void LibEventHttpd::request_coming(struct evhttp_request *req, void *arg)
     LibEventHttpd    *evHttp = (LibEventHttpd*)arg;
     std::string       ret_msg("OK");
 
+    evHttp->error.clear();
+    evHttp->result.clear();
+
+    struct evkeyvalq *kv = evhttp_request_get_input_headers(req);
+    if (evHttp->get_mediaconch_instance(kv) < 0)
+    {
+        evHttp->error = std::string("HTTP header X-App-MediaConch-Instance-ID not corresponding");
+        evHttp->send_result(410, "X-App-MediaConch-Instance-ID-INVALID", req);
+        return;
+    }
+
     switch (evhttp_request_get_command(req))
     {
         case EVHTTP_REQ_GET:
@@ -482,6 +945,31 @@ void LibEventHttpd::request_coming(struct evhttp_request *req, void *arg)
     }
 }
 
+int LibEventHttpd::get_mediaconch_instance(const struct evkeyvalq *headers)
+{
+    if (!headers)
+        return 0;
+
+    struct evkeyval *header = headers->tqh_first;
+    while (header)
+    {
+        if (header->key && !evutil_ascii_strcasecmp(header->key, "X-App-MediaConch-Instance-ID"))
+        {
+            if (!header->value)
+                return 0;
+
+            int value = strtol(header->value, NULL, 10);
+            if (value == -1)
+                return 0;
+            else if (pid != value)
+                return -1;
+        }
+        header = header->next.tqe_next;
+    }
+
+    return 0;
+}
+
 //---------------------------------------------------------------------------
 int LibEventHttpd::get_body(struct evhttp_request *req, std::string& json, std::string& ret_msg)
 {
@@ -499,7 +987,7 @@ int LibEventHttpd::get_body(struct evhttp_request *req, std::string& json, std::
     int n = evbuffer_remove(evBuf, tmpBuf, len);
     if (n <= 0)
     {
-        delete[] tmpBuf; 
+        delete[] tmpBuf;
         error = std::string("body of the request should contain the command");
         ret_msg = "NOVALIDCONTENT";
         send_result(HTTP_BADREQUEST, ret_msg, req);

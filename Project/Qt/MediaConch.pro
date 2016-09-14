@@ -41,11 +41,9 @@ DEFINES          +=  _UNICODE
 SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/Core.cpp \
                     ../../Source/Common/Schema.cpp \
-                    ../../Source/Common/Schematron.cpp \
                     ../../Source/Common/Xslt.cpp \
                     ../../Source/Common/Policies.cpp \
                     ../../Source/Common/Policy.cpp \
-                    ../../Source/Common/SchematronPolicy.cpp \
                     ../../Source/Common/XsltPolicy.cpp \
                     ../../Source/Common/UnknownPolicy.cpp \
                     ../../Source/Common/JS_Tree.cpp \
@@ -88,20 +86,19 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
 HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Core.h \
                     ../../Source/Common/Schema.h \
-                    ../../Source/Common/Schematron.h \
                     ../../Source/Common/Xslt.h \
                     ../../Source/Common/JS_Tree.h \
                     ../../Source/Common/Policies.h \
                     ../../Source/Common/Policy.h \
-                    ../../Source/Common/SchematronPolicy.h \
                     ../../Source/Common/XsltPolicy.h \
                     ../../Source/Common/UnknownPolicy.h \
-                    ../../Source/Common/ImplementationReportXsl.h \
-                    ../../Source/Common/ImplementationReportDisplayTextUnicodeXsl.h \
-                    ../../Source/Common/ImplementationReportDisplayTextXsl.h \
-                    ../../Source/Common/ImplementationReportDisplayHtmlXsl.h \
-                    ../../Source/Common/ImplementationReportMatroskaSchema.h \
-                    ../../Source/Common/MicroMediaTraceToMediaTraceXsl.h \
+                    ../../Source/Common/generated/ImplementationReportXsl.h \
+                    ../../Source/Common/generated/ImplementationReportDisplayTextUnicodeXsl.h \
+                    ../../Source/Common/generated/ImplementationReportDisplayTextXsl.h \
+                    ../../Source/Common/generated/ImplementationReportDisplayHtmlXsl.h \
+                    ../../Source/Common/generated/ImplementationReportMatroskaSchema.h \
+                    ../../Source/Common/generated/MicroMediaTraceToMediaTraceXsl.h \
+                    ../../Source/Common/generated/PolicyTransformXml.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/DatabaseReport.h \
                     ../../Source/Common/NoDatabaseReport.h \
@@ -126,7 +123,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/PluginFormat.h \
                     ../../Source/Common/VeraPDF.h \
                     ../../Source/Common/DpfManager.h \
-                    ../../Source/Common/GeneratedCSVVideos.h \
+                    ../../Source/Common/generated/GeneratedCSVVideos.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebView.h \

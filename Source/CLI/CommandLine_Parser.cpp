@@ -77,6 +77,11 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--implementationverbosity=";
         return true;
     }
+    if (argument=="-prf")
+    {
+        Last_Argument = "--policyreferencefile=";
+        return true;
+    }
     return false;
 }
 
@@ -163,6 +168,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--version",                                     Version)
     OPTION("--report",                                      Report)
     OPTION("--format",                                      Format)
+    OPTION("--policyreferencefile",                         PolicyReferenceFile)
     OPTION("--policy",                                      PolicyOption)
     OPTION("--display",                                     Display)
     OPTION("--logfile",                                     LogFile)
@@ -342,6 +348,23 @@ CL_OPTION(ImplementationVerbosity)
     std::string verbosity;
     verbosity.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_implementation_verbosity(verbosity);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(PolicyReferenceFile)
+{
+    //Form : --PolicyReferenceFile=File
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string file;
+    file.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_policy_reference_file(file);
     return CLI_RETURN_NONE;
 }
 

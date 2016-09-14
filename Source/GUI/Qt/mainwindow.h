@@ -62,7 +62,7 @@ public:
     void update_policy_of_file_in_list(const QString& file, const QString& policy);
     void clear_file_list();
     void policy_to_delete(int row);
-    size_t create_policy_from_file(const QString& file);
+    int  xslt_policy_create_from_file(const QString& file);
 
     // UI
     void                        Ui_Init();
@@ -79,13 +79,15 @@ public:
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
     int                         is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
     int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,
-                                         const std::vector<std::string>& policies_names,
+                                         const std::vector<size_t>& policies_ids,
                                          const std::vector<std::string>& policies_contents,
-                                         std::vector<MediaConchLib::ValidateRes*>& result);
+                                         const std::map<std::string, std::string>& options,
+                                         std::vector<MediaConchLib::Checker_ValidateRes*>& result);
     int                         validate(MediaConchLib::report report, const std::string& file,
-                                         const std::vector<std::string>& policies_names,
+                                         const std::vector<size_t>& policies_ids,
                                          const std::vector<std::string>& policies_contents,
-                                         std::vector<MediaConchLib::ValidateRes*>& result);
+                                         const std::map<std::string, std::string>& options,
+                                         std::vector<MediaConchLib::Checker_ValidateRes*>& result);
 
     QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
@@ -97,33 +99,34 @@ public:
     void                        policies_selected();
     void                        display_selected();
     void                        settings_selected();
-    void                        add_default_policy();
     void                        add_default_displays();
     void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);
-    bool                        is_all_policies_saved();
 
     void                        add_policy_to_list(const QString& policy);
     void                        clear_policy_list();
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
-    int                         import_policy(const QString& file, std::string& err);
-    int                         create_xslt_policy(std::string& err);
-    int                         duplicate_policy(int id, std::string& err);
-    bool                        policy_exists(const std::string& title);
-    int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
-    Policy                     *get_policy(size_t pos);
-    int                         get_policy_index_by_filename(const std::string& filename);
-    void                        add_policy(Policy* policy);
-    int                         save_policy(size_t pos, std::string& err);
-    int                         remove_policy(size_t pos, std::string& err);
-    int                         export_policy(size_t pos, std::string& err);
-    void                        clear_policies();
+    int                         policy_import(const QString& file, std::string& err);
+    int                         xslt_policy_create(int parent_id, std::string& err);
+    int                         policy_duplicate(int id, int dst_policy_id, std::string& err);
+    int                         policy_move(int id, int dst_policy_id, std::string& err);
+    int                         policy_change_info(int id, const std::string& name, const std::string& description, std::string& err);
+    int                         policy_change_type(int id, const std::string& type, std::string& err);
+    int                         policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p);
+    int                         policy_save(int pos, std::string& err);
+    int                         policy_get_name(int pos, std::string& name, std::string& err);
+    int                         policy_dump(int pos, std::string& memory, std::string& err);
+    int                         policy_remove(int pos, std::string& err);
+    int                         policy_export(int pos, std::string& err);
+    int                         clear_policies(std::string& err);
     size_t                      get_policies_count() const;
-    int                         create_policy_rule(int policy_id, std::string& err);
-    int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
-    int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
-    int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);
+    int                         xslt_policy_rule_create(int policy_id, std::string& err);
+    XsltPolicyRule             *xslt_policy_rule_get(int policy_id, int rule_id, std::string& err);
+    int                         xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int                         xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id, std::string& err);
+    int                         xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id, std::string& err);
+    int                         xslt_policy_rule_delete(int policy_id, int rule_id, std::string& err);
     int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
     int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
@@ -147,10 +150,10 @@ public:
     void                        remove_file_registered_from_file(const std::string& file);
 
     int                         get_ui_database_path(std::string& path);
+    void                        get_error_http(MediaConchLib::errorHttp code, QString& error_msg);
     void                        set_error_http(MediaConchLib::errorHttp code);
 
-    const std::vector<Policy *>&  get_all_policies() const;
-    void                          get_policies(std::vector<std::pair<QString, QString> >&);
+    void                          get_policies(const std::string&, MediaConchLib::Get_Policies&);
     QString                       get_local_folder() const;
     void                          get_registered_files(std::map<std::string, FileRegistered>& files);
 
@@ -194,8 +197,6 @@ private:
     void                        createPoliciesView();
     void                        createDisplayView();
     void                        createSettingsView();
-    void                        choose_schematron_file();
-    void                        closeEvent(QCloseEvent *event);
 
     void                        fill_display_used(int *policy_i,
                                                   std::string& display_name, std::string& display_content,

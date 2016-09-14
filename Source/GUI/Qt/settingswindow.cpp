@@ -148,7 +148,8 @@ void SettingsWindow::fill_html(QString& html)
 //---------------------------------------------------------------------------
 void SettingsWindow::create_policy_options(QString& policies)
 {
-    const std::vector<Policy *>& list = parent->get_all_policies();
+    MediaConchLib::Get_Policies p;
+    parent->get_policies("JSON", p);
 
     QString system_policy;
     QString user_policy;
@@ -158,25 +159,28 @@ void SettingsWindow::create_policy_options(QString& policies)
     if (policy_str == "last")
         selected_policy = -2;
     else
-        selected_policy = parent->get_policy_index_by_filename(policy_str);
+        selected_policy = QString().fromUtf8(policy_str.c_str(), policy_str.length()).toInt();
 
-    for (size_t i = 0; i < list.size(); ++i)
+    for (size_t i = 0; p.policies && i < p.policies->size(); ++i)
     {
-        if (list[i]->filename.length() && list[i]->filename.find(":/") == 0)
+        if (!p.policies->at(i))
+            continue;
+
+        if (p.policies->at(i)->is_system)
         {
             system_policy += QString("<option ");
-            if ((int)i == selected_policy)
+            if ((int)p.policies->at(i)->id == selected_policy)
                 system_policy += QString("selected=\"selected\" ");
             system_policy += QString("value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+                .arg(p.policies->at(i)->id).arg(QString().fromUtf8(p.policies->at(i)->name.c_str(), p.policies->at(i)->name.length()));
         }
         else
         {
             user_policy += QString("<option ");
-            if ((int)i == selected_policy)
+            if ((int)p.policies->at(i)->id == selected_policy)
                 user_policy += QString("selected=\"selected\" ");
             user_policy += QString("value=\"%1\">%2</option>")
-                .arg((int)i).arg(QString().fromUtf8(list[i]->title.c_str(), list[i]->title.length()));
+                .arg(p.policies->at(i)->id).arg(QString().fromUtf8(p.policies->at(i)->name.c_str(), p.policies->at(i)->name.length()));
         }
     }
 

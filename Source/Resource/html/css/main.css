@@ -208,15 +208,37 @@ p.registration {
     margin-left: 10px;
 }
 
+#policyInfo {
+    height: 72px;
+    margin-top: -50px;
+}
+
+#policyInfo .alert {
+    margin-top: 0;
+}
+
+.policyRightCol {
+    min-height: 600px;
+}
+
+#policyRuleCreateContainer {
+    padding-bottom: 50px;
+}
+
 .spinner-cell, .spinner-status {
-    background: transparent url("qrc:/ajax-spinner-small.gif");
+    background: transparent url("/static/ajax-spinner-small.gif");
     width: 16px;
     height: 14px;
+    display: block;
     margin: 0 auto;
 }
 
+.spinner-status {
+    display: inline-block;
+}
+
 .spinner-modal {
-    background: transparent url("qrc:/ajax-spinner-big.gif");
+    background: transparent url("/static/ajax-spinner-big.gif");
     width: 66px;
     height: 66px;
     display: block;

@@ -16,14 +16,11 @@
 #include "MediaConchLib.h"
 #include "LibEventHttp.h"
 #include <sstream>
+#include <stdlib.h>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
-
-//***************************************************************************
-// Httpd
-//***************************************************************************
 
 //***************************************************************************
 // Constructor/Destructor
@@ -131,6 +128,10 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
     evOutHeaders = evhttp_request_get_output_headers(req);
     evhttp_add_header(evOutHeaders, "Host", address.c_str());
 
+    std::stringstream ss;
+    ss << current_daemon_id;
+    evhttp_add_header(evOutHeaders, "X-App-MediaConch-Instance-ID", ss.str().c_str());
+
     if (str.length())
     {
         struct evbuffer *evOutBuf = evhttp_request_get_output_buffer(req);;
@@ -174,12 +175,24 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
     int code = evhttp_request_get_response_code(req);
     if (code != HTTP_OK)
     {
-        if (code >= 400 && code < 500)
+        if (code == 410)
+            evHttp->error = MediaConchLib::errorHttp_DAEMON_RESTART;
+        else if (code >= 400 && code < 500)
             evHttp->error = MediaConchLib::errorHttp_INVALID_DATA;
         else
             evHttp->error = MediaConchLib::errorHttp_CONNECT;
         event_base_loopexit(evHttp->base, 0);
         return;
+    }
+
+    struct evkeyvalq *headers = evhttp_request_get_input_headers(req);
+    if (headers)
+    {
+        for (struct evkeyval *header = headers->tqh_first; header; header = header->next.tqe_next)
+        {
+            if (header->key && std::string(header->key) == "X-App-MediaConch-Instance-ID")
+                current_daemon_id = header->value ? strtol(header->value, NULL, 10) : -1;
+        }
     }
 
     std::string data;

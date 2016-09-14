@@ -16,7 +16,7 @@ namespace MediaConch {
 
 class FileRegistered;
 class XsltPolicy;
-class XsltRule;
+class XsltPolicyRule;
 
 class WebPage : public QWebEnginePage
 {
@@ -40,16 +40,16 @@ protected:
     void         string_to_json(QString& str);
 
 public Q_SLOTS:
-    void         on_file_upload_selected(const QString& policy, const QString& display_xslt, const QString& verbosity);
-    void         on_file_online_selected(const QString& url, const QString& policy, const QString& display_xslt, const QString& verbosity);
-    void         on_file_repository_selected(const QString& policy, const QString& display_xslt, const QString& verbosity);
+    void         on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity);
+    void         on_file_online_selected(const QString& url, const QString& policy, const QString& display, const QString& verbosity);
+    void         on_file_repository_selected(const QString& policy, const QString& display, const QString& verbosity);
     void         on_save_settings_selected(const QString& policy, const QString& display, const QString& verbosity,
                                            const QString& save_report, const QString& load_files,
                                            const QString& save_policy, const QString& load_policy,
                                            const QString& save_display, const QString& load_display);
 
-    void         on_input_changed(const QString& inputName);
     void         menu_link_checker(const QString& name);
+    void         on_input_changed(const QString& inputName);
 
     void         on_download_report(const QString& report, const QString& file, const QString& report_name);
     QString      on_fill_implementation_report(const QString& name, const QString& display, const QString& verbosity);
@@ -83,20 +83,21 @@ public Q_SLOTS:
     void         display_delete_id(const QString& name);
 
     QString      get_policies_tree();
-    void         create_rule_tree(XsltRule *r, int index, QString& rule_data);
-    void         create_xslt_policy_rules_tree(XsltPolicy *policy, QString& rules_data);
+    void         create_rule_tree(XsltPolicyRule *r, QString& rule_data);
     QString      import_policy();
     QString      import_policy(const QString& file);
     int          import_policy(const QStringList& files);
-    QString      create_policy();
-    QString      duplicate_policy(int id);
-    QString      export_policy(int id);
-    QString      delete_policy(int id);
-    QString      policy_change_name(int id, const QString& name, const QString& description);
-    QString      policy_rule_create(int policy_id);
-    QString      policy_rule_edit(int policy_id, int rule_id, const QString& title, bool is_editor, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& free_text);
-    QString      policy_rule_duplicate(int policy_id, int rule_id);
-    QString      policy_rule_delete(int policy_id, int rule_id);
+    QString      xslt_policy_create(int parent_id);
+    QString      policy_duplicate(int id, int dst_policy_id);
+    QString      policy_move(int id, int dst_policy_id);
+    QString      policy_export(int id);
+    QString      policy_remove(int id);
+    QString      policy_edit(int id, const QString& name, const QString& description, const QString& type);
+    QString      xslt_policy_rule_create(int policy_id);
+    QString      xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope);
+    QString      xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id);
+    QString      xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id);
+    QString      xslt_policy_rule_delete(int policy_id, int rule_id);
     QString      get_values_list(const QString& type, const QString& field, const QString& value);
     QString      get_fields_list(const QString& type, const QString& field);
 

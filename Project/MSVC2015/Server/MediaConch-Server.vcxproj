@@ -167,8 +167,6 @@
     <ClCompile Include="..\..\..\Source\Common\REST_API.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Scheduler.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schema.cpp" />
-    <ClCompile Include="..\..\..\Source\Common\Schematron.cpp" />
-    <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\SQLLite.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />

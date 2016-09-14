@@ -25,7 +25,7 @@ namespace MediaConch {
 class Core;
 class DaemonClient;
 class Policy;
-class XsltRule;
+class XsltPolicyRule;
 class Http;
 
 #ifdef _WIN32
@@ -78,13 +78,14 @@ public:
 
     enum errorHttp
     {
-        errorHttp_TRUE         = 1,
-        errorHttp_NONE         = 0,
-        errorHttp_INVALID_DATA = -1,
-        errorHttp_INIT         = -2,
-        errorHttp_CONNECT      = -3,
-        errorHttp_INTERNAL     = -4,
-        errorHttp_MAX          = -5,
+        errorHttp_TRUE           = 1,
+        errorHttp_NONE           = 0,
+        errorHttp_INVALID_DATA   = -1,
+        errorHttp_INIT           = -2,
+        errorHttp_CONNECT        = -3,
+        errorHttp_INTERNAL       = -4,
+        errorHttp_DAEMON_RESTART = -5,
+        errorHttp_MAX            = -6,
     };
 
     enum PluginType
@@ -93,19 +94,102 @@ public:
         PLUGIN_MAX,
     };
 
-    struct ReportRes
+    struct Checker_ReportRes
     {
-        std::string       report;
-        bool              has_valid;
-        bool              valid;
-        ReportRes() :     has_valid(false), valid(true) {}
+        std::string           report;
+        bool                  has_valid;
+        bool                  valid;
+        Checker_ReportRes() : has_valid(false), valid(true) {}
     };
 
-    struct ValidateRes
+    struct Checker_ValidateRes
     {
-        std::string     file;
-        bool            valid;
-        ValidateRes() : valid(true) {}
+        std::string             file;
+        bool                    valid;
+        Checker_ValidateRes() : valid(true) {}
+    };
+
+    union XSLT_Child;
+
+    struct XSLT_Policy_Rule
+    {
+        XSLT_Policy_Rule() : id(-1), occurrence(-1) {}
+
+        int          id;
+        std::string  name;
+        std::string  tracktype;
+        std::string  field;
+        std::string  scope;
+        int          occurrence;
+        std::string  ope;
+        std::string  value;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Policy
+    {
+        Policy_Policy() : id(-1), parent_id(-1), is_system(false) {}
+        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), kind(p->kind), type(p->type), name(p->name), description(p->description), children(p->children) {}
+        int                                       id;
+        int                                       parent_id;
+        bool                                      is_system;
+        std::string                               kind;
+        std::string                               type;
+        std::string                               name;
+        std::string                               description;
+        std::vector<std::pair<int, XSLT_Child> >  children;
+        std::string to_str() const;
+    };
+
+    union XSLT_Child
+    {
+        XSLT_Policy_Rule *rule;
+        Policy_Policy    *policy;
+    };
+
+    struct Get_Policies
+    {
+    Get_Policies() : policies(NULL) {}
+
+        ~Get_Policies()
+        {
+            if (format == "JSTREE" && jstree)
+                delete jstree;
+            else if (policies)
+            {
+                for (size_t i = 0; i < policies->size(); ++i)
+                    delete policies->at(i);
+                policies->clear();
+                delete policies;
+            }
+        }
+
+        std::string                      format;
+        union
+        {
+            std::vector<Policy_Policy*>* policies;
+            std::string*                 jstree;
+        };
+    };
+
+    struct Get_Policy
+    {
+        Get_Policy() : policy(NULL) {}
+
+        ~Get_Policy()
+        {
+            if (format == "JSTREE" && jstree)
+                delete jstree;
+            else if (policy)
+                delete policy;
+        }
+
+        std::string          format;
+        union
+        {
+            Policy_Policy   *policy;
+            std::string     *jstree;
+        };
     };
 
     static const std::string display_xml_name;
@@ -115,34 +199,36 @@ public:
     static const std::string display_jstree_name;
 
     // General
-    int init();
-    int close();
+    int  init();
+    int  close();
+    void reset_daemon_client();
 
     //Options
     int add_option(const std::string& option, std::string& report);
 
     // Analyze
-    int  analyze(const std::vector<std::string>& files, bool force_analyze = false);
-    int  analyze(const std::string& file, bool& registered, bool force_analyze = false);
-    int  is_done(const std::vector<std::string>& files, double& percent);
-    int  is_done(const std::string& file, double& percent, report& report_kind);
+    int  checker_analyze(const std::vector<std::string>& files, bool force_analyze = false);
+    int  checker_analyze(const std::string& file, bool& registered, bool force_analyze = false);
+    int  checker_is_done(const std::vector<std::string>& files, double& percent);
+    int  checker_is_done(const std::string& file, double& percent, report& report_kind);
 
-    void list(std::vector<std::string>& vec);
-    void file_from_id(int id, std::string& filename);
+    void checker_list(std::vector<std::string>& vec);
+    void checker_file_from_id(int id, std::string& filename);
 
     // Output
-    int  get_report(const std::bitset<report_Max>& Report, format f,
-                    const std::vector<std::string>& files,
-                    const std::vector<std::string>& policies_names,
-                    const std::vector<std::string>& policies_contents,
-                    const std::map<std::string, std::string>& options,
-                    MediaConchLib::ReportRes* result,
-                    const std::string* display_name = NULL,
-                    const std::string* display_content = NULL);
-    int validate(MediaConchLib::report report, const std::vector<std::string>& files,
-                 const std::vector<std::string>& policies_names,
-                 const std::vector<std::string>& policies_contents,
-                 std::vector<ValidateRes*>& result);
+    int  checker_get_report(int user, const std::bitset<report_Max>& Report, format f,
+                            const std::vector<std::string>& files,
+                            const std::vector<size_t>& policies_ids,
+                            const std::vector<std::string>& policies_contents,
+                            const std::map<std::string, std::string>& options,
+                            Checker_ReportRes* result,
+                            const std::string* display_name = NULL,
+                            const std::string* display_content = NULL);
+    int checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
+                         const std::vector<size_t>& policies_ids,
+                         const std::vector<std::string>& policies_contents,
+                         const std::map<std::string, std::string>& options,
+                         std::vector<Checker_ValidateRes*>& result);
 
     //Clear
     int remove_report(const std::vector<std::string>& files);
@@ -156,9 +242,9 @@ public:
 
     // Xsl Transformation
     int  transform_with_xslt_file(const std::string& report, const std::string& file,
-                                  std::string& result);
+                                  const std::map<std::string, std::string>& opts, std::string& result);
     int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
-                                    std::string& result);
+                                    const std::map<std::string, std::string>& opts, std::string& result);
 
     // Configuration
     void               load_configuration();
@@ -177,35 +263,37 @@ public:
 
     // Policies
     //   Create policy
-    size_t                      create_policy_from_file(const std::string& file);
-    int                         create_xslt_policy(std::string& err);
-    int                         duplicate_policy(int id, std::string& err);
-    int                         policy_change_name(int id, const std::string& name, const std::string& description, std::string& err);
-    int                         create_policy_rule(int policy_id, std::string& err);
-    int                         edit_policy_rule(int policy_id, int rule_id, const XsltRule *rule, std::string& err);
-    int                         duplicate_policy_rule(int policy_id, int rule_id, std::string& err);
-    int                         delete_policy_rule(int policy_id, int rule_id, std::string& err);
-    //   Policy saved?
-    bool                        is_policies_saved() const;
-    bool                        is_policy_saved(size_t pos) const;
+    int                          policy_duplicate(int user, int id, int dst_policy_id, std::string& err);
+    int                          policy_move(int user, int id, int dst_policy_id, std::string& err);
+    int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
+    int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
+    int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);
+    int                          xslt_policy_create_from_file(int user, const std::string& file, std::string& err);
     //   Import policy
-    int                         import_policy_from_file(const std::string& filename, std::string& err);
-    int                         import_policy_from_memory(const char* filename, const std::string& memory, std::string& err, bool is_system_policy=false);
+    int                          policy_import(int user, const std::string& memory, std::string& err, const char* filename=NULL, bool is_system_policy=false);
+
     //   Policy helper
-    size_t                      get_policies_count() const;
-    Policy*                     get_policy(size_t pos);
-    bool                        policy_exists(const std::string& title);
-    int                         save_policy(size_t pos, std::string& err);
-    void                        add_policy(Policy* p);
-    int                         remove_policy(size_t pos, std::string& err);
-    void                        save_policies();
-    int                         export_policy(const char* filename, size_t pos, std::string& err);
-    void                        clear_policies();
-    const std::vector<Policy *>& get_policies() const;
+    size_t                       policy_get_policies_count(int user) const;
+    int                          policy_get(int user, int pos, const std::string& format, Get_Policy&, std::string& err);
+    int                          policy_get_name(int user, int id, std::string& name, std::string& err);
+    void                         policy_get_policies(int user, const std::vector<int>&, const std::string& format, Get_Policies&);
+    void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
+    int                          policy_save(int user, int pos, std::string& err);
+    int                          policy_remove(int user, int pos, std::string& err);
+    int                          policy_dump(int user, int id, std::string& memory, std::string& err);
+    int                          policy_clear_policies(int user, std::string& err);
+
+    // XSLT Policy Rule
+    int                         xslt_policy_rule_create(int user, int policy_id, std::string& err);
+    XsltPolicyRule*             xslt_policy_rule_get(int user, int policy_id, int id, std::string& err);
+    int                         xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int                         xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
+    int                         xslt_policy_rule_move(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
+    int                         xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);
 
     //Generated Values
-    int                         get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
-    int                         get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
+    int                         policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int                         policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
     // Daemon
     void set_use_daemon(bool use);
@@ -215,6 +303,8 @@ public:
     // Helper
     int init_http_client();
     int close_http_client();
+    int load_system_policy();
+    int load_existing_policy();
 
 private:
     MediaConchLib (const MediaConchLib&);

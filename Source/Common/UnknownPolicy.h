@@ -31,15 +31,16 @@ namespace MediaConch {
 class UnknownPolicy : public Policy
 {
 public:
-    UnknownPolicy(bool no_https) : Policy(Policies::POLICY_UNKNOWN, no_https), system_doc(NULL) {}
+    UnknownPolicy(Policies *p, bool no_https) : Policy(p, Policies::POLICY_UNKNOWN, no_https), system_doc(NULL) {}
     UnknownPolicy(const UnknownPolicy*);
     virtual          ~UnknownPolicy();
     xmlDocPtr         create_doc();
 
 private:
     // HELPER
-    int import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
-    xmlDocPtr         system_doc;
+    int        import_schema_from_doc(xmlDocPtr doc, const std::string& filename);
+
+    xmlDocPtr  system_doc;
 };
 
 }

@@ -177,23 +177,19 @@ void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& 
     {
         working_files_mutex.unlock();
 
-        Policy *p = mainwindow->get_policy((size_t)policy);
-        if (p)
-        {
-            std::vector<std::string> policies_names, policies_contents;
-            std::vector<MediaConchLib::ValidateRes*> res;
-            std::string policy_content;
-            p->dump_schema(policy_content);
-            policies_contents.push_back(policy_content);
+        std::vector<size_t> policies_ids;
+        std::vector<std::string> policies_contents;
+        std::vector<MediaConchLib::Checker_ValidateRes*> res;
+        std::map<std::string, std::string> options;
+        policies_ids.push_back(policy);
 
-            if (mainwindow->validate(MediaConchLib::report_Max, file,
-                                     policies_names, policies_contents, res) == 0 && res.size() == 1)
-            {
-                policy_valid = res[0]->valid;
-                for (size_t j = 0; j < res.size() ; ++j)
-                    delete res[j];
-                res.clear();
-            }
+        if (mainwindow->validate(MediaConchLib::report_Max, file,
+                                 policies_ids, policies_contents, options, res) == 0 && res.size() == 1)
+        {
+            policy_valid = res[0]->valid;
+            for (size_t j = 0; j < res.size() ; ++j)
+                delete res[j];
+            res.clear();
         }
 
         working_files_mutex.lock();
@@ -350,11 +346,13 @@ void WorkerFiles::update_unfinished_files()
         {
             fr->analyzed = true;
             fr->report_kind = report_kind;
-            std::vector<std::string> policies_names, policies_contents;
-            std::vector<MediaConchLib::ValidateRes*> res;
+            std::vector<size_t> policies_ids;
+            std::vector<std::string> policies_contents;
+            std::map<std::string, std::string> options;
+            std::vector<MediaConchLib::Checker_ValidateRes*> res;
 
             if (mainwindow->validate(report_kind, files[i],
-                                     policies_names, policies_contents, res) == 0
+                                     policies_ids, policies_contents, options, res) == 0
                 && res.size() == 1)
                 fr->implementation_valid = res[0]->valid;
 
@@ -363,16 +361,10 @@ void WorkerFiles::update_unfinished_files()
             res.clear();
             if (report_kind == MediaConchLib::report_MediaConch && fr->policy >= 0)
             {
-                Policy *p = mainwindow->get_policy((size_t)fr->policy);
-                if (p)
-                {
-                    std::string policy_content;
-                    p->dump_schema(policy_content);
-                    policies_contents.push_back(policy_content);
-                }
+                policies_ids.push_back(fr->policy);
 
-                if (p && mainwindow->validate(MediaConchLib::report_Max, files[i],
-                                              policies_names, policies_contents, res) == 0 && res.size() == 1)
+                if (mainwindow->validate(MediaConchLib::report_Max, files[i],
+                                         policies_ids, policies_contents, options, res) == 0 && res.size() == 1)
                     fr->policy_valid = res[0]->valid;
                 for (size_t j = 0; j < res.size() ; ++j)
                     delete res[j];
@@ -538,8 +530,8 @@ void WorkerFiles::fill_registered_files_from_db()
         full_file += fr->filename;
 
         //check if policy still exists
-        Policy *p = mainwindow->get_policy(fr->policy);
-        if (!p)
+        MediaConchLib::Get_Policy p;
+        if (mainwindow->policy_get(fr->policy, "JSON", p) < 0)
             fr->policy = -1;
 
         fr->index = file_index++;

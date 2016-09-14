@@ -8,6 +8,46 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.8
+
+* Add XSL's options in Checker_Get_Report and Checker_Validate
+* Put the verbosity to options
+
+#### Version 1.7
+
+* create the command for policies
+  * XSLT_Policy_Create
+  * Policy_Import
+  * Policy_Save
+  * Policy_Remove
+  * Policy_Duplicate
+  * Policy_Move
+  * Policy_Dump
+  * Policy_Get_Name
+  * Policy_Change_Info
+  * Policy_Change_Type
+  * Policy_Get
+  * Policy_Get_Policies
+  * Policy_Get_Policies_Names_List
+  * Policy_Get_Policies_Count
+  * Policy_Clear_Policies
+  * XSLT_Policy_Rule_Create
+  * XSLT_Policy_Rule_Get
+  * XSLT_Policy_Rule_Edit
+  * XSLT_Policy_Rule_Move
+  * XSLT_Policy_Rule_Delete
+
+* create the policy object:
+  * Policy_Policy
+  * XSLT_Policy_Rule
+  * Policy_Error
+
+#### Version 1.6
+
+* Use id for policy instead of files
+* Make scope (checker) for all checker commands
+* Change the name of create policy from file
+
 #### Version 1.5
 
 * Add the create policy from file command
@@ -39,25 +79,41 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.5
+Current API version: $API_VERSION = 1.6
 
 #### Command
 
-* Analyze:                 HTTP POST
-* Status:                  HTTP GET
-* Report:                  HTTP POST
-* Retry:                   HTTP PUT
-* Clear:                   HTTP DELETE
-* List:                    HTTP GET
-* Validate:                HTTP POST
-* File_From_Id:            HTTP POST
+* Checker_Analyze:         HTTP POST
+* Checker_Status:          HTTP GET
+* Checker_Report:          HTTP POST
+* Checker_Retry:           HTTP PUT
+* Checker_Clear:           HTTP DELETE
+* Checker_List:            HTTP GET
+* Checker_Validate:        HTTP POST
+* Checker_File_From_Id:    HTTP POST
 * Default_Values_For_type: HTTP GET
-* Create_Policy_From_File: HTTP GET
 
-#### Analyze
+* XSLT_Policy_Create: HTTP GET
+* Policy_Import: HTTP POST
+* Policy_Remove: HTTP GET
+* Policy_Duplicate: HTTP GET
+* Policy_Move: HTTP GET
+* Policy_Dump: HTTP GET
+* Policy_Save: HTTP GET
+* Policy_Get_Name: HTTP GET
+* Policy_Change_Info: HTTP POST
+* Policy_Change_Type: HTTP POST
+* Policy_Get: HTTP GET
+* Policy_Get_Policies: HTTP GET
+* Policy_Get_Policies_Names_List: HTTP GET
+* Policy_Get_Policies_Count: HTTP GET
+* Policy_Clear_Policies: HTTP GET
+* Policy_Create_From_File: HTTP GET
+
+#### Checker_Analyze
 
 JSON format for the parameters.
-URL: /$API_VERSION/analyze
+URL: /$API_VERSION/checker_analyze
 
 ##### Request
 
@@ -84,10 +140,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Status
+#### Checker_Status
 
 URI format for the parameters.
-URL: /$API_VERSION/status
+URL: /$API_VERSION/checker_status
 
 ##### Request
 
@@ -113,10 +169,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Report
+#### Checker_Report
 
 JSON format for the parameters.
-URL: /$API_VERSION/report
+URL: /$API_VERSION/checker_report
 
 ##### Request
 
@@ -127,10 +183,11 @@ Parameters:
 - id:                Integer: id given by the Analyze command
 - reports:           Array of report kinds
 - policies_contents: Array of policies contents (Strings)
-- policies_names:    Array of policies names (Strings)
+- policies_ids:      Array of policies ids (Integer)
 - display_content:   String:  display content
 - display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE)
-- verbosity:         Integer: verbosity of the implementation report wanted, optionnal. Value between -1 and 5. If -1 or not given, takes the one from the server (since API v1.3)
+- options:           Object of strings given to the XSL transformations: Verbosity should be defined here.
+                     Example: "options":{"verbosity": "5", "key":"value", ...}
 
 ##### Response
 
@@ -146,10 +203,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Retry
+#### Checker_Retry
 
 JSON format for the parameters.
-URL: /$API_VERSION/retry
+URL: /$API_VERSION/checker_retry
 
 ##### Request
 
@@ -168,10 +225,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### Clear
+#### Checker_Clear
 
 URI format for the parameters.
-URL: /$API_VERSION/clear
+URL: /$API_VERSION/checker_clear
 
 ##### Request
 
@@ -192,9 +249,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### List
+#### Checker_List
 
 No Parameter
+URL: /$API_VERSION/checker_list
 
 ##### Request
 
@@ -209,10 +267,10 @@ Parameters:
 - file:              Filename of the file
 - id:                Internal id, id to be used by other request
 
-#### Validate
+#### Checker_Validate
 
 JSON format for the parameters.
-URL: /$API_VERSION/validate
+URL: /$API_VERSION/checker_validate
 
 ##### Request
 
@@ -224,6 +282,8 @@ Parameters:
 - report:            report kind, only POLICY or IMPLEMENTATION are possible
 - policies_contents: Array of policies contents (Strings)
 - policies_names:    Array of policies names (Strings)
+- options:           Objects with strings (key, value) given to the XSL transformations: Verbosity should be defined here.
+                     Example: "options":{"verbosity": "5", "key":"value", ...}
 
 ##### Response
 
@@ -239,10 +299,10 @@ Parameters:
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
 
-#### File_From_Id
+#### Checker_File_From_Id
 
 JSON format for the parameters.
-URL: /$API_VERSION/file_from_id
+URL: /$API_VERSION/checker_file_from_id
 
 ##### Request
 
@@ -273,27 +333,555 @@ Parameters:
 
 * values:            Array of values (String)
 
-#### Create_Policy_From_File
 
-URI format for the parameters.
-URL: /$API_VERSION/create_policy_from_file
+#### XSLT_Policy_Create
 
 ##### Request
 
 Parameters:
 
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_create
+
+##### Request
+
+Parameters:
+
+user:      User ID
+parent_id: Policy ID of the parent
+type:      Policy operator ("and", "or"; default is "and")
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the id of the created policy: '{"XSLT_POLICY_CREATE_RESULT": {"id": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_CREATE_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Import
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_import
+
+##### Request
+
+Parameters:
+
+user:  User ID
+xml:   XML corresponding to the policy
+{\"POLICY_IMPORT\": {\"xml\": \"$XML_DATA\"}}
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the id of the created policy: '{"POLICY_IMPORT_RESULT": {"id": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_IMPORT_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Remove
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_remove?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to remove
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an Empty object '{"POLICY_REMOVE_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_REMOVE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Dump
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_dump?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to dump
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the XML of the policy '{"POLICY_DUMP_RESULT": {"xml": "POLICY_XML"}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_DUMP_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Save
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_save?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to save
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an Empty object '{"POLICY_SAVE_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_SAVE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Duplicate
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_duplicate?id=0
+
+##### Request
+
+Parameters:
+
+user:          User ID
+id:            Policy ID to duplicate
+dst_policy_id: Policy ID used as parent (default is -1, root node)
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the new ID '{"POLICY_DUPLICATE_RESULT": {"id": 0}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_DUPLICATE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Move
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_move?id=0&dst_policy_id=41
+
+##### Request
+
+Parameters:
+
+user:          User ID
+id:            Policy ID to move (duplicate + delete)
+dst_policy_id: Policy ID used as new parent (default is -1, root node)
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the new ID '{"POLICY_MOVE_RESULT": {"id": 42}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_MOVE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Get_Name
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_name?id=0
+
+##### Request
+
+Parameters:
+
+user:  User ID
+id:    Policy ID to retrieve information
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an object with the name '{"POLICY_GET_NAME_RESULT": {"name": "New policy"}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_NAME_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Change_Info
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_change_info"
+
+##### Request
+
+Parameters:
+
+user:        User ID
+id:          Policy ID to retrieve information
+name:        New name for the policy
+description: New description for the policy
+'{"POLICY_CHANGE_INFO":{"id": 0, "name": "changed name", "description": "changed description"}}'
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an empty object '{"POLICY_CHANGE_INFO_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CHANGE_INFO_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Change_Type
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_change_type"
+
+##### Request
+
+Parameters:
+
+user:        User ID
+id:          Policy ID to retrieve information
+type:        New type for the policy
+'{"POLICY_CHANGE_TYPE":{"id": 0, "type": "or"}}'
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an empty object '{"POLICY_CHANGE_TYPE_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CHANGE_TYPE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
+#### Policy_Get
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get?id=0&format=JSTREE
+
+##### Request
+
+Parameters:
+
+user:   User ID
+id:     Policy ID
+format: Output format, can be "JSTREE" or "JSON"
+
+##### Response
+
+Parameters:
+
+- if command is ok, if format is JSON, return a Policy_Policy: '{"POLICY_GET_RESULT": {"policy": {"type": "and", "id": 0, "description": "", "parent_id": -1, "name": "New policy", "is_system": false, "children":[]}}}'
+- if command is ok, if format is JSTREE, return a string with policy tree: '{"POLICY_GET_RESULT": "{\"policyTree\": {\"type\": \"p\", \"text\": \"New policy\", \"data\": {\"kind\":\"XSLT\",\"policyId\": 0, \"description\": \"\", \"parent_id\": -1, \"isEditable\": true,\"type\":\"or\"},\"children\":[]}}"}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Get_Policies_Count
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_policies_count
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the number of policies for the user in size: '{"POLICY_GET_POLICIES_COUNT_RESULT": {"size": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_COUNT_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Get_Policies
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_policies?id=0&id=1
+
+##### Request
+
+Parameters:
+
+user:   User ID
+id:     Policy ID (can be cumulated), if not present, return all policies
+format: Output format, can be "JSTREE" or "JSON"
+
+##### Response
+
+Parameters:
+
+- if command is ok, format is "JSON", return an object with an array of policies (Policy_Policy): '{"POLICY_GET_POLICIES_RESULT": {"policies": []}}'
+- if command is ok, format is "JSTREE", return an object with a jstree string policies: '{"POLICY_GET_POLICIES_RESULT": {"policiesTree": "[]"}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Get_Policies_Names_List
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_policies_names_list
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with an array of policies ids and names: '{"POLICY_GET_POLICIES_NAMES_LIST_RESULT": {"policies": [{\"id\":0,\"name\":\"policy name\"}]}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_NAMES_LIST_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Clear_Policies
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_clear_policies
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an empty object: '{"POLICY_CLEAR_POLICIES_RESULT": {}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CLEAR_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### XSLT_Policy_Create_From_File
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_create_from_file
+
+##### Request
+
+Parameters:
+
+user:  User ID
+
+##### Response
+
+Parameters:
+
+##### Request
+
+Parameters:
+
+* user:              Integer: User ID
 * id:                Integer: Id given by analyze for a file
 
 ##### Response
 
 Parameters:
 
-* policy:            String with the XSL policy
+* policy_id:         ID of the created XSL policy
 
 * nok:               Object
 
 - id:                Integer: id given by the request
 - error:             Integer: Error code corresponding to the error
+
+#### XSLT_Policy_Rule_Create
+
+##### Request
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_create?policy_id=0
+
+##### Request
+
+Parameters:
+
+user:      User ID
+policy_id: Policy ID of the parent (XSLT) policy
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the id of the created rule: '{"XSLT_POLICY_RULE_CREATE_RESULT": {"id": 0}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_CREATE_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### XSLT_Policy_Rule_Get
+
+##### Request
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_get?policy_id=0&id=0
+
+##### Request
+
+Parameters:
+
+user:      User ID
+policy_id: Policy ID of the parent (XSLT) policy
+id:        Rule ID of the rule wanted
+
+##### Response
+
+Parameters:
+
+- if command is ok, return a XSLT_Policy_Rule: '{"XSLT_POLICY_RULE_GET_RESULT": {"rule": {"field": "", "id": 0, "occurrence": -1, "name": "New Rule", "ope": "", "tracktype": "", "value": ""}}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_CREATE_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### XSLT_Policy_Rule_Edit
+
+##### Request
+
+Parameters:
+
+JSON format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_edit
+
+##### Request
+
+Parameters:
+
+user:      User ID
+policy_id: Policy ID of the parent (XSLT) policy
+rule:      Contains a XSLT_Policy_Rule object, use the "id" value to find the correct rule
+
+'{"XSLT_POLICY_RULE_EDIT": {"rule": {"field": "Format", "id": 0, "occurrence": -1, "name": "General Format is Matroska", "ope": "is_equal", "tracktype": "General", "value": "Matroska"}}}'
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an empty object: '{"XSLT_POLICY_RULE_EDIT_RESULT": {}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_EDIT_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### XSLT_Policy_Rule_Duplicate
+
+##### Request
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_duplicate?policy_id=0&id=0
+
+##### Request
+
+Parameters:
+
+user:          User ID
+policy_id:     Policy ID of the parent (XSLT) policy
+id:            Rule ID of the rule to duplicate
+dst_policy_id: Policy ID used as parent (default is -1, root node)
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the new Rule ID: '{"XSLT_POLICY_RULE_DUPLICATE_RESULT": {"id": 17}}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_DUPLICATE_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### XSLT_Policy_Rule_Move
+
+##### Request
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_move?policy_id=0&id=0&dst_policy_id=42
+
+##### Request
+
+Parameters:
+
+user:          User ID
+policy_id:     Policy ID of the parent (XSLT) policy
+id:            Rule ID of the rule to move
+dst_policy_id: Policy ID used as new parent (default is -1, root node)
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with the new Rule ID: '{"XSLT_POLICY_RULE_MOVE_RESULT": {"id": 17}}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_MOVE_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### XSLT_Policy_Rule_Delete
+
+##### Request
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/xslt_policy_rule_delete?policy_id=0&id=0
+
+##### Request
+
+Parameters:
+
+user:      User ID
+policy_id: Policy ID of the parent (XSLT) policy
+id:        Rule ID of the rule to delete
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an empty object: '{"XSLT_POLICY_RULE_DELETE_RESULT": {}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"XSLT_POLICY_RULE_DELETE_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Policy
+
+Policy Object
+
+Parameters:
+
+* id:          ID of the policy
+* parent_id:   ID of the parent policy (optional, root is -1)
+* name:        string containing the name of the policy (optional)
+* kind:        string containing the policy kind ("UNKNOWN" or "XSLT")
+* type:        string containing the policy operator (optional; value: "and", "or"; default is "and")
+* is_system:   boolean set to true if it is a system policy
+* description: string containing the name of the policy (optional)
+* children:    list of children of the policy (sub-policies, rules)
+
+{"id":0, "parent_id":-1, "name": "NAME", "description":"", "type":"and", "children":[]}
+
+#### XSLT_Policy_Rule
+
+Policy Object
+
+Parameters:
+
+* id:         ID of the rule inside the policy
+* name:       Name of the rule
+* tracktype:  Track type of the rule
+* field:      Field of the rule
+* scope:      Scope of the rule, mt for MediaTrace, nothing for MediaInfo
+* occurrence: Number of occurrence of the field
+* ope:        Operator of the Rule
+* value:      Value of the rule
+
+{"id":0, "name": "NAME", "tracktype": "TYPE", "field":"FIELD", "occurrence":-1, "ope":"is_existing", value=""}
+
+#### Policy_Error
+
+Policy Object
+
+Parameters:
+
+* error: string corresponding to the error
+{\"error\"=\"ERROR\"}
 
 #### Report kinds
 

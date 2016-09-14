@@ -49,7 +49,7 @@ public:
     virtual int    serialize(Value &v, std::string&);
     virtual Value *get_value_by_key(Value& v, const std::string& key);
     virtual Value *get_value_in_array_by_key(Value& v, const std::string& key);
-    
+
 private:
     json_t        *current_node;
 
