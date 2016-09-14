@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MediaConch xmlns="https://mediaarea.net/mediaconch" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mi="https://mediaarea.net/mediainfo" version="0.3">
+  <media ref="test5.mp4">
+    <policy name="Do I like these frames?" type="or" rules_run="10" fail_count="4" pass_count="6" outcome="pass">
+      <description>NTSC is nice, so is PAL, also 320x240 cuz its my sample file</description>
+      <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='General'][1]/mi:Format='Matroska'" actual="MPEG-4" outcome="fail"/>
+      <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='Video']/mi:Format='AVC2'" outcome="pass"/>
+      <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Format='AVC2'" actual="AVC" outcome="fail"/>
+      <rule name="Jerome's favorite test" xpath="mi:MediaInfo/mi:track[@type='Video'][2]/mi:Format='AVC2'" outcome="pass"/>
+      <rule xpath="mt:MediaTrace/mt:block[@name='Segment']/mt:block[@name='Cluster']/mt:block[@name='SimpleBlock']/mt:block[@name='Data']/mt:data[@name='keyframe']='Yes'" actual="" outcome="fail"/>
+      <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:DisplayAspectRatio&gt;='1.0'" outcome="pass"/>
+      <policy name="Here is a mediatrace-based rule" type="and" rules_run="1" fail_count="1" pass_count="0" outcome="fail">
+        <rule xpath="mt:MediaTrace/mt:block[@name='EBML']/mt:block[@name='EBMLVersion']/mt:data[@name='Data']='2'" actual="1" outcome="fail"/>
+      </policy>
+      <policy name="This is an empty policy with no rules just to see what happens" type="and" rules_run="0" fail_count="0" pass_count="0" outcome="pass"/>
+      <policy name="Does this use framesize and framerates that I like?" type="and" rules_run="4" fail_count="0" pass_count="4" outcome="pass">
+        <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Width='320'" outcome="pass"/>
+        <policy name="I like frame heights like 240, 480, 486" type="or" rules_run="3" fail_count="2" pass_count="1" outcome="pass">
+          <rule name="ntsc height" xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Height='486'" actual="240" outcome="fail"/>
+          <rule name="ntsc-ish height" xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Height='480'" actual="240" outcome="fail"/>
+          <rule name="half-ntsc height" xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Height='240'" outcome="pass"/>
+        </policy>
+        <policy name="These are the framerates that I trust" type="or" rules_run="5" fail_count="3" pass_count="2" outcome="pass">
+          <policy name="NTSC 4EVA" type="and" rules_run="4" fail_count="2" pass_count="2" outcome="fail">
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Num='30000'" actual="25" outcome="fail"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Den='1001'" actual="1" outcome="fail"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Den" outcome="pass"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Den" outcome="pass"/>
+          </policy>
+          <policy name="These next rules test for existance because they have no operator and no value." type="and" rules_run="4" fail_count="1" pass_count="3" outcome="fail">
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate" outcome="pass"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Num" outcome="pass"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Den" outcome="pass"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_FakeValue" actual="" outcome="fail"/>
+          </policy>
+          <policy name="Or Fake NTSC" type="and" rules_run="2" fail_count="2" pass_count="0" outcome="fail">
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Num='2997'" actual="25" outcome="fail"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Den='100'" actual="1" outcome="fail"/>
+          </policy>
+          <policy name="empty" type="and" rules_run="0" fail_count="0" pass_count="0" outcome="pass"/>
+          <policy name="PAL, why not" type="and" rules_run="2" fail_count="0" pass_count="2" outcome="pass">
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Num='25'" outcome="pass"/>
+            <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:FrameRate_Den='1'" outcome="pass"/>
+          </policy>
+        </policy>
+        <policy name="Frames widths like 720, 640, and 320 are nice" type="or" rules_run="3" fail_count="2" pass_count="1" outcome="pass">
+          <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Width='720'" actual="320" outcome="fail"/>
+          <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Width='640'" actual="320" outcome="fail"/>
+          <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:Width='320'" outcome="pass"/>
+        </policy>
+      </policy>
+      <policy name="In my aspect ratio zone?" type="and" rules_run="2" fail_count="0" pass_count="2" outcome="pass">
+        <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:DisplayAspectRatio&lt;='1.5'" outcome="pass"/>
+        <rule xpath="mi:MediaInfo/mi:track[@type='Video'][1]/mi:DisplayAspectRatio&gt;='1.0'" outcome="pass"/>
+      </policy>
+    </policy>
+  </media>
+</MediaConch>
