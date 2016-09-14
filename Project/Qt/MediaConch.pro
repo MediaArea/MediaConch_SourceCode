@@ -76,6 +76,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/checkerwindow.cpp \
                     ../../Source/GUI/Qt/resulttable.cpp \
                     ../../Source/GUI/Qt/policieswindow.cpp \
+                    ../../Source/GUI/Qt/WebCommonPage.cpp \
                     ../../Source/GUI/Qt/progressbar.cpp \
                     ../../Source/GUI/Qt/workerfiles.cpp \
                     ../../Source/GUI/Qt/DatabaseUi.cpp \
@@ -126,6 +127,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/generated/GeneratedCSVVideos.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
+                    ../../Source/GUI/Qt/WebCommonPage.h \
                     ../../Source/GUI/Qt/WebView.h \
                     ../../Source/GUI/Qt/mainwindow.h \
                     ../../Source/GUI/Qt/menumainwindow.h \
