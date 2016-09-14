@@ -532,16 +532,16 @@ var policyTree = (function() {
 
     var dataRuleToJstree = function(rule) {
         return {
-            text: rule.name,
+            text: (undefined == rule.name) ? '' : rule.name,
             type: 'r',
             data: {
                 ruleId: rule.id,
-                tracktype: rule.tracktype,
-                field: rule.field,
-                occurrence: (-1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence,
+                tracktype: (undefined == rule.tracktype) ? '' : rule.tracktype,
+                field: (undefined == rule.field) ? '' : rule.field,
+                occurrence: (undefined == rule.occurrence || -1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence,
+                ope: (undefined == rule.ope) ? '' : rule.ope,
+                value: (undefined == rule.value) ? '' : rule.value,
                 scope: (undefined == rule.scope) ? '' : rule.scope,
-                ope: rule.ope,
-                value: rule.value
             }
         }
     }

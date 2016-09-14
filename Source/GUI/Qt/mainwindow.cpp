@@ -572,6 +572,7 @@ void MainWindow::createPoliciesView()
     if (clearVisualElements() < 0)
         return;
 
+    MCL.reset_daemon_client();
     policiesView = new PoliciesWindow(this);
     policiesView->display_policies();
 }
@@ -1275,7 +1276,7 @@ void MainWindow::get_error_http(MediaConchLib::errorHttp code, QString& error_ms
             error_msg = "Cannot connect to the daemon";
             break;
         case MediaConchLib::errorHttp_DAEMON_RESTART:
-            error_msg = "Daemon has restarted, reload the page";
+            error_msg = "Daemon has restarted, please reload the page";
             break;
         default:
             error_msg = "Error not known";

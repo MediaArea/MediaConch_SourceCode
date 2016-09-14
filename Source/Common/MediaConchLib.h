@@ -199,8 +199,9 @@ public:
     static const std::string display_jstree_name;
 
     // General
-    int init();
-    int close();
+    int  init();
+    int  close();
+    void reset_daemon_client();
 
     //Options
     int add_option(const std::string& option, std::string& report);

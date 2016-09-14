@@ -23,12 +23,6 @@
 namespace MediaConch {
 
 //***************************************************************************
-// Httpd
-//***************************************************************************
-
-int LibEventHttp::current_daemon_id = -1;
-
-//***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
 
@@ -182,10 +176,7 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
     if (code != HTTP_OK)
     {
         if (code == 410)
-        {
             evHttp->error = MediaConchLib::errorHttp_DAEMON_RESTART;
-            current_daemon_id = -1;
-        }
         else if (code >= 400 && code < 500)
             evHttp->error = MediaConchLib::errorHttp_INVALID_DATA;
         else

@@ -75,6 +75,8 @@ public:
     void set_port(int port);
     void set_address(std::string& address);
 
+    void reset_daemon_id() { current_daemon_id = -1; }
+
     MediaConchLib::errorHttp get_error() const { return error; }
     std::string              get_result() const { return result; }
 
@@ -84,6 +86,8 @@ protected:
     int                      port;
     std::string              result;
     MediaConchLib::errorHttp error;
+
+    static int                  current_daemon_id;
 
     virtual int send_request_get(std::string& uri) = 0;
     virtual int send_request_post(std::string& uri, std::string& str) = 0;

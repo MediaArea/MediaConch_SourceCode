@@ -38,8 +38,9 @@ public:
     ~DaemonClient();
 
     // General
-    int init();
-    int close();
+    int  init();
+    int  close();
+    void reset();
 
     //***************************************************************************
     // Checker

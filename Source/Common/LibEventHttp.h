@@ -50,8 +50,6 @@ private:
     struct event_base          *base;
     struct evhttp_connection   *connection;
 
-    static int                  current_daemon_id;
-
     static void result_coming(struct evhttp_request *req, void *arg);
 
     virtual int send_request_get(std::string& uri);
