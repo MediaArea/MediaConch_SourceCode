@@ -286,6 +286,8 @@
   </html>
   </xsl:template>
   <xsl:template match="mc:policy">
+    <input id="policy-arrow-{generate-id()}" class="arrow arrow-mark" type="checkbox"/>
+    <label for="policy-arrow-{generate-id()}"></label>
     <div class="mc_header">
       <h2>
         <xsl:value-of select="@name"/>
@@ -298,7 +300,7 @@
       <p>Fail count: <xsl:value-of select="@fail_count"/></p>
       <p>Pass count: <xsl:value-of select="@pass_count"/></p>   
     </div>
-    <div class="mc_element">
+    <div class="mc_element extra">
     <xsl:apply-templates select="mc:rule|mc:policy"/>
     </div>
   </xsl:template>
