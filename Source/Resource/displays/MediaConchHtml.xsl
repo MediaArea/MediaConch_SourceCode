@@ -24,6 +24,8 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
         margin-left:20px;
+        margin-bottom: 0;
+        margin-top: 0;
       }
 
       .mc_header h1 {
@@ -64,10 +66,9 @@
       }
 
       .mc_element {
-        border: 2px solid #ddd;
-        background-color: #f5f5f5;
+        border-left: 2px solid #ddd;
         border-bottom: 0;
-        padding: 0 5px 0 5px;
+        padding: 0 5px 0 20px;
       }
 
       .mc_element .extra {
@@ -297,11 +298,12 @@
       <p>Fail count: <xsl:value-of select="@fail_count"/></p>
       <p>Pass count: <xsl:value-of select="@pass_count"/></p>   
     </div>
-    <table class="mc">
-      <xsl:apply-templates select="mc:rule|mc:policy"/>
-    </table>
+    <div class="mc_element">
+    <xsl:apply-templates select="mc:rule|mc:policy"/>
+    </div>
   </xsl:template>
   <xsl:template match="mc:rule">
+    <table class="mc">
     <tr>
       <td class="mc_element">
         <xsl:text> </xsl:text>
@@ -332,5 +334,6 @@
         </xsl:if>
       </td>
     </tr>
+  </table>
   </xsl:template>
 </xsl:stylesheet>
