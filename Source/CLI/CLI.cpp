@@ -151,7 +151,7 @@ namespace MediaConch
         if (policy_reference_file.size())
         {
             bool registered = false;
-            int ret = MCL.checker_analyze(policy_reference_file, registered, false);
+            int ret = MCL.checker_analyze(policy_reference_file, registered, force_analyze);
             if (ret < 0)
                 return ret;
             if ((ret = run_policy_reference_file()) != MediaConchLib::errorHttp_TRUE)
