@@ -742,7 +742,7 @@ void Core::unify_policy_options(std::map<std::string, std::string>& opts)
         std::string file = it->second;
         opts.erase(it);
 
-        if (!it->second.length())
+        if (!file.length())
             return;
 
         std::vector<std::string> files;
