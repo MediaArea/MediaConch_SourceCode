@@ -38,7 +38,7 @@ class WebCommonPage : public QWebPage
 class WebCommonPage : public QWebEnginePage
 #endif
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 #if defined(WEB_MACHINE_KIT)
     explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebPage(parent), mainwindow(m) {}

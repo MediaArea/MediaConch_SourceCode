@@ -239,6 +239,12 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebCommonPage.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebCommonPage.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -287,9 +293,6 @@
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="_Automated\ui_xsltpolicymenu.h">
@@ -374,6 +377,9 @@
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebCommonPage.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
