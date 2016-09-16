@@ -212,6 +212,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebCommonPage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
@@ -226,6 +227,7 @@
     <ClCompile Include="_Automated\moc_settingswindow.cpp" />
     <ClCompile Include="_Automated\moc_policieswindow.cpp" />
     <ClCompile Include="_Automated\moc_progressbar.cpp" />
+    <ClCompile Include="_Automated\moc_WebCommonPage.cpp" />
     <ClCompile Include="_Automated\moc_WebEnginePage.cpp" />
     <ClCompile Include="_Automated\moc_WebEngineView.cpp" />
     <ClCompile Include="_Automated\moc_WebKitPage.cpp">
@@ -267,11 +269,11 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\menumainwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\settingswindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebChoose.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebCommonPage.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h" />

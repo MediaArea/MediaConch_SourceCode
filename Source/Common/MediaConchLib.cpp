@@ -732,7 +732,21 @@ int MediaConchLib::load_existing_policy()
     for (size_t i = 0; i < list.size(); ++i)
     {
         std::string file = list[i].To_UTF8();
-        size_t pos = file.find("/", path.size());
+        size_t pos;
+#if defined(_WIN32)
+        while (1)
+        {
+            pos = file.find("\\");
+            if (pos == std::string::npos)
+                break;
+
+            if (pos == 0 || file[pos - 1] != '/')
+                file.replace(pos, 1, "/");
+            else
+                file.replace(pos, 1, "");
+		}
+#endif
+        pos = file.find("/", path.size());
         std::string user_str = file.substr(path.size(), pos - path.size());
         int user = strtol(user_str.c_str(), NULL, 10);
         std::string err;

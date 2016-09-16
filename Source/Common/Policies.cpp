@@ -1216,9 +1216,15 @@ void Policies::find_save_name(int user, const char* basename, std::string& save_
     std::stringstream data_path;
 
     data_path << Core::get_local_data_path();
-    data_path << "policies/" << user << "/";
+	data_path << "policies/";
 
-    ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(data_path.str());
+	ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(data_path.str());
+	if (!ZenLib::Dir::Exists(z_path))
+		ZenLib::Dir::Create(z_path);
+
+	data_path << user << "/";
+
+    z_path = ZenLib::Ztring().From_UTF8(data_path.str());
     if (!ZenLib::Dir::Exists(z_path))
         ZenLib::Dir::Create(z_path);
 
