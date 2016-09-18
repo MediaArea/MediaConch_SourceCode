@@ -68,7 +68,7 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
-      .mc_element {
+      div .mc_element {
         padding: 0 5px 0 30px;
       }
 
@@ -314,7 +314,6 @@
           </xsl:otherwise>
         </xsl:choose>
       </h2>
-
       <xsl:if test="mc:description != ''">
         <p>
           <xsl:value-of select="mc:description"/>
