@@ -184,7 +184,7 @@
         margin-left: 15px;
       }
 
-      input.toggle-round[type=checkbox]:checked ~ .extra {
+      input.toggle-round[type=checkbox]:checked ~ .mc .extra {
         display: block;
       }
 
