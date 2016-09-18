@@ -184,7 +184,7 @@
         display: block;
       }
 
-      input.toggle-round[type=checkbox]:checked ~ .mc .arrow + label {
+      input.toggle-round[type=checkbox]:not(:checked) ~ .extra {
         display: none;
       }
 
@@ -296,11 +296,6 @@
   </xsl:template>
 
   <xsl:template match="mc:policy">
-    <xsl:if test="../@ref">
-      <span class="verbosity">Toggle all verbosity: </span> 
-      <input id="policy-toggle-{generate-id()}" class="toggle toggle-round" type="checkbox" checked="checked" />
-      <label for="policy-toggle-{generate-id()}"></label>
-    </xsl:if>
     <div class="mc_header">
       <h2>
         <xsl:value-of select="@name"/>
@@ -312,16 +307,13 @@
       | <strong>Rules run:</strong><xsl:text> </xsl:text><xsl:value-of select="@rules_run"/>
       | <strong>Fail count:</strong><xsl:text> </xsl:text><xsl:value-of select="@fail_count"/>
       | <strong>Pass count:</strong><xsl:text> </xsl:text><xsl:value-of select="@pass_count"/></p> 
-
-            <span class="verbosity">More:</span><xsl:text> </xsl:text>
-    <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox"/>
-    <label for="policy-arrow-{generate-id()}"></label>
-    <div class="mc_element extra">
-    <xsl:apply-templates select="mc:rule|mc:policy"/>
+      <span class="verbosity">More:</span><xsl:text> </xsl:text>
+      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <label for="policy-arrow-{generate-id()}"></label>
+      <div class="mc_element extra">
+      <xsl:apply-templates select="mc:rule|mc:policy"/>
+      </div>
     </div>
-    </div>
-
-
   </xsl:template>
 
   <xsl:template match="mc:rule">
