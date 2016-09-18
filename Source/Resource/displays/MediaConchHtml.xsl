@@ -36,6 +36,8 @@
       .mc_header h2 {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 14px;
+        display: inline-block;
+        margin-left: 6px;
       }
 
       .mc {
@@ -70,7 +72,6 @@
 
       .mc_element .extra {
         background-color: white;
-        border: 1px solid #ddd
       }
 
       .arrow {
@@ -96,6 +97,7 @@
       }
 
       .p-arrow + label {
+        margin-left: 6px;
         display: inline-block;
         position: relative;
         cursor: pointer;
@@ -297,19 +299,22 @@
 
   <xsl:template match="mc:policy">
     <div class="mc_header">
+      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <label for="policy-arrow-{generate-id()}"></label>
       <h2>
         <xsl:value-of select="@name"/>
       </h2>
+
+      <xsl:if test="mc:description != ''">
+        <p>
+          <xsl:value-of select="mc:description"/>
+        </p>
+      </xsl:if>
       <p>
-        <xsl:value-of select="mc:description"/>
-      </p>
-      <p><strong>Type:</strong><xsl:text> </xsl:text><xsl:value-of select="@type"/>
+      <strong>Type:</strong><xsl:text> </xsl:text><xsl:value-of select="@type"/>
       | <strong>Rules run:</strong><xsl:text> </xsl:text><xsl:value-of select="@rules_run"/>
       | <strong>Fail count:</strong><xsl:text> </xsl:text><xsl:value-of select="@fail_count"/>
       | <strong>Pass count:</strong><xsl:text> </xsl:text><xsl:value-of select="@pass_count"/></p> 
-      <span class="verbosity">More:</span><xsl:text> </xsl:text>
-      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
-      <label for="policy-arrow-{generate-id()}"></label>
       <div class="mc_element extra">
       <xsl:apply-templates select="mc:rule|mc:policy"/>
       </div>
@@ -331,19 +336,20 @@
         <xsl:if test="@outcome = 'fail'">
           <xsl:text>&#x274C;  </xsl:text>
         <xsl:value-of select="@outcome"/>
-          <xsl:if test="@actual != ''">
-            <br/>
-            <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
-          </xsl:if>
         </xsl:if>
         <xsl:if test="@outcome = 'N/A'">
         <xsl:value-of select="@outcome"/>
         </xsl:if>
-        <br/>
-        <xsl:text> </xsl:text>
-        <strong><xsl:text>Xpath:  </xsl:text></strong>
-        <xsl:value-of select="@xpath"/>
-        <br/>
+      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <label for="policy-arrow-{generate-id()}"></label>
+        <div class="extra">
+          <xsl:if test="@actual != ''">
+            <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
+          </xsl:if>
+          <br/>
+          <strong><xsl:text>Xpath:  </xsl:text></strong>
+          <xsl:value-of select="@xpath"/>
+        </div>
       </div>
   </div>
   </xsl:template>
