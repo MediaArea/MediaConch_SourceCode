@@ -38,6 +38,8 @@
         font-size: 14px;
         display: inline-block;
         margin-left: 6px;
+        margin-bottom: 0px;
+        margin-top: 4px;
       }
 
       .mc {
@@ -303,6 +305,14 @@
       <label for="policy-arrow-{generate-id()}"></label>
       <h2>
         <xsl:value-of select="@name"/>
+        <xsl:choose>
+          <xsl:when test="@fail_count &gt; 0">
+            <xsl:text>  &#x274C;</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>  &#x2705;</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </h2>
 
       <xsl:if test="mc:description != ''">
@@ -345,8 +355,8 @@
         <div class="extra">
           <xsl:if test="@actual != ''">
             <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
+            <br/>
           </xsl:if>
-          <br/>
           <strong><xsl:text>Xpath:  </xsl:text></strong>
           <xsl:value-of select="@xpath"/>
         </div>
