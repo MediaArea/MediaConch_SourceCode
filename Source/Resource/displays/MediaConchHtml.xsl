@@ -302,7 +302,7 @@
   <xsl:template match="mc:policy">
     <xsl:if test="position() &lt; 2">
       <span class="verbosity">Toggle all verbosity:  </span> 
-      <input id="policy-toggle-{generate-id()}" class="toggle toggle-round" type="checkbox"/>
+      <input id="policy-toggle-{generate-id()}" class="toggle toggle-round" type="checkbox" checked="checked" />
       <label for="policy-toggle-{generate-id()}"></label>
     </xsl:if>
     <div class="mc_header">
