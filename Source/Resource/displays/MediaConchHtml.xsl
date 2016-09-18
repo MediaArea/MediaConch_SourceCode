@@ -18,7 +18,6 @@
         width: 100%;
         max-width: 1280px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        background-color: #f1f1f1;
       }
 
       .mc_header p {
@@ -42,7 +41,6 @@
       .mc {
         width: 100%;
         max-width: 1280px;
-        background-color: #F2F5F8;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
         margin-top: 12px;
@@ -67,14 +65,11 @@
       }
 
       .mc_element {
-        border-left: 2px solid #ddd;
-        border-bottom: 0;
-        padding: 0 5px 0 20px;
+        padding: 0 5px 0 30px;
       }
 
       .mc_element .extra {
         background-color: white;
-        padding: 8px;
         border: 1px solid #ddd
       }
 
@@ -121,7 +116,7 @@
         border-color: transparent transparent black transparent;
       }
 
-      input[type=checkbox]:checked ~ .extra {
+      input.arrow[type=checkbox]:checked ~ .extra {
         display: block;
       }
 
@@ -185,11 +180,11 @@
         margin-left: 15px;
       }
 
-      input[type=checkbox]:checked ~ .mc .extra {
+      input.toggle-round[type=checkbox]:checked ~ .extra {
         display: block;
       }
 
-      input[type=checkbox]:checked ~ .mc .arrow + label {
+      input.toggle-round[type=checkbox]:checked ~ .mc .arrow + label {
         display: none;
       }
 
@@ -299,9 +294,10 @@
   </body>
   </html>
   </xsl:template>
+
   <xsl:template match="mc:policy">
-    <xsl:if test="position() &lt; 2">
-      <span class="verbosity">Toggle all verbosity:  </span> 
+    <xsl:if test="../@ref">
+      <span class="verbosity">Toggle all verbosity: </span> 
       <input id="policy-toggle-{generate-id()}" class="toggle toggle-round" type="checkbox" checked="checked" />
       <label for="policy-toggle-{generate-id()}"></label>
     </xsl:if>
@@ -315,31 +311,26 @@
       <p><strong>Type:</strong><xsl:text> </xsl:text><xsl:value-of select="@type"/>
       | <strong>Rules run:</strong><xsl:text> </xsl:text><xsl:value-of select="@rules_run"/>
       | <strong>Fail count:</strong><xsl:text> </xsl:text><xsl:value-of select="@fail_count"/>
-      | <strong>Pass count:</strong><xsl:text> </xsl:text><xsl:value-of select="@pass_count"/></p>   
-    </div>
-    <xsl:if test="position() &gt; 2">
-      <span class="verbosity">More:</span><xsl:text> </xsl:text>
+      | <strong>Pass count:</strong><xsl:text> </xsl:text><xsl:value-of select="@pass_count"/></p> 
+
+            <span class="verbosity">More:</span><xsl:text> </xsl:text>
     <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox"/>
     <label for="policy-arrow-{generate-id()}"></label>
-    </xsl:if>
     <div class="mc_element extra">
     <xsl:apply-templates select="mc:rule|mc:policy"/>
     </div>
+    </div>
+
+
   </xsl:template>
+
   <xsl:template match="mc:rule">
-    <table class="mc">
-    <tr>
-      <td class="mc_element">
+    <div class="mc">
+      <div class="mc_element">
         <xsl:text> </xsl:text>
         <strong>
           <xsl:value-of select="@name"/>
         </strong>
-        <br/>
-        <xsl:text> </xsl:text>
-        <strong>
-          <xsl:value-of select="@xpath"/>
-        </strong>
-        <br/>
         <xsl:text> </xsl:text>
         <xsl:if test="@outcome = 'pass'">
           <xsl:text>&#x2705;  </xsl:text>
@@ -350,14 +341,18 @@
         <xsl:value-of select="@outcome"/>
           <xsl:if test="@actual != ''">
             <br/>
-            <strong>Actual: </strong>  <xsl:value-of select="@actual"/><br/>
+            <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
           </xsl:if>
         </xsl:if>
         <xsl:if test="@outcome = 'N/A'">
         <xsl:value-of select="@outcome"/>
         </xsl:if>
-      </td>
-    </tr>
-  </table>
+        <br/>
+        <xsl:text> </xsl:text>
+        <strong><xsl:text>Xpath:  </xsl:text></strong>
+        <xsl:value-of select="@xpath"/>
+        <br/>
+      </div>
+  </div>
   </xsl:template>
 </xsl:stylesheet>
