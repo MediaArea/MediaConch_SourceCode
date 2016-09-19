@@ -4,9 +4,18 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+contains(QT_CONFIG, no-gui) {
+    error("qt module gui not found")
+}
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT     += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+    !qtHaveModule(widgets) {
+        error("qt module widgets not found")
+    }
+    QT += widgets
+}
 
 WEB_MACHINE=
 
@@ -35,6 +44,8 @@ TEMPLATE = app
 
 CONFIG += qt release
 CONFIG += no_keywords
+
+CONFIG += link_pkgconfig
 
 DEFINES          +=  _UNICODE
 
@@ -148,6 +159,14 @@ FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
 
 
 equals(WEB_MACHINE, webengine) {
+    !qtHaveModule(webenginewidgets) {
+        error("qt module webenginewidgets not found")
+    }
+
+    !qtHaveModule(webchannel) {
+        error("qt module webchannel not found")
+    }
+
     QT += webenginewidgets webchannel
     SOURCES += ../../Source/GUI/Qt/WebEnginePage.cpp \
                ../../Source/GUI/Qt/WebEngineView.cpp
@@ -155,6 +174,18 @@ equals(WEB_MACHINE, webengine) {
                ../../Source/GUI/Qt/WebEngineView.h
     QMAKE_CXXFLAGS   += -DWEB_MACHINE_ENGINE
 } else {
+    greaterThan(QT_MAJOR_VERSION, 4) {
+        !qtHaveModule(webkit) {
+            error("qt module webkit not found")
+        }
+    } else {
+        # Ubuntu build QtWebKit from separate sources therefore QT_CONFIG contains
+        # neither webkit nor no-webkit, so we also check for pkg-config module
+        !contains(QT_CONFIG, webkit):!packagesExist(QtWebKit) {
+            error("qt module webkit not found")
+        }
+    }
+
     QT += webkit webkitwidgets
     SOURCES += ../../Source/GUI/Qt/WebKitPage.cpp \
                ../../Source/GUI/Qt/WebKitView.cpp
@@ -166,31 +197,28 @@ equals(WEB_MACHINE, webengine) {
 INCLUDEPATH      += ../../Source
 
 exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a) {
-INCLUDEPATH      += ../../../MediaInfoLib/Source
-LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
-message("custom libmediainfo: yes (static)")
-}
-else {
-exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.so) {
-INCLUDEPATH      += ../../../MediaInfoLib/Source
-LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS)
-message("custom libmediainfo: yes (shared)")
-}
-else {
-#CONFIG           += link_pkgconfig
-#PKGCONFIG        += libmediainfo
-#LIBS             += $(pkg-config --libs libmediainfo)
-LIBS             += $$system(pkg-config --libs libmediainfo)
-}
+    INCLUDEPATH      += ../../../MediaInfoLib/Source
+    LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
+    message("custom libmediainfo: yes (static)")
+} else {
+    exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.so) {
+        INCLUDEPATH      += ../../../MediaInfoLib/Source
+        LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS)
+        message("custom libmediainfo: yes (shared)")
+    } else {
+        !packagesExist(libmediainfo) {
+            error("libmediainfo not found on system")
+        }
+        LIBS += $$system(pkg-config --libs libmediainfo)
+    }
 }
 
 exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
     INCLUDEPATH      += ../../../ZenLib/Source
     LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
     message("libzen      : custom")
-}
-else {
-    LIBS             += -lzen
+} else {
+    PKGCONFIG        += libzen
     message("libzen      : system")
 }
 
@@ -198,23 +226,23 @@ exists(../../../libxml2/.libs/libxml2.a) {
     INCLUDEPATH      += ../../../libxml2/include
     LIBS             += ../../../libxml2/.libs/libxml2.a
     message("libxml2     : custom")
-}
-else {
-    INCLUDEPATH      += /usr/include/libxml2
-    LIBS             += -lxml2
+} else {
+    packagesExist(libxml2) {
+        PKGCONFIG += libxml2
+    } else {
+        PKGCONFIG += libxml-2.0
+    }
     message("libxml2     : system")
 }
+
 exists(../../../libxslt/libxslt/.libs/libxslt.a) {
     INCLUDEPATH      += ../../../libxslt/libxslt
     INCLUDEPATH      += ../../../libxslt/libexslt
     LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
     LIBS             += ../../../libxslt/libexslt/.libs/libexslt.a
     message("libxslt     : custom")
-}
-else {
-    INCLUDEPATH      += /usr/include/libxslt
-    INCLUDEPATH      += /usr/include/libexslt
-    LIBS             += -lxslt -lexslt
+} else {
+    PKGCONFIG        += libxslt libexslt
     message("libxslt     : system")
 }
 
@@ -222,49 +250,46 @@ else {
 contains(NO_SQLITE, yes|1) {
     message("libsqlite3  : no")
 } else {
-exists(../../../sqlite/.libs/libsqlite3.a) {
-    INCLUDEPATH      += ../../../sqlite
-    LIBS             += ../../../sqlite/.libs/libsqlite3.a
-    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
-    message("libsqlite3  : custom")
-}
-else {
-    LIBS             += -lsqlite3
-    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
-    message("libsqlite3  : system")
+    exists(../../../sqlite/.libs/libsqlite3.a) {
+        INCLUDEPATH      += ../../../sqlite
+        LIBS             += ../../../sqlite/.libs/libsqlite3.a
+        QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+        message("libsqlite3  : custom")
+    } else {
+        PKGCONFIG        += sqlite3
+        QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+        message("libsqlite3  : system")
     }
 }
 
 contains(NO_JANSSON, yes|1) {
     message("libjansson  : no")
 } else {
-exists(../../../jansson/src/.libs/libjansson.a) {
-    INCLUDEPATH      += ../../../jansson/src
-    LIBS             += ../../../jansson/src/.libs/libjansson.a
-    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
-    message("libjansson  : custom")
-}
-else {
-    LIBS             += -ljansson
-    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
-    message("libjansson  : system")
+    exists(../../../jansson/src/.libs/libjansson.a) {
+        INCLUDEPATH      += ../../../jansson/src
+        LIBS             += ../../../jansson/src/.libs/libjansson.a
+        QMAKE_CXXFLAGS   += -DHAVE_JANSSON
+        message("libjansson  : custom")
+    } else {
+        PKGCONFIG        += jansson
+        QMAKE_CXXFLAGS   += -DHAVE_JANSSON
+        message("libjansson  : system")
     }
 }
 
 contains(NO_LIBEVENT, yes|1) {
     message("libevent    : no")
 } else {
-exists(../../../libevent/.libs/libevent.a) {
-    INCLUDEPATH      += ../../../libevent/include
-    LIBS             += ../../../libevent/.libs/libevent.a
-    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
-    message("libevent    : custom")
-}
-else {
-    LIBS             += -levent
-    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
-    message("libevent    : system")
-}
+    exists(../../../libevent/.libs/libevent.a) {
+        INCLUDEPATH      += ../../../libevent/include
+        LIBS             += ../../../libevent/.libs/libevent.a
+        QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
+        message("libevent    : custom")
+    } else {
+        PKGCONFIG        += libevent
+        QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
+        message("libevent    : system")
+    }
 }
 
 contains(NO_LIBCURL, yes|1) {
