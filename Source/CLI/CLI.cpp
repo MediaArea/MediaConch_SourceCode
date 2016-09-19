@@ -214,6 +214,8 @@ namespace MediaConch
             report_set.set(MediaConchLib::report_MediaInfo);
         if (report_kind == "MediaTrace" || report_kind == "mediatrace")
             report_set.set(MediaConchLib::report_MediaTrace);
+        if (report_kind == "MicroMediaTrace" || report_kind == "micromediatrace")
+            report_set.set(MediaConchLib::report_MicroMediaTrace);
     }
 
     //--------------------------------------------------------------------------

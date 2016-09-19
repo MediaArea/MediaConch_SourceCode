@@ -137,9 +137,9 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
                                                        const std::string& display, MediaConchLib::format& Format,
                                                        std::string& reason)
 {
-    if (reports[MediaConchLib::report_MicroMediaTrace])
+    if (reports[MediaConchLib::report_MicroMediaTrace] && Format != MediaConchLib::format_Xml)
     {
-        reason = "MicroMediaTrace is for internal use only";
+        reason = "MicroMediaTrace can be get only in XML";
         return false;
     }
 
