@@ -333,6 +333,8 @@
   <xsl:template match="mc:rule">
     <div class="mc">
       <div class="mc_element">
+      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <label for="policy-arrow-{generate-id()}"></label>
         <xsl:text> </xsl:text>
         <strong>
           <xsl:value-of select="@name"/>
@@ -349,8 +351,6 @@
         <xsl:if test="@outcome = 'N/A'">
         <xsl:value-of select="@outcome"/>
         </xsl:if>
-      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
-      <label for="policy-arrow-{generate-id()}"></label>
         <div class="extra">
           <xsl:if test="@actual != ''">
             <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
