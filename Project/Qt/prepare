@@ -24,6 +24,6 @@ elif qmake4 --version >/dev/null 2>&1
 then
     qmake4 $QMAKE_ARG $*
 else
-    echo qmake not found
+    echo qmake not found, please install Qt development package
     exit
 fi
