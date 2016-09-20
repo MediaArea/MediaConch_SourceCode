@@ -498,12 +498,13 @@ var policyTree = (function() {
     }
 
     var ruleEdit = function(rule, selectedRule) {
-        instance.rename_node(selectedRule, rule.name);
-        selectedRule.data.tracktype = rule.tracktype;
-        selectedRule.data.field = rule.field;
-        selectedRule.data.occurrence = (-1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence;
-        selectedRule.data.ope = rule.ope;
-        selectedRule.data.value = rule.value;
+        instance.rename_node(selectedRule, (undefined == rule.name) ? '' : rule.name);
+        selectedRule.data.tracktype = (undefined == rule.tracktype) ? '' : rule.tracktype;
+        selectedRule.data.field = (undefined == rule.field) ? '' : rule.field;
+        selectedRule.data.occurrence = (undefined == rule.occurrence || -1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence;
+        selectedRule.data.ope = (undefined == rule.ope) ? '' : rule.ope;
+        selectedRule.data.value = (undefined == rule.value) ? '' : rule.value;
+        selectedRule.data.scope = (undefined == rule.scope) ? '' : rule.scope;
         mcoMessage.success('Rule successfuly edited');
     }
 
