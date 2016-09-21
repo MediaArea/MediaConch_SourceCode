@@ -23,7 +23,6 @@
       .mc_header p {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
-        margin-left:20px;
         margin-bottom: 0;
         margin-top: 0;
       }
@@ -72,8 +71,8 @@
         padding: 0 5px 0 30px;
       }
 
-      .mc_element .extra {
-        background-color: white;
+      .mc_rule {
+        padding-left: 30px;
       }
 
       .arrow {
@@ -194,6 +193,7 @@
 
       .extra {
         display: none;
+        padding-left: 20px;
       }
 
       .verbosity {
@@ -295,6 +295,7 @@
       </xsl:for-each>
       <xsl:apply-templates select="mc:rule|mc:policy"/>
     </xsl:for-each>
+    <br/>
   </body>
   </html>
   </xsl:template>
@@ -307,10 +308,10 @@
         <xsl:value-of select="@name"/>
         <xsl:choose>
           <xsl:when test="@fail_count &gt; 0">
-            <xsl:text>  &#x274C;</xsl:text>
+            <xsl:text>  &#x274C; fail</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>  &#x2705;</xsl:text>
+            <xsl:text>  &#x2705; pass</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </h2>
@@ -319,20 +320,20 @@
           <xsl:value-of select="mc:description"/>
         </p>
       </xsl:if>
+      <div class="mc_rule extra">
       <p>
       <strong>Type:</strong><xsl:text> </xsl:text><xsl:value-of select="@type"/>
       | <strong>Rules run:</strong><xsl:text> </xsl:text><xsl:value-of select="@rules_run"/>
       | <strong>Fail count:</strong><xsl:text> </xsl:text><xsl:value-of select="@fail_count"/>
       | <strong>Pass count:</strong><xsl:text> </xsl:text><xsl:value-of select="@pass_count"/></p> 
-      <div class="mc_element extra">
-      <xsl:apply-templates select="mc:rule|mc:policy"/>
+        <xsl:apply-templates select="mc:rule|mc:policy"/>
       </div>
     </div>
   </xsl:template>
 
   <xsl:template match="mc:rule">
     <div class="mc">
-      <div class="mc_element">
+
       <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
       <label for="policy-arrow-{generate-id()}"></label>
         <xsl:text> </xsl:text>
@@ -359,7 +360,7 @@
           <strong><xsl:text>Xpath:  </xsl:text></strong>
           <xsl:value-of select="@xpath"/>
         </div>
-      </div>
+
   </div>
   </xsl:template>
 </xsl:stylesheet>
