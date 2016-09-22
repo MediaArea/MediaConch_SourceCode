@@ -34,13 +34,20 @@ NoDatabaseReport::NoDatabaseReport() : DatabaseReport()
 //---------------------------------------------------------------------------
 NoDatabaseReport::~NoDatabaseReport()
 {
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.begin();
-    for (; it != reports_saved.end(); ++it)
+    std::map<long, std::vector<MC_Report*> >::iterator it_r = reports_saved.begin();
+    for (; it_r != reports_saved.end(); ++it_r)
     {
-        for (size_t i = 0; i < it->second.size(); ++i)
-            delete it->second[i];
+        for (size_t i = 0; i < it_r->second.size(); ++i)
+            delete it_r->second[i];
     }
     reports_saved.clear();
+
+    for (size_t i = 0; i < files_saved.size(); ++i)
+    {
+        if (files_saved[i])
+            delete files_saved[i];
+    }
+    files_saved.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -74,51 +81,86 @@ int NoDatabaseReport::update_report_table()
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                  const std::string& filename, const std::string& file_last_modification,
-                                  const std::string& report, MediaConchLib::compression c,
-                                  bool has_mil_version)
+long NoDatabaseReport::add_file(const std::string& filename, const std::string& file_last_modification,
+                                std::string&,
+                                long source_id,
+                                const std::string& generated_file, const std::string& log)
 {
-    Report* r = new Report;
+    MC_File* f = new MC_File;
+    f->filename = filename;
+    f->file_last_modification = file_last_modification;
+    f->source_id = source_id;
+    f->generated_file = generated_file;
+    f->log = log;
+
+    long id = (long)files_saved.size();
+    files_saved.push_back(f);
+    return id;
+}
+
+//---------------------------------------------------------------------------
+long NoDatabaseReport::get_file_id(const std::string& file, const std::string& file_last_modification)
+{
+    for (long id = 0; id < (long)files_saved.size(); ++id)
+        if (files_saved[id] && file == files_saved[id]->filename &&
+            (!file_last_modification.size() || file_last_modification == files_saved[id]->file_last_modification))
+            return id;
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+void NoDatabaseReport::get_file_from_id(long id, std::string& file)
+{
+    if (id > 0 && id < (long)files_saved.size())
+        file = files_saved[id]->filename;
+    else
+        file = std::string();
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseReport::save_report(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+                                  const std::string& report, MediaConchLib::compression c,
+                                  int mil_version)
+{
+    if (file_id < 0)
+        return -1;
+
+    MC_Report* r = new MC_Report;
     r->reportKind = reportKind;
     r->format = format;
-    r->file_last_modification = file_last_modification;
     r->report = report;
     r->compression = c;
-    r->has_mil_version = has_mil_version;
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
+    r->mil_version = mil_version;
+
+    std::map<long, std::vector<MC_Report*> >::iterator it = reports_saved.find(file_id);
     if (it != reports_saved.end())
     {
-        for (size_t i = 0; i < it->second.size(); ++i)
+        for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
         {
-            Report *r = it->second[i];
-            if (r->format == format && r->reportKind == reportKind)
+            MC_Report *r = reports_saved[file_id][i];
+            if (r && r->format == format && r->reportKind == reportKind)
             {
                 delete r;
-                it->second.erase(it->second.begin() + i);
+                reports_saved[file_id].erase(reports_saved[file_id].begin() + i);
                 break;
             }
         }
     }
-    reports_saved[filename].push_back(r);
+    reports_saved[file_id].push_back(r);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                  const std::string& filename, const std::string& file_last_modification,
+void NoDatabaseReport::get_report(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                   std::string& report, MediaConchLib::compression& c)
 {
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
-    if (it == reports_saved.end())
+    if (file_id < 0)
         return;
 
-    for (size_t i = 0; i < it->second.size(); ++i)
+    for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
     {
-        Report* r = it->second[i];
-        if (r->format != format || r->reportKind != reportKind)
-            continue;
-        if (file_last_modification.length() && r->file_last_modification != file_last_modification)
+        MC_Report* r = reports_saved[file_id][i];
+        if (!r || r->format != format || r->reportKind != reportKind)
             continue;
 
         report = r->report;
@@ -128,9 +170,13 @@ void NoDatabaseReport::get_report(MediaConchLib::report reportKind, MediaConchLi
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::remove_report(const std::string& filename)
+int NoDatabaseReport::remove_report(long file_id)
 {
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
+    if (file_id < 0)
+        return -1;
+
+    std::map<long, std::vector<MC_Report*> >::iterator it = reports_saved.find(file_id);
+
     if (it == reports_saved.end())
         return -1;
 
@@ -139,80 +185,55 @@ int NoDatabaseReport::remove_report(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabaseReport::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                          const std::string& filename, const std::string& file_last_modification)
+bool NoDatabaseReport::report_is_registered(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format)
 {
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
-
-    if (it == reports_saved.end())
+    if (file_id < 0)
         return false;
 
-    for (size_t i = 0; i < it->second.size(); ++i)
+    for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
     {
-        Report* r = it->second[i];
+        MC_Report* r = reports_saved[file_id][i];
 
-        if (r->format == format && r->reportKind == reportKind
-            && r->file_last_modification == file_last_modification)
+        if (r && r->format == format && r->reportKind == reportKind)
             return true;
     }
     return false;
 }
 
-//---------------------------------------------------------------------------
-bool NoDatabaseReport::file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                          const std::string& filename)
+int NoDatabaseReport::version_registered(long file_id)
 {
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
+    if (file_id < 0)
+        return -1;
 
-    if (it == reports_saved.end())
-        return false;
-
-    for (size_t i = 0; i < it->second.size(); ++i)
+    for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
     {
-        Report* r = it->second[i];
-
-        if (r->format == format && r->reportKind == reportKind)
-            return true;
+        if (reports_saved[file_id][i] && reports_saved[file_id][i]->mil_version)
+            return reports_saved[file_id][i]->mil_version;
     }
-    return false;
-}
 
-bool NoDatabaseReport::has_version_registered(const std::string& filename)
-{
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.find(filename);
-
-    if (it == reports_saved.end())
-        return false;
-
-    for (size_t i = 0; i < it->second.size(); ++i)
-    {
-        if (it->second[i] && it->second[i]->has_mil_version)
-            return true;
-    }
-    return false;
+    return -1;
 }
 
 //---------------------------------------------------------------------------
 void NoDatabaseReport::get_elements(std::vector<std::string>& vec)
 {
-    std::map<std::string, std::vector<Report*> >::iterator it = reports_saved.begin();
-
-    for (; it != reports_saved.end(); ++it)
-        vec.push_back(it->first);
+    for (size_t i = 0; i < files_saved.size(); ++i)
+        vec.push_back(files_saved[i]->filename);
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind)
+void NoDatabaseReport::get_element_report_kind(long file_id, MediaConchLib::report& report_kind)
 {
     report_kind = MediaConchLib::report_MediaConch;
-    if (reports_saved.find(file) != reports_saved.end() && reports_saved[file].size())
+
+    if (file_id >= 0 && reports_saved[file_id].size())
     {
-        for (size_t i = 0; i < reports_saved[file].size(); ++i)
+        for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
         {
-            if (!reports_saved[file][i])
+            if (!reports_saved[file_id][i])
                 continue;
 
-            MediaConchLib::report tool_i = reports_saved[file][i]->reportKind;
+            MediaConchLib::report tool_i = reports_saved[file_id][i]->reportKind;
             if (tool_i == MediaConchLib::report_MediaInfo || tool_i == MediaConchLib::report_MediaTrace || tool_i == MediaConchLib::report_MicroMediaTrace)
                 tool_i = MediaConchLib::report_MediaConch;
 

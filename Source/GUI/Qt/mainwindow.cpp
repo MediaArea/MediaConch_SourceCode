@@ -273,7 +273,11 @@ int MainWindow::xslt_policy_create_from_file(const QString& file)
 {
     std::string err;
     std::string filename(file.toUtf8().data(), file.toUtf8().length());
-    int pos = MCL.xslt_policy_create_from_file(-1, filename, err);
+    long id = workerfiles.get_id_from_registered_file(filename);
+    int pos = -1;
+
+    if (id >= 0)
+        pos = MCL.xslt_policy_create_from_file(-1, id, err);
 
     QMessageBox::Icon icon;
     QString text;
@@ -970,21 +974,35 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::analyze(const std::vector<std::string>& files)
+int MainWindow::analyze(const std::vector<std::string>& files, std::vector<long>& files_id)
 {
-    return MCL.checker_analyze(files);
+    return MCL.checker_analyze(files, files_id);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::is_analyze_finished(const std::vector<std::string>& files, double& percent_done)
 {
-    return MCL.checker_is_done(files, percent_done);
+    std::vector<long> files_id;
+    for (size_t i = 0; ; )
+    {
+        long id = workerfiles.get_id_from_registered_file(files[i]);
+        if (id < 0)
+            return -1;
+
+        files_id.push_back(id);
+    }
+
+    return MCL.checker_is_done(files_id, percent_done);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
 {
-    return MCL.checker_is_done(file, percent_done, report_kind);
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return -1;
+
+    return MCL.checker_is_done(id, percent_done, report_kind);
 }
 
 //---------------------------------------------------------------------------
@@ -994,7 +1012,17 @@ int MainWindow::validate(MediaConchLib::report report, const std::vector<std::st
                          const std::map<std::string, std::string>& options,
                          std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
-    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, options, result);
+    std::vector<long> files_id;
+    for (size_t i = 0; ; )
+    {
+        long id = workerfiles.get_id_from_registered_file(files[i]);
+        if (id < 0)
+            return -1;
+
+        files_id.push_back(id);
+    }
+
+    return MCL.checker_validate(-1, report, files_id, policies_ids, policies_contents, options, result);
 }
 
 //---------------------------------------------------------------------------
@@ -1004,10 +1032,14 @@ int MainWindow::validate(MediaConchLib::report report, const std::string& file,
                          const std::map<std::string, std::string>& options,
                          std::vector<MediaConchLib::Checker_ValidateRes*>& result)
 {
-    std::vector<std::string> files;
-    files.push_back(file);
+    std::vector<long> files_id;
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return -1;
 
-    return MCL.checker_validate(-1, report, files, policies_ids, policies_contents, options, result);
+    files_id.push_back(id);
+
+    return MCL.checker_validate(-1, report, files_id, policies_ids, policies_contents, options, result);
 }
 
 //---------------------------------------------------------------------------
@@ -1019,8 +1051,13 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(const std::string& file,
     report_set.set(MediaConchLib::report_MediaInfo);
     report_set.set(MediaConchLib::report_MediaTrace);
     std::string report;
-    std::vector<std::string> files;
-    files.push_back(file);
+
+    std::vector<long> files;
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return QString();
+
+    files.push_back(id);
 
     MediaConchLib::Checker_ReportRes result;
     std::vector<size_t> ids;
@@ -1041,8 +1078,13 @@ QString MainWindow::get_mediainfo_xml(const std::string& file,
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(MediaConchLib::report_MediaInfo);
     std::string report;
-    std::vector<std::string> files;
-    files.push_back(file);
+
+    std::vector<long> files;
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return QString();
+
+    files.push_back(id);
 
     MediaConchLib::Checker_ReportRes result;
     std::vector<size_t> ids;
@@ -1061,8 +1103,13 @@ QString MainWindow::get_mediainfo_jstree(const std::string& file)
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(MediaConchLib::report_MediaInfo);
     std::string report;
-    std::vector<std::string> files;
-    files.push_back(file);
+
+    std::vector<long> files;
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return QString();
+
+    files.push_back(id);
 
     MediaConchLib::Checker_ReportRes result;
     std::vector<size_t> ids;
@@ -1081,8 +1128,13 @@ QString MainWindow::get_mediatrace_xml(const std::string& file,
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(MediaConchLib::report_MediaTrace);
     std::string report;
-    std::vector<std::string> files;
-    files.push_back(file);
+
+    std::vector<long> files;
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return QString();
+
+    files.push_back(id);
 
     MediaConchLib::Checker_ReportRes result;
     std::vector<size_t> ids;
@@ -1101,8 +1153,13 @@ QString MainWindow::get_mediatrace_jstree(const std::string& file)
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(MediaConchLib::report_MediaTrace);
     std::string report;
-    std::vector<std::string> files;
-    files.push_back(file);
+
+    std::vector<long> files;
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return QString();
+
+    files.push_back(id);
 
     MediaConchLib::Checker_ReportRes result;
     std::vector<size_t> ids;
@@ -1137,8 +1194,12 @@ void MainWindow::get_implementation_report(const std::string& file, QString& rep
     std::bitset<MediaConchLib::report_Max> report_set;
     report_set.set(fr->report_kind);
 
-    std::vector<std::string> files;
-    files.push_back(file);
+    std::vector<long> files;
+    long id = workerfiles.get_id_from_registered_file(file);
+    if (id < 0)
+        return;
+
+    files.push_back(id);
 
     MediaConchLib::Checker_ReportRes result;
     std::vector<size_t> ids;
@@ -1182,8 +1243,8 @@ int MainWindow::validate_policy(const std::string& file, QString& report, int po
     const std::string* dname = NULL;
     const std::string* dcontent = NULL;
     fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
-    std::vector<std::string> files;
-    files.push_back(file);
+    std::vector<long> files;
+    files.push_back(fr->file_id);
     delete fr;
 
     MediaConchLib::Checker_ReportRes result;

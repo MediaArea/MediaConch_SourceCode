@@ -55,9 +55,9 @@ namespace MediaConch
         CLI(const CLI&);
         CLI& operator=(const CLI&);
 
-        int  run_create_policy();
-        int  run_policy_reference_file();
-        int  is_ready(const std::string& file, MediaConchLib::report& report_kind);
+        int  run_create_policy(const std::vector<long>& files_ids);
+        int  run_policy_reference_file(long file_id);
+        int  is_ready(long file_id, MediaConchLib::report& report_kind);
         void add_files_recursively(const std::string& filename);
 
         MediaConchLib MCL;

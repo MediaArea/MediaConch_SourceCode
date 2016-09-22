@@ -129,12 +129,7 @@ namespace MediaConch
         static int on_xslt_policy_rule_delete_command(const RESTAPI::XSLT_Policy_Rule_Delete_Req* req,
                                                       RESTAPI::XSLT_Policy_Rule_Delete_Res& res, void *arg);
 
-        size_t get_first_free_slot();
-        bool id_is_existing(int id) const;
-        bool file_is_registered(const std::string& file, size_t& id);
         std::string get_date() const;
-
-        std::vector<std::string*> current_files;
     };
 
 }

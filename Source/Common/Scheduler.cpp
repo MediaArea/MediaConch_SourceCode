@@ -54,11 +54,11 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int Scheduler::add_element_to_queue(const std::string& filename, const std::vector<std::string>& options)
+    int Scheduler::add_element_to_queue(const std::string& filename, long file_id, const std::vector<std::string>& options)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, filename, options);
+        queue->add_element(PRIORITY_NONE, index++, filename, file_id, options);
         run_element();
         return index - 1;
     }
@@ -93,7 +93,7 @@ namespace MediaConch {
             return;
 
         CS.Enter();
-        core->register_file_to_database(el->filename, MI);
+        core->register_file_to_database(el->file_id, MI);
         std::map<QueueElement*, QueueElement*>::iterator it = working.find(el);
         if (it != working.end())
             working.erase(it);
@@ -120,22 +120,24 @@ namespace MediaConch {
         CS.Leave();
     }
 
-    bool Scheduler::element_is_finished(const std::string& filename, double& percent_done)
+    bool Scheduler::element_is_finished(long file_id, double& percent_done)
     {
         bool ret = true;
         CS.Enter();
 
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first->filename == filename)
+            if (it->first->file_id == file_id)
                 break;
+
         if (it != working.end())
         {
             percent_done = it->first->percent_done();
             CS.Leave();
             return false;
         }
-        if (queue->has_element(filename))
+
+        if (queue->has_id(file_id) >= 0)
         {
             percent_done = 0.0;
             ret = false;
@@ -145,19 +147,25 @@ namespace MediaConch {
         return ret;
     }
 
-    bool Scheduler::element_exists(const std::string& filename)
+    long Scheduler::element_exists(const std::string& filename)
     {
         CS.Enter();
-        bool ret = queue->has_element(filename);
+        long file_id = queue->has_element(filename);
+        if (file_id >= 0)
+        {
+            CS.Leave();
+            return file_id;
+        }
 
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
             if (it->first->filename == filename)
                 break;
+
         if (it != working.end())
-            ret = true;
+            file_id = it->first->file_id;
         CS.Leave();
-        return ret;
+        return file_id;
     }
 
     int Scheduler::another_work_to_do(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
@@ -174,7 +182,7 @@ namespace MediaConch {
             plugins[format_str]->run(error);
             const std::string& report = plugins[format_str]->get_report();
             MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
-            core->register_file_to_database(el->filename, report, report_kind, MI);
+            core->register_file_to_database(el->file_id, report, report_kind, MI);
         }
         else
             return 1;

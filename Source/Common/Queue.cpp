@@ -99,12 +99,14 @@ Queue::~Queue()
     clear();
 }
 
-int Queue::add_element(QueuePriority priority, int id, const std::string& filename, const std::vector<std::string>& options)
+int Queue::add_element(QueuePriority priority, int id, const std::string& filename, long file_id, const std::vector<std::string>& options)
 {
     QueueElement *el = new QueueElement(scheduler);
 
     el->id = id;
     el->filename = filename;
+    el->file_id = file_id;
+
     for (size_t i = 0; i < options.size(); ++i)
     {
         std::string option = options[i];
@@ -126,7 +128,7 @@ int Queue::add_element(QueuePriority priority, int id, const std::string& filena
     return 0;
 }
 
-bool Queue::has_element(const std::string& filename)
+long Queue::has_element(const std::string& filename)
 {
     std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
 
@@ -135,10 +137,25 @@ bool Queue::has_element(const std::string& filename)
         std::list<QueueElement*>::iterator it_l = it->second.begin();
         for (; it_l != it->second.end() ; ++it_l)
             if ((*it_l)->filename == filename)
-                return true;
+                return (*it_l)->file_id;
     }
 
-    return false;
+    return -1;
+}
+
+int Queue::has_id(long file_id)
+{
+    std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
+
+    for (; it != queue.end(); ++it)
+    {
+        std::list<QueueElement*>::iterator it_l = it->second.begin();
+        for (; it_l != it->second.end() ; ++it_l)
+            if ((*it_l)->file_id == file_id)
+                return 0;
+    }
+
+    return -1;
 }
 
 int Queue::remove_element(int id)

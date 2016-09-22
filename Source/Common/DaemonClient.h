@@ -49,27 +49,27 @@ public:
     int checker_list(std::vector<std::string>& vec);
 
     // file_from_id
-    int checker_file_from_id(int id, std::string& filename);
+    int checker_file_from_id(long id, std::string& filename);
 
     // default_values_for_type
     int default_values_for_type(const std::string& type, std::vector<std::string>& values);
 
     // Analyze
-    int checker_analyze(const std::string& file, bool& registered, bool force_analyze);
+    int checker_analyze(const std::string& file, bool& registered, bool force_analyze, long& file_id);
 
     // Status
-    int checker_is_done(const std::string& file, double& done, MediaConchLib::report& report_kind);
+    int checker_is_done(long file_id, double& done, MediaConchLib::report& report_kind);
 
     // Report
     int checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
-                           const std::vector<std::string>& files,
+                           const std::vector<long>& files,
                            const std::vector<size_t>& policies_names,
                            const std::vector<std::string>& policies_contents,
                            const std::map<std::string, std::string>& options,
                            MediaConchLib::Checker_ReportRes* result,
                            const std::string* display_name = NULL,
                            const std::string* display_content = NULL);
-    int checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
+    int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
                          const std::map<std::string, std::string>& options,
@@ -125,7 +125,7 @@ public:
     void policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
 
     // policy_create_from_file
-    int xslt_policy_create_from_file(int user, const std::string& id);
+    int xslt_policy_create_from_file(int user, long id);
 
     // create XSLT rule
     int xslt_policy_rule_create(int user, int policy_id, std::string& err);
@@ -152,8 +152,6 @@ private:
 
     DaemonClient(const DaemonClient&);
     DaemonClient& operator=(const DaemonClient&);
-
-    std::map<std::string, int> file_ids;
 };
 
 }

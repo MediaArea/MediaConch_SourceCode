@@ -37,23 +37,29 @@ public:
     void        set_database_directory(const std::string& dirname);
     void        set_database_filename(const std::string& name);
 
+    // Init
     virtual int create_report_table() = 0;
     virtual int update_report_table() = 0;
-    virtual int save_report(MediaConchLib::report reportKind, MediaConchLib::format format,
-                            const std::string& filename, const std::string& file_last_modification,
+
+    // File
+    virtual long add_file(const std::string& filename, const std::string& file_last_modification,
+                          std::string& err,
+                          long source_id = -1,
+                          const std::string& generated_file="", const std::string& log="") = 0;
+    virtual long get_file_id(const std::string& file, const std::string& file_last_modification) = 0;
+    virtual void get_file_from_id(long id, std::string& file) = 0;
+
+    // Report
+    virtual int save_report(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& report, MediaConchLib::compression,
-                            bool has_mil_version) = 0;
-    virtual int remove_report(const std::string& filename) = 0;
-    virtual void get_report(MediaConchLib::report reportKind, MediaConchLib::format format,
-                            const std::string& filename, const std::string& file_last_modification,
+                            int mil_version) = 0;
+    virtual int remove_report(long file_id) = 0;
+    virtual void get_report(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                             std::string& report, MediaConchLib::compression&) = 0;
-    virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                    const std::string& file, const std::string& file_last_modification) = 0;
-    virtual bool file_is_registered(MediaConchLib::report reportKind, MediaConchLib::format format,
-                                    const std::string& file) = 0;
-    virtual bool has_version_registered(const std::string& file) = 0;
+    virtual bool report_is_registered(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format) = 0;
+    virtual int  version_registered(long file_id) = 0;
     virtual void get_elements(std::vector<std::string>& vec) = 0;
-    virtual void get_element_report_kind(const std::string& file, MediaConchLib::report& report_kind) = 0;
+    virtual void get_element_report_kind(long file_id, MediaConchLib::report& report_kind) = 0;
 
     virtual int init_report() = 0;
 
@@ -63,6 +69,7 @@ protected:
     void        get_sql_query_for_update_report_table_v0(std::string& q);
     void        get_sql_query_for_update_report_table_v1(std::string& q);
     void        get_sql_query_for_update_report_table_v2(std::string& q);
+    void        get_sql_query_for_update_report_table_v3(std::string& q);
 
 private:
     DatabaseReport (const DatabaseReport&);

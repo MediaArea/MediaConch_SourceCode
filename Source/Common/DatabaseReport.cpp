@@ -87,4 +87,28 @@ void DatabaseReport::get_sql_query_for_update_report_table_v2(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseReport::get_sql_query_for_update_report_table_v3(std::string& q)
+{
+    std::stringstream create;
+    create << "CREATE TABLE IF NOT EXISTS MEDIACONCH_FILE ";
+    create << "(ID INTEGER PRIMARY KEY ASC,";
+    create << " FILENAME TEXT NOT NULL,";
+    create << " FILE_LAST_MODIFICATION TEXT NOT NULL,";
+    create << " SOURCE_FILE_ID INT DEFAULT -1,";
+    create << " GENERATED_FILE TEXT,";
+    create << " LOG TEXT);";
+
+    create << " CREATE TABLE IF NOT EXISTS MEDIACONCH_REPORT ";
+    create << "(FILE_ID INT NOT NULL,";
+    create << " TOOL INT NOT NULL,";
+    create << " FORMAT INT NOT NULL,";
+    create << " COMPRESS INT DEFAULT 0 NOT NULL,";
+    create << " MIL_VERSION INT DEFAULT 0 NOT NULL,";
+    create << " REPORT TEXT);";
+
+    create << " DROP TABLE Report;";
+    q = create.str();
+}
+
 }

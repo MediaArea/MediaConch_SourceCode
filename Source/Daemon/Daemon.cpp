@@ -458,7 +458,8 @@ namespace MediaConch
             if (req->args[i].has_force_analyze)
                 force = req->args[i].force_analyze;
             bool registered = false;
-            int ret = d->MCL->checker_analyze(req->args[i].file, registered, force);
+            long out_id = -1;
+            int ret = d->MCL->checker_analyze(req->args[i].file, registered, out_id, force);
             if (ret < 0)
             {
                 RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;
@@ -470,29 +471,12 @@ namespace MediaConch
 
             RESTAPI::Checker_Analyze_Ok *ok = new RESTAPI::Checker_Analyze_Ok;
             ok->inId = req->args[i].id;
-            if (registered)
-            {
-                size_t id = 0;
-                for (; id < d->current_files.size(); ++id)
-                    if (d->id_is_existing(id) && *d->current_files[id] == req->args[i].file)
-                    {
-                        ok->outId = id;
-                        break;
-                    }
-                if (id < d->current_files.size())
-                {
-                    ok->create = false;
-                    res.ok.push_back(ok);
-                    continue;
-                }
-            }
-
-            size_t new_id = d->get_first_free_slot();
-            d->current_files[new_id] = new std::string(req->args[i].file);
-            ok->outId = new_id;
+            ok->outId = out_id;
             ok->create = !registered;
+
             res.ok.push_back(ok);
         }
+
         std::clog << d->get_date() << "Daemon send checker analyze result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -509,8 +493,8 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
-            int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            long id = req->ids[i];
+            if (id < 0)
             {
                 RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
                 nok->id = id;
@@ -521,7 +505,7 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
+            int is_done = d->MCL->checker_is_done(id, percent_done, report_kind);
 
             if (is_done < 0)
             {
@@ -609,11 +593,11 @@ namespace MediaConch
 
         bool has_valid = false;
         bool valid = true;
-        std::vector<std::string> files;
+        std::vector<long> files;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
-            int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            long id = req->ids[i];
+            if (id < 0)
             {
                 RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
                 nok->id = id;
@@ -624,7 +608,7 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
+            int is_done = d->MCL->checker_is_done(id, percent_done, report_kind);
             if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
@@ -634,7 +618,7 @@ namespace MediaConch
                 continue;
             }
 
-            files.push_back(*d->current_files[id]);
+            files.push_back(id);
         }
 
         std::map<std::string, std::string> options;
@@ -677,8 +661,8 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
-            int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            long id = req->ids[i];
+            if (id < 0)
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
                 nok->id = id;
@@ -687,11 +671,24 @@ namespace MediaConch
                 continue;
             }
 
-            std::vector<std::string> files;
-            files.push_back(*d->current_files[id]);
+            std::string filename;
+            d->MCL->checker_file_from_id(id, filename);
+            if (!filename.size())
+            {
+                RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
+                nok->id = id;
+                nok->error = RESTAPI::ID_NOT_EXISTING;
+                res.nok.push_back(nok);
+                continue;
+            }
+
+            std::vector<long> files;
+            files.push_back(id);
             d->MCL->remove_report(files);
+
             bool registered = false;
-            int ret = d->MCL->checker_analyze(*d->current_files[id], registered);
+            long new_id = -1;
+            int ret = d->MCL->checker_analyze(filename, registered, new_id);
             if (ret < 0)
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
@@ -700,7 +697,7 @@ namespace MediaConch
                 res.nok.push_back(nok);
                 continue;
             }
-            res.ok.push_back(id);
+            res.ok.push_back(new_id);
         }
         std::clog << d->get_date() << "Daemon send checker retry result: " << res.to_str() << std::endl;
         return 0;
@@ -719,7 +716,7 @@ namespace MediaConch
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            if (id < 0)
             {
                 RESTAPI::Checker_Clear_Nok *nok = new RESTAPI::Checker_Clear_Nok;
                 nok->id = id;
@@ -728,13 +725,12 @@ namespace MediaConch
                 continue;
             }
 
-            std::vector<std::string> files;
-            files.push_back(*d->current_files[id]);
+            std::vector<long> files;
+            files.push_back(id);
             d->MCL->remove_report(files);
-            delete d->current_files[id];
-            d->current_files[id] = NULL;
             res.ok.push_back(id);
         }
+
         std::clog << d->get_date() << "Daemon send checker clear result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -755,14 +751,7 @@ namespace MediaConch
             RESTAPI::Checker_List_File *file = new RESTAPI::Checker_List_File;
             file->file = vec[i];
 
-            size_t id = 0;
-            if (!d->file_is_registered(vec[i], id))
-            {
-                id = d->get_first_free_slot();
-                d->current_files[id] = new std::string(vec[i]);
-            }
-
-            file->id = id;
+            d->MCL->checker_id_from_filename(vec[i], file->id);
             res.files.push_back(file);
         }
         std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
@@ -792,12 +781,11 @@ namespace MediaConch
         else
             report = MediaConchLib::report_Max;
 
-        std::map<std::string, int> saved_ids;
-        std::vector<std::string> files;
+        std::vector<long> files;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            if (id < 0)
             {
                 RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
                 nok->id = id;
@@ -808,7 +796,7 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
+            int is_done = d->MCL->checker_is_done(id, percent_done, report_kind);
             if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
@@ -819,8 +807,7 @@ namespace MediaConch
             }
 
             // Output
-            files.push_back(*d->current_files[id]);
-            saved_ids[*d->current_files[id]] = id;
+            files.push_back(id);
         }
 
         std::map<std::string, std::string> options;
@@ -842,7 +829,7 @@ namespace MediaConch
         for (size_t i = 0; i < result.size(); ++i)
         {
             RESTAPI::Checker_Validate_Ok* ok = new RESTAPI::Checker_Validate_Ok;
-            ok->id = saved_ids[result[i]->file];
+            ok->id = result[i]->id;
             ok->valid = result[i]->valid;
             res.ok.push_back(ok);
         }
@@ -861,8 +848,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a checker_file_from_id command" << std::endl;
         std::clog << req->to_str() << std::endl;
 
-        if (d->id_is_existing(req->id))
-            res.file = *d->current_files[req->id];
+        d->MCL->checker_file_from_id(req->id, res.file);
 
         std::clog << d->get_date() << "Daemon send checker_file_from_id result: " << res.to_str() << std::endl;
         return 0;
@@ -1251,7 +1237,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a xslt_policy_create_from_file command: ";
         std::clog << req->to_str() << std::endl;
 
-        if (!d->id_is_existing(req->id))
+        if (req->id < 0)
         {
             RESTAPI::XSLT_Policy_Create_From_File_Nok *nok = new RESTAPI::XSLT_Policy_Create_From_File_Nok;
             nok->id = req->id;
@@ -1261,7 +1247,7 @@ namespace MediaConch
         else
         {
             std::string err;
-            int pos = d->MCL->xslt_policy_create_from_file(req->user, *d->current_files[req->id], err);
+            int pos = d->MCL->xslt_policy_create_from_file(req->user, req->id, err);
 
             if (pos == -1)
             {
@@ -1442,25 +1428,6 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    size_t Daemon::get_first_free_slot()
-    {
-        size_t i = 0;
-        for (; i < current_files.size();  ++i)
-            if (!current_files[i])
-                return i;
-        current_files.push_back(NULL);
-        return current_files.size() - 1;
-    }
-
-    //--------------------------------------------------------------------------
-    bool Daemon::id_is_existing(int id) const
-    {
-        if (id < 0 || id >= (int)current_files.size() || !current_files[id])
-            return false;
-        return true;
-    }
-
-    //--------------------------------------------------------------------------
     std::string Daemon::get_date() const
     {
         std::stringstream out;
@@ -1471,17 +1438,5 @@ namespace MediaConch
         str = str.substr(0, str.length() - 1);
         out << "[" << str << "]";
         return out.str();
-    }
-
-    //--------------------------------------------------------------------------
-    bool Daemon::file_is_registered(const std::string& file, size_t& id)
-    {
-        for (size_t i = 0; i < current_files.size(); ++i)
-            if (current_files[i] && !current_files[i]->compare(file))
-            {
-                id = i;
-                return true;
-            }
-        return false;
     }
 }

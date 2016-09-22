@@ -106,7 +106,7 @@ public:
 
     struct Checker_ValidateRes
     {
-        std::string             file;
+        long                    id;
         bool                    valid;
         Checker_ValidateRes() : valid(true) {}
     };
@@ -209,31 +209,33 @@ public:
     int add_option(const std::string& option, std::string& report);
 
     // Analyze
-    int  checker_analyze(const std::vector<std::string>& files, bool force_analyze = false);
-    int  checker_analyze(const std::string& file, bool& registered, bool force_analyze = false);
-    int  checker_is_done(const std::vector<std::string>& files, double& percent);
-    int  checker_is_done(const std::string& file, double& percent, report& report_kind);
+    int  checker_analyze(const std::vector<std::string>& files, std::vector<long>& files_id, bool force_analyze = false);
+    int  checker_analyze(const std::string& file, bool& registered, long& file_id, bool force_analyze = false);
+    int  checker_is_done(const std::vector<long>& files, double& percent);
+    int  checker_is_done(long file, double& percent, report& report_kind);
 
     void checker_list(std::vector<std::string>& vec);
-    void checker_file_from_id(int id, std::string& filename);
+    void checker_file_from_id(long id, std::string& filename);
+    void checker_id_from_filename(std::string& filename, long id);
+
 
     // Output
     int  checker_get_report(int user, const std::bitset<report_Max>& Report, format f,
-                            const std::vector<std::string>& files,
+                            const std::vector<long>& files,
                             const std::vector<size_t>& policies_ids,
                             const std::vector<std::string>& policies_contents,
                             const std::map<std::string, std::string>& options,
                             Checker_ReportRes* result,
                             const std::string* display_name = NULL,
                             const std::string* display_content = NULL);
-    int checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
+    int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
                          const std::map<std::string, std::string>& options,
                          std::vector<Checker_ValidateRes*>& result);
 
     //Clear
-    int remove_report(const std::vector<std::string>& files);
+    int remove_report(const std::vector<long>& files);
 
     // Implementation checker arguments
     void               set_implementation_schema_file(const std::string& file);
@@ -270,7 +272,7 @@ public:
     int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
     int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
     int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);
-    int                          xslt_policy_create_from_file(int user, const std::string& file, std::string& err);
+    int                          xslt_policy_create_from_file(int user, long file, std::string& err);
     //   Import policy
     int                          policy_import(int user, const std::string& memory, std::string& err, const char* filename=NULL, bool is_system_policy=false);
 

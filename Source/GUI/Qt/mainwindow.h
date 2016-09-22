@@ -75,7 +75,7 @@ public:
     void                        remove_widget_from_layout(QWidget* w);
     int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
-    int                         analyze(const std::vector<std::string>& files);
+    int                         analyze(const std::vector<std::string>& files, std::vector<long>& files_id);
     int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
     int                         is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
     int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,

@@ -76,6 +76,17 @@ FileRegistered* WorkerFiles::get_file_registered_from_file(const std::string& fi
 }
 
 //---------------------------------------------------------------------------
+long WorkerFiles::get_id_from_registered_file(const std::string& file)
+{
+    long id = -1;
+    working_files_mutex.lock();
+    if (working_files.find(file) != working_files.end() && working_files[file])
+        id = working_files[file]->file_id;
+    working_files_mutex.unlock();
+    return id;
+}
+
+//---------------------------------------------------------------------------
 void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& files)
 {
     working_files_mutex.lock();
@@ -121,9 +132,13 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
 
     // Keep the old index for the same file
     if (exists)
+    {
         fr->index = working_files[full_file]->index;
+        fr->file_id = working_files[full_file]->file_id;
+    }
     else
         fr->index = file_index++;
+
     fr->filename = file;
     fr->filepath = path;
     fr->policy = policy;
@@ -149,16 +164,19 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
         return;
     }
 
-    to_add_files_mutex.lock();
-    to_add_files[full_file] = new FileRegistered(*fr);
-    to_add_files_mutex.unlock();
-
     std::vector<std::string> vec;
     vec.push_back(full_file);
 
     int ret;
-    if ((ret = mainwindow->analyze(vec)) < 0)
+    std::vector<long> files_id;
+    if ((ret = mainwindow->analyze(vec, files_id)) < 0 || files_id.size() != 1)
         mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
+
+    fr->file_id = files_id[0];
+
+    to_add_files_mutex.lock();
+    to_add_files[full_file] = new FileRegistered(*fr);
+    to_add_files_mutex.unlock();
 }
 
 //---------------------------------------------------------------------------
@@ -539,6 +557,17 @@ void WorkerFiles::fill_registered_files_from_db()
 
         working_files[full_file] = fr;
         files.push_back(full_file);
+
+
+        std::vector<std::string> tmp;
+        tmp.push_back(full_file);
+
+        int ret;
+        std::vector<long> files_id;
+        if ((ret = mainwindow->analyze(tmp, files_id)) < 0 && files_id.size() != 1)
+            mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
+        else
+            fr->file_id = files_id[0];
     }
     working_files_mutex.unlock();
 
@@ -546,10 +575,6 @@ void WorkerFiles::fill_registered_files_from_db()
     for (size_t i = 0; i < files.size(); ++i)
         unfinished_files.push_back(files[i]);
     unfinished_files_mutex.unlock();
-
-    int ret;
-    if ((ret = mainwindow->analyze(files)) < 0)
-        mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
 }
 
 }

@@ -51,15 +51,15 @@ public:
     Scheduler(Core *c);
     virtual ~Scheduler();
 
-    int add_element_to_queue(const std::string& filename, const std::vector<std::string>& options);
+    int  add_element_to_queue(const std::string& filename, long file_id, const std::vector<std::string>& options);
     void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     bool is_finished();
-    bool element_exists(const std::string& filename);
-    bool element_is_finished(const std::string& filename, double& percent_done);
+    long element_exists(const std::string& filename);
+    bool element_is_finished(long file_id, double& percent_done);
     void set_max_threads(size_t nb) { max_threads = nb; }
     void get_elements(std::vector<std::string>& vec);
-    int another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
-    int execute_pre_hook_plugins(std::string& file, std::string& err);
+    int  another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
+    int  execute_pre_hook_plugins(std::string& file, std::string& err);
 
 private:
     Scheduler(const Scheduler&);

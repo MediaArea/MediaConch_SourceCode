@@ -65,7 +65,7 @@ public:
     int         import_policy_from_file(int user, const std::string& file, std::string& err);
     int         duplicate_policy(int user, int id, int dst_policy_id, std::string& err, bool copy_name=true);
     int         move_policy(int user, int id, int dst_policy_id, std::string& err);
-    int         create_xslt_policy_from_file(int user, const std::string& file, std::string& err);
+    int         create_xslt_policy_from_file(int user, long file, std::string& err);
 
     int         save_policy(int user, int id, std::string& err);
     int         export_policy(int user, const char* filename, int id, std::string& err);

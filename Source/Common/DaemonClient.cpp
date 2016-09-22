@@ -134,7 +134,7 @@ int DaemonClient::checker_list(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_file_from_id(int id, std::string& filename)
+int DaemonClient::checker_file_from_id(long id, std::string& filename)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -199,7 +199,7 @@ int DaemonClient::default_values_for_type(const std::string& type, std::vector<s
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_analyze(const std::string& file, bool& registered, bool force_analyze)
+int DaemonClient::checker_analyze(const std::string& file, bool& registered, bool force_analyze, long& file_id)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -263,22 +263,19 @@ int DaemonClient::checker_analyze(const std::string& file, bool& registered, boo
 
     registered = !res->ok[0]->create;
 
-    file_ids[file] = res->ok[0]->outId;
+    file_id = res->ok[0]->outId;
     delete res;
     return MediaConchLib::errorHttp_NONE;
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_is_done(const std::string& file, double& done, MediaConchLib::report& report_kind)
+int DaemonClient::checker_is_done(long file_id, double& done, MediaConchLib::report& report_kind)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Checker_Status_Req req;
-    std::map<std::string, int>::iterator it = file_ids.find(file);
-    if (it == file_ids.end())
-        return MediaConchLib::errorHttp_MAX;
-    req.ids.push_back(it->second);
+    req.ids.push_back(file_id);
 
     int ret = http_client->start();
     if (ret < 0)
@@ -327,7 +324,7 @@ int DaemonClient::checker_is_done(const std::string& file, double& done, MediaCo
 
 //---------------------------------------------------------------------------
 int DaemonClient::checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set,
-                                     MediaConchLib::format f, const std::vector<std::string>& files,
+                                     MediaConchLib::format f, const std::vector<long>& files,
                                      const std::vector<size_t>& policies_ids,
                                      const std::vector<std::string>& policies_contents,
                                      const std::map<std::string, std::string>& options,
@@ -343,12 +340,7 @@ int DaemonClient::checker_get_report(int user, const std::bitset<MediaConchLib::
     req.user = user;
 
     for (size_t i = 0; i < files.size(); ++i)
-    {
-        std::map<std::string, int>::iterator it = file_ids.find(files[i]);
-        if (it == file_ids.end())
-            continue;
-        req.ids.push_back(it->second);
-    }
+        req.ids.push_back(files[i]);
 
     // REPORT KIND
     if (report_set[MediaConchLib::report_MediaConch])
@@ -435,7 +427,7 @@ int DaemonClient::checker_get_report(int user, const std::bitset<MediaConchLib::
 
 //---------------------------------------------------------------------------
 int DaemonClient::checker_validate(int user, MediaConchLib::report report,
-                                   const std::vector<std::string>& files,
+                                   const std::vector<long>& files,
                                    const std::vector<size_t>& policies_ids,
                                    const std::vector<std::string>& policies_contents,
                                    const std::map<std::string, std::string>& options,
@@ -448,15 +440,8 @@ int DaemonClient::checker_validate(int user, MediaConchLib::report report,
     RESTAPI::Checker_Validate_Req req;
     req.user = user;
 
-    std::map<int, std::string> saved_ids;
     for (size_t i = 0; i < files.size(); ++i)
-    {
-        std::map<std::string, int>::iterator it = file_ids.find(files[i]);
-        if (it == file_ids.end())
-            continue;
-        req.ids.push_back(it->second);
-        saved_ids[it->second] = files[i];
-    }
+        req.ids.push_back(files[i]);
 
     // REPORT KIND
     if (report == MediaConchLib::report_MediaConch)
@@ -513,7 +498,7 @@ int DaemonClient::checker_validate(int user, MediaConchLib::report report,
     for (size_t i = 0; i < res->ok.size(); ++i)
     {
         MediaConchLib::Checker_ValidateRes* v = new MediaConchLib::Checker_ValidateRes;
-        v->file = saved_ids[res->ok[i]->id];
+        v->id = res->ok[i]->id;
         v->valid = res->ok[i]->valid;
         result.push_back(v);
     }
@@ -1144,18 +1129,13 @@ int DaemonClient::policy_clear_policies(int user, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::xslt_policy_create_from_file(int user, const std::string& file)
+int DaemonClient::xslt_policy_create_from_file(int user, long file_id)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
-    std::map<std::string, int>::iterator it = file_ids.find(file);
-    if (it == file_ids.end())
-        return MediaConchLib::errorHttp_MAX;
-    int id = it->second;
-
     RESTAPI::XSLT_Policy_Create_From_File_Req req;
-    req.id = id;
+    req.id = file_id;
     req.user = user;
 
     int ret = http_client->start();
