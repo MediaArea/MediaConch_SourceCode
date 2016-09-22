@@ -45,7 +45,7 @@ TEMPLATE = app
 CONFIG += qt release
 CONFIG += no_keywords
 
-CONFIG += link_pkgconfig
+unix:CONFIG += link_pkgconfig
 
 DEFINES          +=  _UNICODE
 
@@ -196,11 +196,11 @@ equals(WEB_MACHINE, webengine) {
 
 INCLUDEPATH      += ../../Source
 
-exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a) {
+unix:exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a) {
     INCLUDEPATH      += ../../../MediaInfoLib/Source
     LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
     message("custom libmediainfo: yes (static)")
-} else {
+} else:unix {
     exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.so) {
         INCLUDEPATH      += ../../../MediaInfoLib/Source
         LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS)
@@ -213,20 +213,20 @@ exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a) {
     }
 }
 
-exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
+unix:exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
     INCLUDEPATH      += ../../../ZenLib/Source
     LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
     message("libzen      : custom")
-} else {
+} else:unix {
     PKGCONFIG        += libzen
     message("libzen      : system")
 }
 
-exists(../../../libxml2/.libs/libxml2.a) {
+unix:exists(../../../libxml2/.libs/libxml2.a) {
     INCLUDEPATH      += ../../../libxml2/include
     LIBS             += ../../../libxml2/.libs/libxml2.a
     message("libxml2     : custom")
-} else {
+} else:unix {
     packagesExist(libxml2) {
         PKGCONFIG += libxml2
     } else {
@@ -235,13 +235,13 @@ exists(../../../libxml2/.libs/libxml2.a) {
     message("libxml2     : system")
 }
 
-exists(../../../libxslt/libxslt/.libs/libxslt.a) {
+unix:exists(../../../libxslt/libxslt/.libs/libxslt.a) {
     INCLUDEPATH      += ../../../libxslt/libxslt
     INCLUDEPATH      += ../../../libxslt/libexslt
     LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
     LIBS             += ../../../libxslt/libexslt/.libs/libexslt.a
     message("libxslt     : custom")
-} else {
+} else:unix {
     PKGCONFIG        += libxslt libexslt
     message("libxslt     : system")
 }
@@ -250,14 +250,13 @@ exists(../../../libxslt/libxslt/.libs/libxslt.a) {
 contains(NO_SQLITE, yes|1) {
     message("libsqlite3  : no")
 } else {
-    exists(../../../sqlite/.libs/libsqlite3.a) {
+    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    unix:exists(../../../sqlite/.libs/libsqlite3.a) {
         INCLUDEPATH      += ../../../sqlite
         LIBS             += ../../../sqlite/.libs/libsqlite3.a
-        QMAKE_CXXFLAGS   += -DHAVE_SQLITE
         message("libsqlite3  : custom")
-    } else {
+    } else:unix {
         PKGCONFIG        += sqlite3
-        QMAKE_CXXFLAGS   += -DHAVE_SQLITE
         message("libsqlite3  : system")
     }
 }
@@ -265,14 +264,13 @@ contains(NO_SQLITE, yes|1) {
 contains(NO_JANSSON, yes|1) {
     message("libjansson  : no")
 } else {
-    exists(../../../jansson/src/.libs/libjansson.a) {
+    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
+    unix:exists(../../../jansson/src/.libs/libjansson.a) {
         INCLUDEPATH      += ../../../jansson/src
         LIBS             += ../../../jansson/src/.libs/libjansson.a
-        QMAKE_CXXFLAGS   += -DHAVE_JANSSON
         message("libjansson  : custom")
-    } else {
+    } else:unix {
         PKGCONFIG        += jansson
-        QMAKE_CXXFLAGS   += -DHAVE_JANSSON
         message("libjansson  : system")
     }
 }
@@ -280,14 +278,13 @@ contains(NO_JANSSON, yes|1) {
 contains(NO_LIBEVENT, yes|1) {
     message("libevent    : no")
 } else {
-    exists(../../../libevent/.libs/libevent.a) {
+    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
+    unix:exists(../../../libevent/.libs/libevent.a) {
         INCLUDEPATH      += ../../../libevent/include
         LIBS             += ../../../libevent/.libs/libevent.a
-        QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
         message("libevent    : custom")
-    } else {
+    } else:unix {
         PKGCONFIG        += libevent
-        QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
         message("libevent    : system")
     }
 }
