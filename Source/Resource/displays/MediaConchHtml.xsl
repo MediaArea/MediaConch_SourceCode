@@ -49,22 +49,10 @@
         margin-top: 12px;
       }
 
-      .mc h1  {
-        background-color: #64A8DD;
-      }
-
-      .mc hr  {
-        border-top: 1px solid whitesmoke;
-        box-sizing: content-box;
-        height: 0;
-      }
-
       .mc p {
         margin: 0px;
         background-color: #64A8DD;
-        font-size: 12px;
         font-weight: 700;
-        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       }
 
       div .mc_element {
@@ -97,19 +85,11 @@
         margin-left:6px;
       }
 
-      .arrow input:checked + label {
-        width: 0;
-        height: 0;
-        border-style: solid;
-        border-width: 6px 0 6px 6px;
-        border-color: white white black white;
-      }
-
-      input.arrow[type=checkbox]:checked ~ .extra {
+      .arrow[type=checkbox]:checked ~ .extra {
         display: block;
       }
 
-      input.arrow:checked + label {
+      .arrow:checked + label {
         transform: rotate(45deg);
       }
 
