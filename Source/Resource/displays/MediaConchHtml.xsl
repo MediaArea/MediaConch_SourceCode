@@ -302,7 +302,14 @@
 
   <xsl:template match="mc:policy">
     <div class="mc_header">
-      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <xsl:choose>
+        <xsl:when test="name(parent::*) = 'media'">
+          <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox"/>
+        </xsl:otherwise>
+      </xsl:choose>
       <label for="policy-arrow-{generate-id()}"></label>
       <h2>
         <xsl:value-of select="@name"/>
@@ -333,34 +340,32 @@
 
   <xsl:template match="mc:rule">
     <div class="mc">
-
-      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox"/>
       <label for="policy-arrow-{generate-id()}"></label>
-        <xsl:text> </xsl:text>
-        <strong>
-          <xsl:value-of select="@name"/>
-        </strong>
-        <xsl:text> </xsl:text>
-        <xsl:if test="@outcome = 'pass'">
-          <xsl:text>&#x2705;  </xsl:text>
-          <xsl:value-of select="@outcome"/>
-        </xsl:if>
-        <xsl:if test="@outcome = 'fail'">
-          <xsl:text>&#x274C;  </xsl:text>
+      <xsl:text> </xsl:text>
+      <strong>
+        <xsl:value-of select="@name"/>
+      </strong>
+      <xsl:text> </xsl:text>
+      <xsl:if test="@outcome = 'pass'">
+        <xsl:text>&#x2705;  </xsl:text>
         <xsl:value-of select="@outcome"/>
+      </xsl:if>
+      <xsl:if test="@outcome = 'fail'">
+        <xsl:text>&#x274C;  </xsl:text>
+      <xsl:value-of select="@outcome"/>
+      </xsl:if>
+      <xsl:if test="@outcome = 'N/A'">
+      <xsl:value-of select="@outcome"/>
+      </xsl:if>
+      <div class="extra">
+        <xsl:if test="@actual != ''">
+          <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
+          <br/>
         </xsl:if>
-        <xsl:if test="@outcome = 'N/A'">
-        <xsl:value-of select="@outcome"/>
-        </xsl:if>
-        <div class="extra">
-          <xsl:if test="@actual != ''">
-            <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
-            <br/>
-          </xsl:if>
-          <strong><xsl:text>Xpath:  </xsl:text></strong>
-          <xsl:value-of select="@xpath"/>
-        </div>
-
-  </div>
+        <strong><xsl:text>Xpath:  </xsl:text></strong>
+        <xsl:value-of select="@xpath"/>
+      </div>
+    </div>
   </xsl:template>
 </xsl:stylesheet>
