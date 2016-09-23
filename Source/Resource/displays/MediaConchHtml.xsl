@@ -314,11 +314,17 @@
       <h2>
         <xsl:value-of select="@name"/>
         <xsl:choose>
-          <xsl:when test="@fail_count &gt; 0">
+          <xsl:when test="@outcome = 'fail'">
             <xsl:text>  &#x274C; fail</xsl:text>
+            <xsl:if test="@actual != ''">
+              (Actual:<xsl:value-of select="@actual"/>)
+            </xsl:if>
+          </xsl:when>
+          <xsl:when test="@outcome = 'pass'">
+            <xsl:text>  &#x2705; pass</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>  &#x2705; pass</xsl:text>
+            <xsl:text>  N/A</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </h2>
@@ -354,6 +360,9 @@
       <xsl:if test="@outcome = 'fail'">
         <xsl:text>&#x274C;  </xsl:text>
       <xsl:value-of select="@outcome"/>
+      <xsl:if test="@actual != ''">
+        (Actual: <xsl:value-of select="@actual"/>)
+      </xsl:if>
       </xsl:if>
       <xsl:if test="@outcome = 'N/A'">
       <xsl:value-of select="@outcome"/>
