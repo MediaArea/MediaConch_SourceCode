@@ -116,7 +116,7 @@
         height: 0;
         border-style: solid;
         border-width: 6px 0 6px 6px;
-        border-color: transparent transparent black transparent;
+        border-color: white white black white;
       }
 
       input.arrow[type=checkbox]:checked ~ .extra {
