@@ -81,7 +81,7 @@
         visibility: hidden;
       }
 
-      .i-arrow + label {
+      .arrow + label {
         display: inline-block;
         position: relative;
         cursor: pointer;
@@ -95,20 +95,6 @@
         margin-top:6px;
         margin-right:6px;
         margin-left:6px;
-      }
-
-      .p-arrow + label {
-        margin-left: 6px;
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        outline: none;
-        user-select: none;
-        border-right:3px solid black;
-        border-bottom:3px solid black;
-        width:6px;
-        height:6px;
-        transform: rotate(-45deg);
       }
 
       .arrow input:checked + label {
@@ -229,7 +215,7 @@
             <xsl:for-each select="mc:check">
               <tr>
                 <td class="mc_element">
-                  <input id="implementation-arrow-{generate-id()}" class="i-arrow arrow" type="checkbox"/>
+                  <input id="implementation-arrow-{generate-id()}" class="arrow" type="checkbox"/>
                   <label for="implementation-arrow-{generate-id()}"></label>
                   <strong><xsl:value-of select="@icid"/></strong>
                   <xsl:if test="@tests_run !=''">
@@ -304,10 +290,10 @@
     <div class="mc_header">
       <xsl:choose>
         <xsl:when test="name(parent::*) = 'media'">
-          <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+          <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox" checked="checked"/>
         </xsl:when>
         <xsl:otherwise>
-          <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox"/>
+          <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox"/>
         </xsl:otherwise>
       </xsl:choose>
       <label for="policy-arrow-{generate-id()}"></label>
@@ -346,7 +332,7 @@
 
   <xsl:template match="mc:rule">
     <div class="mc">
-      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox"/>
+      <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox"/>
       <label for="policy-arrow-{generate-id()}"></label>
       <xsl:text> </xsl:text>
       <strong>
