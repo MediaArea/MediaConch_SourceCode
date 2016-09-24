@@ -23,7 +23,6 @@
       .mc_header p {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
-        margin-left:20px;
         margin-bottom: 0;
         margin-top: 0;
       }
@@ -37,7 +36,7 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 14px;
         display: inline-block;
-        margin-left: 6px;
+        margin-left: 4px;
         margin-bottom: 0px;
         margin-top: 4px;
       }
@@ -47,42 +46,35 @@
         max-width: 1280px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
-        margin-top: 12px;
-      }
-
-      .mc h1  {
-        background-color: #64A8DD;
-      }
-
-      .mc hr  {
-        border-top: 1px solid whitesmoke;
-        box-sizing: content-box;
-        height: 0;
+        margin-top: 6px;
       }
 
       .mc p {
         margin: 0px;
         background-color: #64A8DD;
-        font-size: 12px;
         font-weight: 700;
-        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+      }
+
+      .mc span {
+        color: black;
       }
 
       div .mc_element {
-        padding: 0 5px 0 30px;
+        padding-left: 1px;
       }
 
-      .mc_element .extra {
-        background-color: white;
+      .mc_rule {
+        padding-left: 30px;
       }
 
       .arrow {
+        display: inline-block;
         position: absolute;
         margin-left: -9999px;
         visibility: hidden;
       }
 
-      .i-arrow + label {
+      .arrow + label {
         display: inline-block;
         position: relative;
         cursor: pointer;
@@ -92,39 +84,24 @@
         border-bottom:3px solid black;
         width:6px;
         height:6px;
+        -webkit-transform: rotate(-45deg);
+        -moz-transform: rotate(-45deg);
+        -o-transform: rotate(-45deg); 
         transform: rotate(-45deg);
         margin-top:6px;
         margin-right:6px;
         margin-left:6px;
       }
 
-      .p-arrow + label {
-        margin-left: 6px;
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        outline: none;
-        user-select: none;
-        border-right:3px solid black;
-        border-bottom:3px solid black;
-        width:6px;
-        height:6px;
-        transform: rotate(-45deg);
-      }
-
-      .arrow input:checked + label {
-        width: 0;
-        height: 0;
-        border-style: solid;
-        border-width: 6px 0 6px 6px;
-        border-color: transparent transparent black transparent;
-      }
-
-      input.arrow[type=checkbox]:checked ~ .extra {
+      .arrow[type=checkbox]:checked ~ .extra {
         display: block;
       }
 
-      input.arrow:checked + label {
+      .arrow:checked + label {
+        display: inline-block;
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -o-transform: rotate(45deg); 
         transform: rotate(45deg);
       }
 
@@ -194,6 +171,11 @@
 
       .extra {
         display: none;
+        padding-left: 25px;
+      }
+
+      .description {
+        padding-left: 25px;
       }
 
       .verbosity {
@@ -229,7 +211,7 @@
             <xsl:for-each select="mc:check">
               <tr>
                 <td class="mc_element">
-                  <input id="implementation-arrow-{generate-id()}" class="i-arrow arrow" type="checkbox"/>
+                  <input id="implementation-arrow-{generate-id()}" class="arrow" type="checkbox"/>
                   <label for="implementation-arrow-{generate-id()}"></label>
                   <strong><xsl:value-of select="@icid"/></strong>
                   <xsl:if test="@tests_run !=''">
@@ -295,37 +277,51 @@
       </xsl:for-each>
       <xsl:apply-templates select="mc:rule|mc:policy"/>
     </xsl:for-each>
+    <br/>
   </body>
   </html>
   </xsl:template>
 
   <xsl:template match="mc:policy">
     <div class="mc_header">
-      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <xsl:choose>
+        <xsl:when test="name(parent::*) = 'media'">
+          <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox" checked="checked"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox"/>
+        </xsl:otherwise>
+      </xsl:choose>
       <label for="policy-arrow-{generate-id()}"></label>
       <h2>
         <xsl:value-of select="@name"/>
         <xsl:choose>
-          <xsl:when test="@fail_count &gt; 0">
-            <xsl:text>  &#x274C;</xsl:text>
+          <xsl:when test="@outcome = 'fail'">
+            <xsl:text>  &#x274C; fail</xsl:text>
+            <xsl:if test="@actual != ''">
+              (Actual:<xsl:value-of select="@actual"/>)
+            </xsl:if>
+          </xsl:when>
+          <xsl:when test="@outcome = 'pass'">
+            <xsl:text>  &#x2705; pass</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>  &#x2705;</xsl:text>
+            <xsl:text>  N/A</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </h2>
       <xsl:if test="mc:description != ''">
-        <p>
+        <p class="description">
           <xsl:value-of select="mc:description"/>
         </p>
       </xsl:if>
+      <div class="mc_rule extra">
       <p>
       <strong>Type:</strong><xsl:text> </xsl:text><xsl:value-of select="@type"/>
       | <strong>Rules run:</strong><xsl:text> </xsl:text><xsl:value-of select="@rules_run"/>
       | <strong>Fail count:</strong><xsl:text> </xsl:text><xsl:value-of select="@fail_count"/>
       | <strong>Pass count:</strong><xsl:text> </xsl:text><xsl:value-of select="@pass_count"/></p> 
-      <div class="mc_element extra">
-      <xsl:apply-templates select="mc:rule|mc:policy"/>
+        <xsl:apply-templates select="mc:rule|mc:policy"/>
       </div>
     </div>
   </xsl:template>
@@ -333,33 +329,36 @@
   <xsl:template match="mc:rule">
     <div class="mc">
       <div class="mc_element">
-      <input id="policy-arrow-{generate-id()}" class="p-arrow arrow" type="checkbox" checked="checked"/>
+      <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox"/>
       <label for="policy-arrow-{generate-id()}"></label>
-        <xsl:text> </xsl:text>
-        <strong>
-          <xsl:value-of select="@name"/>
-        </strong>
-        <xsl:text> </xsl:text>
-        <xsl:if test="@outcome = 'pass'">
-          <xsl:text>&#x2705;  </xsl:text>
-          <xsl:value-of select="@outcome"/>
-        </xsl:if>
-        <xsl:if test="@outcome = 'fail'">
-          <xsl:text>&#x274C;  </xsl:text>
+      <xsl:text> </xsl:text>
+      <strong>
+        <span><xsl:value-of select="@name"/></span>
+      </strong>
+      <xsl:text> </xsl:text>
+      <xsl:if test="@outcome = 'pass'">
+        <xsl:text>&#x2705;  </xsl:text>
         <xsl:value-of select="@outcome"/>
+      </xsl:if>
+      <xsl:if test="@outcome = 'fail'">
+        <xsl:text>&#x274C;  </xsl:text>
+      <xsl:value-of select="@outcome"/>
+      <xsl:if test="@actual != ''">
+        (Actual: <xsl:value-of select="@actual"/>)
+      </xsl:if>
+      </xsl:if>
+      <xsl:if test="@outcome = 'N/A'">
+      <xsl:value-of select="@outcome"/>
+      </xsl:if>
+      <div class="extra">
+        <xsl:if test="@actual != ''">
+          <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
+          <br/>
         </xsl:if>
-        <xsl:if test="@outcome = 'N/A'">
-        <xsl:value-of select="@outcome"/>
-        </xsl:if>
-        <div class="extra">
-          <xsl:if test="@actual != ''">
-            <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
-            <br/>
-          </xsl:if>
-          <strong><xsl:text>Xpath:  </xsl:text></strong>
-          <xsl:value-of select="@xpath"/>
-        </div>
+        <strong><xsl:text>Xpath:  </xsl:text></strong>
+        <xsl:value-of select="@xpath"/>
       </div>
+    </div>
   </div>
   </xsl:template>
 </xsl:stylesheet>
