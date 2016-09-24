@@ -52,11 +52,11 @@
         <xsl:text> Results: </xsl:text>
         <xsl:choose>
           <xsl:when test="@fail_count &gt; 0">
-            <xsl:text>[O]  </xsl:text>
+            <xsl:text>[X]  </xsl:text>
             <xsl:text>Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>[X]  </xsl:text><xsl:value-of select="@outcome"/>
+            <xsl:text>[O]  </xsl:text><xsl:value-of select="@outcome"/>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:text>&#xa;</xsl:text>
