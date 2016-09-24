@@ -55,6 +55,10 @@
         font-weight: 700;
       }
 
+      .mc span {
+        color: black;
+      }
+
       div .mc_element {
         padding: 0 5px 0 30px;
       }
@@ -167,7 +171,11 @@
 
       .extra {
         display: none;
-        padding-left: 20px;
+        padding-left: 26px;
+      }
+
+      .description {
+        padding-left: 26px;
       }
 
       .verbosity {
@@ -303,7 +311,7 @@
         </xsl:choose>
       </h2>
       <xsl:if test="mc:description != ''">
-        <p>
+        <p class="description">
           <xsl:value-of select="mc:description"/>
         </p>
       </xsl:if>
@@ -324,7 +332,7 @@
       <label for="policy-arrow-{generate-id()}"></label>
       <xsl:text> </xsl:text>
       <strong>
-        <xsl:value-of select="@name"/>
+        <span><xsl:value-of select="@name"/></span>
       </strong>
       <xsl:text> </xsl:text>
       <xsl:if test="@outcome = 'pass'">
