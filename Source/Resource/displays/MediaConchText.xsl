@@ -17,7 +17,6 @@
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
     <xsl:for-each select="mc:media">
-      <xsl:text>******************************************************************************&#xa;</xsl:text>
       <xsl:value-of select="@ref"/>
       <xsl:text>&#xa;</xsl:text>
       <xsl:for-each select="mc:implementationChecks">
