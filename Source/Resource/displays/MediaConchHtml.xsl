@@ -36,7 +36,7 @@
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 14px;
         display: inline-block;
-        margin-left: 6px;
+        margin-left: 4px;
         margin-bottom: 0px;
         margin-top: 4px;
       }
@@ -46,7 +46,7 @@
         max-width: 1280px;
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
-        margin-top: 12px;
+        margin-top: 6px;
       }
 
       .mc p {
@@ -60,7 +60,7 @@
       }
 
       div .mc_element {
-        padding: 0 5px 0 30px;
+        padding-left: 1px;
       }
 
       .mc_rule {
@@ -171,11 +171,11 @@
 
       .extra {
         display: none;
-        padding-left: 26px;
+        padding-left: 25px;
       }
 
       .description {
-        padding-left: 26px;
+        padding-left: 25px;
       }
 
       .verbosity {
@@ -328,6 +328,7 @@
 
   <xsl:template match="mc:rule">
     <div class="mc">
+      <div class="mc_element">
       <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox"/>
       <label for="policy-arrow-{generate-id()}"></label>
       <xsl:text> </xsl:text>
@@ -358,5 +359,6 @@
         <xsl:value-of select="@xpath"/>
       </div>
     </div>
+  </div>
   </xsl:template>
 </xsl:stylesheet>
