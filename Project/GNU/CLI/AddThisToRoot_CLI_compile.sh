@@ -46,9 +46,8 @@ elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
 #    OS="freebsd"
 fi
 
-
 ##################################################################
-# ZenLib
+# Configure ZenLib
 
 if test -e ZenLib/Project/GNU/Library/configure; then
     cd ZenLib/Project/GNU/Library/
@@ -59,16 +58,7 @@ if test -e ZenLib/Project/GNU/Library/configure; then
     else
         ./configure $ZenLib_Options $*
     fi
-    if test -e Makefile; then
-        make clean
-        Parallel_Make
-        if test -e libzen.la; then
-            echo ZenLib compiled
-        else
-            echo Problem while compiling ZenLib
-            exit
-        fi
-    else
+    if test ! -e Makefile; then
         echo Problem while configuring ZenLib
         exit
     fi
@@ -79,7 +69,21 @@ fi
 cd $Home
 
 ##################################################################
-# MediaInfoLib
+# Compile ZenLib
+
+cd ZenLib/Project/GNU/Library/
+make clean
+Parallel_Make
+if test -e libzen.la; then
+    echo ZenLib compiled
+else
+    echo Problem while compiling ZenLib
+    exit
+fi
+cd $Home
+
+##################################################################
+# Configure MediaInfoLib
 
 if test -e MediaInfoLib/Project/GNU/Library/configure; then
     cd MediaInfoLib/Project/GNU/Library/
@@ -90,17 +94,7 @@ if test -e MediaInfoLib/Project/GNU/Library/configure; then
     else
         ./configure --with-libcurl $*
     fi
-    if test -e Makefile; then
-        make clean
-        Parallel_Make
-        #if test "$(./libmediainfo-config la_name)" != "" && test -e $(./libmediainfo-config la_name); then
-        if test -e libmediainfo.la; then
-            echo MediaInfoLib compiled
-        else
-            echo Problem while compiling MediaInfoLib
-            exit
-        fi
-    else
+    if test ! -e Makefile; then
         echo Problem while configuring MediaInfoLib
         exit
     fi
@@ -111,7 +105,7 @@ fi
 cd $Home
 
 ##################################################################
-# MediaConch
+# Configure MediaConch
 
 if test -e MediaConch/Project/GNU/CLI/configure; then
     cd MediaConch/Project/GNU/CLI/
@@ -122,21 +116,40 @@ if test -e MediaConch/Project/GNU/CLI/configure; then
     else
         ./configure --enable-staticlibs $*
     fi
-    if test -e Makefile; then
-        make clean
-        Parallel_Make
-        if test -e mediaconch; then
-        echo "MediaConch (CLI) compiled"
-        else
-            echo "Problem while compiling MediaConch (CLI)"
-            exit
-        fi
-    else
+    if test ! -e Makefile; then
         echo "Problem while configuring MediaConch (CLI)"
         exit
     fi
 else
     echo MediaConch directory is not found
+    exit
+fi
+cd $Home
+
+##################################################################
+# Compile MediaInfoLib
+
+cd MediaInfoLib/Project/GNU/Library/
+make clean
+Parallel_Make
+if test -e libmediainfo.la; then
+    echo MediaInfoLib compiled
+else
+    echo Problem while compiling MediaInfoLib
+    exit
+fi
+cd $Home
+
+##################################################################
+# Compile MediaConch
+
+cd MediaConch/Project/GNU/CLI/
+make clean
+Parallel_Make
+if test -e mediaconch; then
+    echo "MediaConch (CLI) compiled"
+else
+    echo "Problem while compiling MediaConch (CLI)"
     exit
 fi
 cd $Home
