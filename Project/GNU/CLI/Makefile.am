@@ -44,6 +44,7 @@ INCLUDES = -I../../../Source -I../../../../MediaInfoLib/Source -I../../../../Zen
 
 TESTS = \
     test/simple.sh \
+    test/filename.sh \
     test/test_ffv1.sh
 
 SAMPLES_DIR = test/SampleFiles

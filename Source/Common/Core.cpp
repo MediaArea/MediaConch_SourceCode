@@ -1721,7 +1721,7 @@ void Core::xml_escape_attributes(std::string& xml)
                 i += 3;
                 break;
             case '>':
-                xml.replace(i, 1, "&lg;");
+                xml.replace(i, 1, "&gt;");
                 len += 3;
                 i += 3;
                 break;
