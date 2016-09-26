@@ -185,9 +185,9 @@ var policyTreeAjax = (function() {
         var value = "";
 
         if ($(".ruleMediaTrace").hasClass("active"))
-            scope = "mt";
+            scope = "mmt";
 
-        if (scope === "mt")
+        if (scope === "mmt")
         {
             name = $("#xslPolicyRuleMt_title").val();
             if (name === null)
