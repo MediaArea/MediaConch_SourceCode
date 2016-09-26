@@ -22,7 +22,7 @@ var policyTreeRules = (function() {
     }
 
     var isRuleMT = function(node) {
-        if ('mt' == node.data.scope) {
+        if ('mmt' == node.data.scope) {
             return true;
         }
 

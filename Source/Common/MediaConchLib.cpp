@@ -21,6 +21,7 @@
 #include "LibEventHttp.h"
 #include "generated/PolicySample1.h"
 #include "generated/PolicySample4.h"
+#include "generated/PolicySample5.h"
 
 namespace MediaConch {
 
@@ -715,6 +716,10 @@ int MediaConchLib::load_system_policy()
 
     policy_path = path + "policy_sample_4.xml";
     memory = std::string(policy_sample_4);
+    core->policies.import_policy_from_memory(-1, memory, err, path.c_str(), true);
+
+    policy_path = path + "policy_sample_5.xml";
+    memory = std::string(policy_sample_5);
     core->policies.import_policy_from_memory(-1, memory, err, path.c_str(), true);
 
     return 0;

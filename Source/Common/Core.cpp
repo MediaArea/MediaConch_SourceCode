@@ -749,7 +749,7 @@ void Core::unify_policy_options(std::map<std::string, std::string>& opts)
         std::string report;
 
         files.push_back(file);
-        create_report_ma_xml(files, opts, report, get_bitset_with_mi_mt());
+        create_report_ma_xml(files, opts, report, get_bitset_with_mi_mmt());
 
         std::string path = get_local_data_path();
         path += "policies_references_files/";
