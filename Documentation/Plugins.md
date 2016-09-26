@@ -35,13 +35,15 @@ It should be a struct named *Plugins* which contains an array of plugin.
 
 ##### FFmpeg
 
-* **name**:         Has to be *FFmpeg*.
-* **bin**:          Full path to the Command Line Interface of ffmpeg.
-* **outputDir**:    File created by ffmpeg and used to be analyzed will be creted in this directory.
-* **outputExt**:    Extension of the File created by ffmpeg.
-* **inputParams**:  CLI parameters to be given to ffmpeg for the input file, the -i will be added by the program.
-* **outputParams**: CLI parameters to be given to ffmpeg for the output file.
-* **params**:       CLI parameters added after the ffmpeg command.
+* **name**:          Has to be *FFmpeg*.
+* **bin**:           Full path to the Command Line Interface of ffmpeg.
+* **createFile**:    Need to be set to true, tell the plugin manager to create an output file.
+* **analyzeSource**: Analyze the generated file and the source file.
+* **outputDir**:     File created by ffmpeg and used to be analyzed will be creted in this directory.
+* **outputExt**:     Extension of the File created by ffmpeg.
+* **inputParams**:   CLI parameters to be given to ffmpeg for the input file, the -i will be added by the program.
+* **outputParams**:  CLI parameters to be given to ffmpeg for the output file.
+* **params**:        CLI parameters added after the ffmpeg command.
 
 ### Example
 
@@ -63,6 +65,8 @@ It should be a struct named *Plugins* which contains an array of plugin.
             {
                 "name": "FFmpeg",
                 "bin": "$PATH_TO_FFMPEG",
+                "analyzeSource": false,
+                "createFile": true,
                 "outputDir": "/tmp",
                 "outputExt": "mkv",
                 "inputParams": ["-y", "-v", "-8"],

@@ -76,8 +76,8 @@ public:
     int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
     int                         analyze(const std::vector<std::string>& files, std::vector<long>& files_id);
-    int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
-    int                         is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
+    int                         is_analyze_finished(const std::vector<std::string>& files, std::vector<MediaConchLib::Checker_StatusRes>& res);
+    int                         is_analyze_finished(const std::string& file, MediaConchLib::Checker_StatusRes& res);
     int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,
                                          const std::vector<size_t>& policies_ids,
                                          const std::vector<std::string>& policies_contents,

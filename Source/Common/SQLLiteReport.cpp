@@ -122,8 +122,9 @@ int SQLLiteReport::update_report_table()
 
 long SQLLiteReport::add_file(const std::string& filename, const std::string& file_last_modification,
                              std::string& err,
-                             long source_id,
-                             const std::string& generated_file, const std::string& log)
+                             long generated_id,
+                             long source_id, size_t generated_time,
+                             const std::string& generated_log, const std::string& generated_error_log)
 {
     long id = get_file_id(filename, file_last_modification);
     if (id >= 0)
@@ -133,8 +134,8 @@ long SQLLiteReport::add_file(const std::string& filename, const std::string& fil
 
     reports.clear();
     create << "INSERT INTO MEDIACONCH_FILE";
-    create << " (FILENAME, FILE_LAST_MODIFICATION, SOURCE_FILE_ID, GENERATED_FILE, LOG)";
-    create << " VALUES (?, ?, ?, ?, ?);";
+    create << " (FILENAME, FILE_LAST_MODIFICATION, GENERATED_ID, SOURCE_ID, GENERATED_TIME, GENERATED_LOG, GENERATED_ERROR_LOG)";
+    create << " VALUES (?, ?, ?, ?, ?, ?, ?);";
     query = create.str();
 
     const char* end = NULL;
@@ -150,15 +151,23 @@ long SQLLiteReport::add_file(const std::string& filename, const std::string& fil
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 3, source_id);
+    ret = sqlite3_bind_int(stmt, 3, generated_id);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 4, generated_file.c_str(), generated_file.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int(stmt, 4, source_id);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 5, log.c_str(), log.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int(stmt, 5, generated_time);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 6, generated_log.c_str(), generated_log.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 7, generated_error_log.c_str(), generated_error_log.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -170,6 +179,63 @@ long SQLLiteReport::add_file(const std::string& filename, const std::string& fil
 
     id = get_file_id(filename, file_last_modification);
     return id;
+}
+
+long SQLLiteReport::update_file(long file_id, const std::string& file_last_modification,
+                                std::string& err,
+                                long generated_id, long source_id, size_t generated_time,
+                                const std::string& generated_log, const std::string& generated_error_log)
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE MEDIACONCH_FILE";
+    create << " SET FILE_LAST_MODIFICATION = ?, GENERATED_ID = ?, SOURCE_ID = ?,";
+    create << " GENERATED_TIME = ?, GENERATED_LOG = ?, GENERATED_ERROR_LOG = ?,";
+    create << " ANALYZED = 0";
+    create << " WHERE ID = ?;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, generated_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 3, source_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 4, generated_time);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 5, generated_log.c_str(), generated_log.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 6, generated_error_log.c_str(), generated_error_log.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 7, file_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() < 0)
+    {
+        err = error;
+        return -1;
+    }
+
+    return file_id;
 }
 
 long SQLLiteReport::get_file_id(const std::string& filename, const std::string& file_last_modification)
@@ -208,7 +274,7 @@ long SQLLiteReport::get_file_id(const std::string& filename, const std::string& 
 }
 
 //---------------------------------------------------------------------------
-void SQLLiteReport::get_file_from_id(long id, std::string& file)
+void SQLLiteReport::get_file_name_from_id(long id, std::string& file)
 {
     std::stringstream create;
     std::string key("FILENAME");
@@ -230,7 +296,150 @@ void SQLLiteReport::get_file_from_id(long id, std::string& file)
     if (execute() || !reports.size() || reports[0].find(key) == reports[0].end())
         return;
 
-    file =reports[0][key];
+    file = reports[0][key];
+}
+void SQLLiteReport::get_file_information_from_id(long id, std::string& filename, std::string& file_last_modification,
+                                                 long& generated_id, long& source_id, size_t& generated_time,
+                                                 std::string& generated_log, std::string& generated_error_log, bool& analyzed)
+{
+    std::stringstream create;
+    std::string name("FILENAME");
+    std::string modif("FILE_LAST_MODIFICATION");
+    std::string analyz("ANALYZED");
+    std::string gen_id("GENERATED_ID");
+    std::string src_id("SOURCE_ID");
+    std::string gen_time("GENERATED_TIME");
+    std::string gen_log("GENERATED_LOG");
+    std::string gen_error_log("GENERATED_ERROR_LOG");
+
+    reports.clear();
+    create << "SELECT " << name;
+    create << ", " << modif;
+    create << ", " << analyzed;
+    create << ", " << src_id;
+    create << ", " << gen_id;
+    create << ", " << gen_time;
+    create << ", " << gen_log;
+    create << ", " << gen_error_log;
+    create << " FROM MEDIACONCH_FILE";
+    create << " WHERE ID = ?;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return;
+
+    ret = sqlite3_bind_int(stmt, 1, id);
+    if (ret != SQLITE_OK)
+        return;
+
+    if (execute() || reports.size() != 1)
+        return;
+
+    if (reports[0].find(name) != reports[0].end())
+        filename = reports[0][name];
+
+    if (reports[0].find(modif) != reports[0].end())
+        file_last_modification = reports[0][modif];
+
+    if (reports[0].find(analyz) != reports[0].end())
+        analyzed = (bool)std_string_to_int(reports[0][analyz]);
+
+    if (reports[0].find(gen_id) != reports[0].end())
+        generated_id = std_string_to_int(reports[0][gen_id]);
+
+    if (reports[0].find(src_id) != reports[0].end())
+        source_id = std_string_to_int(reports[0][src_id]);
+
+    if (reports[0].find(gen_time) != reports[0].end())
+        generated_time = std_string_to_uint(reports[0][gen_time]);
+
+    if (reports[0].find(gen_log) != reports[0].end())
+        generated_log = reports[0][gen_log];
+
+    if (reports[0].find(gen_error_log) != reports[0].end())
+        generated_error_log = reports[0][gen_error_log];
+}
+
+int SQLLiteReport::update_file_generated_id(long source_id, long generated_id)
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE MEDIACONCH_FILE ";
+    create << "SET GENERATED_ID = ? ";
+    create << "WHERE ID = ?;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, generated_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, source_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+int SQLLiteReport::update_file_analyzed(long id, bool analyzed)
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE MEDIACONCH_FILE ";
+    create << "SET ANALYZED = ? ";
+    create << "WHERE ID = ?;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, analyzed);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+bool SQLLiteReport::file_is_analyzed(long id)
+{
+    std::stringstream create;
+
+    reports.clear();
+    create << "SELECT ANALYZED FROM MEDIACONCH_FILE ";
+    create << "WHERE ID = ?;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return false;
+
+    ret = sqlite3_bind_int(stmt, 1, id);
+    if (ret != SQLITE_OK)
+        return false;
+
+    if (execute() || reports.size() != 1)
+        return false;
+
+    bool analyzed = false;
+    if (reports[0].find("ANALYZED") != reports[0].end())
+        analyzed = (bool)std_string_to_int(reports[0]["ANALYZED"]);
+
+    return analyzed;
 }
 
 int SQLLiteReport::save_report(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
@@ -288,7 +497,7 @@ int SQLLiteReport::update_report(long file_id, MediaConchLib::report reportKind,
 
     reports.clear();
     create << "UPDATE MEDIACONCH_REPORT ";
-    create << "REPORT = ?, COMPRESS = ?, MIL_VERSION = ? ";
+    create << "SET REPORT = ?, COMPRESS = ?, MIL_VERSION = ? ";
     create << "WHERE FILE_ID = ? AND TOOL = ? AND FORMAT = ?;";
     query = create.str();
 

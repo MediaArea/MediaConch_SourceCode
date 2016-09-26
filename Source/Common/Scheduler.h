@@ -51,7 +51,7 @@ public:
     Scheduler(Core *c);
     virtual ~Scheduler();
 
-    int  add_element_to_queue(const std::string& filename, long file_id, const std::vector<std::string>& options);
+    int  add_element_to_queue(const std::string& filename, long file_id, const std::vector<std::string>& options, bool pre_hook=true);
     void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     bool is_finished();
     long element_exists(const std::string& filename);
@@ -59,7 +59,7 @@ public:
     void set_max_threads(size_t nb) { max_threads = nb; }
     void get_elements(std::vector<std::string>& vec);
     int  another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
-    int  execute_pre_hook_plugins(std::string& file, std::string& err);
+    int  execute_pre_hook_plugins(QueueElement *el, std::string& err);
 
 private:
     Scheduler(const Scheduler&);
@@ -73,6 +73,7 @@ private:
     CriticalSection                         CS;
 
     void run_element();
+    void remove_element(QueueElement *el);
 };
 
 }

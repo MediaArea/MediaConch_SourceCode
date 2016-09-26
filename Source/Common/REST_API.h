@@ -181,13 +181,15 @@ public:
 
     struct Checker_Status_Ok
     {
-        Checker_Status_Ok() : finished(false), has_percent(false), has_tool(false) {}
-        int                     id;
+        Checker_Status_Ok() : finished(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
+        ~Checker_Status_Ok();
+
+        long                    id;
         bool                    finished;
-        bool                    has_percent;
-        double                  done;
-        bool                    has_tool;
-        Report                  tool;
+        double                  *percent;
+        Report                  *tool;
+        long                    generated_id;
+        long                    source_id;
         std::string             to_str() const;
     };
 

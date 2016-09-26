@@ -980,7 +980,7 @@ int MainWindow::analyze(const std::vector<std::string>& files, std::vector<long>
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::is_analyze_finished(const std::vector<std::string>& files, double& percent_done)
+int MainWindow::is_analyze_finished(const std::vector<std::string>& files, std::vector<MediaConchLib::Checker_StatusRes>& res)
 {
     std::vector<long> files_id;
     for (size_t i = 0; ; )
@@ -992,17 +992,17 @@ int MainWindow::is_analyze_finished(const std::vector<std::string>& files, doubl
         files_id.push_back(id);
     }
 
-    return MCL.checker_is_done(files_id, percent_done);
+    return MCL.checker_status(files_id, res);
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind)
+int MainWindow::is_analyze_finished(const std::string& file, MediaConchLib::Checker_StatusRes& res)
 {
     long id = workerfiles.get_id_from_registered_file(file);
     if (id < 0)
         return -1;
 
-    return MCL.checker_is_done(id, percent_done, report_kind);
+    return MCL.checker_status(id, res);
 }
 
 //---------------------------------------------------------------------------

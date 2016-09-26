@@ -109,12 +109,24 @@ int SQLLite::execute()
 }
 
 //---------------------------------------------------------------------------
-int SQLLite::std_string_to_int(const std::string& str)
+long SQLLite::std_string_to_int(const std::string& str)
 {
-    int val;
+    long val;
     char *end = NULL;
 
     val = strtol(str.c_str(), &end, 10);
+    // if (!end || *end != '\0')
+    //     error;
+    return val;
+}
+
+//---------------------------------------------------------------------------
+size_t SQLLite::std_string_to_uint(const std::string& str)
+{
+    size_t val;
+    char *end = NULL;
+
+    val = strtoul(str.c_str(), &end, 10);
     // if (!end || *end != '\0')
     //     error;
     return val;

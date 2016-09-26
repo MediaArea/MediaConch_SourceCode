@@ -297,41 +297,118 @@ long Core::checker_analyze(const std::string& file, bool& registered,
 {
     long id = -1;
     registered = false;
-    if (!force_analyze)
-        id = file_is_registered(file);
+    bool analyzed = false;
+
+    id = file_is_registered_and_analyzed(file, analyzed);
+    if (force_analyze)
+        analyzed = false;
 
     if (id < 0)
     {
         std::string file_last_modification = get_last_modification_file(file);
         std::string err;
+        db_mutex.Enter();
         id = get_db()->add_file(file, file_last_modification, err);
+        db_mutex.Leave();
         if (id < 0)
             return -1;
-
-        if (scheduler->add_element_to_queue(file, id, options) < 0)
-            id = -1;
     }
     else
         registered = true;
+
+    if (!analyzed && scheduler->add_element_to_queue(file, id, options) < 0)
+        return -1;
 
     return id;
 }
 
 //---------------------------------------------------------------------------
-bool Core::checker_is_done(long file, double& percent_done, MediaConchLib::report& report_kind)
+long Core::checker_analyze(const std::string& filename, long src_id, size_t generated_time,
+                           const std::string generated_log, const std::string generated_error_log,
+                           const std::vector<std::string>& options, bool do_pre_hook)
 {
-    bool is_done = scheduler->element_is_finished(file, percent_done);
+    long id = -1;
+    bool analyzed = false;
+    bool force_analyze = true;
+
+    id = file_is_registered_and_analyzed(filename, analyzed);
+    if (force_analyze)
+        analyzed = false;
+
+    std::string file_last_modification = get_last_modification_file(filename);
+    std::string err;
+    if (id < 0)
+    {
+        db_mutex.Enter();
+        id = get_db()->add_file(filename, file_last_modification, err,
+                                -1, src_id, generated_time,
+                                generated_log, generated_error_log);
+        db_mutex.Leave();
+        if (id < 0)
+            return -1;
+    }
+    else
+    {
+        db_mutex.Enter();
+        id = get_db()->update_file(id, file_last_modification, err,
+                                   -1, src_id, generated_time,
+                                   generated_log, generated_error_log);
+        db_mutex.Leave();
+        if (id < 0)
+            return -1;
+    }
+
+    if (!analyzed && scheduler->add_element_to_queue(filename, id, options, do_pre_hook) < 0)
+        return -1;
+
+    return id;
+}
+
+//---------------------------------------------------------------------------
+int Core::file_update_generated_file(long src_id, long generated_id)
+{
+    db_mutex.Enter();
+    int ret = get_db()->update_file_generated_id(src_id, generated_id);
+    db_mutex.Leave();
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+bool Core::checker_status(long file_id, MediaConchLib::Checker_StatusRes& res)
+{
+    double percent_done = 0.0;
+    bool is_finished = scheduler->element_is_finished(file_id, percent_done);
     int ret = MediaConchLib::errorHttp_NONE;
 
-    if (is_done)
+    res.finished = is_finished;
+    if (is_finished)
     {
-        report_kind = MediaConchLib::report_MediaConch;
-        ret = MediaConchLib::errorHttp_TRUE;
+        res.tool = new int;
+        *res.tool = (int)MediaConchLib::report_MediaConch;;
+
+        MediaConchLib::report r;
+        std::string filename;
+        std::string file_time;
+        size_t generated_time;
+        std::string generated_log;
+        std::string generated_error_log;
 
         db_mutex.Enter();
-        get_db()->get_element_report_kind(file, report_kind);
+        get_db()->get_file_information_from_id(file_id, filename, file_time,
+                                               res.generated_id, res.source_id, generated_time,
+                                               generated_log, generated_error_log, is_finished);
+        if (is_finished)
+            get_db()->get_element_report_kind(file_id, r);
         db_mutex.Leave();
+        *res.tool = r;
     }
+    else
+    {
+        res.percent = new double;
+        *res.percent = percent_done;
+    }
+
     return ret;
 }
 
@@ -339,7 +416,7 @@ bool Core::checker_is_done(long file, double& percent_done, MediaConchLib::repor
 void Core::checker_file_from_id(long id, std::string& file)
 {
     db_mutex.Enter();
-    get_db()->get_file_from_id(id, file);
+    get_db()->get_file_name_from_id(id, file);
     db_mutex.Leave();
 }
 
@@ -1067,18 +1144,26 @@ void Core::add_file_to_db(std::string& filename, const std::string& time)
 }
 
 //---------------------------------------------------------------------------
-void Core::register_file_to_database(long file, const std::string& report,
-                                     MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfo* curMI)
+void Core::set_file_analyzed_to_database(long id)
+{
+    db_mutex.Enter();
+    get_db()->update_file_analyzed(id, true);
+    db_mutex.Leave();
+}
+
+//---------------------------------------------------------------------------
+void Core::register_reports_to_database(long file, const std::string& report,
+                                        MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfo* curMI)
 {
     // Implementation
     register_report_xml_to_database(file, report, report_kind);
 
     //MI and MT
-    register_file_to_database(file, curMI);
+    register_reports_to_database(file, curMI);
 }
 
 //---------------------------------------------------------------------------
-void Core::register_file_to_database(long file, MediaInfoNameSpace::MediaInfo* curMI)
+void Core::register_reports_to_database(long file, MediaInfoNameSpace::MediaInfo* curMI)
 {
     // MediaInfo
     register_report_mediainfo_text_to_database(file, curMI);
@@ -1089,7 +1174,7 @@ void Core::register_file_to_database(long file, MediaInfoNameSpace::MediaInfo* c
 }
 
 //---------------------------------------------------------------------------
-void Core::register_file_to_database(long file)
+void Core::register_reports_to_database(long file)
 {
     // MediaInfo
     register_report_mediainfo_text_to_database(file, MI);
@@ -1570,43 +1655,29 @@ bool Core::get_dpfmanager_report(long file, std::string& report)
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_in_db(const std::string& filename)
+long Core::file_is_registered_and_analyzed_in_db(const std::string& filename, bool& analyzed)
 {
-    std::string time;
     bool is_existing = file_is_existing(filename);
+
+    std::string time;
     if (is_existing)
         time = get_last_modification_file(filename);
 
     db_mutex.Enter();
+
     bool res;
     long id = get_db()->get_file_id(filename, time);
     if (id < 0)
     {
+        analyzed = false;
         db_mutex.Leave();
         return id;
     }
 
-    res = get_db()->report_is_registered(id, MediaConchLib::report_MediaInfo,
-                                         MediaConchLib::format_Xml);
-
-    if (!res)
-    {
-        MediaConchLib::report report_kind;
-        get_db()->get_element_report_kind(id, report_kind);
-        if (report_kind == MediaConchLib::report_MediaConch)
-        {
-            db_mutex.Leave();
-            return -1;
-        }
-
-        if (!get_db()->report_is_registered(id, report_kind, MediaConchLib::format_Xml))
-        {
-            db_mutex.Leave();
-            return -1;
-        }
-    }
+    analyzed = get_db()->file_is_analyzed(id);
 
     db_mutex.Leave();
+
     return id;
 }
 
@@ -1620,12 +1691,14 @@ long Core::file_is_registered_in_queue(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered(const std::string& filename)
+long Core::file_is_registered_and_analyzed(const std::string& filename, bool& analyzed)
 {
     long id;
+    analyzed = false;
     if ((id = file_is_registered_in_queue(filename)) >= 0)
         return id;
-    return file_is_registered_in_db(filename);
+
+    return file_is_registered_and_analyzed_in_db(filename, analyzed);
 }
 
 //---------------------------------------------------------------------------

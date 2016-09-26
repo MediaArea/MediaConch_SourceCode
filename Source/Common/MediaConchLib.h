@@ -96,6 +96,20 @@ public:
         PLUGIN_MAX,
     };
 
+    struct Checker_StatusRes
+    {
+        Checker_StatusRes() : id(-1), finished(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
+
+        long    id;
+        bool    finished;
+
+        double *percent;
+
+        int    *tool;
+        long    generated_id;
+        long    source_id;
+    };
+
     struct Checker_ReportRes
     {
         std::string           report;
@@ -211,8 +225,10 @@ public:
     // Analyze
     int  checker_analyze(const std::vector<std::string>& files, std::vector<long>& files_id, bool force_analyze = false);
     int  checker_analyze(const std::string& file, bool& registered, long& file_id, bool force_analyze = false);
-    int  checker_is_done(const std::vector<long>& files, double& percent);
-    int  checker_is_done(long file, double& percent, report& report_kind);
+
+    // Status
+    int  checker_status(const std::vector<long>& files_id, std::vector<Checker_StatusRes>& res);
+    int  checker_status(long file_id, Checker_StatusRes& res);
 
     void checker_list(std::vector<std::string>& vec);
     void checker_file_from_id(long id, std::string& filename);

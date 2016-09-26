@@ -349,27 +349,27 @@ void WorkerFiles::update_unfinished_files()
             continue;
         }
 
-        double percent;
-
-        MediaConchLib::report report_kind;
-        int ret = mainwindow->is_analyze_finished(files[i], percent, report_kind);
+        MediaConchLib::Checker_StatusRes st_res;
+        int ret = mainwindow->is_analyze_finished(files[i], st_res);
         if (ret < 0)
         {
             mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
             return;
         }
 
-        fr->analyzed = false;
-        if (ret == MediaConchLib::errorHttp_TRUE)
+        fr->analyzed = st_res.finished;
+        if (st_res.finished)
         {
-            fr->analyzed = true;
-            fr->report_kind = report_kind;
+            fr->report_kind = MediaConchLib::report_MediaConch;
+            if (st_res.tool)
+                fr->report_kind = *st_res.tool;
+
             std::vector<size_t> policies_ids;
             std::vector<std::string> policies_contents;
             std::map<std::string, std::string> options;
             std::vector<MediaConchLib::Checker_ValidateRes*> res;
 
-            if (mainwindow->validate(report_kind, files[i],
+            if (mainwindow->validate((MediaConchLib::report)fr->report_kind, files[i],
                                      policies_ids, policies_contents, options, res) == 0
                 && res.size() == 1)
                 fr->implementation_valid = res[0]->valid;
@@ -377,7 +377,8 @@ void WorkerFiles::update_unfinished_files()
             for (size_t j = 0; j < res.size() ; ++j)
                 delete res[j];
             res.clear();
-            if (report_kind == MediaConchLib::report_MediaConch && fr->policy >= 0)
+
+            if (fr->report_kind == MediaConchLib::report_MediaConch && fr->policy >= 0)
             {
                 policies_ids.push_back(fr->policy);
 
@@ -391,7 +392,9 @@ void WorkerFiles::update_unfinished_files()
         }
         else
         {
-            fr->analyze_percent = percent;
+            fr->analyze_percent = 0.0;
+            if (st_res.percent)
+                fr->analyze_percent = *st_res.percent;
             vec.push_back(files[i]);
         }
 

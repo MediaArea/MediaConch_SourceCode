@@ -51,6 +51,7 @@ namespace MediaConch
         std::string                        filename;
         std::map<std::string, std::string> options;
         long                               file_id;
+        bool                               do_pre_hook;
 
         void                               Entry();
         void                               stop();
@@ -83,7 +84,8 @@ namespace MediaConch
         Queue(Scheduler *s) : scheduler(s){}
         ~Queue();
 
-        int add_element(QueuePriority priority, int id, const std::string& filename, long file_id, const std::vector<std::string>& options);
+        int add_element(QueuePriority priority, int id, const std::string& filename, long file_id,
+                        const std::vector<std::string>& options, bool do_pre_hook);
         long has_element(const std::string& filename);
         int  has_id(long file_id);
         int remove_element(int id);

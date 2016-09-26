@@ -83,19 +83,52 @@ int NoDatabaseReport::update_report_table()
 //---------------------------------------------------------------------------
 long NoDatabaseReport::add_file(const std::string& filename, const std::string& file_last_modification,
                                 std::string&,
-                                long source_id,
-                                const std::string& generated_file, const std::string& log)
+                                long generated_id,
+                                long source_id, size_t generated_time,
+                                const std::string& generated_log, const std::string& generated_error_log)
 {
     MC_File* f = new MC_File;
     f->filename = filename;
     f->file_last_modification = file_last_modification;
+
+    f->analyzed = false;
+
     f->source_id = source_id;
-    f->generated_file = generated_file;
-    f->log = log;
+    f->generated_id = generated_id;
+
+    f->generated_time = generated_time;
+    f->generated_log = generated_log;
+    f->generated_error_log = generated_error_log;
 
     long id = (long)files_saved.size();
     files_saved.push_back(f);
     return id;
+}
+
+//---------------------------------------------------------------------------
+long NoDatabaseReport::update_file(long file_id, const std::string& file_last_modification,
+                                   std::string&,
+                                   long generated_id,
+                                   long source_id, size_t generated_time,
+                                   const std::string& generated_log, const std::string& generated_error_log)
+{
+    if (file_id < 0 && file_id >= (long)files_saved.size())
+        return -1;
+
+    MC_File* f = files_saved[file_id];
+
+    f->file_last_modification = file_last_modification;
+
+    f->analyzed = false;
+
+    f->source_id = source_id;
+    f->generated_id = generated_id;
+
+    f->generated_time = generated_time;
+    f->generated_log = generated_log;
+    f->generated_error_log = generated_error_log;
+
+    return file_id;
 }
 
 //---------------------------------------------------------------------------
@@ -109,12 +142,72 @@ long NoDatabaseReport::get_file_id(const std::string& file, const std::string& f
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_file_from_id(long id, std::string& file)
+void NoDatabaseReport::get_file_name_from_id(long id, std::string& file)
 {
     if (id > 0 && id < (long)files_saved.size())
         file = files_saved[id]->filename;
     else
         file = std::string();
+}
+
+//---------------------------------------------------------------------------
+void NoDatabaseReport::get_file_information_from_id(long id, std::string& filename, std::string& file_last_modification,
+                                                    long& generated_id, long& source_id, size_t& generated_time,
+                                                    std::string& generated_log, std::string& generated_error_log, bool& analyzed)
+{
+    if (id > 0 && id < (long)files_saved.size())
+    {
+        filename = files_saved[id]->filename;
+        file_last_modification = files_saved[id]->file_last_modification;
+        generated_id = files_saved[id]->generated_id;
+        source_id = files_saved[id]->source_id;
+        generated_time = files_saved[id]->generated_time;
+        generated_log = files_saved[id]->generated_log;
+        generated_error_log = files_saved[id]->generated_error_log;
+        analyzed = files_saved[id]->analyzed;
+    }
+    else
+    {
+        filename = std::string();
+        file_last_modification = std::string();
+        generated_id = -1;
+        source_id = -1;
+        generated_time = (size_t)-1;
+        generated_log = std::string();
+        generated_error_log = std::string();
+        analyzed = false;
+    }
+}
+
+//---------------------------------------------------------------------------
+bool NoDatabaseReport::file_is_analyzed(long id)
+{
+    if (id > 0 && id < (long)files_saved.size() && files_saved[id])
+        return files_saved[id]->analyzed;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseReport::update_file_generated_id(long source_id, long generated_id)
+{
+    if (source_id > 0 && source_id < (long)files_saved.size() && files_saved[source_id])
+    {
+        files_saved[source_id]->generated_id = generated_id;
+        return 0;
+    }
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseReport::update_file_analyzed(long id, bool analyzed)
+{
+    if (id > 0 && id < (long)files_saved.size() && files_saved[id])
+    {
+        files_saved[id]->analyzed = analyzed;
+        return 0;
+    }
+    return -1;
 }
 
 //---------------------------------------------------------------------------

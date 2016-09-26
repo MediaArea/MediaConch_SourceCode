@@ -269,7 +269,7 @@ int DaemonClient::checker_analyze(const std::string& file, bool& registered, boo
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_is_done(long file_id, double& done, MediaConchLib::report& report_kind)
+int DaemonClient::checker_status(long file_id, MediaConchLib::Checker_StatusRes& st_res)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -297,26 +297,33 @@ int DaemonClient::checker_is_done(long file_id, double& done, MediaConchLib::rep
 
     RESTAPI::Checker_Status_Ok *ok = res->ok[0];
 
-    if (ok->finished)
+    st_res.finished = ok->finished;
+
+    if (ok->finished && ok->tool)
     {
-        report_kind = MediaConchLib::report_MediaConch;
-        if (ok->has_tool)
-        {
-            if (ok->tool == RESTAPI::VERAPDF)
-                report_kind = MediaConchLib::report_MediaVeraPdf;
-            else if (ok->tool == RESTAPI::DPFMANAGER)
-                report_kind = MediaConchLib::report_MediaDpfManager;
-        }
-        delete res;
-        return MediaConchLib::errorHttp_TRUE;
+        st_res.tool = new int;
+        if (*ok->tool == RESTAPI::VERAPDF)
+            *st_res.tool = (int)MediaConchLib::report_MediaVeraPdf;
+        else if (*ok->tool == RESTAPI::DPFMANAGER)
+            *st_res.tool = (int)MediaConchLib::report_MediaDpfManager;
+        else
+            *st_res.tool = (int)MediaConchLib::report_MediaConch;
     }
 
-    if (ok->has_percent)
-        done = ok->done;
-    else
-        done = 0.0;
+    if (ok->generated_id >= 0)
+        st_res.generated_id = ok->generated_id;
 
-    report_kind = MediaConchLib::report_MediaConch;
+    if (ok->source_id >= 0)
+        st_res.source_id = ok->source_id;
+
+    if (!ok->finished)
+    {
+        st_res.percent = new double;
+        if(ok->percent)
+            *st_res.percent = *ok->percent;
+        else
+            *st_res.percent = 0.0;
+    }
 
     delete res;
     return MediaConchLib::errorHttp_NONE;

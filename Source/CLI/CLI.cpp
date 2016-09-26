@@ -351,34 +351,52 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int CLI::is_ready(long file_id, MediaConchLib::report& report_kind)
+    int CLI::is_ready(long& file_id, MediaConchLib::report& report_kind)
     {
-        double percent_done = 0;
+        MediaConchLib::Checker_StatusRes res;
+        int ret = MCL.checker_status(file_id, res);
 
-        int ret = MCL.checker_is_done(file_id, percent_done, report_kind);
         if (use_daemon && asynchronous)
         {
-            if (ret == MediaConchLib::errorHttp_NONE)
+            if (ret >= 0 && !res.finished)
             {
+                std::string file;
+                MCL.checker_file_from_id(file_id, file);
+
                 std::stringstream str;
-                str << "Analyzing " << file_id << " ; done: " << percent_done  << "%";
+                double percent = res.percent ? *res.percent : (double)0;
+                str << "Analyzing " << file << " ; done: " << percent << "%";
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
                 return 1;
             }
+
+            if (res.tool)
+                report_kind = (MediaConchLib::report)*res.tool;
+
             return ret;
         }
         else
         {
-            while (ret != MediaConchLib::errorHttp_TRUE)
+            while (!res.finished)
             {
                 if (ret < 0)
                     return ret;
+
                 #ifdef WINDOWS
                 ::Sleep((DWORD)5);
                 #else
                 usleep(500000);
                 #endif
-                ret = MCL.checker_is_done(file_id, percent_done, report_kind);
+                ret = MCL.checker_status(file_id, res);
+            }
+
+            if (res.tool)
+                report_kind = (MediaConchLib::report)*res.tool;
+
+            if (res.generated_id >= 0)
+            {
+                file_id = res.generated_id;
+                return is_ready(file_id, report_kind);
             }
         }
         return MediaConchLib::errorHttp_TRUE;

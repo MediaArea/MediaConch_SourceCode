@@ -208,41 +208,33 @@ int MediaConchLib::checker_analyze(const std::string& file, bool& registered, lo
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_is_done(const std::vector<long>& files, double& percent)
+int MediaConchLib::checker_status(const std::vector<long>& files_id, std::vector<Checker_StatusRes>& res)
 {
-    if (!files.size())
-        return errorHttp_TRUE;
-
-    MediaConchLib::report report_kind;
     int done = errorHttp_TRUE;
-    percent = 0.0;
-    double unit_percent = (1.0 / files.size()) * 100.0;
-    for (size_t i = 0; i < files.size(); ++i)
+
+    for (size_t i = 0; i < files_id.size(); ++i)
     {
-        double percent_done;
-        int ret = checker_is_done(files[i], percent_done, report_kind);
-        if (ret == errorHttp_TRUE)
-            percent += unit_percent;
-        else if (ret == errorHttp_NONE)
-        {
-            percent += unit_percent * percent_done;
-            done = errorHttp_NONE;
-        }
-        else
+        Checker_StatusRes r;
+        int ret = checker_status(files_id[i], r);
+
+        if (ret < 0)
             return ret;
+
+        res.push_back(r);
     }
+
     return done;
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_is_done(long file, double& percent, MediaConchLib::report& report_kind)
+int MediaConchLib::checker_status(long file_id, Checker_StatusRes& res)
 {
-    if (file < 0)
+    if (file_id < 0)
         return errorHttp_NONE;
 
     if (use_daemon)
-        return daemon_client->checker_is_done(file, percent, report_kind);
-    return core->checker_is_done(file, percent, report_kind);
+        return daemon_client->checker_status(file_id, res);
+    return core->checker_status(file_id, res);
 }
 
 //---------------------------------------------------------------------------

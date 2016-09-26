@@ -57,7 +57,7 @@ namespace MediaConch
 
         int  run_create_policy(const std::vector<long>& files_ids);
         int  run_policy_reference_file(long file_id);
-        int  is_ready(long file_id, MediaConchLib::report& report_kind);
+        int  is_ready(long& file_id, MediaConchLib::report& report_kind);
         void add_files_recursively(const std::string& filename);
 
         MediaConchLib MCL;

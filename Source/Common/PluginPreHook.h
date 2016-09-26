@@ -28,14 +28,25 @@ namespace MediaConch {
 class PluginPreHook : public Plugin
 {
 public:
-    PluginPreHook() {}
-    virtual ~PluginPreHook() {}
+    PluginPreHook() : create_file(false), analyze_source(true) {}
+    virtual      ~PluginPreHook() {}
+
+    void          set_input_file(const std::string& file) { input_file = file; }
+
+    std::string   get_output_file() const { return output_file; }
+
+    bool          is_creating_file() { return create_file; }
+    bool          analyzing_source() { return analyze_source; }
 
 protected:
+    std::string   input_file;
+    std::string   output_file;
+    bool          create_file;
+    bool          analyze_source;
 
 private:
     PluginPreHook(const PluginPreHook&);
-    PluginPreHook&         operator=(const PluginPreHook&);
+    PluginPreHook &operator=(const PluginPreHook&);
 };
 
 }

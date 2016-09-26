@@ -25,9 +25,8 @@
 namespace MediaConch {
 
 //---------------------------------------------------------------------------
-QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s)
+QueueElement::QueueElement(Scheduler *s) : Thread(), do_pre_hook(true), scheduler(s), MI(NULL)
 {
-    MI = new MediaInfoNameSpace::MediaInfo;
 }
 
 //---------------------------------------------------------------------------
@@ -56,8 +55,14 @@ void QueueElement::Entry()
     std::string err;
 
     //Pre hook plugins
-    scheduler->execute_pre_hook_plugins(file, err);
+    int ret = 0;
+    if (do_pre_hook && (ret = scheduler->execute_pre_hook_plugins(this, err)) != 0)
+    {
+        scheduler->work_finished(this, NULL);
+        return;
+    }
 
+    MI = new MediaInfoNameSpace::MediaInfo;
     // Currently avoiding to have a big trace
     if (options.find("parsespeed") == options.end())
         MI->Option(__T("ParseSpeed"), __T("0"));
@@ -85,6 +90,9 @@ void QueueElement::Entry()
 //---------------------------------------------------------------------------
 double QueueElement::percent_done()
 {
+    if (!MI)
+        return (double)0;
+
     size_t state = MI->State_Get();
     return (double)state / 100;
 }
@@ -99,13 +107,15 @@ Queue::~Queue()
     clear();
 }
 
-int Queue::add_element(QueuePriority priority, int id, const std::string& filename, long file_id, const std::vector<std::string>& options)
+int Queue::add_element(QueuePriority priority, int id, const std::string& filename, long file_id,
+                       const std::vector<std::string>& options, bool do_pre_hook)
 {
     QueueElement *el = new QueueElement(scheduler);
 
     el->id = id;
     el->filename = filename;
     el->file_id = file_id;
+    el->do_pre_hook = do_pre_hook;
 
     for (size_t i = 0; i < options.size(); ++i)
     {

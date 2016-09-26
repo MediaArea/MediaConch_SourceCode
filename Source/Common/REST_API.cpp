@@ -68,6 +68,22 @@ RESTAPI::Checker_Analyze_Res::~Checker_Analyze_Res()
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Checker_Status_Ok::~Checker_Status_Ok()
+{
+    if (tool)
+    {
+        delete tool;
+        tool = NULL;
+    }
+
+    if (percent)
+    {
+        delete percent;
+        percent = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Checker_Status_Res::~Checker_Status_Res()
 {
     for (size_t i = 0; i < ok.size(); ++i)
@@ -634,15 +650,24 @@ std::string RESTAPI::Checker_Status_Ok::to_str() const
 {
     std::stringstream out;
 
-    out << "{id: " << id;
-    out << ", finished: " << std::boolalpha << finished;
-    if (has_percent)
-        out << ", done: " << done;
-    if (finished && has_tool)
+    out << "{\"id\": " << id;
+    out << ", \"finished\": " << std::boolalpha << finished;
+
+    if (!finished && percent)
+        out << ", \"done\": " << *percent;
+
+    if (finished && tool)
     {
         RESTAPI api;
-        out << ", tool: " << api.get_Report_string(tool);
+        out << ", \"tool\": " << api.get_Report_string(*tool);
     }
+
+    if (generated_id != -1)
+        out << ", \"generated_id\": " << generated_id;
+
+    if (source_id != -1)
+        out << ", \"source_id\": " << source_id;
+
     out << "}";
     return out.str();
 }
@@ -6243,7 +6268,7 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Checker_Status_Ok*>& 
         if (!array[i])
             continue;
 
-        Container::Value v, id, finished, done, tool;
+        Container::Value v, id, finished, done, tool, generated_id, source_id;
 
         v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -6255,18 +6280,32 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Checker_Status_Ok*>& 
         finished.b = array[i]->finished;
         v.obj["finished"] = finished;
 
-        if (array[i]->has_percent)
+        if (!array[i]->finished && array[i]->percent)
         {
             done.type = Container::Value::CONTAINER_TYPE_REAL;
-            done.d = array[i]->done;
+            done.d = *array[i]->percent;
             v.obj["done"] = done;
         }
 
-        if (array[i]->finished && array[i]->has_tool)
+        if (array[i]->finished && array[i]->tool)
         {
             tool.type = Container::Value::CONTAINER_TYPE_INTEGER;
-            tool.l = array[i]->tool;
+            tool.l = *array[i]->tool;
             v.obj["tool"] = tool;
+        }
+
+        if (array[i]->generated_id != -1)
+        {
+            generated_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+            generated_id.l = array[i]->generated_id;
+            v.obj["generated_id"] = generated_id;
+        }
+
+        if (array[i]->source_id != -1)
+        {
+            source_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+            source_id.l = array[i]->source_id;
+            v.obj["source_id"] = source_id;
         }
 
         ok.array.push_back(v);
@@ -6622,12 +6661,14 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *id, *finished, *done, *tool;
+        Container::Value *id, *finished, *done, *tool, *generated_id, *source_id;
 
         id = model->get_value_by_key(*obj, "id");
         finished = model->get_value_by_key(*obj, "finished");
         done = model->get_value_by_key(*obj, "done");
         tool = model->get_value_by_key(*obj, "tool");
+        generated_id = model->get_value_by_key(*obj, "generated_id");
+        source_id = model->get_value_by_key(*obj, "source_id");
 
         if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !finished || finished->type != Container::Value::CONTAINER_TYPE_BOOL)
@@ -6637,28 +6678,33 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*
         ok->id = id->l;
         ok->finished = finished->b;
 
-        if (!done)
-            ok->has_percent = false;
-        else if (done->type == Container::Value::CONTAINER_TYPE_REAL)
+        if (!ok->finished && done && done->type == Container::Value::CONTAINER_TYPE_REAL)
         {
-            ok->has_percent = true;
-            ok->done = done->d;
+            ok->percent = new double;
+            *ok->percent = done->d;
         }
-        else if (done->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        else if (!ok->finished && done->type == Container::Value::CONTAINER_TYPE_INTEGER)
         {
-            ok->has_percent = true;
-            ok->done = (double)done->l;
+            ok->percent = new double;
+            *ok->percent = (double)done->l;
         }
-        else
-            return -1;
+        else if (!ok->finished)
+        {
+            ok->percent = new double;
+            *ok->percent = (double)0;
+        }
 
-        if (tool && tool->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        if (ok->finished && tool && tool->type == Container::Value::CONTAINER_TYPE_INTEGER)
         {
-            ok->has_tool = true;
-            ok->tool = (Report)tool->l;
+            ok->tool = new Report;
+            *ok->tool = (Report)tool->l;
         }
-        else
-            ok->has_tool = false;
+
+        if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            ok->generated_id = generated_id->l;
+
+        if (source_id && source_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            ok->source_id = source_id->l;
 
         oks.push_back(ok);
     }

@@ -58,7 +58,7 @@ public:
     int checker_analyze(const std::string& file, bool& registered, bool force_analyze, long& file_id);
 
     // Status
-    int checker_is_done(long file_id, double& done, MediaConchLib::report& report_kind);
+    int checker_status(long file_id, MediaConchLib::Checker_StatusRes& res);
 
     // Report
     int checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,

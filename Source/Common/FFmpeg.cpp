@@ -50,6 +50,17 @@ namespace MediaConch {
         }
         bin = obj.at("bin").s;
 
+        if (obj.find("createFile") == obj.end() || obj.at("createFile").type != Container::Value::CONTAINER_TYPE_BOOL ||
+            obj.at("createFile").b == false)
+        {
+            error += "Field 'createFile' must be set true\n";
+            return -1;
+        }
+        create_file = true;
+
+        if (obj.find("analyzeSource") != obj.end() && obj.at("analyzeSource").type == Container::Value::CONTAINER_TYPE_BOOL)
+            analyze_source = obj.at("analyzeSource").b;
+
         if (obj.find("outputDir") == obj.end() || obj.at("outputDir").type != Container::Value::CONTAINER_TYPE_STRING)
         {
             error += "Field 'outputDir' is not present\n";
@@ -112,9 +123,9 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int FFmpeg::run(std::string& error)
     {
-        outputFile.clear();
+        output_file.clear();
 
-        if (!inputFile.length())
+        if (!input_file.length())
             return 0;
 
         if (!outputDir.length())
@@ -129,12 +140,12 @@ namespace MediaConch {
             exec_params.push_back(inputParams[i]);
 
         exec_params.push_back("-i");
-        exec_params.push_back(inputFile);
+        exec_params.push_back(input_file);
 
         for (size_t i = 0; i < outputParams.size(); ++i)
             exec_params.push_back(outputParams[i]);
 
-        exec_params.push_back(outputFile);
+        exec_params.push_back(output_file);
 
         for (size_t i = 0; i < params.size(); ++i)
             exec_params.push_back(params[i]);
@@ -145,7 +156,7 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     void FFmpeg::create_output_file_name()
     {
-        ZenLib::Ztring z_in = ZenLib::Ztring().From_UTF8(inputFile);
+        ZenLib::Ztring z_in = ZenLib::Ztring().From_UTF8(input_file);
         ZenLib::FileName file(z_in);
         std::string out = file.Name_Get().To_UTF8();
 
@@ -158,8 +169,8 @@ namespace MediaConch {
                 path << i;
             path << "." << outputExt;
 
-            outputFile = path.str();
-            if (!ZenLib::File::Exists(ZenLib::Ztring().From_UTF8(outputFile)))
+            output_file = path.str();
+            if (!ZenLib::File::Exists(ZenLib::Ztring().From_UTF8(output_file)))
                 break;
         }
     }

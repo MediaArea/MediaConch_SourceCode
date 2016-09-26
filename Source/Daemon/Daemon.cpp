@@ -503,11 +503,10 @@ namespace MediaConch
                 continue;
             }
 
-            MediaConchLib::report report_kind;
-            double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(id, percent_done, report_kind);
+            MediaConchLib::Checker_StatusRes st_res;
+            int ret = d->MCL->checker_status(id, st_res);
 
-            if (is_done < 0)
+            if (ret < 0)
             {
                 RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
                 nok->id = id;
@@ -518,27 +517,34 @@ namespace MediaConch
             RESTAPI::Checker_Status_Ok *ok = new RESTAPI::Checker_Status_Ok;
 
             ok->id = id;
-            if (is_done == MediaConchLib::errorHttp_TRUE)
+            ok->finished = st_res.finished;
+
+            if (st_res.tool)
             {
-                ok->finished = true;
-                ok->has_tool = false;
-                if (report_kind == MediaConchLib::report_MediaVeraPdf)
+                if (*st_res.tool == (int)MediaConchLib::report_MediaVeraPdf)
                 {
-                    ok->has_tool = true;
-                    ok->tool = RESTAPI::VERAPDF;
+                    ok->tool = new RESTAPI::Report;
+                    *ok->tool = RESTAPI::VERAPDF;
                 }
-                else if (report_kind == MediaConchLib::report_MediaDpfManager)
+                else if (*st_res.tool == (int)MediaConchLib::report_MediaDpfManager)
                 {
-                    ok->has_tool = true;
-                    ok->tool = RESTAPI::DPFMANAGER;
+                    ok->tool = new RESTAPI::Report;
+                    *ok->tool = RESTAPI::DPFMANAGER;
                 }
             }
-            else
+
+            if (st_res.percent)
             {
-                ok->finished = false;
-                ok->has_percent = true;
-                ok->done = percent_done;
+                ok->percent = new double;
+                *ok->percent = *st_res.percent;
             }
+
+            if (st_res.generated_id >= 0)
+                ok->generated_id = st_res.generated_id;
+
+            if (st_res.source_id >= 0)
+                ok->source_id = st_res.source_id;
+
             res.ok.push_back(ok);
         }
         std::clog << d->get_date() << "Daemon send checker status result: " << res.to_str() << std::endl;
@@ -608,7 +614,7 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(id, percent_done, report_kind);
+            int is_done = d->MCL->checker_status(id, percent_done, report_kind);
             if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
@@ -796,7 +802,7 @@ namespace MediaConch
 
             MediaConchLib::report report_kind;
             double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(id, percent_done, report_kind);
+            int is_done = d->MCL->checker_status(id, percent_done, report_kind);
             if (is_done != MediaConchLib::errorHttp_TRUE)
             {
                 RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;

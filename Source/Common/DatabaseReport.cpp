@@ -95,9 +95,15 @@ void DatabaseReport::get_sql_query_for_update_report_table_v3(std::string& q)
     create << "(ID INTEGER PRIMARY KEY ASC,";
     create << " FILENAME TEXT NOT NULL,";
     create << " FILE_LAST_MODIFICATION TEXT NOT NULL,";
-    create << " SOURCE_FILE_ID INT DEFAULT -1,";
-    create << " GENERATED_FILE TEXT,";
-    create << " LOG TEXT);";
+
+    create << " ANALYZED INT DEFAULT 0,";
+
+    create << " GENERATED_ID INT DEFAULT -1,";
+
+    create << " SOURCE_ID INT DEFAULT -1,";
+    create << " GENERATED_TIME INT DEFAULT -1,";
+    create << " GENERATED_LOG TEXT,";
+    create << " GENERATED_ERROR_LOG TEXT);";
 
     create << " CREATE TABLE IF NOT EXISTS MEDIACONCH_REPORT ";
     create << "(FILE_ID INT NOT NULL,";

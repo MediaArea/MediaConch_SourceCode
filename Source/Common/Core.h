@@ -64,8 +64,13 @@ public:
 
 
 //---------------------------------------------------------------------------
-    bool        checker_is_done(long file, double& percent_done, MediaConchLib::report& report_kind);
     long        checker_analyze(const std::string& filename, bool& registered, const std::vector<std::string>& options, bool force_analyze = false);
+    long        checker_analyze(const std::string& filename, long src_id, size_t generated_time,
+                                const std::string generated_log, const std::string generated_error_log,
+                                const std::vector<std::string>& options, bool pre_hook=true);
+    int         file_update_generated_file(long src_id, long generated_id);
+
+    bool        checker_status(long file, MediaConchLib::Checker_StatusRes& res);
     int         remove_report(const std::vector<long>& files);
     int         checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
                                    const std::vector<long>& files,
@@ -131,9 +136,10 @@ public:
     //General Report Database
     void load_database();
     bool database_is_enabled() const;
-    void register_file_to_database(long file, MediaInfoNameSpace::MediaInfo* MI);
-    void register_file_to_database(long file, const std::string& report, MediaConchLib::report report_kind,
-                                   MediaInfoNameSpace::MediaInfo* curMI);
+    void set_file_analyzed_to_database(long id);
+    void register_reports_to_database(long file, MediaInfoNameSpace::MediaInfo* MI);
+    void register_reports_to_database(long file, const std::string& report, MediaConchLib::report report_kind,
+                                      MediaInfoNameSpace::MediaInfo* curMI);
     void create_report_mi_xml(const std::vector<long>& filename, std::string& report);
     void create_report_mt_xml(const std::vector<long>& filename, std::string& report);
     void create_report_mmt_xml(const std::vector<long>& filename, std::string& report);
@@ -193,8 +199,8 @@ private:
     int transform_with_xslt_text_memory(const std::string& report, std::string& result);
     int transform_with_xslt_html_memory(const std::string& report, std::string& result);
 
-    long   file_is_registered(const std::string& file);
-    long   file_is_registered_in_db(const std::string& file);
+    long   file_is_registered_and_analyzed(const std::string& file, bool& analyzed);
+    long   file_is_registered_and_analyzed_in_db(const std::string& file, bool& analyzed);
     long   file_is_registered_in_queue(const std::string& file);
     std::string get_last_modification_file(const std::string& file);
     bool        file_is_existing(const std::string& filename);
@@ -214,7 +220,7 @@ private:
     bool get_dpfmanager_report(long file, std::string& report);
 
     void add_file_to_db(std::string& filename, const std::string& time);
-    void register_file_to_database(long file);
+    void register_reports_to_database(long file);
     void register_report_xml_to_database(long file, const std::string& report,
                                          MediaConchLib::report report_kind);
     void register_report_mediainfo_text_to_database(long file, MediaInfoNameSpace::MediaInfo* MI);
