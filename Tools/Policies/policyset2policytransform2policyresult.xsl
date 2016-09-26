@@ -3,7 +3,7 @@
   <xsl:param name="compare" as="xsl:string"/>
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
   <xsl:template match="/">
-    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
+    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
       <aliasxsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
       <aliasxsl:template match="ma:MediaArea">
         <MediaConch>
@@ -201,6 +201,33 @@
             </xsl:choose>
           </xsl:if>
         </xsl:when>
+        <xsl:when test="@scope='mmt'">
+          <xsl:text>mmt:MicroMediaTrace</xsl:text>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
+          <xsl:if test="@operator">
+            <xsl:value-of select="@operator"/>
+            <xsl:choose>
+              <xsl:when test=".='compare' and string-length($compare)>0">
+                <xsl:text>document('</xsl:text>
+                <xsl:value-of select="$compare"/>
+                <xsl:text>')//</xsl:text>
+                <xsl:text>mmt:MicroMediaTrace</xsl:text>
+                <xsl:call-template name="tokenize">
+                  <xsl:with-param name="list" select="@value"/>
+                  <xsl:with-param name="delimiter" select="'/'"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>'</xsl:text>
+                <xsl:value-of select="."/>
+                <xsl:text>'</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
           <xsl:value-of select="@tracktype"/>
@@ -248,6 +275,13 @@
             <xsl:with-param name="delimiter" select="'/'"/>
           </xsl:call-template>
         </xsl:when>
+        <xsl:when test="@scope='mmt'">
+          <xsl:text>mmt:MicroMediaTrace</xsl:text>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
           <xsl:value-of select="@tracktype"/>
@@ -269,7 +303,14 @@
         <xsl:text>')//</xsl:text>
         <xsl:choose>
           <xsl:when test="@scope='mt'">
-            <xsl:text>mt:MediaTrace</xsl:text>
+            <xsl:text>mmt:MediaTrace</xsl:text>
+            <xsl:call-template name="tokenize">
+              <xsl:with-param name="list" select="@value"/>
+              <xsl:with-param name="delimiter" select="'/'"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="@scope='mmt'">
+            <xsl:text>mmt:MicroMediaTrace</xsl:text>
             <xsl:call-template name="tokenize">
               <xsl:with-param name="list" select="@value"/>
               <xsl:with-param name="delimiter" select="'/'"/>
@@ -337,7 +378,14 @@
 
     <xsl:choose>
       <xsl:when test="$remaining">
-        <xsl:text>/mt:block[@name='</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@scope='mmt'">
+            <xsl:text>/mmt:b[@n='</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>/mt:block[@name='</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
         <xsl:value-of select="$first"/>
         <xsl:text>']</xsl:text>
         <xsl:call-template name="tokenize">
@@ -350,10 +398,24 @@
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="@first='data'">
-            <xsl:text>/mt:dataHI</xsl:text>
+            <xsl:choose>
+              <xsl:when test="@scope='mmt'">
+                <xsl:text>/mmt:d</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>/mt:data</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>/mt:data[@name='</xsl:text>
+            <xsl:choose>
+              <xsl:when test="@scope='mmt'">
+                <xsl:text>/mmt:d[@n='</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>/mt:data[@name='</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
             <xsl:value-of select="$first"/>
             <xsl:text>']</xsl:text>
           </xsl:otherwise>

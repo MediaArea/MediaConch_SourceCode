@@ -5,11 +5,11 @@
     <rule name="Jerome's favorite test" value="Format" tracktype="Video" occurrence="1" operator="=">AVC2</rule>
     <rule name="Jerome's favorite test" value="Format" tracktype="Video" occurrence="2" operator="=">AVC2</rule>
     <policy type="and" name="Here is a mediatrace-based rule">
-      <rule scope="mt" value="EBML/EBMLVersion/Data" operator="=">2</rule>
+      <rule scope="mmt" value="EBML/EBMLVersion/Data" operator="=">2</rule>
     </policy>
     <policy type="and" name="This is an empty policy with no rules just to see what happens">
     </policy>
-    <rule scope="mt" value="Segment/Cluster/SimpleBlock/Data/keyframe" operator="=">Yes</rule>
+    <rule scope="mmt" value="Segment/Cluster/SimpleBlock/Data/keyframe" operator="=">Yes</rule>
     <policy type="and" name="Does this use framesize and framerates that I like?">
         <policy type="or" name="I like frame heights like 240, 480, 486">
             <rule name="ntsc height" value="Height" tracktype="Video" occurrence="1" operator="=">486</rule>
