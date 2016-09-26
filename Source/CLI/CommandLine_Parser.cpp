@@ -110,6 +110,8 @@ static void change_short_options_to_long(std::string& argument)
         argument = "-mi";
     if (argument=="--mediatrace")
         argument = "-mt";
+    if (argument=="--micromediatrace")
+        argument = "-mmt";
 
     // Report short options
     if (argument=="-mc")
@@ -118,6 +120,8 @@ static void change_short_options_to_long(std::string& argument)
         argument = "--report=MediaInfo";
     if (argument=="-mt")
         argument = "--report=MediaTrace";
+    if (argument=="-mmt")
+        argument = "--report=MicroMediaTrace";
 
     // Format short options
     if (argument=="-ft")

@@ -1376,6 +1376,14 @@ void Core::get_reports_output(const std::vector<std::string>& files,
             result->report += "\r\n";
         }
 
+        if (report_set[MediaConchLib::report_MicroMediaTrace])
+        {
+            std::string tmp;
+            create_report_mmt_xml(files, tmp);
+            if (f == MediaConchLib::format_Xml)
+                result->report += tmp;
+        }
+
         if (report_set[MediaConchLib::report_MediaConch])
         {
             std::string tmp;
