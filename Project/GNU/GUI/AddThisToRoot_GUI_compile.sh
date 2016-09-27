@@ -52,7 +52,7 @@ elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
 fi
 
 ##################################################################
-# ZenLib
+# Configure ZenLib
 
 if test -e ZenLib/Project/GNU/Library/configure; then
     cd ZenLib/Project/GNU/Library/
@@ -63,16 +63,7 @@ if test -e ZenLib/Project/GNU/Library/configure; then
     else
         ./configure $ZenLib_Options $*
     fi
-    if test -e Makefile; then
-        make clean
-        Parallel_Make
-        if test -e libzen.la; then
-            echo ZenLib compiled
-        else
-            echo Problem while compiling ZenLib
-            exit
-        fi
-    else
+    if test ! -e Makefile; then
         echo Problem while configuring ZenLib
         exit
     fi
@@ -83,7 +74,21 @@ fi
 cd $Home
 
 ##################################################################
-# MediaInfoLib
+# Compile ZenLib
+
+cd ZenLib/Project/GNU/Library/
+make clean
+Parallel_Make
+if test -e libzen.la; then
+    echo ZenLib compiled
+else
+    echo Problem while compiling ZenLib
+    exit
+fi
+cd $Home
+
+##################################################################
+# Configure MediaInfoLib
 
 if test -e MediaInfoLib/Project/GNU/Library/configure; then
     cd MediaInfoLib/Project/GNU/Library/
@@ -94,16 +99,7 @@ if test -e MediaInfoLib/Project/GNU/Library/configure; then
     else
         ./configure --with-libcurl $*
     fi
-    if test -e Makefile; then
-        make clean
-        Parallel_Make
-        if test -e libmediainfo.la; then
-            echo MediaInfoLib compiled
-        else
-            echo Problem while compiling MediaInfoLib
-            exit
-        fi
-    else
+    if test ! -e Makefile; then
         echo Problem while configuring MediaInfoLib
         exit
     fi
@@ -114,28 +110,47 @@ fi
 cd $Home
 
 ##################################################################
-# MediaConch
+# Configure MediaConch
 
 if test -e MediaConch/Project/Qt/prepare; then
-    cd MediaConch/Project/Qt
+    cd MediaConch/Project/Qt/
     test -e Makefile && rm Makefile
     chmod +x prepare
-    ./prepare
-    if test -e Makefile; then
-        make clean
-        Parallel_Make
-        if test -e $BINARY; then
-            echo "MediaConch (GUI) compiled"
-        else
-            echo "Problem while compiling MediaConch (GUI)"
-            exit
-        fi
-    else
+    ./prepare STATIC_LIBS=1
+    if test ! -e Makefile; then
         echo "Problem while configuring MediaConch (GUI)"
         exit
     fi
 else
     echo MediaConch directory is not found
+    exit
+fi
+cd $Home
+
+##################################################################
+# Compile MediaInfoLib
+
+cd MediaInfoLib/Project/GNU/Library
+make clean
+Parallel_Make
+if test -e libmediainfo.la; then
+    echo MediaInfoLib compiled
+else
+    echo Problem while compiling MediaInfoLib
+    exit
+fi
+cd $Home
+
+##################################################################
+# Compile MediaConch
+
+cd MediaConch/Project/Qt
+make clean
+Parallel_Make
+if test -e $BINARY; then
+    echo "MediaConch (GUI) compiled"
+else
+    echo "Problem while compiling MediaConch (GUI)"
     exit
 fi
 cd $Home

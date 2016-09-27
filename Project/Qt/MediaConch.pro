@@ -196,21 +196,21 @@ equals(WEB_MACHINE, webengine) {
 
 INCLUDEPATH      += ../../Source
 
-unix:exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.a) {
-    INCLUDEPATH      += ../../../MediaInfoLib/Source
-    LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
-    message("custom libmediainfo: yes (static)")
-} else:unix {
-    exists(../../../MediaInfoLib/Project/GNU/Library/.libs/libmediainfo.so) {
+unix:exists(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config) {
+    contains(STATIC_LIBS, yes|1) {
+        INCLUDEPATH      += ../../../MediaInfoLib/Source
+        LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
+        message("custom libmediainfo: yes (static)")
+    } else {
         INCLUDEPATH      += ../../../MediaInfoLib/Source
         LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS)
         message("custom libmediainfo: yes (shared)")
-    } else {
-        !packagesExist(libmediainfo) {
-            error("libmediainfo not found on system")
-        }
-        LIBS += $$system(pkg-config --libs libmediainfo)
     }
+} else:unix {
+    !packagesExist(libmediainfo) {
+        error("libmediainfo not found on system")
+    }
+    LIBS += $$system(pkg-config --libs libmediainfo)
 }
 
 unix:exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
