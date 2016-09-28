@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<policy type="or" name="Memorial Video files Recommendations">
+  <description>This policy tests is the video codec is either 'recommended' or 'conditionally recommended' according to Memoriav Recommendations - Digital Archiving of Film and Video: Principles and Guideance, see http://memoriav.ch/wp-content/uploads/2016/04/Empfehlungen_Digitale_-Archivierung_EN_Version1.0_Web.pdf</description>
+  <policy type="or" name="Recommended Video Encoding?">
+    <policy type="and" name="Format is 10 bit 4:2:2 uncompressed?">
+      <description>This test uses characteristics rather than encoding ids</description>
+      <rule name="Format is YUV?" value="Format" tracktype="Video" occurrence="*" operator="=">YUV</rule>
+      <rule name="Chromasubsampling is 4:2:2?" value="ChromaSubsampling" tracktype="Video" occurrence="*" operator="=">4:2:2</rule>
+      <rule name="BitDepth is 10?" value="BitDepth" tracktype="Video" occurrence="*" operator="=">10</rule>
+    </policy>
+    <policy type="and" name="Format is 10 bit 4:4:4 uncompressed?">
+      <description>This test uses characteristics rather than encoding ids</description>
+      <rule name="Format is YUV?" value="Format" tracktype="Video" occurrence="*" operator="=">YUV</rule>
+      <rule name="Chromasubsampling is 4:4:4?" value="ChromaSubsampling" tracktype="Video" occurrence="*" operator="=">4:4:4</rule>
+      <rule name="BitDepth is 10?" value="BitDepth" tracktype="Video" occurrence="*" operator="=">10</rule>
+    </policy>
+    <policy type="and" name="Format is 8 bit 4:4:4 uncompressed?">
+      <description>This test uses characteristics rather than encoding ids</description>
+      <rule name="Format is YUV?" value="Format" tracktype="Video" occurrence="*" operator="=">YUV</rule>
+      <rule name="Chromasubsampling is 4:2:2?" value="ChromaSubsampling" tracktype="Video" occurrence="*" operator="=">4:2:2</rule>
+      <rule name="BitDepth is 8?" value="BitDepth" tracktype="Video" occurrence="*" operator="=">8</rule>
+    </policy>
+  </policy>
+  <policy type="or" name="Conditionally recommended Video Encoding?">
+    <rule name="Format is DV?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">DV</rule>
+    <rule name="Format is IMX 50?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">IMX 50</rule>
+    <rule name="Format is XDCAM HD?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">XDCAM HD</rule>
+    <rule name="Format is JPEG 2000?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">JPEG 2000</rule>
+    <rule name="Format is FFV1?" value="Format" tracktype="Video" occurrence="*" operator="=">FFV1</rule>
+  </policy>
+</policy>
