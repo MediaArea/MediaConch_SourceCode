@@ -90,7 +90,8 @@ public:
 
     void        checker_list(std::vector<std::string>& vec);
     void        checker_file_from_id(long id, std::string& file);
-    void        checker_id_from_filename(std::string& filename, long id);
+    long        checker_id_from_filename(const std::string& filename);
+    int         checker_file_information(long id, MediaConchLib::Checker_FileInfo& info);
 
     int         checker_validate(int user, MediaConchLib::report report,
                                  const std::vector<long>& file,

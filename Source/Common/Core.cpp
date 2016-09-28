@@ -421,11 +421,26 @@ void Core::checker_file_from_id(long id, std::string& file)
 }
 
 //---------------------------------------------------------------------------
-void Core::checker_id_from_filename(std::string& filename, long id)
+long Core::checker_id_from_filename(const std::string& filename)
 {
     std::string time = get_last_modification_file(filename);
-    id = db->get_file_id(filename, time);
-    (void)id;
+
+    db_mutex.Enter();
+    long id = get_db()->get_file_id(filename, time);
+    db_mutex.Leave();
+
+    return id;
+}
+
+//---------------------------------------------------------------------------
+int Core::checker_file_information(long id, MediaConchLib::Checker_FileInfo& info)
+{
+    db_mutex.Enter();
+    get_db()->get_file_information_from_id(id, info.filename, info.file_last_modification, info.generated_id,
+                                           info.source_id, info.generated_time, info.generated_log,
+                                           info.generated_error_log, info.analyzed);
+    db_mutex.Leave();
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -1665,7 +1680,6 @@ long Core::file_is_registered_and_analyzed_in_db(const std::string& filename, bo
 
     db_mutex.Enter();
 
-    bool res;
     long id = get_db()->get_file_id(filename, time);
     if (id < 0)
     {

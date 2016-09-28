@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.8";
+const std::string RESTAPI::API_VERSION = "1.9";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -352,6 +352,24 @@ std::string RESTAPI::Checker_Validate_Req::to_str() const
 
 //---------------------------------------------------------------------------
 std::string RESTAPI::Checker_File_From_Id_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[id: '" << id << "']";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Checker_Id_From_Filename_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "[filename: \"" << filename << "\"]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Checker_File_Information_Req::to_str() const
 {
     std::stringstream out;
 
@@ -879,6 +897,33 @@ std::string RESTAPI::Checker_File_From_Id_Res::to_str() const
     std::stringstream out;
 
     out << "[file: '" << file << "']";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Checker_Id_From_Filename_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[id: " << id << "]";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Checker_File_Information_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "[\"filename\":\"" << filename << "\"";
+    out << ",\"file_last_modification\":\"" << file_last_modification << "\"";
+    out << ",\"generated_id\":" << generated_id;
+    out << ",\"source_id\":" << source_id;
+    out << ",\"generated_time\":" << generated_time;
+    out << ",\"generated_log\":\"" << generated_log << "\"";
+    out << ",\"generated_error_log\":\"" << generated_error_log << "\"";
+    out << ",\"analyzed\":" << analyzed;
+    out << "]";
+
     return out.str();
 }
 
@@ -1435,6 +1480,54 @@ int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::stri
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_FILE_FROM_ID"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string& data)
+{
+    Container::Value v, child, filename;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    filename.type = Container::Value::CONTAINER_TYPE_STRING;
+    filename.s = req.filename;
+
+    child.obj["filename"] = filename;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["CHECKER_ID_FROM_FILENAME"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_file_information_req(Checker_File_Information_Req& req, std::string& data)
+{
+    Container::Value v, child, id;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = req.id;
+
+    child.obj["id"] = id;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["CHECKER_FILE_INFORMATION"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -2092,6 +2185,81 @@ int RESTAPI::serialize_file_from_id_res(Checker_File_From_Id_Res& res, std::stri
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_FILE_FROM_ID_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_id_from_filename_res(Checker_Id_From_Filename_Res& res, std::string& data)
+{
+    Container::Value v, child, id;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = res.id;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    child.obj["id"] = id;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["CHECKER_ID_FROM_FILENAME_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, std::string& data)
+{
+    Container::Value v, child, filename, file_last_modification, generated_id, source_id, generated_time,
+        generated_log, generated_error_log, analyzed;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    filename.type = Container::Value::CONTAINER_TYPE_STRING;
+    filename.s = res.filename;
+    child.obj["filename"] = filename;
+
+    file_last_modification.type = Container::Value::CONTAINER_TYPE_STRING;
+    file_last_modification.s = res.file_last_modification;
+    child.obj["file_last_modification"] = file_last_modification;
+
+    generated_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    generated_id.l = res.generated_id;
+    child.obj["generated_id"] = generated_id;
+
+    source_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    source_id.l = res.source_id;
+    child.obj["source_id"] = source_id;
+
+    generated_time.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    generated_time.l = res.generated_time;
+    child.obj["generated_time"] = generated_time;
+
+    generated_log.type = Container::Value::CONTAINER_TYPE_STRING;
+    generated_log.s = res.generated_log;
+    child.obj["generated_log"] = generated_log;
+
+    generated_error_log.type = Container::Value::CONTAINER_TYPE_STRING;
+    generated_error_log.s = res.generated_error_log;
+    child.obj["generated_error_log"] = generated_error_log;
+
+    analyzed.type = Container::Value::CONTAINER_TYPE_BOOL;
+    analyzed.b = res.analyzed;
+    child.obj["analyzed"] = analyzed;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["CHECKER_FILE_INFORMATION_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -3063,6 +3231,56 @@ RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::st
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_id_from_filename_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CHECKER_ID_FROM_FILENAME");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *filename;
+    filename = model->get_value_by_key(*child, "filename");
+    if (!filename || filename->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Checker_Id_From_Filename_Req *req = new Checker_Id_From_Filename_Req;
+    req->filename = filename->s;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_File_Information_Req *RESTAPI::parse_file_information_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CHECKER_FILE_INFORMATION");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Checker_File_Information_Req *req = new Checker_File_Information_Req;
+    req->id = id->l;
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -3925,6 +4143,20 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_uri_validate_req(const std::string
 RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_uri_file_from_id_req(const std::string&)
 {
     Checker_File_From_Id_Req *req = new Checker_File_From_Id_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_uri_id_from_filename_req(const std::string&)
+{
+    Checker_Id_From_Filename_Req *req = new Checker_Id_From_Filename_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_File_Information_Req *RESTAPI::parse_uri_file_information_req(const std::string&)
+{
+    Checker_File_Information_Req *req = new Checker_File_Information_Req;
     return req;
 }
 
@@ -5324,6 +5556,86 @@ RESTAPI::Checker_File_From_Id_Res *RESTAPI::parse_file_from_id_res(const std::st
 
     Checker_File_From_Id_Res *res = new Checker_File_From_Id_Res;
     res->file = file->s;
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_Id_From_Filename_Res *RESTAPI::parse_id_from_filename_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CHECKER_ID_FROM_FILENAME_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id;
+    id = model->get_value_by_key(*child, "id");
+
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Checker_Id_From_Filename_Res *res = new Checker_Id_From_Filename_Res;
+    res->id = id->l;
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_File_Information_Res *RESTAPI::parse_file_information_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CHECKER_FILE_INFORMATION_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *filename = model->get_value_by_key(*child, "filename");
+    if (!filename || filename->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    Checker_File_Information_Res *res = new Checker_File_Information_Res;
+    res->filename = filename->s;
+
+    Container::Value *file_last_modification = model->get_value_by_key(*child, "file_last_modification");
+    if (file_last_modification && file_last_modification->type == Container::Value::CONTAINER_TYPE_STRING)
+        res->file_last_modification = file_last_modification->s;
+
+    Container::Value *generated_id = model->get_value_by_key(*child, "generated_id");
+    if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->generated_id = generated_id->l;
+
+    Container::Value *source_id = model->get_value_by_key(*child, "source_id");
+    if (source_id && source_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->source_id = source_id->l;
+
+    Container::Value *generated_time = model->get_value_by_key(*child, "generated_time");
+    if (generated_time && generated_time->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->generated_time = generated_time->l;
+
+    Container::Value *generated_log = model->get_value_by_key(*child, "generated_log");
+    if (generated_log && generated_log->type == Container::Value::CONTAINER_TYPE_STRING)
+        res->generated_log = generated_log->s;
+
+    Container::Value *generated_error_log = model->get_value_by_key(*child, "generated_error_log");
+    if (generated_error_log && generated_error_log->type == Container::Value::CONTAINER_TYPE_STRING)
+        res->generated_error_log = generated_error_log->s;
+
+    Container::Value *analyzed = model->get_value_by_key(*child, "analyzed");
+    if (analyzed && analyzed->type == Container::Value::CONTAINER_TYPE_BOOL)
+        res->analyzed = analyzed->b;
 
     return res;
 }

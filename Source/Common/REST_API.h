@@ -347,13 +347,45 @@ public:
 
     struct Checker_File_From_Id_Req
     {
-        int          id;
+        long         id;
         std::string  to_str() const;
     };
 
     struct Checker_File_From_Id_Res
     {
         std::string  file;
+        std::string  to_str() const;
+    };
+
+    struct Checker_Id_From_Filename_Req
+    {
+        std::string  filename;
+        std::string  to_str() const;
+    };
+
+    struct Checker_Id_From_Filename_Res
+    {
+        long         id;
+        std::string  to_str() const;
+    };
+
+    struct Checker_File_Information_Req
+    {
+        long         id;
+        std::string  to_str() const;
+    };
+
+    struct Checker_File_Information_Res
+    {
+        Checker_File_Information_Res() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false) {}
+        std::string  filename;
+        std::string  file_last_modification;
+        long         generated_id;
+        long         source_id;
+        size_t       generated_time;
+        std::string  generated_log;
+        std::string  generated_error_log;
+        bool         analyzed;
         std::string  to_str() const;
     };
 
@@ -784,6 +816,8 @@ public:
     int serialize_list_req(Checker_List_Req& req, std::string&);
     int serialize_validate_req(Checker_Validate_Req& req, std::string&);
     int serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::string&);
+    int serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string&);
+    int serialize_file_information_req(Checker_File_Information_Req& req, std::string&);
     int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&);
 
     int serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string&);
@@ -819,6 +853,8 @@ public:
     int serialize_list_res(Checker_List_Res& res, std::string&);
     int serialize_validate_res(Checker_Validate_Res& res, std::string&);
     int serialize_file_from_id_res(Checker_File_From_Id_Res& res, std::string&);
+    int serialize_id_from_filename_res(Checker_Id_From_Filename_Res& res, std::string&);
+    int serialize_file_information_res(Checker_File_Information_Res& res, std::string&);
     int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&);
 
     int serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string&);
@@ -853,6 +889,8 @@ public:
     Checker_List_Req                    *parse_list_req(const std::string& data);
     Checker_Validate_Req                *parse_validate_req(const std::string& data);
     Checker_File_From_Id_Req            *parse_file_from_id_req(const std::string& data);
+    Checker_Id_From_Filename_Req        *parse_id_from_filename_req(const std::string& data);
+    Checker_File_Information_Req        *parse_file_information_req(const std::string& data);
     Default_Values_For_Type_Req         *parse_default_values_for_type_req(const std::string& data);
 
     XSLT_Policy_Create_Req              *parse_xslt_policy_create_req(const std::string&);
@@ -888,6 +926,8 @@ public:
     Checker_List_Req                    *parse_uri_list_req(const std::string& uri);
     Checker_Validate_Req                *parse_uri_validate_req(const std::string& uri);
     Checker_File_From_Id_Req            *parse_uri_file_from_id_req(const std::string& uri);
+    Checker_Id_From_Filename_Req        *parse_uri_id_from_filename_req(const std::string& uri);
+    Checker_File_Information_Req        *parse_uri_file_information_req(const std::string& uri);
     Default_Values_For_Type_Req         *parse_uri_default_values_for_type_req(const std::string& uri);
 
     XSLT_Policy_Create_Req              *parse_uri_xslt_policy_create_req(const std::string&);
@@ -922,6 +962,8 @@ public:
     Checker_List_Res                   *parse_list_res(const std::string& data);
     Checker_Validate_Res               *parse_validate_res(const std::string& data);
     Checker_File_From_Id_Res           *parse_file_from_id_res(const std::string& data);
+    Checker_Id_From_Filename_Res       *parse_id_from_filename_res(const std::string& data);
+    Checker_File_Information_Res       *parse_file_information_res(const std::string& data);
     Default_Values_For_Type_Res        *parse_default_values_for_type_res(const std::string& data);
 
     XSLT_Policy_Create_Res             *parse_xslt_policy_create_res(const std::string&);

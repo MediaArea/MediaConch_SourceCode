@@ -46,6 +46,8 @@ public:
     int send_request(RESTAPI::Checker_List_Req& req);
     int send_request(RESTAPI::Checker_Validate_Req& req);
     int send_request(RESTAPI::Checker_File_From_Id_Req& req);
+    int send_request(RESTAPI::Checker_Id_From_Filename_Req& req);
+    int send_request(RESTAPI::Checker_File_Information_Req& req);
     int send_request(RESTAPI::Default_Values_For_Type_Req& req);
 
     // Policy

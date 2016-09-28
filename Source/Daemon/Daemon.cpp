@@ -95,6 +95,8 @@ namespace MediaConch
         httpd->commands.list_cb = on_list_command;
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
+        httpd->commands.id_from_filename_cb = on_id_from_filename_command;
+        httpd->commands.file_information_cb = on_file_information_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
 
         httpd->commands.xslt_policy_create_cb = on_xslt_policy_create_command;
@@ -612,10 +614,9 @@ namespace MediaConch
                 continue;
             }
 
-            MediaConchLib::report report_kind;
-            double percent_done = 0.0;
-            int is_done = d->MCL->checker_status(id, percent_done, report_kind);
-            if (is_done != MediaConchLib::errorHttp_TRUE)
+            MediaConchLib::Checker_StatusRes cs_res;
+            int is_done = d->MCL->checker_status(id, cs_res);
+            if (is_done < 0 || !cs_res.finished)
             {
                 RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
                 nok->id = id;
@@ -757,7 +758,7 @@ namespace MediaConch
             RESTAPI::Checker_List_File *file = new RESTAPI::Checker_List_File;
             file->file = vec[i];
 
-            d->MCL->checker_id_from_filename(vec[i], file->id);
+            file->id = d->MCL->checker_id_from_filename(vec[i]);
             res.files.push_back(file);
         }
         std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
@@ -800,10 +801,9 @@ namespace MediaConch
                 continue;
             }
 
-            MediaConchLib::report report_kind;
-            double percent_done = 0.0;
-            int is_done = d->MCL->checker_status(id, percent_done, report_kind);
-            if (is_done != MediaConchLib::errorHttp_TRUE)
+            MediaConchLib::Checker_StatusRes st_res;
+            int is_done = d->MCL->checker_status(id, st_res);
+            if (is_done < 0 || !st_res.finished)
             {
                 RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
                 nok->id = id;
@@ -851,12 +851,56 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a checker_file_from_id command" << std::endl;
+        std::clog << d->get_date() << "Daemon received a checker_file_from_id command:";
         std::clog << req->to_str() << std::endl;
 
         d->MCL->checker_file_from_id(req->id, res.file);
 
         std::clog << d->get_date() << "Daemon send checker_file_from_id result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_id_from_filename_command(const RESTAPI::Checker_Id_From_Filename_Req* req, RESTAPI::Checker_Id_From_Filename_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a checker_id_from_filename command:";
+        std::clog << req->to_str() << std::endl;
+
+        res.id = d->MCL->checker_id_from_filename(req->filename);
+
+        std::clog << d->get_date() << "Daemon send checker_id_from_filename result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_file_information_command(const RESTAPI::Checker_File_Information_Req* req, RESTAPI::Checker_File_Information_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a checker_file_information command" << std::endl;
+        std::clog << req->to_str() << std::endl;
+
+        MediaConchLib::Checker_FileInfo info;
+        d->MCL->checker_file_information(req->id, info);
+
+        res.filename = info.filename;
+        res.file_last_modification = info.file_last_modification;
+        res.analyzed = info.analyzed;
+        res.generated_id = info.generated_id;
+        res.source_id = info.source_id;
+        res.generated_time = info.generated_time;
+        res.generated_log = info.generated_log;
+        res.generated_error_log = info.generated_error_log;
+
+        std::clog << d->get_date() << "Daemon send checker_file_information result: " << res.to_str() << std::endl;
         return 0;
     }
 

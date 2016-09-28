@@ -37,7 +37,7 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false)
+    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false), file_information(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -109,6 +109,10 @@ namespace MediaConch
     {
         std::vector<long> id_to_report;
         MediaConchLib::report report_kind;
+
+        //Return file information
+        if (file_information)
+            return run_file_information();
 
         for (size_t i = 0; i < files.size(); ++i)
         {
@@ -200,6 +204,31 @@ namespace MediaConch
         MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);
         STRINGOUT(policy_mil);
 
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_file_information()
+    {
+        for  (size_t i = 0; i < files.size(); ++i)
+        {
+            long id = MCL.checker_id_from_filename(files[i]);
+            if (id < 0)
+            {
+                error = "File is not registered";
+                return MediaConchLib::errorHttp_INTERNAL;
+            }
+
+            MediaConchLib::Checker_FileInfo info;
+            int ret;
+            if ((ret = MCL.checker_file_information(id, info)) < 0)
+                return ret;
+
+            std::string report;
+            file_info_report(&info, report);
+            MediaInfoLib::String info_str = ZenLib::Ztring().From_UTF8(report);
+            STRINGOUT(info_str);
+        }
         return 0;
     }
 
@@ -335,6 +364,12 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    void CLI::set_file_information_mode()
+    {
+        file_information = true;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::register_option(const std::string& opt)
     {
         std::string report;
@@ -355,6 +390,7 @@ namespace MediaConch
     {
         MediaConchLib::Checker_StatusRes res;
         int ret = MCL.checker_status(file_id, res);
+        report_kind = MediaConchLib::report_MediaConch;
 
         if (use_daemon && asynchronous)
         {
@@ -478,6 +514,32 @@ namespace MediaConch
     {
         MediaConchLib::report report_kind;
         return is_ready(id, report_kind);
+    }
+
+    void CLI::file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report)
+    {
+        std::stringstream ss;
+
+        ss << "filename:" << info->filename << "\n";
+        ss << "file_last_modification:" << info->file_last_modification << "\n";
+        if (info->generated_id >= 0)
+        {
+            std::string file;
+            MCL.checker_file_from_id(info->generated_id, file);
+            ss << "generated file:" << file << "\n";
+        }
+
+        if (info->source_id >= 0)
+        {
+            std::string file;
+            MCL.checker_file_from_id(info->source_id, file);
+            ss << "source file:" << file << "\n";
+            ss << "file generation time:" << info->generated_time << " milliseconds\n";
+            ss << "generated log:" << info->generated_log << "\n";
+            ss << "generated error log:" << info->generated_error_log << "\n";
+        }
+
+        report = ss.str();
     }
 
 }

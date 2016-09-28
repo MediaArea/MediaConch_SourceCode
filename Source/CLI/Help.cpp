@@ -76,6 +76,10 @@ int Help()
     TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
 
+    TEXTOUT("File:");
+    TEXTOUT("--FileInformation, -fi");
+    TEXTOUT("                 Print files information and quit");
+
     return CLI_RETURN_FINISH;
 }
 

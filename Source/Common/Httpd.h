@@ -46,6 +46,8 @@ public:
     REQ_FUNC(Checker_Report);
     REQ_FUNC(Checker_Validate);
     REQ_FUNC(Checker_File_From_Id);
+    REQ_FUNC(Checker_Id_From_Filename);
+    REQ_FUNC(Checker_File_Information);
     REQ_FUNC(Checker_Retry);
     REQ_FUNC(Policy_Import);
     REQ_FUNC(Policy_Change_Info);
@@ -107,6 +109,10 @@ public:
                                        RESTAPI::Checker_Validate_Res& res, void* arg);
     typedef int (*on_file_from_id_command)(const RESTAPI::Checker_File_From_Id_Req* req,
                                            RESTAPI::Checker_File_From_Id_Res& res, void* arg);
+    typedef int (*on_id_from_filename_command)(const RESTAPI::Checker_Id_From_Filename_Req* req,
+                                               RESTAPI::Checker_Id_From_Filename_Res& res, void* arg);
+    typedef int (*on_file_information_command)(const RESTAPI::Checker_File_Information_Req* req,
+                                               RESTAPI::Checker_File_Information_Res& res, void* arg);
     typedef int (*on_default_values_for_type_command)(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void* arg);
 
@@ -160,6 +166,7 @@ public:
         Commands() : analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
                      retry_cb(NULL), clear_cb(NULL), list_cb(NULL),
                      validate_cb(NULL), file_from_id_cb(NULL),
+                     id_from_filename_cb(NULL), file_information_cb(NULL),
                      default_values_for_type_cb(NULL),
                      xslt_policy_create_cb(NULL),
                      policy_import_cb(NULL),
@@ -194,6 +201,8 @@ public:
         on_list_command                         list_cb;
         on_validate_command                     validate_cb;
         on_file_from_id_command                 file_from_id_cb;
+        on_id_from_filename_command             id_from_filename_cb;
+        on_file_information_command             file_information_cb;
         on_default_values_for_type_command      default_values_for_type_cb;
 
         on_xslt_policy_create_command xslt_policy_create_cb;

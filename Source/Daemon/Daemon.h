@@ -80,6 +80,10 @@ namespace MediaConch
                                        RESTAPI::Checker_Validate_Res& res, void *arg);
         static int on_file_from_id_command(const RESTAPI::Checker_File_From_Id_Req* req,
                                            RESTAPI::Checker_File_From_Id_Res& res, void *arg);
+        static int on_id_from_filename_command(const RESTAPI::Checker_Id_From_Filename_Req* req,
+                                               RESTAPI::Checker_Id_From_Filename_Res& res, void *arg);
+        static int on_file_information_command(const RESTAPI::Checker_File_Information_Req* req,
+                                               RESTAPI::Checker_File_Information_Res& res, void *arg);
         static int on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void *arg);
 

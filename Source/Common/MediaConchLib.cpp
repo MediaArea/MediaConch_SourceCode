@@ -261,12 +261,21 @@ void MediaConchLib::checker_file_from_id(long id, std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::checker_id_from_filename(std::string& filename, long id)
+long MediaConchLib::checker_id_from_filename(const std::string& filename)
 {
     if (use_daemon)
-        return;
+        return daemon_client->checker_id_from_filename(filename);
 
-    core->checker_id_from_filename(filename, id);
+    return core->checker_id_from_filename(filename);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::checker_file_information(long id, MediaConchLib::Checker_FileInfo& info)
+{
+    if (use_daemon)
+        return daemon_client->checker_file_information(id, info);
+
+    return core->checker_file_information(id, info);
 }
 
 //***************************************************************************

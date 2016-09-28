@@ -707,6 +707,54 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_file_from_id_res(res, result) < 0)
             error = rest.get_error();
     }
+    else if (!std::string("/checker_id_from_filename").compare(uri_path))
+    {
+        RESTAPI::Checker_Id_From_Filename_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Checker_Id_From_Filename_Res res;
+        if (commands.id_from_filename_cb && commands.id_from_filename_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_id_from_filename_res(res, result) < 0)
+            error = rest.get_error();
+    }
+    else if (!std::string("/checker_file_information").compare(uri_path))
+    {
+        RESTAPI::Checker_File_Information_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Checker_File_Information_Res res;
+        if (commands.file_information_cb && commands.file_information_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_file_information_res(res, result) < 0)
+            error = rest.get_error();
+    }
     else if (!std::string("/policy_import").compare(uri_path))
     {
         RESTAPI::Policy_Import_Req *r = NULL;

@@ -166,6 +166,78 @@ int DaemonClient::checker_file_from_id(long id, std::string& filename)
 }
 
 //---------------------------------------------------------------------------
+long DaemonClient::checker_id_from_filename(const std::string& filename)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Checker_Id_From_Filename_Req req;
+    req.filename = filename;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Checker_Id_From_Filename_Res *res = rest.parse_id_from_filename_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    long id = res->id;
+    delete res;
+    return id;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::checker_file_information(long id, MediaConchLib::Checker_FileInfo& info)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Checker_File_Information_Req req;
+    req.id = id;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Checker_File_Information_Res *res = rest.parse_file_information_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    info.filename = res->filename;
+    info.file_last_modification = res->file_last_modification;
+    info.generated_id = res->generated_id;
+    info.source_id = res->source_id;
+    info.generated_time = res->generated_time;
+    info.generated_log = res->generated_log;
+    info.generated_error_log = res->generated_error_log;
+    info.analyzed = res->analyzed;
+
+    delete res;
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::default_values_for_type(const std::string& type, std::vector<std::string>& values)
 {
     if (!http_client)

@@ -125,6 +125,20 @@ public:
         Checker_ValidateRes() : valid(true) {}
     };
 
+    struct Checker_FileInfo
+    {
+        Checker_FileInfo() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false) {}
+
+        std::string filename;
+        std::string file_last_modification;
+        std::string generated_log;
+        std::string generated_error_log;
+        long        generated_id;
+        long        source_id;
+        size_t      generated_time;
+        bool        analyzed;
+    };
+
     union XSLT_Child;
 
     struct XSLT_Policy_Rule
@@ -232,8 +246,8 @@ public:
 
     void checker_list(std::vector<std::string>& vec);
     void checker_file_from_id(long id, std::string& filename);
-    void checker_id_from_filename(std::string& filename, long id);
-
+    long checker_id_from_filename(const std::string& filename);
+    int  checker_file_information(long id, Checker_FileInfo& info);
 
     // Output
     int  checker_get_report(int user, const std::bitset<report_Max>& Report, format f,

@@ -48,8 +48,10 @@ public:
     // List
     int checker_list(std::vector<std::string>& vec);
 
-    // file_from_id
+    // filename_from_id
     int checker_file_from_id(long id, std::string& filename);
+    long checker_id_from_filename(const std::string& filename);
+    int checker_file_information(long id, MediaConchLib::Checker_FileInfo& info);
 
     // default_values_for_type
     int default_values_for_type(const std::string& type, std::vector<std::string>& values);

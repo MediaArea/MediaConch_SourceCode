@@ -134,6 +134,30 @@ int Http::send_request(RESTAPI::Checker_File_From_Id_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Checker_Id_From_Filename_Req& req)
+{
+    std::string cmd;
+    rest.serialize_id_from_filename_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/checker_id_from_filename";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Checker_File_Information_Req& req)
+{
+    std::string cmd;
+    rest.serialize_file_information_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/checker_file_information";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Default_Values_For_Type_Req& req)
 {
     std::string query;

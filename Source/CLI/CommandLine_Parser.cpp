@@ -52,32 +52,32 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--pluginsconfiguration=";
         return true;
     }
-    if (argument=="-p")
+    else if (argument=="-p")
     {
         Last_Argument = "--policy=";
         return true;
     }
-    if (argument=="-d")
+    else if (argument=="-d")
     {
         Last_Argument = "--display=";
         return true;
     }
-    if (argument=="-c")
+    else if (argument=="-c")
     {
         Last_Argument = "--configuration=";
         return true;
     }
-    if (argument=="-i")
+    else if (argument=="-i")
     {
         Last_Argument = "--implementationschema=";
         return true;
     }
-    if (argument=="-iv")
+    else if (argument=="-iv")
     {
         Last_Argument = "--implementationverbosity=";
         return true;
     }
-    if (argument=="-prf")
+    else if (argument=="-prf")
     {
         Last_Argument = "--policyreferencefile=";
         return true;
@@ -142,6 +142,9 @@ static void change_short_options_to_long(std::string& argument)
     // Asynchronous mode
     if (argument=="-as")
         argument = "--async=yes";
+
+    if (argument=="-fi")
+        argument = "--fileinformation";
 }
 
 int Parse(MediaConch::CLI* cli, std::string& argument)
@@ -185,6 +188,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--pluginsconfiguration",                        PluginsConfiguration)
     OPTION("--defaultvaluesfortype",                        DefaultValuesForType)
     OPTION("--createpolicy",                                CreatePolicy)
+    OPTION("--fileinformation",                             FileInformation)
     //Default
     OPTION("--",                                            Default)
     else
@@ -481,6 +485,16 @@ CL_OPTION(CreatePolicy)
     (void)argument;
     //Form : --CreatePolicy
     cli->set_create_policy_mode();
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(FileInformation)
+{
+    //Form : --FileInformation, -fi
+    (void)argument;
+    cli->set_file_information_mode();
+
     return CLI_RETURN_NONE;
 }
 
