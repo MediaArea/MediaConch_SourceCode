@@ -161,7 +161,7 @@ dnl -------------------------------------------------------------------------
 dnl MediaInfoLib
 dnl
 if test "$with_dll" != "yes"; then
-	if test -e ../../../../MediaInfoLib/Project/GNU/Library/lib$with_libmediainfo_name.la; then
+	if test -e ../../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config; then
 		CXXFLAGS="$CXXFLAGS $(../../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config CXXFLAGS)"
 		if test "$enable_staticlibs" = "yes"; then
 			with_mediainfolib="builtin (static)"
@@ -200,7 +200,7 @@ fi
 dnl -------------------------------------------------------------------------
 dnl ZenLib
 dnl
-if test -e ../../../../ZenLib/Project/GNU/Library/libzen.la; then
+if test -e ../../../../ZenLib/Project/GNU/Library/libzen-config; then
 	CXXFLAGS="$CXXFLAGS $(../../../../ZenLib/Project/GNU/Library/libzen-config CXXFLAGS)"
 	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS $(../../../../ZenLib/Project/GNU/Library/libzen-config CXXFLAGS)"
 	if test "$enable_staticlibs" = "yes"; then

@@ -749,7 +749,7 @@ void Core::unify_policy_options(std::map<std::string, std::string>& opts)
         std::string report;
 
         files.push_back(file);
-        create_report_ma_xml(files, opts, report, get_bitset_with_mi_mt());
+        create_report_ma_xml(files, opts, report, get_bitset_with_mi_mmt());
 
         std::string path = get_local_data_path();
         path += "policies_references_files/";
@@ -1374,6 +1374,14 @@ void Core::get_reports_output(const std::vector<std::string>& files,
                 result->report += tmp;
             }
             result->report += "\r\n";
+        }
+
+        if (report_set[MediaConchLib::report_MicroMediaTrace])
+        {
+            std::string tmp;
+            create_report_mmt_xml(files, tmp);
+            if (f == MediaConchLib::format_Xml)
+                result->report += tmp;
         }
 
         if (report_set[MediaConchLib::report_MediaConch])

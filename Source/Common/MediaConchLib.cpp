@@ -21,6 +21,7 @@
 #include "LibEventHttp.h"
 #include "generated/PolicySample1.h"
 #include "generated/PolicySample4.h"
+#include "generated/PolicySample5.h"
 
 namespace MediaConch {
 
@@ -137,9 +138,9 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
                                                        const std::string& display, MediaConchLib::format& Format,
                                                        std::string& reason)
 {
-    if (reports[MediaConchLib::report_MicroMediaTrace])
+    if (reports[MediaConchLib::report_MicroMediaTrace] && Format != MediaConchLib::format_Xml)
     {
-        reason = "MicroMediaTrace is for internal use only";
+        reason = "MicroMediaTrace can be get only in XML";
         return false;
     }
 
@@ -715,6 +716,10 @@ int MediaConchLib::load_system_policy()
 
     policy_path = path + "policy_sample_4.xml";
     memory = std::string(policy_sample_4);
+    core->policies.import_policy_from_memory(-1, memory, err, path.c_str(), true);
+
+    policy_path = path + "policy_sample_5.xml";
+    memory = std::string(policy_sample_5);
     core->policies.import_policy_from_memory(-1, memory, err, path.c_str(), true);
 
     return 0;
