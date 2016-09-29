@@ -1,18 +1,19 @@
-<policy type="or" name="Do I like these frames?">
-  <description>Is this NTSC or PAL</description>
-  <policy type="or" name="Is this NTSC or PAL?">
+<policy type="or" name="Is this NTSC or PAL SD?">
+  <description>A test to see if the files use NTSC or PAL frame rates and sizes.</description>
+  <policy type="or" name="Is this NTSC SD or PAL SD?">
     <policy type="and" name="Is this PAL?">
-      <rule name="PAL height" value="Height" tracktype="Video" occurrence="1" operator="=">512</rule>
-      <rule value="PAL Width" tracktype="Video" occurrence="1" operator="=">720</rule>
-      <rule value="PAL FrameRate" tracktype="Video" occurrence="1" operator="=">25</rule>
+      <rule name="PAL height" value="Height" tracktype="Video" occurrence="1" operator="=">576</rule>
+      <rule name="PAL Width" value="Width" tracktype="Video" occurrence="1" operator="=">720</rule>
+      <rule name="PAL FrameRate" value="FrameRate" tracktype="Video" occurrence="1" operator="=">25.000</rule>
     </policy>
     <policy type="and" name="Is this NTSC?">
       <policy type="or" name="NTSC Height">
         <rule name="NTSC height" value="Height" tracktype="Video" occurrence="1" operator="=">486</rule>
         <rule name="NTSC-ish height" value="Height" tracktype="Video" occurrence="1" operator="=">480</rule>
       </policy>
-      <rule value="NTSC Width" tracktype="Video" occurrence="1" operator="=">720</rule>
-      <rule value="NTSC FrameRate" tracktype="Video" occurrence="1" operator="=">29.970</rule>
+      <rule name="NTSC Width" value="Width" tracktype="Video" occurrence="1" operator="=">720</rule>
+      <rule name="NTSC FrameRate" value="FrameRate" tracktype="Video" occurrence="1" operator="=">29.970</rule>
     </policy>
   </policy>
+  <rule name="Is Interlaced?" value="ScanType" tracktype="Video" occurrence="1" operator="=">Interlaced</rule>
 </policy>
