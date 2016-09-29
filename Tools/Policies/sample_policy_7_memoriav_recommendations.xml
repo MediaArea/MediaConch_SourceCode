@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <policy type="or" name="Memorial Video files Recommendations">
-  <description>This policy tests is the video codec is either 'recommended' or 'conditionally recommended' according to Memoriav Recommendations - Digital Archiving of Film and Video: Principles and Guideance, see http://memoriav.ch/wp-content/uploads/2016/04/Empfehlungen_Digitale_-Archivierung_EN_Version1.0_Web.pdf</description>
+  <description>This policy tests is the video codec is either 'recommended' or 'conditionally recommended' according to Memoriav Recommendations - Digital Archiving of Film and Video Principles and Guideance, see memoriav.ch/wp-content/uploads/2016/04/Empfehlungen_Digitale_-Archivierung_EN_Version1.0_Web.pdf</description>
   <policy type="or" name="Recommended Video Encoding?">
     <policy type="and" name="Format is 10 bit 4:2:2 uncompressed?">
       <description>This test uses characteristics rather than encoding ids</description>
@@ -22,10 +22,17 @@
     </policy>
   </policy>
   <policy type="or" name="Conditionally recommended Video Encoding?">
-    <rule name="Format is DV?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">DV</rule>
-    <rule name="Format is IMX 50?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">IMX 50</rule>
-    <rule name="Format is XDCAM HD?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">XDCAM HD</rule>
-    <rule name="Format is JPEG 2000?" value="Format_Commercial" tracktype="Video" occurrence="*" operator="=">JPEG 2000</rule>
+    <rule name="Format is DV?" value="Format" tracktype="Video" occurrence="*" operator="=">DV</rule>
+    <policy type="and" name="Format is MPEG2 (XDCam 50 or IMX 50)?">
+      <description>to do: make test more specific to IMX or XDCam</description>
+      <rule name="Format is MPEG?" value="Format" tracktype="Video" occurrence="*" operator="=">MPEG Video</rule>
+      <rule name="Format verison is 2 (MPEG2)?" value="Format_Version" tracktype="Video" occurrence="*" operator="=">2</rule>
+      <policy type="or" name="BitRate is 50Mb">
+        <rule name="BitRate is 50Mb?" value="BitRate" tracktype="Video" occurrence="*" operator="=">50000000</rule>
+        <rule name="Max BitRate is 50Mb?" value="BitRate_Maximum" tracktype="Video" occurrence="*" operator="=">50000000</rule>
+      </policy>
+    </policy>
+    <rule name="Format is JPEG 2000?" value="Format" tracktype="Video" occurrence="*" operator="=">JPEG 2000</rule>
     <rule name="Format is FFV1?" value="Format" tracktype="Video" occurrence="*" operator="=">FFV1</rule>
   </policy>
 </policy>
