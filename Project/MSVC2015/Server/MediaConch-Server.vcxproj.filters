@@ -129,6 +129,12 @@
     <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\FFmpeg.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Daemon\Daemon_Main.h">
@@ -182,9 +188,6 @@
     <ClInclude Include="..\..\..\Source\Common\VeraPDF.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h">
-      <Filter>Source Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Database.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
@@ -195,6 +198,12 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\SQLLiteReport.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\FFmpeg.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>

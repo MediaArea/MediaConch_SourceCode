@@ -521,8 +521,9 @@ namespace MediaConch
         std::stringstream ss;
 
         ss << "filename:" << info->filename << "\n";
-        ss << "file_last_modification:" << info->file_last_modification << "\n";
-        if (info->generated_id >= 0)
+		ss << "file_last_modification:" << info->file_last_modification << "\n";
+        ss << "analyzed:" << std::boolalpha << info->analyzed << "\n";
+		if (info->generated_id >= 0)
         {
             std::string file;
             MCL.checker_file_from_id(info->generated_id, file);

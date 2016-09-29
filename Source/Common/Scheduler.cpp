@@ -263,7 +263,6 @@ namespace MediaConch {
                     else
                         options.push_back(it->first);
                 }
-                //TODO: Add it to analyzer with source id and add generated id
                 long id = core->checker_analyze(new_file, old_id, time_passed, generated_log, generated_log, options, false);
                 if (id >= 0)
                     core->file_update_generated_file(old_id, id);

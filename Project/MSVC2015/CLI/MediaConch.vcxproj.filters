@@ -135,6 +135,9 @@
     <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\FFmpeg.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\CLI\CLI_Main.h">
@@ -186,6 +189,9 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\FFmpeg.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>

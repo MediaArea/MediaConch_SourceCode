@@ -175,6 +175,7 @@
     <ClCompile Include="..\..\..\Source\Common\Database.cpp" />
     <ClCompile Include="..\..\..\Source\Common\DatabaseReport.cpp" />
     <ClCompile Include="..\..\..\Source\Common\DpfManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\FFmpeg.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Http.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Httpd.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Json.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="..\..\..\Source\Common\Database.h" />
     <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h" />
     <ClInclude Include="..\..\..\Source\Common\DpfManager.h" />
+    <ClInclude Include="..\..\..\Source\Common\FFmpeg.h" />
     <ClInclude Include="..\..\..\Source\Common\Plugin.h" />
     <ClInclude Include="..\..\..\Source\Common\PluginFormat.h" />
     <ClInclude Include="..\..\..\Source\Common\PluginsConfig.h" />

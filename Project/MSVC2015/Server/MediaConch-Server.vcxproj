@@ -141,6 +141,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Common\DatabaseReport.cpp" />
     <ClCompile Include="..\..\..\Source\Common\DpfManager.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\FFmpeg.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Plugin.cpp" />
     <ClCompile Include="..\..\..\Source\Common\PluginsConfig.cpp" />
     <ClCompile Include="..\..\..\Source\Common\PluginsManager.cpp" />
@@ -176,6 +178,7 @@
     <ClInclude Include="..\..\..\Source\Common\Database.h" />
     <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h" />
     <ClInclude Include="..\..\..\Source\Common\DpfManager.h" />
+    <ClInclude Include="..\..\..\Source\Common\FFmpeg.h" />
     <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h" />
     <ClInclude Include="..\..\..\Source\Common\Plugin.h" />
     <ClInclude Include="..\..\..\Source\Common\PluginFormat.h" />
