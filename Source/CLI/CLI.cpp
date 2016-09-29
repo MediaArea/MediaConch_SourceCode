@@ -520,24 +520,24 @@ namespace MediaConch
     {
         std::stringstream ss;
 
-        ss << "filename:" << info->filename << "\n";
-		ss << "file_last_modification:" << info->file_last_modification << "\n";
-        ss << "analyzed:" << std::boolalpha << info->analyzed << "\n";
+        ss << "filename:               " << info->filename << "\n";
+		ss << "file last modification: " << info->file_last_modification << "\n";
+        ss << "analyzed:               " << std::boolalpha << info->analyzed << "\n";
 		if (info->generated_id >= 0)
         {
             std::string file;
             MCL.checker_file_from_id(info->generated_id, file);
-            ss << "generated file:" << file << "\n";
+            ss << "generated file:         " << file << "\n";
         }
 
         if (info->source_id >= 0)
         {
             std::string file;
             MCL.checker_file_from_id(info->source_id, file);
-            ss << "source file:" << file << "\n";
-            ss << "file generation time:" << info->generated_time << " milliseconds\n";
-            ss << "generated log:" << info->generated_log << "\n";
-            ss << "generated error log:" << info->generated_error_log << "\n";
+            ss << "source file:            " << file << "\n";
+            ss << "file generation time:   " << info->generated_time << " milliseconds\n";
+            ss << "generated log:          " << info->generated_log << "\n";
+            ss << "generated error log:    " << info->generated_error_log << "\n";
         }
 
         report = ss.str();

@@ -67,8 +67,13 @@ namespace MediaConch {
             return -1;
         }
         outputDir = obj.at("outputDir").s;
+#if defined(_WIN32) || defined(WIN32)
+        if (outputDir[outputDir.length() - 1] != '\\')
+            outputDir += "\\";
+#else
         if (outputDir[outputDir.length() - 1] != '/')
             outputDir += "/";
+#endif
 
         if (obj.find("outputExt") == obj.end() || obj.at("outputExt").type != Container::Value::CONTAINER_TYPE_STRING)
         {
@@ -76,16 +81,6 @@ namespace MediaConch {
             return -1;
         }
         outputExt = obj.at("outputExt").s;
-
-        size_t pos = 0;
-        while (1)
-        {
-            pos = outputDir.find("\\", pos);
-            if (pos == std::string::npos)
-                break;
-
-            outputDir[pos] = '/';
-        }
 
         if (obj.find("inputParams") != obj.end() && obj.at("inputParams").type == Container::Value::CONTAINER_TYPE_ARRAY)
         {

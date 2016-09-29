@@ -381,13 +381,13 @@ bool Core::checker_status(long file_id, MediaConchLib::Checker_StatusRes& res)
     bool is_finished = scheduler->element_is_finished(file_id, percent_done);
     int ret = MediaConchLib::errorHttp_NONE;
 
+    res.id = file_id;
     res.finished = is_finished;
     if (is_finished)
     {
         res.tool = new int;
         *res.tool = (int)MediaConchLib::report_MediaConch;;
 
-        MediaConchLib::report r;
         std::string filename;
         std::string file_time;
         size_t generated_time;
@@ -399,9 +399,8 @@ bool Core::checker_status(long file_id, MediaConchLib::Checker_StatusRes& res)
                                                res.generated_id, res.source_id, generated_time,
                                                generated_log, generated_error_log, is_finished);
         if (is_finished)
-            get_db()->get_element_report_kind(file_id, r);
+            get_db()->get_element_report_kind(file_id, (MediaConchLib::report&)*res.tool);
         db_mutex.Leave();
-        *res.tool = r;
     }
     else
     {
@@ -1071,7 +1070,7 @@ void Core::register_report_mediainfo_text_to_database(long file, MediaInfoNameSp
     compress_report(report, mode);
 
     db_mutex.Enter();
-    db->save_report(file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
+    get_db()->save_report(file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
                     report, mode, true);
     db_mutex.Leave();
 }

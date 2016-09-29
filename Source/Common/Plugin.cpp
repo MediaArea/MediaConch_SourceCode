@@ -59,17 +59,25 @@ namespace MediaConch {
 
         HANDLE handler_out_rd = NULL;
         HANDLE handler_out_wr = NULL;
+        HANDLE handler_err_rd = NULL;
+        HANDLE handler_err_wr = NULL;
 
         if (create_pipe(&handler_out_rd, &handler_out_wr) < 0)
             return -1;
 
-        if (execute_the_command(cmd, handler_out_wr) < 0)
+        if (create_pipe(&handler_err_rd, &handler_err_wr) < 0)
+            return -1;
+
+        if (execute_the_command(cmd, handler_out_wr, handler_err_wr) < 0)
         {
             error = "Error in command execution";
             return -1;
         }
 
-        if (read_the_stdout(handler_out_wr, handler_out_rd) < 0)
+        if (read_the_output(handler_out_wr, handler_out_rd, true) < 0)
+            return -1;
+
+        if (read_the_output(handler_err_wr, handler_err_rd, false) < 0)
             return -1;
         return 0;
     }
@@ -97,13 +105,13 @@ namespace MediaConch {
         return 0;
     }
 
-    int Plugin::execute_the_command(std::string& cmd, HANDLE handler_out_wr)
+    int Plugin::execute_the_command(std::string& cmd, HANDLE handler_out_wr, HANDLE handler_err_wr)
     {
         PROCESS_INFORMATION piProcInfo = { 0 };
         STARTUPINFO siStartInfo = { 0 };
 
         siStartInfo.cb = sizeof(STARTUPINFO);
-        siStartInfo.hStdError = NULL;
+        siStartInfo.hStdError = handler_err_wr;
         siStartInfo.hStdOutput = handler_out_wr;
         siStartInfo.hStdInput = NULL;
         siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
@@ -129,7 +137,7 @@ namespace MediaConch {
         return 0;
     }
 
-    int Plugin::read_the_stdout(HANDLE handler_out_wr, HANDLE handler_out_rd)
+    int Plugin::read_the_output(HANDLE handler_out_wr, HANDLE handler_out_rd, bool is_out)
     {
         DWORD dwRead;
         CHAR chBuf[4096];
@@ -150,7 +158,11 @@ namespace MediaConch {
                 break;
             tmp += ZenLib::Ztring(chBuf, dwRead);
         }
-        report = tmp.To_UTF8();
+        if (is_out)
+            report = tmp.To_UTF8();
+        else
+            report_err = tmp.To_UTF8();
+
         return 0;
     }
 

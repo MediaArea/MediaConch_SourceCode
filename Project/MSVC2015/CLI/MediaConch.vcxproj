@@ -181,6 +181,7 @@
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Source\CLI\CLI.h" />
     <ClInclude Include="..\..\..\Source\CLI\CLI_Main.h" />
     <ClInclude Include="..\..\..\Source\CLI\CommandLine_Parser.h" />
     <ClInclude Include="..\..\..\Source\CLI\Config.h" />

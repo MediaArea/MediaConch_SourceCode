@@ -315,7 +315,7 @@ void SQLLiteReport::get_file_information_from_id(long id, std::string& filename,
     reports.clear();
     create << "SELECT " << name;
     create << ", " << modif;
-    create << ", " << analyzed;
+    create << ", " << analyz;
     create << ", " << src_id;
     create << ", " << gen_id;
     create << ", " << gen_time;

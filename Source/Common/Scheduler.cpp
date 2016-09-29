@@ -252,6 +252,7 @@ namespace MediaConch {
             if (((PluginPreHook*)plugins[i])->is_creating_file())
             {
                 std::string generated_log = ((PluginPreHook*)plugins[i])->get_report();
+                std::string generated_error_log = ((PluginPreHook*)plugins[i])->get_report_err();
                 new_file = ((PluginPreHook*)plugins[i])->get_output_file();
 
                 std::vector<std::string> options;
@@ -263,7 +264,7 @@ namespace MediaConch {
                     else
                         options.push_back(it->first);
                 }
-                long id = core->checker_analyze(new_file, old_id, time_passed, generated_log, generated_log, options, false);
+                long id = core->checker_analyze(new_file, old_id, time_passed, generated_log, generated_error_log, options, false);
                 if (id >= 0)
                     core->file_update_generated_file(old_id, id);
                 old_id = id;
