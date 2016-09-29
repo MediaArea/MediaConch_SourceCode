@@ -22,6 +22,11 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <strsafe.h>
+#else
+#include <stdlib.h>
+#include <unistd.h>
+extern char **environ;
+#include <sys/wait.h>
 #endif
 
 //---------------------------------------------------------------------------
@@ -171,32 +176,80 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int Plugin::exec_bin(const std::vector<std::string>& params, std::string& error)
     {
-        std::string cmd;
-        for (size_t i = 0; i < params.size(); ++i)
-        {
-            if (i)
-                cmd += " ";
-            if (params[i].length() && params[i][0] != '"')
-                cmd += "\"" + params[i] + "\"";
-            else
-                cmd += params[i];
-        }
+        if (!params.size())
+            return -1;
 
-        FILE* pipe = popen(cmd.c_str(), "r");
+        int pipe_out_fd[2];
+        int pipe_err_fd[2];
 
-        if (!pipe)
+        if (pipe(pipe_out_fd) < 0)
         {
-            error = "Command cannot be executed";
+            error = "Cannot create the out pipe";
             return -1;
         }
 
-        char buffer[4096];
-        while (!feof(pipe))
+        if (pipe(pipe_err_fd) < 0)
         {
-            if (fgets(buffer, 4096, pipe) != NULL)
-                report += buffer;
+            error = "Cannot create the error pipe";
+            return -1;
         }
-        pclose(pipe);
+
+        pid_t pid = fork();
+        if (pid < 0)
+        {
+            error = "Cannot fork";
+            return -1;
+        }
+
+        if (pid == (pid_t)0)
+        {
+            close(pipe_out_fd[0]);
+            close(pipe_err_fd[0]);
+
+            dup2(pipe_out_fd[1], STDOUT_FILENO);
+            close(pipe_out_fd[1]);
+
+            dup2(pipe_err_fd[1], STDERR_FILENO);
+            close(pipe_err_fd[1]);
+
+            const char *bin = params[0].c_str();
+            char* args[params.size() + 1];
+            size_t i = 0;
+            for (; i < params.size(); ++i)
+                args[i] = const_cast<char*>(params[i].c_str());
+            args[i] = NULL;
+
+            execvpe(bin, args, environ);
+            exit(1);
+        }
+        else
+        {
+            close(pipe_out_fd[1]);
+            close(pipe_err_fd[1]);
+
+            waitpid(pid, NULL, 0);
+
+            int rd = 0;
+            char buf[4096];
+            for (; 1;)
+            {
+                rd = read(pipe_out_fd[0], buf, 4095);
+                if (rd <= 0)
+                    break;
+
+                report += std::string(buf, rd);
+            }
+
+            for (; 1;)
+            {
+                rd = read(pipe_err_fd[0], buf, 4095);
+                if (rd <= 0)
+                    break;
+
+                report_err += std::string(buf, rd);
+            }
+        }
+
         return 0;
     }
 
