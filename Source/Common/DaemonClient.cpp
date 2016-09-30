@@ -102,12 +102,13 @@ void DaemonClient::reset()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_list(std::vector<std::string>& vec)
+int DaemonClient::checker_list(int user, std::vector<std::string>& vec)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Checker_List_Req req;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -134,13 +135,14 @@ int DaemonClient::checker_list(std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_file_from_id(long id, std::string& filename)
+int DaemonClient::checker_file_from_id(int user, long id, std::string& filename)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Checker_File_From_Id_Req req;
     req.id = id;
+    req.user = user;
 
     int ret = http_client->start();
     if (ret < 0)
@@ -166,12 +168,13 @@ int DaemonClient::checker_file_from_id(long id, std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-long DaemonClient::checker_id_from_filename(const std::string& filename)
+long DaemonClient::checker_id_from_filename(int user, const std::string& filename)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Checker_Id_From_Filename_Req req;
+    req.user = user;
     req.filename = filename;
 
     int ret = http_client->start();
@@ -198,12 +201,13 @@ long DaemonClient::checker_id_from_filename(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_file_information(long id, MediaConchLib::Checker_FileInfo& info)
+int DaemonClient::checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Checker_File_Information_Req req;
+    req.user = user;
     req.id = id;
 
     int ret = http_client->start();
@@ -271,7 +275,7 @@ int DaemonClient::default_values_for_type(const std::string& type, std::vector<s
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_analyze(const std::string& file, bool& registered, bool force_analyze, long& file_id)
+int DaemonClient::checker_analyze(int user, const std::string& file, bool& registered, bool force_analyze, long& file_id)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -279,6 +283,7 @@ int DaemonClient::checker_analyze(const std::string& file, bool& registered, boo
     RESTAPI::Checker_Analyze_Req req;
     RESTAPI::Checker_Analyze_Arg arg;
 
+    arg.user = user;
     arg.id = 0;
 
     std::string real_file(file);
@@ -341,12 +346,13 @@ int DaemonClient::checker_analyze(const std::string& file, bool& registered, boo
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_status(long file_id, MediaConchLib::Checker_StatusRes& st_res)
+int DaemonClient::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& st_res)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
 
     RESTAPI::Checker_Status_Req req;
+    req.user = user;
     req.ids.push_back(file_id);
 
     int ret = http_client->start();

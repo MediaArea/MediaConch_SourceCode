@@ -175,13 +175,14 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_analyze(const std::vector<std::string>& files, std::vector<long>& files_id, bool force_analyze)
+int MediaConchLib::checker_analyze(int user, const std::vector<std::string>& files,
+                                   std::vector<long>& files_id, bool force_analyze)
 {
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
     {
         long file_id;
-        int ret = checker_analyze(files[i], registered, file_id, force_analyze);
+        int ret = checker_analyze(user, files[i], registered, file_id, force_analyze);
         if (ret < 0)
             return ret;
         files_id.push_back(file_id);
@@ -190,16 +191,17 @@ int MediaConchLib::checker_analyze(const std::vector<std::string>& files, std::v
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_analyze(const std::string& file, bool& registered, long& file_id, bool force_analyze)
+int MediaConchLib::checker_analyze(int user, const std::string& file, bool& registered,
+                                   long& file_id, bool force_analyze)
 {
     if (!file.length())
         return errorHttp_INVALID_DATA;
 
     // Send Options by API
     if (use_daemon)
-        return daemon_client->checker_analyze(file, registered, force_analyze, file_id);
+        return daemon_client->checker_analyze(user, file, registered, force_analyze, file_id);
 
-    long id = core->checker_analyze(file, registered, Options, force_analyze);
+    long id = core->checker_analyze(user, file, registered, Options, force_analyze);
     if (id < 0)
         return -1;
 
@@ -208,14 +210,14 @@ int MediaConchLib::checker_analyze(const std::string& file, bool& registered, lo
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_status(const std::vector<long>& files_id, std::vector<Checker_StatusRes>& res)
+int MediaConchLib::checker_status(int user, const std::vector<long>& files_id, std::vector<Checker_StatusRes>& res)
 {
     int done = errorHttp_TRUE;
 
     for (size_t i = 0; i < files_id.size(); ++i)
     {
         Checker_StatusRes r;
-        int ret = checker_status(files_id[i], r);
+        int ret = checker_status(user, files_id[i], r);
 
         if (ret < 0)
             return ret;
@@ -227,55 +229,55 @@ int MediaConchLib::checker_status(const std::vector<long>& files_id, std::vector
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_status(long file_id, Checker_StatusRes& res)
+int MediaConchLib::checker_status(int user, long file_id, Checker_StatusRes& res)
 {
     if (file_id < 0)
         return errorHttp_NONE;
 
     if (use_daemon)
-        return daemon_client->checker_status(file_id, res);
-    return core->checker_status(file_id, res);
+        return daemon_client->checker_status(user, file_id, res);
+    return core->checker_status(user, file_id, res);
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::checker_list(std::vector<std::string>& vec)
+void MediaConchLib::checker_list(int user, std::vector<std::string>& vec)
 {
     if (use_daemon)
     {
-        daemon_client->checker_list(vec);
+        daemon_client->checker_list(user, vec);
         return;
     }
-    core->checker_list(vec);
+    core->checker_list(user, vec);
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::checker_file_from_id(long id, std::string& filename)
+void MediaConchLib::checker_file_from_id(int user, long id, std::string& filename)
 {
     if (use_daemon)
     {
-        daemon_client->checker_file_from_id(id, filename);
+        daemon_client->checker_file_from_id(user, id, filename);
         return;
     }
 
-    core->checker_file_from_id(id, filename);
+    core->checker_file_from_id(user, id, filename);
 }
 
 //---------------------------------------------------------------------------
-long MediaConchLib::checker_id_from_filename(const std::string& filename)
+long MediaConchLib::checker_id_from_filename(int user, const std::string& filename)
 {
     if (use_daemon)
-        return daemon_client->checker_id_from_filename(filename);
+        return daemon_client->checker_id_from_filename(user, filename);
 
-    return core->checker_id_from_filename(filename);
+    return core->checker_id_from_filename(user, filename);
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_file_information(long id, MediaConchLib::Checker_FileInfo& info)
+int MediaConchLib::checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info)
 {
     if (use_daemon)
-        return daemon_client->checker_file_information(id, info);
+        return daemon_client->checker_file_information(user, id, info);
 
-    return core->checker_file_information(id, info);
+    return core->checker_file_information(user, id, info);
 }
 
 //***************************************************************************
@@ -333,12 +335,12 @@ int MediaConchLib::checker_validate(int user, report report, const std::vector<l
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::remove_report(const std::vector<long>& files)
+int MediaConchLib::remove_report(int user, const std::vector<long>& files)
 {
     if (!files.size())
         return errorHttp_INVALID_DATA;
 
-    return core->remove_report(files);
+    return core->remove_report(user, files);
 }
 
 //***************************************************************************

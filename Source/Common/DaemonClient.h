@@ -46,21 +46,21 @@ public:
     // Checker
     //***************************************************************************
     // List
-    int checker_list(std::vector<std::string>& vec);
+    int checker_list(int user, std::vector<std::string>& vec);
 
     // filename_from_id
-    int checker_file_from_id(long id, std::string& filename);
-    long checker_id_from_filename(const std::string& filename);
-    int checker_file_information(long id, MediaConchLib::Checker_FileInfo& info);
+    int checker_file_from_id(int user, long id, std::string& filename);
+    long checker_id_from_filename(int user, const std::string& filename);
+    int checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info);
 
     // default_values_for_type
     int default_values_for_type(const std::string& type, std::vector<std::string>& values);
 
     // Analyze
-    int checker_analyze(const std::string& file, bool& registered, bool force_analyze, long& file_id);
+    int checker_analyze(int user, const std::string& file, bool& registered, bool force_analyze, long& file_id);
 
     // Status
-    int checker_status(long file_id, MediaConchLib::Checker_StatusRes& res);
+    int checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res);
 
     // Report
     int checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,

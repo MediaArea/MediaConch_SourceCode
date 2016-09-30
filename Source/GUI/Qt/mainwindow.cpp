@@ -976,7 +976,7 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 //---------------------------------------------------------------------------
 int MainWindow::analyze(const std::vector<std::string>& files, std::vector<long>& files_id)
 {
-    return MCL.checker_analyze(files, files_id);
+    return MCL.checker_analyze(-1, files, files_id);
 }
 
 //---------------------------------------------------------------------------
@@ -992,7 +992,7 @@ int MainWindow::is_analyze_finished(const std::vector<std::string>& files, std::
         files_id.push_back(id);
     }
 
-    return MCL.checker_status(files_id, res);
+    return MCL.checker_status(-1, files_id, res);
 }
 
 //---------------------------------------------------------------------------
@@ -1002,7 +1002,7 @@ int MainWindow::is_analyze_finished(const std::string& file, MediaConchLib::Chec
     if (id < 0)
         return -1;
 
-    return MCL.checker_status(id, res);
+    return MCL.checker_status(-1, id, res);
 }
 
 //---------------------------------------------------------------------------

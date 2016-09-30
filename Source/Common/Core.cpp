@@ -292,14 +292,14 @@ const std::vector<Plugin*>& Core::get_pre_hook_plugins() const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-long Core::checker_analyze(const std::string& file, bool& registered,
+long Core::checker_analyze(int user, const std::string& file, bool& registered,
                            const std::vector<std::string>& options, bool force_analyze)
 {
     long id = -1;
     registered = false;
     bool analyzed = false;
 
-    id = file_is_registered_and_analyzed(file, analyzed);
+    id = file_is_registered_and_analyzed(user, file, analyzed);
     if (force_analyze)
         analyzed = false;
 
@@ -308,7 +308,7 @@ long Core::checker_analyze(const std::string& file, bool& registered,
         std::string file_last_modification = get_last_modification_file(file);
         std::string err;
         db_mutex.Enter();
-        id = get_db()->add_file(file, file_last_modification, err);
+        id = get_db()->add_file(user, file, file_last_modification, err);
         db_mutex.Leave();
         if (id < 0)
             return -1;
@@ -316,14 +316,14 @@ long Core::checker_analyze(const std::string& file, bool& registered,
     else
         registered = true;
 
-    if (!analyzed && scheduler->add_element_to_queue(file, id, options) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, file, id, options) < 0)
         return -1;
 
     return id;
 }
 
 //---------------------------------------------------------------------------
-long Core::checker_analyze(const std::string& filename, long src_id, size_t generated_time,
+long Core::checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                            const std::string generated_log, const std::string generated_error_log,
                            const std::vector<std::string>& options, bool do_pre_hook)
 {
@@ -331,7 +331,7 @@ long Core::checker_analyze(const std::string& filename, long src_id, size_t gene
     bool analyzed = false;
     bool force_analyze = true;
 
-    id = file_is_registered_and_analyzed(filename, analyzed);
+    id = file_is_registered_and_analyzed(user, filename, analyzed);
     if (force_analyze)
         analyzed = false;
 
@@ -340,7 +340,7 @@ long Core::checker_analyze(const std::string& filename, long src_id, size_t gene
     if (id < 0)
     {
         db_mutex.Enter();
-        id = get_db()->add_file(filename, file_last_modification, err,
+        id = get_db()->add_file(user, filename, file_last_modification, err,
                                 -1, src_id, generated_time,
                                 generated_log, generated_error_log);
         db_mutex.Leave();
@@ -350,7 +350,7 @@ long Core::checker_analyze(const std::string& filename, long src_id, size_t gene
     else
     {
         db_mutex.Enter();
-        id = get_db()->update_file(id, file_last_modification, err,
+        id = get_db()->update_file(user, id, file_last_modification, err,
                                    -1, src_id, generated_time,
                                    generated_log, generated_error_log);
         db_mutex.Leave();
@@ -358,27 +358,27 @@ long Core::checker_analyze(const std::string& filename, long src_id, size_t gene
             return -1;
     }
 
-    if (!analyzed && scheduler->add_element_to_queue(filename, id, options, do_pre_hook) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, do_pre_hook) < 0)
         return -1;
 
     return id;
 }
 
 //---------------------------------------------------------------------------
-int Core::file_update_generated_file(long src_id, long generated_id)
+int Core::file_update_generated_file(int user, long src_id, long generated_id)
 {
     db_mutex.Enter();
-    int ret = get_db()->update_file_generated_id(src_id, generated_id);
+    int ret = get_db()->update_file_generated_id(user, src_id, generated_id);
     db_mutex.Leave();
 
     return ret;
 }
 
 //---------------------------------------------------------------------------
-bool Core::checker_status(long file_id, MediaConchLib::Checker_StatusRes& res)
+bool Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res)
 {
     double percent_done = 0.0;
-    bool is_finished = scheduler->element_is_finished(file_id, percent_done);
+    bool is_finished = scheduler->element_is_finished(user, file_id, percent_done);
     int ret = MediaConchLib::errorHttp_NONE;
 
     res.id = file_id;
@@ -395,11 +395,11 @@ bool Core::checker_status(long file_id, MediaConchLib::Checker_StatusRes& res)
         std::string generated_error_log;
 
         db_mutex.Enter();
-        get_db()->get_file_information_from_id(file_id, filename, file_time,
+        get_db()->get_file_information_from_id(user, file_id, filename, file_time,
                                                res.generated_id, res.source_id, generated_time,
                                                generated_log, generated_error_log, is_finished);
         if (is_finished)
-            get_db()->get_element_report_kind(file_id, (MediaConchLib::report&)*res.tool);
+            get_db()->get_element_report_kind(user, file_id, (MediaConchLib::report&)*res.tool);
         db_mutex.Leave();
     }
     else
@@ -412,30 +412,30 @@ bool Core::checker_status(long file_id, MediaConchLib::Checker_StatusRes& res)
 }
 
 //---------------------------------------------------------------------------
-void Core::checker_file_from_id(long id, std::string& file)
+void Core::checker_file_from_id(int user, long id, std::string& file)
 {
     db_mutex.Enter();
-    get_db()->get_file_name_from_id(id, file);
+    get_db()->get_file_name_from_id(user, id, file);
     db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
-long Core::checker_id_from_filename(const std::string& filename)
+long Core::checker_id_from_filename(int user, const std::string& filename)
 {
     std::string time = get_last_modification_file(filename);
 
     db_mutex.Enter();
-    long id = get_db()->get_file_id(filename, time);
+    long id = get_db()->get_file_id(user, filename, time);
     db_mutex.Leave();
 
     return id;
 }
 
 //---------------------------------------------------------------------------
-int Core::checker_file_information(long id, MediaConchLib::Checker_FileInfo& info)
+int Core::checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info)
 {
     db_mutex.Enter();
-    get_db()->get_file_information_from_id(id, info.filename, info.file_last_modification, info.generated_id,
+    get_db()->get_file_information_from_id(user, id, info.filename, info.file_last_modification, info.generated_id,
                                            info.source_id, info.generated_time, info.generated_log,
                                            info.generated_error_log, info.analyzed);
     db_mutex.Leave();
@@ -443,11 +443,11 @@ int Core::checker_file_information(long id, MediaConchLib::Checker_FileInfo& inf
 }
 
 //---------------------------------------------------------------------------
-void Core::checker_list(std::vector<std::string>& vec)
+void Core::checker_list(int user, std::vector<std::string>& vec)
 {
-    scheduler->get_elements(vec);
+    scheduler->get_elements(user, vec);
     db_mutex.Enter();
-    get_db()->get_elements(vec);
+    get_db()->get_elements(user, vec);
     db_mutex.Leave();
 }
 
@@ -486,10 +486,10 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
             case MediaConchLib::format_MaXml:
             case MediaConchLib::format_Html:
             case MediaConchLib::format_OrigXml:
-                get_reports_output(files, options, f, report_set, result);
+                get_reports_output(user, files, options, f, report_set, result);
                 break;
             case MediaConchLib::format_JsTree:
-                get_reports_output_JStree(files, report_set, result->report);
+                get_reports_output_JStree(user, files, report_set, result->report);
                 break;
             default:
                 return -1;
@@ -526,17 +526,17 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
         {
             //XXX
             std::string report;
-            res->valid = get_implementation_report(file_tmp, options, report);
+            res->valid = get_implementation_report(user, file_tmp, options, report);
         }
         else if (report == MediaConchLib::report_MediaVeraPdf)
         {
             std::string report;
-            res->valid = get_verapdf_report(files[i], report);
+            res->valid = get_verapdf_report(user, files[i], report);
         }
         else if (report == MediaConchLib::report_MediaDpfManager)
         {
             std::string report;
-            res->valid = get_dpfmanager_report(files[i], report);
+            res->valid = get_dpfmanager_report(user, files[i], report);
         }
         else if (!policies_ids.empty() || !policies_contents.empty())
         {
@@ -553,21 +553,21 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
 }
 
 //---------------------------------------------------------------------------
-int Core::remove_report(const std::vector<long>& files)
+int Core::remove_report(int user, const std::vector<long>& files)
 {
     if (!get_db())
         return -1;
 
     db_mutex.Enter();
     for (size_t i = 0; i < files.size(); ++i)
-        db->remove_report(files[i]);
+        db->remove_report(user, files[i]);
     db_mutex.Leave();
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int Core::get_reports_output_JStree(const std::vector<long>& files,
+int Core::get_reports_output_JStree(int user, const std::vector<long>& files,
                                     const std::bitset<MediaConchLib::report_Max>& report_set,
                                     std::string& report)
 {
@@ -582,14 +582,14 @@ int Core::get_reports_output_JStree(const std::vector<long>& files,
         if (report_set[MediaConchLib::report_MediaInfo])
         {
             std::string ret;
-            create_report_mi_xml(vec, ret);
+            create_report_mi_xml(user, vec, ret);
             report += js.format_from_inform_XML(ret);
         }
 
         if (report_set[MediaConchLib::report_MediaTrace])
         {
             std::string ret;
-            create_report_mt_xml(vec, ret);
+            create_report_mt_xml(user, vec, ret);
             report += js.format_from_trace_XML(ret);
         }
     }
@@ -598,7 +598,7 @@ int Core::get_reports_output_JStree(const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::check_policies_xslts(const std::vector<long>& files,
+bool Core::check_policies_xslts(int user, const std::vector<long>& files,
                                 const std::map<std::string, std::string>& options,
                                 const std::vector<std::string>& policies,
                                 std::stringstream& Out)
@@ -607,7 +607,7 @@ bool Core::check_policies_xslts(const std::vector<long>& files,
     for (size_t i = 0; i < policies.size(); ++i)
     {
         std::string tmp;
-        if (!validate_xslt_from_memory(files, options, policies[i], tmp))
+        if (!validate_xslt_from_memory(user, files, options, policies[i], tmp))
         {
             valid = false;
             Out << tmp;
@@ -640,7 +640,7 @@ int Core::check_policies(int user, const std::vector<long>& files,
     for (; it != opts.end(); ++it)
         options[it->first] = it->second;
 
-    unify_policy_options(options);
+    unify_policy_options(user, options);
 
     std::vector<std::string> policies;
     if (this->policies.policy_get_policies(user, policies_ids, policies_contents, options, policies, result->report) < 0)
@@ -649,7 +649,7 @@ int Core::check_policies(int user, const std::vector<long>& files,
     std::stringstream Out;
     result->has_valid = true;
     result->valid = true;
-    if (!check_policies_xslts(files, options, policies, Out))
+    if (!check_policies_xslts(user, files, options, policies, Out))
         result->valid = false;
 
     result->report = Out.str();
@@ -750,7 +750,7 @@ bool Core::validate_xslt_policy(int user, const std::vector<long>& files,
         doc = policies.create_doc(user, pos);
 
     if (doc && S->register_schema_from_doc(doc))
-        valid = validation(files, S, report);
+        valid = validation(user, files, S, report);
     else
     {
         valid = false;
@@ -768,7 +768,7 @@ bool Core::validate_xslt_policy(int user, const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::validate_xslt_policy_from_file(const std::vector<long>& files,
+bool Core::validate_xslt_policy_from_file(int user, const std::vector<long>& files,
                                           const std::map<std::string, std::string>&,
                                           const std::string& policy, std::string& report)
 {
@@ -776,7 +776,7 @@ bool Core::validate_xslt_policy_from_file(const std::vector<long>& files,
     Schema *S = new Xslt(!accepts_https());
 
     if (S->register_schema_from_file(policy.c_str()))
-        valid = validation(files, S, report);
+        valid = validation(user, files, S, report);
     else
     {
         valid = false;
@@ -794,7 +794,7 @@ bool Core::validate_xslt_policy_from_file(const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::validate_xslt_from_memory(const std::vector<long>& files,
+bool Core::validate_xslt_from_memory(int user, const std::vector<long>& files,
                                      const std::map<std::string, std::string>& opts,
                                      const std::string& memory, std::string& report,
                                      bool is_implem)
@@ -816,7 +816,7 @@ bool Core::validate_xslt_from_memory(const std::vector<long>& files,
     }
 
     if (S->register_schema_from_memory(memory))
-        valid = validation(files, S, report);
+        valid = validation(user, files, S, report);
     else
     {
         valid = false;
@@ -834,10 +834,10 @@ bool Core::validate_xslt_from_memory(const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::validation(const std::vector<long>& files, Schema* S, std::string& report)
+bool Core::validation(int user, const std::vector<long>& files, Schema* S, std::string& report)
 {
     std::string xml;
-    create_report_ma_xml(files, S->get_options(), xml, get_bitset_with_mi_mmt());
+    create_report_ma_xml(user, files, S->get_options(), xml, get_bitset_with_mi_mmt());
     bool valid = true;
 
     int ret = S->validate_xml(xml);
@@ -870,7 +870,7 @@ void Core::unify_implementation_options(std::map<std::string, std::string>& opts
 }
 
 //---------------------------------------------------------------------------
-void Core::unify_policy_options(std::map<std::string, std::string>& opts)
+void Core::unify_policy_options(int user, std::map<std::string, std::string>& opts)
 {
     std::map<std::string, std::string>::iterator it;
     if ((it = opts.find("policy_reference_id")) != opts.end())
@@ -883,11 +883,14 @@ void Core::unify_policy_options(std::map<std::string, std::string>& opts)
 
         std::vector<long> files;
         std::string time = get_last_modification_file(file);
-        long file_id = get_db()->get_file_id(file, time);
         std::string report;
 
+        db_mutex.Enter();
+        long file_id = get_db()->get_file_id(user, file, time);
+        db_mutex.Leave();
+
         files.push_back(file_id);
-        create_report_ma_xml(files, opts, report, get_bitset_with_mi_mmt());
+        create_report_ma_xml(user, files, opts, report, get_bitset_with_mi_mmt());
 
         std::string path = get_local_data_path();
         path += "policies_references_files/";
@@ -966,7 +969,7 @@ void Core::compress_report_copy(std::string& report, const char* src, size_t src
 {
     switch (compress)
     {
-        case MediaConchLib::compression_ZLib : 
+        case MediaConchLib::compression_ZLib:
         {
             uLongf dst_len;
 
@@ -1046,7 +1049,7 @@ bool Core::file_is_existing(const std::string& filename)
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_xml_to_database(long file, const std::string& report,
+void Core::register_report_xml_to_database(int user, long file, const std::string& report,
                                            MediaConchLib::report report_kind)
 {
     MediaConchLib::compression mode = compression_mode;
@@ -1054,13 +1057,13 @@ void Core::register_report_xml_to_database(long file, const std::string& report,
     compress_report(new_report, mode);
 
     db_mutex.Enter();
-    db->save_report(file, report_kind, MediaConchLib::format_Xml,
+    db->save_report(user, file, report_kind, MediaConchLib::format_Xml,
                     new_report, mode, true);
     db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_text_to_database(long file, MediaInfoNameSpace::MediaInfo* curMI)
+void Core::register_report_mediainfo_text_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* curMI)
 {
     curMI->Option(__T("Details"), __T("0"));
     curMI->Option(__T("Inform"), String());
@@ -1070,13 +1073,13 @@ void Core::register_report_mediainfo_text_to_database(long file, MediaInfoNameSp
     compress_report(report, mode);
 
     db_mutex.Enter();
-    get_db()->save_report(file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
+    get_db()->save_report(user, file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
                     report, mode, true);
     db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_mediainfo_xml_to_database(long file, MediaInfoNameSpace::MediaInfo* curMI)
+void Core::register_report_mediainfo_xml_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* curMI)
 {
     curMI->Option(__T("Details"), __T("0"));
     curMI->Option(__T("Inform"), __T("MIXML"));
@@ -1084,13 +1087,13 @@ void Core::register_report_mediainfo_xml_to_database(long file, MediaInfoNameSpa
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
     db_mutex.Enter();
-    db->save_report(file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
+    db->save_report(user, file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
                     report, mode, true);
     db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
-void Core::register_report_micromediatrace_xml_to_database(long file, MediaInfoNameSpace::MediaInfo* curMI)
+void Core::register_report_micromediatrace_xml_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* curMI)
 {
     curMI->Option(__T("Details"), __T("1"));
     curMI->Option(__T("Inform"), __T("MICRO_XML"));
@@ -1118,7 +1121,7 @@ void Core::register_report_micromediatrace_xml_to_database(long file, MediaInfoN
     }
 
     db_mutex.Enter();
-    db->save_report(file, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml,
+    db->save_report(user, file, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml,
                     report, mode, true);
     db_mutex.Leave();
 }
@@ -1149,57 +1152,57 @@ void Core::get_content_of_media_in_xml(std::string& report)
 }
 
 //---------------------------------------------------------------------------
-void Core::add_file_to_db(std::string& filename, const std::string& time)
+void Core::add_file_to_db(int user, std::string& filename, const std::string& time)
 {
     std::string err;
     db_mutex.Enter();
-    get_db()->add_file(filename, time, err);
+    get_db()->add_file(user, filename, time, err);
     db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
-void Core::set_file_analyzed_to_database(long id)
+void Core::set_file_analyzed_to_database(int user, long id)
 {
     db_mutex.Enter();
-    get_db()->update_file_analyzed(id, true);
+    get_db()->update_file_analyzed(user, id, true);
     db_mutex.Leave();
 }
 
 //---------------------------------------------------------------------------
-void Core::register_reports_to_database(long file, const std::string& report,
+void Core::register_reports_to_database(int user, long file, const std::string& report,
                                         MediaConchLib::report report_kind, MediaInfoNameSpace::MediaInfo* curMI)
 {
     // Implementation
-    register_report_xml_to_database(file, report, report_kind);
+    register_report_xml_to_database(user, file, report, report_kind);
 
     //MI and MT
-    register_reports_to_database(file, curMI);
+    register_reports_to_database(user, file, curMI);
 }
 
 //---------------------------------------------------------------------------
-void Core::register_reports_to_database(long file, MediaInfoNameSpace::MediaInfo* curMI)
+void Core::register_reports_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* curMI)
 {
     // MediaInfo
-    register_report_mediainfo_text_to_database(file, curMI);
-    register_report_mediainfo_xml_to_database(file, curMI);
+    register_report_mediainfo_text_to_database(user, file, curMI);
+    register_report_mediainfo_xml_to_database(user, file, curMI);
 
     // MicroMediaTrace
-    register_report_micromediatrace_xml_to_database(file, curMI);
+    register_report_micromediatrace_xml_to_database(user, file, curMI);
 }
 
 //---------------------------------------------------------------------------
-void Core::register_reports_to_database(long file)
+void Core::register_reports_to_database(int user, long file)
 {
     // MediaInfo
-    register_report_mediainfo_text_to_database(file, MI);
-    register_report_mediainfo_xml_to_database(file, MI);
+    register_report_mediainfo_text_to_database(user, file, MI);
+    register_report_mediainfo_xml_to_database(user, file, MI);
 
     // MicroMediaTrace
-    register_report_micromediatrace_xml_to_database(file, MI);
+    register_report_micromediatrace_xml_to_database(user, file, MI);
 }
 
 //---------------------------------------------------------------------------
-void Core::create_report_mi_xml(const std::vector<long>& files, std::string& report)
+void Core::create_report_mi_xml(int user, const std::vector<long>& files, std::string& report)
 {
     bool AcceptsHttps = accepts_https();
 
@@ -1228,12 +1231,12 @@ void Core::create_report_mi_xml(const std::vector<long>& files, std::string& rep
         vec.push_back(files[i]);
 
         std::string file;
-        checker_file_from_id(files[i], file);
+        checker_file_from_id(user, files[i], file);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
 
         std::string info;
-        get_report_saved(vec, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, info);
+        get_report_saved(user, vec, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, info);
         get_content_of_media_in_xml(info);
         if (info.length())
             report += info;
@@ -1243,7 +1246,7 @@ void Core::create_report_mi_xml(const std::vector<long>& files, std::string& rep
 }
 
 //---------------------------------------------------------------------------
-void Core::create_report_mt_xml(const std::vector<long>& files, std::string& report)
+void Core::create_report_mt_xml(int user, const std::vector<long>& files, std::string& report)
 {
     bool AcceptsHttps = accepts_https();
     std::string version = ZenLib::Ztring(Menu_Option_Preferences_Option (__T("Info_Version"), __T(""))).To_UTF8();
@@ -1272,12 +1275,12 @@ void Core::create_report_mt_xml(const std::vector<long>& files, std::string& rep
         vec.push_back(files[i]);
 
         std::string file;
-        checker_file_from_id(files[i], file);
+        checker_file_from_id(user, files[i], file);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
 
         std::string tmp;
-        create_report_mmt_xml(vec, tmp);
+        create_report_mmt_xml(user, vec, tmp);
         if (tmp.length())
         {
             std::map<std::string, std::string> opts;
@@ -1292,7 +1295,7 @@ void Core::create_report_mt_xml(const std::vector<long>& files, std::string& rep
 }
 
 //---------------------------------------------------------------------------
-void Core::create_report_mmt_xml(const std::vector<long>& files, std::string& report)
+void Core::create_report_mmt_xml(int user, const std::vector<long>& files, std::string& report)
 {
     bool AcceptsHttps = accepts_https();
     std::string version = ZenLib::Ztring(Menu_Option_Preferences_Option (__T("Info_Version"), __T(""))).To_UTF8();
@@ -1321,12 +1324,12 @@ void Core::create_report_mmt_xml(const std::vector<long>& files, std::string& re
         vec.push_back(files[i]);
 
         std::string file;
-        checker_file_from_id(files[i], file);
+        checker_file_from_id(user, files[i], file);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">";
 
         std::string trace;
-        get_report_saved(vec, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml, trace);
+        get_report_saved(user, vec, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml, trace);
         if (trace.length())
             report += trace;
         report += std::string("</media>");
@@ -1335,7 +1338,7 @@ void Core::create_report_mmt_xml(const std::vector<long>& files, std::string& re
 }
 
 //---------------------------------------------------------------------------
-void Core::create_report_ma_xml(const std::vector<long>& files,
+void Core::create_report_ma_xml(int user, const std::vector<long>& files,
                                 const std::map<std::string, std::string>& options,
                                 std::string& report,
                                 std::bitset<MediaConchLib::report_Max> reports)
@@ -1368,14 +1371,14 @@ void Core::create_report_ma_xml(const std::vector<long>& files,
         vec.push_back(files[i]);
 
         std::string file;
-        checker_file_from_id(files[i], file);
+        checker_file_from_id(user, files[i], file);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
 
         if (reports[MediaConchLib::report_MediaInfo])
         {
             std::string info;
-            get_report_saved(vec, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, info);
+            get_report_saved(user, vec, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, info);
             get_content_of_media_in_xml(info);
             if (info.length())
                 report += "<MediaInfo xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediainfo\" version=\"2.0beta1\">" + info + "</MediaInfo>\n";
@@ -1384,7 +1387,7 @@ void Core::create_report_ma_xml(const std::vector<long>& files,
         if (reports[MediaConchLib::report_MediaTrace])
         {
             std::string trace;
-            create_report_mt_xml(vec, trace);
+            create_report_mt_xml(user, vec, trace);
             get_content_of_media_in_xml(trace);
             report += "<MediaTrace xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediatrace\" version=\"0.1\">\n";
             if (trace.length())
@@ -1395,7 +1398,7 @@ void Core::create_report_ma_xml(const std::vector<long>& files,
         if (reports[MediaConchLib::report_MicroMediaTrace])
         {
             std::string trace;
-            get_report_saved(vec, MediaConchLib::report_MicroMediaTrace,
+            get_report_saved(user, vec, MediaConchLib::report_MicroMediaTrace,
                              MediaConchLib::format_Xml, trace);
             report += "<MicroMediaTrace xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/micromediatrace\" version=\"0.1\">\n";
             if (trace.length())
@@ -1407,7 +1410,7 @@ void Core::create_report_ma_xml(const std::vector<long>& files,
         if (reports[MediaConchLib::report_MediaConch])
         {
             std::string implem;
-            if (get_implementation_report(vec, options, implem))
+            if (get_implementation_report(user, vec, options, implem))
                 get_content_of_media_in_xml(implem);
             else
                 implem = std::string();
@@ -1421,36 +1424,36 @@ void Core::create_report_ma_xml(const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-void Core::create_report_verapdf_xml(const std::vector<long>& files, std::string& report)
+void Core::create_report_verapdf_xml(int user, const std::vector<long>& files, std::string& report)
 {
     if (files.size() == 1)
     {
-        get_report_saved(files, MediaConchLib::report_MediaVeraPdf, MediaConchLib::format_Xml, report);
+        get_report_saved(user, files, MediaConchLib::report_MediaVeraPdf, MediaConchLib::format_Xml, report);
         return;
     }
     report = "Not implemented";
 }
 
 //---------------------------------------------------------------------------
-void Core::create_report_dpfmanager_xml(const std::vector<long>& files, std::string& report)
+void Core::create_report_dpfmanager_xml(int user, const std::vector<long>& files, std::string& report)
 {
     if (files.size() == 1)
     {
-        get_report_saved(files, MediaConchLib::report_MediaDpfManager, MediaConchLib::format_Xml, report);
+        get_report_saved(user, files, MediaConchLib::report_MediaDpfManager, MediaConchLib::format_Xml, report);
         return;
     }
     report = "Not implemented";
 }
 
 //---------------------------------------------------------------------------
-void Core::get_report_saved(const std::vector<long>& files,
+void Core::get_report_saved(int user, const std::vector<long>& files,
                             MediaConchLib::report reportKind, MediaConchLib::format f,
                             std::string& report)
 {
     if (f == MediaConchLib::format_MaXml)
     {
         std::map<std::string, std::string> options;
-        create_report_ma_xml(files, options, report, get_bitset_with_mi_mt());
+        create_report_ma_xml(user, files, options, report, get_bitset_with_mi_mt());
         return;
     }
 
@@ -1466,7 +1469,7 @@ void Core::get_report_saved(const std::vector<long>& files,
         std::string raw;
         MediaConchLib::compression compress;
         db_mutex.Enter();
-        db->get_report(files[i], reportKind, f, raw, compress);
+        db->get_report(user, files[i], reportKind, f, raw, compress);
         db_mutex.Leave();
         uncompress_report(raw, compress);
         report += raw;
@@ -1474,7 +1477,7 @@ void Core::get_report_saved(const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-void Core::get_reports_output(const std::vector<long>& files,
+void Core::get_reports_output(int user, const std::vector<long>& files,
                               const std::map<std::string, std::string>& options,
                               MediaConchLib::format f,
                               std::bitset<MediaConchLib::report_Max> report_set,
@@ -1482,7 +1485,7 @@ void Core::get_reports_output(const std::vector<long>& files,
 {
     if (f == MediaConchLib::format_MaXml)
     {
-        create_report_ma_xml(files, options, result->report, report_set);
+        create_report_ma_xml(user, files, options, result->report, report_set);
         result->report += "\r\n";
     }
     else
@@ -1490,16 +1493,16 @@ void Core::get_reports_output(const std::vector<long>& files,
         if (report_set[MediaConchLib::report_MediaInfo])
         {
             if (f == MediaConchLib::format_Xml)
-                create_report_mi_xml(files, result->report);
+                create_report_mi_xml(user, files, result->report);
             else
-                get_report_saved(files, MediaConchLib::report_MediaInfo, f, result->report);
+                get_report_saved(user, files, MediaConchLib::report_MediaInfo, f, result->report);
             result->report += "\r\n";
         }
 
         if (report_set[MediaConchLib::report_MediaTrace])
         {
             std::string tmp;
-            create_report_mt_xml(files, tmp);
+            create_report_mt_xml(user, files, tmp);
             if (f == MediaConchLib::format_Xml)
                 result->report += tmp;
             else if (f == MediaConchLib::format_Html)
@@ -1524,7 +1527,7 @@ void Core::get_reports_output(const std::vector<long>& files,
         if (report_set[MediaConchLib::report_MicroMediaTrace])
         {
             std::string tmp;
-            create_report_mmt_xml(files, tmp);
+            create_report_mmt_xml(user, files, tmp);
             if (f == MediaConchLib::format_Xml)
                 result->report += tmp;
         }
@@ -1533,7 +1536,7 @@ void Core::get_reports_output(const std::vector<long>& files,
         {
             std::string tmp;
             bool is_valid = true;
-            if (get_implementation_report(files, options, tmp))
+            if (get_implementation_report(user, files, options, tmp))
                 is_valid = implementation_is_valid(tmp);
             else
                 is_valid = false;
@@ -1559,7 +1562,7 @@ void Core::get_reports_output(const std::vector<long>& files,
         if (report_set[MediaConchLib::report_MediaVeraPdf])
         {
             std::string tmp, transformed;
-            create_report_verapdf_xml(files, tmp);
+            create_report_verapdf_xml(user, files, tmp);
 
             std::string memory(implementation_report_vera_pdf_xsl);
             const std::map<std::string, std::string> opts;
@@ -1594,8 +1597,8 @@ void Core::get_reports_output(const std::vector<long>& files,
 
         if (report_set[MediaConchLib::report_MediaDpfManager])
         {
-           std::string tmp, transformed;
-            create_report_dpfmanager_xml(files, tmp);
+            std::string tmp, transformed;
+            create_report_dpfmanager_xml(user, files, tmp);
 
             std::string memory(implementation_report_dpf_manager_xsl);
             const std::map<std::string, std::string> opts;
@@ -1631,13 +1634,13 @@ void Core::get_reports_output(const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::get_implementation_report(const std::vector<long>& files,
+bool Core::get_implementation_report(int user, const std::vector<long>& files,
                                      const std::map<std::string, std::string>& options,
                                      std::string& report)
 {
     std::string memory(implementation_report_xsl);
     std::string r;
-    bool valid = validate_xslt_from_memory(files, options, memory, r, true);
+    bool valid = validate_xslt_from_memory(user, files, options, memory, r, true);
     if (valid)
         valid = implementation_is_valid(r);
     report += r;
@@ -1645,31 +1648,31 @@ bool Core::get_implementation_report(const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::get_verapdf_report(long file, std::string& report)
+bool Core::get_verapdf_report(int user, long file, std::string& report)
 {
     std::vector<long> files;
     files.push_back(file);
 
-    get_report_saved(files, MediaConchLib::report_MediaVeraPdf, MediaConchLib::format_Xml,
+    get_report_saved(user, files, MediaConchLib::report_MediaVeraPdf, MediaConchLib::format_Xml,
                      report);
 
     return verapdf_report_is_valid(report);
 }
 
 //---------------------------------------------------------------------------
-bool Core::get_dpfmanager_report(long file, std::string& report)
+bool Core::get_dpfmanager_report(int user, long file, std::string& report)
 {
     std::vector<long> files;
     files.push_back(file);
 
-    get_report_saved(files, MediaConchLib::report_MediaDpfManager, MediaConchLib::format_Xml,
+    get_report_saved(user, files, MediaConchLib::report_MediaDpfManager, MediaConchLib::format_Xml,
                      report);
 
     return dpfmanager_report_is_valid(report);
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_and_analyzed_in_db(const std::string& filename, bool& analyzed)
+long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& filename, bool& analyzed)
 {
     bool is_existing = file_is_existing(filename);
 
@@ -1679,7 +1682,7 @@ long Core::file_is_registered_and_analyzed_in_db(const std::string& filename, bo
 
     db_mutex.Enter();
 
-    long id = get_db()->get_file_id(filename, time);
+    long id = get_db()->get_file_id(user, filename, time);
     if (id < 0)
     {
         analyzed = false;
@@ -1687,7 +1690,7 @@ long Core::file_is_registered_and_analyzed_in_db(const std::string& filename, bo
         return id;
     }
 
-    analyzed = get_db()->file_is_analyzed(id);
+    analyzed = get_db()->file_is_analyzed(user, id);
 
     db_mutex.Leave();
 
@@ -1695,23 +1698,23 @@ long Core::file_is_registered_and_analyzed_in_db(const std::string& filename, bo
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_in_queue(const std::string& filename)
+long Core::file_is_registered_in_queue(int user, const std::string& filename)
 {
     if (!scheduler)
         return -1;
 
-    return scheduler->element_exists(filename);;
+    return scheduler->element_exists(user, filename);
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_and_analyzed(const std::string& filename, bool& analyzed)
+long Core::file_is_registered_and_analyzed(int user, const std::string& filename, bool& analyzed)
 {
     long id;
     analyzed = false;
-    if ((id = file_is_registered_in_queue(filename)) >= 0)
+    if ((id = file_is_registered_in_queue(user, filename)) >= 0)
         return id;
 
-    return file_is_registered_and_analyzed_in_db(filename, analyzed);
+    return file_is_registered_and_analyzed_in_db(user, filename, analyzed);
 }
 
 //---------------------------------------------------------------------------

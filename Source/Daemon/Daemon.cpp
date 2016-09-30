@@ -461,7 +461,7 @@ namespace MediaConch
                 force = req->args[i].force_analyze;
             bool registered = false;
             long out_id = -1;
-            int ret = d->MCL->checker_analyze(req->args[i].file, registered, out_id, force);
+            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, registered, out_id, force);
             if (ret < 0)
             {
                 RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;
@@ -506,7 +506,7 @@ namespace MediaConch
             }
 
             MediaConchLib::Checker_StatusRes st_res;
-            int ret = d->MCL->checker_status(id, st_res);
+            int ret = d->MCL->checker_status(req->user, id, st_res);
 
             if (ret < 0)
             {
@@ -615,7 +615,7 @@ namespace MediaConch
             }
 
             MediaConchLib::Checker_StatusRes cs_res;
-            int is_done = d->MCL->checker_status(id, cs_res);
+            int is_done = d->MCL->checker_status(req->user, id, cs_res);
             if (is_done < 0 || !cs_res.finished)
             {
                 RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
@@ -679,7 +679,7 @@ namespace MediaConch
             }
 
             std::string filename;
-            d->MCL->checker_file_from_id(id, filename);
+            d->MCL->checker_file_from_id(req->user, id, filename);
             if (!filename.size())
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
@@ -691,11 +691,11 @@ namespace MediaConch
 
             std::vector<long> files;
             files.push_back(id);
-            d->MCL->remove_report(files);
+            d->MCL->remove_report(req->user, files);
 
             bool registered = false;
             long new_id = -1;
-            int ret = d->MCL->checker_analyze(filename, registered, new_id);
+            int ret = d->MCL->checker_analyze(req->user, filename, registered, new_id);
             if (ret < 0)
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
@@ -734,7 +734,7 @@ namespace MediaConch
 
             std::vector<long> files;
             files.push_back(id);
-            d->MCL->remove_report(files);
+            d->MCL->remove_report(req->user, files);
             res.ok.push_back(id);
         }
 
@@ -752,13 +752,13 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a checker list command" << std::endl;
         std::vector<std::string> vec;
-        d->MCL->checker_list(vec);
+        d->MCL->checker_list(req->user, vec);
         for (size_t i = 0; i < vec.size(); ++i)
         {
             RESTAPI::Checker_List_File *file = new RESTAPI::Checker_List_File;
             file->file = vec[i];
 
-            file->id = d->MCL->checker_id_from_filename(vec[i]);
+            file->id = d->MCL->checker_id_from_filename(req->user, vec[i]);
             res.files.push_back(file);
         }
         std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
@@ -802,7 +802,7 @@ namespace MediaConch
             }
 
             MediaConchLib::Checker_StatusRes st_res;
-            int is_done = d->MCL->checker_status(id, st_res);
+            int is_done = d->MCL->checker_status(req->user, id, st_res);
             if (is_done < 0 || !st_res.finished)
             {
                 RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
@@ -854,7 +854,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a checker_file_from_id command:";
         std::clog << req->to_str() << std::endl;
 
-        d->MCL->checker_file_from_id(req->id, res.file);
+        d->MCL->checker_file_from_id(req->user, req->id, res.file);
 
         std::clog << d->get_date() << "Daemon send checker_file_from_id result: " << res.to_str() << std::endl;
         return 0;
@@ -871,7 +871,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a checker_id_from_filename command:";
         std::clog << req->to_str() << std::endl;
 
-        res.id = d->MCL->checker_id_from_filename(req->filename);
+        res.id = d->MCL->checker_id_from_filename(req->user, req->filename);
 
         std::clog << d->get_date() << "Daemon send checker_id_from_filename result: " << res.to_str() << std::endl;
         return 0;
@@ -889,7 +889,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         MediaConchLib::Checker_FileInfo info;
-        d->MCL->checker_file_information(req->id, info);
+        d->MCL->checker_file_information(req->user, req->id, info);
 
         res.filename = info.filename;
         res.file_last_modification = info.file_last_modification;

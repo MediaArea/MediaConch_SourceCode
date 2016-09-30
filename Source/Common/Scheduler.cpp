@@ -59,12 +59,12 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int Scheduler::add_element_to_queue(const std::string& filename, long file_id,
+    int Scheduler::add_element_to_queue(int user, const std::string& filename, long file_id,
                                         const std::vector<std::string>& options, bool do_pre_hook)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, filename, file_id, options, do_pre_hook);
+        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, do_pre_hook);
         run_element();
         return index - 1;
     }
@@ -95,7 +95,7 @@ namespace MediaConch {
         if (!el)
             return;
 
-        core->set_file_analyzed_to_database(el->file_id);
+        core->set_file_analyzed_to_database(el->user, el->file_id);
 
         if (!MI)
         {
@@ -110,7 +110,7 @@ namespace MediaConch {
             return;
 
         CS.Enter();
-        core->register_reports_to_database(el->file_id, MI);
+        core->register_reports_to_database(el->user, el->file_id, MI);
         remove_element(el);
         CS.Leave();
         run_element();
@@ -124,24 +124,24 @@ namespace MediaConch {
         return size == 0;
     }
 
-    void Scheduler::get_elements(std::vector<std::string>& vec)
+    void Scheduler::get_elements(int user, std::vector<std::string>& vec)
     {
         CS.Enter();
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first)
+            if (it->first && it->first->user == user)
                 vec.push_back(it->first->filename);
         CS.Leave();
     }
 
-    bool Scheduler::element_is_finished(long file_id, double& percent_done)
+    bool Scheduler::element_is_finished(int user, long file_id, double& percent_done)
     {
         bool ret = true;
         CS.Enter();
 
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first->file_id == file_id)
+            if (it->first->file_id == file_id && it->first->user == user)
                 break;
 
         if (it != working.end())
@@ -151,7 +151,7 @@ namespace MediaConch {
             return false;
         }
 
-        if (queue->has_id(file_id) >= 0)
+        if (queue->has_id(user, file_id) >= 0)
         {
             percent_done = 0.0;
             ret = false;
@@ -161,10 +161,10 @@ namespace MediaConch {
         return ret;
     }
 
-    long Scheduler::element_exists(const std::string& filename)
+    long Scheduler::element_exists(int user, const std::string& filename)
     {
         CS.Enter();
-        long file_id = queue->has_element(filename);
+        long file_id = queue->has_element(user, filename);
         if (file_id >= 0)
         {
             CS.Leave();
@@ -173,7 +173,7 @@ namespace MediaConch {
 
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first->filename == filename)
+            if (it->first->filename == filename && user == it->first->user)
                 break;
 
         if (it != working.end())
@@ -199,7 +199,7 @@ namespace MediaConch {
         MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
 
         CS.Enter();
-        core->register_reports_to_database(el->file_id, report, report_kind, MI);
+        core->register_reports_to_database(el->user, el->file_id, report, report_kind, MI);
         remove_element(el);
         CS.Leave();
         run_element();
@@ -264,9 +264,9 @@ namespace MediaConch {
                     else
                         options.push_back(it->first);
                 }
-                long id = core->checker_analyze(new_file, old_id, time_passed, generated_log, generated_error_log, options, false);
+                long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log, generated_error_log, options, false);
                 if (id >= 0)
-                    core->file_update_generated_file(old_id, id);
+                    core->file_update_generated_file(el->user, old_id, id);
                 old_id = id;
             }
 

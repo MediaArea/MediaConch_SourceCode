@@ -825,7 +825,7 @@ int Policies::create_xslt_policy_from_file(int user, long file_id, std::string& 
     find_save_name(user, NULL, p->filename);
 
     std::string file;
-    core->checker_file_from_id(file_id, file);
+    core->checker_file_from_id(user, file_id, file);
     size_t name_pos = file.rfind("/");
     if (name_pos == std::string::npos)
         name_pos = 0;

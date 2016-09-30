@@ -93,6 +93,7 @@ void DatabaseReport::get_sql_query_for_update_report_table_v3(std::string& q)
     std::stringstream create;
     create << "CREATE TABLE IF NOT EXISTS MEDIACONCH_FILE ";
     create << "(ID INTEGER PRIMARY KEY ASC,";
+    create << " USER INT DEFAULT -1,";
     create << " FILENAME TEXT NOT NULL,";
     create << " FILE_LAST_MODIFICATION TEXT NOT NULL,";
 

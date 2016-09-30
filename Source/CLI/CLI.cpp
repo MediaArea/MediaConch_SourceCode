@@ -118,7 +118,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id = -1;
-            int ret = MCL.checker_analyze(files[i], registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(-1, files[i], registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
 
@@ -158,7 +158,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id;
-            int ret = MCL.checker_analyze(policy_reference_file, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(-1, policy_reference_file, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
             if ((ret = run_policy_reference_file(file_id)) != MediaConchLib::errorHttp_TRUE)
@@ -212,7 +212,7 @@ namespace MediaConch
     {
         for  (size_t i = 0; i < files.size(); ++i)
         {
-            long id = MCL.checker_id_from_filename(files[i]);
+            long id = MCL.checker_id_from_filename(-1, files[i]);
             if (id < 0)
             {
                 error = "File is not registered";
@@ -221,7 +221,7 @@ namespace MediaConch
 
             MediaConchLib::Checker_FileInfo info;
             int ret;
-            if ((ret = MCL.checker_file_information(id, info)) < 0)
+            if ((ret = MCL.checker_file_information(-1, id, info)) < 0)
                 return ret;
 
             std::string report;
@@ -389,7 +389,7 @@ namespace MediaConch
     int CLI::is_ready(long& file_id, MediaConchLib::report& report_kind)
     {
         MediaConchLib::Checker_StatusRes res;
-        int ret = MCL.checker_status(file_id, res);
+        int ret = MCL.checker_status(-1, file_id, res);
         report_kind = MediaConchLib::report_MediaConch;
 
         if (use_daemon && asynchronous)
@@ -397,7 +397,7 @@ namespace MediaConch
             if (ret >= 0 && !res.finished)
             {
                 std::string file;
-                MCL.checker_file_from_id(file_id, file);
+                MCL.checker_file_from_id(-1, file_id, file);
 
                 std::stringstream str;
                 double percent = res.percent ? *res.percent : (double)0;
@@ -423,7 +423,7 @@ namespace MediaConch
                 #else
                 usleep(500000);
                 #endif
-                ret = MCL.checker_status(file_id, res);
+                ret = MCL.checker_status(-1, file_id, res);
             }
 
             if (res.tool)
@@ -526,14 +526,14 @@ namespace MediaConch
 		if (info->generated_id >= 0)
         {
             std::string file;
-            MCL.checker_file_from_id(info->generated_id, file);
+            MCL.checker_file_from_id(-1, info->generated_id, file);
             ss << "generated file:         " << file << "\n";
         }
 
         if (info->source_id >= 0)
         {
             std::string file;
-            MCL.checker_file_from_id(info->source_id, file);
+            MCL.checker_file_from_id(-1, info->source_id, file);
             ss << "source file:            " << file << "\n";
             ss << "file generation time:   " << info->generated_time << " milliseconds\n";
             ss << "generated log:          " << info->generated_log << "\n";

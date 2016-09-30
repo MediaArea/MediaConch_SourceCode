@@ -107,12 +107,13 @@ Queue::~Queue()
     clear();
 }
 
-int Queue::add_element(QueuePriority priority, int id, const std::string& filename, long file_id,
+int Queue::add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
                        const std::vector<std::string>& options, bool do_pre_hook)
 {
     QueueElement *el = new QueueElement(scheduler);
 
     el->id = id;
+    el->user = user;
     el->filename = filename;
     el->file_id = file_id;
     el->do_pre_hook = do_pre_hook;
@@ -138,7 +139,7 @@ int Queue::add_element(QueuePriority priority, int id, const std::string& filena
     return 0;
 }
 
-long Queue::has_element(const std::string& filename)
+long Queue::has_element(int user, const std::string& filename)
 {
     std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
 
@@ -146,14 +147,14 @@ long Queue::has_element(const std::string& filename)
     {
         std::list<QueueElement*>::iterator it_l = it->second.begin();
         for (; it_l != it->second.end() ; ++it_l)
-            if ((*it_l)->filename == filename)
+            if ((*it_l)->filename == filename && (*it_l)->user == user)
                 return (*it_l)->file_id;
     }
 
     return -1;
 }
 
-int Queue::has_id(long file_id)
+int Queue::has_id(int user, long file_id)
 {
     std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
 
@@ -161,7 +162,7 @@ int Queue::has_id(long file_id)
     {
         std::list<QueueElement*>::iterator it_l = it->second.begin();
         for (; it_l != it->second.end() ; ++it_l)
-            if ((*it_l)->file_id == file_id)
+            if ((*it_l)->file_id == file_id && (*it_l)->user == user)
                 return 0;
     }
 
@@ -185,7 +186,7 @@ int Queue::remove_element(int id)
     return 0;
 }
 
-int Queue::remove_elements(const std::string& filename)
+int Queue::remove_elements(int user, const std::string& filename)
 {
     std::map<QueuePriority, std::list<QueueElement*> >::iterator it = queue.begin();
 
@@ -193,7 +194,7 @@ int Queue::remove_elements(const std::string& filename)
     {
         std::list<QueueElement*>::iterator it_l = it->second.begin();
         for (; it_l != it->second.end() ; ++it_l)
-            if ((*it_l)->filename == filename)
+            if ((*it_l)->filename == filename && (*it_l)->user == user)
             {
                 delete *it_l;
                 it_l = it->second.erase(it_l);

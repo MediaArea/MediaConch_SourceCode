@@ -14,6 +14,7 @@ It is used above an HTTP connection.
   * Checker_File_information
  * Update commands of the checker
   * Checker_Status_result: add more information
+ * Add user to all checker_* command
 
 #### Version 1.8
 
@@ -129,6 +130,7 @@ Parameters:
 * args:              Array of arguments
 
 - file:              String: Name of the file to analyze
+- user:              Integer: a unique id for the user
 - id:                Integer: a unique id for the request
 - force:             Boolean: force to analyze the file even if registered in database (introduced in v1.1)
 
@@ -155,6 +157,8 @@ URL: /$API_VERSION/checker_status
 ##### Request
 
 Parameters:
+
+- user:              Integer: a unique id for the user
 
 * List of:
 
@@ -186,6 +190,8 @@ URL: /$API_VERSION/checker_report
 ##### Request
 
 Parameters:
+
+- user:              Integer: a unique id for the user
 
 * args:              Array of arguments
 
@@ -221,7 +227,8 @@ URL: /$API_VERSION/checker_retry
 
 Parameters:
 
-* ids:              Array of id given by the Analyze command
+- user:              Integer: a unique id for the user
+- ids:               Array of id given by the Analyze command
 
 ##### Response
 
@@ -245,7 +252,8 @@ Parameters:
 
 * List of:
 
-- id:                Integer: id given by the Analyze command
+- user:              Integer: a unique id for the user
+- ids:               Array of integers: ids given by the Analyze command
 
 ##### Response
 
@@ -267,6 +275,8 @@ URL: /$API_VERSION/checker_list
 
 Parameters:
 
+- user:              Integer: a unique id for the user
+
 ##### Response
 
 Parameters:
@@ -285,6 +295,7 @@ URL: /$API_VERSION/checker_validate
 
 Parameters:
 
+- user:              Integer: a unique id for the user
 * args:              Array of arguments
 
 - id:                Integer: id given by the Analyze command
@@ -317,6 +328,7 @@ URL: /$API_VERSION/checker_file_from_id
 
 Parameters:
 
+- user:              Integer: a unique id for the user
 - id:                Integer: id given by the Analyze command
 
 ##### Response
@@ -334,6 +346,7 @@ URL: /$API_VERSION/checker_id_from_filename
 
 Parameters:
 
+- user:              Integer: a unique id for the user
 - filename:          String: Requested filename for id
 
 ##### Response
@@ -351,6 +364,7 @@ URL: /$API_VERSION/checker_file_information
 
 Parameters:
 
+- user:              Integer: a unique id for the user
 - id:                Integer: id given by the Analyze command
 
 ##### Response
@@ -376,6 +390,7 @@ URL: /$API_VERSION/default_values_for_type
 Parameters:
 
 * type:              String: name of the type wanted
+* field:             String: name of the field wanted
 
 ##### Response
 

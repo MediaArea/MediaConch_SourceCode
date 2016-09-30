@@ -81,15 +81,15 @@ int NoDatabaseReport::update_report_table()
 }
 
 //---------------------------------------------------------------------------
-long NoDatabaseReport::add_file(const std::string& filename, const std::string& file_last_modification,
-                                std::string&,
-                                long generated_id,
+long NoDatabaseReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
+                                std::string&, long generated_id,
                                 long source_id, size_t generated_time,
                                 const std::string& generated_log, const std::string& generated_error_log)
 {
     MC_File* f = new MC_File;
     f->filename = filename;
     f->file_last_modification = file_last_modification;
+    f->user = user;
 
     f->analyzed = false;
 
@@ -106,13 +106,12 @@ long NoDatabaseReport::add_file(const std::string& filename, const std::string& 
 }
 
 //---------------------------------------------------------------------------
-long NoDatabaseReport::update_file(long file_id, const std::string& file_last_modification,
-                                   std::string&,
-                                   long generated_id,
+long NoDatabaseReport::update_file(int user, long file_id, const std::string& file_last_modification,
+                                   std::string&, long generated_id,
                                    long source_id, size_t generated_time,
                                    const std::string& generated_log, const std::string& generated_error_log)
 {
-    if (file_id < 0 && file_id >= (long)files_saved.size())
+    if (file_id < 0 || file_id >= (long)files_saved.size() || files_saved[file_id]->user != user)
         return -1;
 
     MC_File* f = files_saved[file_id];
@@ -132,30 +131,33 @@ long NoDatabaseReport::update_file(long file_id, const std::string& file_last_mo
 }
 
 //---------------------------------------------------------------------------
-long NoDatabaseReport::get_file_id(const std::string& file, const std::string& file_last_modification)
+long NoDatabaseReport::get_file_id(int user, const std::string& file, const std::string& file_last_modification)
 {
     for (long id = 0; id < (long)files_saved.size(); ++id)
         if (files_saved[id] && file == files_saved[id]->filename &&
-            (!file_last_modification.size() || file_last_modification == files_saved[id]->file_last_modification))
+            (!file_last_modification.size() || file_last_modification == files_saved[id]->file_last_modification) &&
+            files_saved[id]->user == user)
             return id;
     return -1;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_file_name_from_id(long id, std::string& file)
+void NoDatabaseReport::get_file_name_from_id(int user, long id, std::string& file)
 {
-    if (id > 0 && id < (long)files_saved.size())
+    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+        files_saved[id]->user == user)
         file = files_saved[id]->filename;
     else
         file = std::string();
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_file_information_from_id(long id, std::string& filename, std::string& file_last_modification,
+void NoDatabaseReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
                                                     long& generated_id, long& source_id, size_t& generated_time,
                                                     std::string& generated_log, std::string& generated_error_log, bool& analyzed)
 {
-    if (id > 0 && id < (long)files_saved.size())
+    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+        files_saved[id]->user == user)
     {
         filename = files_saved[id]->filename;
         file_last_modification = files_saved[id]->file_last_modification;
@@ -180,18 +182,20 @@ void NoDatabaseReport::get_file_information_from_id(long id, std::string& filena
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabaseReport::file_is_analyzed(long id)
+bool NoDatabaseReport::file_is_analyzed(int user, long id)
 {
-    if (id > 0 && id < (long)files_saved.size() && files_saved[id])
+    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+        files_saved[id]->user == user)
         return files_saved[id]->analyzed;
 
     return false;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::update_file_generated_id(long source_id, long generated_id)
+int NoDatabaseReport::update_file_generated_id(int user, long source_id, long generated_id)
 {
-    if (source_id > 0 && source_id < (long)files_saved.size() && files_saved[source_id])
+    if (source_id > 0 && source_id < (long)files_saved.size() && files_saved[source_id] &&
+        files_saved[source_id]->user == user)
     {
         files_saved[source_id]->generated_id = generated_id;
         return 0;
@@ -200,9 +204,10 @@ int NoDatabaseReport::update_file_generated_id(long source_id, long generated_id
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::update_file_analyzed(long id, bool analyzed)
+int NoDatabaseReport::update_file_analyzed(int user, long id, bool analyzed)
 {
-    if (id > 0 && id < (long)files_saved.size() && files_saved[id])
+    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+        files_saved[id]->user == user)
     {
         files_saved[id]->analyzed = analyzed;
         return 0;
@@ -211,11 +216,12 @@ int NoDatabaseReport::update_file_analyzed(long id, bool analyzed)
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::save_report(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+int NoDatabaseReport::save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                   const std::string& report, MediaConchLib::compression c,
                                   int mil_version)
 {
-    if (file_id < 0)
+    if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
+        files_saved[file_id]->user != user)
         return -1;
 
     MC_Report* r = new MC_Report;
@@ -244,10 +250,11 @@ int NoDatabaseReport::save_report(long file_id, MediaConchLib::report reportKind
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_report(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+void NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                   std::string& report, MediaConchLib::compression& c)
 {
-    if (file_id < 0)
+    if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
+        files_saved[file_id]->user != user)
         return;
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
@@ -263,9 +270,10 @@ void NoDatabaseReport::get_report(long file_id, MediaConchLib::report reportKind
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::remove_report(long file_id)
+int NoDatabaseReport::remove_report(int user, long file_id)
 {
-    if (file_id < 0)
+    if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
+        files_saved[file_id]->user != user)
         return -1;
 
     std::map<long, std::vector<MC_Report*> >::iterator it = reports_saved.find(file_id);
@@ -278,9 +286,10 @@ int NoDatabaseReport::remove_report(long file_id)
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabaseReport::report_is_registered(long file_id, MediaConchLib::report reportKind, MediaConchLib::format format)
+bool NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format)
 {
-    if (file_id < 0)
+    if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
+        files_saved[file_id]->user != user)
         return false;
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
@@ -293,9 +302,10 @@ bool NoDatabaseReport::report_is_registered(long file_id, MediaConchLib::report 
     return false;
 }
 
-int NoDatabaseReport::version_registered(long file_id)
+int NoDatabaseReport::version_registered(int user, long file_id)
 {
-    if (file_id < 0)
+    if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
+        files_saved[file_id]->user != user)
         return -1;
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
@@ -308,16 +318,24 @@ int NoDatabaseReport::version_registered(long file_id)
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_elements(std::vector<std::string>& vec)
+void NoDatabaseReport::get_elements(int user, std::vector<std::string>& vec)
 {
     for (size_t i = 0; i < files_saved.size(); ++i)
+    {
+        if (!files_saved[i] || files_saved[i]->user != user)
+            continue;
+
         vec.push_back(files_saved[i]->filename);
+    }
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_element_report_kind(long file_id, MediaConchLib::report& report_kind)
+void NoDatabaseReport::get_element_report_kind(int user, long file_id, MediaConchLib::report& report_kind)
 {
     report_kind = MediaConchLib::report_MediaConch;
+    if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
+        files_saved[file_id]->user != user)
+        return;
 
     if (file_id >= 0 && reports_saved[file_id].size())
     {

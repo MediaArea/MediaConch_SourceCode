@@ -237,17 +237,20 @@ public:
     int add_option(const std::string& option, std::string& report);
 
     // Analyze
-    int  checker_analyze(const std::vector<std::string>& files, std::vector<long>& files_id, bool force_analyze = false);
-    int  checker_analyze(const std::string& file, bool& registered, long& file_id, bool force_analyze = false);
+    int  checker_analyze(int user, const std::vector<std::string>& files,
+                         std::vector<long>& files_id, bool force_analyze = false);
+    int  checker_analyze(int user, const std::string& file, bool& registered,
+                         long& file_id, bool force_analyze = false);
 
     // Status
-    int  checker_status(const std::vector<long>& files_id, std::vector<Checker_StatusRes>& res);
-    int  checker_status(long file_id, Checker_StatusRes& res);
+    int  checker_status(int user, const std::vector<long>& files_id,
+                        std::vector<Checker_StatusRes>& res);
+    int  checker_status(int user, long file_id, Checker_StatusRes& res);
 
-    void checker_list(std::vector<std::string>& vec);
-    void checker_file_from_id(long id, std::string& filename);
-    long checker_id_from_filename(const std::string& filename);
-    int  checker_file_information(long id, Checker_FileInfo& info);
+    void checker_list(int user, std::vector<std::string>& vec);
+    void checker_file_from_id(int user, long id, std::string& filename);
+    long checker_id_from_filename(int user, const std::string& filename);
+    int  checker_file_information(int user, long id, Checker_FileInfo& info);
 
     // Output
     int  checker_get_report(int user, const std::bitset<report_Max>& Report, format f,
@@ -265,7 +268,7 @@ public:
                          std::vector<Checker_ValidateRes*>& result);
 
     //Clear
-    int remove_report(const std::vector<long>& files);
+    int remove_report(int user, const std::vector<long>& files);
 
     // Implementation checker arguments
     void               set_implementation_schema_file(const std::string& file);

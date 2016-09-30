@@ -211,7 +211,7 @@ std::string RESTAPI::Checker_Analyze_Arg::to_str() const
 {
     std::stringstream out;
 
-    out << "[file: '" << file << "', id: '" << id << "', force: '";
+    out << "[file:\"" << file << "\",user:" << user << ",id:" << id << ", force:";
     if (!has_force_analyze || !force_analyze)
         out << "false";
     else
@@ -239,14 +239,15 @@ std::string RESTAPI::Checker_Status_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[ids: [";
+    out << "[\"user\":" << user;
+    out << ",\"ids\":[";
     for (size_t i = 0; i < ids.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ids[i];
     }
-    out << "] ]";
+    out << "]]";
     return out.str();
 }
 
@@ -256,33 +257,33 @@ std::string RESTAPI::Checker_Report_Req::to_str() const
     std::stringstream out;
 
     out << "{\"user\":" << user;
-    out << ",\"ids\": [";
+    out << ",\"ids\":[";
     for (size_t i = 0; i < ids.size(); ++i)
     {
         if (i)
             out << ",";
         out << ids[i];
     }
-    out << "],reports:[";
+    out << "],\"reports\":[";
     for (size_t i = 0; i < reports.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         RESTAPI api;
         out << api.get_Report_string(reports[i]);
     }
-    out << "],policies_ids_size:[" << policies_ids.size();
-    out << "],policies_contents_size:[" << policies_contents.size();
-    out << "],display_name:" << display_name;
-    out << ",display_content_length:" << display_content.size();
-    out << ",options:[";
+    out << "],\"policies_ids_size\":" << policies_ids.size();
+    out << ",\"policies_contents_size\":" << policies_contents.size();
+    out << ",\"display_name\":" << display_name;
+    out << ",\"display_content_length\":" << display_content.size();
+    out << ",\"options\":[";
 
     std::map<std::string, std::string>::const_iterator it = options.begin();
     for (; it != options.end(); ++it)
     {
         if (it != options.begin())
-            out << ", ";
-        out << "{" << it->first << ":" << it->second << "}";
+            out << ",";
+        out << "{\"" << it->first << "\":\"" << it->second << "\"}";
     }
     out << "]}";
     return out.str();
@@ -293,14 +294,15 @@ std::string RESTAPI::Checker_Retry_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[ids: [";
+    out << "{\"user\":" << user;
+    out << ",\"ids\":[";
     for (size_t i = 0; i < ids.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ids[i];
     }
-    out << "] ]";
+    out << "]}";
     return out.str();
 }
 
@@ -309,14 +311,24 @@ std::string RESTAPI::Checker_Clear_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[ids: [";
+    out << "{\"user\":" << user;
+    out << ",\"ids\":[";
     for (size_t i = 0; i < ids.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ids[i];
     }
-    out << "] ]";
+    out << "]}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Checker_List_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\":" << user << "}";
     return out.str();
 }
 
@@ -326,7 +338,7 @@ std::string RESTAPI::Checker_Validate_Req::to_str() const
     std::stringstream out;
 
     out << "{\"user\":" << user;
-    out << ",ids:[";
+    out << ",\"ids\":[";
     for (size_t i = 0; i < ids.size(); ++i)
     {
         if (i)
@@ -334,17 +346,17 @@ std::string RESTAPI::Checker_Validate_Req::to_str() const
         out << ids[i];
     }
     RESTAPI api;
-    out << "],report: " << api.get_Report_string(report);
-    out << ",policies_ids_size:[" << policies_ids.size();
-    out << "],policies_contents_size:[" << policies_contents.size();
-    out << ",options:[";
+    out << "],\"report\":" << api.get_Report_string(report);
+    out << ",\"policies_ids_size\":" << policies_ids.size();
+    out << ",\"policies_contents_size\":" << policies_contents.size();
+    out << ",\"options\":[";
 
     std::map<std::string, std::string>::const_iterator it = options.begin();
     for (; it != options.end(); ++it)
     {
         if (it != options.begin())
-            out << ", ";
-        out << "{" << it->first << ":" << it->second << "}";
+            out << ",";
+        out << "{\"" << it->first << "\":\"" << it->second << "\"}";
     }
     out << "]}";
     return out.str();
@@ -355,7 +367,7 @@ std::string RESTAPI::Checker_File_From_Id_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[id: '" << id << "']";
+    out << "{\"user\":" << user << ",\"id\":" << id << "}";
     return out.str();
 }
 
@@ -364,7 +376,7 @@ std::string RESTAPI::Checker_Id_From_Filename_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[filename: \"" << filename << "\"]";
+    out << "{\"user\":" << user << ",\"filename\":\"" << filename << "\"}";
     return out.str();
 }
 
@@ -373,7 +385,7 @@ std::string RESTAPI::Checker_File_Information_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "[id: '" << id << "']";
+    out << "{\"user\":" << user << ",\"id\":" << id << "}";
     return out.str();
 }
 
@@ -382,8 +394,8 @@ std::string RESTAPI::Default_Values_For_Type_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{type: '" << type << "'";
-    out << ", field: '" << field << "'}";
+    out << "{\"type\":\"" << type << "\"";
+    out << ",\"field\":\"" << field << "\"}";
     return out.str();
 }
 
@@ -1297,14 +1309,9 @@ int RESTAPI::serialize_status_req(Checker_Status_Req& req, std::string& data)
     //URI
     std::stringstream ss;
 
-    if (req.ids.size() > 0)
-        ss << "?";
+    ss << "?user=" << req.user;
     for (size_t i = 0; i < req.ids.size(); ++i)
-    {
-        if (i)
-            ss << "&";
-        ss << "id=" << req.ids[i];
-    }
+        ss << "&id=" << req.ids[i];
     data = ss.str();
 
     return 0;
@@ -1369,9 +1376,14 @@ int RESTAPI::serialize_report_req(Checker_Report_Req& req, std::string& data)
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_retry_req(Checker_Retry_Req& req, std::string& data)
 {
-    Container::Value v, child;
+    Container::Value v, child, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
+
     child.obj["ids"] = serialize_ids(req.ids);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -1392,23 +1404,22 @@ int RESTAPI::serialize_clear_req(Checker_Clear_Req& req, std::string& data)
     //URI
     std::stringstream ss;
 
-    if (req.ids.size() > 0)
-        ss << "?";
+    ss << "?user=" << req.user;
     for (size_t i = 0; i < req.ids.size(); ++i)
-    {
-        if (i)
-            ss << "&";
-        ss << "id=" << req.ids[i];
-    }
+        ss << "&id=" << req.ids[i];
     data = ss.str();
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_list_req(Checker_List_Req&, std::string& data)
+int RESTAPI::serialize_list_req(Checker_List_Req& req, std::string& data)
 {
-    data = std::string();
+    //URI
+    std::stringstream ss;
+
+    ss << "?user=" << req.user;
+    data = ss.str();
     return 0;
 }
 
@@ -1469,13 +1480,16 @@ int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::string& data)
 {
-    Container::Value v, child, id;
+    Container::Value v, child, id, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
+
     id.type = Container::Value::CONTAINER_TYPE_INTEGER;
     id.l = req.id;
-
     child.obj["id"] = id;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -1493,13 +1507,16 @@ int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::stri
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string& data)
 {
-    Container::Value v, child, filename;
+    Container::Value v, child, filename, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
+
     filename.type = Container::Value::CONTAINER_TYPE_STRING;
     filename.s = req.filename;
-
     child.obj["filename"] = filename;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -1517,13 +1534,16 @@ int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, s
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_file_information_req(Checker_File_Information_Req& req, std::string& data)
 {
-    Container::Value v, child, id;
+    Container::Value v, child, id, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
+
     id.type = Container::Value::CONTAINER_TYPE_INTEGER;
     id.l = req.id;
-
     child.obj["id"] = id;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2924,17 +2944,12 @@ RESTAPI::Checker_Status_Req *RESTAPI::parse_status_req(const std::string& data)
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Checker_Status_Req *req = new Checker_Status_Req;
 
-    Container::Value *ids;
-    ids = model->get_value_by_key(*child, "ids");
-
+    Container::Value *ids = model->get_value_by_key(*child, "ids");
     if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
-    {
-        delete req;
         return NULL;
-    }
 
+    Checker_Status_Req *req = new Checker_Status_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
     {
         Container::Value *id = &ids->array[i];
@@ -2946,6 +2961,11 @@ RESTAPI::Checker_Status_Req *RESTAPI::parse_status_req(const std::string& data)
         }
         req->ids.push_back(id->l);
     }
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -3067,6 +3087,11 @@ RESTAPI::Checker_Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
         }
         req->ids.push_back(id->l);
     }
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -3103,6 +3128,10 @@ RESTAPI::Checker_Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
         }
         req->ids.push_back(id->l);
     }
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
     return req;
 }
 
@@ -3120,7 +3149,13 @@ RESTAPI::Checker_List_Req *RESTAPI::parse_list_req(const std::string& data)
     child = model->get_value_by_key(v, "CHECKER_LIST");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
+
     Checker_List_Req *req = new Checker_List_Req;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -3227,6 +3262,11 @@ RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::st
 
     Checker_File_From_Id_Req *req = new Checker_File_From_Id_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -3252,6 +3292,11 @@ RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_id_from_filename_req(const
 
     Checker_Id_From_Filename_Req *req = new Checker_Id_From_Filename_Req;
     req->filename = filename->s;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -3277,6 +3322,11 @@ RESTAPI::Checker_File_Information_Req *RESTAPI::parse_file_information_req(const
 
     Checker_File_Information_Req *req = new Checker_File_Information_Req;
     req->id = id->l;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
     return req;
 }
 
@@ -4057,27 +4107,42 @@ RESTAPI::Checker_Status_Req *RESTAPI::parse_uri_status_req(const std::string& ur
 {
     Checker_Status_Req *req = new Checker_Status_Req;
 
-    size_t end, start = 0;
-    while (1)
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
     {
-        end = uri.find("=", start);
-        if (end == std::string::npos || uri.substr(start, end - start) != "id")
-            goto finish;
-        start = end + 1;
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-        end = uri.find("&", start);
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos - start);
 
-        std::string id = uri.substr(start, end - start);
-        if (!id.length())
-            goto finish;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
-        req->ids.push_back(strtoll(id.c_str(), NULL, 10));
-        if (end == std::string::npos)
-            goto finish;
-        start = end + 1;
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->ids.push_back(strtoll(val.c_str(), NULL, 10));
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
     }
 
-finish:
     return req;
 }
 
@@ -4101,34 +4166,79 @@ RESTAPI::Checker_Retry_Req *RESTAPI::parse_uri_retry_req(const std::string&)
 RESTAPI::Checker_Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
 {
     Checker_Clear_Req *req = new Checker_Clear_Req;
-    size_t end, start = 0;
-    while (1)
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
     {
-        end = uri.find("=", start);
-        if (end == std::string::npos || uri.substr(start, end - start) != "id")
-            goto finish;
-        start = end + 1;
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-        end = uri.find("&", start);
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos - start);
 
-        std::string id = uri.substr(start, end - start);
-        if (!id.length())
-            goto finish;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
-        req->ids.push_back(strtoll(id.c_str(), NULL, 10));
-        if (end == std::string::npos)
-            goto finish;
-        start = end + 1;
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->ids.push_back(strtoll(val.c_str(), NULL, 10));
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
     }
 
-finish:
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_List_Req *RESTAPI::parse_uri_list_req(const std::string&)
+RESTAPI::Checker_List_Req *RESTAPI::parse_uri_list_req(const std::string& uri)
 {
     Checker_List_Req *req = new Checker_List_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos - start);
+
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
+
+        if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else
+            start = std::string::npos;
+    }
     return req;
 }
 
@@ -4165,30 +4275,41 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type
 {
     Default_Values_For_Type_Req *req = new Default_Values_For_Type_Req;
 
-    size_t end, start = 0;
-    end = uri.find("=", start);
-    if (end == std::string::npos || uri.substr(start, end - start) != "type")
-        return req;
-    start = end + 1;
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
 
-    end = uri.find("&", start);
-    std::string type = uri.substr(start, end - start);
-    if (!type.length())
-        return req;
-    start = end + 1;
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos - start);
 
-    end = uri.find("=", start);
-    if (end == std::string::npos || uri.substr(start, end - start) != "field")
-        return req;
-    start = end + 1;
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
 
-    end = uri.find("&", start);
-    std::string field = uri.substr(start, end - start);
-    if (!field.length())
-        return req;
+        if (substr == "type")
+        {
+            if (!val.length())
+                continue;
 
-    req->type = type;
-    req->field = field;
+            req->type = val;
+        }
+        else if (substr == "field")
+        {
+            if (!val.length())
+                continue;
+
+            req->field = val;
+        }
+        else
+            start = std::string::npos;
+    }
 
     return req;
 }
@@ -6397,12 +6518,16 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        Container::Value arg, file, id, force;
+        Container::Value arg, file, user, id, force;
         arg.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         file.type = Container::Value::CONTAINER_TYPE_STRING;
         file.s = args[i].file;
         arg.obj["file"] = file;
+
+        user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        user.l = args[i].user;
+        arg.obj["user"] = user;
 
         id.type = Container::Value::CONTAINER_TYPE_INTEGER;
         id.l = args[i].id;
@@ -6860,9 +6985,10 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *file, *id, *force;
+        Container::Value *file, *user, *id, *force;
 
         file = model->get_value_by_key(*obj, "file");
+        user = model->get_value_by_key(*obj, "user");
         id = model->get_value_by_key(*obj, "id");
         force = model->get_value_by_key(*obj, "force");
 
@@ -6873,6 +6999,9 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
         Checker_Analyze_Arg arg;
         arg.file = file->s;
         arg.id = id->l;
+
+        if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            arg.user = user->l;
 
         if (force && force->type == Container::Value::CONTAINER_TYPE_BOOL)
         {

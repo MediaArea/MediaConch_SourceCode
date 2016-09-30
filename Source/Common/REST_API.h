@@ -135,9 +135,11 @@ public:
     // Analyze
     struct Checker_Analyze_Arg
     {
-        Checker_Analyze_Arg() : has_force_analyze(false) {}
+        Checker_Analyze_Arg() : user(-1), has_force_analyze(false) {}
+
         std::string             to_str() const;
         std::string             file;
+        int                     user;
         int                     id;
         bool                    has_force_analyze;
         bool                    force_analyze;
@@ -175,6 +177,9 @@ public:
     // Status
     struct Checker_Status_Req
     {
+        Checker_Status_Req() :  user(-1) {}
+
+        int                     user;
         std::vector<int>        ids;
         std::string             to_str() const;
     };
@@ -212,6 +217,7 @@ public:
     struct Checker_Report_Req
     {
         Checker_Report_Req() :             user(-1) {}
+
         int                                user;
         std::vector<int>                   ids;
         std::vector<Report>                reports;
@@ -250,6 +256,9 @@ public:
     // Retry
     struct Checker_Retry_Req
     {
+        Checker_Retry_Req() :   user(-1) {}
+
+        int                     user;
         std::vector<int>        ids;
         std::string             to_str() const;
     };
@@ -272,6 +281,9 @@ public:
     // Clear
     struct Checker_Clear_Req
     {
+        Checker_Clear_Req() :   user(-1) {}
+
+        int                     user;
         std::vector<int>        ids;
         std::string             to_str() const;
     };
@@ -294,6 +306,10 @@ public:
     // List
     struct Checker_List_Req
     {
+        Checker_List_Req() :   user(-1) {}
+
+        int                    user;
+        std::string            to_str() const;
     };
 
     struct Checker_List_File
@@ -313,6 +329,7 @@ public:
     struct Checker_Validate_Req
     {
         Checker_Validate_Req() :           user(-1) {}
+
         int                                user;
         std::vector<int>                   ids;
         Report                             report;
@@ -347,6 +364,9 @@ public:
 
     struct Checker_File_From_Id_Req
     {
+        Checker_File_From_Id_Req() : user(-1), id(-1) {}
+
+        int          user;
         long         id;
         std::string  to_str() const;
     };
@@ -359,6 +379,9 @@ public:
 
     struct Checker_Id_From_Filename_Req
     {
+        Checker_Id_From_Filename_Req() : user(-1) {}
+
+        int          user;
         std::string  filename;
         std::string  to_str() const;
     };
@@ -371,6 +394,9 @@ public:
 
     struct Checker_File_Information_Req
     {
+        Checker_File_Information_Req() : user(-1), id(-1) {}
+
+        int          user;
         long         id;
         std::string  to_str() const;
     };
