@@ -214,13 +214,13 @@ namespace MediaConch {
             working.erase(it);
     }
 
-    int Scheduler::execute_pre_hook_plugins(QueueElement *el, std::string& err)
+    int Scheduler::execute_pre_hook_plugins(QueueElement *el, std::string& err, bool& analyze_file)
     {
         // Before registering, check the format
         std::vector<Plugin*> plugins = core->get_pre_hook_plugins();
-        bool                 analyze_file = true;
         std::string          new_file = el->filename;
         long                 old_id = el->file_id;
+        int                  ret = 0;
 
         for (size_t i = 0; i < plugins.size(); ++i)
         {
@@ -236,8 +236,7 @@ namespace MediaConch {
             gettimeofday(&time_before, NULL);
 #endif
 
-            if (plugins[i]->run(err) < 0)
-                return -1;
+            ret = plugins[i]->run(err);
 
 #if defined(_WIN32) || defined(WIN32)
             unsigned long time_after = GetTickCount();
@@ -249,7 +248,7 @@ namespace MediaConch {
             size_t time_passed = (time_after.tv_sec - time_before.tv_sec) * 1000 + (time_after.tv_usec - time_before.tv_usec) / 1000;
 #endif
 
-            if (((PluginPreHook*)plugins[i])->is_creating_file())
+            if (ret == 0 && ((PluginPreHook*)plugins[i])->is_creating_file())
             {
                 std::string generated_log = ((PluginPreHook*)plugins[i])->get_report();
                 std::string generated_error_log = ((PluginPreHook*)plugins[i])->get_report_err();
@@ -269,18 +268,21 @@ namespace MediaConch {
                     core->file_update_generated_file(el->user, old_id, id);
                 old_id = id;
             }
+            else if (ret)
+            {
+                std::string error_log = ((PluginPreHook*)plugins[i])->get_report_err();
+                core->update_file_error(el->user, old_id, true, error_log);
+                return ret;
+            }
 
             if (!((PluginPreHook*)plugins[i])->analyzing_source())
                 analyze_file = false;
         }
 
         if (!analyze_file)
-        {
             remove_element(el);
-            return 1;
-        }
 
-        return analyze_file ? 0 : 1;
+        return ret;
     }
 
 }

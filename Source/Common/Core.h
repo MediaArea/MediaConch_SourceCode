@@ -70,6 +70,7 @@ public:
                                 const std::string generated_log, const std::string generated_error_log,
                                 const std::vector<std::string>& options, bool pre_hook=true);
     int         file_update_generated_file(int user, long src_id, long generated_id);
+    int         update_file_error(int user, long id, bool has_error, const std::string& error_log);
 
     bool        checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res);
     int         remove_report(int user, const std::vector<long>& files);

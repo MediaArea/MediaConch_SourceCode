@@ -186,11 +186,13 @@ public:
 
     struct Checker_Status_Ok
     {
-        Checker_Status_Ok() : finished(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
+        Checker_Status_Ok() : finished(false), has_error(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
         ~Checker_Status_Ok();
 
         long                    id;
         bool                    finished;
+        bool                    has_error;
+        std::string             error_log;
         double                  *percent;
         Report                  *tool;
         long                    generated_id;
@@ -403,7 +405,7 @@ public:
 
     struct Checker_File_Information_Res
     {
-        Checker_File_Information_Res() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false) {}
+        Checker_File_Information_Res() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false), has_error(false) {}
         std::string  filename;
         std::string  file_last_modification;
         long         generated_id;
@@ -412,6 +414,8 @@ public:
         std::string  generated_log;
         std::string  generated_error_log;
         bool         analyzed;
+        bool         has_error;
+        std::string  error_log;
         std::string  to_str() const;
     };
 

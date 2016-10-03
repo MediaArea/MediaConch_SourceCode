@@ -374,6 +374,16 @@ int Core::file_update_generated_file(int user, long src_id, long generated_id)
 }
 
 //---------------------------------------------------------------------------
+int Core::update_file_error(int user, long id, bool has_error, const std::string& error_log)
+{
+    db_mutex.Enter();
+    int ret = get_db()->update_file_error(user, id, has_error, error_log);
+    db_mutex.Leave();
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
 bool Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res)
 {
     double percent_done = 0.0;
@@ -396,7 +406,7 @@ bool Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusR
         db_mutex.Enter();
         get_db()->get_file_information_from_id(user, file_id, filename, file_time,
                                                res.generated_id, res.source_id, generated_time,
-                                               generated_log, generated_error_log, is_finished);
+                                               generated_log, generated_error_log, is_finished, res.has_error, res.error_log);
         if (is_finished)
             get_db()->get_element_report_kind(user, file_id, (MediaConchLib::report&)*res.tool);
         db_mutex.Leave();
@@ -436,7 +446,7 @@ int Core::checker_file_information(int user, long id, MediaConchLib::Checker_Fil
     db_mutex.Enter();
     get_db()->get_file_information_from_id(user, id, info.filename, info.file_last_modification, info.generated_id,
                                            info.source_id, info.generated_time, info.generated_log,
-                                           info.generated_error_log, info.analyzed);
+                                           info.generated_error_log, info.analyzed, info.has_error, info.error_log);
     db_mutex.Leave();
     return 0;
 }

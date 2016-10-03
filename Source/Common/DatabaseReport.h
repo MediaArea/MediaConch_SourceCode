@@ -56,10 +56,11 @@ public:
     virtual void get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
                                               long& generated_id, long& source_id, size_t& generated_time,
                                               std::string& generated_log, std::string& generated_error_log,
-                                              bool& analyzed) = 0;
+                                              bool& analyzed, bool& has_error, std::string& error_log) = 0;
     virtual bool file_is_analyzed(int user, long id) = 0;
     virtual int  update_file_generated_id(int user, long source_id, long generated_id) = 0;
     virtual int  update_file_analyzed(int user, long id, bool analyzed=true) = 0;
+    virtual int  update_file_error(int user, long id, bool has_error=true, const std::string& error_log="") = 0;
 
     // Report
     virtual int save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,

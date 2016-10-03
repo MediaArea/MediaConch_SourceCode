@@ -682,6 +682,10 @@ std::string RESTAPI::Checker_Status_Ok::to_str() const
 
     out << "{\"id\": " << id;
     out << ", \"finished\": " << std::boolalpha << finished;
+    out << ", \"has_error\": " << std::boolalpha << has_error;
+
+    if (finished && has_error)
+    out << ", \"error_log\": " << error_log;
 
     if (!finished && percent)
         out << ", \"done\": " << *percent;
@@ -934,6 +938,8 @@ std::string RESTAPI::Checker_File_Information_Res::to_str() const
     out << ",\"generated_log\":\"" << generated_log << "\"";
     out << ",\"generated_error_log\":\"" << generated_error_log << "\"";
     out << ",\"analyzed\":" << analyzed;
+    out << ",\"has_error\":" << has_error;
+    out << ",\"error_log\":\"" << error_log << "\"";
     out << "]";
 
     return out.str();
@@ -2242,7 +2248,7 @@ int RESTAPI::serialize_id_from_filename_res(Checker_Id_From_Filename_Res& res, s
 int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, std::string& data)
 {
     Container::Value v, child, filename, file_last_modification, generated_id, source_id, generated_time,
-        generated_log, generated_error_log, analyzed;
+        generated_log, generated_error_log, analyzed, has_error, error_log;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -2277,6 +2283,17 @@ int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, s
     analyzed.type = Container::Value::CONTAINER_TYPE_BOOL;
     analyzed.b = res.analyzed;
     child.obj["analyzed"] = analyzed;
+
+    has_error.type = Container::Value::CONTAINER_TYPE_BOOL;
+    has_error.b = res.has_error;
+    child.obj["has_error"] = has_error;
+
+    if (res.has_error)
+    {
+        error_log.type = Container::Value::CONTAINER_TYPE_STRING;
+        error_log.s = res.error_log;
+        child.obj["error_log"] = error_log;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_FILE_INFORMATION_RESULT"] = child;
@@ -5758,6 +5775,17 @@ RESTAPI::Checker_File_Information_Res *RESTAPI::parse_file_information_res(const
     if (analyzed && analyzed->type == Container::Value::CONTAINER_TYPE_BOOL)
         res->analyzed = analyzed->b;
 
+    Container::Value *has_error = model->get_value_by_key(*child, "has_error");
+    if (has_error && has_error->type == Container::Value::CONTAINER_TYPE_BOOL)
+        res->has_error = has_error->b;
+
+    if (res->has_error)
+    {
+        Container::Value *error_log = model->get_value_by_key(*child, "error_log");
+        if (error_log && error_log->type == Container::Value::CONTAINER_TYPE_STRING)
+            res->error_log = error_log->s;
+    }
+
     return res;
 }
 
@@ -6705,7 +6733,7 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Checker_Status_Ok*>& 
         if (!array[i])
             continue;
 
-        Container::Value v, id, finished, done, tool, generated_id, source_id;
+        Container::Value v, id, finished, has_error, error_log, done, tool, generated_id, source_id;
 
         v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -6716,6 +6744,17 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Checker_Status_Ok*>& 
         finished.type = Container::Value::CONTAINER_TYPE_BOOL;
         finished.b = array[i]->finished;
         v.obj["finished"] = finished;
+
+        if (array[i]->finished && array[i]->has_error)
+        {
+            has_error.type = Container::Value::CONTAINER_TYPE_BOOL;
+            has_error.b = array[i]->has_error;
+            v.obj["has_error"] = has_error;
+
+            error_log.type = Container::Value::CONTAINER_TYPE_STRING;
+            error_log.s = array[i]->error_log;
+            v.obj["error_log"] = error_log;
+        }
 
         if (!array[i]->finished && array[i]->percent)
         {
@@ -7102,10 +7141,12 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *id, *finished, *done, *tool, *generated_id, *source_id;
+        Container::Value *id, *finished, *has_error, *error_log, *done, *tool, *generated_id, *source_id;
 
         id = model->get_value_by_key(*obj, "id");
         finished = model->get_value_by_key(*obj, "finished");
+        has_error = model->get_value_by_key(*obj, "has_error");
+        error_log = model->get_value_by_key(*obj, "error_log");
         done = model->get_value_by_key(*obj, "done");
         tool = model->get_value_by_key(*obj, "tool");
         generated_id = model->get_value_by_key(*obj, "generated_id");
@@ -7139,6 +7180,13 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*
         {
             ok->tool = new Report;
             *ok->tool = (Report)tool->l;
+        }
+
+        if (ok->finished && has_error && has_error->type == Container::Value::CONTAINER_TYPE_BOOL)
+        {
+            ok->has_error = has_error->b;
+            if (ok->has_error && error_log && error_log->type == Container::Value::CONTAINER_TYPE_STRING)
+                ok->error_log = error_log->s;
         }
 
         if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_INTEGER)

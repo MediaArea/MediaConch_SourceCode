@@ -99,6 +99,9 @@ void DatabaseReport::get_sql_query_for_update_report_table_v3(std::string& q)
 
     create << " ANALYZED INT DEFAULT 0,";
 
+    create << " HAS_ERROR INT DEFAULT 0,";
+    create << " ERROR_LOG TEXT,";
+
     create << " GENERATED_ID INT DEFAULT -1,";
 
     create << " SOURCE_ID INT DEFAULT -1,";

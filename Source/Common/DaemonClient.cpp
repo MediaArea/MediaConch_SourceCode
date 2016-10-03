@@ -236,6 +236,8 @@ int DaemonClient::checker_file_information(int user, long id, MediaConchLib::Che
     info.generated_log = res->generated_log;
     info.generated_error_log = res->generated_error_log;
     info.analyzed = res->analyzed;
+    info.has_error = res->has_error;
+    info.error_log = res->error_log;
 
     delete res;
     return MediaConchLib::errorHttp_NONE;
@@ -393,6 +395,12 @@ int DaemonClient::checker_status(int user, long file_id, MediaConchLib::Checker_
 
     if (ok->source_id >= 0)
         st_res.source_id = ok->source_id;
+
+    if (ok->has_error)
+    {
+        st_res.has_error = true;
+        st_res.error_log = ok->error_log;
+    }
 
     if (!ok->finished)
     {

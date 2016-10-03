@@ -520,6 +520,9 @@ namespace MediaConch
 
             ok->id = id;
             ok->finished = st_res.finished;
+            ok->has_error = st_res.has_error;
+            if (ok->has_error)
+                ok->error_log = st_res.error_log;
 
             if (st_res.tool)
             {
@@ -899,6 +902,8 @@ namespace MediaConch
         res.generated_time = info.generated_time;
         res.generated_log = info.generated_log;
         res.generated_error_log = info.generated_error_log;
+        res.has_error = info.has_error;
+        res.error_log = info.error_log;
 
         std::clog << d->get_date() << "Daemon send checker_file_information result: " << res.to_str() << std::endl;
         return 0;

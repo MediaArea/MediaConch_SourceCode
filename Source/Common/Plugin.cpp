@@ -114,6 +114,7 @@ namespace MediaConch {
     {
         PROCESS_INFORMATION piProcInfo = { 0 };
         STARTUPINFO siStartInfo = { 0 };
+        int val_ret = -1;
 
         siStartInfo.cb = sizeof(STARTUPINFO);
         siStartInfo.hStdError = handler_err_wr;
@@ -128,18 +129,24 @@ namespace MediaConch {
             buff_cmd[i] = wcmd[i];
         buff_cmd[i] = 0;
 
-        BOOL ret = CreateProcess(NULL, buff_cmd, NULL, NULL, TRUE, 0, NULL, NULL, &siStartInfo, &piProcInfo);
+        BOOL ret = CreateProcess(NULL, buff_cmd, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &siStartInfo, &piProcInfo);
 
         if (!ret)
         {
             error = "cannot execute CreateProcess";
-            return -1;
+            return val_ret;
         }
+
+        WaitForSingleObject(piProcInfo.hProcess, INFINITE);
+
+        DWORD exit_code = NULL;
+        GetExitCodeProcess(piProcInfo.hProcess, &exit_code);
+        val_ret = (int)exit_code;
 
         CloseHandle(piProcInfo.hProcess);
         CloseHandle(piProcInfo.hThread);
 
-        return 0;
+        return val_ret;
     }
 
     int Plugin::read_the_output(HANDLE handler_out_wr, HANDLE handler_out_rd, bool is_out)
@@ -201,6 +208,8 @@ namespace MediaConch {
             return -1;
         }
 
+        int ret = 0;
+
         if (pid == (pid_t)0)
         {
             close(pipe_out_fd[0]);
@@ -227,7 +236,13 @@ namespace MediaConch {
             close(pipe_out_fd[1]);
             close(pipe_err_fd[1]);
 
-            waitpid(pid, NULL, 0);
+            int wstatus;
+            waitpid(pid, &wstatus, 0);
+
+            if (WIFEXITED(wstatus))
+                ret = WEXITSTATUS(wstatus);
+            else if (WIFSIGNALED(wstatus))
+                ret = WTERMSIG(wstatus);
 
             int rd = 0;
             char buf[4096];
@@ -250,7 +265,7 @@ namespace MediaConch {
             }
         }
 
-        return 0;
+        return ret;
     }
 
 #endif

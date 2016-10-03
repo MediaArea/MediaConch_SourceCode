@@ -390,11 +390,14 @@ namespace MediaConch
     {
         MediaConchLib::Checker_StatusRes res;
         int ret = MCL.checker_status(-1, file_id, res);
+        if (ret < 0)
+            return ret;
+
         report_kind = MediaConchLib::report_MediaConch;
 
         if (use_daemon && asynchronous)
         {
-            if (ret >= 0 && !res.finished)
+            if (!res.finished)
             {
                 std::string file;
                 MCL.checker_file_from_id(-1, file_id, file);
@@ -415,8 +418,6 @@ namespace MediaConch
         {
             while (!res.finished)
             {
-                if (ret < 0)
-                    return ret;
 
                 #ifdef WINDOWS
                 ::Sleep((DWORD)5);
@@ -424,6 +425,18 @@ namespace MediaConch
                 usleep(500000);
                 #endif
                 ret = MCL.checker_status(-1, file_id, res);
+            }
+
+            if (res.has_error)
+            {
+                std::stringstream ss;
+                std::string file;
+                MCL.checker_file_from_id(-1, file_id, file);
+
+                ss << "File: " << file << " had a problem during analyze\n";
+                ss << "\tError logs are: " << res.error_log;
+                error = ss.str();
+                return MediaConchLib::errorHttp_INTERNAL;
             }
 
             if (res.tool)
@@ -521,9 +534,13 @@ namespace MediaConch
         std::stringstream ss;
 
         ss << "filename:               " << info->filename << "\n";
-		ss << "file last modification: " << info->file_last_modification << "\n";
+        ss << "file last modification: " << info->file_last_modification << "\n";
         ss << "analyzed:               " << std::boolalpha << info->analyzed << "\n";
-		if (info->generated_id >= 0)
+        ss << "has_error:              " << std::boolalpha << info->has_error << "\n";
+        if (info->has_error)
+            ss << "error_log:          " << std::boolalpha << info->error_log << "\n";
+
+        if (info->generated_id >= 0)
         {
             std::string file;
             MCL.checker_file_from_id(-1, info->generated_id, file);

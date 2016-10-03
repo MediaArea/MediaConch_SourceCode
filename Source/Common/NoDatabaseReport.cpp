@@ -91,8 +91,6 @@ long NoDatabaseReport::add_file(int user, const std::string& filename, const std
     f->file_last_modification = file_last_modification;
     f->user = user;
 
-    f->analyzed = false;
-
     f->source_id = source_id;
     f->generated_id = generated_id;
 
@@ -154,7 +152,8 @@ void NoDatabaseReport::get_file_name_from_id(int user, long id, std::string& fil
 //---------------------------------------------------------------------------
 void NoDatabaseReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
                                                     long& generated_id, long& source_id, size_t& generated_time,
-                                                    std::string& generated_log, std::string& generated_error_log, bool& analyzed)
+                                                    std::string& generated_log, std::string& generated_error_log, bool& analyzed,
+                                                    bool& has_error, std::string& error_log)
 {
     if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
@@ -167,6 +166,8 @@ void NoDatabaseReport::get_file_information_from_id(int user, long id, std::stri
         generated_log = files_saved[id]->generated_log;
         generated_error_log = files_saved[id]->generated_error_log;
         analyzed = files_saved[id]->analyzed;
+        has_error = files_saved[id]->has_error;
+        error_log = files_saved[id]->error_log;
     }
     else
     {
@@ -178,6 +179,8 @@ void NoDatabaseReport::get_file_information_from_id(int user, long id, std::stri
         generated_log = std::string();
         generated_error_log = std::string();
         analyzed = false;
+        has_error = false;
+        error_log = std::string();
     }
 }
 
@@ -210,6 +213,19 @@ int NoDatabaseReport::update_file_analyzed(int user, long id, bool analyzed)
         files_saved[id]->user == user)
     {
         files_saved[id]->analyzed = analyzed;
+        return 0;
+    }
+    return -1;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseReport::update_file_error(int user, long id, bool has_error, const std::string& error_log)
+{
+    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+        files_saved[id]->user == user)
+    {
+        files_saved[id]->has_error = has_error;
+        files_saved[id]->error_log = error_log;
         return 0;
     }
     return -1;

@@ -56,7 +56,11 @@ void QueueElement::Entry()
 
     //Pre hook plugins
     int ret = 0;
-    if (do_pre_hook && (ret = scheduler->execute_pre_hook_plugins(this, err)) != 0)
+    bool analyze_file = true;
+    if (do_pre_hook)
+        ret = scheduler->execute_pre_hook_plugins(this, err, analyze_file);
+
+    if (!analyze_file || ret)
     {
         scheduler->work_finished(this, NULL);
         return;

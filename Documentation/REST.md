@@ -172,6 +172,8 @@ Parameters:
 
 - id:                Integer: id given by the request
 - finished:          Boolean: if the file is finished to be analyzed
+- has_error:         Boolean: if the file analyze has error (optional, no error if not present)
+- error_log:         String: if the file has error (has_error = true), give the error logs if any
 - done:              Double: Percent done by the analysis
 - tool:              REPORT: give the report tool used to analyze, when it is finished, optionnal (Default is IMPLEMENTATION) (since API v1.3)
 - generated_id:      Integer: id of the last file generated, if any.
@@ -379,6 +381,8 @@ Parameter:
 - generated_log:          String: Output log when generating this file (stdout)
 - generated_log:          String: Output error log when generating this file (stderr)
 - analyzed:               Boolean: If this file is already analyzed
+- has_error:              Boolean: if the file analyze has error (optional, no error if not present)
+- error_log:              String: if the file has error (has_error = true), give the error logs if any
 
 #### Default_Values_For_type
 

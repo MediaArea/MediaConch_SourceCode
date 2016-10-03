@@ -98,16 +98,19 @@ public:
 
     struct Checker_StatusRes
     {
-        Checker_StatusRes() : id(-1), finished(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
+        Checker_StatusRes() : id(-1), finished(false), has_error(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
 
-        long    id;
-        bool    finished;
+        long         id;
+        bool         finished;
 
-        double *percent;
+        bool         has_error;
+        std::string  error_log;
 
-        int    *tool;
-        long    generated_id;
-        long    source_id;
+        double      *percent;
+
+        int         *tool;
+        long         generated_id;
+        long         source_id;
     };
 
     struct Checker_ReportRes
@@ -127,7 +130,7 @@ public:
 
     struct Checker_FileInfo
     {
-        Checker_FileInfo() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false) {}
+        Checker_FileInfo() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false), has_error(false) {}
 
         std::string filename;
         std::string file_last_modification;
@@ -137,6 +140,8 @@ public:
         long        source_id;
         size_t      generated_time;
         bool        analyzed;
+        bool        has_error;
+        std::string error_log;
     };
 
     union XSLT_Child;
