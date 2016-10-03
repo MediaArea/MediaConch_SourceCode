@@ -62,15 +62,18 @@ int SQLLiteReport::init_report()
 //---------------------------------------------------------------------------
 int SQLLiteReport::create_report_table()
 {
-    get_sql_query_for_create_report_table(query);
+    if (report_version == 0)
+    {
+        get_sql_query_for_create_report_table(query);
 
-    const char* end = NULL;
-    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
-    if (ret != SQLITE_OK || !stmt || (end && *end))
-        return -1;
-    ret = execute();
-    if (ret < 0)
-        return -1;
+        const char* end = NULL;
+        int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+        if (ret != SQLITE_OK || !stmt || (end && *end))
+            return -1;
+        ret = execute();
+        if (ret < 0)
+            return -1;
+    }
 
     return update_report_table();
 }

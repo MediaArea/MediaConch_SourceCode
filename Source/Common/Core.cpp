@@ -173,7 +173,6 @@ void Core::load_database()
 #endif
     if (!db)
     {
-        exit(1);
         db = new NoDatabaseReport;
         db->init_report();
     }
