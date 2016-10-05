@@ -243,11 +243,11 @@
                     <xsl:text>) </xsl:text>
                     </xsl:if>
                     <br/>
-                    <xsl:if test="../mc:context !=''">
-                      <strong><xsl:value-of select="../mc:context/@name"/></strong>
+                    <xsl:for-each select="../mc:context">
+                      <strong><xsl:value-of select="@name"/></strong>
                       <xsl:text>: </xsl:text>
-                      <xsl:value-of select="../mc:context"/><br/>
-                   </xsl:if>
+                      <xsl:value-of select="."/><br/>
+                   </xsl:for-each>
                     <xsl:if test="mc:value/@name !=''">
                        <strong>Name: </strong><xsl:value-of select="mc:value/@name"/><br/>
                      </xsl:if>
