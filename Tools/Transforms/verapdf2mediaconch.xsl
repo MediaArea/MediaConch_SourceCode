@@ -52,9 +52,18 @@
                 <test>
                   <xsl:attribute name="outcome">
                     <xsl:choose>
-                      <xsl:when test="../@status='FAILED'">fail</xsl:when>
+                      <xsl:when test="@status='FAILED'">fail</xsl:when>
                       <xsl:otherwise>pass</xsl:otherwise>
                     </xsl:choose>
+                  </xsl:attribute>
+                  <xsl:attribute name="outcome">
+                    <xsl:choose>
+                      <xsl:when test="@status='FAILED'">fail</xsl:when>
+                      <xsl:otherwise>pass</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:attribute>
+                  <xsl:attribute name="reason">
+                    <xsl:value-of select="v:message"/>
                   </xsl:attribute>
                   <value>
                     <xsl:attribute name="name">
@@ -63,7 +72,6 @@
                     <xsl:attribute name="context">
                       <xsl:value-of select="v:location/v:context"/>
                     </xsl:attribute>
-                    <xsl:value-of select="v:message"/>
                   </value>
                 </test>
               </check>
