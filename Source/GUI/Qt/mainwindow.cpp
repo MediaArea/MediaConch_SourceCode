@@ -1234,7 +1234,7 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
             display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);
             QByteArray xsl = display_xsl.readAll();
             display_xsl.close();
-            display_content = QString(xsl).toUtf8().data();
+            display_content = xsl.data();
         }
         else
             display_content = std::string(implementation_report_display_html_xsl);
