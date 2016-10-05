@@ -66,6 +66,7 @@ public:
         format_MaXml,       // MAXML, can contain one or more of MediaConch, MediaInfo, MediaTrace
         format_JsTree,
         format_Html,
+        format_OrigXml,
         format_Max,
     };
 
