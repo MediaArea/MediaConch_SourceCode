@@ -23,6 +23,7 @@
 #include "Common/PluginsConfig.h"
 #include "Common/generated/ImplementationReportXsl.h"
 #include "Common/generated/ImplementationReportVeraPDFXsl.h"
+#include "Common/generated/ImplementationReportDPFManagerXsl.h"
 #if defined(_WIN32) || defined(WIN32)
 #include "Common/generated/ImplementationReportDisplayTextXsl.h"
 #include <Shlobj.h>
@@ -1445,8 +1446,32 @@ void Core::get_reports_output(const std::vector<std::string>& files,
 
         if (report_set[MediaConchLib::report_MediaDpfManager])
         {
+           std::string tmp, transformed;
+            create_report_dpfmanager_xml(files, tmp);
+
+            std::string memory(implementation_report_dpf_manager_xsl);
+            const std::map<std::string, std::string> opts;
+            transform_with_xslt_memory(tmp, memory, opts, transformed);
+
+            if (!policy_is_valid(transformed))
+                result->valid = false;
+            else
+                result->valid = true;
+
             if (f == MediaConchLib::format_Xml)
-                create_report_dpfmanager_xml(files, result->report);
+            {
+                // No transformation, keep the original XML
+                result->report += tmp;
+            }
+            else
+            {
+                if (f == MediaConchLib::format_Html)
+                    transform_with_xslt_html_memory(transformed, transformed);
+                else
+                    transform_with_xslt_text_memory(transformed, transformed);
+
+                result->report += transformed;
+            }
             result->report += "\r\n";
         }
     }
