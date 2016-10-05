@@ -51,8 +51,8 @@ namespace MediaConch
         int                                id;
         std::string                        filename;
         std::map<std::string, std::string> options;
+        std::vector<std::string>           plugins;
         long                               file_id;
-        bool                               do_pre_hook;
 
         void                               Entry();
         void                               stop();
@@ -86,7 +86,7 @@ namespace MediaConch
         ~Queue();
 
         int add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
-                        const std::vector<std::string>& options, bool do_pre_hook);
+                        const std::vector<std::string>& options, const std::vector<std::string>& plugins);
         long has_element(int user, const std::string& filename);
         int  has_id(int user, long file_id);
         int remove_element(int id);

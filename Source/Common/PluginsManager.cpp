@@ -64,7 +64,9 @@ namespace MediaConch {
             return -1;
         }
 
-        p->load_plugin(obj, error);
+        if (p->load_plugin(obj, error) < 0)
+            return -1;
+
         plugins.push_back(p);
 
         if (p->get_type() == MediaConchLib::PLUGIN_FORMAT)

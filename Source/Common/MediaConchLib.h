@@ -241,11 +241,15 @@ public:
     //Options
     int add_option(const std::string& option, std::string& report);
 
+    // MediaConch
+    int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);
+
     // Analyze
     int  checker_analyze(int user, const std::vector<std::string>& files,
+                         const std::vector<std::string>& plugins,
                          std::vector<long>& files_id, bool force_analyze = false);
-    int  checker_analyze(int user, const std::string& file, bool& registered,
-                         long& file_id, bool force_analyze = false);
+    int  checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                         bool& registered, long& file_id, bool force_analyze = false);
 
     // Status
     int  checker_status(int user, const std::vector<long>& files_id,

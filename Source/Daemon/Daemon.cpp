@@ -87,6 +87,8 @@ namespace MediaConch
             return -1;
         }
 
+        httpd->commands.mediaconch_get_plugins_cb = on_mediaconch_get_plugins_command;
+
         httpd->commands.analyze_cb = on_analyze_command;
         httpd->commands.status_cb = on_status_command;
         httpd->commands.report_cb = on_report_command;
@@ -445,6 +447,32 @@ namespace MediaConch
 #endif
 
     //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_get_plugins_command(const RESTAPI::MediaConch_Get_Plugins_Req* req, RESTAPI::MediaConch_Get_Plugins_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch get plugins command" << std::endl;
+        std::vector<std::string> vec;
+        std::string error;
+        if (d->MCL->mediaconch_get_plugins(vec, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+        else
+        {
+            for (size_t i = 0; i < vec.size(); ++i)
+                res.plugins.push_back(vec[i]);
+        }
+
+        std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_analyze_command(const RESTAPI::Checker_Analyze_Req* req, RESTAPI::Checker_Analyze_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
@@ -459,9 +487,12 @@ namespace MediaConch
             bool force = false;
             if (req->args[i].has_force_analyze)
                 force = req->args[i].force_analyze;
+            std::vector<std::string> plugins;
+            for (size_t j = 0; j < req->args[i].plugins.size(); ++j)
+                plugins.push_back(req->args[i].plugins[j]);
             bool registered = false;
             long out_id = -1;
-            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, registered, out_id, force);
+            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, registered, out_id, force);
             if (ret < 0)
             {
                 RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;
@@ -698,7 +729,8 @@ namespace MediaConch
 
             bool registered = false;
             long new_id = -1;
-            int ret = d->MCL->checker_analyze(req->user, filename, registered, new_id);
+            std::vector<std::string> plugins;
+            int ret = d->MCL->checker_analyze(req->user, filename, plugins, registered, new_id);
             if (ret < 0)
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;

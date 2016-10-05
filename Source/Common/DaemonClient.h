@@ -43,6 +43,12 @@ public:
     void reset();
 
     //***************************************************************************
+    // MediaConch General
+    //***************************************************************************
+    // Plugins
+    int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);
+
+    //***************************************************************************
     // Checker
     //***************************************************************************
     // List
@@ -57,7 +63,8 @@ public:
     int default_values_for_type(const std::string& type, std::vector<std::string>& values);
 
     // Analyze
-    int checker_analyze(int user, const std::string& file, bool& registered, bool force_analyze, long& file_id);
+    int checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                        bool& registered, bool force_analyze, long& file_id);
 
     // Status
     int checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res);

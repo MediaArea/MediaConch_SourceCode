@@ -42,7 +42,6 @@ int Help()
     TEXTOUT("--PluginsConfiguration=PluginsConfigurationFile, -pc PluginsConfigurationFile");
     TEXTOUT("                    Use PluginsConfigurationFile as plugins configuration file");
     TEXTOUT("                    Default, it uses the struct in the configuration file or no plugins configured if not inside.");
-    TEXTOUT("");
 
     TEXTOUT("Reporting Elements:");
     TEXTOUT("--Mediaconch, -mc");
@@ -75,6 +74,15 @@ int Help()
     TEXTOUT("                    Output MediaConch report in HTML format");
     TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
+
+    TEXTOUT("Plugins:");
+    TEXTOUT("--PluginsList");
+    TEXTOUT("                    Output the plugins information ID");
+    TEXTOUT("--UsePlugin=PluginId, -up PluginId");
+    TEXTOUT("                    By default, only format plugin are used.");
+    TEXTOUT("                    With this command, you can give the plugin ID you want to use.");
+    TEXTOUT("                    Plugin ID can be get using the --pluginslist.");
+    TEXTOUT("");
 
     TEXTOUT("File:");
     TEXTOUT("--FileInformation, -fi");

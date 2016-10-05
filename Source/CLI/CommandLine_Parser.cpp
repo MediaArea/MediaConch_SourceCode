@@ -82,6 +82,11 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--policyreferencefile=";
         return true;
     }
+    else if (argument=="-up")
+    {
+        Last_Argument = "--useplugin=";
+        return true;
+    }
     return false;
 }
 
@@ -185,6 +190,8 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
     OPTION("--async",                                       Asynchronous)
+    OPTION("--pluginslist",                                 PluginsList)
+    OPTION("--useplugin",                                   UsePlugin)
     OPTION("--pluginsconfiguration",                        PluginsConfiguration)
     OPTION("--defaultvaluesfortype",                        DefaultValuesForType)
     OPTION("--createpolicy",                                CreatePolicy)
@@ -419,6 +426,33 @@ CL_OPTION(Asynchronous)
         is_async = true;
 
     cli->set_asynchronous(is_async);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(UsePlugin)
+{
+    //Form : --UsePlugin=IdPlugin
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string plugin;
+    plugin.assign(argument, egal_pos + 1 , std::string::npos);
+
+    cli->add_plugin_to_use(plugin);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(PluginsList)
+{
+    //Form : --PluginsList
+    (void)argument;
+    cli->set_plugins_list_mode();
     return CLI_RETURN_NONE;
 }
 

@@ -167,7 +167,30 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
     if (uri_api_version_is_valid(uri_path, req) < 0)
         return;
     const char* query_str = evhttp_uri_get_query(uri);
-    if (query_str && !std::string("/checker_status").compare(uri_path))
+
+    if (!std::string("/mediaconch_get_plugins").compare(uri_path))
+    {
+        std::string query;
+        RESTAPI::MediaConch_Get_Plugins_Req *r = NULL;
+        if (query_str)
+            query = std::string(query_str);
+        get_uri_request(query, &r);
+
+        RESTAPI::MediaConch_Get_Plugins_Res res;
+        if (commands.mediaconch_get_plugins_cb && commands.mediaconch_get_plugins_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_mediaconch_get_plugins_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (query_str && !std::string("/checker_status").compare(uri_path))
     {
         std::string query(query_str);
         RESTAPI::Checker_Status_Req *r = NULL;
@@ -186,6 +209,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_status_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/checker_list").compare(uri_path))
     {
         std::string query;
@@ -205,6 +229,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_list_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/default_values_for_type").compare(uri_path))
     {
         std::string query(query_str);
@@ -247,6 +272,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_create_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_remove").compare(uri_path))
     {
         std::string query(query_str);
@@ -266,6 +292,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_remove_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_dump").compare(uri_path))
     {
         std::string query(query_str);
@@ -285,6 +312,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_dump_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_save").compare(uri_path))
     {
         std::string query(query_str);
@@ -304,6 +332,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_save_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_duplicate").compare(uri_path))
     {
         std::string query(query_str);
@@ -323,6 +352,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_duplicate_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_move").compare(uri_path))
     {
         std::string query(query_str);
@@ -342,6 +372,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_move_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_get").compare(uri_path))
     {
         std::string query(query_str);
@@ -361,6 +392,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_get_name").compare(uri_path))
     {
         std::string query(query_str);
@@ -380,6 +412,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_name_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_get_policies_count").compare(uri_path))
     {
         std::string query;
@@ -402,6 +435,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_policies_count_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_clear_policies").compare(uri_path))
     {
         std::string query;
@@ -424,6 +458,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_clear_policies_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_get_policies").compare(uri_path))
     {
         std::string query;
@@ -446,6 +481,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_policies_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_get_policies_names_list").compare(uri_path))
     {
         std::string query;
@@ -468,6 +504,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_policies_names_list_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_create_from_file").compare(uri_path))
     {
         std::string query(query_str);
@@ -487,6 +524,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_create_from_file_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_create").compare(uri_path))
     {
         std::string query(query_str);
@@ -506,6 +544,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_create_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_get").compare(uri_path))
     {
         std::string query(query_str);
@@ -525,6 +564,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_get_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_duplicate").compare(uri_path))
     {
         std::string query(query_str);
@@ -544,6 +584,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_duplicate_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_move").compare(uri_path))
     {
         std::string query(query_str);
@@ -563,6 +604,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_move_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_delete").compare(uri_path))
     {
         std::string query(query_str);

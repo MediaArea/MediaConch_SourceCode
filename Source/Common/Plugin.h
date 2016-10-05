@@ -41,6 +41,7 @@ public:
 
     MediaConchLib::PluginType get_type() const { return type; }
     const std::string&        get_name() const { return name; }
+    const std::string&        get_id() const { return id; }
     const std::string&        get_report() const { return report; }
     const std::string&        get_report_err() const { return report_err; }
     const std::string&        get_error() const { return error; }
@@ -48,6 +49,7 @@ public:
 protected:
     MediaConchLib::PluginType type;
     std::string               name;
+    std::string               id;
     std::string               report;
     std::string               report_err;
     std::string               error;

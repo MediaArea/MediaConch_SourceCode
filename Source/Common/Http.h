@@ -37,6 +37,9 @@ public:
     virtual int stop() = 0;
     virtual int finish() = 0;
 
+    // MediaConch
+    int send_request(RESTAPI::MediaConch_Get_Plugins_Req& req);
+
     // Checker
     int send_request(RESTAPI::Checker_Analyze_Req& req);
     int send_request(RESTAPI::Checker_Status_Req& req);

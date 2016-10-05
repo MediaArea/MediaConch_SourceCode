@@ -100,6 +100,8 @@ int Httpd::send_result()
             error = rest.get_error();                                      \
     }
 
+    MAKE_URI_REQ_FUNC(mediaconch_get_plugins, MediaConch_Get_Plugins)
+
     MAKE_URI_REQ_FUNC(status, Checker_Status)
     MAKE_URI_REQ_FUNC(clear, Checker_Clear)
     MAKE_URI_REQ_FUNC(list, Checker_List)

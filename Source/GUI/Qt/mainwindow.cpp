@@ -976,7 +976,8 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 //---------------------------------------------------------------------------
 int MainWindow::analyze(const std::vector<std::string>& files, std::vector<long>& files_id)
 {
-    return MCL.checker_analyze(-1, files, files_id);
+    std::vector<std::string> plugins;
+    return MCL.checker_analyze(-1, files, plugins, files_id);
 }
 
 //---------------------------------------------------------------------------

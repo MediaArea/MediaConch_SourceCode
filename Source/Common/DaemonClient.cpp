@@ -98,6 +98,47 @@ void DaemonClient::reset()
 }
 
 //***************************************************************************
+// Plugins
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+int DaemonClient::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::MediaConch_Get_Plugins_Req req;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::MediaConch_Get_Plugins_Res *res = rest.parse_mediaconch_get_plugins_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    if (res->nok)
+        error = res->nok->error;
+    else
+    {
+        for (size_t i = 0; i < res->plugins.size(); ++i)
+            plugins.push_back(res->plugins[i]);
+    }
+
+    delete res;
+    return MediaConchLib::errorHttp_NONE;
+}
+
+//***************************************************************************
 // Checker
 //***************************************************************************
 
@@ -277,7 +318,8 @@ int DaemonClient::default_values_for_type(const std::string& type, std::vector<s
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_analyze(int user, const std::string& file, bool& registered, bool force_analyze, long& file_id)
+    int DaemonClient::checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                                  bool& registered, bool force_analyze, long& file_id)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -287,6 +329,9 @@ int DaemonClient::checker_analyze(int user, const std::string& file, bool& regis
 
     arg.user = user;
     arg.id = 0;
+
+    for (size_t i = 0; i < plugins.size(); ++i)
+        arg.plugins.push_back(plugins[i]);
 
     std::string real_file(file);
 #ifdef _WIN32

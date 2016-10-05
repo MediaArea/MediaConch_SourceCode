@@ -132,6 +132,7 @@ Parameters:
 - file:              String: Name of the file to analyze
 - user:              Integer: a unique id for the user
 - id:                Integer: a unique id for the request
+- plugins:           Array of Integer: List of Plugins to use (other than format plugins)
 - force:             Boolean: force to analyze the file even if registered in database (introduced in v1.1)
 
 ##### Response

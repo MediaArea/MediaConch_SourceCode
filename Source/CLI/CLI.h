@@ -43,11 +43,13 @@ namespace MediaConch
         void set_implementation_schema_file(const std::string& file);
         void set_implementation_verbosity(const std::string& verbosity);
         int  set_policy_reference_file(const std::string& file);
+        int  add_plugin_to_use(const std::string& plugin);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
         void set_asynchronous(bool async);
         void set_create_policy_mode();
         void set_file_information_mode();
+        void set_plugins_list_mode();
         int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
 
         void print_error(MediaConchLib::errorHttp code);
@@ -59,6 +61,7 @@ namespace MediaConch
         int  run_create_policy(const std::vector<long>& files_ids);
         int  run_policy_reference_file(long file_id);
         int  run_file_information();
+        int  run_plugins_list();
         int  is_ready(long& file_id, MediaConchLib::report& report_kind);
         void add_files_recursively(const std::string& filename);
         void file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report);
@@ -66,6 +69,7 @@ namespace MediaConch
         MediaConchLib MCL;
         std::vector<std::string> files;
         std::vector<std::string> policies;
+        std::vector<std::string> plugins;
         std::string              error;
         std::string              display_file;
         std::string              configuration_file;
@@ -78,6 +82,7 @@ namespace MediaConch
         bool                    force_analyze;
         bool                    create_policy_mode;
         bool                    file_information;
+        bool                    plugins_list_mode;
     };
 
 }

@@ -60,11 +60,12 @@ namespace MediaConch {
 
     //---------------------------------------------------------------------------
     int Scheduler::add_element_to_queue(int user, const std::string& filename, long file_id,
-                                        const std::vector<std::string>& options, bool do_pre_hook)
+                                        const std::vector<std::string>& options,
+                                        const std::vector<std::string>& plugins)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, do_pre_hook);
+        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins);
         run_element();
         return index - 1;
     }
@@ -227,6 +228,13 @@ namespace MediaConch {
             if (!plugins[i])
                 continue;
 
+            bool is_el_plugin = false;
+            for (size_t j = 0; j < el->plugins.size(); ++j)
+                if (el->plugins[j] == plugins[i]->get_id())
+                    is_el_plugin = true;
+            if (!is_el_plugin)
+                continue;
+
             ((PluginPreHook*)plugins[i])->set_input_file(new_file);
 
 #if defined(_WIN32) || defined(WIN32)
@@ -263,7 +271,9 @@ namespace MediaConch {
                     else
                         options.push_back(it->first);
                 }
-                long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log, generated_error_log, options, false);
+
+                std::vector<std::string> plugins;
+                long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log, generated_error_log, options, plugins);
                 if (id >= 0)
                     core->file_update_generated_file(el->user, old_id, id);
                 old_id = id;

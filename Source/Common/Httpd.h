@@ -58,10 +58,13 @@ public:
 #define URI_REQ_FUNC(type) \
     void get_uri_request(std::string& uri, RESTAPI::type##_Req** req);
 
+    URI_REQ_FUNC(MediaConch_Get_Plugins);
+
     URI_REQ_FUNC(Checker_Status);
     URI_REQ_FUNC(Checker_Clear);
     URI_REQ_FUNC(Checker_List);
     URI_REQ_FUNC(Default_Values_For_Type);
+
     URI_REQ_FUNC(XSLT_Policy_Create);
     URI_REQ_FUNC(Policy_Remove);
     URI_REQ_FUNC(Policy_Dump);
@@ -93,6 +96,9 @@ public:
     std::string get_result() const;
 
     // On command received and parsed
+    typedef int (*on_mediaconch_get_plugins_command)(const RESTAPI::MediaConch_Get_Plugins_Req* req,
+                                                     RESTAPI::MediaConch_Get_Plugins_Res& res, void* arg);
+
     typedef int (*on_analyze_command)(const RESTAPI::Checker_Analyze_Req* req,
                                       RESTAPI::Checker_Analyze_Res& res, void* arg);
     typedef int (*on_status_command)(const RESTAPI::Checker_Status_Req* req,
@@ -163,7 +169,8 @@ public:
 
     struct Commands
     {
-        Commands() : analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
+        Commands() : mediaconch_get_plugins_cb(NULL),
+                     analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
                      retry_cb(NULL), clear_cb(NULL), list_cb(NULL),
                      validate_cb(NULL), file_from_id_cb(NULL),
                      id_from_filename_cb(NULL), file_information_cb(NULL),
@@ -192,41 +199,45 @@ public:
                      xslt_policy_rule_delete_cb(NULL)
             {
             }
-        //checker
-        on_analyze_command                      analyze_cb;
-        on_status_command                       status_cb;
-        on_report_command                       report_cb;
-        on_retry_command                        retry_cb;
-        on_clear_command                        clear_cb;
-        on_list_command                         list_cb;
-        on_validate_command                     validate_cb;
-        on_file_from_id_command                 file_from_id_cb;
-        on_id_from_filename_command             id_from_filename_cb;
-        on_file_information_command             file_information_cb;
-        on_default_values_for_type_command      default_values_for_type_cb;
+        //mediaconch
+        on_mediaconch_get_plugins_command         mediaconch_get_plugins_cb;
 
-        on_xslt_policy_create_command xslt_policy_create_cb;
-        on_policy_import_command policy_import_cb;
-        on_policy_remove_command policy_remove_cb;
-        on_policy_dump_command policy_dump_cb;
-        on_policy_save_command policy_save_cb;
-        on_policy_duplicate_command policy_duplicate_cb;
-        on_policy_move_command policy_move_cb;
-        on_policy_change_info_command policy_change_info_cb;
-        on_policy_change_type_command policy_change_type_cb;
-        on_policy_get_command policy_get_cb;
-        on_policy_get_name_command policy_get_name_cb;
-        on_policy_get_policies_count_command policy_get_policies_count_cb;
-        on_policy_clear_policies_command policy_clear_policies_cb;
-        on_policy_get_policies_command policy_get_policies_cb;
+        //checker
+        on_analyze_command                        analyze_cb;
+        on_status_command                         status_cb;
+        on_report_command                         report_cb;
+        on_retry_command                          retry_cb;
+        on_clear_command                          clear_cb;
+        on_list_command                           list_cb;
+        on_validate_command                       validate_cb;
+        on_file_from_id_command                   file_from_id_cb;
+        on_id_from_filename_command               id_from_filename_cb;
+        on_file_information_command               file_information_cb;
+        on_default_values_for_type_command        default_values_for_type_cb;
+
+        // policy
+        on_xslt_policy_create_command             xslt_policy_create_cb;
+        on_policy_import_command                  policy_import_cb;
+        on_policy_remove_command                  policy_remove_cb;
+        on_policy_dump_command                    policy_dump_cb;
+        on_policy_save_command                    policy_save_cb;
+        on_policy_duplicate_command               policy_duplicate_cb;
+        on_policy_move_command                    policy_move_cb;
+        on_policy_change_info_command             policy_change_info_cb;
+        on_policy_change_type_command             policy_change_type_cb;
+        on_policy_get_command                     policy_get_cb;
+        on_policy_get_name_command                policy_get_name_cb;
+        on_policy_get_policies_count_command      policy_get_policies_count_cb;
+        on_policy_clear_policies_command          policy_clear_policies_cb;
+        on_policy_get_policies_command            policy_get_policies_cb;
         on_policy_get_policies_names_list_command policy_get_policies_names_list_cb;
-        on_xslt_policy_create_from_file_command xslt_policy_create_from_file_cb;
-        on_xslt_policy_rule_create_command xslt_policy_rule_create_cb;
-        on_xslt_policy_rule_get_command xslt_policy_rule_get_cb;
-        on_xslt_policy_rule_edit_command xslt_policy_rule_edit_cb;
-        on_xslt_policy_rule_duplicate_command xslt_policy_rule_duplicate_cb;
-        on_xslt_policy_rule_move_command xslt_policy_rule_move_cb;
-        on_xslt_policy_rule_delete_command xslt_policy_rule_delete_cb;
+        on_xslt_policy_create_from_file_command   xslt_policy_create_from_file_cb;
+        on_xslt_policy_rule_create_command        xslt_policy_rule_create_cb;
+        on_xslt_policy_rule_get_command           xslt_policy_rule_get_cb;
+        on_xslt_policy_rule_edit_command          xslt_policy_rule_edit_cb;
+        on_xslt_policy_rule_duplicate_command     xslt_policy_rule_duplicate_cb;
+        on_xslt_policy_rule_move_command          xslt_policy_rule_move_cb;
+        on_xslt_policy_rule_delete_command        xslt_policy_rule_delete_cb;
     };
 
     Commands commands;

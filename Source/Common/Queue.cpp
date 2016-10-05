@@ -25,7 +25,7 @@
 namespace MediaConch {
 
 //---------------------------------------------------------------------------
-QueueElement::QueueElement(Scheduler *s) : Thread(), do_pre_hook(true), scheduler(s), MI(NULL)
+QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s), MI(NULL)
 {
 }
 
@@ -57,8 +57,7 @@ void QueueElement::Entry()
     //Pre hook plugins
     int ret = 0;
     bool analyze_file = true;
-    if (do_pre_hook)
-        ret = scheduler->execute_pre_hook_plugins(this, err, analyze_file);
+    ret = scheduler->execute_pre_hook_plugins(this, err, analyze_file);
 
     if (!analyze_file || ret)
     {
@@ -112,7 +111,7 @@ Queue::~Queue()
 }
 
 int Queue::add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
-                       const std::vector<std::string>& options, bool do_pre_hook)
+                       const std::vector<std::string>& options, const std::vector<std::string>& plugins)
 {
     QueueElement *el = new QueueElement(scheduler);
 
@@ -120,7 +119,6 @@ int Queue::add_element(QueuePriority priority, int id, int user, const std::stri
     el->user = user;
     el->filename = filename;
     el->file_id = file_id;
-    el->do_pre_hook = do_pre_hook;
 
     for (size_t i = 0; i < options.size(); ++i)
     {
@@ -139,6 +137,10 @@ int Queue::add_element(QueuePriority priority, int id, int user, const std::stri
         }
         el->options[key] = value;
     }
+
+    for (size_t i = 0; i < plugins.size(); ++i)
+        el->plugins.push_back(plugins[i]);
+
     queue[priority].push_back(el);
     return 0;
 }

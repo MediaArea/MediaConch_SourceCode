@@ -37,7 +37,8 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false), file_information(false)
+    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false),
+                 file_information(false), plugins_list_mode(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -51,7 +52,7 @@ namespace MediaConch
     int CLI::init()
     {
         // If no filenames (and no options)
-        if (files.empty())
+        if (files.empty() && !plugins_list_mode)
             return Help_Nothing();
 
         // If no report selected, use Implementation by default
@@ -110,6 +111,10 @@ namespace MediaConch
         std::vector<long> id_to_report;
         MediaConchLib::report report_kind;
 
+        //Return plugins list
+        if (plugins_list_mode)
+            return run_plugins_list();
+
         //Return file information
         if (file_information)
             return run_file_information();
@@ -118,7 +123,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id = -1;
-            int ret = MCL.checker_analyze(-1, files[i], registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(-1, files[i], plugins, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
 
@@ -158,7 +163,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id;
-            int ret = MCL.checker_analyze(-1, policy_reference_file, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(-1, policy_reference_file, plugins, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
             if ((ret = run_policy_reference_file(file_id)) != MediaConchLib::errorHttp_TRUE)
@@ -229,6 +234,31 @@ namespace MediaConch
             MediaInfoLib::String info_str = ZenLib::Ztring().From_UTF8(report);
             STRINGOUT(info_str);
         }
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_plugins_list()
+    {
+        std::vector<std::string> list;
+        if (MCL.mediaconch_get_plugins(list, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        std::stringstream out;
+        out << "plugins:[";
+
+        for (size_t i = 0; i < list.size(); ++i)
+        {
+            if (i)
+                out << ", ";
+            out << "\"" << list[i] << "\"";
+        }
+
+        out << "]";
+
+        MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
+        STRINGOUT(out_str);
+
         return 0;
     }
 
@@ -349,6 +379,13 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int CLI::add_plugin_to_use(const std::string& plugin)
+    {
+        plugins.push_back(plugin);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::set_compression_mode(const std::string& mode_str)
     {
         MediaConchLib::compression mode;
@@ -367,6 +404,12 @@ namespace MediaConch
     void CLI::set_file_information_mode()
     {
         file_information = true;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_plugins_list_mode()
+    {
+        plugins_list_mode = true;
     }
 
     //--------------------------------------------------------------------------

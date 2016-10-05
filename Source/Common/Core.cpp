@@ -21,6 +21,7 @@
 #include "Common/JS_Tree.h"
 #include "Common/PluginsManager.h"
 #include "Common/PluginsConfig.h"
+#include "Common/Plugin.h"
 #include "Common/generated/ImplementationReportXsl.h"
 #include "Common/generated/ImplementationReportVeraPDFXsl.h"
 #include "Common/generated/ImplementationReportDPFManagerXsl.h"
@@ -82,7 +83,7 @@ Core::Core() : policies(this)
     config = NULL;
     db = NULL;
     scheduler = new Scheduler(this);
-    pluginsManager = new PluginsManager(this);
+    plugins_manager = new PluginsManager(this);
     policies.create_values_from_csv();
     compression_mode = MediaConchLib::compression_ZLib;
 }
@@ -91,8 +92,8 @@ Core::~Core()
 {
     if (scheduler)
         delete scheduler;
-    if (pluginsManager)
-        delete pluginsManager;
+    if (plugins_manager)
+        delete plugins_manager;
     if (db)
         delete db;
     delete MI;
@@ -140,7 +141,7 @@ void Core::load_configuration()
     if (!config->get("Plugins", plugins))
     {
         std::string error;
-        PluginsConfig pc(pluginsManager);
+        PluginsConfig pc(plugins_manager);
         pc.parse_struct(plugins, error);
     }
 }
@@ -149,7 +150,7 @@ void Core::load_configuration()
 void Core::load_plugins_configuration()
 {
     std::string error;
-    PluginsConfig pc(pluginsManager);
+    PluginsConfig pc(plugins_manager);
     pc.load_file(plugins_configuration_file, error);
 }
 
@@ -277,22 +278,43 @@ int Core::get_ui_database_path(std::string& path) const
 //---------------------------------------------------------------------------
 const std::map<std::string, Plugin*>& Core::get_format_plugins() const
 {
-    return pluginsManager->get_format_plugins();
+    return plugins_manager->get_format_plugins();
 }
 
 //---------------------------------------------------------------------------
 const std::vector<Plugin*>& Core::get_pre_hook_plugins() const
 {
-    return pluginsManager->get_pre_hook_plugins();
+    return plugins_manager->get_pre_hook_plugins();
 }
 
 //***************************************************************************
-// Tools
+// Plugins
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+int Core::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string&)
+{
+    const std::vector<Plugin*>& list = plugins_manager->get_plugins();
+
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        if (!list[i])
+            continue;
+
+        plugins.push_back(list[i]->get_id());
+    }
+
+    return 0;
+}
+
+//***************************************************************************
+// Checker
 //***************************************************************************
 
 //---------------------------------------------------------------------------
 long Core::checker_analyze(int user, const std::string& file, bool& registered,
-                           const std::vector<std::string>& options, bool force_analyze)
+                           const std::vector<std::string>& options, const std::vector<std::string>& plugins,
+                           bool force_analyze)
 {
     long id = -1;
     registered = false;
@@ -315,7 +337,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
     else
         registered = true;
 
-    if (!analyzed && scheduler->add_element_to_queue(user, file, id, options) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, file, id, options, plugins) < 0)
         return -1;
 
     return id;
@@ -324,7 +346,8 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 //---------------------------------------------------------------------------
 long Core::checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                            const std::string generated_log, const std::string generated_error_log,
-                           const std::vector<std::string>& options, bool do_pre_hook)
+                           const std::vector<std::string>& options,
+                           const std::vector<std::string>& plugins)
 {
     long id = -1;
     bool analyzed = false;
@@ -357,7 +380,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
             return -1;
     }
 
-    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, do_pre_hook) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, plugins) < 0)
         return -1;
 
     return id;

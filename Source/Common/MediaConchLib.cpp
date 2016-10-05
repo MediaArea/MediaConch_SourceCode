@@ -175,14 +175,28 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+int MediaConchLib::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error)
+{
+    if (use_daemon)
+        return daemon_client->mediaconch_get_plugins(plugins, error);
+
+    return core->mediaconch_get_plugins(plugins, error);
+}
+
+//***************************************************************************
+// Analyze
+//***************************************************************************
+
+//---------------------------------------------------------------------------
 int MediaConchLib::checker_analyze(int user, const std::vector<std::string>& files,
+                                   const std::vector<std::string>& plugins,
                                    std::vector<long>& files_id, bool force_analyze)
 {
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
     {
         long file_id;
-        int ret = checker_analyze(user, files[i], registered, file_id, force_analyze);
+        int ret = checker_analyze(user, files[i], plugins, registered, file_id, force_analyze);
         if (ret < 0)
             return ret;
         files_id.push_back(file_id);
@@ -191,17 +205,17 @@ int MediaConchLib::checker_analyze(int user, const std::vector<std::string>& fil
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_analyze(int user, const std::string& file, bool& registered,
-                                   long& file_id, bool force_analyze)
+int MediaConchLib::checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                                   bool& registered, long& file_id, bool force_analyze)
 {
     if (!file.length())
         return errorHttp_INVALID_DATA;
 
     // Send Options by API
     if (use_daemon)
-        return daemon_client->checker_analyze(user, file, registered, force_analyze, file_id);
+        return daemon_client->checker_analyze(user, file, plugins, registered, force_analyze, file_id);
 
-    long id = core->checker_analyze(user, file, registered, Options, force_analyze);
+    long id = core->checker_analyze(user, file, registered, Options, plugins, force_analyze);
     if (id < 0)
         return -1;
 

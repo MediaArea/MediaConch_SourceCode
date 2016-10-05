@@ -38,7 +38,20 @@ Http::~Http()
 {
 }
 
-// Policy
+// MediaConch
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::MediaConch_Get_Plugins_Req& req)
+{
+    std::string query;
+    rest.serialize_mediaconch_get_plugins_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_get_plugins" << query;
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+// Checker
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Checker_Analyze_Req& req)
 {

@@ -46,6 +46,8 @@ CL_OPTION(PolicyReferenceFile);
 CL_OPTION(Compression);
 CL_OPTION(Force);
 CL_OPTION(Asynchronous);
+CL_OPTION(UsePlugin);
+CL_OPTION(PluginsList);
 CL_OPTION(PluginsConfiguration);
 CL_OPTION(DefaultValuesForType);
 CL_OPTION(CreatePolicy);

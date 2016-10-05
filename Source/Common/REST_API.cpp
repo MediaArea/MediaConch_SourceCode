@@ -56,6 +56,14 @@ RESTAPI::~RESTAPI()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+RESTAPI::MediaConch_Get_Plugins_Res::~MediaConch_Get_Plugins_Res()
+{
+    plugins.clear();
+    if (nok)
+        delete nok;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Checker_Analyze_Res::~Checker_Analyze_Res()
 {
     for (size_t i = 0; i < ok.size(); ++i)
@@ -207,6 +215,14 @@ RESTAPI::Policy_Get_Res::~Policy_Get_Res()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::MediaConch_Get_Plugins_Req::to_str() const
+{
+    std::stringstream out;
+
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::Checker_Analyze_Arg::to_str() const
 {
     std::stringstream out;
@@ -216,7 +232,14 @@ std::string RESTAPI::Checker_Analyze_Arg::to_str() const
         out << "false";
     else
         out << "true";
-    out << "]";
+    out << ",plugins:[";
+    for (size_t i = 0; i < plugins.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << plugins[i];
+    }
+    out << "]]";
     return out.str();
 }
 
@@ -629,6 +652,39 @@ std::string RESTAPI::XSLT_Policy_Rule_Delete_Req::to_str() const
 // Result: to_str()
 //***************************************************************************
 
+//  MediaConch
+//---------------------------------------------------------------------------
+std::string RESTAPI::MediaConch_Nok::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"error\":\"" << error << "\"}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::MediaConch_Get_Plugins_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
+    {
+        out << "\"plugins\":[";
+        for (size_t i = 0; i < plugins.size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << plugins[i];
+        }
+        out << "]";
+    }
+    out << "}";
+    return out.str();
+}
+
 // Checker
 //---------------------------------------------------------------------------
 std::string RESTAPI::Checker_Analyze_Ok::to_str() const
@@ -978,7 +1034,7 @@ std::string RESTAPI::Policy_Nok::to_str() const
 {
     std::stringstream out;
 
-    out << "\"" << error << "\"";
+    out << "{\"error\":\"" << error << "\"}";
     return out.str();
 }
 
@@ -1288,6 +1344,17 @@ std::string RESTAPI::XSLT_Policy_Rule_Delete_Res::to_str() const
 //***************************************************************************
 // Serialize: Request
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, std::string& data)
+{
+    //URI
+    std::stringstream ss;
+
+    data = ss.str();
+
+    return 0;
+}
 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_analyze_req(Checker_Analyze_Req& req, std::string& data)
@@ -2020,6 +2087,44 @@ int RESTAPI::serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& 
 //***************************************************************************
 // Serialize: Result
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string& data)
+{
+    Container::Value v, child, nok, plugins;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+    {
+        nok = serialize_mediaconch_nok(res.nok);
+        child.obj["nok"] = nok;
+    }
+    else
+    {
+        plugins.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < res.plugins.size(); ++i)
+        {
+            Container::Value plugin;
+
+            plugin.type = Container::Value::CONTAINER_TYPE_STRING;
+            plugin.s = res.plugins[i];
+
+            plugins.array.push_back(plugin);
+        }
+        child.obj["plugins"] = plugins;
+    }
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["MEDIACONCH_GET_PLUGINS_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+    return 0;
+}
 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_analyze_res(Checker_Analyze_Res& res, std::string& data)
@@ -2918,6 +3023,25 @@ int RESTAPI::serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& 
 //***************************************************************************
 // Parse: Request
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_mediaconch_get_plugins_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "MEDIACONCH_GET_PLUGINS");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+    MediaConch_Get_Plugins_Req *req = new MediaConch_Get_Plugins_Req;
+
+    return req;
+}
 
 //---------------------------------------------------------------------------
 RESTAPI::Checker_Analyze_Req *RESTAPI::parse_analyze_req(const std::string& data)
@@ -4108,6 +4232,17 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
 
+    return req;
+}
+
+//***************************************************************************
+// Parse: Request URI
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_uri_mediaconch_get_plugins_req(const std::string&)
+{
+    MediaConch_Get_Plugins_Req *req = new MediaConch_Get_Plugins_Req;
     return req;
 }
 
@@ -5308,6 +5443,58 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete
 //***************************************************************************
 // Parse: Result
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+RESTAPI::MediaConch_Get_Plugins_Res *RESTAPI::parse_mediaconch_get_plugins_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "MEDIACONCH_GET_PLUGINS_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *plugins = model->get_value_by_key(*child, "plugins");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+
+    MediaConch_Get_Plugins_Res *res = new MediaConch_Get_Plugins_Res;
+
+    if (nok)
+    {
+        if (nok->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        {
+            delete res;
+            return NULL;
+        }
+
+        parse_mediaconch_nok(nok, &res->nok);
+    }
+    else if (plugins && plugins->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < plugins->array.size(); ++i)
+        {
+            if (plugins->array[i].type != Container::Value::CONTAINER_TYPE_STRING)
+            {
+                delete res;
+                return NULL;
+            }
+
+            res->plugins.push_back(plugins->array[i].s);
+        }
+    }
+    else
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
 
 //---------------------------------------------------------------------------
 RESTAPI::Checker_Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
@@ -6538,6 +6725,20 @@ RESTAPI::XSLT_Policy_Rule_Delete_Res *RESTAPI::parse_xslt_policy_rule_delete_res
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+Container::Value RESTAPI::serialize_mediaconch_nok(MediaConch_Nok* nok)
+{
+    Container::Value nok_v, error_v;
+
+    nok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    error_v.type = Container::Value::CONTAINER_TYPE_STRING;
+    error_v.s = nok->error;
+    nok_v.obj["error"] = error_v;
+
+    return nok_v;
+}
+
+//---------------------------------------------------------------------------
 Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg>& args)
 {
     Container::Value args_val;
@@ -6546,7 +6747,7 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        Container::Value arg, file, user, id, force;
+        Container::Value arg, file, user, id, force, plugins;
         arg.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         file.type = Container::Value::CONTAINER_TYPE_STRING;
@@ -6567,6 +6768,16 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
             force.b = args[i].force_analyze;
             arg.obj["force"] = force;
         }
+
+        plugins.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t j = 0; j < args[i].plugins.size(); ++j)
+        {
+            Container::Value plugin;
+            plugin.type = Container::Value::CONTAINER_TYPE_STRING;
+            plugin.s = args[i].plugins[j];
+            plugins.array.push_back(plugin);
+        }
+        arg.obj["plugins"] = plugins;
 
         args_val.array.push_back(arg);
     }
@@ -7012,6 +7223,36 @@ void RESTAPI::serialize_policies_get_policies_names(const std::vector<std::pair<
 }
 
 //---------------------------------------------------------------------------
+int RESTAPI::parse_mediaconch_nok(Container::Value *nok_v, RESTAPI::MediaConch_Nok **nok)
+{
+    if (!nok_v)
+    {
+        *nok = NULL;
+        return 0;
+    }
+
+    *nok = new MediaConch_Nok;
+    if (nok_v->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        delete *nok;
+        *nok = NULL;
+        return -1;
+    }
+
+    Container::Value *error = model->get_value_by_key(*nok_v, "error");
+    if (!error || error->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        delete *nok;
+        *nok = NULL;
+        return -1;
+    }
+
+    (*nok)->error = error->s;
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
@@ -7024,12 +7265,11 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
             return -1;
 
-        Container::Value *file, *user, *id, *force;
-
-        file = model->get_value_by_key(*obj, "file");
-        user = model->get_value_by_key(*obj, "user");
-        id = model->get_value_by_key(*obj, "id");
-        force = model->get_value_by_key(*obj, "force");
+        Container::Value *file = model->get_value_by_key(*obj, "file");
+        Container::Value *user = model->get_value_by_key(*obj, "user");
+        Container::Value *id = model->get_value_by_key(*obj, "id");
+        Container::Value *force = model->get_value_by_key(*obj, "force");
+        Container::Value *plugins = model->get_value_by_key(*obj, "plugins");
 
         if (!file || !id || file->type != Container::Value::CONTAINER_TYPE_STRING ||
             id->type != Container::Value::CONTAINER_TYPE_INTEGER)
@@ -7046,6 +7286,13 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
         {
             arg.has_force_analyze = true;
             arg.force_analyze = force->b;
+        }
+
+        if (plugins && plugins->type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t j = 0; j < plugins->array.size(); ++j)
+                if (plugins->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                    arg.plugins.push_back(plugins->array[j].s);
         }
 
         args.push_back(arg);

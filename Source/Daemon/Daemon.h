@@ -39,12 +39,12 @@ namespace MediaConch
         Daemon(const Daemon&);
         Daemon& operator=(const Daemon&);
 
-        MediaConchLib  *MCL;
-        bool            is_daemon;
-        Httpd          *httpd;
-        std::string     last_argument;
-        std::ofstream  *logger;
-        std::streambuf *clog_buffer;
+        MediaConchLib            *MCL;
+        bool                      is_daemon;
+        Httpd                    *httpd;
+        std::string               last_argument;
+        std::ofstream            *logger;
+        std::streambuf           *clog_buffer;
 
         // Helper
         int daemonize();
@@ -63,6 +63,9 @@ namespace MediaConch
         int parse_other(const std::string& argument);
 
         // Request received callbacks
+        //  MediaConch
+        static int on_mediaconch_get_plugins_command(const RESTAPI::MediaConch_Get_Plugins_Req* req, RESTAPI::MediaConch_Get_Plugins_Res& res, void *arg);
+
         //  Checker
         static int on_analyze_command(const RESTAPI::Checker_Analyze_Req* req,
                                       RESTAPI::Checker_Analyze_Res& res, void *arg);

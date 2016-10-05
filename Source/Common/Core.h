@@ -62,15 +62,29 @@ public:
     void    Menu_Option_Preferences_Inform  (const MediaInfoNameSpace::String &Inform);
     String  Menu_Option_Preferences_Option  (const MediaInfoNameSpace::String &Param, const MediaInfoNameSpace::String &Value);
 
+    //***************************************************************************
+    // Local path
+    //***************************************************************************
+    static std::string get_local_data_path();
+    static std::string get_local_config_path();
 
-//---------------------------------------------------------------------------
+    //***************************************************************************
+    // MediaConch General
+    //***************************************************************************
+    // Plugins
+    int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);
+    const std::map<std::string, Plugin*>& get_format_plugins() const;
+    const std::vector<Plugin*>&           get_pre_hook_plugins() const;
+
+    //***************************************************************************
+    // Checker
+    //***************************************************************************
     long        checker_analyze(int user, const std::string& filename, bool& registered,
-                                const std::vector<std::string>& options, bool force_analyze = false);
+                                const std::vector<std::string>& options, const std::vector<std::string>& plugins,
+                                bool force_analyze = false);
     long        checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                                 const std::string generated_log, const std::string generated_error_log,
-                                const std::vector<std::string>& options, bool pre_hook=true);
-    int         file_update_generated_file(int user, long src_id, long generated_id);
-    int         update_file_error(int user, long id, bool has_error, const std::string& error_log);
+                                const std::vector<std::string>& options, const std::vector<std::string>& plugins);
 
     bool        checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res);
     int         remove_report(int user, const std::vector<long>& files);
@@ -82,10 +96,12 @@ public:
                                    MediaConchLib::Checker_ReportRes* res,
                                    const std::string* display_names = NULL,
                                    const std::string* display_contents = NULL);
-    int         get_reports_output_JStree(int user, const std::vector<long>& file,
-                                          const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
-    int         get_reports_output_Html(int user, const std::vector<long>& file,
-                                        const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
+    int         checker_validate(int user, MediaConchLib::report report,
+                                 const std::vector<long>& file,
+                                 const std::vector<size_t>& policies_ids,
+                                 const std::vector<std::string>& policies_contents,
+                                 const std::map<std::string, std::string>& options,
+                                 std::vector<MediaConchLib::Checker_ValidateRes*>& result);
     int         check_policies(int user, const std::vector<long>& files,
                                const std::map<std::string, std::string>& options,
                                MediaConchLib::Checker_ReportRes *result,
@@ -97,50 +113,58 @@ public:
     long        checker_id_from_filename(int user, const std::string& filename);
     int         checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info);
 
-    int         checker_validate(int user, MediaConchLib::report report,
-                                 const std::vector<long>& file,
-                                 const std::vector<size_t>& policies_ids,
-                                 const std::vector<std::string>& policies_contents,
-                                 const std::map<std::string, std::string>& options,
-                                 std::vector<MediaConchLib::Checker_ValidateRes*>& result);
+    //***************************************************************************
+    // Checker Helper
+    //***************************************************************************
+    int         file_update_generated_file(int user, long src_id, long generated_id);
+    int         update_file_error(int user, long id, bool has_error, const std::string& error_log);
+    int         get_reports_output_JStree(int user, const std::vector<long>& file,
+                                          const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
+    int         get_reports_output_Html(int user, const std::vector<long>& file,
+                                        const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
 
-    // Apply display
+    //***************************************************************************
+    // Display
+    //***************************************************************************
     int  transform_with_xslt_file(const std::string& report, const std::string& Xslt,
                                   const std::map<std::string, std::string>& opts, std::string& result);
     int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
                                     const std::map<std::string, std::string>& opts, std::string& result);
-
-    int  policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
-    int  policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
-
-    Policies policies;
     std::string xslt_display;
 
-    //General Configuration
-    void load_configuration();
-    void set_configuration_file(const std::string& file);
+    //***************************************************************************
+    // Policy
+    //***************************************************************************
+    int  policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+    int  policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
+    Policies policies;
+
+    //***************************************************************************
+    // Configuration
+    //***************************************************************************
+    void               load_configuration();
+    void               set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
-    void load_plugins_configuration();
-    void set_plugins_configuration_file(const std::string& file);
-    void set_implementation_schema_file(const std::string& file);
+    void               load_plugins_configuration();
+    void               set_plugins_configuration_file(const std::string& file);
+    void               set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
-    void create_default_implementation_schema();
-    void set_implementation_verbosity(const std::string& verbosity);
+    void               create_default_implementation_schema();
+    void               set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
-    void set_compression_mode(MediaConchLib::compression compress);
-    int get_ui_poll_request() const;
-    int get_ui_database_path(std::string& path) const;
+    void               set_compression_mode(MediaConchLib::compression compress);
+    int                get_ui_poll_request() const;
+    int                get_ui_database_path(std::string& path) const;
+    bool               is_using_daemon() const;
+    void               get_daemon_address(std::string& addr, int& port) const;
+    void               load_database();
+    bool               database_is_enabled() const;
+    bool               accepts_https();
+    static void        unify_no_https(std::string& str);
 
-    //Plugins
-    const std::map<std::string, Plugin*>& get_format_plugins() const;
-    const std::vector<Plugin*>&           get_pre_hook_plugins() const;
-
-    bool is_using_daemon() const;
-    void get_daemon_address(std::string& addr, int& port) const;
-
-    //General Report Database
-    void load_database();
-    bool database_is_enabled() const;
+    //***************************************************************************
+    // Report Database access
+    //***************************************************************************
     void set_file_analyzed_to_database(int user, long id);
     void register_reports_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* MI);
     void register_reports_to_database(int user, long file, const std::string& report, MediaConchLib::report report_kind,
@@ -156,13 +180,6 @@ public:
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
 
-    // Get Local Paths
-    static std::string get_local_data_path();
-    static std::string get_local_config_path();
-
-    bool        accepts_https();
-    static void unify_no_https(std::string& str);
-
 private:
     Core (const Core&);
 
@@ -174,9 +191,8 @@ private:
     std::string                        configuration_file;
     std::string                        plugins_configuration_file;
     std::map<std::string, std::string> implementation_options;
-    //TODO: remove with the daemon
     Scheduler                         *scheduler;
-    PluginsManager                    *pluginsManager;
+    PluginsManager                    *plugins_manager;
     MediaConchLib::compression         compression_mode;
 
     bool check_policies_xslts(int user, const std::vector<long>& files,
@@ -189,7 +205,9 @@ private:
     bool verapdf_report_is_valid(const std::string& report);
     bool dpfmanager_report_is_valid(const std::string& report);
 
-    //Helper
+    //***************************************************************************
+    // Helper
+    //***************************************************************************
     bool validation(int user, const std::vector<long>& files, Schema* S, std::string& report);
     bool validate_xslt_policy(int user, const std::vector<long>& files,
                               const std::map<std::string, std::string>& opts,

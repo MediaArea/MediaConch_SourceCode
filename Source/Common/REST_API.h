@@ -129,6 +129,33 @@ public:
     }
 
 //***************************************************************************
+// MediaConch General
+//***************************************************************************
+
+    // Generic error
+    struct MediaConch_Nok
+    {
+        std::string  error;
+        std::string  to_str() const;
+    };
+
+    // Get Plugins
+    struct MediaConch_Get_Plugins_Req
+    {
+        std::string  to_str() const;
+    };
+
+    struct MediaConch_Get_Plugins_Res
+    {
+        MediaConch_Get_Plugins_Res() : nok(NULL) {}
+        ~MediaConch_Get_Plugins_Res();
+
+        std::vector<std::string>         plugins;
+        MediaConch_Nok                  *nok;
+        std::string                      to_str() const;
+    };
+
+//***************************************************************************
 // Checker
 //***************************************************************************
 
@@ -137,12 +164,13 @@ public:
     {
         Checker_Analyze_Arg() : user(-1), has_force_analyze(false) {}
 
-        std::string             to_str() const;
-        std::string             file;
-        int                     user;
-        int                     id;
-        bool                    has_force_analyze;
-        bool                    force_analyze;
+        std::string              to_str() const;
+        std::string              file;
+        int                      user;
+        int                      id;
+        std::vector<std::string> plugins;
+        bool                     has_force_analyze;
+        bool                     force_analyze;
     };
 
     struct Checker_Analyze_Req
@@ -838,6 +866,8 @@ public:
     virtual ~RESTAPI();
 
     // Serialize: Request
+    int serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req& req, std::string&);
+
     int serialize_analyze_req(Checker_Analyze_Req& req, std::string&);
     int serialize_status_req(Checker_Status_Req& req, std::string&);
     int serialize_report_req(Checker_Report_Req& req, std::string&);
@@ -875,6 +905,8 @@ public:
     int serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string&);
 
     // Serialize: Result
+    int serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string&);
+
     int serialize_analyze_res(Checker_Analyze_Res& res, std::string&);
     int serialize_status_res(Checker_Status_Res& res, std::string&);
     int serialize_report_res(Checker_Report_Res& res, std::string&);
@@ -911,6 +943,8 @@ public:
     int serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string&);
 
     // Parse: Request
+    MediaConch_Get_Plugins_Req          *parse_mediaconch_get_plugins_req(const std::string& data);
+
     Checker_Analyze_Req                 *parse_analyze_req(const std::string& data);
     Checker_Status_Req                  *parse_status_req(const std::string& data);
     Checker_Report_Req                  *parse_report_req(const std::string& data);
@@ -948,6 +982,8 @@ public:
     XSLT_Policy_Rule_Delete_Req         *parse_xslt_policy_rule_delete_req(const std::string&);
 
     // Parse: URI Request
+    MediaConch_Get_Plugins_Req          *parse_uri_mediaconch_get_plugins_req(const std::string& uri);
+
     Checker_Analyze_Req                 *parse_uri_analyze_req(const std::string& uri);
     Checker_Status_Req                  *parse_uri_status_req(const std::string& uri);
     Checker_Report_Req                  *parse_uri_report_req(const std::string& uri);
@@ -984,6 +1020,8 @@ public:
     XSLT_Policy_Rule_Delete_Req         *parse_uri_xslt_policy_rule_delete_req(const std::string&);
 
     // Parse: Result
+    MediaConch_Get_Plugins_Res         *parse_mediaconch_get_plugins_res(const std::string& data);
+
     Checker_Analyze_Res                *parse_analyze_res(const std::string& data);
     Checker_Status_Res                 *parse_status_res(const std::string& data);
     Checker_Report_Res                 *parse_report_res(const std::string& data);
@@ -1027,6 +1065,7 @@ private:
     std::string error;
 
     //Helper
+    Container::Value serialize_mediaconch_nok(MediaConch_Nok* nok);
     Container::Value serialize_analyze_args(std::vector<Checker_Analyze_Arg>& args);
     Container::Value serialize_ids(std::vector<int>& ids);
     Container::Value serialize_report_reports(std::vector<Report>& args);
@@ -1046,6 +1085,7 @@ private:
     void serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v);
     void serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v);
 
+    int parse_mediaconch_nok(Container::Value *v, MediaConch_Nok** n);
     int parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args);
     int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
     int parse_generic_nok(Container::Value *v, int& id, Reason& error);
