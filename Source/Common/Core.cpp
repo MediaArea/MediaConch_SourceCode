@@ -22,6 +22,8 @@
 #include "Common/PluginsManager.h"
 #include "Common/PluginsConfig.h"
 #include "Common/generated/ImplementationReportXsl.h"
+#include "Common/generated/ImplementationReportVeraPDFXsl.h"
+#include "Common/generated/ImplementationReportDPFManagerXsl.h"
 #if defined(_WIN32) || defined(WIN32)
 #include "Common/generated/ImplementationReportDisplayTextXsl.h"
 #include <Shlobj.h>
@@ -344,12 +346,18 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
     }
     else
     {
+        // For VeraPDF and DPFManager, to get the original XML
+        if ((report_set[MediaConchLib::report_MediaVeraPdf] || report_set[MediaConchLib::report_MediaVeraPdf]) &&
+            f == MediaConchLib::format_Xml && !display_content && !display_name)
+            f = MediaConchLib::format_OrigXml;
+
         switch (f)
         {
             case MediaConchLib::format_Text:
             case MediaConchLib::format_Xml:
             case MediaConchLib::format_MaXml:
             case MediaConchLib::format_Html:
+            case MediaConchLib::format_OrigXml:
                 get_reports_output(files, options, f, report_set, result);
                 break;
             case MediaConchLib::format_JsTree:
@@ -1413,15 +1421,73 @@ void Core::get_reports_output(const std::vector<std::string>& files,
 
         if (report_set[MediaConchLib::report_MediaVeraPdf])
         {
-            if (f == MediaConchLib::format_Xml)
-                create_report_verapdf_xml(files, result->report);
+            std::string tmp, transformed;
+            create_report_verapdf_xml(files, tmp);
+
+            std::string memory(implementation_report_vera_pdf_xsl);
+            const std::map<std::string, std::string> opts;
+            transform_with_xslt_memory(tmp, memory, opts, transformed);
+
+            if (!policy_is_valid(transformed))
+                result->valid = false;
+            else
+                result->valid = true;
+
+            if (f == MediaConchLib::format_OrigXml)
+            {
+                // No transformation, keep the original XML
+                result->report += tmp;
+            }
+            else if (f == MediaConchLib::format_Xml)
+            {
+                // Get the transformed XML for applying display
+                result->report += transformed;
+            }
+            else
+            {
+                if (f == MediaConchLib::format_Html)
+                    transform_with_xslt_html_memory(transformed, transformed);
+                else
+                    transform_with_xslt_text_memory(transformed, transformed);
+
+                result->report += transformed;
+            }
             result->report += "\r\n";
         }
 
         if (report_set[MediaConchLib::report_MediaDpfManager])
         {
-            if (f == MediaConchLib::format_Xml)
-                create_report_dpfmanager_xml(files, result->report);
+           std::string tmp, transformed;
+            create_report_dpfmanager_xml(files, tmp);
+
+            std::string memory(implementation_report_dpf_manager_xsl);
+            const std::map<std::string, std::string> opts;
+            transform_with_xslt_memory(tmp, memory, opts, transformed);
+
+            if (!policy_is_valid(transformed))
+                result->valid = false;
+            else
+                result->valid = true;
+
+            if (f == MediaConchLib::format_OrigXml)
+            {
+                // No transformation, keep the original XML
+                result->report += tmp;
+            }
+            else if (f == MediaConchLib::format_Xml)
+            {
+                // Get the transformed XML for applying display
+                result->report += transformed;
+            }
+            else
+            {
+                if (f == MediaConchLib::format_Html)
+                    transform_with_xslt_html_memory(transformed, transformed);
+                else
+                    transform_with_xslt_text_memory(transformed, transformed);
+
+                result->report += transformed;
+            }
             result->report += "\r\n";
         }
     }
