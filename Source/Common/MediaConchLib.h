@@ -93,6 +93,7 @@ public:
     {
         PLUGIN_FORMAT = 0,
         PLUGIN_PRE_HOOK,
+        PLUGIN_LOG,
         PLUGIN_MAX,
     };
 

@@ -36,20 +36,6 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int FFmpeg::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
     {
-        if (obj.find("id") == obj.end() || obj.at("id").type != Container::Value::CONTAINER_TYPE_STRING)
-        {
-            error += "Field 'id' is not present\n";
-            return -1;
-        }
-        id = obj.at("id").s;
-
-        if (obj.find("name") == obj.end() || obj.at("name").type != Container::Value::CONTAINER_TYPE_STRING)
-        {
-            error += "Field 'name' is not present\n";
-            return -1;
-        }
-        name = obj.at("name").s;
-
         if (obj.find("bin") == obj.end() || obj.at("bin").type != Container::Value::CONTAINER_TYPE_STRING)
         {
             error += "Field 'bin' is not present\n";
@@ -131,7 +117,7 @@ namespace MediaConch {
             return 0;
 
         if (!outputDir.length())
-            outputDir = ".";
+            outputDir = "./";
 
         create_output_file_name();
 

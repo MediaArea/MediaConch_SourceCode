@@ -46,6 +46,9 @@ public:
     const std::string&        get_report_err() const { return report_err; }
     const std::string&        get_error() const { return error; }
 
+    void                      set_id(const std::string& i) { this->id = i; }
+    void                      set_name(const std::string& n) { this->name = n; }
+
 protected:
     MediaConchLib::PluginType type;
     std::string               name;

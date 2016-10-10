@@ -17,6 +17,7 @@
 #include "VeraPDF.h"
 #include "DpfManager.h"
 #include "FFmpeg.h"
+#include "PluginFileLog.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -46,7 +47,6 @@ namespace MediaConch {
         return plugins;
     }
 
-
     //---------------------------------------------------------------------------
     int PluginsManager::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
     {
@@ -58,11 +58,28 @@ namespace MediaConch {
             p = new DPFManager;
         else if (obj.at("name").s == "FFmpeg")
             p = new FFmpeg;
+        else if (obj.at("name").s == "FileLog")
+            p = new PluginFileLog;
         else
         {
             error += std::string("The plugin ") + obj.at("name").s + " is not managed yet.\n";
             return -1;
         }
+
+        //Common plugin field
+        if (obj.find("id") == obj.end() || obj.at("id").type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            error += "Field 'id' is not present\n";
+            return -1;
+        }
+        p->set_id(obj.at("id").s);
+
+        if (obj.find("name") == obj.end() || obj.at("name").type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            error += "Field 'name' is not present\n";
+            return -1;
+        }
+        p->set_name(obj.at("name").s);
 
         if (p->load_plugin(obj, error) < 0)
             return -1;
@@ -73,7 +90,26 @@ namespace MediaConch {
             format_plugins[((PluginFormat*)p)->get_format()] = p;
         else if (p->get_type() == MediaConchLib::PLUGIN_PRE_HOOK)
             pre_hook_plugins.push_back(p);
+        else if (p->get_type() == MediaConchLib::PLUGIN_LOG)
+            log_plugins.push_back(p);
         return 0;
+    }
+
+    //---------------------------------------------------------------------------
+    int PluginsManager::write_log(const std::string& log)
+    {
+        int ret = 0;
+        std::string time = Core::get_date();
+
+        for (size_t i = 0; i < log_plugins.size(); ++i)
+        {
+            if (!log_plugins[i])
+                continue;
+
+            ((PluginLog*)log_plugins[i])->add_log(time, log);
+        }
+
+        return ret;
     }
 
 }

@@ -180,6 +180,12 @@ public:
     // TODO: removed and manage waiting time otherway
     void WaitRunIsFinished();
 
+    //***************************************************************************
+    // Helper
+    //***************************************************************************
+    static std::string get_date();
+    void plugin_add_log(const std::string& log);
+
 private:
     Core (const Core&);
 

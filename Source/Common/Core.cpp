@@ -44,6 +44,7 @@
 #include <sstream>
 #include <fstream>
 #include <sys/stat.h>
+#include <ctime>
 //---------------------------------------------------------------------------
 
 #if defined(UNIX)
@@ -127,7 +128,8 @@ void Core::load_configuration()
     config = new Configuration;
     std::string config_file = get_config_file();
     config->set_file(config_file);
-    config->parse();
+    if (config->parse() < 0)
+        return;
 
     long scheduler_max_threads = 1;
     if (scheduler && !config->get("Scheduler_Max_Threads", scheduler_max_threads))
@@ -402,6 +404,8 @@ int Core::update_file_error(int user, long id, bool has_error, const std::string
     db_mutex.Enter();
     int ret = get_db()->update_file_error(user, id, has_error, error_log);
     db_mutex.Leave();
+
+    plugin_add_log(error_log);
 
     return ret;
 }
@@ -2098,6 +2102,27 @@ int Core::policy_get_values_for_type_field(const std::string& type, const std::s
     }
 
     return 0;
+}
+
+//--------------------------------------------------------------------------
+std::string Core::get_date()
+{
+    time_t t;
+    time(&t);
+
+    std::string str;
+
+    const char* t_str = ctime(&t);
+    if (t_str)
+        str = std::string(t_str);
+    return str;
+}
+
+//--------------------------------------------------------------------------
+void Core::plugin_add_log(const std::string& log)
+{
+    if (plugins_manager)
+        plugins_manager->write_log(log);
 }
 
 }

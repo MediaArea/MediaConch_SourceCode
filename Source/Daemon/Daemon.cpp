@@ -14,6 +14,7 @@
 #include <map>
 #include <ZenLib/Ztring.h>
 #include "Common/Httpd.h"
+#include "Common/Core.h"
 #include "Common/LibEventHttpd.h"
 #include "Common/Policy.h"
 #include "Common/XsltPolicy.h"
@@ -26,7 +27,6 @@
 #endif //_WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <ctime>
 
 //****************************************************************************
 // Extern
@@ -1518,12 +1518,7 @@ namespace MediaConch
     std::string Daemon::get_date() const
     {
         std::stringstream out;
-        time_t            t;
-
-        time(&t);
-        std::string str(ctime(&t));
-        str = str.substr(0, str.length() - 1);
-        out << "[" << str << "]";
+        out << "[" << Core::get_date() << "]";
         return out.str();
     }
 }

@@ -195,7 +195,8 @@ namespace MediaConch {
 
         std::string error;
         ((PluginFormat*)plugins[format_str])->set_file(el->filename);
-        plugins[format_str]->run(error);
+        if (plugins[format_str]->run(error) < 0)
+            core->plugin_add_log(error);
         const std::string& report = plugins[format_str]->get_report();
         MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
 
