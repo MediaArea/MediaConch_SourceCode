@@ -79,6 +79,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/VeraPDF.cpp \
                     ../../Source/Common/DpfManager.cpp \
                     ../../Source/Common/FFmpeg.cpp \
+                    ../../Source/Common/PluginFileLog.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
@@ -137,6 +138,8 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/VeraPDF.h \
                     ../../Source/Common/DpfManager.h \
                     ../../Source/Common/FFmpeg.h \
+                    ../../Source/Common/PluginLog.h \
+                    ../../Source/Common/PluginFileLog.h \
                     ../../Source/Common/generated/GeneratedCSVVideos.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \

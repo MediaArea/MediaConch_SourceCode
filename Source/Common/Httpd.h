@@ -42,6 +42,8 @@ public:
 #define REQ_FUNC(type) \
     void get_request(std::string& json, RESTAPI::type##_Req** req);
 
+    REQ_FUNC(MediaConch_Watch_Folder);
+
     REQ_FUNC(Checker_Analyze);
     REQ_FUNC(Checker_Report);
     REQ_FUNC(Checker_Validate);
@@ -49,6 +51,7 @@ public:
     REQ_FUNC(Checker_Id_From_Filename);
     REQ_FUNC(Checker_File_Information);
     REQ_FUNC(Checker_Retry);
+
     REQ_FUNC(Policy_Import);
     REQ_FUNC(Policy_Change_Info);
     REQ_FUNC(Policy_Change_Type);
@@ -98,6 +101,8 @@ public:
     // On command received and parsed
     typedef int (*on_mediaconch_get_plugins_command)(const RESTAPI::MediaConch_Get_Plugins_Req* req,
                                                      RESTAPI::MediaConch_Get_Plugins_Res& res, void* arg);
+    typedef int (*on_mediaconch_watch_folder_command)(const RESTAPI::MediaConch_Watch_Folder_Req* req,
+                                                      RESTAPI::MediaConch_Watch_Folder_Res& res, void* arg);
 
     typedef int (*on_analyze_command)(const RESTAPI::Checker_Analyze_Req* req,
                                       RESTAPI::Checker_Analyze_Res& res, void* arg);
@@ -169,7 +174,7 @@ public:
 
     struct Commands
     {
-        Commands() : mediaconch_get_plugins_cb(NULL),
+        Commands() : mediaconch_get_plugins_cb(NULL), mediaconch_watch_folder_cb(NULL),
                      analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
                      retry_cb(NULL), clear_cb(NULL), list_cb(NULL),
                      validate_cb(NULL), file_from_id_cb(NULL),
@@ -201,6 +206,7 @@ public:
             }
         //mediaconch
         on_mediaconch_get_plugins_command         mediaconch_get_plugins_cb;
+        on_mediaconch_watch_folder_command        mediaconch_watch_folder_cb;
 
         //checker
         on_analyze_command                        analyze_cb;

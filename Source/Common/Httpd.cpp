@@ -75,6 +75,8 @@ int Httpd::send_result()
             error = rest.get_error();                                     \
     }
 
+    MAKE_REQ_FUNC(mediaconch_watch_folder, MediaConch_Watch_Folder)
+
     MAKE_REQ_FUNC(analyze, Checker_Analyze)
     MAKE_REQ_FUNC(report, Checker_Report)
     MAKE_REQ_FUNC(validate, Checker_Validate)

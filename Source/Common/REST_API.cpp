@@ -56,6 +56,13 @@ RESTAPI::~RESTAPI()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+RESTAPI::MediaConch_Watch_Folder_Res::~MediaConch_Watch_Folder_Res()
+{
+    if (nok)
+        delete nok;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::MediaConch_Get_Plugins_Res::~MediaConch_Get_Plugins_Res()
 {
     plugins.clear();
@@ -213,6 +220,17 @@ RESTAPI::Policy_Get_Res::~Policy_Get_Res()
 //***************************************************************************
 // Request: to_str()
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::MediaConch_Watch_Folder_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"folder\":\"" << folder << "\"";
+    out << ",\"folder_report\":\"" << folder_reports << "\"";
+    out << "}";
+    return out.str();
+}
 
 //---------------------------------------------------------------------------
 std::string RESTAPI::MediaConch_Get_Plugins_Req::to_str() const
@@ -681,6 +699,20 @@ std::string RESTAPI::MediaConch_Get_Plugins_Res::to_str() const
         }
         out << "]";
     }
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::MediaConch_Watch_Folder_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
+        out << "\"user\":" << user;
     out << "}";
     return out.str();
 }
@@ -1352,6 +1384,33 @@ int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, s
     std::stringstream ss;
 
     data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string& data)
+{
+    Container::Value v, child, folder, folder_reports;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    folder.type = Container::Value::CONTAINER_TYPE_STRING;
+    folder.s = req.folder;
+    child.obj["folder"] = folder;
+
+    folder_reports.type = Container::Value::CONTAINER_TYPE_STRING;
+    folder_reports.s = req.folder_reports;
+    child.obj["folder_reports"] = folder_reports;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["MEDIACONCH_WATCH_FOLDER"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
 
     return 0;
 }
@@ -2117,6 +2176,36 @@ int RESTAPI::serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& re
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["MEDIACONCH_GET_PLUGINS_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& res, std::string& data)
+{
+    Container::Value v, child, nok, user;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+    {
+        nok = serialize_mediaconch_nok(res.nok);
+        child.obj["nok"] = nok;
+    }
+    else
+    {
+        user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        user.l = res.user;
+        child.obj["user"] = user;
+    }
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["MEDIACONCH_WATCH_FOLDER_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -3039,6 +3128,35 @@ RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_mediaconch_get_plugins_req(c
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
     MediaConch_Get_Plugins_Req *req = new MediaConch_Get_Plugins_Req;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "MEDIACONCH_WATCH_FOLDER");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *folder = model->get_value_by_key(*child, "folder");
+    if (!folder || folder->type != Container::Value::CONTAINER_TYPE_STRING)
+        return NULL;
+
+    MediaConch_Watch_Folder_Req *req = new MediaConch_Watch_Folder_Req;
+    req->folder = folder->s;
+
+    Container::Value *folder_reports = model->get_value_by_key(*child, "folder_reports");
+    if (folder_reports && folder_reports->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->folder_reports = folder_reports->s;
 
     return req;
 }
@@ -4243,6 +4361,14 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req
 RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_uri_mediaconch_get_plugins_req(const std::string&)
 {
     MediaConch_Get_Plugins_Req *req = new MediaConch_Get_Plugins_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_watch_folder_req(const std::string&)
+{
+    MediaConch_Watch_Folder_Req *req = new MediaConch_Watch_Folder_Req;
+    //TODO
     return req;
 }
 
@@ -5487,6 +5613,47 @@ RESTAPI::MediaConch_Get_Plugins_Res *RESTAPI::parse_mediaconch_get_plugins_res(c
             res->plugins.push_back(plugins->array[i].s);
         }
     }
+    else
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::MediaConch_Watch_Folder_Res *RESTAPI::parse_mediaconch_watch_folder_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "MEDIACONCH_WATCH_FOLDER_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+
+    MediaConch_Watch_Folder_Res *res = new MediaConch_Watch_Folder_Res;
+
+    if (nok)
+    {
+        if (nok->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        {
+            delete res;
+            return NULL;
+        }
+
+        parse_mediaconch_nok(nok, &res->nok);
+    }
+    else if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->user = user->l;
     else
     {
         delete res;

@@ -51,6 +51,18 @@ int Http::send_request(RESTAPI::MediaConch_Get_Plugins_Req& req)
     return send_request_get(uri_str);
 }
 
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::MediaConch_Watch_Folder_Req& req)
+{
+    std::string cmd;
+    rest.serialize_mediaconch_watch_folder_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_watch_folder";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
 // Checker
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Checker_Analyze_Req& req)

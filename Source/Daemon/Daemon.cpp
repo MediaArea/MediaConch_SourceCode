@@ -88,6 +88,7 @@ namespace MediaConch
         }
 
         httpd->commands.mediaconch_get_plugins_cb = on_mediaconch_get_plugins_command;
+        httpd->commands.mediaconch_watch_folder_cb = on_mediaconch_watch_folder_command;
 
         httpd->commands.analyze_cb = on_analyze_command;
         httpd->commands.status_cb = on_status_command;
@@ -152,6 +153,14 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int Daemon::run()
     {
+        if (MCL && watch_folder.size())
+        {
+            std::string err;
+            long user_id = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, err);
+            if (user_id < 0)
+                std::clog << "Cannot watch folder" << watch_folder << ":" << err << std::endl;
+        }
+
         if (is_daemon)
             daemonize();
         if (!httpd)
@@ -248,6 +257,8 @@ namespace MediaConch
         OPTION("--implementationschema",    implementationschema)
         OPTION("--implementationverbosity", implementationverbosity)
         OPTION("--outputlog",               outputlog)
+        OPTION("--watchfolder-reports",     watchfolder_reports)
+        OPTION("--watchfolder",             watchfolder)
         OPTION("--",                        other)
         else
         {
@@ -394,6 +405,36 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder(const std::string& argument)
+    {
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+        std::string folder;
+        folder.assign(argument, egal_pos + 1 , std::string::npos);
+        watch_folder = folder;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder_reports(const std::string& argument)
+    {
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+        std::string dir;
+        dir.assign(argument, egal_pos + 1 , std::string::npos);
+        watch_folder_reports = dir;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::parse_other(const std::string& argument)
     {
         std::string report;
@@ -468,7 +509,32 @@ namespace MediaConch
                 res.plugins.push_back(vec[i]);
         }
 
-        std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
+        std::clog << d->get_date() << "Daemon send get mediaconch plugins result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_watch_folder_command(const RESTAPI::MediaConch_Watch_Folder_Req* req,
+                                                   RESTAPI::MediaConch_Watch_Folder_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch watch folder command: ";
+        std::clog << req->to_str() << std::endl;
+        std::string error;
+        long user_id = -1;
+        if ((user_id = d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports, error)) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+        else
+            res.user = user_id;
+
+        std::clog << d->get_date() << "Daemon send mediaconch watch folder result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -1518,7 +1584,10 @@ namespace MediaConch
     std::string Daemon::get_date() const
     {
         std::stringstream out;
-        out << "[" << Core::get_date() << "]";
+        std::string time = Core::get_date();
+        if (time.length())
+            time[time.length() - 1] = '\0';
+        out << "[" << time << "]";
         return out.str();
     }
 }

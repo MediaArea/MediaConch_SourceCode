@@ -38,7 +38,7 @@ namespace MediaConch
 
     //--------------------------------------------------------------------------
     CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false),
-                 file_information(false), plugins_list_mode(false)
+                 file_information(false), plugins_list_mode(false), no_needs_files_mode(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -51,24 +51,27 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::init()
     {
-        // If no filenames (and no options)
-        if (files.empty() && !plugins_list_mode)
-            return Help_Nothing();
-
-        // If no report selected, use Implementation by default
-        if (!report_set.count() && !policies.size())
-            report_set.set(MediaConchLib::report_MediaConch);
-
-        // If no Implementation Schema registered, use one by default
-        if (!MCL.get_implementation_schema_file().length())
-            MCL.create_default_implementation_schema();
-
-        std::string reason;
-        if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
-                                                    format, reason))
+        if (!no_needs_files_mode)
         {
-            STRINGOUT(ZenLib::Ztring().From_UTF8(reason));
-            return -1;
+            // If no filenames (and no options)
+            if (files.empty())
+                return Help_Nothing();
+
+            // If no report selected, use Implementation by default
+            if (!report_set.count() && !policies.size())
+                report_set.set(MediaConchLib::report_MediaConch);
+
+            // If no Implementation Schema registered, use one by default
+            if (!MCL.get_implementation_schema_file().length())
+                MCL.create_default_implementation_schema();
+
+            std::string reason;
+            if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
+                                                        format, reason))
+            {
+                STRINGOUT(ZenLib::Ztring().From_UTF8(reason));
+                return -1;
+            }
         }
 
         MCL.set_configuration_file(configuration_file);
@@ -114,6 +117,8 @@ namespace MediaConch
         //Return plugins list
         if (plugins_list_mode)
             return run_plugins_list();
+        else if (watch_folder.size())
+            return run_watch_folder_cmd();
 
         //Return file information
         if (file_information)
@@ -263,6 +268,15 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int CLI::run_watch_folder_cmd()
+    {
+        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::finish()
     {
         MCL.close();
@@ -386,6 +400,21 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int CLI::set_watch_folder(const std::string& folder)
+    {
+        watch_folder = folder;
+        no_needs_files_mode = true;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::set_watch_folder_reports(const std::string& folder)
+    {
+        watch_folder_reports = folder;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::set_compression_mode(const std::string& mode_str)
     {
         MediaConchLib::compression mode;
@@ -410,6 +439,7 @@ namespace MediaConch
     void CLI::set_plugins_list_mode()
     {
         plugins_list_mode = true;
+        no_needs_files_mode = true;
     }
 
     //--------------------------------------------------------------------------

@@ -171,7 +171,7 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 }
 
 //***************************************************************************
-// Analyze
+// MediaConch
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -181,6 +181,16 @@ int MediaConchLib::mediaconch_get_plugins(std::vector<std::string>& plugins, std
         return daemon_client->mediaconch_get_plugins(plugins, error);
 
     return core->mediaconch_get_plugins(plugins, error);
+}
+
+//---------------------------------------------------------------------------
+long MediaConchLib::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                            std::string& error)
+{
+    if (use_daemon)
+        return daemon_client->mediaconch_watch_folder(folder, folder_reports, error);
+
+    return core->mediaconch_watch_folder(folder, folder_reports, error);
 }
 
 //***************************************************************************

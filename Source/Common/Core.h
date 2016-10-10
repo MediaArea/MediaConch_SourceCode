@@ -76,6 +76,10 @@ public:
     const std::map<std::string, Plugin*>& get_format_plugins() const;
     const std::vector<Plugin*>&           get_pre_hook_plugins() const;
 
+    // watch folder
+    long mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                 std::string& error);
+
     //***************************************************************************
     // Checker
     //***************************************************************************

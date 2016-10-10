@@ -45,6 +45,8 @@ namespace MediaConch
         std::string               last_argument;
         std::ofstream            *logger;
         std::streambuf           *clog_buffer;
+        std::string               watch_folder;
+        std::string               watch_folder_reports;
 
         // Helper
         int daemonize();
@@ -60,11 +62,15 @@ namespace MediaConch
         int parse_implementationschema(const std::string& argument);
         int parse_implementationverbosity(const std::string& argument);
         int parse_outputlog(const std::string& argument);
+        int parse_watchfolder(const std::string& argument);
+        int parse_watchfolder_reports(const std::string& argument);
         int parse_other(const std::string& argument);
 
         // Request received callbacks
         //  MediaConch
         static int on_mediaconch_get_plugins_command(const RESTAPI::MediaConch_Get_Plugins_Req* req, RESTAPI::MediaConch_Get_Plugins_Res& res, void *arg);
+        static int on_mediaconch_watch_folder_command(const RESTAPI::MediaConch_Watch_Folder_Req* req,
+                                                      RESTAPI::MediaConch_Watch_Folder_Res& res, void *arg);
 
         //  Checker
         static int on_analyze_command(const RESTAPI::Checker_Analyze_Req* req,

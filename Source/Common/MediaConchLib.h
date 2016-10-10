@@ -244,6 +244,7 @@ public:
 
     // MediaConch
     int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);
+    long mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports, std::string& error);
 
     // Analyze
     int  checker_analyze(int user, const std::vector<std::string>& files,

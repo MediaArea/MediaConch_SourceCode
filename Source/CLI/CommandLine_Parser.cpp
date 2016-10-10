@@ -87,6 +87,16 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--useplugin=";
         return true;
     }
+    else if (argument=="-wf")
+    {
+        Last_Argument = "--watchfolder=";
+        return true;
+    }
+    else if (argument=="-wfr")
+    {
+        Last_Argument = "--watchfolderreports=";
+        return true;
+    }
     return false;
 }
 
@@ -196,6 +206,8 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--defaultvaluesfortype",                        DefaultValuesForType)
     OPTION("--createpolicy",                                CreatePolicy)
     OPTION("--fileinformation",                             FileInformation)
+    OPTION("--watchfolder-reports",                         WatchFolderReports)
+    OPTION("--watchfolder",                                 WatchFolder)
     //Default
     OPTION("--",                                            Default)
     else
@@ -528,6 +540,42 @@ CL_OPTION(FileInformation)
     //Form : --FileInformation, -fi
     (void)argument;
     cli->set_file_information_mode();
+
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(WatchFolder)
+{
+    //Form : --WatchFolder=folder, -wf folder
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string folder;
+    folder.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_watch_folder(folder);
+
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(WatchFolderReports)
+{
+    //Form : --WatchFolderReports=folder, -wfr folder
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string folder;
+    folder.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_watch_folder_reports(folder);
 
     return CLI_RETURN_NONE;
 }

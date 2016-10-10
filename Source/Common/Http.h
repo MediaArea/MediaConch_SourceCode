@@ -39,6 +39,7 @@ public:
 
     // MediaConch
     int send_request(RESTAPI::MediaConch_Get_Plugins_Req& req);
+    int send_request(RESTAPI::MediaConch_Watch_Folder_Req& req);
 
     // Checker
     int send_request(RESTAPI::Checker_Analyze_Req& req);

@@ -309,6 +309,13 @@ int Core::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string&
     return 0;
 }
 
+//---------------------------------------------------------------------------
+long Core::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                           std::string& error)
+{
+    return -1;
+}
+
 //***************************************************************************
 // Checker
 //***************************************************************************

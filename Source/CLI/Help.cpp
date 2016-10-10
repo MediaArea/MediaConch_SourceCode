@@ -75,6 +75,12 @@ int Help()
     TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
 
+    TEXTOUT("Watch folder:");
+    TEXTOUT("--WatchFolder=folder -wf folder");
+    TEXTOUT("                    Send to the server a folder to watch");
+    TEXTOUT("--WatchFolder-Reports=folder -wfr folder");
+    TEXTOUT("                    Create reports of the selected watch folder to this folder");
+
     TEXTOUT("Plugins:");
     TEXTOUT("--PluginsList");
     TEXTOUT("                    Output the plugins information ID");

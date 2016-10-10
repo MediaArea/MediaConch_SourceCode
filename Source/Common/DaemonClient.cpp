@@ -98,7 +98,7 @@ void DaemonClient::reset()
 }
 
 //***************************************************************************
-// Plugins
+// MediaConch
 //***************************************************************************
 
 //---------------------------------------------------------------------------
@@ -136,6 +136,44 @@ int DaemonClient::mediaconch_get_plugins(std::vector<std::string>& plugins, std:
 
     delete res;
     return MediaConchLib::errorHttp_NONE;
+}
+
+//---------------------------------------------------------------------------
+long DaemonClient::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                           std::string& error)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::MediaConch_Watch_Folder_Req req;
+    req.folder = folder;
+    req.folder_reports = folder_reports;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::MediaConch_Watch_Folder_Res *res = rest.parse_mediaconch_watch_folder_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    long user_id = -1;
+    if (res->nok)
+        error = res->nok->error;
+    else
+        user_id = res->user;
+
+    delete res;
+    return user_id;
 }
 
 //***************************************************************************

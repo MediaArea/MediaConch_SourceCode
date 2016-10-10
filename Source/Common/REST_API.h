@@ -155,6 +155,25 @@ public:
         std::string                      to_str() const;
     };
 
+    // Watch Folder
+    struct MediaConch_Watch_Folder_Req
+    {
+        std::string  to_str() const;
+
+        std::string  folder;
+        std::string  folder_reports;
+    };
+
+    struct MediaConch_Watch_Folder_Res
+    {
+        MediaConch_Watch_Folder_Res() : nok(NULL) {}
+        ~MediaConch_Watch_Folder_Res();
+
+        long                             user;
+        MediaConch_Nok                  *nok;
+        std::string                      to_str() const;
+    };
+
 //***************************************************************************
 // Checker
 //***************************************************************************
@@ -867,6 +886,7 @@ public:
 
     // Serialize: Request
     int serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req& req, std::string&);
+    int serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string&);
 
     int serialize_analyze_req(Checker_Analyze_Req& req, std::string&);
     int serialize_status_req(Checker_Status_Req& req, std::string&);
@@ -906,6 +926,7 @@ public:
 
     // Serialize: Result
     int serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string&);
+    int serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& res, std::string&);
 
     int serialize_analyze_res(Checker_Analyze_Res& res, std::string&);
     int serialize_status_res(Checker_Status_Res& res, std::string&);
@@ -944,6 +965,7 @@ public:
 
     // Parse: Request
     MediaConch_Get_Plugins_Req          *parse_mediaconch_get_plugins_req(const std::string& data);
+    MediaConch_Watch_Folder_Req         *parse_mediaconch_watch_folder_req(const std::string& data);
 
     Checker_Analyze_Req                 *parse_analyze_req(const std::string& data);
     Checker_Status_Req                  *parse_status_req(const std::string& data);
@@ -983,6 +1005,7 @@ public:
 
     // Parse: URI Request
     MediaConch_Get_Plugins_Req          *parse_uri_mediaconch_get_plugins_req(const std::string& uri);
+    MediaConch_Watch_Folder_Req         *parse_uri_mediaconch_watch_folder_req(const std::string& uri);
 
     Checker_Analyze_Req                 *parse_uri_analyze_req(const std::string& uri);
     Checker_Status_Req                  *parse_uri_status_req(const std::string& uri);
@@ -1021,6 +1044,7 @@ public:
 
     // Parse: Result
     MediaConch_Get_Plugins_Res         *parse_mediaconch_get_plugins_res(const std::string& data);
+    MediaConch_Watch_Folder_Res        *parse_mediaconch_watch_folder_res(const std::string& data);
 
     Checker_Analyze_Res                *parse_analyze_res(const std::string& data);
     Checker_Status_Res                 *parse_status_res(const std::string& data);
