@@ -37,7 +37,8 @@ mediaconch_SOURCES = \
     ../../../Source/Common/DpfManager.cpp \
     ../../../Source/Common/FFmpeg.cpp \
     ../../../Source/Common/PluginFileLog.cpp \
-    ../../../Source/Common/WatchFoldersManager.cpp
+    ../../../Source/Common/WatchFoldersManager.cpp \
+    ../../../Source/Common/WatchFolder.cpp
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconch_CPPFLAGS = $(XML_CFLAGS)

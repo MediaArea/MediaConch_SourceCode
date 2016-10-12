@@ -6,49 +6,42 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Watch Folder Manager
+// Watch Folder
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef WATCHFOLDER_MANAGERH
-#define WATCHFOLDER_MANAGERH
+#ifndef WATCHFOLDERH
+#define WATCHFOLDERH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 #include <string>
 #include <map>
+#include "ZenLib/Thread.h"
 #include "ZenLib/CriticalSection.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
 
-class Core;
-class WatchFolder;
-
 //***************************************************************************
-// Class WatchFolderManager
+// Class WatchFolder
 //***************************************************************************
 
-class WatchFoldersManager
+class WatchFolder : public ZenLib::Thread
 {
 public:
-    WatchFoldersManager(Core *c);
-    ~WatchFoldersManager();
+    WatchFolder();
+    ~WatchFolder();
 
-    std::map<std::string, std::string>  get_watch_folders();
+    void          Entry();
 
-    long                                add_watch_folder(const std::string&, const std::string&, std::string&);
-    int                                 edit_watch_folder(const std::string&, const std::string&, std::string&);
-    int                                 remove_watch_folder(const std::string&, std::string&);
+    std::string   folder;
+    std::string   folder_reports;
 
 private:
-    WatchFoldersManager(const WatchFoldersManager&);
-    WatchFoldersManager&                operator=(const WatchFoldersManager&);
-
-    Core                                *core;
-    ZenLib::CriticalSection              CS;
-    std::map<std::string, WatchFolder*>  watch_folders;
+    WatchFolder(const WatchFolder&);
+    WatchFolder&  operator=(const WatchFolder&);
 };
 
 }
