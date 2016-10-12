@@ -190,6 +190,34 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
             error = rest.get_error();
     }
 
+    else if (!std::string("/mediaconch_list_watch_folders").compare(uri_path))
+    {
+        std::string query;
+        RESTAPI::MediaConch_List_Watch_Folders_Req *r = NULL;
+        if (query_str)
+            query = std::string(query_str);
+        get_uri_request(query, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::MediaConch_List_Watch_Folders_Res res;
+        if (commands.mediaconch_list_watch_folders_cb && commands.mediaconch_list_watch_folders_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_mediaconch_list_watch_folders_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else if (query_str && !std::string("/checker_status").compare(uri_path))
     {
         std::string query(query_str);
@@ -676,6 +704,56 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
 
             delete r;
         if (rest.serialize_mediaconch_watch_folder_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (!std::string("/mediaconch_edit_watch_folder").compare(uri_path))
+    {
+        RESTAPI::MediaConch_Edit_Watch_Folder_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::MediaConch_Edit_Watch_Folder_Res res;
+        if (commands.mediaconch_edit_watch_folder_cb && commands.mediaconch_edit_watch_folder_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+            delete r;
+        if (rest.serialize_mediaconch_edit_watch_folder_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (!std::string("/mediaconch_remove_watch_folder").compare(uri_path))
+    {
+        RESTAPI::MediaConch_Remove_Watch_Folder_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::MediaConch_Remove_Watch_Folder_Res res;
+        if (commands.mediaconch_remove_watch_folder_cb && commands.mediaconch_remove_watch_folder_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+            delete r;
+        if (rest.serialize_mediaconch_remove_watch_folder_res(res, result) < 0)
             error = rest.get_error();
     }
 

@@ -44,6 +44,7 @@ namespace MediaConch {
 
 class Schema;
 class DatabaseReport;
+class WatchFoldersManager;
 class PluginsManager;
 class Plugin;
 
@@ -77,8 +78,12 @@ public:
     const std::vector<Plugin*>&           get_pre_hook_plugins() const;
 
     // watch folder
+    int  mediaconch_list_watch_folders(std::vector<std::string>& folders, std::string& error);
     long mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                  std::string& error);
+    int  mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                        std::string& error);
+    int  mediaconch_remove_watch_folder(const std::string& folder, std::string& error);
 
     //***************************************************************************
     // Checker
@@ -203,6 +208,7 @@ private:
     std::map<std::string, std::string> implementation_options;
     Scheduler                         *scheduler;
     PluginsManager                    *plugins_manager;
+    WatchFoldersManager                *watch_folders_manager;
     MediaConchLib::compression         compression_mode;
 
     bool check_policies_xslts(int user, const std::vector<long>& files,

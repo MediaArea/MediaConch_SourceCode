@@ -35,7 +35,8 @@ mediaconchd_SOURCES = \
     ../../../Source/Common/VeraPDF.cpp \
     ../../../Source/Common/DpfManager.cpp \
     ../../../Source/Common/FFmpeg.cpp \
-    ../../../Source/Common/PluginFileLog.cpp
+    ../../../Source/Common/PluginFileLog.cpp \
+    ../../../Source/Common/WatchFoldersManager.cpp
 
 #mediaconchd_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconchd_CPPFLAGS = $(XML_CFLAGS)

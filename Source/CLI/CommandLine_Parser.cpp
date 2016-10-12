@@ -206,6 +206,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--defaultvaluesfortype",                        DefaultValuesForType)
     OPTION("--createpolicy",                                CreatePolicy)
     OPTION("--fileinformation",                             FileInformation)
+    OPTION("--watchfolders-list",                           WatchFoldersList)
     OPTION("--watchfolder-reports",                         WatchFolderReports)
     OPTION("--watchfolder",                                 WatchFolder)
     //Default
@@ -540,6 +541,16 @@ CL_OPTION(FileInformation)
     //Form : --FileInformation, -fi
     (void)argument;
     cli->set_file_information_mode();
+
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(WatchFoldersList)
+{
+    //Form : --WatchFoldersList
+    (void)argument;
+    cli->set_list_watch_folders_mode();
 
     return CLI_RETURN_NONE;
 }

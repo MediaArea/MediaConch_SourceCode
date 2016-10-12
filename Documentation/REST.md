@@ -8,6 +8,20 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.10
+ * Update command:
+  * Checker_Get_Report: add plugins to the command to use
+ * Create new command for the MediaConch
+  * MediaConch_Get_Plugins
+  * MediaConch_Watch_Folder
+  * MediaConch_List_Watch_Folders
+  * MediaConch_Edit_Watch_Folder
+  * MediaConch_Remove_Watch_Folder
+ * Create new structure for the MediaConch
+  * MediaConch_Nok
+ * Create new command namespace:
+  * MediaConch
+
 #### Version 1.9
  * Create new command for the checker
   * Checker_Id_From_Filename
@@ -87,36 +101,139 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.6
+Current API version: $API_VERSION = 1.10
 
 #### Command
 
-* Checker_Analyze:         HTTP POST
-* Checker_Status:          HTTP GET
-* Checker_Report:          HTTP POST
-* Checker_Retry:           HTTP PUT
-* Checker_Clear:           HTTP DELETE
-* Checker_List:            HTTP GET
-* Checker_Validate:        HTTP POST
-* Checker_File_From_Id:    HTTP POST
-* Default_Values_For_type: HTTP GET
+* MediaConch_Watch_Folder:        HTTP POST
+* MediaConch_List_Watch_Folder:   HTTP GET
+* MediaConch_Edit_Watch_Folder:   HTTP POST
+* MediaConch_Remove_Watch_Folder: HTTP POST
 
-* XSLT_Policy_Create: HTTP GET
-* Policy_Import: HTTP POST
-* Policy_Remove: HTTP GET
-* Policy_Duplicate: HTTP GET
-* Policy_Move: HTTP GET
-* Policy_Dump: HTTP GET
-* Policy_Save: HTTP GET
-* Policy_Get_Name: HTTP GET
-* Policy_Change_Info: HTTP POST
-* Policy_Change_Type: HTTP POST
-* Policy_Get: HTTP GET
-* Policy_Get_Policies: HTTP GET
+* Checker_Analyze:                HTTP POST
+* Checker_Status:                 HTTP GET
+* Checker_Report:                 HTTP POST
+* Checker_Retry:                  HTTP PUT
+* Checker_Clear:                  HTTP DELETE
+* Checker_List:                   HTTP GET
+* Checker_Validate:               HTTP POST
+* Checker_File_From_Id:           HTTP POST
+* Default_Values_For_type:        HTTP GET
+
+* XSLT_Policy_Create:             HTTP GET
+* Policy_Import:                  HTTP POST
+* Policy_Remove:                  HTTP GET
+* Policy_Duplicate:               HTTP GET
+* Policy_Move:                    HTTP GET
+* Policy_Dump:                    HTTP GET
+* Policy_Save:                    HTTP GET
+* Policy_Get_Name:                HTTP GET
+* Policy_Change_Info:             HTTP POST
+* Policy_Change_Type:             HTTP POST
+* Policy_Get:                     HTTP GET
+* Policy_Get_Policies:            HTTP GET
 * Policy_Get_Policies_Names_List: HTTP GET
-* Policy_Get_Policies_Count: HTTP GET
-* Policy_Clear_Policies: HTTP GET
-* Policy_Create_From_File: HTTP GET
+* Policy_Get_Policies_Count:      HTTP GET
+* Policy_Clear_Policies:          HTTP GET
+* Policy_Create_From_File:        HTTP GET
+
+#### MediaConch_Nok
+
+Structure used when error occurs.
+
+##### Parameters
+
+* error:              String with the error description
+
+#### MediaConch_Get_Plugins
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_get_plugins
+
+##### Request
+
+Parameters:
+
+No parameters for the request
+
+##### Response
+
+Parameters:
+
+* plugins:           Array of String with the Plugins ID
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_Watch_Folder
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_watch_folder
+
+##### Request
+
+Parameters:
+
+* folder:            String with the new directory name to watch
+* folder_reports:    String with the name of the directory where to put the reports of the file analyzed in the watched folders
+
+##### Response
+
+Parameters:
+
+* user:              Integer: a unique id of the user for this watch folder
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_List_Watch_Folders
+
+URI format for the parameters.
+URL: /$API_VERSION/mediaconch_list_watch_folders
+
+##### Request
+
+Parameters:
+
+No parameters for the request
+
+##### Response
+
+Parameters:
+
+* folders:           Array of String: List the folders watched
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_Edit_Watch_Folder
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_edit_watch_folder
+
+##### Request
+
+Parameters:
+
+* folder:            String with the old directory watched
+* folder_reports:    String with the name of the directory where to put the reports of the file analyzed in the watched folders
+
+##### Response
+
+Parameters:
+
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_Remove_Watch_Folder
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_remove_watch_folder
+
+##### Request
+
+Parameters:
+
+* folder:            String with the directory to stop to watch
+
+##### Response
+
+Parameters:
+
+* nok:               MediaConch_Nok when error occurs
 
 #### Checker_Analyze
 

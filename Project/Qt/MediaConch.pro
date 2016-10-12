@@ -80,6 +80,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/DpfManager.cpp \
                     ../../Source/Common/FFmpeg.cpp \
                     ../../Source/Common/PluginFileLog.cpp \
+                    ../../Source/Common/WatchFoldersManager.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
@@ -113,6 +114,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/generated/ImplementationReportMatroskaSchema.h \
                     ../../Source/Common/generated/MicroMediaTraceToMediaTraceXsl.h \
                     ../../Source/Common/generated/PolicyTransformXml.h \
+                    ../../Source/Common/generated/GeneratedCSVVideos.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/DatabaseReport.h \
                     ../../Source/Common/NoDatabaseReport.h \
@@ -140,7 +142,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/FFmpeg.h \
                     ../../Source/Common/PluginLog.h \
                     ../../Source/Common/PluginFileLog.h \
-                    ../../Source/Common/generated/GeneratedCSVVideos.h \
+                    ../../Source/Common/WatchFoldersManager.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebCommonPage.h \

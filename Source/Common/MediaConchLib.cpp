@@ -184,6 +184,15 @@ int MediaConchLib::mediaconch_get_plugins(std::vector<std::string>& plugins, std
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::mediaconch_list_watch_folders(std::vector<std::string>& folders, std::string& error)
+{
+    if (use_daemon)
+        return daemon_client->mediaconch_list_watch_folders(folders, error);
+
+    return core->mediaconch_list_watch_folders(folders, error);
+}
+
+//---------------------------------------------------------------------------
 long MediaConchLib::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                             std::string& error)
 {
@@ -191,6 +200,25 @@ long MediaConchLib::mediaconch_watch_folder(const std::string& folder, const std
         return daemon_client->mediaconch_watch_folder(folder, folder_reports, error);
 
     return core->mediaconch_watch_folder(folder, folder_reports, error);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                                std::string& error)
+{
+    if (use_daemon)
+        return daemon_client->mediaconch_edit_watch_folder(folder, folder_reports, error);
+
+    return core->mediaconch_edit_watch_folder(folder, folder_reports, error);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::mediaconch_remove_watch_folder(const std::string& folder, std::string& error)
+{
+    if (use_daemon)
+        return daemon_client->mediaconch_remove_watch_folder(folder, error);
+
+    return core->mediaconch_remove_watch_folder(folder, error);
 }
 
 //***************************************************************************

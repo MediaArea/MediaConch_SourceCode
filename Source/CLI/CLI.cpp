@@ -38,7 +38,7 @@ namespace MediaConch
 
     //--------------------------------------------------------------------------
     CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false),
-                 file_information(false), plugins_list_mode(false), no_needs_files_mode(false)
+                 file_information(false), plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -117,6 +117,10 @@ namespace MediaConch
         //Return plugins list
         if (plugins_list_mode)
             return run_plugins_list();
+        //Return watch folders list
+        else if (list_watch_folders_mode)
+            return run_watch_folders_list();
+        // Add a watch folder
         else if (watch_folder.size())
             return run_watch_folder_cmd();
 
@@ -251,6 +255,31 @@ namespace MediaConch
 
         std::stringstream out;
         out << "plugins:[";
+
+        for (size_t i = 0; i < list.size(); ++i)
+        {
+            if (i)
+                out << ", ";
+            out << "\"" << list[i] << "\"";
+        }
+
+        out << "]";
+
+        MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
+        STRINGOUT(out_str);
+
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_watch_folders_list()
+    {
+        std::vector<std::string> list;
+        if (MCL.mediaconch_list_watch_folders(list, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        std::stringstream out;
+        out << "watched folders:[";
 
         for (size_t i = 0; i < list.size(); ++i)
         {
@@ -439,6 +468,13 @@ namespace MediaConch
     void CLI::set_plugins_list_mode()
     {
         plugins_list_mode = true;
+        no_needs_files_mode = true;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_list_watch_folders_mode()
+    {
+        list_watch_folders_mode = true;
         no_needs_files_mode = true;
     }
 

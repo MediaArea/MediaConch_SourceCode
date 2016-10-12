@@ -155,6 +155,22 @@ public:
         std::string                      to_str() const;
     };
 
+    // List Watch Folder
+    struct MediaConch_List_Watch_Folders_Req
+    {
+        std::string  to_str() const;
+    };
+
+    struct MediaConch_List_Watch_Folders_Res
+    {
+        MediaConch_List_Watch_Folders_Res() : nok(NULL) {}
+        ~MediaConch_List_Watch_Folders_Res();
+
+        std::vector<std::string>         folders;
+        MediaConch_Nok                  *nok;
+        std::string                      to_str() const;
+    };
+
     // Watch Folder
     struct MediaConch_Watch_Folder_Req
     {
@@ -170,6 +186,41 @@ public:
         ~MediaConch_Watch_Folder_Res();
 
         long                             user;
+        MediaConch_Nok                  *nok;
+        std::string                      to_str() const;
+    };
+
+    // Edit Watch Folder
+    struct MediaConch_Edit_Watch_Folder_Req
+    {
+        std::string  to_str() const;
+
+        std::string  folder;
+        std::string  folder_reports;
+    };
+
+    struct MediaConch_Edit_Watch_Folder_Res
+    {
+        MediaConch_Edit_Watch_Folder_Res() : nok(NULL) {}
+        ~MediaConch_Edit_Watch_Folder_Res();
+
+        MediaConch_Nok                  *nok;
+        std::string                      to_str() const;
+    };
+
+    // Remove Watch Folder
+    struct MediaConch_Remove_Watch_Folder_Req
+    {
+        std::string  to_str() const;
+
+        std::string  folder;
+    };
+
+    struct MediaConch_Remove_Watch_Folder_Res
+    {
+        MediaConch_Remove_Watch_Folder_Res() : nok(NULL) {}
+        ~MediaConch_Remove_Watch_Folder_Res();
+
         MediaConch_Nok                  *nok;
         std::string                      to_str() const;
     };
@@ -887,6 +938,9 @@ public:
     // Serialize: Request
     int serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req& req, std::string&);
     int serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string&);
+    int serialize_mediaconch_list_watch_folders_req(MediaConch_List_Watch_Folders_Req& req, std::string&);
+    int serialize_mediaconch_edit_watch_folder_req(MediaConch_Edit_Watch_Folder_Req& req, std::string&);
+    int serialize_mediaconch_remove_watch_folder_req(MediaConch_Remove_Watch_Folder_Req& req, std::string&);
 
     int serialize_analyze_req(Checker_Analyze_Req& req, std::string&);
     int serialize_status_req(Checker_Status_Req& req, std::string&);
@@ -927,6 +981,9 @@ public:
     // Serialize: Result
     int serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string&);
     int serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& res, std::string&);
+    int serialize_mediaconch_list_watch_folders_res(MediaConch_List_Watch_Folders_Res& res, std::string&);
+    int serialize_mediaconch_edit_watch_folder_res(MediaConch_Edit_Watch_Folder_Res& res, std::string&);
+    int serialize_mediaconch_remove_watch_folder_res(MediaConch_Remove_Watch_Folder_Res& res, std::string&);
 
     int serialize_analyze_res(Checker_Analyze_Res& res, std::string&);
     int serialize_status_res(Checker_Status_Res& res, std::string&);
@@ -966,6 +1023,9 @@ public:
     // Parse: Request
     MediaConch_Get_Plugins_Req          *parse_mediaconch_get_plugins_req(const std::string& data);
     MediaConch_Watch_Folder_Req         *parse_mediaconch_watch_folder_req(const std::string& data);
+    MediaConch_List_Watch_Folders_Req   *parse_mediaconch_list_watch_folders_req(const std::string& data);
+    MediaConch_Edit_Watch_Folder_Req    *parse_mediaconch_edit_watch_folder_req(const std::string& data);
+    MediaConch_Remove_Watch_Folder_Req  *parse_mediaconch_remove_watch_folder_req(const std::string& data);
 
     Checker_Analyze_Req                 *parse_analyze_req(const std::string& data);
     Checker_Status_Req                  *parse_status_req(const std::string& data);
@@ -1006,6 +1066,9 @@ public:
     // Parse: URI Request
     MediaConch_Get_Plugins_Req          *parse_uri_mediaconch_get_plugins_req(const std::string& uri);
     MediaConch_Watch_Folder_Req         *parse_uri_mediaconch_watch_folder_req(const std::string& uri);
+    MediaConch_List_Watch_Folders_Req   *parse_uri_mediaconch_list_watch_folders_req(const std::string& uri);
+    MediaConch_Edit_Watch_Folder_Req    *parse_uri_mediaconch_edit_watch_folder_req(const std::string& uri);
+    MediaConch_Remove_Watch_Folder_Req  *parse_uri_mediaconch_remove_watch_folder_req(const std::string& uri);
 
     Checker_Analyze_Req                 *parse_uri_analyze_req(const std::string& uri);
     Checker_Status_Req                  *parse_uri_status_req(const std::string& uri);
@@ -1045,6 +1108,9 @@ public:
     // Parse: Result
     MediaConch_Get_Plugins_Res         *parse_mediaconch_get_plugins_res(const std::string& data);
     MediaConch_Watch_Folder_Res        *parse_mediaconch_watch_folder_res(const std::string& data);
+    MediaConch_List_Watch_Folders_Res  *parse_mediaconch_list_watch_folders_res(const std::string& data);
+    MediaConch_Edit_Watch_Folder_Res   *parse_mediaconch_edit_watch_folder_res(const std::string& data);
+    MediaConch_Remove_Watch_Folder_Res *parse_mediaconch_remove_watch_folder_res(const std::string& data);
 
     Checker_Analyze_Res                *parse_analyze_res(const std::string& data);
     Checker_Status_Res                 *parse_status_res(const std::string& data);

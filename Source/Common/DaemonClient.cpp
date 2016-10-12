@@ -176,6 +176,119 @@ long DaemonClient::mediaconch_watch_folder(const std::string& folder, const std:
     return user_id;
 }
 
+//---------------------------------------------------------------------------
+int DaemonClient::mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                               std::string& error)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::MediaConch_Edit_Watch_Folder_Req req;
+    req.folder = folder;
+    req.folder_reports = folder_reports;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::MediaConch_Edit_Watch_Folder_Res *res = rest.parse_mediaconch_edit_watch_folder_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    ret = -1;
+    if (res->nok)
+        error = res->nok->error;
+    else
+        ret = 0;
+
+    delete res;
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::mediaconch_list_watch_folders(std::vector<std::string>& folders, std::string& error)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::MediaConch_List_Watch_Folders_Req req;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::MediaConch_List_Watch_Folders_Res *res = rest.parse_mediaconch_list_watch_folders_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    ret = -1;
+    if (res->nok)
+        error = res->nok->error;
+    else
+    {
+        for (size_t i = 0; i < res->folders.size(); ++i)
+            folders.push_back(res->folders[i]);
+        ret = 0;
+    }
+
+    delete res;
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::mediaconch_remove_watch_folder(const std::string& folder, std::string& error)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::MediaConch_Remove_Watch_Folder_Req req;
+    req.folder = folder;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::MediaConch_Remove_Watch_Folder_Res *res = rest.parse_mediaconch_remove_watch_folder_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    ret = -1;
+    if (res->nok)
+        error = res->nok->error;
+    else
+        ret = 0;
+
+    delete res;
+    return ret;
+}
+
 //***************************************************************************
 // Checker
 //***************************************************************************

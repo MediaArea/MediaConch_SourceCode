@@ -76,6 +76,8 @@ int Help()
     TEXTOUT("                    Apply the display transformation (XSL)");
 
     TEXTOUT("Watch folder:");
+    TEXTOUT("--WatchFolders-List");
+    TEXTOUT("                    List the folder watched");
     TEXTOUT("--WatchFolder=folder -wf folder");
     TEXTOUT("                    Send to the server a folder to watch");
     TEXTOUT("--WatchFolder-Reports=folder -wfr folder");

@@ -19,6 +19,7 @@
 #include "Json.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
+#include "Common/WatchFoldersManager.h"
 #include "Common/PluginsManager.h"
 #include "Common/PluginsConfig.h"
 #include "Common/Plugin.h"
@@ -85,12 +86,15 @@ Core::Core() : policies(this)
     db = NULL;
     scheduler = new Scheduler(this);
     plugins_manager = new PluginsManager(this);
+    watch_folders_manager = new WatchFoldersManager(this);
     policies.create_values_from_csv();
     compression_mode = MediaConchLib::compression_ZLib;
 }
 
 Core::~Core()
 {
+    if (watch_folders_manager)
+        delete watch_folders_manager;
     if (scheduler)
         delete scheduler;
     if (plugins_manager)
@@ -311,9 +315,57 @@ int Core::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string&
 
 //---------------------------------------------------------------------------
 long Core::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
-                                           std::string& error)
+                                   std::string& error)
 {
-    return -1;
+    if (!watch_folders_manager)
+    {
+        error = "Watch folder manager not exisitng";
+        return -1;
+    }
+
+    return watch_folders_manager->add_watch_folder(folder, folder_reports, error);
+}
+
+//---------------------------------------------------------------------------
+int Core::mediaconch_list_watch_folders(std::vector<std::string>& folders, std::string& error)
+{
+    if (!watch_folders_manager)
+    {
+        error = "Watch folder manager not exisitng";
+        return -1;
+    }
+
+    std::map<std::string, std::string> tmp = watch_folders_manager->get_watch_folders();
+    std::map<std::string, std::string>::iterator it = tmp.begin();
+    for (; it != tmp.end(); ++it)
+        folders.push_back(it->first);
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Core::mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                       std::string& error)
+{
+    if (!watch_folders_manager)
+    {
+        error = "Watch folder manager not exisitng";
+        return -1;
+    }
+
+    return watch_folders_manager->edit_watch_folder(folder, folder_reports, error);
+}
+
+//---------------------------------------------------------------------------
+int Core::mediaconch_remove_watch_folder(const std::string& folder, std::string& error)
+{
+    if (!watch_folders_manager)
+    {
+        error = "Watch folder manager not exisitng";
+        return -1;
+    }
+
+    return watch_folders_manager->remove_watch_folder(folder, error);
 }
 
 //***************************************************************************

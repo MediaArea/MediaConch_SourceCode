@@ -76,6 +76,8 @@ int Httpd::send_result()
     }
 
     MAKE_REQ_FUNC(mediaconch_watch_folder, MediaConch_Watch_Folder)
+    MAKE_REQ_FUNC(mediaconch_edit_watch_folder, MediaConch_Edit_Watch_Folder)
+    MAKE_REQ_FUNC(mediaconch_remove_watch_folder, MediaConch_Remove_Watch_Folder)
 
     MAKE_REQ_FUNC(analyze, Checker_Analyze)
     MAKE_REQ_FUNC(report, Checker_Report)
@@ -103,6 +105,7 @@ int Httpd::send_result()
     }
 
     MAKE_URI_REQ_FUNC(mediaconch_get_plugins, MediaConch_Get_Plugins)
+    MAKE_URI_REQ_FUNC(mediaconch_list_watch_folders, MediaConch_List_Watch_Folders)
 
     MAKE_URI_REQ_FUNC(status, Checker_Status)
     MAKE_URI_REQ_FUNC(clear, Checker_Clear)

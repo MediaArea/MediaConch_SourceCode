@@ -89,6 +89,9 @@ namespace MediaConch
 
         httpd->commands.mediaconch_get_plugins_cb = on_mediaconch_get_plugins_command;
         httpd->commands.mediaconch_watch_folder_cb = on_mediaconch_watch_folder_command;
+        httpd->commands.mediaconch_list_watch_folders_cb = on_mediaconch_list_watch_folders_command;
+        httpd->commands.mediaconch_edit_watch_folder_cb = on_mediaconch_edit_watch_folder_command;
+        httpd->commands.mediaconch_remove_watch_folder_cb = on_mediaconch_remove_watch_folder_command;
 
         httpd->commands.analyze_cb = on_analyze_command;
         httpd->commands.status_cb = on_status_command;
@@ -535,6 +538,75 @@ namespace MediaConch
             res.user = user_id;
 
         std::clog << d->get_date() << "Daemon send mediaconch watch folder result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_list_watch_folders_command(const RESTAPI::MediaConch_List_Watch_Folders_Req* req,
+                                                         RESTAPI::MediaConch_List_Watch_Folders_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch list watch folders command" << std::endl;
+        std::string error;
+        std::vector<std::string> list;
+        if (d->MCL->mediaconch_list_watch_folders(list, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+        else
+            for (size_t i = 0; i < list.size(); ++i)
+                res.folders.push_back(list[i]);
+
+        std::clog << d->get_date() << "Daemon send mediaconch list watch folders result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_edit_watch_folder_command(const RESTAPI::MediaConch_Edit_Watch_Folder_Req* req,
+                                                        RESTAPI::MediaConch_Edit_Watch_Folder_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch edit watch folder command: ";
+        std::clog << req->to_str() << std::endl;
+        std::string error;
+        if (d->MCL->mediaconch_edit_watch_folder(req->folder, req->folder_reports, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+
+        std::clog << d->get_date() << "Daemon send mediaconch edit watch folder result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_remove_watch_folder_command(const RESTAPI::MediaConch_Remove_Watch_Folder_Req* req,
+                                                          RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch remove watch folder command: ";
+        std::clog << req->to_str() << std::endl;
+        std::string error;
+        if (d->MCL->mediaconch_remove_watch_folder(req->folder, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+
+        std::clog << d->get_date() << "Daemon send mediaconch remove watch folder result: " << res.to_str() << std::endl;
         return 0;
     }
 

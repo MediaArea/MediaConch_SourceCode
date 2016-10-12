@@ -71,6 +71,12 @@ namespace MediaConch
         static int on_mediaconch_get_plugins_command(const RESTAPI::MediaConch_Get_Plugins_Req* req, RESTAPI::MediaConch_Get_Plugins_Res& res, void *arg);
         static int on_mediaconch_watch_folder_command(const RESTAPI::MediaConch_Watch_Folder_Req* req,
                                                       RESTAPI::MediaConch_Watch_Folder_Res& res, void *arg);
+        static int on_mediaconch_list_watch_folders_command(const RESTAPI::MediaConch_List_Watch_Folders_Req* req,
+                                                            RESTAPI::MediaConch_List_Watch_Folders_Res& res, void *arg);
+        static int on_mediaconch_edit_watch_folder_command(const RESTAPI::MediaConch_Edit_Watch_Folder_Req* req,
+                                                           RESTAPI::MediaConch_Edit_Watch_Folder_Res& res, void *arg);
+        static int on_mediaconch_remove_watch_folder_command(const RESTAPI::MediaConch_Remove_Watch_Folder_Req* req,
+                                                             RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void *arg);
 
         //  Checker
         static int on_analyze_command(const RESTAPI::Checker_Analyze_Req* req,

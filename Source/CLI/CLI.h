@@ -53,6 +53,7 @@ namespace MediaConch
         int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
         int  set_watch_folder(const std::string& folder);
         int  set_watch_folder_reports(const std::string& folder);
+        void set_list_watch_folders_mode();
 
         void print_error(MediaConchLib::errorHttp code);
 
@@ -64,6 +65,7 @@ namespace MediaConch
         int  run_policy_reference_file(long file_id);
         int  run_file_information();
         int  run_plugins_list();
+        int  run_watch_folders_list();
         int  run_watch_folder_cmd();
         int  is_ready(long& file_id, MediaConchLib::report& report_kind);
         void add_files_recursively(const std::string& filename);
@@ -82,12 +84,14 @@ namespace MediaConch
         std::string              watch_folder_reports;
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format   format;
+        //TODO: clean
         bool                    use_daemon;
         bool                    asynchronous;
         bool                    force_analyze;
         bool                    create_policy_mode;
         bool                    file_information;
         bool                    plugins_list_mode;
+        bool                    list_watch_folders_mode;
         bool                    no_needs_files_mode;
     };
 

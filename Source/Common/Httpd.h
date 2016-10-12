@@ -43,6 +43,8 @@ public:
     void get_request(std::string& json, RESTAPI::type##_Req** req);
 
     REQ_FUNC(MediaConch_Watch_Folder);
+    REQ_FUNC(MediaConch_Edit_Watch_Folder);
+    REQ_FUNC(MediaConch_Remove_Watch_Folder);
 
     REQ_FUNC(Checker_Analyze);
     REQ_FUNC(Checker_Report);
@@ -62,6 +64,7 @@ public:
     void get_uri_request(std::string& uri, RESTAPI::type##_Req** req);
 
     URI_REQ_FUNC(MediaConch_Get_Plugins);
+    URI_REQ_FUNC(MediaConch_List_Watch_Folders);
 
     URI_REQ_FUNC(Checker_Status);
     URI_REQ_FUNC(Checker_Clear);
@@ -103,6 +106,12 @@ public:
                                                      RESTAPI::MediaConch_Get_Plugins_Res& res, void* arg);
     typedef int (*on_mediaconch_watch_folder_command)(const RESTAPI::MediaConch_Watch_Folder_Req* req,
                                                       RESTAPI::MediaConch_Watch_Folder_Res& res, void* arg);
+    typedef int (*on_mediaconch_list_watch_folders_command)(const RESTAPI::MediaConch_List_Watch_Folders_Req* req,
+                                                            RESTAPI::MediaConch_List_Watch_Folders_Res& res, void* arg);
+    typedef int (*on_mediaconch_edit_watch_folder_command)(const RESTAPI::MediaConch_Edit_Watch_Folder_Req* req,
+                                                           RESTAPI::MediaConch_Edit_Watch_Folder_Res& res, void* arg);
+    typedef int (*on_mediaconch_remove_watch_folder_command)(const RESTAPI::MediaConch_Remove_Watch_Folder_Req* req,
+                                                             RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void* arg);
 
     typedef int (*on_analyze_command)(const RESTAPI::Checker_Analyze_Req* req,
                                       RESTAPI::Checker_Analyze_Res& res, void* arg);
@@ -175,6 +184,8 @@ public:
     struct Commands
     {
         Commands() : mediaconch_get_plugins_cb(NULL), mediaconch_watch_folder_cb(NULL),
+                     mediaconch_list_watch_folders_cb(NULL),
+                     mediaconch_edit_watch_folder_cb(NULL), mediaconch_remove_watch_folder_cb(NULL),
                      analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
                      retry_cb(NULL), clear_cb(NULL), list_cb(NULL),
                      validate_cb(NULL), file_from_id_cb(NULL),
@@ -207,6 +218,9 @@ public:
         //mediaconch
         on_mediaconch_get_plugins_command         mediaconch_get_plugins_cb;
         on_mediaconch_watch_folder_command        mediaconch_watch_folder_cb;
+        on_mediaconch_list_watch_folders_command  mediaconch_list_watch_folders_cb;
+        on_mediaconch_edit_watch_folder_command   mediaconch_edit_watch_folder_cb;
+        on_mediaconch_remove_watch_folder_command mediaconch_remove_watch_folder_cb;
 
         //checker
         on_analyze_command                        analyze_cb;
