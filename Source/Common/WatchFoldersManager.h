@@ -38,7 +38,7 @@ public:
 
     std::map<std::string, std::string>  get_watch_folders();
 
-    long                                add_watch_folder(const std::string&, const std::string&, std::string&);
+    int                                 add_watch_folder(const std::string&, const std::string&, long& user_id, std::string&);
     int                                 edit_watch_folder(const std::string&, const std::string&, std::string&);
     int                                 remove_watch_folder(const std::string&, std::string&);
 

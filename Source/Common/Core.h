@@ -79,8 +79,8 @@ public:
 
     // watch folder
     int  mediaconch_list_watch_folders(std::vector<std::string>& folders, std::string& error);
-    long mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
-                                 std::string& error);
+    int  mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                 long& user_id, std::string& error);
     int  mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
                                         std::string& error);
     int  mediaconch_remove_watch_folder(const std::string& folder, std::string& error);
@@ -95,7 +95,7 @@ public:
                                 const std::string generated_log, const std::string generated_error_log,
                                 const std::vector<std::string>& options, const std::vector<std::string>& plugins);
 
-    bool        checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res);
+    int         checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res);
     int         remove_report(int user, const std::vector<long>& files);
     int         checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
                                    const std::vector<long>& files,

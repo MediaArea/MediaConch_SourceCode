@@ -314,8 +314,8 @@ int Core::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string&
 }
 
 //---------------------------------------------------------------------------
-long Core::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
-                                   std::string& error)
+int Core::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                   long& user_id, std::string& error)
 {
     if (!watch_folders_manager)
     {
@@ -323,7 +323,7 @@ long Core::mediaconch_watch_folder(const std::string& folder, const std::string&
         return -1;
     }
 
-    return watch_folders_manager->add_watch_folder(folder, folder_reports, error);
+    return watch_folders_manager->add_watch_folder(folder, folder_reports, user_id, error);
 }
 
 //---------------------------------------------------------------------------
@@ -470,7 +470,7 @@ int Core::update_file_error(int user, long id, bool has_error, const std::string
 }
 
 //---------------------------------------------------------------------------
-bool Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res)
+int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res)
 {
     double percent_done = 0.0;
     bool is_finished = scheduler->element_is_finished(user, file_id, percent_done);

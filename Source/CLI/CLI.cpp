@@ -299,8 +299,15 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::run_watch_folder_cmd()
     {
-        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, error) < 0)
+        long user_id = -1;
+        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, user_id, error) < 0)
             return MediaConchLib::errorHttp_INTERNAL;
+
+        std::stringstream out;
+        out << "Watch folder user ID:" << user_id;
+
+        MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
+        STRINGOUT(out_str);
 
         return 0;
     }

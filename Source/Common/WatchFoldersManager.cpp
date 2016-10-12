@@ -55,7 +55,7 @@ std::map<std::string, std::string> WatchFoldersManager::get_watch_folders()
 }
 
 //---------------------------------------------------------------------------
-long WatchFoldersManager::add_watch_folder(const std::string& folder, const std::string& folder_reports, std::string& error)
+int WatchFoldersManager::add_watch_folder(const std::string& folder, const std::string& folder_reports, long& user_id, std::string& error)
 {
     CS.Enter();
     std::map<std::string, WatchFolder*>::iterator it = watch_folders.find(folder);
@@ -67,10 +67,13 @@ long WatchFoldersManager::add_watch_folder(const std::string& folder, const std:
         return -1;
     }
 
-    WatchFolder *wf = new WatchFolder;
+    //Find a user ID free
+    user_id = -1;
+    WatchFolder *wf = new WatchFolder(core, user_id);
     wf->folder = folder;
     wf->folder_reports = folder_reports;
     watch_folders[folder] = wf;
+    wf->Run();
     CS.Leave();
     return 0;
 }

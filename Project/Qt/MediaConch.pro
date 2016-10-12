@@ -81,6 +81,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/FFmpeg.cpp \
                     ../../Source/Common/PluginFileLog.cpp \
                     ../../Source/Common/WatchFoldersManager.cpp \
+                    ../../Source/Common/WatchFolder.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \

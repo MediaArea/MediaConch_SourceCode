@@ -140,7 +140,7 @@ int DaemonClient::mediaconch_get_plugins(std::vector<std::string>& plugins, std:
 
 //---------------------------------------------------------------------------
 long DaemonClient::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
-                                           std::string& error)
+                                           long& user_id, std::string& error)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -166,14 +166,17 @@ long DaemonClient::mediaconch_watch_folder(const std::string& folder, const std:
     if (!res)
         return MediaConchLib::errorHttp_INVALID_DATA;
 
-    long user_id = -1;
+    ret = -1;
     if (res->nok)
         error = res->nok->error;
     else
+    {
         user_id = res->user;
+        ret = 0;
+    }
 
     delete res;
-    return user_id;
+    return ret;
 }
 
 //---------------------------------------------------------------------------

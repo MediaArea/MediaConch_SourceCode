@@ -159,9 +159,12 @@ namespace MediaConch
         if (MCL && watch_folder.size())
         {
             std::string err;
-            long user_id = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, err);
-            if (user_id < 0)
-                std::clog << "Cannot watch folder" << watch_folder << ":" << err << std::endl;
+            long user_id = -1;
+            int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, user_id, err);
+            if (ret < 0)
+                std::clog << "Cannot watch folder:" << watch_folder << ":" << err << std::endl;
+            else
+                std::clog << "Watching folder:" << watch_folder << ", user:" << user_id << std::endl;
         }
 
         if (is_daemon)
@@ -529,7 +532,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
         std::string error;
         long user_id = -1;
-        if ((user_id = d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports, error)) < 0)
+        if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports, user_id, error) < 0)
         {
             res.nok = new RESTAPI::MediaConch_Nok;
             res.nok->error = error;
