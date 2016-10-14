@@ -197,12 +197,11 @@ equals(WEB_MACHINE, webengine) {
 INCLUDEPATH      += ../../Source
 
 unix:exists(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config) {
+    INCLUDEPATH      += ../../../MediaInfoLib/Source
     contains(STATIC_LIBS, yes|1) {
-        INCLUDEPATH      += ../../../MediaInfoLib/Source
         LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
         message("custom libmediainfo: yes (static)")
     } else {
-        INCLUDEPATH      += ../../../MediaInfoLib/Source
         LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS)
         message("custom libmediainfo: yes (shared)")
     }
@@ -213,10 +212,15 @@ unix:exists(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config) {
     LIBS += $$system(pkg-config --libs libmediainfo)
 }
 
-unix:exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
+unix:exists(../../../ZenLib/Project/GNU/Library/libzen-config) {
     INCLUDEPATH      += ../../../ZenLib/Source
-    LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
-    message("libzen      : custom")
+    contains(STATIC_LIBS, yes|1) {
+        LIBS             += $$system(../../../ZenLib/Project/GNU/Library/libzen-config LIBS_Static)
+        message("custom libzen       : yes (static)")
+    } else {
+        LIBS             += $$system(../../../ZenLib/Project/GNU/Library/libzen-config LIBS)
+        message("custom libzen       : yes (shared)")
+    }
 } else:unix {
     PKGCONFIG        += libzen
     message("libzen      : system")

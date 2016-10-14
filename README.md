@@ -275,17 +275,23 @@ cd MediaConch_SourceCode/Project/GNU/CLI
 ./autogen.sh
 ```
 
-Then, under Mac:
+##### Then, under Mac:
 
 ```sh
 ./configure --enable-staticlibs
 make
 ```
 
-Under Linux:
+##### Under Linux:
 
 ```sh
 ./configure --enable-shared
+make
+```
+
+Or, if you also build ZenLib and MediaInfoLib:
+```sh
+./configure --enable-staticlibs
 make
 ```
 
@@ -316,12 +322,25 @@ Run:
 make
 ```
 
+Under Mac, or if you also build ZenLib and MediaInfoLib, run:
+```sh
+./prepare STATIC_LIBS=1
+make
+```
+
+
 ##### With online checker
 
 You must install the online checker dependencies. Then run:
 
 ```sh
 ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+make
+```
+
+Under Mac, or if you also build ZenLib and MediaInfoLib, run:
+```sh
+./prepare STATIC_LIBS=1 "DEFINES+=MEDIAINFO_LIBCURL_YES"
 make
 ```
 
@@ -350,7 +369,7 @@ cd $BUILD_DIR
 git clone https://github.com/MediaArea/ZenLib.git
 cd ZenLib/Project/GNU/Library
 ./autogen.sh
-./configure
+./configure --enable-static
 make
 ```
 
@@ -370,7 +389,7 @@ cd MediaInfoLib/Project/GNU/Library
 Run:
 
 ```sh
-./configure --with-libcurl=runtime
+./configure --enable-static --with-libcurl=runtime
 make
 ```
 
@@ -379,7 +398,7 @@ make
 Under Mac:
 
 ```sh
-./configure --with-libcurl=runtime
+./configure --enable-static --with-libcurl=runtime
 make
 ```
 
@@ -388,7 +407,7 @@ Under Linux:
 You must install the online checker dependencies. Then run:
 
 ```sh
-./configure --with-libcurl
+./configure --enable-static --with-libcurl
 make
 ```
 

@@ -54,9 +54,9 @@ if test -e ZenLib/Project/GNU/Library/configure; then
     test -e Makefile && rm Makefile
     chmod +x configure
     if [ "$OS" = "mac" ]; then
-        ./configure $MacOptions $ZenLib_Options $*
+        ./configure --enable-static --disable-shared $MacOptions $ZenLib_Options $*
     else
-        ./configure $ZenLib_Options $*
+        ./configure --enable-static --disable-shared $ZenLib_Options $*
     fi
     if test ! -e Makefile; then
         echo Problem while configuring ZenLib
@@ -90,9 +90,9 @@ if test -e MediaInfoLib/Project/GNU/Library/configure; then
     test -e Makefile && rm Makefile
     chmod +x configure
     if [ "$OS" = "mac" ]; then
-        ./configure $MacOptions --with-libcurl=runtime $*
+        ./configure --enable-staticlibs --enable-static --disable-shared $MacOptions --with-libcurl=runtime $*
     else
-        ./configure --with-libcurl $*
+        ./configure --enable-staticlibs --enable-static --disable-shared --with-libcurl $*
     fi
     if test ! -e Makefile; then
         echo Problem while configuring MediaInfoLib
