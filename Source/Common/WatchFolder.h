@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "ZenLib/Thread.h"
-#include "ZenLib/CriticalSection.h"
+#include <ZenLib/Thread.h>
+#include <ZenLib/CriticalSection.h>
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -46,6 +46,7 @@ public:
 
     std::string           name;
     std::string           time;
+    std::string           report_file;
     long                  file_id;
     WatchFolderFileState  state;
 };

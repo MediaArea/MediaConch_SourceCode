@@ -18,7 +18,10 @@
 #include <ZenLib/Ztring.h>
 #include <ZenLib/ZtringList.h>
 #include <ZenLib/File.h>
+#include <ZenLib/FileName.h>
 #include <ZenLib/Dir.h>
+
+#include <fstream>
 
 #if defined(UNIX)
 #include <unistd.h>
@@ -43,7 +46,7 @@ WatchFolderFile::~WatchFolderFile()
 }
 
 //---------------------------------------------------------------------------
-WatchFolder::WatchFolder(Core* c, long user_id) : user(user_id), core(c), recursive(false), end(false), is_watching(false)
+WatchFolder::WatchFolder(Core* c, long user_id) : user(user_id), core(c), recursive(true), end(false), is_watching(false)
 {
 #ifdef WINDOWS
         waiting_time = 10;
@@ -92,9 +95,40 @@ void WatchFolder::Entry()
 
             if (files.find(filename) == files.end() || !files[filename])
             {
+                if (!filename.size())
+                    continue;
+
                 WatchFolderFile *wffile = new WatchFolderFile;
                 wffile->name = filename;
                 wffile->time = time_utf8;
+
+                //Create sub directory if needed
+                std::string reports_dir = ZenLib::FileName::Path_Get(list[i]).To_UTF8();
+                if (reports_dir.size() > folder.size())
+                {
+                    size_t s = folder.size();
+                    if (s && (folder[s - 1] == '/' || folder[s - 1] == '\\'))
+                        s -= 1;
+                    reports_dir = reports_dir.substr(s);
+                }
+                else
+                    reports_dir = std::string();
+
+                ZenLib::Ztring f_reports = ZenLib::Ztring().From_UTF8(folder_reports);
+                if (f_reports[f_reports.size() - 1] != ZenLib::FileName_PathSeparator[0])
+                    f_reports += ZenLib::FileName_PathSeparator;
+                f_reports += ZenLib::Ztring().From_UTF8(reports_dir);
+                if (folder_reports.size() && !ZenLib::Dir::Exists(f_reports))
+                    ZenLib::Dir::Create(f_reports);
+
+                if (f_reports[f_reports.size() - 1] != ZenLib::FileName_PathSeparator[0])
+                    f_reports += ZenLib::FileName_PathSeparator;
+                wffile->report_file = f_reports.To_UTF8();
+
+                wffile->report_file += ZenLib::FileName::Name_Get(list[i]).To_UTF8();
+                if (ZenLib::FileName::Extension_Get(list[i]).size())
+                    wffile->report_file += "." + ZenLib::FileName::Extension_Get(list[i]).To_UTF8();
+
                 files[filename] = wffile;
                 continue;
             }
@@ -116,8 +150,8 @@ void WatchFolder::Entry()
                 core->checker_status(user, wffile->file_id, status);
                 if (status.finished)
                 {
-                    //TODO: write report if folder_reports is set
-                    ask_report(wffile);
+                    if (folder_reports.size())
+                        ask_report(wffile);
                     wffile->state = WatchFolderFile::WFFS_DONE;
                 }
                 continue;
@@ -180,19 +214,63 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
 
     std::string display_name, display_content;
 
+    //Implementation report
     report_set.set(MediaConchLib::report_MediaConch);
     int ret = core->checker_get_report(user, report_set, format,
                                        files, policies_ids, policies_contents, options,
                                        &result, &display_name, &display_content);
     report_set.reset();
 
-    if (!result.valid)
+    if (!ret || !result.valid)
     {
         std::stringstream out;
 
         out << wffile->name << ": is not valid";
         core->plugin_add_log(out.str());
     }
+
+    std::string filename = wffile->report_file + ".html";
+    std::ofstream out(filename.c_str(), std::ofstream::out);
+    out << result.report;
+    out.close();
+
+    //MediaInfo
+    report_set.set(MediaConchLib::report_MediaInfo);
+    format = MediaConchLib::format_Xml;
+    ret = core->checker_get_report(user, report_set, format,
+                                   files, policies_ids, policies_contents, options,
+                                   &result, &display_name, &display_content);
+    report_set.reset();
+
+    filename = wffile->report_file + ".mi.xml";
+    std::ofstream out_mi(filename.c_str(), std::ofstream::out);
+    out_mi << result.report;
+    out_mi.close();
+
+    //MediaTrace
+    report_set.set(MediaConchLib::report_MediaTrace);
+    ret = core->checker_get_report(user, report_set, format,
+                                   files, policies_ids, policies_contents, options,
+                                   &result, &display_name, &display_content);
+    report_set.reset();
+
+    filename = wffile->report_file + ".mt.xml";
+    std::ofstream out_mt(filename.c_str(), std::ofstream::out);
+    out_mt << result.report;
+    out_mt.close();
+
+    //Policies
+    // report_set.set(MediaConchLib::report_Max);
+    // policies_contents.push_back();
+    // ret = core->checker_get_report(user, report_set, format,
+    //                                    files, policies_ids, policies_contents, options,
+    //                                    &result, &display_name, &display_content);
+    // report_set.reset();
+
+    // out = std::ofstream(std::string(wffile->report_file + ".XXX.xml").c_str(), std::ofstream::out);
+    // out << result.report;
+    // out.close();
+
     return ret;
 }
 
