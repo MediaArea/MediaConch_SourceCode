@@ -581,15 +581,24 @@ int MediaConchLib::policy_change_type(int user, int id, const std::string& type,
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
+int MediaConchLib::policy_change_is_public(int user, int id, bool is_public, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->policy_change_is_public(user, id, is_public, err);
+    return core->policies.policy_change_is_public(user, id, is_public, err);
+}
+
+//---------------------------------------------------------------------------
+int MediaConchLib::policy_get(int user, int id, const std::string& format, bool must_be_public,
+                              MediaConchLib::Get_Policy& policy, std::string& err)
 {
     if (use_daemon)
     {
-        int ret = daemon_client->policy_get(user, id, format, policy, err);
+        int ret = daemon_client->policy_get(user, id, format, must_be_public, policy, err);
         return ret;
     }
 
-    return core->policies.policy_get(user, id, format, policy, err);
+    return core->policies.policy_get(user, id, format, must_be_public, policy, err);
 }
 
 //---------------------------------------------------------------------------

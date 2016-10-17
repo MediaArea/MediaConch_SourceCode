@@ -760,7 +760,7 @@ int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, std::string&
 int MainWindow::policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p)
 {
     std::string err;
-    return MCL.policy_get(-1, pos, format, p, err);
+    return MCL.policy_get(-1, pos, format, false, p, err);
 }
 
 //---------------------------------------------------------------------------

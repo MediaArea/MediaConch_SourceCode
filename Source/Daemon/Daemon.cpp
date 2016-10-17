@@ -114,6 +114,7 @@ namespace MediaConch
         httpd->commands.policy_move_cb = on_policy_move_command;
         httpd->commands.policy_change_info_cb = on_policy_change_info_command;
         httpd->commands.policy_change_type_cb = on_policy_change_type_command;
+        httpd->commands.policy_change_is_public_cb = on_policy_change_is_public_command;
         httpd->commands.policy_get_cb = on_policy_get_command;
         httpd->commands.policy_get_name_cb = on_policy_get_name_command;
         httpd->commands.policy_get_policies_count_cb = on_policy_get_policies_count_command;
@@ -1316,6 +1317,29 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_policy_change_is_public_command(const RESTAPI::Policy_Change_Is_Public_Req* req,
+                                                   RESTAPI::Policy_Change_Is_Public_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_change_is_public command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        if (d->MCL->policy_change_is_public(req->user, req->id, req->is_public, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
+        std::clog << d->get_date() << "Daemon send policy_change_is_public result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
                                       RESTAPI::Policy_Get_Res& res, void *arg)
     {
@@ -1329,7 +1353,7 @@ namespace MediaConch
 
         std::string err;
         MediaConchLib::Get_Policy p;
-        if (d->MCL->policy_get(req->user, req->id, req->format, p, err) < 0)
+        if (d->MCL->policy_get(req->user, req->id, req->format, req->must_be_public, p, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;

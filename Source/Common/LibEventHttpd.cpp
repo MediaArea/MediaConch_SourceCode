@@ -1005,6 +1005,31 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
             error = rest.get_error();
     }
 
+    else if (!std::string("/policy_change_is_public").compare(uri_path))
+    {
+        RESTAPI::Policy_Change_Is_Public_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Change_Is_Public_Res res;
+        if (commands.policy_change_is_public_cb && commands.policy_change_is_public_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_change_is_public_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else if (!std::string("/xslt_policy_rule_edit").compare(uri_path))
     {
         RESTAPI::XSLT_Policy_Rule_Edit_Req *r = NULL;

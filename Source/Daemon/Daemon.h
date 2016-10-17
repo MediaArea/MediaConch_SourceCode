@@ -121,6 +121,8 @@ namespace MediaConch
                                                  RESTAPI::Policy_Change_Info_Res& res, void *arg);
         static int on_policy_change_type_command(const RESTAPI::Policy_Change_Type_Req* req,
                                                  RESTAPI::Policy_Change_Type_Res& res, void *arg);
+        static int on_policy_change_is_public_command(const RESTAPI::Policy_Change_Is_Public_Req* req,
+                                                      RESTAPI::Policy_Change_Is_Public_Res& res, void *arg);
         static int on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
                                          RESTAPI::Policy_Get_Res& res, void *arg);
         static int on_policy_get_name_command(const RESTAPI::Policy_Get_Name_Req* req,

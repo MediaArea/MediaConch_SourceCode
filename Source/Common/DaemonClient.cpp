@@ -1164,7 +1164,48 @@ int DaemonClient::policy_change_type(int user, int id, const std::string& type, 
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
+int DaemonClient::policy_change_is_public(int user, int id, bool is_public, std::string& err)
+{
+    if (!http_client)
+        return MediaConchLib::errorHttp_INIT;
+
+    RESTAPI::Policy_Change_Is_Public_Req req;
+    req.id = id;
+    req.is_public = is_public;
+    req.user = user;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return ret;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return ret;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return http_client->get_error();
+
+    RESTAPI rest;
+    RESTAPI::Policy_Change_Is_Public_Res *res = rest.parse_policy_change_is_public_res(data);
+    if (!res)
+        return MediaConchLib::errorHttp_INVALID_DATA;
+
+    ret = -1;
+    if (!res->nok)
+        ret = 0;
+    else
+        err = res->nok->error;
+
+    delete res;
+    res = NULL;
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int DaemonClient::policy_get(int user, int id, const std::string& format, bool must_be_public,
+                             MediaConchLib::Get_Policy& policy, std::string& err)
 {
     if (!http_client)
         return -1;
@@ -1173,6 +1214,7 @@ int DaemonClient::policy_get(int user, int id, const std::string& format, MediaC
     req.id = id;
     req.user = user;
     req.format = format;
+    req.must_be_public = must_be_public;
 
     int ret = http_client->start();
     if (ret < 0)

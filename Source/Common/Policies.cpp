@@ -442,6 +442,7 @@ MediaConchLib::Policy_Policy *Policies::xslt_policy_to_mcl_policy(XsltPolicy *po
     p->name = policy->name;
     p->description = policy->description;
     p->is_system = policy->is_system;
+    p->is_public = policy->is_public;
     p->kind = "XSLT";
 
     for (size_t i = 0; i < policy->nodes.size(); ++i)
@@ -480,11 +481,18 @@ MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std
     return p;
 }
 
-int Policies::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
+int Policies::policy_get(int user, int id, const std::string& format, bool must_be_public,
+                         MediaConchLib::Get_Policy& policy, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
         return -1;
+
+    if (must_be_public && !p->is_public)
+    {
+        err = "This policy is not a public policy";
+        return -1;
+    }
 
     MediaConchLib::Policy_Policy *pp = policy_to_mcl_policy(p, err);
 
@@ -789,6 +797,35 @@ int Policies::policy_change_type(int user, int id, const std::string& type, std:
     }
 
     ((XsltPolicy*)p)->ope = type;
+
+    return 0;
+}
+
+int Policies::policy_change_is_public(int user, int id, bool is_public, std::string& err)
+{
+    Policy *p = get_policy(user, id, err);
+    if (!p)
+        return -1;
+
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
+
+    if (p->type != POLICY_XSLT)
+    {
+        err = "Not an XSLT policy";
+        return -1;
+    }
+
+    if (((XsltPolicy*)p)->parent_id != (size_t)-1)
+    {
+        err = "Not a root policy";
+        return -1;
+    }
+
+    p->is_public = is_public;
 
     return 0;
 }

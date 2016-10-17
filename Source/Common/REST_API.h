@@ -696,11 +696,29 @@ public:
         std::string  to_str() const;
     };
 
+    struct Policy_Change_Is_Public_Req
+    {
+        Policy_Change_Is_Public_Req() : user(-1), id(-1), is_public(false) {}
+        int          user;
+        int          id;
+        bool         is_public;
+        std::string  to_str() const;
+    };
+
+    struct Policy_Change_Is_Public_Res
+    {
+        Policy_Change_Is_Public_Res() : nok(NULL) {}
+        ~Policy_Change_Is_Public_Res();
+        Policy_Nok  *nok;
+        std::string  to_str() const;
+    };
+
     struct Policy_Get_Req
     {
-        Policy_Get_Req() : user(-1), id(-1), format("JSON") {}
+        Policy_Get_Req() : user(-1), id(-1), must_be_public(false), format("JSON") {}
         int         user;
         int         id;
+        bool        must_be_public;
         std::string format;
         std::string to_str() const;
     };
@@ -986,6 +1004,7 @@ public:
     int serialize_policy_move_req(Policy_Move_Req& req, std::string&);
     int serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string&);
     int serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string&);
+    int serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& req, std::string&);
     int serialize_policy_get_req(Policy_Get_Req& req, std::string&);
     int serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string&);
     int serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string&);
@@ -1030,6 +1049,7 @@ public:
     int serialize_policy_move_res(Policy_Move_Res& res, std::string&);
     int serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string&);
     int serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string&);
+    int serialize_policy_change_is_public_res(Policy_Change_Is_Public_Res& res, std::string&);
     int serialize_policy_get_res(Policy_Get_Res& res, std::string&);
     int serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string&);
     int serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string&);
@@ -1073,6 +1093,7 @@ public:
     Policy_Move_Req                     *parse_policy_move_req(const std::string&);
     Policy_Change_Info_Req              *parse_policy_change_info_req(const std::string&);
     Policy_Change_Type_Req              *parse_policy_change_type_req(const std::string&);
+    Policy_Change_Is_Public_Req         *parse_policy_change_is_public_req(const std::string&);
     Policy_Get_Req                      *parse_policy_get_req(const std::string&);
     Policy_Get_Name_Req                 *parse_policy_get_name_req(const std::string&);
     Policy_Get_Policies_Count_Req       *parse_policy_get_policies_count_req(const std::string&);
@@ -1117,6 +1138,7 @@ public:
     Policy_Move_Req                     *parse_uri_policy_move_req(const std::string&);
     Policy_Change_Info_Req              *parse_uri_policy_change_info_req(const std::string&);
     Policy_Change_Type_Req              *parse_uri_policy_change_type_req(const std::string&);
+    Policy_Change_Is_Public_Req         *parse_uri_policy_change_is_public_req(const std::string&);
     Policy_Get_Req                      *parse_uri_policy_get_req(const std::string&);
     Policy_Get_Name_Req                 *parse_uri_policy_get_name_req(const std::string&);
     Policy_Get_Policies_Count_Req       *parse_uri_policy_get_policies_count_req(const std::string&);
@@ -1160,6 +1182,7 @@ public:
     Policy_Move_Res                    *parse_policy_move_res(const std::string&);
     Policy_Change_Info_Res             *parse_policy_change_info_res(const std::string&);
     Policy_Change_Type_Res             *parse_policy_change_type_res(const std::string&);
+    Policy_Change_Is_Public_Res        *parse_policy_change_is_public_res(const std::string&);
     Policy_Get_Res                     *parse_policy_get_res(const std::string&);
     Policy_Get_Name_Res                *parse_policy_get_name_res(const std::string&);
     Policy_Get_Policies_Count_Res      *parse_policy_get_policies_count_res(const std::string&);

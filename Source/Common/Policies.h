@@ -73,6 +73,7 @@ public:
 
     int         policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
     int         policy_change_type(int user, int id, const std::string& type, std::string& err);
+    int         policy_change_is_public(int user, int id, bool is_public, std::string& err);
 
     int         erase_policy(int user, int index, std::string& err);
     int         clear_policies(int user, std::string& err);
@@ -83,7 +84,8 @@ public:
     void        get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies& ps);
     int         get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& policies, std::string& err);
     void        get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps);
-    int         policy_get(int user, int pos, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err);
+    int         policy_get(int user, int pos, const std::string& format, bool must_be_public,
+                           MediaConchLib::Get_Policy& policy, std::string& err);
 
     int         policy_get_policies(int user, const std::vector<size_t>* policies_ids,
                                     const std::vector<std::string>* policies_contents,

@@ -347,6 +347,18 @@ int Http::send_request(RESTAPI::Policy_Change_Type_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Policy_Change_Is_Public_Req& req)
+{
+    std::string cmd;
+    rest.serialize_policy_change_is_public_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/policy_change_is_public";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Policy_Get_Req& req)
 {
     std::string query;

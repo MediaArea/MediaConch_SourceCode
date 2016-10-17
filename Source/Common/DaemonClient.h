@@ -121,8 +121,12 @@ public:
     // change type
     int policy_change_type(int user, int id, const std::string& type, std::string& err);
 
+    // change is_public
+    int policy_change_is_public(int user, int id, bool is_public, std::string& err);
+
     // get policy
-    int policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err);
+    int policy_get(int user, int id, const std::string& format, bool must_be_public,
+                   MediaConchLib::Get_Policy& policy, std::string& err);
 
     // get policy name
     int policy_get_name(int user, int id, std::string& name, std::string& err);

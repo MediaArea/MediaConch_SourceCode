@@ -57,6 +57,7 @@ public:
     REQ_FUNC(Policy_Import);
     REQ_FUNC(Policy_Change_Info);
     REQ_FUNC(Policy_Change_Type);
+    REQ_FUNC(Policy_Change_Is_Public);
     REQ_FUNC(XSLT_Policy_Rule_Edit);
 #undef REQ_FUNC
 
@@ -155,6 +156,8 @@ public:
                                                  RESTAPI::Policy_Change_Info_Res& res, void* arg);
     typedef int (*on_policy_change_type_command)(const RESTAPI::Policy_Change_Type_Req* req,
                                                  RESTAPI::Policy_Change_Type_Res& res, void* arg);
+    typedef int (*on_policy_change_is_public_command)(const RESTAPI::Policy_Change_Is_Public_Req* req,
+                                                      RESTAPI::Policy_Change_Is_Public_Res& res, void* arg);
     typedef int (*on_policy_get_command)(const RESTAPI::Policy_Get_Req* req,
                                          RESTAPI::Policy_Get_Res& res, void* arg);
     typedef int (*on_policy_get_name_command)(const RESTAPI::Policy_Get_Name_Req* req,
@@ -203,6 +206,7 @@ public:
                      policy_move_cb(NULL),
                      policy_change_info_cb(NULL),
                      policy_change_type_cb(NULL),
+                     policy_change_is_public_cb(NULL),
                      policy_get_cb(NULL),
                      policy_get_name_cb(NULL),
                      policy_get_policies_count_cb(NULL),
@@ -249,6 +253,7 @@ public:
         on_policy_move_command                    policy_move_cb;
         on_policy_change_info_command             policy_change_info_cb;
         on_policy_change_type_command             policy_change_type_cb;
+        on_policy_change_is_public_command        policy_change_is_public_cb;
         on_policy_get_command                     policy_get_cb;
         on_policy_get_name_command                policy_get_name_cb;
         on_policy_get_policies_count_command      policy_get_policies_count_cb;

@@ -9,8 +9,12 @@ It is used above an HTTP connection.
 ### History
 
 #### Version 1.11
+ * Update command:
+  * Policy_Get_Policy: add is_public
+  * Policy_Get_Policy: add must_be_public
  * Create new command for the Policy
   * Policy_Get_Public_Policies
+  * Policy_Change_Is_Public
  * create the policy object:
   * Policy_Public_Policy
 
@@ -107,7 +111,7 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.10
+Current API version: $API_VERSION = 1.11
 
 #### Command
 
@@ -136,6 +140,7 @@ Current API version: $API_VERSION = 1.10
 * Policy_Get_Name:                HTTP GET
 * Policy_Change_Info:             HTTP POST
 * Policy_Change_Type:             HTTP POST
+* Policy_Change_Is_Public:        HTTP POST
 * Policy_Get:                     HTTP GET
 * Policy_Get_Policies:            HTTP GET
 * Policy_Get_Public_Policies:     HTTP GET
@@ -741,6 +746,28 @@ Parameters:
 - Otherwise, return a "nok" object with a Policy_Error
 {"POLICY_CHANGE_TYPE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
+#### Policy_Change_Is_Public
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_change_is_public"
+
+##### Request
+
+Parameters:
+
+user:        User ID
+id:          Policy ID to retrieve information (must be a root policy)
+is_public:   Boolean to set the policy to public or not
+'{"POLICY_CHANGE_IS_PUBLIC":{"id": 0, "is_public": true}}'
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an empty object '{"POLICY_CHANGE_IS_PUBLIC_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CHANGE_IS_PUBLIC_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
 #### Policy_Get
 
 Parameters:
@@ -752,9 +779,10 @@ URL: /$API_VERSION/policy_get?id=0&format=JSTREE
 
 Parameters:
 
-user:   User ID
-id:     Policy ID
-format: Output format, can be "JSTREE" or "JSON"
+user:           User ID
+id:             Policy ID
+format:         Output format, can be "JSTREE" or "JSON"
+must_be_public: Return an error if the policy is not public
 
 ##### Response
 
@@ -1067,6 +1095,7 @@ Parameters:
 * kind:        string containing the policy kind ("UNKNOWN" or "XSLT")
 * type:        string containing the policy operator (optional; value: "and", "or"; default is "and")
 * is_system:   boolean set to true if it is a system policy
+* is_public:   boolean set to true if it is a public policy
 * description: string containing the name of the policy (optional)
 * children:    list of children of the policy (sub-policies, rules)
 

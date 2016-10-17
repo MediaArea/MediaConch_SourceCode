@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.10";
+const std::string RESTAPI::API_VERSION = "1.11";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -194,6 +194,7 @@ DESTRUCTOR_POLICY(Policy_Duplicate_Res)
 DESTRUCTOR_POLICY(Policy_Move_Res)
 DESTRUCTOR_POLICY(Policy_Change_Info_Res)
 DESTRUCTOR_POLICY(Policy_Change_Type_Res)
+DESTRUCTOR_POLICY(Policy_Change_Is_Public_Res)
 DESTRUCTOR_POLICY(Policy_Get_Name_Res)
 DESTRUCTOR_POLICY(Policy_Get_Policies_Count_Res)
 DESTRUCTOR_POLICY(Policy_Get_Policies_Names_List_Res)
@@ -594,11 +595,24 @@ std::string RESTAPI::Policy_Change_Type_Req::to_str() const
 }
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Change_Is_Public_Req::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"user\":" << user;
+    out << ",\"id\":" << id;
+    out << ",\"is_public\":" << std::boolalpha << is_public;
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::Policy_Get_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\":" << user << ",\"id\":" << id << ",\"format\":\"" << format << "\"}";
+    out << "{\"user\":" << user << ",\"id\":" << id << ",\"format\":\"" << format;
+    out <<",\"must_be_public\":" << std::boolalpha << must_be_public << "}";
     return out.str();
 }
 
@@ -1290,6 +1304,18 @@ std::string RESTAPI::Policy_Change_Info_Res::to_str() const
 
 //---------------------------------------------------------------------------
 std::string RESTAPI::Policy_Change_Type_Res::to_str() const
+{
+    std::stringstream out;
+
+    out << "{";
+    if (nok)
+        out << nok->to_str();
+    out << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Change_Is_Public_Res::to_str() const
 {
     std::stringstream out;
 
@@ -2109,6 +2135,37 @@ int RESTAPI::serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::
 }
 
 //---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& req, std::string& data)
+{
+    Container::Value v, child, id, is_public, user;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    id.l = req.id;
+    child.obj["id"] = id;
+
+    is_public.type = Container::Value::CONTAINER_TYPE_BOOL;
+    is_public.b = req.is_public;
+    child.obj["is_public"] = is_public;
+
+    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+    user.l = req.user;
+    child.obj["user"] = user;
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_CHANGE_IS_PUBLIC"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data)
 {
     //URI
@@ -2117,6 +2174,7 @@ int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data)
     ss << "?id=" << req.id;
     ss << "&user=" << req.user;
     ss << "&format=" << req.format;
+    ss << "&must_be_public=" << req.must_be_public;
     data = ss.str();
 
     return 0;
@@ -3058,6 +3116,28 @@ int RESTAPI::serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_CHANGE_TYPE_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_change_is_public_res(Policy_Change_Is_Public_Res& res, std::string& data)
+{
+    Container::Value v, child, nok;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_CHANGE_IS_PUBLIC_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -4316,6 +4396,40 @@ RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_policy_change_type_req(const std
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_policy_change_is_public_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_CHANGE_IS_PUBLIC");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        return NULL;
+
+    Container::Value *is_public = model->get_value_by_key(*child, "is_public");
+    if (!is_public || is_public->type != Container::Value::CONTAINER_TYPE_BOOL)
+        return NULL;
+
+    Policy_Change_Is_Public_Req *req = new Policy_Change_Is_Public_Req;
+    req->id = id->l;
+    req->is_public = is_public->b;
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        req->user = user->l;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -4344,6 +4458,10 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
     Container::Value *format = model->get_value_by_key(*child, "format");
     if (format && format->type == Container::Value::CONTAINER_TYPE_STRING)
         req->format = format->s;
+
+    Container::Value *be_public = model->get_value_by_key(*child, "must_be_public");
+    if (be_public && be_public->type == Container::Value::CONTAINER_TYPE_BOOL)
+        req->must_be_public = be_public->b;
 
     return req;
 }
@@ -5450,6 +5568,58 @@ RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_uri_policy_change_type_req(const
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_uri_policy_change_is_public_req(const std::string& uri)
+{
+    Policy_Change_Is_Public_Req *req = new Policy_Change_Is_Public_Req;
+
+    size_t start = 0;
+    size_t and_pos = 0;
+    while (start != std::string::npos)
+    {
+        size_t key_start = start;
+        start = uri.find("=", start);
+        if (start == std::string::npos)
+            continue;
+
+        std::string substr = uri.substr(key_start, start - key_start);
+        ++start;
+        and_pos = uri.find("&", start);
+        std::string val = uri.substr(start, and_pos - start);
+
+        start = and_pos;
+        if (start != std::string::npos)
+            start += 1;
+
+        if (substr == "id")
+        {
+            if (!val.length())
+                continue;
+
+            req->id = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "user")
+        {
+            if (!val.length())
+                continue;
+
+            req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "is_public")
+        {
+            if (!val.length())
+                continue;
+
+            if (val == "true")
+                req->is_public = true;
+        }
+        else
+            start = std::string::npos;
+    }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& uri)
 {
     Policy_Get_Req *req = new Policy_Get_Req;
@@ -5492,6 +5662,14 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& ur
                 continue;
 
             req->format = val;
+        }
+        else if (substr == "must_be_public")
+        {
+            if (!val.length())
+                continue;
+
+            if (val == "true")
+                req->must_be_public = true;
         }
         else
             start = std::string::npos;
@@ -7019,6 +7197,33 @@ RESTAPI::Policy_Change_Type_Res *RESTAPI::parse_policy_change_type_res(const std
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Change_Is_Public_Res *RESTAPI::parse_policy_change_is_public_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_CHANGE_IS_PUBLIC_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Change_Is_Public_Res *res = new Policy_Change_Is_Public_Res;
+
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    if (parse_policy_nok(nok, &res->nok) < 0)
+    {
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
 {
     Container::Value v, *child;
@@ -7866,7 +8071,7 @@ Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
 //---------------------------------------------------------------------------
 void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v)
 {
-    Container::Value id, parent_id, is_system, kind, type, name, description, children;
+    Container::Value id, parent_id, is_system, is_public, kind, type, name, description, children;
 
     ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -7881,6 +8086,10 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
     is_system.type = Container::Value::CONTAINER_TYPE_BOOL;
     is_system.b = policy->is_system;
     ok_v.obj["is_system"] = is_system;
+
+    is_public.type = Container::Value::CONTAINER_TYPE_BOOL;
+    is_public.b = policy->is_public;
+    ok_v.obj["is_public"] = is_public;
 
     kind.type = Container::Value::CONTAINER_TYPE_STRING;
     kind.s = policy->kind;
@@ -8469,6 +8678,10 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
     Container::Value *is_system = model->get_value_by_key(*policy, "is_system");
     if (is_system && is_system->type == Container::Value::CONTAINER_TYPE_BOOL)
         ok->is_system = is_system->b;
+
+    Container::Value *is_public = model->get_value_by_key(*policy, "is_public");
+    if (is_public && is_public->type == Container::Value::CONTAINER_TYPE_BOOL)
+        ok->is_public = is_public->b;
 
     Container::Value *kind = model->get_value_by_key(*policy, "kind");
     if (kind && kind->type == Container::Value::CONTAINER_TYPE_STRING)

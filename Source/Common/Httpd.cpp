@@ -90,6 +90,7 @@ int Httpd::send_result()
     MAKE_REQ_FUNC(policy_import, Policy_Import);
     MAKE_REQ_FUNC(policy_change_info, Policy_Change_Info);
     MAKE_REQ_FUNC(policy_change_type, Policy_Change_Type);
+    MAKE_REQ_FUNC(policy_change_is_public, Policy_Change_Is_Public);
     MAKE_REQ_FUNC(xslt_policy_rule_edit, XSLT_Policy_Rule_Edit);
 
 #undef MAKE_REQ_FUNC
