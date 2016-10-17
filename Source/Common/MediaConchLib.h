@@ -183,6 +183,16 @@ public:
         Policy_Policy    *policy;
     };
 
+    struct Policy_Public_Policy
+    {
+        Policy_Public_Policy() : id(-1), user(-1) {}
+        Policy_Public_Policy(const Policy_Public_Policy* p) : id(p->id), user(p->user), name(p->name), description(p->description) {}
+        long                                      id;
+        long                                      user;
+        std::string                               name;
+        std::string                               description;
+    };
+
     struct Get_Policies
     {
     Get_Policies() : policies(NULL) {}
@@ -328,6 +338,7 @@ public:
     int                          policy_get(int user, int pos, const std::string& format, Get_Policy&, std::string& err);
     int                          policy_get_name(int user, int id, std::string& name, std::string& err);
     void                         policy_get_policies(int user, const std::vector<int>&, const std::string& format, Get_Policies&);
+    int                          policy_get_public_policies(std::vector<Policy_Public_Policy*>& policies, std::string& err);
     void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
     int                          policy_save(int user, int pos, std::string& err);
     int                          policy_remove(int user, int pos, std::string& err);

@@ -629,6 +629,15 @@ void MediaConchLib::policy_get_policies(int user, const std::vector<int>& ids, c
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::policy_get_public_policies(std::vector<Policy_Public_Policy*>& policies, std::string& err)
+{
+    if (use_daemon)
+        return daemon_client->policy_get_public_policies(policies, err);
+
+    return core->policies.get_public_policies(policies, err);
+}
+
+//---------------------------------------------------------------------------
 void MediaConchLib::policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& policies)
 {
     if (use_daemon)

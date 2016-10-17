@@ -400,6 +400,19 @@ int Http::send_request(RESTAPI::Policy_Get_Policies_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Policy_Get_Public_Policies_Req& req)
+{
+    std::string query;
+    rest.serialize_policy_get_public_policies_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/policy_get_public_policies" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Policy_Get_Policies_Names_List_Req&)
 {
     std::string uri = "/" + RESTAPI::API_VERSION + "/policy_get_policies_names_list";

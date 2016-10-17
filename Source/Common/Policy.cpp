@@ -26,7 +26,7 @@ namespace MediaConch {
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Policy::Policy(Policies *p, Policies::PolicyType t, bool n_https) : type(t), is_system(false), no_https(n_https), policies(p)
+Policy::Policy(Policies *p, Policies::PolicyType t, bool n_https) : type(t), is_system(false), no_https(n_https), is_public(false), policies(p)
 {
     this->id = p->get_an_id();
 }
@@ -40,6 +40,7 @@ Policy::Policy(const Policy* p)
     this->name = p->name;
     this->description = p->description;
     this->is_system = false;
+    this->is_public = p->is_public;
     this->no_https = p->no_https;
     this->policies = p->policies;
     this->id = p->policies->get_an_id();
@@ -54,6 +55,7 @@ Policy::Policy(const Policy& p)
     this->name = p.name;
     this->description = p.description;
     this->is_system = p.is_system;
+    this->is_public = p.is_public;
     this->no_https = p.no_https;
     this->policies = p.policies;
     this->id = p.id;

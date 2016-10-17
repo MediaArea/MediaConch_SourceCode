@@ -136,6 +136,9 @@ public:
     // get all policies
     void policy_get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies&);
 
+    // get all public policies
+    int policy_get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& policies, std::string& err);
+
     // get all policies with ID && name
     void policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
 

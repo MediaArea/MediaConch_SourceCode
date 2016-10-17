@@ -1313,6 +1313,58 @@ void DaemonClient::policy_get_policies(int user, const std::vector<int>& ids, co
 }
 
 //---------------------------------------------------------------------------
+int DaemonClient::policy_get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& policies, std::string& err)
+{
+    if (!http_client)
+        return -1;
+
+    RESTAPI::Policy_Get_Public_Policies_Req req;
+
+    int ret = http_client->start();
+    if (ret < 0)
+        return -1;
+
+    ret = http_client->send_request(req);
+    if (ret < 0)
+        return -1;
+
+    std::string data = http_client->get_result();
+    http_client->stop();
+    if (!data.length())
+        return -1;
+
+    RESTAPI rest;
+    RESTAPI::Policy_Get_Public_Policies_Res *res = rest.parse_policy_get_public_policies_res(data);
+    if (!res)
+        return -1;
+
+    ret = -1;
+    if (res->nok)
+        err = res->nok->error;
+    else
+    {
+        for (size_t i = 0; i < res->policies.size(); ++i)
+        {
+            if (!res->policies[i])
+                continue;
+
+            MediaConchLib::Policy_Public_Policy* p = new MediaConchLib::Policy_Public_Policy;
+            p->id = res->policies[i]->id;
+            p->user = res->policies[i]->user;
+            p->name = res->policies[i]->name;
+            p->description = res->policies[i]->description;
+            policies.push_back(p);
+        }
+        ret = 0;
+    }
+
+    delete res;
+    res = NULL;
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
 void DaemonClient::policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& policies)
 {
     if (!http_client)

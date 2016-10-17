@@ -510,6 +510,29 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
             error = rest.get_error();
     }
 
+    else if (!std::string("/policy_get_public_policies").compare(uri_path))
+    {
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
+        RESTAPI::Policy_Get_Public_Policies_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Public_Policies_Res res;
+        if (commands.policy_get_public_policies_cb && commands.policy_get_public_policies_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_public_policies_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else if (!std::string("/policy_get_policies_names_list").compare(uri_path))
     {
         std::string query;

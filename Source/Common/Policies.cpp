@@ -596,9 +596,36 @@ void Policies::get_policies(int user, const std::vector<int>& ids, const std::st
     }
 }
 
+int Policies::get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& ps, std::string&)
+{
+    std::map<int, std::map<size_t, Policy*> >::iterator it = policies.begin();
+    for (; it != policies.end(); ++it)
+    {
+        std::map<size_t, Policy *>::iterator it_p = it->second.begin();
+        for (; it_p != it->second.end(); ++it_p)
+        {
+            if (!it_p->second)
+                continue;
+
+            if (!it_p->second->is_public)
+                continue;
+
+            MediaConchLib::Policy_Public_Policy *p = new MediaConchLib::Policy_Public_Policy;
+            p->id = (long)it_p->second->id;
+            p->user = it->first;
+            p->name = it_p->second->name;
+            p->description = it_p->second->description;
+
+            ps.push_back(p);
+        }
+    }
+
+    return 0;
+}
+
 void Policies::get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps)
 {
-    std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
+    std::map<int, std::map<size_t, Policy*> >::iterator it = policies.find(user);
 
     if (it == policies.end())
         add_system_policies_to_user_policies(user);

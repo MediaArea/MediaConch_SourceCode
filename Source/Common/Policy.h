@@ -58,9 +58,10 @@ public:
     std::string          name;
     std::string          description;
     Policies::PolicyType type;
+    size_t               id;
     bool                 is_system;
     bool                 no_https;
-    size_t               id;
+    bool                 is_public;
 
 protected:
     Policies            *policies;

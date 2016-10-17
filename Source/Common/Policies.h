@@ -81,6 +81,7 @@ public:
     Policy*     get_policy(int user, int pos, std::string& err);
     int         policy_get_name(int user, int id, std::string& name, std::string& err);
     void        get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies& ps);
+    int         get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& policies, std::string& err);
     void        get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps);
     int         policy_get(int user, int pos, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err);
 

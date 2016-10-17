@@ -782,6 +782,29 @@ public:
         std::string                                 to_str() const;
     };
 
+    struct Policy_Public_Policy
+    {
+        long             id;
+        long             user;
+        std::string      name;
+        std::string      description;
+        std::string      to_str() const;
+    };
+
+    struct Policy_Get_Public_Policies_Req
+    {
+        std::string      to_str() const;
+    };
+
+    struct Policy_Get_Public_Policies_Res
+    {
+        Policy_Get_Public_Policies_Res() :  nok(NULL) {}
+        ~Policy_Get_Public_Policies_Res();
+        std::vector<Policy_Public_Policy*>  policies;
+        Policy_Nok                         *nok;
+        std::string                         to_str() const;
+    };
+
     struct Policy_Get_Policies_Names_List_Req
     {
         Policy_Get_Policies_Names_List_Req() : user(-1) {}
@@ -968,6 +991,7 @@ public:
     int serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string&);
     int serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req, std::string&);
     int serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string&);
+    int serialize_policy_get_public_policies_req(Policy_Get_Public_Policies_Req& req, std::string&);
     int serialize_policy_get_policies_names_list_req(Policy_Get_Policies_Names_List_Req& req, std::string&);
     int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&);
     int serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string&);
@@ -1011,6 +1035,7 @@ public:
     int serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string&);
     int serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res, std::string&);
     int serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string&);
+    int serialize_policy_get_public_policies_res(Policy_Get_Public_Policies_Res& res, std::string&);
     int serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Names_List_Res& res, std::string&);
     int serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string&);
     int serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string&);
@@ -1053,6 +1078,7 @@ public:
     Policy_Get_Policies_Count_Req       *parse_policy_get_policies_count_req(const std::string&);
     Policy_Clear_Policies_Req           *parse_policy_clear_policies_req(const std::string&);
     Policy_Get_Policies_Req             *parse_policy_get_policies_req(const std::string&);
+    Policy_Get_Public_Policies_Req      *parse_policy_get_public_policies_req(const std::string&);
     Policy_Get_Policies_Names_List_Req  *parse_policy_get_policies_names_list_req(const std::string&);
     XSLT_Policy_Create_From_File_Req    *parse_xslt_policy_create_from_file_req(const std::string&);
     XSLT_Policy_Rule_Create_Req         *parse_xslt_policy_rule_create_req(const std::string&);
@@ -1096,6 +1122,7 @@ public:
     Policy_Get_Policies_Count_Req       *parse_uri_policy_get_policies_count_req(const std::string&);
     Policy_Clear_Policies_Req           *parse_uri_policy_clear_policies_req(const std::string&);
     Policy_Get_Policies_Req             *parse_uri_policy_get_policies_req(const std::string&);
+    Policy_Get_Public_Policies_Req      *parse_uri_policy_get_public_policies_req(const std::string&);
     Policy_Get_Policies_Names_List_Req  *parse_uri_policy_get_policies_names_list_req(const std::string&);
     XSLT_Policy_Create_From_File_Req    *parse_uri_xslt_policy_create_from_file_req(const std::string&);
     XSLT_Policy_Rule_Create_Req         *parse_uri_xslt_policy_rule_create_req(const std::string&);
@@ -1138,6 +1165,7 @@ public:
     Policy_Get_Policies_Count_Res      *parse_policy_get_policies_count_res(const std::string&);
     Policy_Clear_Policies_Res          *parse_policy_clear_policies_res(const std::string&);
     Policy_Get_Policies_Res            *parse_policy_get_policies_res(const std::string&);
+    Policy_Get_Public_Policies_Res     *parse_policy_get_public_policies_res(const std::string&);
     Policy_Get_Policies_Names_List_Res *parse_policy_get_policies_names_list_res(const std::string&);
     XSLT_Policy_Create_From_File_Res   *parse_xslt_policy_create_from_file_res(const std::string&);
     XSLT_Policy_Rule_Create_Res        *parse_xslt_policy_rule_create_res(const std::string&);
@@ -1171,6 +1199,7 @@ private:
     Container::Value serialize_validate_ok(Checker_Validate_Ok* ok);
     Container::Value serialize_policy_nok(Policy_Nok* nok);
     void serialize_policies_get_policies(const std::vector<MediaConchLib::Policy_Policy*>&, Container::Value& policies);
+    void serialize_policy_public_policy(const std::vector<Policy_Public_Policy*>&, Container::Value& policies);
     void serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p);
     void serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v);
     void serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v);
@@ -1186,6 +1215,7 @@ private:
     int parse_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks);
     int parse_policy_nok(Container::Value *v, Policy_Nok** n);
     int parse_policies_get_policies(Container::Value* policies, std::vector<MediaConchLib::Policy_Policy*>&);
+    int parse_policy_public_policy(Container::Value* policies, std::vector<Policy_Public_Policy*>&);
     int parse_policies_get_policies_names(Container::Value* policies, std::vector<std::pair<int, std::string> >&);
     MediaConchLib::Policy_Policy* parse_a_policy(Container::Value* policy);
     MediaConchLib::XSLT_Policy_Rule* parse_a_xslt_policy_rule(Container::Value* rule);

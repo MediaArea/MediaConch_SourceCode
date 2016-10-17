@@ -8,6 +8,12 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.11
+ * Create new command for the Policy
+  * Policy_Get_Public_Policies
+ * create the policy object:
+  * Policy_Public_Policy
+
 #### Version 1.10
  * Update command:
   * Checker_Get_Report: add plugins to the command to use
@@ -132,6 +138,7 @@ Current API version: $API_VERSION = 1.10
 * Policy_Change_Type:             HTTP POST
 * Policy_Get:                     HTTP GET
 * Policy_Get_Policies:            HTTP GET
+* Policy_Get_Public_Policies:     HTTP GET
 * Policy_Get_Policies_Names_List: HTTP GET
 * Policy_Get_Policies_Count:      HTTP GET
 * Policy_Clear_Policies:          HTTP GET
@@ -801,6 +808,27 @@ Parameters:
 - otherwise, return a "nok" object with a Policy_Error
 {"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
 
+#### Policy_Get_Public_Policies
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_public_policies
+
+##### Request
+
+Parameters:
+
+- No parameters for Policy_Get_Public_Policies
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with an array of public policies (Policy_Public_Policy): '{"POLICY_GET_PUBLIC_POLICIES_RESULT": {"policies": []}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
+
 #### Policy_Get_Policies_Names_List
 
 Parameters:
@@ -1060,6 +1088,19 @@ Parameters:
 * value:      Value of the rule
 
 {"id":0, "name": "NAME", "tracktype": "TYPE", "field":"FIELD", "occurrence":-1, "ope":"is_existing", value=""}
+
+#### Policy_Public_Policy
+
+Public Policy Object
+
+Parameters:
+
+* id:          ID of the policy
+* user:        ID of the user owning this policy
+* name:        string containing the name of the policy (optional)
+* description: string containing the name of the policy (optional)
+
+{"id":0, "user":-1, "name": "NAME", "description":""}
 
 #### Policy_Error
 

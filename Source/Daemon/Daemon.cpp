@@ -119,6 +119,7 @@ namespace MediaConch
         httpd->commands.policy_get_policies_count_cb = on_policy_get_policies_count_command;
         httpd->commands.policy_clear_policies_cb = on_policy_clear_policies_command;
         httpd->commands.policy_get_policies_cb = on_policy_get_policies_command;
+        httpd->commands.policy_get_public_policies_cb = on_policy_get_public_policies_command;
         httpd->commands.policy_get_policies_names_list_cb = on_policy_get_policies_names_list_command;
         httpd->commands.xslt_policy_create_from_file_cb = on_xslt_policy_create_from_file_command;
         httpd->commands.xslt_policy_rule_create_cb = on_xslt_policy_rule_create_command;
@@ -1431,6 +1432,44 @@ namespace MediaConch
         }
 
         std::clog << d->get_date() << "Daemon send policy_get_policies result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_policy_get_public_policies_command(const RESTAPI::Policy_Get_Public_Policies_Req* req,
+                                                      RESTAPI::Policy_Get_Public_Policies_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_get_public_policies command" << std::endl;
+
+        std::vector<MediaConchLib::Policy_Public_Policy*> policies;
+        std::string err;
+        if (d->MCL->policy_get_public_policies(policies, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+        else
+        {
+            for (size_t i = 0; i < policies.size(); ++i)
+            {
+                if (!policies[i])
+                    continue;
+
+                RESTAPI::Policy_Public_Policy *policy = new RESTAPI::Policy_Public_Policy;
+                policy->id = policies[i]->id;
+                policy->user = policies[i]->user;
+                policy->name = policies[i]->name;
+                policy->description = policies[i]->description;
+                res.policies.push_back(policy);
+            }
+        }
+
+        std::clog << d->get_date() << "Daemon send policy_get_public_policies result: " << res.to_str() << std::endl;
         return 0;
     }
 

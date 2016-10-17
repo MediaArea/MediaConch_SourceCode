@@ -223,6 +223,20 @@ RESTAPI::Policy_Get_Policies_Res::~Policy_Get_Policies_Res()
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Public_Policies_Res::~Policy_Get_Public_Policies_Res()
+{
+    for (size_t i = 0; i < policies.size(); ++i)
+        delete policies[i];
+    policies.clear();
+
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Get_Res::~Policy_Get_Res()
 {
     if (policy)
@@ -631,6 +645,12 @@ std::string RESTAPI::Policy_Get_Policies_Req::to_str() const
     out << "],\"format\":\"" << format;
     out << "\"}";
     return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Public_Policies_Req::to_str() const
+{
+    return std::string();
 }
 
 //---------------------------------------------------------------------------
@@ -1354,6 +1374,42 @@ std::string RESTAPI::Policy_Get_Policies_Res::to_str() const
     }
     else if (policiesTree.size())
         out << policiesTree;
+    else if (nok)
+        out << "{" << nok->to_str() << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Public_Policy::to_str() const
+{
+    std::stringstream out;
+
+    out << "{\"id\":" << id;
+    out << ",\"user\":" << user;
+    out << ",\"name\":\"" << name << "\"";
+    out << ",\"description\":\"" << description << "\"}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Policy_Get_Public_Policies_Res::to_str() const
+{
+    std::stringstream out;
+
+    if (policies.size())
+    {
+        out << "{\"policies\":[";
+        for (size_t i = 0; i < policies.size(); ++i)
+        {
+            if (!policies[i])
+                continue;
+
+            if (i)
+                out << ",";
+            out << policies[i]->to_str();
+        }
+        out << "]}";
+    }
     else if (nok)
         out << "{" << nok->to_str() << "}";
     return out.str();
@@ -2114,6 +2170,15 @@ int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std
         ss << "&id=" << req.ids[i];
     ss << "&format=" << req.format;
     data = ss.str();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_public_policies_req(Policy_Get_Public_Policies_Req&, std::string&)
+{
+    //URI
+    std::stringstream ss;
 
     return 0;
 }
@@ -3130,9 +3195,37 @@ int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std
         child.s = res.policiesTree;
     }
 
-
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_GET_POLICIES_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        error = model->get_error();
+        return -1;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_policy_get_public_policies_res(Policy_Get_Public_Policies_Res& res, std::string& data)
+{
+    Container::Value v, child;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_policy_nok(res.nok);
+    else if (res.policies.size())
+    {
+        Container::Value policies;
+        serialize_policy_public_policy(res.policies, policies);
+        child.obj["policies"] = policies;
+    }
+
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["POLICY_GET_PUBLIC_POLICIES_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
@@ -4370,6 +4463,26 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const s
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_policy_get_public_policies_req(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET_PUBLIC_POLICIES");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        return NULL;
+
+    Policy_Get_Public_Policies_Req *req = new Policy_Get_Public_Policies_Req;
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_policy_get_policies_names_list_req(const std::string& data)
 {
     Container::Value v, *child;
@@ -5552,6 +5665,14 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(con
         else
             start = std::string::npos;
     }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_uri_policy_get_public_policies_req(const std::string&)
+{
+    Policy_Get_Public_Policies_Req *req = new Policy_Get_Public_Policies_Req;
 
     return req;
 }
@@ -7088,6 +7209,51 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Get_Public_Policies_Res *RESTAPI::parse_policy_get_public_policies_res(const std::string& data)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        error = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "POLICY_GET_PUBLIC_POLICIES_RESULT");
+    if (!child)
+        return NULL;
+
+    Policy_Get_Public_Policies_Res *res = NULL;
+    if (child->type == Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        Container::Value *policies = model->get_value_by_key(*child, "policies");
+        Container::Value *nok = model->get_value_by_key(*child, "nok");
+
+        res = new Policy_Get_Public_Policies_Res;
+        if (nok && parse_policy_nok(nok, &res->nok) < 0)
+        {
+            delete res;
+            return NULL;
+        }
+        else if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            if (parse_policy_public_policy(policies, res->policies) < 0)
+            {
+                delete res;
+                return NULL;
+            }
+        }
+        else
+        {
+            delete res;
+            return NULL;
+        }
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Get_Policies_Names_List_Res *RESTAPI::parse_policy_get_policies_names_list_res(const std::string& data)
 {
     Container::Value v, *child;
@@ -7821,6 +7987,39 @@ void RESTAPI::serialize_policies_get_policies(const std::vector<MediaConchLib::P
 }
 
 //---------------------------------------------------------------------------
+void RESTAPI::serialize_policy_public_policy(const std::vector<Policy_Public_Policy*>& policies, Container::Value &p)
+{
+    p.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < policies.size(); ++i)
+    {
+        if (!policies[i])
+            continue;
+
+        Container::Value policy, id, user, name, description;
+
+        policy.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = policies[i]->id;
+        policy.obj["id"] = id;
+
+        user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        user.l = policies[i]->user;
+        policy.obj["user"] = user;
+
+        name.type = Container::Value::CONTAINER_TYPE_STRING;
+        name.s = policies[i]->name;
+        policy.obj["name"] = name;
+
+        description.type = Container::Value::CONTAINER_TYPE_STRING;
+        description.s = policies[i]->description;
+        policy.obj["description"] = description;
+
+        p.array.push_back(policy);
+    }
+}
+
+//---------------------------------------------------------------------------
 void RESTAPI::serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p)
 {
     p.type = Container::Value::CONTAINER_TYPE_ARRAY;
@@ -8188,6 +8387,38 @@ int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaC
 
         if (ok)
             policies.push_back(ok);
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::parse_policy_public_policy(Container::Value *p, std::vector<Policy_Public_Policy*>& policies)
+{
+    if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        return -1;
+
+    for (size_t i = 0; i < p->array.size(); ++i)
+    {
+        if (p->array[i].type != Container::Value::CONTAINER_TYPE_OBJECT)
+            continue;
+
+        Container::Value *id = model->get_value_by_key(p->array[i], "id");
+        Container::Value *user = model->get_value_by_key(p->array[i], "user");
+        Container::Value *name = model->get_value_by_key(p->array[i], "name");
+        Container::Value *description = model->get_value_by_key(p->array[i], "description");
+        if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER ||
+            !user || user->type != Container::Value::CONTAINER_TYPE_INTEGER ||
+            !name || name->type != Container::Value::CONTAINER_TYPE_STRING ||
+            !description || description->type != Container::Value::CONTAINER_TYPE_STRING)
+            return -1;
+
+        Policy_Public_Policy *policy = new Policy_Public_Policy;
+        policy->id = id->l;
+        policy->user = user->l;
+        policy->name = name->s;
+        policy->description = description->s;
+
+        policies.push_back(policy);
     }
     return 0;
 }
