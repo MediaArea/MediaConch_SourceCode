@@ -17,6 +17,7 @@
 
 //---------------------------------------------------------------------------
 #include <string>
+#include <vector>
 #include <map>
 #include "ZenLib/CriticalSection.h"
 
@@ -38,7 +39,9 @@ public:
 
     std::map<std::string, std::string>  get_watch_folders();
 
-    int                                 add_watch_folder(const std::string&, const std::string&, long& user_id, std::string&);
+    int                                 add_watch_folder(const std::string&, const std::string&,
+                                                         const std::vector<std::string>&, const std::vector<std::string>&,
+                                                         long& user_id, std::string&);
     int                                 edit_watch_folder(const std::string&, const std::string&, std::string&);
     int                                 remove_watch_folder(const std::string&, std::string&);
 

@@ -315,7 +315,8 @@ int Core::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string&
 
 //---------------------------------------------------------------------------
 int Core::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
-                                   long& user_id, std::string& error)
+                                  const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
+                                  long& user_id, std::string& error)
 {
     if (!watch_folders_manager)
     {
@@ -323,7 +324,7 @@ int Core::mediaconch_watch_folder(const std::string& folder, const std::string& 
         return -1;
     }
 
-    return watch_folders_manager->add_watch_folder(folder, folder_reports, user_id, error);
+    return watch_folders_manager->add_watch_folder(folder, folder_reports, plugins, policies, user_id, error);
 }
 
 //---------------------------------------------------------------------------

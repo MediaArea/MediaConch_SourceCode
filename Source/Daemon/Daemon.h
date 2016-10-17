@@ -33,6 +33,7 @@ namespace MediaConch
         int parse_args(int ac, char** av);
         int init();
         int run();
+        int run_plugins_list();
         int finish();
 
       private:
@@ -47,6 +48,16 @@ namespace MediaConch
         std::streambuf           *clog_buffer;
         std::string               watch_folder;
         std::string               watch_folder_reports;
+        std::vector<std::string>  plugins;
+        std::vector<std::string>  policies;
+
+        //Mode
+        enum daemon_mode
+        {
+            DAEMON_MODE_DAEMON,
+            DAEMON_MODE_PLUGINS_LIST,
+        };
+        daemon_mode mode;
 
         // Helper
         int daemonize();
@@ -58,6 +69,9 @@ namespace MediaConch
         int parse_fork(const std::string& argument);
         int parse_configuration(const std::string& argument);
         int parse_plugins_configuration(const std::string& argument);
+        int parse_plugins_list(const std::string& argument);
+        int parse_plugin(const std::string& argument);
+        int parse_policy(const std::string& argument);
         int parse_compression(const std::string& argument);
         int parse_implementationschema(const std::string& argument);
         int parse_implementationverbosity(const std::string& argument);

@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <map>
 #include <ZenLib/Ztring.h>
+#include <ZenLib/File.h>
 #include "Common/Httpd.h"
 #include "Common/Core.h"
 #include "Common/LibEventHttpd.h"
@@ -43,7 +44,7 @@ namespace MediaConch
     std::string Daemon::version = "16.09.0";
 
     //--------------------------------------------------------------------------
-    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL)
+    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), mode(DAEMON_MODE_DAEMON)
     {
         MCL = new MediaConchLib(true);
         clog_buffer = std::clog.rdbuf();
@@ -158,11 +159,20 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int Daemon::run()
     {
+        switch (mode)
+        {
+            case DAEMON_MODE_PLUGINS_LIST:
+                return run_plugins_list();
+            case DAEMON_MODE_DAEMON:
+                //default, continue
+                break;
+        }
+
         if (MCL && watch_folder.size())
         {
             std::string err;
             long user_id = -1;
-            int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, user_id, err);
+            int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies, user_id, err);
             if (ret < 0)
                 std::clog << "Cannot watch folder:" << watch_folder << ":" << err << std::endl;
             else
@@ -187,6 +197,29 @@ namespace MediaConch
             return -1;
         }
         return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::run_plugins_list()
+    {
+        std::stringstream out;
+        std::vector<std::string> list;
+        std::string error;
+        if (MCL->mediaconch_get_plugins(list, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        out << "plugins:[";
+
+        for (size_t i = 0; i < list.size(); ++i)
+        {
+            if (i)
+                out << ", ";
+            out << "\"" << list[i] << "\"";
+        }
+
+        out << "]" << std::endl;
+        TEXTOUT(out.str().c_str());
+        return DAEMON_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -261,6 +294,9 @@ namespace MediaConch
         OPTION("--fork",                    fork)
         OPTION("--configuration",           configuration)
         OPTION("--pluginsconfiguration",    plugins_configuration)
+        OPTION("--pluginslist",             plugins_list)
+        OPTION("--plugin",                  plugin)
+        OPTION("--policy",                  policy)
         OPTION("--compression",             compression)
         OPTION("--implementationschema",    implementationschema)
         OPTION("--implementationverbosity", implementationverbosity)
@@ -413,6 +449,72 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::parse_plugin(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string plugin = argument.substr(equal_pos + 1);
+        plugins.push_back(plugin);
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_plugins_list(const std::string& argument)
+    {
+        (void)argument;
+
+        mode = DAEMON_MODE_PLUGINS_LIST;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_policy(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string filename = argument.substr(equal_pos + 1);
+        ZenLib::Ztring z_filename = ZenLib::Ztring().From_UTF8(filename);
+        if (!ZenLib::File::Exists(z_filename))
+        {
+            TEXTOUT("Policiy file does not exists");
+            return DAEMON_RETURN_ERROR;
+        }
+
+        ZenLib::File file(z_filename);
+
+        ZenLib::int64u size = file.Size_Get();
+        if (size == (ZenLib::int64u)-1)
+        {
+            TEXTOUT("Cannot read the policiy file");
+            return DAEMON_RETURN_ERROR;
+        }
+
+        ZenLib::int8u* Buffer = new ZenLib::int8u[size + 1];
+        size_t len = file.Read(Buffer, size);
+        Buffer[len] = '\0';
+
+        ZenLib::Ztring FromFile;
+        FromFile.From_UTF8((char*)Buffer);
+        if (FromFile.empty())
+            FromFile.From_Local((char*)Buffer);
+
+        file.Close();
+        policies.push_back(FromFile.To_UTF8());
+        delete [] Buffer;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::parse_watchfolder(const std::string& argument)
     {
         size_t egal_pos = argument.find('=');
@@ -534,7 +636,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
         std::string error;
         long user_id = -1;
-        if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports, user_id, error) < 0)
+        if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports, req->plugins, req->policies, user_id, error) < 0)
         {
             res.nok = new RESTAPI::MediaConch_Nok;
             res.nok->error = error;

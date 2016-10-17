@@ -194,12 +194,13 @@ int MediaConchLib::mediaconch_list_watch_folders(std::vector<std::string>& folde
 
 //---------------------------------------------------------------------------
 int MediaConchLib::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                           const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
                                            long& user_id, std::string& error)
 {
     if (use_daemon)
-        return daemon_client->mediaconch_watch_folder(folder, folder_reports, user_id, error);
+        return daemon_client->mediaconch_watch_folder(folder, folder_reports, plugins, policies, user_id, error);
 
-    return core->mediaconch_watch_folder(folder, folder_reports, user_id, error);
+    return core->mediaconch_watch_folder(folder, folder_reports, plugins, policies, user_id, error);
 }
 
 //---------------------------------------------------------------------------

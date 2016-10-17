@@ -229,7 +229,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
         core->plugin_add_log(out.str());
     }
 
-    std::string filename = wffile->report_file + ".html";
+    std::string filename = wffile->report_file + "implementationReport.html";
     std::ofstream out(filename.c_str(), std::ofstream::out);
     out << result.report;
     out.close();
@@ -260,16 +260,14 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     out_mt.close();
 
     //Policies
-    // report_set.set(MediaConchLib::report_Max);
-    // policies_contents.push_back();
-    // ret = core->checker_get_report(user, report_set, format,
-    //                                    files, policies_ids, policies_contents, options,
-    //                                    &result, &display_name, &display_content);
-    // report_set.reset();
+    ret = core->checker_get_report(user, report_set, format,
+                                   files, policies_ids, policies, options,
+                                   &result, &display_name, &display_content);
+    report_set.reset();
 
-    // out = std::ofstream(std::string(wffile->report_file + ".XXX.xml").c_str(), std::ofstream::out);
-    // out << result.report;
-    // out.close();
+    out = std::ofstream(std::string(wffile->report_file + ".policiesReport.xml").c_str(), std::ofstream::out);
+    out << result.report;
+    out.close();
 
     return ret;
 }

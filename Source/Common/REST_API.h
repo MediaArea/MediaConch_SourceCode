@@ -174,10 +174,12 @@ public:
     // Watch Folder
     struct MediaConch_Watch_Folder_Req
     {
-        std::string  to_str() const;
+        std::string              to_str() const;
 
-        std::string  folder;
-        std::string  folder_reports;
+        std::string              folder;
+        std::string              folder_reports;
+        std::vector<std::string> plugins;
+        std::vector<std::string> policies;
     };
 
     struct MediaConch_Watch_Folder_Res

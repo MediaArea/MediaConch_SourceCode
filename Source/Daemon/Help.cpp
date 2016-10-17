@@ -58,12 +58,31 @@ int Help()
     TEXTOUT("                    If No, MediaConchd will not fork, default it forks");
     TEXTOUT("-n");
     TEXTOUT("                    Same as --Fork=No");
+    TEXTOUT("");
 
     TEXTOUT("Daemon Debug:");
     TEXTOUT("--OutputLog=File");
     TEXTOUT("                    Log debug information to File");
     TEXTOUT("-o File");
     TEXTOUT("                    Same as --OutFile=File");
+    TEXTOUT("");
+
+    TEXTOUT("Watch folder:");
+    TEXTOUT("--WatchFolders-List");
+    TEXTOUT("                    List the folder watched");
+    TEXTOUT("--WatchFolder=folder -wf folder");
+    TEXTOUT("                    Send to the server a folder to watch");
+    TEXTOUT("--WatchFolder-Reports=folder -wfr folder");
+    TEXTOUT("                    Create reports of the selected watch folder to this folder");
+    TEXTOUT("--Plugin=PluginID");
+    TEXTOUT("                    By default, only format plugin are used.");
+    TEXTOUT("                    With this command, you can give the plugin ID you want to use.");
+    TEXTOUT("                    Plugin ID can be get using the --pluginslist.");
+    TEXTOUT("--PluginsList");
+    TEXTOUT("                    Output the plugins information ID");
+    TEXTOUT("--Policy=PolicyFile");
+    TEXTOUT("                    Policy used by the watch folder manager.");
+    TEXTOUT("");
 
     return DAEMON_RETURN_FINISH;
 }

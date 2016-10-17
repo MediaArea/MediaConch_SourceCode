@@ -69,6 +69,7 @@ public:
     std::string                              folder;
     std::string                              folder_reports;
     std::vector<std::string>                 plugins;
+    std::vector<std::string>                 policies;
     long                                     user;
 
 private:

@@ -48,7 +48,8 @@ public:
     // Plugins
     int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);
     int  mediaconch_list_watch_folders(std::vector<std::string>& folders, std::string& error);
-    long mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+    int  mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                 const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
                                  long& user_id, std::string& error);
     int  mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
                                       std::string& error);

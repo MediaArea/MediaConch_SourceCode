@@ -186,6 +186,8 @@ Parameters:
 
 * folder:            String with the new directory name to watch
 * folder_reports:    String with the name of the directory where to put the reports of the file analyzed in the watched folders
+* plugins:           Array of String with the plugins ID
+* policies:          Array of String with the policies contents
 
 ##### Response
 

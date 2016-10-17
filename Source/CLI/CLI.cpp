@@ -300,7 +300,7 @@ namespace MediaConch
     int CLI::run_watch_folder_cmd()
     {
         long user_id = -1;
-        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, user_id, error) < 0)
+        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies, user_id, error) < 0)
             return MediaConchLib::errorHttp_INTERNAL;
 
         std::stringstream out;

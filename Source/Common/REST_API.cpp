@@ -264,7 +264,21 @@ std::string RESTAPI::MediaConch_Watch_Folder_Req::to_str() const
 
     out << "{\"folder\":\"" << folder << "\"";
     out << ",\"folder_report\":\"" << folder_reports << "\"";
-    out << "}";
+    out << ",\"plugins\":[";
+    for (size_t i = 0; i < plugins.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "\"" << plugins[i] << "\"";
+    }
+    out << "],\"policies\":[";
+    for (size_t i = 0; i < policies.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "\"" << policies[i].size() << "\"";
+    }
+    out << "]}";
     return out.str();
 }
 
@@ -1571,7 +1585,7 @@ int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, s
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string& data)
 {
-    Container::Value v, child, folder, folder_reports;
+    Container::Value v, child, folder, folder_reports, plugins, policies;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -1582,6 +1596,26 @@ int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& 
     folder_reports.type = Container::Value::CONTAINER_TYPE_STRING;
     folder_reports.s = req.folder_reports;
     child.obj["folder_reports"] = folder_reports;
+
+    plugins.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < req.plugins.size(); ++i)
+    {
+        Container::Value plugin;
+        plugin.type = Container::Value::CONTAINER_TYPE_STRING;
+        plugin.s = req.plugins[i];
+        plugins.array.push_back(plugin);
+    }
+    child.obj["plugins"] = plugins;
+
+    policies.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < req.policies.size(); ++i)
+    {
+        Container::Value policy;
+        policy.type = Container::Value::CONTAINER_TYPE_STRING;
+        policy.s = req.policies[i];
+        policies.array.push_back(policy);
+    }
+    child.obj["policies"] = policies;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["MEDIACONCH_WATCH_FOLDER"] = child;
@@ -3574,6 +3608,22 @@ RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req
     Container::Value *folder_reports = model->get_value_by_key(*child, "folder_reports");
     if (folder_reports && folder_reports->type == Container::Value::CONTAINER_TYPE_STRING)
         req->folder_reports = folder_reports->s;
+
+    Container::Value *plugins = model->get_value_by_key(*child, "plugins");
+    if (plugins && plugins->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < plugins->array.size(); ++i)
+            if (plugins->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->plugins.push_back(plugins->array[i].s);
+    }
+
+    Container::Value *policies = model->get_value_by_key(*child, "policies");
+    if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < policies->array.size(); ++i)
+            if (policies->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->policies.push_back(policies->array[i].s);
+    }
 
     return req;
 }
