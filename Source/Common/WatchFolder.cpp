@@ -265,9 +265,9 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
                                    &result, &display_name, &display_content);
     report_set.reset();
 
-    out = std::ofstream(std::string(wffile->report_file + ".policiesReport.xml").c_str(), std::ofstream::out);
-    out << result.report;
-    out.close();
+    std::ofstream out_pr(std::string(wffile->report_file + ".policiesReport.xml").c_str(), std::ofstream::out);
+    out_pr << result.report;
+    out_pr.close();
 
     return ret;
 }
