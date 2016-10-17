@@ -105,7 +105,7 @@ public:
     int policy_remove(int user, int id, std::string& err);
 
     // remove
-    int policy_dump(int user, int id, std::string& memory, std::string& err);
+    int policy_dump(int user, int id, bool must_be_public, std::string& memory, std::string& err);
 
     // save
     int policy_save(int user, int pos, std::string& err);

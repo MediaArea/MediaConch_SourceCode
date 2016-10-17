@@ -778,7 +778,7 @@ int MainWindow::policy_save(int pos, std::string& err)
 //---------------------------------------------------------------------------
 int MainWindow::policy_dump(int pos, std::string& memory, std::string& err)
 {
-    return MCL.policy_dump(-1, pos, memory, err);
+    return MCL.policy_dump(-1, pos, false, memory, err);
 }
 
 //---------------------------------------------------------------------------
@@ -807,7 +807,7 @@ int MainWindow::policy_export(int pos, std::string& err)
     set_last_save_policy_path(info.absolutePath().toUtf8().data());
 
     std::string policy;
-    if (MCL.policy_dump(-1, pos, policy, err))
+    if (MCL.policy_dump(-1, pos, false, policy, err))
         return -1;
 
     QFile file(filename);

@@ -212,7 +212,7 @@ namespace MediaConch
             return MediaConchLib::errorHttp_INTERNAL;
 
         std::string policy;
-        if (MCL.policy_dump(-1, pos, policy, error))
+        if (MCL.policy_dump(-1, pos, false, policy, error))
             return MediaConchLib::errorHttp_INTERNAL;
 
         MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);

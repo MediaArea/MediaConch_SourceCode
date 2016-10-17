@@ -10,8 +10,9 @@ It is used above an HTTP connection.
 
 #### Version 1.11
  * Update command:
-  * Policy_Get_Policy: add is_public
-  * Policy_Get_Policy: add must_be_public
+  * Policy_Get: add is_public
+  * Policy_Get: add must_be_public
+  * Policy_Dump: add must_be_public
  * Create new command for the Policy
   * Policy_Get_Public_Policies
   * Policy_Change_Is_Public
@@ -604,14 +605,15 @@ Parameters:
 #### Policy_Dump
 
 URI format for the parameters.
-URL: /$API_VERSION/policy_dump?id=0
+URL: /$API_VERSION/policy_dump?id=0&must_be_public=true
 
 ##### Request
 
 Parameters:
 
-user:  User ID
-id:    Policy ID to dump
+user:           User ID
+id:             Policy ID to dump
+must_be_public: Return an error if the policy is not public
 
 ##### Response
 

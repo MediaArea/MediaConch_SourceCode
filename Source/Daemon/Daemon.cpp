@@ -1291,7 +1291,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_dump(req->user, req->id, res.xml, err) == -1)
+        if (d->MCL->policy_dump(req->user, req->id, req->must_be_public, res.xml, err) == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;

@@ -1048,7 +1048,7 @@ int DaemonClient::policy_save(int user, int id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_dump(int user, int id, std::string& memory, std::string& err)
+int DaemonClient::policy_dump(int user, int id, bool must_be_public, std::string& memory, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -1056,6 +1056,7 @@ int DaemonClient::policy_dump(int user, int id, std::string& memory, std::string
     RESTAPI::Policy_Dump_Req req;
     req.id = id;
     req.user = user;
+    req.must_be_public = must_be_public;
 
     int ret = http_client->start();
     if (ret < 0)

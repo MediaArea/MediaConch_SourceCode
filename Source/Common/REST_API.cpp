@@ -552,7 +552,8 @@ std::string RESTAPI::Policy_Dump_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\": " << user << ",\"id\": " << id << "}";
+    out << "{\"user\": " << user << ",\"id\": " << id;
+    out << ",\"must_be_public\":" << std::boolalpha << must_be_public << "}";
     return out.str();
 }
 
@@ -2056,6 +2057,8 @@ int RESTAPI::serialize_policy_dump_req(Policy_Dump_Req& req, std::string& data)
 
     ss << "?id=" << req.id;
     ss << "&user=" << req.user;
+    if (req.must_be_public)
+        ss << "&must_be_public=" << req.must_be_public;
     data = ss.str();
 
     return 0;
@@ -4274,6 +4277,10 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_policy_dump_req(const std::string& data
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
 
+    Container::Value *must_be_public = model->get_value_by_key(*child, "must_be_public");
+    if (must_be_public && must_be_public->type == Container::Value::CONTAINER_TYPE_BOOL)
+        req->must_be_public = must_be_public->b;
+
     return req;
 }
 
@@ -5354,6 +5361,14 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& 
                 continue;
 
             req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "must_be_public")
+        {
+            if (!val.length())
+                continue;
+
+            if (val == "true")
+                req->must_be_public = true;
         }
         else
             start = std::string::npos;

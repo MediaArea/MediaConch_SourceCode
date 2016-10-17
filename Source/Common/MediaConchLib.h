@@ -347,7 +347,7 @@ public:
     void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
     int                          policy_save(int user, int pos, std::string& err);
     int                          policy_remove(int user, int pos, std::string& err);
-    int                          policy_dump(int user, int id, std::string& memory, std::string& err);
+    int                          policy_dump(int user, int id, bool must_be_public, std::string& memory, std::string& err);
     int                          policy_clear_policies(int user, std::string& err);
 
     // XSLT Policy Rule

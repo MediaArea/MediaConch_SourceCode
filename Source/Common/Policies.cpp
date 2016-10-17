@@ -341,11 +341,17 @@ int Policies::export_policy(int user, const char* filename, int id, std::string&
     return p->export_schema(filename, err);
 }
 
-int Policies::dump_policy_to_memory(int user, int id, std::string& memory, std::string& err)
+int Policies::dump_policy_to_memory(int user, int id, bool must_be_public, std::string& memory, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
         return -1;
+
+    if (must_be_public && !p->is_public)
+    {
+        err = "This policy is not a public policy";
+        return -1;
+    }
 
     if (p->dump_schema(memory) < 0)
     {

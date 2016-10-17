@@ -532,12 +532,12 @@ int MediaConchLib::policy_remove(int user, int pos, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_dump(int user, int id, std::string& memory, std::string& err)
+int MediaConchLib::policy_dump(int user, int id, bool must_be_public, std::string& memory, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_dump(user, id, memory, err);
+        return daemon_client->policy_dump(user, id, must_be_public, memory, err);
 
-    return core->policies.dump_policy_to_memory(user, id, memory, err);
+    return core->policies.dump_policy_to_memory(user, id, must_be_public, memory, err);
 }
 
 //---------------------------------------------------------------------------

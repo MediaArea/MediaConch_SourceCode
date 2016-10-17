@@ -596,9 +596,10 @@ public:
 
     struct Policy_Dump_Req
     {
-        Policy_Dump_Req() : user(-1), id(-1) {}
+        Policy_Dump_Req() : user(-1), id(-1), must_be_public(false) {}
         int         user;
         int         id;
+        bool        must_be_public;
         std::string to_str() const;
     };
 
