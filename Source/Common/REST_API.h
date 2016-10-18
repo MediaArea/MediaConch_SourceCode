@@ -630,10 +630,13 @@ public:
 
     struct Policy_Duplicate_Req
     {
-        Policy_Duplicate_Req() : user(-1), id(-1), dst_policy_id(-1) {}
+        Policy_Duplicate_Req() : user(-1), dst_user(NULL), id(-1), dst_policy_id(-1), must_be_public(false) {}
+        ~Policy_Duplicate_Req();
         int         user;
+        int        *dst_user;
         int         id;
         int         dst_policy_id;
+        int         must_be_public;
         std::string to_str() const;
     };
 

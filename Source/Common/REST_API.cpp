@@ -56,6 +56,13 @@ RESTAPI::~RESTAPI()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+RESTAPI::Policy_Duplicate_Req::~Policy_Duplicate_Req()
+{
+    if (dst_user)
+        delete dst_user;
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::MediaConch_Watch_Folder_Res::~MediaConch_Watch_Folder_Res()
 {
     if (nok)
@@ -571,7 +578,11 @@ std::string RESTAPI::Policy_Duplicate_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\": " << user << ",\"id\": " << id << ",\"dst_policy_id\": " << dst_policy_id << "}";
+    out << "{\"user\":" << user;
+    if (dst_user)
+        out << ",\"dst_user\":" << dst_user;
+    out << ",\"must_be_public\":" << std::boolalpha << must_be_public;
+    out << ",\"id\": " << id << ",\"dst_policy_id\": " << dst_policy_id << "}";
     return out.str();
 }
 
@@ -2086,6 +2097,10 @@ int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::stri
     ss << "?id=" << req.id;
     ss << "&dst_policy_id=" << req.dst_policy_id;
     ss << "&user=" << req.user;
+    if (req.dst_user)
+        ss << "&dst_user=" << *req.dst_user;
+    if (req.must_be_public)
+        ss << "&must_be_public=" << std::boolalpha << req.must_be_public;
     data = ss.str();
 
     return 0;
@@ -4343,6 +4358,17 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::st
     if (dst_policy_id && dst_policy_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->dst_policy_id = dst_policy_id->l;
 
+    Container::Value *dst_user = model->get_value_by_key(*child, "dst_user");
+    if (dst_user && dst_user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        req->dst_user = new int;
+        *req->dst_user = dst_user->l;
+    }
+
+    Container::Value *must_be_public = model->get_value_by_key(*child, "must_be_public");
+    if (must_be_public && must_be_public->type == Container::Value::CONTAINER_TYPE_BOOL)
+        req->must_be_public = must_be_public->b;
+
     return req;
 }
 
@@ -5464,6 +5490,22 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std
                 continue;
 
             req->user = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "dst_user")
+        {
+            if (!val.length())
+                continue;
+
+            req->dst_user = new int;
+            *req->dst_user = strtoll(val.c_str(), NULL, 10);
+        }
+        else if (substr == "must_be_public")
+        {
+            if (!val.length())
+                continue;
+
+            if (val == "true")
+                req->must_be_public = true;
         }
         else
             start = std::string::npos;

@@ -890,7 +890,7 @@ int DaemonClient::policy_import(int user, const std::string& memory, std::string
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::policy_duplicate(int user, int id, int dst_policy_id, std::string& err)
+int DaemonClient::policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -899,6 +899,8 @@ int DaemonClient::policy_duplicate(int user, int id, int dst_policy_id, std::str
     req.id = id;
     req.dst_policy_id = dst_policy_id;
     req.user = user;
+    req.dst_user = dst_user;
+    req.must_be_public = must_be_public;
 
     int ret = http_client->start();
     if (ret < 0)

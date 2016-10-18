@@ -111,7 +111,7 @@ public:
     int policy_save(int user, int pos, std::string& err);
 
     // duplicate
-    int policy_duplicate(int user, int id, int dst_policy_id, std::string& err);
+    int policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err);
 
     // policy move
     int policy_move(int user, int id, int dst_policy_id, std::string& err);

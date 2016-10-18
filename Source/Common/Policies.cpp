@@ -240,11 +240,21 @@ int Policies::save_policy(int user, int id, std::string& err)
     return export_policy(user, NULL, id, err);
 }
 
-int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string& err, bool copy_name)
+int Policies::duplicate_policy(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err, bool copy_name)
 {
     Policy *old = get_policy(user, id, err);
     if (!old)
         return -1;
+
+    if (must_be_public && !old->is_public)
+    {
+        err = "This policy is not a public policy";
+        return -1;
+    }
+
+    int destination_user = user;
+    if (dst_user)
+        destination_user = *dst_user;
 
     Policy *p = NULL;
     if (dst_policy_id == -1)
@@ -274,7 +284,7 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
             return -1;
         }
 
-        Policy *destination = get_policy(user, dst_policy_id, err);
+        Policy *destination = get_policy(destination_user, dst_policy_id, err);
         if (!destination)
             return -1;
 
@@ -299,18 +309,18 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         return -1;
     }
 
-    add_recursively_policy_to_user_policies(user, p);
+    add_recursively_policy_to_user_policies(destination_user, p);
 
-    find_save_name(user, NULL, p->filename, p->name.c_str());
+    find_save_name(destination_user, NULL, p->filename, p->name.c_str());
     if (p->type == POLICY_UNKNOWN)
-        export_policy(user, p->filename.c_str(), old->id, err);
+        export_policy(destination_user, p->filename.c_str(), old->id, err);
 
     return (int)p->id;
 }
 
 int Policies::move_policy(int user, int id, int dst_policy_id, std::string& err)
 {
-    int new_id = duplicate_policy(user, id, dst_policy_id, err, false);
+    int new_id = duplicate_policy(user, id, dst_policy_id, NULL, false, err, false);
     if (new_id < 0)
         return -1;
 

@@ -1337,7 +1337,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->policy_duplicate(req->user, req->id, req->dst_policy_id, err);
+        res.id = d->MCL->policy_duplicate(req->user, req->id, req->dst_policy_id, req->dst_user, req->must_be_public, err);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;

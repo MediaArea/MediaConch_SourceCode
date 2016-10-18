@@ -541,11 +541,11 @@ int MediaConchLib::policy_dump(int user, int id, bool must_be_public, std::strin
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_duplicate(int user, int id, int dst_policy_id, std::string& err)
+int MediaConchLib::policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_duplicate(user, id, dst_policy_id, err);
-    return core->policies.duplicate_policy(user, id, dst_policy_id, err);
+        return daemon_client->policy_duplicate(user, id, dst_policy_id, dst_user, must_be_public, err);
+    return core->policies.duplicate_policy(user, id, dst_policy_id, dst_user, must_be_public, err);
 }
 
 //---------------------------------------------------------------------------

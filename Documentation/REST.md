@@ -13,6 +13,8 @@ It is used above an HTTP connection.
   * Policy_Get: add is_public
   * Policy_Get: add must_be_public
   * Policy_Dump: add must_be_public
+  * Policy_Duplicate: add must_be_public
+  * Policy_Duplicate: add dst_user
  * Create new command for the Policy
   * Policy_Get_Public_Policies
   * Policy_Change_Is_Public
@@ -652,9 +654,11 @@ URL: /$API_VERSION/policy_duplicate?id=0
 
 Parameters:
 
-user:          User ID
-id:            Policy ID to duplicate
-dst_policy_id: Policy ID used as parent (default is -1, root node)
+user:           User ID
+id:             Policy ID to duplicate
+dst_policy_id:  Policy ID used as parent (default is -1, root node)
+dst_user:       Copy the policy to this user ID (optional, if not present, copy to the "user")
+must_be_public: Return an error if the policy is not public
 
 ##### Response
 

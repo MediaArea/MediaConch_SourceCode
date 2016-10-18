@@ -327,7 +327,7 @@ public:
 
     // Policies
     //   Create policy
-    int                          policy_duplicate(int user, int id, int dst_policy_id, std::string& err);
+    int                          policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err);
     int                          policy_move(int user, int id, int dst_policy_id, std::string& err);
     int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
     int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
