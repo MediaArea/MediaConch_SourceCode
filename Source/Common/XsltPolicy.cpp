@@ -358,7 +358,7 @@ int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* c
     if (is_public && is_root)
     {
         std::string is_public_str = std::string((const char*)is_public);
-        if (is_public_str == "yes")
+        if (is_public_str == "true")
             p->is_public = true;
         xmlFree(is_public);
     }
