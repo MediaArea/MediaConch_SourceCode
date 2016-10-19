@@ -48,6 +48,7 @@ namespace MediaConch
         std::streambuf           *clog_buffer;
         std::string               watch_folder;
         std::string               watch_folder_reports;
+        long                     *watch_folder_user;
         std::vector<std::string>  plugins;
         std::vector<std::string>  policies;
 
@@ -78,6 +79,7 @@ namespace MediaConch
         int parse_outputlog(const std::string& argument);
         int parse_watchfolder(const std::string& argument);
         int parse_watchfolder_reports(const std::string& argument);
+        int parse_watchfolder_user(const std::string& argument);
         int parse_other(const std::string& argument);
 
         // Request received callbacks

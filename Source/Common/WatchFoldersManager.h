@@ -41,6 +41,7 @@ public:
 
     int                                 add_watch_folder(const std::string&, const std::string&,
                                                          const std::vector<std::string>&, const std::vector<std::string>&,
+                                                         long *in_user,
                                                          long& user_id, std::string&);
     int                                 edit_watch_folder(const std::string&, const std::string&, std::string&);
     int                                 remove_watch_folder(const std::string&, std::string&);

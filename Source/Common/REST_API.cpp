@@ -56,10 +56,23 @@ RESTAPI::~RESTAPI()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+RESTAPI::MediaConch_Watch_Folder_Req::~MediaConch_Watch_Folder_Req()
+{
+    if (user)
+    {
+        delete user;
+        user = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Policy_Duplicate_Req::~Policy_Duplicate_Req()
 {
     if (dst_user)
+    {
         delete dst_user;
+        dst_user = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -285,7 +298,9 @@ std::string RESTAPI::MediaConch_Watch_Folder_Req::to_str() const
             out << ",";
         out << "\"" << policies[i].size() << "\"";
     }
-    out << "]}";
+    if (user)
+        out << "],\"user\":" << user;
+    out << "}";
     return out.str();
 }
 
@@ -1597,7 +1612,7 @@ int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, s
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string& data)
 {
-    Container::Value v, child, folder, folder_reports, plugins, policies;
+    Container::Value v, child, folder, folder_reports, plugins, policies, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -1628,6 +1643,13 @@ int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& 
         policies.array.push_back(policy);
     }
     child.obj["policies"] = policies;
+
+    if (req.user)
+    {
+        user.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        user.l = *req.user;
+        child.obj["user"] = user;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["MEDIACONCH_WATCH_FOLDER"] = child;
@@ -3641,6 +3663,13 @@ RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req
         for (size_t i = 0; i < policies->array.size(); ++i)
             if (policies->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
                 req->policies.push_back(policies->array[i].s);
+    }
+
+    Container::Value *user = model->get_value_by_key(*child, "user");
+    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        req->user = new long;
+        *req->user = user->l;
     }
 
     return req;

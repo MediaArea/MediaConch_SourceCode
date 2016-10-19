@@ -191,12 +191,13 @@ Parameters:
 * folder_reports:    String with the name of the directory where to put the reports of the file analyzed in the watched folders
 * plugins:           Array of String with the plugins ID
 * policies:          Array of String with the policies contents
+* user:              Integer: Use this User ID for the watch folder. If not present, find a unique ID
 
 ##### Response
 
 Parameters:
 
-* user:              Integer: a unique id of the user for this watch folder
+* user:              Integer: a unique id of the user for this watch folder or the one given as input
 * nok:               MediaConch_Nok when error occurs
 
 #### MediaConch_List_Watch_Folders

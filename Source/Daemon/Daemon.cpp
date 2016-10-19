@@ -44,7 +44,7 @@ namespace MediaConch
     std::string Daemon::version = "16.09.0";
 
     //--------------------------------------------------------------------------
-    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), mode(DAEMON_MODE_DAEMON)
+    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), watch_folder_user(NULL), mode(DAEMON_MODE_DAEMON)
     {
         MCL = new MediaConchLib(true);
         clog_buffer = std::clog.rdbuf();
@@ -59,6 +59,9 @@ namespace MediaConch
             std::clog.rdbuf(clog_buffer);
             delete logger;
         }
+
+        if (watch_folder_user)
+            delete watch_folder_user;
     }
 
     //--------------------------------------------------------------------------
@@ -172,7 +175,8 @@ namespace MediaConch
         {
             std::string err;
             long user_id = -1;
-            int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies, user_id, err);
+            int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
+                                                   watch_folder_user, user_id, err);
             if (ret < 0)
                 std::clog << "Cannot watch folder:" << watch_folder << ":" << err << std::endl;
             else
@@ -302,6 +306,7 @@ namespace MediaConch
         OPTION("--implementationverbosity", implementationverbosity)
         OPTION("--outputlog",               outputlog)
         OPTION("--watchfolder-reports",     watchfolder_reports)
+        OPTION("--watchfolder-user",        watchfolder_user)
         OPTION("--watchfolder",             watchfolder)
         OPTION("--",                        other)
         else
@@ -545,6 +550,28 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder_user(const std::string& argument)
+    {
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string user;
+        user.assign(argument, egal_pos + 1 , std::string::npos);
+
+        if (user.size())
+        {
+            char *end = NULL;
+            watch_folder_user = new long;
+            *watch_folder_user = strtol(user.c_str(), &end, 10);
+        }
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::parse_other(const std::string& argument)
     {
         std::string report;
@@ -636,7 +663,9 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
         std::string error;
         long user_id = -1;
-        if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports, req->plugins, req->policies, user_id, error) < 0)
+        if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports,
+                                            req->plugins, req->policies,
+                                            req->user, user_id, error) < 0)
         {
             res.nok = new RESTAPI::MediaConch_Nok;
             res.nok->error = error;

@@ -141,7 +141,8 @@ int DaemonClient::mediaconch_get_plugins(std::vector<std::string>& plugins, std:
 //---------------------------------------------------------------------------
 int DaemonClient::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                           const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
-                                           long& user_id, std::string& error)
+                                          long *in_user,
+                                          long& user_id, std::string& error)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -149,6 +150,7 @@ int DaemonClient::mediaconch_watch_folder(const std::string& folder, const std::
     RESTAPI::MediaConch_Watch_Folder_Req req;
     req.folder = folder;
     req.folder_reports = folder_reports;
+    req.user = in_user;
 
     for (size_t i = 0; i < plugins.size(); ++i)
         req.plugins.push_back(plugins[i]);

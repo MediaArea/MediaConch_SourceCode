@@ -57,6 +57,7 @@ std::map<std::string, std::string> WatchFoldersManager::get_watch_folders()
 //---------------------------------------------------------------------------
 int WatchFoldersManager::add_watch_folder(const std::string& folder, const std::string& folder_reports,
                                           const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
+                                          long *in_user,
                                           long& user_id, std::string& error)
 {
     CS.Enter();
@@ -69,8 +70,13 @@ int WatchFoldersManager::add_watch_folder(const std::string& folder, const std::
         return -1;
     }
 
-    //Find a user ID free
-    user_id = -1;
+    if (in_user)
+        user_id = *in_user;
+    else
+    {
+        //Find a user ID free
+        user_id = -1;
+    }
     WatchFolder *wf = new WatchFolder(core, user_id);
     wf->folder = folder;
     wf->folder_reports = folder_reports;

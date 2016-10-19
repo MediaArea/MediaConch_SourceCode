@@ -74,14 +74,18 @@ int Help()
     TEXTOUT("                    Output MediaConch report in HTML format");
     TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
+    TEXTOUT("");
 
     TEXTOUT("Watch folder:");
-    TEXTOUT("--WatchFolders-List");
+    TEXTOUT("--WatchFolders-List, -wfl");
     TEXTOUT("                    List the folder watched");
     TEXTOUT("--WatchFolder=folder -wf folder");
     TEXTOUT("                    Send to the server a folder to watch");
     TEXTOUT("--WatchFolder-Reports=folder -wfr folder");
     TEXTOUT("                    Create reports of the selected watch folder to this folder");
+    TEXTOUT("--WatchFolder-User=userId -wfu userId");
+    TEXTOUT("                    Create reports of the watch folder for the selected user ID");
+    TEXTOUT("");
 
     TEXTOUT("Plugins:");
     TEXTOUT("--PluginsList");

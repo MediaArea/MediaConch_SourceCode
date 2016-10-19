@@ -53,6 +53,7 @@ namespace MediaConch
         int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
         int  set_watch_folder(const std::string& folder);
         int  set_watch_folder_reports(const std::string& folder);
+        int  set_watch_folder_user(const std::string& user);
         void set_list_watch_folders_mode();
 
         void print_error(MediaConchLib::errorHttp code);
@@ -82,6 +83,7 @@ namespace MediaConch
         std::string              policy_reference_file;
         std::string              watch_folder;
         std::string              watch_folder_reports;
+        long                    *watch_folder_user;
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format   format;
         //TODO: clean
