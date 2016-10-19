@@ -57,6 +57,7 @@ public:
     std::string          filename;
     std::string          name;
     std::string          description;
+    std::string          licence;
     Policies::PolicyType type;
     size_t               id;
     bool                 is_system;

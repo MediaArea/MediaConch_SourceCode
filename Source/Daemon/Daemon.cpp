@@ -1414,7 +1414,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, err) < 0)
+        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, req->licence, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1620,6 +1620,7 @@ namespace MediaConch
                 policy->user = policies[i]->user;
                 policy->name = policies[i]->name;
                 policy->description = policies[i]->description;
+                policy->licence = policies[i]->licence;
                 res.policies.push_back(policy);
             }
         }

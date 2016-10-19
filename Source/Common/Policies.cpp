@@ -457,6 +457,7 @@ MediaConchLib::Policy_Policy *Policies::xslt_policy_to_mcl_policy(XsltPolicy *po
         p->type = "and";
     p->name = policy->name;
     p->description = policy->description;
+    p->licence = policy->licence;
     p->is_system = policy->is_system;
     p->is_public = policy->is_public;
     p->kind = "XSLT";
@@ -774,7 +775,8 @@ int Policies::clear_policies(int user, std::string& err)
     return 0;
 }
 
-int Policies::policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err)
+int Policies::policy_change_info(int user, int id, const std::string& name, const std::string& description,
+                                 const std::string& licence, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
@@ -790,6 +792,7 @@ int Policies::policy_change_info(int user, int id, const std::string& name, cons
     if (p->type == POLICY_XSLT)
         ((XsltPolicy*)p)->node_name = p->name;
     p->description = description;
+    p->licence = licence;
 
     return 0;
 }

@@ -567,11 +567,12 @@ int MediaConchLib::policy_save(int user, int pos, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err)
+int MediaConchLib::policy_change_info(int user, int id, const std::string& name, const std::string& description,
+                                      const std::string& licence, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_change_info(user, id, name, description, err);
-    return core->policies.policy_change_info(user, id, name, description, err);
+        return daemon_client->policy_change_info(user, id, name, description, licence, err);
+    return core->policies.policy_change_info(user, id, name, description, licence, err);
 }
 
 //---------------------------------------------------------------------------
@@ -758,10 +759,13 @@ std::string MediaConchLib::Policy_Policy::to_str() const
     out << "{\"id\":" << id;
     out << ",\"parent_id\":" << parent_id;
     out << ",\"is_system\":" << std::boolalpha << is_system;
+    if (is_public)
+        out << ",\"is_public\":" << std::boolalpha << is_public;
     out << ",\"kind\":\"" << kind;
     out << "\",\"type\":\"" << type;
     out << "\",\"name\":\"" << name;
     out << "\",\"description\":\"" << description;
+    out << "\",\"licence\":\"" << licence;
     out << "\",\"children\":[";
     for (size_t i = 0; i < children.size(); ++i)
     {

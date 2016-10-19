@@ -111,7 +111,8 @@ public:
     int                         xslt_policy_create(int parent_id, std::string& err);
     int                         policy_duplicate(int id, int dst_policy_id, std::string& err);
     int                         policy_move(int id, int dst_policy_id, std::string& err);
-    int                         policy_change_info(int id, const std::string& name, const std::string& description, std::string& err);
+    int                         policy_change_info(int id, const std::string& name, const std::string& description,
+                                                   const std::string& licence, std::string& err);
     int                         policy_change_type(int id, const std::string& type, std::string& err);
     int                         policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p);
     int                         policy_save(int pos, std::string& err);
