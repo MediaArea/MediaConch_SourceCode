@@ -81,6 +81,23 @@ int NoDatabaseReport::update_report_table()
 }
 
 //---------------------------------------------------------------------------
+void NoDatabaseReport::get_users_id(std::vector<long>& ids, std::string&)
+{
+    std::map<long, bool> tmp;
+    for (size_t i = 0; i < files_saved.size(); ++i)
+    {
+        if (!files_saved[i])
+            continue;
+
+        tmp[files_saved[i]->user] = true;
+    }
+
+    std::map<long, bool>::iterator it = tmp.begin();
+    for (; it != tmp.end(); ++it)
+        ids.push_back(it->first);
+}
+
+//---------------------------------------------------------------------------
 long NoDatabaseReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
                                 std::string&, long generated_id,
                                 long source_id, size_t generated_time,

@@ -375,6 +375,18 @@ int Core::mediaconch_remove_watch_folder(const std::string& folder, std::string&
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void Core::get_users_ids(std::vector<long>& ids, std::string& err)
+{
+    db_mutex.Enter();
+    get_db()->get_users_id(ids, err);
+    db_mutex.Leave();
+}
+
+//***************************************************************************
+// Checker
+//***************************************************************************
+
+//---------------------------------------------------------------------------
 long Core::checker_analyze(int user, const std::string& file, bool& registered,
                            const std::vector<std::string>& options, const std::vector<std::string>& plugins,
                            bool force_analyze)

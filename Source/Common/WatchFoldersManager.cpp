@@ -74,9 +74,25 @@ int WatchFoldersManager::add_watch_folder(const std::string& folder, const std::
         user_id = *in_user;
     else
     {
-        //Find a user ID free
-        user_id = -1;
+        std::vector<long> ids;
+        std::string err;
+        core->get_users_ids(ids, err);
+        for (user_id = -2; true; --user_id)
+        {
+            bool exists = false;
+            for (size_t i = 0; i < ids.size(); ++i)
+            {
+                if (ids[i] == user_id)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists)
+                break;
+        }
     }
+
     WatchFolder *wf = new WatchFolder(core, user_id);
     wf->folder = folder;
     wf->folder_reports = folder_reports;

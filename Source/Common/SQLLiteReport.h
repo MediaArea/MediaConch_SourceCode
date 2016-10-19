@@ -39,6 +39,9 @@ public:
     virtual int create_report_table();
     virtual int update_report_table();
 
+    //User
+    virtual void get_users_id(std::vector<long>& ids, std::string& err);
+
     // File
     virtual long add_file(int user, const std::string& filename, const std::string& file_last_modification,
                           std::string& err,

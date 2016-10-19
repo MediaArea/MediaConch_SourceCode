@@ -88,6 +88,11 @@ public:
     int  mediaconch_remove_watch_folder(const std::string& folder, std::string& error);
 
     //***************************************************************************
+    // Users
+    //***************************************************************************
+    void        get_users_ids(std::vector<long>&, std::string&);
+
+    //***************************************************************************
     // Checker
     //***************************************************************************
     long        checker_analyze(int user, const std::string& filename, bool& registered,

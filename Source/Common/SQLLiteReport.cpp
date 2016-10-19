@@ -123,6 +123,33 @@ int SQLLiteReport::update_report_table()
     return set_db_version(current_report_version);
 }
 
+//---------------------------------------------------------------------------
+void SQLLiteReport::get_users_id(std::vector<long>& ids, std::string& err)
+{
+    reports.clear();
+    query = "SELECT USER FROM MEDIACONCH_FILE;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+    {
+        err = error;
+        return;
+    }
+
+    if (execute())
+    {
+        err = error;
+        return;
+    }
+
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        if (reports[i].find("USER") != reports[i].end())
+            ids.push_back(std_string_to_int(reports[i]["USER"]));
+    }
+}
+
 long SQLLiteReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
                              std::string& err,
                              long generated_id,
