@@ -640,6 +640,7 @@ int Policies::get_public_policies(std::vector<MediaConchLib::Policy_Public_Polic
             p->user = it->first;
             p->name = it_p->second->name;
             p->description = it_p->second->description;
+            p->license = it_p->second->license;
 
             ps.push_back(p);
         }
