@@ -242,15 +242,15 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
                                        &result, &display_name, &display_content);
     report_set.reset();
 
-    if (!ret || !result.valid)
+    if (ret || (result.has_valid && !result.valid))
     {
         std::stringstream out;
 
-        out << wffile->name << ": is not valid";
+        out << wffile->name << ": implementation is not valid";
         core->plugin_add_log(out.str());
     }
 
-    std::string filename = wffile->report_file + ".implementationReport.html";
+    std::string filename = wffile->report_file + ".ImplementationReport.html";
     std::ofstream out(filename.c_str(), std::ofstream::out);
     out << result.report;
     out.close();
@@ -265,7 +265,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
                                        &result, &display_name, &display_content);
     report_set.reset();
 
-    filename = wffile->report_file + ".implementationReport.xml";
+    filename = wffile->report_file + ".ImplementationReport.xml";
     std::ofstream out_xml(filename.c_str(), std::ofstream::out);
     out_xml << result.report;
     out_xml.close();
@@ -279,7 +279,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
                                    &result, &display_name, &display_content);
     report_set.reset();
 
-    filename = wffile->report_file + ".mi.xml";
+    filename = wffile->report_file + ".MediaInfo.xml";
     std::ofstream out_mi(filename.c_str(), std::ofstream::out);
     out_mi << result.report;
     out_mi.close();
@@ -293,7 +293,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
                                    &result, &display_name, &display_content);
     report_set.reset();
 
-    filename = wffile->report_file + ".mt.xml";
+    filename = wffile->report_file + ".MediaTrace.xml";
     std::ofstream out_mt(filename.c_str(), std::ofstream::out);
     out_mt << result.report;
     out_mt.close();
@@ -306,9 +306,16 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
         ret = core->checker_get_report(user, report_set, format,
                                        files, policies_ids, policies, options,
                                        &result, &display_name, &display_content);
+        if (ret || (result.has_valid && !result.valid))
+        {
+            std::stringstream out;
+
+            out << wffile->name << ": policy is not valid";
+            core->plugin_add_log(out.str());
+        }
         report_set.reset();
 
-        std::ofstream out_pr(std::string(wffile->report_file + ".policiesReport.xml").c_str(), std::ofstream::out);
+        std::ofstream out_pr(std::string(wffile->report_file + ".PoliciesReport.xml").c_str(), std::ofstream::out);
         out_pr << result.report;
         out_pr.close();
     }

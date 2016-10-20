@@ -1644,11 +1644,7 @@ void Core::get_reports_output(int user, const std::vector<long>& files,
         if (report_set[MediaConchLib::report_MediaConch])
         {
             std::string tmp;
-            bool is_valid = true;
-            if (get_implementation_report(user, files, options, tmp))
-                is_valid = implementation_is_valid(tmp);
-            else
-                is_valid = false;
+            bool is_valid = get_implementation_report(user, files, options, tmp);
 
             if (f == MediaConchLib::format_Html)
                 transform_with_xslt_html_memory(tmp, tmp);
@@ -1751,7 +1747,7 @@ bool Core::get_implementation_report(int user, const std::vector<long>& files,
     std::string r;
     bool valid = validate_xslt_from_memory(user, files, options, memory, r, true);
     if (valid)
-        valid = implementation_is_valid(r);
+        valid = policy_is_valid(r);
     report += r;
     return valid;
 }
