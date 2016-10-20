@@ -238,9 +238,9 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
             error = rest.get_error();
     }
 
-    else if (!std::string("/checker_list").compare(uri_path))
+    else if (query_str && !std::string("/checker_list").compare(uri_path))
     {
-        std::string query;
+        std::string query(query_str);
         RESTAPI::Checker_List_Req *r = NULL;
         get_uri_request(query, &r);
 

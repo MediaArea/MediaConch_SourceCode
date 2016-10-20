@@ -163,11 +163,16 @@ int Http::send_request(RESTAPI::Checker_Clear_Req& req)
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_List_Req&)
+int Http::send_request(RESTAPI::Checker_List_Req& req)
 {
-    std::string uri("/");
-    uri +=  RESTAPI::API_VERSION + "/checker_list";
-    return send_request_get(uri);
+    std::string query;
+    rest.serialize_list_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/checker_list" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
 }
 
 //---------------------------------------------------------------------------

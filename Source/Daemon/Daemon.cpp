@@ -1059,7 +1059,8 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a checker list command" << std::endl;
+        std::clog << d->get_date() << "Daemon received a checker list command: ";
+        std::clog << req->to_str() << std::endl;
         std::vector<std::string> vec;
         d->MCL->checker_list(req->user, vec);
         for (size_t i = 0; i < vec.size(); ++i)
