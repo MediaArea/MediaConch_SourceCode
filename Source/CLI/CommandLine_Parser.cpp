@@ -87,6 +87,11 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--useplugin=";
         return true;
     }
+    else if (argument=="-u")
+    {
+        Last_Argument = "--user=";
+        return true;
+    }
     else if (argument=="-wfl")
     {
         Last_Argument = "--watchfolders-list=";
@@ -220,6 +225,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--watchfolder-reports",                         WatchFolderReports)
     OPTION("--watchfolder-user",                            WatchFolderUser)
     OPTION("--watchfolder",                                 WatchFolder)
+    OPTION("--user",                                        User)
     //Default
     OPTION("--",                                            Default)
     else
@@ -616,6 +622,24 @@ CL_OPTION(WatchFolderUser)
     std::string user;
     user.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_watch_folder_user(user);
+
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(User)
+{
+    //Form : --User=user, -u user
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string user;
+    user.assign(argument, egal_pos + 1 , std::string::npos);
+    cli->set_user_to_use(user);
 
     return CLI_RETURN_NONE;
 }

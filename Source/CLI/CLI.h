@@ -44,6 +44,7 @@ namespace MediaConch
         void set_implementation_verbosity(const std::string& verbosity);
         int  set_policy_reference_file(const std::string& file);
         int  add_plugin_to_use(const std::string& plugin);
+        int  set_user_to_use(const std::string& user);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
         void set_asynchronous(bool async);
@@ -87,6 +88,7 @@ namespace MediaConch
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format   format;
         //TODO: clean
+        long                    use_as_user;
         bool                    use_daemon;
         bool                    asynchronous;
         bool                    force_analyze;

@@ -37,7 +37,7 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : watch_folder_user(NULL), use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false),
+    CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false),
                  file_information(false), plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
     {
         format = MediaConchLib::format_Text;
@@ -132,7 +132,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id = -1;
-            int ret = MCL.checker_analyze(-1, files[i], plugins, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(use_as_user, files[i], plugins, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
 
@@ -172,7 +172,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id;
-            int ret = MCL.checker_analyze(-1, policy_reference_file, plugins, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(use_as_user, policy_reference_file, plugins, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
             if ((ret = run_policy_reference_file(file_id)) != MediaConchLib::errorHttp_TRUE)
@@ -187,7 +187,7 @@ namespace MediaConch
         MediaConchLib::Checker_ReportRes result;
         std::vector<size_t> policies_ids;
         options["verbosity"] = MCL.get_implementation_verbosity();
-        MCL.checker_get_report(-1, report_set, format, id_to_report, policies_ids,
+        MCL.checker_get_report(use_as_user, report_set, format, id_to_report, policies_ids,
                                policies, options, &result, &display_file, NULL);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
@@ -207,12 +207,12 @@ namespace MediaConch
             return MediaConchLib::errorHttp_INTERNAL;
         }
 
-        size_t pos = MCL.xslt_policy_create_from_file(-1, files_ids[0], error);
+        size_t pos = MCL.xslt_policy_create_from_file(use_as_user, files_ids[0], error);
         if (pos == (size_t)-1)
             return MediaConchLib::errorHttp_INTERNAL;
 
         std::string policy;
-        if (MCL.policy_dump(-1, pos, false, policy, error))
+        if (MCL.policy_dump(use_as_user, pos, false, policy, error))
             return MediaConchLib::errorHttp_INTERNAL;
 
         MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);
@@ -226,7 +226,7 @@ namespace MediaConch
     {
         for  (size_t i = 0; i < files.size(); ++i)
         {
-            long id = MCL.checker_id_from_filename(-1, files[i]);
+            long id = MCL.checker_id_from_filename(use_as_user, files[i]);
             if (id < 0)
             {
                 error = "File is not registered";
@@ -235,7 +235,7 @@ namespace MediaConch
 
             MediaConchLib::Checker_FileInfo info;
             int ret;
-            if ((ret = MCL.checker_file_information(-1, id, info)) < 0)
+            if ((ret = MCL.checker_file_information(use_as_user, id, info)) < 0)
                 return ret;
 
             std::string report;
@@ -436,6 +436,20 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int CLI::set_user_to_use(const std::string& user)
+    {
+        if (!user.size())
+            return 0;
+
+        if (watch_folder_user)
+            delete watch_folder_user;
+        watch_folder_user = new long;
+        char *end = NULL;
+        use_as_user = strtol(user.c_str(), &end, 10);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::set_watch_folder(const std::string& folder)
     {
         watch_folder = folder;
@@ -519,7 +533,7 @@ namespace MediaConch
     int CLI::is_ready(long& file_id, MediaConchLib::report& report_kind)
     {
         MediaConchLib::Checker_StatusRes res;
-        int ret = MCL.checker_status(-1, file_id, res);
+        int ret = MCL.checker_status(use_as_user, file_id, res);
         if (ret < 0)
             return ret;
 
@@ -530,7 +544,7 @@ namespace MediaConch
             if (!res.finished)
             {
                 std::string file;
-                MCL.checker_file_from_id(-1, file_id, file);
+                MCL.checker_file_from_id(use_as_user, file_id, file);
 
                 std::stringstream str;
                 double percent = res.percent ? *res.percent : (double)0;
@@ -554,14 +568,14 @@ namespace MediaConch
                 #else
                 usleep(500000);
                 #endif
-                ret = MCL.checker_status(-1, file_id, res);
+                ret = MCL.checker_status(use_as_user, file_id, res);
             }
 
             if (res.has_error)
             {
                 std::stringstream ss;
                 std::string file;
-                MCL.checker_file_from_id(-1, file_id, file);
+                MCL.checker_file_from_id(use_as_user, file_id, file);
 
                 ss << "File: " << file << " had a problem during analyze\n";
                 ss << "\tError logs are: " << res.error_log;
@@ -673,14 +687,14 @@ namespace MediaConch
         if (info->generated_id >= 0)
         {
             std::string file;
-            MCL.checker_file_from_id(-1, info->generated_id, file);
+            MCL.checker_file_from_id(use_as_user, info->generated_id, file);
             ss << "generated file:         " << file << "\n";
         }
 
         if (info->source_id >= 0)
         {
             std::string file;
-            MCL.checker_file_from_id(-1, info->source_id, file);
+            MCL.checker_file_from_id(use_as_user, info->source_id, file);
             ss << "source file:            " << file << "\n";
             ss << "file generation time:   " << info->generated_time << " milliseconds\n";
             ss << "generated log:          " << info->generated_log << "\n";

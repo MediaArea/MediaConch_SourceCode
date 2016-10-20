@@ -35,6 +35,10 @@ int Help()
     TEXTOUT("                    Display the version and exit");
     TEXTOUT("");
 
+    TEXTOUT("--User=UserID, -u UserID");
+    TEXTOUT("                    CLI user will be UserID");
+    TEXTOUT("");
+
     TEXTOUT("Configuration Element:");
     TEXTOUT("--Configuration=ConfigurationFile, -c ConfigurationFile");
     TEXTOUT("                    Use ConfigurationFile as configuration file");
