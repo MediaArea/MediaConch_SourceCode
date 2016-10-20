@@ -2188,6 +2188,10 @@ std::string Core::get_date()
     const char* t_str = ctime(&t);
     if (t_str)
         str = std::string(t_str);
+
+    if (str.length())
+        str[str.length() - 1] = '\0';
+
     return str;
 }
 

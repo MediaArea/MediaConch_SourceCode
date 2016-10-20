@@ -1856,8 +1856,6 @@ namespace MediaConch
     {
         std::stringstream out;
         std::string time = Core::get_date();
-        if (time.length())
-            time[time.length() - 1] = '\0';
         out << "[" << time << "]";
         return out.str();
     }
