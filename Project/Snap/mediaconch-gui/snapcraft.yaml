@@ -1,0 +1,81 @@
+name: mediaconch-gui
+version: 16.11
+summary: Implementation checker and policy checker for video and audio files (GUI)
+description: |
+  MediaConch is an implementation checker, policy checker, reporter,
+  and fixer that targets preservation-level audiovisual files
+  (specifically Matroska, Linear Pulse Code Modulation (LPCM)
+  and FF Video Codec 1 (FFV1)).
+
+  This project is maintained by MediaArea and funded by PREFORMA.
+confinement: strict
+grade: stable
+
+apps:
+  mediaconch-gui:
+    command: desktop-launch mediaconch-gui
+    plugs:
+      - unity7
+      - home
+      - network
+
+parts:
+  mediaconch-gui:
+    plugin: qmake-subdir
+    source: MediaConch
+    make-directory: Project/Qt
+    qt-version: qt5
+    options:
+      - USE_WEBKIT=1
+    build-packages:
+      - qtbase5-dev
+      - libqt5webkit5-dev
+      - zlib1g-dev
+      - libxml2-dev
+      - libxslt1-dev
+      - libevent-dev
+      - libsqlite3-dev
+      - libjansson-dev
+      - libcurl4-gnutls-dev
+    after:
+      - desktop-qt5
+      - libmediainfo
+      - libzen
+      - build-essential
+
+  libmediainfo:
+    plugin: autotools-subdir
+    source: MediaInfoLib
+    make-directory: Project/GNU/Library
+    configflags:
+      - --enable-shared
+      - --disable-static
+      - --with-libcurl
+      - --with-libmms
+    build-packages:
+      - libcurl4-gnutls-dev
+      - libglib2.0-dev
+      - libmms-dev
+      - zlib1g-dev
+    after:
+      - libzen
+      - build-essential
+    snap:
+      - lib/libmediainfo.*
+
+  libzen:
+    plugin: autotools-subdir
+    source: ZenLib
+    make-directory: Project/GNU/Library
+    configflags:
+      - --enable-shared
+      - --disable-static
+    snap:
+      - lib/libzen.*
+    after:
+      - build-essential
+
+  build-essential:
+    plugin: nil
+    build-packages:
+      - build-essential
