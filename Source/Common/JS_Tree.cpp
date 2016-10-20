@@ -520,8 +520,8 @@ int JsTree::policy_to_js_tree(MediaConchLib::Policy_Policy* policy, std::string&
         ss << ",\"description\":\"" << policy->description << "\"";
         if (policy->parent_id == -1 && policy->is_public)
             ss << ",\"isPublic\":" << std::boolalpha << policy->is_public;
-        if (policy->licence.size())
-            ss << ",\"licence\":\"" << policy->licence << "\"";
+        if (policy->license.size())
+            ss << ",\"license\":\"" << policy->license << "\"";
     }
     else
         ss << ",\"isEditable\":false";

@@ -710,9 +710,9 @@ int MainWindow::policy_move(int id, int dst_policy_id, std::string& err)
 
 //---------------------------------------------------------------------------
 int MainWindow::policy_change_info(int id, const std::string& name, const std::string& description,
-                                   const std::string& licence, std::string& err)
+                                   const std::string& license, std::string& err)
 {
-    return MCL.policy_change_info(-1, id, name, description, licence, err);
+    return MCL.policy_change_info(-1, id, name, description, license, err);
 }
 
 //---------------------------------------------------------------------------

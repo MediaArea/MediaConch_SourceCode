@@ -1096,7 +1096,7 @@ int DaemonClient::policy_dump(int user, int id, bool must_be_public, std::string
 
 //---------------------------------------------------------------------------
 int DaemonClient::policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                                     const std::string& licence, std::string& err)
+                                     const std::string& license, std::string& err)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -1106,7 +1106,7 @@ int DaemonClient::policy_change_info(int user, int id, const std::string& name, 
     req.name = name;
     req.description = description;
     req.user = user;
-    req.licence = licence;
+    req.license = license;
 
     int ret = http_client->start();
     if (ret < 0)

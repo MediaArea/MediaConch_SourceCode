@@ -39,7 +39,7 @@ Policy::Policy(const Policy* p)
 
     this->name = p->name;
     this->description = p->description;
-    this->licence = p->licence;
+    this->license = p->license;
     this->is_system = false;
     this->is_public = p->is_public;
     this->no_https = p->no_https;
@@ -55,7 +55,7 @@ Policy::Policy(const Policy& p)
 
     this->name = p.name;
     this->description = p.description;
-    this->licence = p.licence;
+    this->license = p.license;
     this->is_system = p.is_system;
     this->is_public = p.is_public;
     this->no_https = p.no_https;

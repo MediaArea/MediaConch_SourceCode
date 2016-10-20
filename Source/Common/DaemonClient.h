@@ -119,7 +119,7 @@ public:
 
     // change name && description
     int policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                           const std::string& licence, std::string& err);
+                           const std::string& license, std::string& err);
 
     // change type
     int policy_change_type(int user, int id, const std::string& type, std::string& err);

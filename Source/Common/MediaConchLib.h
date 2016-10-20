@@ -165,7 +165,7 @@ public:
     struct Policy_Policy
     {
         Policy_Policy() : id(-1), parent_id(-1), is_system(false) {}
-        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), is_public(p->is_public), kind(p->kind), type(p->type), name(p->name), description(p->description), licence(p->licence), children(p->children) {}
+        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), is_public(p->is_public), kind(p->kind), type(p->type), name(p->name), description(p->description), license(p->license), children(p->children) {}
         int                                       id;
         int                                       parent_id;
         bool                                      is_system;
@@ -174,7 +174,7 @@ public:
         std::string                               type;
         std::string                               name;
         std::string                               description;
-        std::string                               licence;
+        std::string                               license;
         std::vector<std::pair<int, XSLT_Child> >  children;
         std::string                               to_str() const;
     };
@@ -188,12 +188,12 @@ public:
     struct Policy_Public_Policy
     {
         Policy_Public_Policy() : id(-1), user(-1) {}
-        Policy_Public_Policy(const Policy_Public_Policy* p) : id(p->id), user(p->user), name(p->name), description(p->description), licence(p->licence) {}
+        Policy_Public_Policy(const Policy_Public_Policy* p) : id(p->id), user(p->user), name(p->name), description(p->description), license(p->license) {}
         long                                      id;
         long                                      user;
         std::string                               name;
         std::string                               description;
-        std::string                               licence;
+        std::string                               license;
     };
 
     struct Get_Policies
@@ -332,7 +332,7 @@ public:
     //   Create policy
     int                          policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err);
     int                          policy_move(int user, int id, int dst_policy_id, std::string& err);
-    int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, const std::string& licence, std::string& err);
+    int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, const std::string& license, std::string& err);
     int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
     int                          policy_change_is_public(int user, int id, bool is_public, std::string& err);
     int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);

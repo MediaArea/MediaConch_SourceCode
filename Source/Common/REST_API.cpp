@@ -619,7 +619,7 @@ std::string RESTAPI::Policy_Change_Info_Req::to_str() const
     out << ",\"id\": " << id;
     out << ",\"name\":\"" << name;
     out << "\",\"description\":\"" << description;
-    out << "\",\"licence\":\"" << licence;
+    out << "\",\"license\":\"" << license;
     out << "\"}";
     return out.str();
 }
@@ -1456,7 +1456,7 @@ std::string RESTAPI::Policy_Public_Policy::to_str() const
     out << ",\"user\":" << user;
     out << ",\"name\":\"" << name << "\"";
     out << ",\"description\":\"" << description << "\"";
-    out << ",\"licence\":\"" << licence << "\"}";
+    out << ",\"license\":\"" << license << "\"}";
     return out.str();
 }
 
@@ -2147,7 +2147,7 @@ int RESTAPI::serialize_policy_move_req(Policy_Move_Req& req, std::string& data)
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string& data)
 {
-    Container::Value v, child, name, description, licence, user, id;
+    Container::Value v, child, name, description, license, user, id;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -2159,11 +2159,11 @@ int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::
     description.s = req.description;
     child.obj["description"] = description;
 
-    if (req.licence.size())
+    if (req.license.size())
     {
-        licence.type = Container::Value::CONTAINER_TYPE_STRING;
-        licence.s = req.licence;
-        child.obj["licence"] = licence;
+        license.type = Container::Value::CONTAINER_TYPE_STRING;
+        license.s = req.license;
+        child.obj["license"] = license;
     }
 
     user.type = Container::Value::CONTAINER_TYPE_INTEGER;
@@ -4479,9 +4479,9 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
 
-    Container::Value *licence = model->get_value_by_key(*child, "licence");
-    if (licence && licence->type == Container::Value::CONTAINER_TYPE_STRING)
-        req->licence = licence->s;
+    Container::Value *license = model->get_value_by_key(*child, "license");
+    if (license && license->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->license = license->s;
 
     return req;
 }
@@ -5658,12 +5658,12 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const
 
             req->description = val;
         }
-        else if (substr == "licence")
+        else if (substr == "license")
         {
             if (!val.length())
                 continue;
 
-            req->licence = val;
+            req->license = val;
         }
         else
             start = std::string::npos;
@@ -8227,7 +8227,7 @@ Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
 //---------------------------------------------------------------------------
 void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v)
 {
-    Container::Value id, parent_id, is_system, is_public, kind, type, name, description, licence, children;
+    Container::Value id, parent_id, is_system, is_public, kind, type, name, description, license, children;
 
     ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -8263,11 +8263,11 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
     description.s = policy->description;
     ok_v.obj["description"] = description;
 
-    if (policy->licence.size())
+    if (policy->license.size())
     {
-        licence.type = Container::Value::CONTAINER_TYPE_STRING;
-        licence.s = policy->licence;
-        ok_v.obj["licence"] = licence;
+        license.type = Container::Value::CONTAINER_TYPE_STRING;
+        license.s = policy->license;
+        ok_v.obj["license"] = license;
     }
 
     children.type = Container::Value::CONTAINER_TYPE_ARRAY;
@@ -8367,7 +8367,7 @@ void RESTAPI::serialize_policy_public_policy(const std::vector<Policy_Public_Pol
         if (!policies[i])
             continue;
 
-        Container::Value policy, id, user, name, description, licence;
+        Container::Value policy, id, user, name, description, license;
 
         policy.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -8387,11 +8387,11 @@ void RESTAPI::serialize_policy_public_policy(const std::vector<Policy_Public_Pol
         description.s = policies[i]->description;
         policy.obj["description"] = description;
 
-        if (policies[i]->licence.size())
+        if (policies[i]->license.size())
         {
-            licence.type = Container::Value::CONTAINER_TYPE_STRING;
-            licence.s = policies[i]->licence;
-            policy.obj["licence"] = licence;
+            license.type = Container::Value::CONTAINER_TYPE_STRING;
+            license.s = policies[i]->license;
+            policy.obj["license"] = license;
         }
 
         p.array.push_back(policy);
@@ -8785,7 +8785,7 @@ int RESTAPI::parse_policy_public_policy(Container::Value *p, std::vector<Policy_
         Container::Value *user = model->get_value_by_key(p->array[i], "user");
         Container::Value *name = model->get_value_by_key(p->array[i], "name");
         Container::Value *description = model->get_value_by_key(p->array[i], "description");
-        Container::Value *licence = model->get_value_by_key(p->array[i], "licence");
+        Container::Value *license = model->get_value_by_key(p->array[i], "license");
         if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !user || user->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !name || name->type != Container::Value::CONTAINER_TYPE_STRING ||
@@ -8797,8 +8797,8 @@ int RESTAPI::parse_policy_public_policy(Container::Value *p, std::vector<Policy_
         policy->user = user->l;
         policy->name = name->s;
         policy->description = description->s;
-        if (licence && licence->type == Container::Value::CONTAINER_TYPE_STRING)
-            policy->licence = licence->s;
+        if (license && license->type == Container::Value::CONTAINER_TYPE_STRING)
+            policy->license = license->s;
 
         policies.push_back(policy);
     }
@@ -8874,9 +8874,9 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
     if (description && description->type == Container::Value::CONTAINER_TYPE_STRING)
         ok->description = description->s;
 
-    Container::Value *licence = model->get_value_by_key(*policy, "licence");
-    if (licence && licence->type == Container::Value::CONTAINER_TYPE_STRING)
-        ok->licence = licence->s;
+    Container::Value *license = model->get_value_by_key(*policy, "license");
+    if (license && license->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->license = license->s;
 
     Container::Value *children = model->get_value_by_key(*policy, "children");
     if (children && children->type == Container::Value::CONTAINER_TYPE_ARRAY)

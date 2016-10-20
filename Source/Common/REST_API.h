@@ -678,7 +678,7 @@ public:
         int          id;
         std::string  name;
         std::string  description;
-        std::string  licence;
+        std::string  license;
         std::string  to_str() const;
     };
 
@@ -817,7 +817,7 @@ public:
         long             user;
         std::string      name;
         std::string      description;
-        std::string      licence;
+        std::string      license;
         std::string      to_str() const;
     };
 

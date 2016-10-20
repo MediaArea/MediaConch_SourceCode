@@ -15,8 +15,8 @@ It is used above an HTTP connection.
   * Policy_Dump: add must_be_public
   * Policy_Duplicate: add must_be_public
   * Policy_Duplicate: add dst_user
-  * Policy_Change_Info: add licence
-  * Policy_Policy: add licence
+  * Policy_Change_Info: add license
+  * Policy_Policy: add license
  * Create new command for the Policy
   * Policy_Get_Public_Policies
   * Policy_Change_Is_Public
@@ -725,8 +725,8 @@ user:        User ID
 id:          Policy ID to retrieve information
 name:        New name for the policy
 description: New description for the policy
-licence:     New licence for the policy
-'{"POLICY_CHANGE_INFO":{"id": 0, "name": "changed name", "description": "changed description", "licence": "MIT"}}'
+license:     New license for the policy
+'{"POLICY_CHANGE_INFO":{"id": 0, "name": "changed name", "description": "changed description", "license": "MIT"}}'
 
 ##### Response
 
@@ -1109,7 +1109,7 @@ Parameters:
 * is_system:   boolean set to true if it is a system policy
 * is_public:   boolean set to true if it is a public policy
 * description: string containing the description of the policy (optional)
-* licence:     string containing the licence of the policy (optional)
+* license:     string containing the license of the policy (optional)
 * children:    list of children of the policy (sub-policies, rules)
 
 {"id":0, "parent_id":-1, "name": "NAME", "description":"", "type":"and", "children":[]}

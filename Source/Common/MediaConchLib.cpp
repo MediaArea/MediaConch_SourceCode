@@ -568,11 +568,11 @@ int MediaConchLib::policy_save(int user, int pos, std::string& err)
 
 //---------------------------------------------------------------------------
 int MediaConchLib::policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                                      const std::string& licence, std::string& err)
+                                      const std::string& license, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_change_info(user, id, name, description, licence, err);
-    return core->policies.policy_change_info(user, id, name, description, licence, err);
+        return daemon_client->policy_change_info(user, id, name, description, license, err);
+    return core->policies.policy_change_info(user, id, name, description, license, err);
 }
 
 //---------------------------------------------------------------------------
@@ -765,7 +765,7 @@ std::string MediaConchLib::Policy_Policy::to_str() const
     out << "\",\"type\":\"" << type;
     out << "\",\"name\":\"" << name;
     out << "\",\"description\":\"" << description;
-    out << "\",\"licence\":\"" << licence;
+    out << "\",\"license\":\"" << license;
     out << "\",\"children\":[";
     for (size_t i = 0; i < children.size(); ++i)
     {
