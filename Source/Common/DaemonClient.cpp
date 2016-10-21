@@ -141,7 +141,7 @@ int DaemonClient::mediaconch_get_plugins(std::vector<std::string>& plugins, std:
 //---------------------------------------------------------------------------
 int DaemonClient::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                           const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
-                                          long *in_user,
+                                          long *in_user, bool recursive,
                                           long& user_id, std::string& error)
 {
     if (!http_client)
@@ -151,6 +151,7 @@ int DaemonClient::mediaconch_watch_folder(const std::string& folder, const std::
     req.folder = folder;
     req.folder_reports = folder_reports;
     req.user = in_user;
+    req.recursive = recursive;
 
     for (size_t i = 0; i < plugins.size(); ++i)
         req.plugins.push_back(plugins[i]);

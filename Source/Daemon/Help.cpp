@@ -74,6 +74,8 @@ int Help()
     TEXTOUT("                    Send to the server a folder to watch");
     TEXTOUT("--WatchFolder-Reports=folder -wfr folder");
     TEXTOUT("                    Create reports of the selected watch folder to this folder");
+    TEXTOUT("--WatchFolder-Not-Recursive");
+    TEXTOUT("                    If watch folder is enabled, do not check recursively the folder");
     TEXTOUT("--Plugin=PluginID");
     TEXTOUT("                    By default, only format plugin are used.");
     TEXTOUT("                    With this command, you can give the plugin ID you want to use.");

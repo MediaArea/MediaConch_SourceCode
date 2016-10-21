@@ -37,8 +37,9 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false),
-                 file_information(false), plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
+    CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false),
+                 force_analyze(false), watch_folder_recursive(true), create_policy_mode(false), file_information(false),
+                 plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -300,7 +301,8 @@ namespace MediaConch
     int CLI::run_watch_folder_cmd()
     {
         long user_id = -1;
-        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies, watch_folder_user, user_id, error) < 0)
+        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
+                                        watch_folder_user, watch_folder_recursive, user_id, error) < 0)
             return MediaConchLib::errorHttp_INTERNAL;
 
         std::stringstream out;
@@ -461,6 +463,13 @@ namespace MediaConch
     int CLI::set_watch_folder_reports(const std::string& folder)
     {
         watch_folder_reports = folder;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::set_watch_folder_not_recursive()
+    {
+        watch_folder_recursive = false;
         return 0;
     }
 

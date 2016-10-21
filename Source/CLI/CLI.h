@@ -54,6 +54,7 @@ namespace MediaConch
         int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
         int  set_watch_folder(const std::string& folder);
         int  set_watch_folder_reports(const std::string& folder);
+        int  set_watch_folder_not_recursive();
         int  set_watch_folder_user(const std::string& user);
         void set_list_watch_folders_mode();
 
@@ -92,6 +93,7 @@ namespace MediaConch
         bool                    use_daemon;
         bool                    asynchronous;
         bool                    force_analyze;
+        bool                    watch_folder_recursive;
         bool                    create_policy_mode;
         bool                    file_information;
         bool                    plugins_list_mode;

@@ -300,6 +300,7 @@ std::string RESTAPI::MediaConch_Watch_Folder_Req::to_str() const
     }
     if (user)
         out << "],\"user\":" << user;
+    out << ",\"recursive\":" << std::boolalpha << recursive;
     out << "}";
     return out.str();
 }
@@ -1614,7 +1615,7 @@ int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, s
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string& data)
 {
-    Container::Value v, child, folder, folder_reports, plugins, policies, user;
+    Container::Value v, child, folder, folder_reports, plugins, policies, user, recursive;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -1652,6 +1653,10 @@ int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& 
         user.l = *req.user;
         child.obj["user"] = user;
     }
+
+    recursive.type = Container::Value::CONTAINER_TYPE_BOOL;
+    recursive.b = req.recursive;
+    child.obj["recursive"] = recursive;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["MEDIACONCH_WATCH_FOLDER"] = child;
@@ -3680,6 +3685,10 @@ RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req
         req->user = new long;
         *req->user = user->l;
     }
+
+    Container::Value *recursive = model->get_value_by_key(*child, "recursive");
+    if (recursive && recursive->type == Container::Value::CONTAINER_TYPE_BOOL)
+        req->recursive = recursive->b;
 
     return req;
 }

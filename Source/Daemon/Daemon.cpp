@@ -44,7 +44,8 @@ namespace MediaConch
     std::string Daemon::version = "16.09.0";
 
     //--------------------------------------------------------------------------
-    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), watch_folder_user(NULL), mode(DAEMON_MODE_DAEMON)
+    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), watch_folder_user(NULL),
+                       watch_folder_recursive(true), mode(DAEMON_MODE_DAEMON)
     {
         MCL = new MediaConchLib(true);
         clog_buffer = std::clog.rdbuf();
@@ -176,7 +177,7 @@ namespace MediaConch
             std::string err;
             long user_id = -1;
             int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
-                                                   watch_folder_user, user_id, err);
+                                                   watch_folder_user, watch_folder_recursive, user_id, err);
             if (ret < 0)
                 std::clog << "Cannot watch folder:" << watch_folder << ":" << err << std::endl;
             else
@@ -293,22 +294,23 @@ namespace MediaConch
             argument = "--compression=zlib";
 
         if (0);
-        OPTION("--help",                    help)
-        OPTION("--version",                 version)
-        OPTION("--fork",                    fork)
-        OPTION("--configuration",           configuration)
-        OPTION("--pluginsconfiguration",    plugins_configuration)
-        OPTION("--pluginslist",             plugins_list)
-        OPTION("--plugin",                  plugin)
-        OPTION("--policy",                  policy)
-        OPTION("--compression",             compression)
-        OPTION("--implementationschema",    implementationschema)
-        OPTION("--implementationverbosity", implementationverbosity)
-        OPTION("--outputlog",               outputlog)
-        OPTION("--watchfolder-reports",     watchfolder_reports)
-        OPTION("--watchfolder-user",        watchfolder_user)
-        OPTION("--watchfolder",             watchfolder)
-        OPTION("--",                        other)
+        OPTION("--help",                      help)
+        OPTION("--version",                   version)
+        OPTION("--fork",                      fork)
+        OPTION("--configuration",             configuration)
+        OPTION("--pluginsconfiguration",      plugins_configuration)
+        OPTION("--pluginslist",               plugins_list)
+        OPTION("--plugin",                    plugin)
+        OPTION("--policy",                    policy)
+        OPTION("--compression",               compression)
+        OPTION("--implementationschema",      implementationschema)
+        OPTION("--implementationverbosity",   implementationverbosity)
+        OPTION("--outputlog",                 outputlog)
+        OPTION("--watchfolder-reports",       watchfolder_reports)
+        OPTION("--watchfolder-not-recursive", watchfolder_not_recursive)
+        OPTION("--watchfolder-user",          watchfolder_user)
+        OPTION("--watchfolder",               watchfolder)
+        OPTION("--",                          other)
         else
         {
             Help();
@@ -572,6 +574,14 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder_not_recursive(const std::string& argument)
+    {
+        (void)argument;
+        watch_folder_recursive = false;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::parse_other(const std::string& argument)
     {
         std::string report;
@@ -665,7 +675,7 @@ namespace MediaConch
         long user_id = -1;
         if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports,
                                             req->plugins, req->policies,
-                                            req->user, user_id, error) < 0)
+                                            req->user, req->recursive, user_id, error) < 0)
         {
             res.nok = new RESTAPI::MediaConch_Nok;
             res.nok->error = error;

@@ -174,7 +174,7 @@ public:
     // Watch Folder
     struct MediaConch_Watch_Folder_Req
     {
-        MediaConch_Watch_Folder_Req() : user(NULL) {}
+        MediaConch_Watch_Folder_Req() : user(NULL), recursive(true) {}
         ~MediaConch_Watch_Folder_Req();
 
         std::string               to_str() const;
@@ -184,6 +184,7 @@ public:
         std::vector<std::string>  plugins;
         std::vector<std::string>  policies;
         long                     *user;
+        bool                      recursive;
     };
 
     struct MediaConch_Watch_Folder_Res

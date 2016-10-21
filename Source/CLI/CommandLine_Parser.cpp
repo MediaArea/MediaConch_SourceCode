@@ -175,6 +175,10 @@ static void change_short_options_to_long(std::string& argument)
 
     if (argument=="-fi")
         argument = "--fileinformation";
+
+    // Watch Folder short options
+    if (argument=="-wfnr")
+        argument = "--watchfolder-not-recursive";
 }
 
 int Parse(MediaConch::CLI* cli, std::string& argument)
@@ -223,6 +227,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--fileinformation",                             FileInformation)
     OPTION("--watchfolders-list",                           WatchFoldersList)
     OPTION("--watchfolder-reports",                         WatchFolderReports)
+    OPTION("--watchfolder-not-recursive",                   WatchFolderNotRecursive)
     OPTION("--watchfolder-user",                            WatchFolderUser)
     OPTION("--watchfolder",                                 WatchFolder)
     OPTION("--user",                                        User)
@@ -606,6 +611,14 @@ CL_OPTION(WatchFolderReports)
     cli->set_watch_folder_reports(folder);
 
     return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(WatchFolderNotRecursive)
+{
+    //Form : --WatchFolderNotRecursive, -wfnr
+    (void)argument;
+    return cli->set_watch_folder_not_recursive();
 }
 
 //---------------------------------------------------------------------------

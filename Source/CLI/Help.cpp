@@ -87,6 +87,8 @@ int Help()
     TEXTOUT("                    Send to the server a folder to watch");
     TEXTOUT("--WatchFolder-Reports=folder -wfr folder");
     TEXTOUT("                    Create reports of the selected watch folder to this folder");
+    TEXTOUT("--WatchFolder-Not-Recursive");
+    TEXTOUT("                    If watch folder is enabled, do not check recursively the folder");
     TEXTOUT("--WatchFolder-User=userId -wfu userId");
     TEXTOUT("                    Create reports of the watch folder for the selected user ID");
     TEXTOUT("");

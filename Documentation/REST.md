@@ -194,6 +194,7 @@ Parameters:
 * plugins:           Array of String with the plugins ID
 * policies:          Array of String with the policies contents
 * user:              Integer: Use this User ID for the watch folder. If not present, find a unique ID
+* recursive:         Boolean: Check the folder recursively (sub-directory), set to true by default
 
 ##### Response
 
