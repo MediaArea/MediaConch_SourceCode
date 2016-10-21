@@ -7,6 +7,16 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 16.09, 2016-09-30
+-------------
+New policy format to allow complex policies
+Update example policies and displays
+Compare files
+Policy rules can use MediaTrace
+Handling of FFV1 16-bit bitdepth (YUV and RGB)
+Support of Matroska FieldOrder, MatrixCoefficients, BitsPerChannel, Range, TransferCharacteristics, Primaries new elements
+Stream count policy test (in General section)
+
 Version 16.08, 2016-08-31
 -------------
 Checker: fix handling of files with special chars

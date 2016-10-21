@@ -172,7 +172,7 @@ equals(WEB_MACHINE, webengine) {
                ../../Source/GUI/Qt/WebEngineView.cpp
     HEADERS += ../../Source/GUI/Qt/WebEnginePage.h \
                ../../Source/GUI/Qt/WebEngineView.h
-    QMAKE_CXXFLAGS   += -DWEB_MACHINE_ENGINE
+    DEFINES += WEB_MACHINE_ENGINE
 } else {
     greaterThan(QT_MAJOR_VERSION, 4) {
         !qtHaveModule(webkit) {
@@ -191,18 +191,17 @@ equals(WEB_MACHINE, webengine) {
                ../../Source/GUI/Qt/WebKitView.cpp
     HEADERS += ../../Source/GUI/Qt/WebKitPage.h \
                ../../Source/GUI/Qt/WebKitView.h
-    QMAKE_CXXFLAGS   += -DWEB_MACHINE_KIT
+    DEFINES += WEB_MACHINE_KIT
 }
 
 INCLUDEPATH      += ../../Source
 
 unix:exists(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config) {
+    INCLUDEPATH      += ../../../MediaInfoLib/Source
     contains(STATIC_LIBS, yes|1) {
-        INCLUDEPATH      += ../../../MediaInfoLib/Source
         LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS_Static)
         message("custom libmediainfo: yes (static)")
     } else {
-        INCLUDEPATH      += ../../../MediaInfoLib/Source
         LIBS             += $$system(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config LIBS)
         message("custom libmediainfo: yes (shared)")
     }
@@ -213,10 +212,15 @@ unix:exists(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config) {
     LIBS += $$system(pkg-config --libs libmediainfo)
 }
 
-unix:exists(../../../ZenLib/Project/GNU/Library/.libs/libzen.a) {
+unix:exists(../../../ZenLib/Project/GNU/Library/libzen-config) {
     INCLUDEPATH      += ../../../ZenLib/Source
-    LIBS             += ../../../ZenLib/Project/GNU/Library/.libs/libzen.a
-    message("libzen      : custom")
+    contains(STATIC_LIBS, yes|1) {
+        LIBS             += $$system(../../../ZenLib/Project/GNU/Library/libzen-config LIBS_Static)
+        message("custom libzen       : yes (static)")
+    } else {
+        LIBS             += $$system(../../../ZenLib/Project/GNU/Library/libzen-config LIBS)
+        message("custom libzen       : yes (shared)")
+    }
 } else:unix {
     PKGCONFIG        += libzen
     message("libzen      : system")
@@ -250,7 +254,7 @@ unix:exists(../../../libxslt/libxslt/.libs/libxslt.a) {
 contains(NO_SQLITE, yes|1) {
     message("libsqlite3  : no")
 } else {
-    QMAKE_CXXFLAGS   += -DHAVE_SQLITE
+    DEFINES              += HAVE_SQLITE
     unix:exists(../../../sqlite/.libs/libsqlite3.a) {
         INCLUDEPATH      += ../../../sqlite
         LIBS             += ../../../sqlite/.libs/libsqlite3.a
@@ -264,7 +268,7 @@ contains(NO_SQLITE, yes|1) {
 contains(NO_JANSSON, yes|1) {
     message("libjansson  : no")
 } else {
-    QMAKE_CXXFLAGS   += -DHAVE_JANSSON
+    DEFINES              += HAVE_JANSSON
     unix:exists(../../../jansson/src/.libs/libjansson.a) {
         INCLUDEPATH      += ../../../jansson/src
         LIBS             += ../../../jansson/src/.libs/libjansson.a
@@ -278,7 +282,7 @@ contains(NO_JANSSON, yes|1) {
 contains(NO_LIBEVENT, yes|1) {
     message("libevent    : no")
 } else {
-    QMAKE_CXXFLAGS   += -DHAVE_LIBEVENT
+    DEFINES              += HAVE_LIBEVENT
     unix:exists(../../../libevent/.libs/libevent.a) {
         INCLUDEPATH      += ../../../libevent/include
         LIBS             += ../../../libevent/.libs/libevent.a
@@ -293,7 +297,7 @@ contains(NO_LIBCURL, yes|1) {
     message("use libcurl : no")
 } else {
     message("use libcurl : yes (from libmediainfo)")
-    QMAKE_CXXFLAGS   += -DMEDIAINFO_LIBCURL_YES
+    DEFINES += MEDIAINFO_LIBCURL_YES
 }
 
 macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5

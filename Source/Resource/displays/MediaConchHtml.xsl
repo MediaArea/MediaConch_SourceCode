@@ -174,10 +174,6 @@
         padding-left: 25px;
       }
 
-      .description {
-        padding-left: 25px;
-      }
-
       .verbosity {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
         font-size: 12px;
@@ -247,11 +243,11 @@
                     <xsl:text>) </xsl:text>
                     </xsl:if>
                     <br/>
-                    <xsl:if test="../mc:context !=''">
-                      <strong><xsl:value-of select="../mc:context/@name"/></strong>
+                    <xsl:for-each select="../mc:context">
+                      <strong><xsl:value-of select="@name"/></strong>
                       <xsl:text>: </xsl:text>
-                      <xsl:value-of select="../mc:context"/><br/>
-                   </xsl:if>
+                      <xsl:value-of select="."/><br/>
+                   </xsl:for-each>
                     <xsl:if test="mc:value/@name !=''">
                        <strong>Name: </strong><xsl:value-of select="mc:value/@name"/><br/>
                      </xsl:if>
@@ -310,12 +306,12 @@
           </xsl:otherwise>
         </xsl:choose>
       </h2>
+      <div class="mc_rule extra">
       <xsl:if test="mc:description != ''">
         <p class="description">
           <xsl:value-of select="mc:description"/>
         </p>
       </xsl:if>
-      <div class="mc_rule extra">
       <p>
       <strong>Type:</strong><xsl:text> </xsl:text><xsl:value-of select="@type"/>
       | <strong>Rules run:</strong><xsl:text> </xsl:text><xsl:value-of select="@rules_run"/>
@@ -351,6 +347,11 @@
       <xsl:value-of select="@outcome"/>
       </xsl:if>
       <div class="extra">
+        <xsl:if test="mc:description != ''">
+          <p class="description">
+            <xsl:value-of select="mc:description"/>
+          </p>
+        </xsl:if>
         <xsl:if test="@actual != ''">
           <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
           <br/>

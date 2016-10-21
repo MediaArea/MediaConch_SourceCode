@@ -1226,14 +1226,6 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
                                    const std::string*& dname, const std::string*& dcontent,
                                    FileRegistered* fr)
 {
-    if (fr && (fr->report_kind == MediaConchLib::report_MediaVeraPdf ||
-               fr->report_kind == MediaConchLib::report_MediaDpfManager))
-    {
-        dname = NULL;
-        dcontent = NULL;
-        return;
-    }
-
     if (display_p)
     {
         if (*display_p >= 0 && (size_t)*display_p < displays_list.size())
@@ -1242,7 +1234,7 @@ void MainWindow::fill_display_used(int *display_p, std::string&, std::string& di
             display_xsl.open(QIODevice::ReadOnly | QIODevice::Text);
             QByteArray xsl = display_xsl.readAll();
             display_xsl.close();
-            display_content = QString(xsl).toUtf8().data();
+            display_content = xsl.data();
         }
         else
             display_content = std::string(implementation_report_display_html_xsl);

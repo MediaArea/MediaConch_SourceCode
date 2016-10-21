@@ -5,17 +5,15 @@
     <xsl:text>*********************&#xa;</xsl:text>
     <xsl:text>* MediaConch report *&#xa;</xsl:text>
     <xsl:text>*********************&#xa;</xsl:text>
-    <xsl:if test="mc:name != '' or mc:description != ''">
-      <xsl:if test="mc:name != ''">
-        <xsl:value-of select="mc:name"/>
-        <xsl:text>&#xa;</xsl:text>
-      </xsl:if>
-      <xsl:if test="mc:description != ''">
-        <xsl:value-of select="mc:description"/>
-        <xsl:text>&#xa;</xsl:text>
-      </xsl:if>
+    <xsl:for-each select="mc:name">
+      <xsl:value-of select="mc:name"/>
       <xsl:text>&#xa;</xsl:text>
-    </xsl:if>
+    </xsl:for-each>
+    <xsl:for-each select="mc:description">
+      <xsl:value-of select="mc:description"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:for-each>
+    <xsl:text>&#xa;</xsl:text>
     <xsl:for-each select="mc:media">
       <xsl:value-of select="@ref"/>
       <xsl:text>&#xa;</xsl:text>
