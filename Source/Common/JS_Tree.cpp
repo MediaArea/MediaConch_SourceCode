@@ -420,8 +420,9 @@ void JsTree::interpret_offset(std::string& offset, bool coma, std::string& json)
 }
 
 //---------------------------------------------------------------------------
-void JsTree::unified_json_value(std::string& value)
+std::string JsTree::unified_json_value(const std::string& v)
 {
+    std::string value(v);
     size_t pos = 0;
     while (pos != std::string::npos)
     {
@@ -442,17 +443,18 @@ void JsTree::unified_json_value(std::string& value)
             pos += 2;
         }
     }
+
+    return value;
 }
 
 //---------------------------------------------------------------------------
 void JsTree::interpret_value(std::string& value, bool coma, std::string& json)
 {
-    unified_json_value(value);
     if (coma)
         json += ", ";
     json += "\"dataValue\":\"";
 
-    json += value;
+    json += unified_json_value(value);
 
     // Not numerical
     std::size_t found = value.find_first_not_of("0123456789.");
@@ -483,16 +485,16 @@ int JsTree::rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& 
         return 0;
 
     std::stringstream ss;
-    ss << "{\"text\":\"" << rule->name;
+    ss << "{\"text\":\"" << unified_json_value(rule->name);
     ss << "\",\"type\":\"r\"";
     ss << ",\"data\":{";
     ss << "\"ruleId\":" << rule->id;
-    ss << ",\"tracktype\":\"" << rule->tracktype;
-    ss << "\",\"field\":\"" << rule->field;
-    ss << "\",\"scope\":\"" << rule->scope;
+    ss << ",\"tracktype\":\"" << unified_json_value(rule->tracktype);
+    ss << "\",\"field\":\"" << unified_json_value(rule->field);
+    ss << "\",\"scope\":\"" << unified_json_value(rule->scope);
     ss << "\",\"occurrence\":" << rule->occurrence;
-    ss << ",\"ope\":\"" << rule->ope;
-    ss << "\",\"value\":\"" << rule->value;
+    ss << ",\"ope\":\"" << unified_json_value(rule->ope);
+    ss << "\",\"value\":\"" << unified_json_value(rule->value);
     ss <<"\"}}";
 
     json = ss.str();
@@ -506,22 +508,22 @@ int JsTree::policy_to_js_tree(MediaConchLib::Policy_Policy* policy, std::string&
         return 0;
 
     std::stringstream ss;
-    ss << "{\"text\":\"" << policy->name;
+    ss << "{\"text\":\"" << unified_json_value(policy->name);
     if (policy->kind == "XSLT")
-        ss << " (" << policy->type << ")";
+        ss << " (" << unified_json_value(policy->type) << ")";
     ss << "\",\"type\":\"" << (policy->is_system ? "s" : "u");
     ss << "\",\"data\":{";
     ss << "\"policyId\":" << policy->id;
-    ss << ",\"kind\":\"" << policy->kind;
-    ss << "\",\"type\":\"" << policy->type << "\"";
+    ss << ",\"kind\":\"" << unified_json_value(policy->kind);
+    ss << "\",\"type\":\"" << unified_json_value(policy->type) << "\"";
     if (policy->kind == "XSLT")
     {
         ss << ",\"isEditable\":true";
-        ss << ",\"description\":\"" << policy->description << "\"";
+        ss << ",\"description\":\"" << unified_json_value(policy->description) << "\"";
         if (policy->parent_id == -1 && policy->is_public)
             ss << ",\"isPublic\":" << std::boolalpha << policy->is_public;
         if (policy->license.size())
-            ss << ",\"license\":\"" << policy->license << "\"";
+            ss << ",\"license\":\"" << unified_json_value(policy->license) << "\"";
     }
     else
         ss << ",\"isEditable\":false";
