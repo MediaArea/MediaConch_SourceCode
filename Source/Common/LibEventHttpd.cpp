@@ -167,7 +167,58 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
     if (uri_api_version_is_valid(uri_path, req) < 0)
         return;
     const char* query_str = evhttp_uri_get_query(uri);
-    if (query_str && !std::string("/checker_status").compare(uri_path))
+
+    if (!std::string("/mediaconch_get_plugins").compare(uri_path))
+    {
+        std::string query;
+        RESTAPI::MediaConch_Get_Plugins_Req *r = NULL;
+        if (query_str)
+            query = std::string(query_str);
+        get_uri_request(query, &r);
+
+        RESTAPI::MediaConch_Get_Plugins_Res res;
+        if (commands.mediaconch_get_plugins_cb && commands.mediaconch_get_plugins_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_mediaconch_get_plugins_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (!std::string("/mediaconch_list_watch_folders").compare(uri_path))
+    {
+        std::string query;
+        RESTAPI::MediaConch_List_Watch_Folders_Req *r = NULL;
+        if (query_str)
+            query = std::string(query_str);
+        get_uri_request(query, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::MediaConch_List_Watch_Folders_Res res;
+        if (commands.mediaconch_list_watch_folders_cb && commands.mediaconch_list_watch_folders_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_mediaconch_list_watch_folders_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (query_str && !std::string("/checker_status").compare(uri_path))
     {
         std::string query(query_str);
         RESTAPI::Checker_Status_Req *r = NULL;
@@ -186,9 +237,10 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_status_res(res, result) < 0)
             error = rest.get_error();
     }
-    else if (!std::string("/checker_list").compare(uri_path))
+
+    else if (query_str && !std::string("/checker_list").compare(uri_path))
     {
-        std::string query;
+        std::string query(query_str);
         RESTAPI::Checker_List_Req *r = NULL;
         get_uri_request(query, &r);
 
@@ -205,6 +257,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_list_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/default_values_for_type").compare(uri_path))
     {
         std::string query(query_str);
@@ -247,6 +300,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_create_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_remove").compare(uri_path))
     {
         std::string query(query_str);
@@ -266,6 +320,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_remove_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_dump").compare(uri_path))
     {
         std::string query(query_str);
@@ -285,6 +340,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_dump_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_save").compare(uri_path))
     {
         std::string query(query_str);
@@ -304,6 +360,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_save_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_duplicate").compare(uri_path))
     {
         std::string query(query_str);
@@ -323,6 +380,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_duplicate_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_move").compare(uri_path))
     {
         std::string query(query_str);
@@ -342,6 +400,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_move_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_get").compare(uri_path))
     {
         std::string query(query_str);
@@ -361,6 +420,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/policy_get_name").compare(uri_path))
     {
         std::string query(query_str);
@@ -380,6 +440,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_name_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_get_policies_count").compare(uri_path))
     {
         std::string query;
@@ -402,6 +463,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_policies_count_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_clear_policies").compare(uri_path))
     {
         std::string query;
@@ -424,6 +486,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_clear_policies_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_get_policies").compare(uri_path))
     {
         std::string query;
@@ -446,6 +509,30 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_policies_res(res, result) < 0)
             error = rest.get_error();
     }
+
+    else if (!std::string("/policy_get_public_policies").compare(uri_path))
+    {
+        std::string query;
+        if (query_str)
+            query = std::string(query_str);
+
+        RESTAPI::Policy_Get_Public_Policies_Req *r = NULL;
+        get_uri_request(query, &r);
+
+        RESTAPI::Policy_Get_Public_Policies_Res res;
+        if (commands.policy_get_public_policies_cb && commands.policy_get_public_policies_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_get_public_policies_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else if (!std::string("/policy_get_policies_names_list").compare(uri_path))
     {
         std::string query;
@@ -468,6 +555,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_policy_get_policies_names_list_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_create_from_file").compare(uri_path))
     {
         std::string query(query_str);
@@ -487,6 +575,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_create_from_file_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_create").compare(uri_path))
     {
         std::string query(query_str);
@@ -506,6 +595,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_create_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_get").compare(uri_path))
     {
         std::string query(query_str);
@@ -525,6 +615,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_get_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_duplicate").compare(uri_path))
     {
         std::string query(query_str);
@@ -544,6 +635,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_duplicate_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_move").compare(uri_path))
     {
         std::string query(query_str);
@@ -563,6 +655,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_move_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (query_str && !std::string("/xslt_policy_rule_delete").compare(uri_path))
     {
         std::string query(query_str);
@@ -611,7 +704,83 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
 
     if (uri_api_version_is_valid(uri_path, req) < 0)
         return;
-    if (!std::string("/checker_analyze").compare(uri_path))
+
+    if (!std::string("/mediaconch_watch_folder").compare(uri_path))
+    {
+        RESTAPI::MediaConch_Watch_Folder_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::MediaConch_Watch_Folder_Res res;
+        if (commands.mediaconch_watch_folder_cb && commands.mediaconch_watch_folder_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+            delete r;
+        if (rest.serialize_mediaconch_watch_folder_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (!std::string("/mediaconch_edit_watch_folder").compare(uri_path))
+    {
+        RESTAPI::MediaConch_Edit_Watch_Folder_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::MediaConch_Edit_Watch_Folder_Res res;
+        if (commands.mediaconch_edit_watch_folder_cb && commands.mediaconch_edit_watch_folder_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+            delete r;
+        if (rest.serialize_mediaconch_edit_watch_folder_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (!std::string("/mediaconch_remove_watch_folder").compare(uri_path))
+    {
+        RESTAPI::MediaConch_Remove_Watch_Folder_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::MediaConch_Remove_Watch_Folder_Res res;
+        if (commands.mediaconch_remove_watch_folder_cb && commands.mediaconch_remove_watch_folder_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+            delete r;
+        if (rest.serialize_mediaconch_remove_watch_folder_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (!std::string("/checker_analyze").compare(uri_path))
     {
         RESTAPI::Checker_Analyze_Req *r = NULL;
         get_request(json, &r);
@@ -635,6 +804,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_analyze_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/checker_report").compare(uri_path))
     {
         RESTAPI::Checker_Report_Req *r = NULL;
@@ -659,6 +829,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_report_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/checker_validate").compare(uri_path))
     {
         RESTAPI::Checker_Validate_Req *r = NULL;
@@ -683,6 +854,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_validate_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/checker_file_from_id").compare(uri_path))
     {
         RESTAPI::Checker_File_From_Id_Req *r = NULL;
@@ -707,6 +879,57 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_file_from_id_res(res, result) < 0)
             error = rest.get_error();
     }
+
+    else if (!std::string("/checker_id_from_filename").compare(uri_path))
+    {
+        RESTAPI::Checker_Id_From_Filename_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Checker_Id_From_Filename_Res res;
+        if (commands.id_from_filename_cb && commands.id_from_filename_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_id_from_filename_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
+    else if (!std::string("/checker_file_information").compare(uri_path))
+    {
+        RESTAPI::Checker_File_Information_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Checker_File_Information_Res res;
+        if (commands.file_information_cb && commands.file_information_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_file_information_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else if (!std::string("/policy_import").compare(uri_path))
     {
         RESTAPI::Policy_Import_Req *r = NULL;
@@ -731,6 +954,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_policy_import_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_change_info").compare(uri_path))
     {
         RESTAPI::Policy_Change_Info_Req *r = NULL;
@@ -755,6 +979,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_policy_change_info_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else if (!std::string("/policy_change_type").compare(uri_path))
     {
         RESTAPI::Policy_Change_Type_Req *r = NULL;
@@ -779,6 +1004,32 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_policy_change_type_res(res, result) < 0)
             error = rest.get_error();
     }
+
+    else if (!std::string("/policy_change_is_public").compare(uri_path))
+    {
+        RESTAPI::Policy_Change_Is_Public_Req *r = NULL;
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Policy_Change_Is_Public_Res res;
+        if (commands.policy_change_is_public_cb && commands.policy_change_is_public_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_policy_change_is_public_res(res, result) < 0)
+            error = rest.get_error();
+    }
+
     else if (!std::string("/xslt_policy_rule_edit").compare(uri_path))
     {
         RESTAPI::XSLT_Policy_Rule_Edit_Req *r = NULL;
@@ -803,6 +1054,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         if (rest.serialize_xslt_policy_rule_edit_res(res, result) < 0)
             error = rest.get_error();
     }
+
     else
     {
         code = HTTP_NOTFOUND;

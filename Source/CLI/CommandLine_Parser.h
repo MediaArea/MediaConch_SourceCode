@@ -30,6 +30,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument);
 
 CL_OPTION(Help);
 CL_OPTION(Inform);
+CL_OPTION(User);
 CL_OPTION(Report);
 CL_OPTION(Language);
 CL_OPTION(Format);
@@ -46,9 +47,17 @@ CL_OPTION(PolicyReferenceFile);
 CL_OPTION(Compression);
 CL_OPTION(Force);
 CL_OPTION(Asynchronous);
+CL_OPTION(UsePlugin);
+CL_OPTION(PluginsList);
 CL_OPTION(PluginsConfiguration);
 CL_OPTION(DefaultValuesForType);
 CL_OPTION(CreatePolicy);
+CL_OPTION(FileInformation);
+CL_OPTION(WatchFoldersList);
+CL_OPTION(WatchFolder);
+CL_OPTION(WatchFolderReports);
+CL_OPTION(WatchFolderNotRecursive);
+CL_OPTION(WatchFolderUser);
 CL_OPTION(Default);
 
 //***************************************************************************

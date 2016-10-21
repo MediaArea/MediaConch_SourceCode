@@ -981,7 +981,7 @@ namespace MediaConch {
         QString json;
         std::string err;
         int code;
-        if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(), err)) < 0)
+        if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(), "", err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             if (!error.size())

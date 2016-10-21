@@ -43,11 +43,20 @@ namespace MediaConch
         void set_implementation_schema_file(const std::string& file);
         void set_implementation_verbosity(const std::string& verbosity);
         int  set_policy_reference_file(const std::string& file);
+        int  add_plugin_to_use(const std::string& plugin);
+        int  set_user_to_use(const std::string& user);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
         void set_asynchronous(bool async);
         void set_create_policy_mode();
+        void set_file_information_mode();
+        void set_plugins_list_mode();
         int  get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
+        int  set_watch_folder(const std::string& folder);
+        int  set_watch_folder_reports(const std::string& folder);
+        int  set_watch_folder_not_recursive();
+        int  set_watch_folder_user(const std::string& user);
+        void set_list_watch_folders_mode();
 
         void print_error(MediaConchLib::errorHttp code);
 
@@ -55,25 +64,41 @@ namespace MediaConch
         CLI(const CLI&);
         CLI& operator=(const CLI&);
 
-        int  run_create_policy();
-        int  run_policy_reference_file();
-        int  is_ready(const std::string& file, MediaConchLib::report& report_kind);
+        int  run_create_policy(const std::vector<long>& files_ids);
+        int  run_policy_reference_file(long file_id);
+        int  run_file_information();
+        int  run_plugins_list();
+        int  run_watch_folders_list();
+        int  run_watch_folder_cmd();
+        int  is_ready(long& file_id, MediaConchLib::report& report_kind);
         void add_files_recursively(const std::string& filename);
+        void file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report);
 
         MediaConchLib MCL;
         std::vector<std::string> files;
         std::vector<std::string> policies;
+        std::vector<std::string> plugins;
         std::string              error;
         std::string              display_file;
         std::string              configuration_file;
         std::string              plugins_configuration_file;
         std::string              policy_reference_file;
+        std::string              watch_folder;
+        std::string              watch_folder_reports;
+        long                    *watch_folder_user;
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format   format;
+        //TODO: clean
+        long                    use_as_user;
         bool                    use_daemon;
         bool                    asynchronous;
         bool                    force_analyze;
+        bool                    watch_folder_recursive;
         bool                    create_policy_mode;
+        bool                    file_information;
+        bool                    plugins_list_mode;
+        bool                    list_watch_folders_mode;
+        bool                    no_needs_files_mode;
     };
 
 }

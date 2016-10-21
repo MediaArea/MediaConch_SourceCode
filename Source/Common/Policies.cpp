@@ -240,11 +240,21 @@ int Policies::save_policy(int user, int id, std::string& err)
     return export_policy(user, NULL, id, err);
 }
 
-int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string& err, bool copy_name)
+int Policies::duplicate_policy(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err, bool copy_name)
 {
     Policy *old = get_policy(user, id, err);
     if (!old)
         return -1;
+
+    if (must_be_public && !old->is_public)
+    {
+        err = "This policy is not a public policy";
+        return -1;
+    }
+
+    int destination_user = user;
+    if (dst_user)
+        destination_user = *dst_user;
 
     Policy *p = NULL;
     if (dst_policy_id == -1)
@@ -274,7 +284,7 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
             return -1;
         }
 
-        Policy *destination = get_policy(user, dst_policy_id, err);
+        Policy *destination = get_policy(destination_user, dst_policy_id, err);
         if (!destination)
             return -1;
 
@@ -299,18 +309,18 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, std::string&
         return -1;
     }
 
-    add_recursively_policy_to_user_policies(user, p);
+    add_recursively_policy_to_user_policies(destination_user, p);
 
-    find_save_name(user, NULL, p->filename, p->name.c_str());
+    find_save_name(destination_user, NULL, p->filename, p->name.c_str());
     if (p->type == POLICY_UNKNOWN)
-        export_policy(user, p->filename.c_str(), old->id, err);
+        export_policy(destination_user, p->filename.c_str(), old->id, err);
 
     return (int)p->id;
 }
 
 int Policies::move_policy(int user, int id, int dst_policy_id, std::string& err)
 {
-    int new_id = duplicate_policy(user, id, dst_policy_id, err, false);
+    int new_id = duplicate_policy(user, id, dst_policy_id, NULL, false, err, false);
     if (new_id < 0)
         return -1;
 
@@ -341,11 +351,17 @@ int Policies::export_policy(int user, const char* filename, int id, std::string&
     return p->export_schema(filename, err);
 }
 
-int Policies::dump_policy_to_memory(int user, int id, std::string& memory, std::string& err)
+int Policies::dump_policy_to_memory(int user, int id, bool must_be_public, std::string& memory, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
         return -1;
+
+    if (must_be_public && !p->is_public)
+    {
+        err = "This policy is not a public policy";
+        return -1;
+    }
 
     if (p->dump_schema(memory) < 0)
     {
@@ -441,7 +457,9 @@ MediaConchLib::Policy_Policy *Policies::xslt_policy_to_mcl_policy(XsltPolicy *po
         p->type = "and";
     p->name = policy->name;
     p->description = policy->description;
+    p->license = policy->license;
     p->is_system = policy->is_system;
+    p->is_public = policy->is_public;
     p->kind = "XSLT";
 
     for (size_t i = 0; i < policy->nodes.size(); ++i)
@@ -480,11 +498,18 @@ MediaConchLib::Policy_Policy* Policies::policy_to_mcl_policy(Policy *policy, std
     return p;
 }
 
-int Policies::policy_get(int user, int id, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err)
+int Policies::policy_get(int user, int id, const std::string& format, bool must_be_public,
+                         MediaConchLib::Get_Policy& policy, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
         return -1;
+
+    if (must_be_public && !p->is_public)
+    {
+        err = "This policy is not a public policy";
+        return -1;
+    }
 
     MediaConchLib::Policy_Policy *pp = policy_to_mcl_policy(p, err);
 
@@ -596,9 +621,37 @@ void Policies::get_policies(int user, const std::vector<int>& ids, const std::st
     }
 }
 
+int Policies::get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& ps, std::string&)
+{
+    std::map<int, std::map<size_t, Policy*> >::iterator it = policies.begin();
+    for (; it != policies.end(); ++it)
+    {
+        std::map<size_t, Policy *>::iterator it_p = it->second.begin();
+        for (; it_p != it->second.end(); ++it_p)
+        {
+            if (!it_p->second)
+                continue;
+
+            if (!it_p->second->is_public)
+                continue;
+
+            MediaConchLib::Policy_Public_Policy *p = new MediaConchLib::Policy_Public_Policy;
+            p->id = (long)it_p->second->id;
+            p->user = it->first;
+            p->name = it_p->second->name;
+            p->description = it_p->second->description;
+            p->license = it_p->second->license;
+
+            ps.push_back(p);
+        }
+    }
+
+    return 0;
+}
+
 void Policies::get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps)
 {
-    std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
+    std::map<int, std::map<size_t, Policy*> >::iterator it = policies.find(user);
 
     if (it == policies.end())
         add_system_policies_to_user_policies(user);
@@ -723,7 +776,8 @@ int Policies::clear_policies(int user, std::string& err)
     return 0;
 }
 
-int Policies::policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err)
+int Policies::policy_change_info(int user, int id, const std::string& name, const std::string& description,
+                                 const std::string& license, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
@@ -739,6 +793,7 @@ int Policies::policy_change_info(int user, int id, const std::string& name, cons
     if (p->type == POLICY_XSLT)
         ((XsltPolicy*)p)->node_name = p->name;
     p->description = description;
+    p->license = license;
 
     return 0;
 }
@@ -762,6 +817,35 @@ int Policies::policy_change_type(int user, int id, const std::string& type, std:
     }
 
     ((XsltPolicy*)p)->ope = type;
+
+    return 0;
+}
+
+int Policies::policy_change_is_public(int user, int id, bool is_public, std::string& err)
+{
+    Policy *p = get_policy(user, id, err);
+    if (!p)
+        return -1;
+
+    if (p->is_system)
+    {
+        err = "Cannot change a system policy";
+        return -1;
+    }
+
+    if (p->type != POLICY_XSLT)
+    {
+        err = "Not an XSLT policy";
+        return -1;
+    }
+
+    if (((XsltPolicy*)p)->parent_id != (size_t)-1)
+    {
+        err = "Not a root policy";
+        return -1;
+    }
+
+    p->is_public = is_public;
 
     return 0;
 }
@@ -797,17 +881,17 @@ bool Policies::policy_exists(int user, const std::string& policy)
     return false;
 }
 
-int Policies::create_xslt_policy_from_file(int user, const std::string& file, std::string& err)
+int Policies::create_xslt_policy_from_file(int user, long file_id, std::string& err)
 {
     std::bitset<MediaConchLib::report_Max> report_set;
-    std::vector<std::string> files;
+    std::vector<long> files;
     std::map<std::string, std::string> options;
     std::vector<size_t> policies_ids;
     std::vector<std::string> policies_contents;
     MediaConchLib::Checker_ReportRes result;
 
     report_set.set(MediaConchLib::report_MediaInfo);
-    files.push_back(file);
+    files.push_back(file_id);
 
     core->checker_get_report(user, report_set, MediaConchLib::format_Xml, files,
                              policies_ids, policies_contents,
@@ -824,6 +908,8 @@ int Policies::create_xslt_policy_from_file(int user, const std::string& file, st
     //Policy filename
     find_save_name(user, NULL, p->filename);
 
+    std::string file;
+    core->checker_file_from_id(user, file_id, file);
     size_t name_pos = file.rfind("/");
     if (name_pos == std::string::npos)
         name_pos = 0;

@@ -38,7 +38,10 @@ public:
 
     const std::vector<Plugin*>& get_plugins() const;
     const std::map<std::string, Plugin*>& get_format_plugins() const { return format_plugins; }
+    const std::vector<Plugin*>& get_pre_hook_plugins() const { return pre_hook_plugins; }
     int   load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
+
+    int   write_log(const std::string& log);
 
 private:
     PluginsManager(const PluginsManager&);
@@ -47,6 +50,8 @@ private:
     Core                           *core;
     std::vector<Plugin*>            plugins;
     std::map<std::string, Plugin*>  format_plugins;
+    std::vector<Plugin*>            pre_hook_plugins;
+    std::vector<Plugin*>            log_plugins;
 };
 
 }

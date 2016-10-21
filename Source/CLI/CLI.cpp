@@ -37,7 +37,9 @@ namespace MediaConch
     //**************************************************************************
 
     //--------------------------------------------------------------------------
-    CLI::CLI() : use_daemon(false), asynchronous(false), force_analyze(false), create_policy_mode(false)
+    CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false),
+                 force_analyze(false), watch_folder_recursive(true), create_policy_mode(false), file_information(false),
+                 plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
     {
         format = MediaConchLib::format_Text;
     }
@@ -50,24 +52,27 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::init()
     {
-        // If no filenames (and no options)
-        if (files.empty())
-            return Help_Nothing();
-
-        // If no report selected, use Implementation by default
-        if (!report_set.count() && !policies.size())
-            report_set.set(MediaConchLib::report_MediaConch);
-
-        // If no Implementation Schema registered, use one by default
-        if (!MCL.get_implementation_schema_file().length())
-            MCL.create_default_implementation_schema();
-
-        std::string reason;
-        if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
-                                                    format, reason))
+        if (!no_needs_files_mode)
         {
-            STRINGOUT(ZenLib::Ztring().From_UTF8(reason));
-            return -1;
+            // If no filenames (and no options)
+            if (files.empty())
+                return Help_Nothing();
+
+            // If no report selected, use Implementation by default
+            if (!report_set.count() && !policies.size())
+                report_set.set(MediaConchLib::report_MediaConch);
+
+            // If no Implementation Schema registered, use one by default
+            if (!MCL.get_implementation_schema_file().length())
+                MCL.create_default_implementation_schema();
+
+            std::string reason;
+            if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
+                                                        format, reason))
+            {
+                STRINGOUT(ZenLib::Ztring().From_UTF8(reason));
+                return -1;
+            }
         }
 
         MCL.set_configuration_file(configuration_file);
@@ -107,13 +112,28 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::run()
     {
-        std::vector<std::string> file_to_report;
+        std::vector<long> id_to_report;
         MediaConchLib::report report_kind;
+
+        //Return plugins list
+        if (plugins_list_mode)
+            return run_plugins_list();
+        //Return watch folders list
+        else if (list_watch_folders_mode)
+            return run_watch_folders_list();
+        // Add a watch folder
+        else if (watch_folder.size())
+            return run_watch_folder_cmd();
+
+        //Return file information
+        if (file_information)
+            return run_file_information();
 
         for (size_t i = 0; i < files.size(); ++i)
         {
             bool registered = false;
-            int ret = MCL.checker_analyze(files[i], registered, force_analyze);
+            long file_id = -1;
+            int ret = MCL.checker_analyze(use_as_user, files[i], plugins, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
 
@@ -126,7 +146,7 @@ namespace MediaConch
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
             }
 
-            int ready = is_ready(files[i], report_kind);
+            int ready = is_ready(file_id, report_kind);
             if (ready == MediaConchLib::errorHttp_NONE)
                 continue;
             else if (ready < 0)
@@ -140,31 +160,35 @@ namespace MediaConch
                 set_report_reset();
                 report_set.set(report_kind);
             }
-            file_to_report.push_back(files[i]);
+            id_to_report.push_back(file_id);
         }
 
         //Ensure to analyze before creating library
         if (create_policy_mode)
-            return run_create_policy();
+            return run_create_policy(id_to_report);
 
+        std::map<std::string, std::string> options;
         // if compare two files
         if (policy_reference_file.size())
         {
             bool registered = false;
-            int ret = MCL.checker_analyze(policy_reference_file, registered, force_analyze);
+            long file_id;
+            int ret = MCL.checker_analyze(use_as_user, policy_reference_file, plugins, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
-            if ((ret = run_policy_reference_file()) != MediaConchLib::errorHttp_TRUE)
+            if ((ret = run_policy_reference_file(file_id)) != MediaConchLib::errorHttp_TRUE)
                 return ret;
+
+            std::stringstream ss;
+            ss << file_id;
+            options["policy_reference_id"] = ss.str();
         }
 
         //Output
         MediaConchLib::Checker_ReportRes result;
         std::vector<size_t> policies_ids;
-        std::map<std::string, std::string> options;
         options["verbosity"] = MCL.get_implementation_verbosity();
-        options["policy_reference_file"] = policy_reference_file;
-        MCL.checker_get_report(-1, report_set, format, file_to_report, policies_ids,
+        MCL.checker_get_report(use_as_user, report_set, format, id_to_report, policies_ids,
                                policies, options, &result, &display_file, NULL);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
@@ -176,24 +200,116 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int CLI::run_create_policy()
+    int CLI::run_create_policy(const std::vector<long>& files_ids)
     {
-        if (files.size() != 1)
+        if (files_ids.size() != 1)
         {
             error = "Create a policy only with one file";
             return MediaConchLib::errorHttp_INTERNAL;
         }
 
-        size_t pos = MCL.xslt_policy_create_from_file(-1, files[0], error);
+        size_t pos = MCL.xslt_policy_create_from_file(use_as_user, files_ids[0], error);
         if (pos == (size_t)-1)
             return MediaConchLib::errorHttp_INTERNAL;
 
         std::string policy;
-        if (MCL.policy_dump(-1, pos, policy, error))
+        if (MCL.policy_dump(use_as_user, pos, false, policy, error))
             return MediaConchLib::errorHttp_INTERNAL;
 
         MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);
         STRINGOUT(policy_mil);
+
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_file_information()
+    {
+        for  (size_t i = 0; i < files.size(); ++i)
+        {
+            long id = MCL.checker_id_from_filename(use_as_user, files[i]);
+            if (id < 0)
+            {
+                error = "File is not registered";
+                return MediaConchLib::errorHttp_INTERNAL;
+            }
+
+            MediaConchLib::Checker_FileInfo info;
+            int ret;
+            if ((ret = MCL.checker_file_information(use_as_user, id, info)) < 0)
+                return ret;
+
+            std::string report;
+            file_info_report(&info, report);
+            MediaInfoLib::String info_str = ZenLib::Ztring().From_UTF8(report);
+            STRINGOUT(info_str);
+        }
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_plugins_list()
+    {
+        std::vector<std::string> list;
+        if (MCL.mediaconch_get_plugins(list, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        std::stringstream out;
+        out << "plugins:[";
+
+        for (size_t i = 0; i < list.size(); ++i)
+        {
+            if (i)
+                out << ", ";
+            out << "\"" << list[i] << "\"";
+        }
+
+        out << "]";
+
+        MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
+        STRINGOUT(out_str);
+
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_watch_folders_list()
+    {
+        std::vector<std::string> list;
+        if (MCL.mediaconch_list_watch_folders(list, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        std::stringstream out;
+        out << "watched folders:[";
+
+        for (size_t i = 0; i < list.size(); ++i)
+        {
+            if (i)
+                out << ", ";
+            out << "\"" << list[i] << "\"";
+        }
+
+        out << "]";
+
+        MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
+        STRINGOUT(out_str);
+
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_watch_folder_cmd()
+    {
+        long user_id = -1;
+        if (MCL.mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
+                                        watch_folder_user, watch_folder_recursive, user_id, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        std::stringstream out;
+        out << "Watch folder user ID:" << user_id;
+
+        MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
+        STRINGOUT(out_str);
 
         return 0;
     }
@@ -315,6 +431,63 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int CLI::add_plugin_to_use(const std::string& plugin)
+    {
+        plugins.push_back(plugin);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::set_user_to_use(const std::string& user)
+    {
+        if (!user.size())
+            return 0;
+
+        if (watch_folder_user)
+            delete watch_folder_user;
+        watch_folder_user = new long;
+        char *end = NULL;
+        use_as_user = strtol(user.c_str(), &end, 10);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::set_watch_folder(const std::string& folder)
+    {
+        watch_folder = folder;
+        no_needs_files_mode = true;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::set_watch_folder_reports(const std::string& folder)
+    {
+        watch_folder_reports = folder;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::set_watch_folder_not_recursive()
+    {
+        watch_folder_recursive = false;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::set_watch_folder_user(const std::string& user)
+    {
+        if (!user.size())
+            return 0;
+
+        if (watch_folder_user)
+            delete watch_folder_user;
+        watch_folder_user = new long;
+        char *end = NULL;
+        *watch_folder_user = strtol(user.c_str(), &end, 10);
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::set_compression_mode(const std::string& mode_str)
     {
         MediaConchLib::compression mode;
@@ -327,6 +500,26 @@ namespace MediaConch
 
         MCL.set_compression_mode(mode);
         return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_file_information_mode()
+    {
+        file_information = true;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_plugins_list_mode()
+    {
+        plugins_list_mode = true;
+        no_needs_files_mode = true;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_list_watch_folders_mode()
+    {
+        list_watch_folders_mode = true;
+        no_needs_files_mode = true;
     }
 
     //--------------------------------------------------------------------------
@@ -346,34 +539,66 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int CLI::is_ready(const std::string& file, MediaConchLib::report& report_kind)
+    int CLI::is_ready(long& file_id, MediaConchLib::report& report_kind)
     {
-        double percent_done = 0;
+        MediaConchLib::Checker_StatusRes res;
+        int ret = MCL.checker_status(use_as_user, file_id, res);
+        if (ret < 0)
+            return ret;
 
-        int ret = MCL.checker_is_done(file, percent_done, report_kind);
+        report_kind = MediaConchLib::report_MediaConch;
+
         if (use_daemon && asynchronous)
         {
-            if (ret == MediaConchLib::errorHttp_NONE)
+            if (!res.finished)
             {
+                std::string file;
+                MCL.checker_file_from_id(use_as_user, file_id, file);
+
                 std::stringstream str;
-                str << "Analyzing " << file << " ; done: " << percent_done  << "%";
+                double percent = res.percent ? *res.percent : (double)0;
+                str << "Analyzing " << file << " ; done: " << percent << "%";
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
                 return 1;
             }
+
+            if (res.tool)
+                report_kind = (MediaConchLib::report)*res.tool;
+
             return ret;
         }
         else
         {
-            while (ret != MediaConchLib::errorHttp_TRUE)
+            while (!res.finished)
             {
-                if (ret < 0)
-                    return ret;
+
                 #ifdef WINDOWS
                 ::Sleep((DWORD)5);
                 #else
                 usleep(500000);
                 #endif
-                ret = MCL.checker_is_done(file, percent_done, report_kind);
+                ret = MCL.checker_status(use_as_user, file_id, res);
+            }
+
+            if (res.has_error)
+            {
+                std::stringstream ss;
+                std::string file;
+                MCL.checker_file_from_id(use_as_user, file_id, file);
+
+                ss << "File: " << file << " had a problem during analyze\n";
+                ss << "\tError logs are: " << res.error_log;
+                error = ss.str();
+                return MediaConchLib::errorHttp_INTERNAL;
+            }
+
+            if (res.tool)
+                report_kind = (MediaConchLib::report)*res.tool;
+
+            if (res.generated_id >= 0)
+            {
+                file_id = res.generated_id;
+                return is_ready(file_id, report_kind);
             }
         }
         return MediaConchLib::errorHttp_TRUE;
@@ -451,10 +676,41 @@ namespace MediaConch
         return MCL.policy_get_values_for_type_field(type, field, values);
     }
 
-    int CLI::run_policy_reference_file()
+    int CLI::run_policy_reference_file(long id)
     {
         MediaConchLib::report report_kind;
-        return is_ready(policy_reference_file, report_kind);
+        return is_ready(id, report_kind);
+    }
+
+    void CLI::file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report)
+    {
+        std::stringstream ss;
+
+        ss << "filename:               " << info->filename << "\n";
+        ss << "file last modification: " << info->file_last_modification << "\n";
+        ss << "analyzed:               " << std::boolalpha << info->analyzed << "\n";
+        ss << "has_error:              " << std::boolalpha << info->has_error << "\n";
+        if (info->has_error)
+            ss << "error_log:          " << std::boolalpha << info->error_log << "\n";
+
+        if (info->generated_id >= 0)
+        {
+            std::string file;
+            MCL.checker_file_from_id(use_as_user, info->generated_id, file);
+            ss << "generated file:         " << file << "\n";
+        }
+
+        if (info->source_id >= 0)
+        {
+            std::string file;
+            MCL.checker_file_from_id(use_as_user, info->source_id, file);
+            ss << "source file:            " << file << "\n";
+            ss << "file generation time:   " << info->generated_time << " milliseconds\n";
+            ss << "generated log:          " << info->generated_log << "\n";
+            ss << "generated error log:    " << info->generated_error_log << "\n";
+        }
+
+        report = ss.str();
     }
 
 }

@@ -75,15 +75,22 @@ int Httpd::send_result()
             error = rest.get_error();                                     \
     }
 
+    MAKE_REQ_FUNC(mediaconch_watch_folder, MediaConch_Watch_Folder)
+    MAKE_REQ_FUNC(mediaconch_edit_watch_folder, MediaConch_Edit_Watch_Folder)
+    MAKE_REQ_FUNC(mediaconch_remove_watch_folder, MediaConch_Remove_Watch_Folder)
+
     MAKE_REQ_FUNC(analyze, Checker_Analyze)
     MAKE_REQ_FUNC(report, Checker_Report)
     MAKE_REQ_FUNC(validate, Checker_Validate)
     MAKE_REQ_FUNC(retry, Checker_Retry)
     MAKE_REQ_FUNC(file_from_id, Checker_File_From_Id)
+    MAKE_REQ_FUNC(id_from_filename, Checker_Id_From_Filename)
+    MAKE_REQ_FUNC(file_information, Checker_File_Information)
 
     MAKE_REQ_FUNC(policy_import, Policy_Import);
     MAKE_REQ_FUNC(policy_change_info, Policy_Change_Info);
     MAKE_REQ_FUNC(policy_change_type, Policy_Change_Type);
+    MAKE_REQ_FUNC(policy_change_is_public, Policy_Change_Is_Public);
     MAKE_REQ_FUNC(xslt_policy_rule_edit, XSLT_Policy_Rule_Edit);
 
 #undef MAKE_REQ_FUNC
@@ -97,6 +104,9 @@ int Httpd::send_result()
         if (!*req)                                                         \
             error = rest.get_error();                                      \
     }
+
+    MAKE_URI_REQ_FUNC(mediaconch_get_plugins, MediaConch_Get_Plugins)
+    MAKE_URI_REQ_FUNC(mediaconch_list_watch_folders, MediaConch_List_Watch_Folders)
 
     MAKE_URI_REQ_FUNC(status, Checker_Status)
     MAKE_URI_REQ_FUNC(clear, Checker_Clear)
@@ -114,6 +124,7 @@ int Httpd::send_result()
     MAKE_URI_REQ_FUNC(policy_get_policies_count, Policy_Get_Policies_Count)
     MAKE_URI_REQ_FUNC(policy_clear_policies, Policy_Clear_Policies)
     MAKE_URI_REQ_FUNC(policy_get_policies, Policy_Get_Policies)
+    MAKE_URI_REQ_FUNC(policy_get_public_policies, Policy_Get_Public_Policies)
     MAKE_URI_REQ_FUNC(policy_get_policies_names_list, Policy_Get_Policies_Names_List)
     MAKE_URI_REQ_FUNC(xslt_policy_create_from_file, XSLT_Policy_Create_From_File)
     MAKE_URI_REQ_FUNC(xslt_policy_rule_create, XSLT_Policy_Rule_Create)

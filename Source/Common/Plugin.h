@@ -41,21 +41,28 @@ public:
 
     MediaConchLib::PluginType get_type() const { return type; }
     const std::string&        get_name() const { return name; }
+    const std::string&        get_id() const { return id; }
     const std::string&        get_report() const { return report; }
+    const std::string&        get_report_err() const { return report_err; }
     const std::string&        get_error() const { return error; }
+
+    void                      set_id(const std::string& i) { this->id = i; }
+    void                      set_name(const std::string& n) { this->name = n; }
 
 protected:
     MediaConchLib::PluginType type;
     std::string               name;
+    std::string               id;
     std::string               report;
+    std::string               report_err;
     std::string               error;
     int                       exec_bin(const std::vector<std::string>& params, std::string& error);
     int                       read_report(const std::string& file, std::string& report);
 
 #if defined(_WIN32)
     int                       create_pipe(HANDLE* handler_out_rd, HANDLE* handler_out_wr);
-    int                       execute_the_command(std::string& cmd, HANDLE handler_out_wr);
-    int                       read_the_stdout(HANDLE handler_out_wr, HANDLE handler_out_rd);
+    int                       execute_the_command(std::string& cmd, HANDLE handler_out_wr, HANDLE handler_err_wr);
+    int                       read_the_output(HANDLE handler_out_wr, HANDLE handler_out_rd, bool is_out);
 #endif
 
     void                      unified_string(std::string& str);

@@ -8,6 +8,43 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.11
+ * Update command:
+  * Policy_Get: add is_public
+  * Policy_Get: add must_be_public
+  * Policy_Dump: add must_be_public
+  * Policy_Duplicate: add must_be_public
+  * Policy_Duplicate: add dst_user
+  * Policy_Change_Info: add license
+  * Policy_Policy: add license
+ * Create new command for the Policy
+  * Policy_Get_Public_Policies
+  * Policy_Change_Is_Public
+ * create the policy object:
+  * Policy_Public_Policy
+
+#### Version 1.10
+ * Update command:
+  * Checker_Get_Report: add plugins to the command to use
+ * Create new command for the MediaConch
+  * MediaConch_Get_Plugins
+  * MediaConch_Watch_Folder
+  * MediaConch_List_Watch_Folders
+  * MediaConch_Edit_Watch_Folder
+  * MediaConch_Remove_Watch_Folder
+ * Create new structure for the MediaConch
+  * MediaConch_Nok
+ * Create new command namespace:
+  * MediaConch
+
+#### Version 1.9
+ * Create new command for the checker
+  * Checker_Id_From_Filename
+  * Checker_File_information
+ * Update commands of the checker
+  * Checker_Status_result: add more information
+ * Add user to all checker_* command
+
 #### Version 1.8
 
 * Add XSL's options in Checker_Get_Report and Checker_Validate
@@ -79,36 +116,145 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.6
+Current API version: $API_VERSION = 1.11
 
 #### Command
 
-* Checker_Analyze:         HTTP POST
-* Checker_Status:          HTTP GET
-* Checker_Report:          HTTP POST
-* Checker_Retry:           HTTP PUT
-* Checker_Clear:           HTTP DELETE
-* Checker_List:            HTTP GET
-* Checker_Validate:        HTTP POST
-* Checker_File_From_Id:    HTTP POST
-* Default_Values_For_type: HTTP GET
+* MediaConch_Watch_Folder:        HTTP POST
+* MediaConch_List_Watch_Folder:   HTTP GET
+* MediaConch_Edit_Watch_Folder:   HTTP POST
+* MediaConch_Remove_Watch_Folder: HTTP POST
 
-* XSLT_Policy_Create: HTTP GET
-* Policy_Import: HTTP POST
-* Policy_Remove: HTTP GET
-* Policy_Duplicate: HTTP GET
-* Policy_Move: HTTP GET
-* Policy_Dump: HTTP GET
-* Policy_Save: HTTP GET
-* Policy_Get_Name: HTTP GET
-* Policy_Change_Info: HTTP POST
-* Policy_Change_Type: HTTP POST
-* Policy_Get: HTTP GET
-* Policy_Get_Policies: HTTP GET
+* Checker_Analyze:                HTTP POST
+* Checker_Status:                 HTTP GET
+* Checker_Report:                 HTTP POST
+* Checker_Retry:                  HTTP PUT
+* Checker_Clear:                  HTTP DELETE
+* Checker_List:                   HTTP GET
+* Checker_Validate:               HTTP POST
+* Checker_File_From_Id:           HTTP POST
+* Default_Values_For_type:        HTTP GET
+
+* XSLT_Policy_Create:             HTTP GET
+* Policy_Import:                  HTTP POST
+* Policy_Remove:                  HTTP GET
+* Policy_Duplicate:               HTTP GET
+* Policy_Move:                    HTTP GET
+* Policy_Dump:                    HTTP GET
+* Policy_Save:                    HTTP GET
+* Policy_Get_Name:                HTTP GET
+* Policy_Change_Info:             HTTP POST
+* Policy_Change_Type:             HTTP POST
+* Policy_Change_Is_Public:        HTTP POST
+* Policy_Get:                     HTTP GET
+* Policy_Get_Policies:            HTTP GET
+* Policy_Get_Public_Policies:     HTTP GET
 * Policy_Get_Policies_Names_List: HTTP GET
-* Policy_Get_Policies_Count: HTTP GET
-* Policy_Clear_Policies: HTTP GET
-* Policy_Create_From_File: HTTP GET
+* Policy_Get_Policies_Count:      HTTP GET
+* Policy_Clear_Policies:          HTTP GET
+* Policy_Create_From_File:        HTTP GET
+
+#### MediaConch_Nok
+
+Structure used when error occurs.
+
+##### Parameters
+
+* error:              String with the error description
+
+#### MediaConch_Get_Plugins
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_get_plugins
+
+##### Request
+
+Parameters:
+
+No parameters for the request
+
+##### Response
+
+Parameters:
+
+* plugins:           Array of String with the Plugins ID
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_Watch_Folder
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_watch_folder
+
+##### Request
+
+Parameters:
+
+* folder:            String with the new directory name to watch
+* folder_reports:    String with the name of the directory where to put the reports of the file analyzed in the watched folders
+* plugins:           Array of String with the plugins ID
+* policies:          Array of String with the policies contents
+* user:              Integer: Use this User ID for the watch folder. If not present, find a unique ID
+* recursive:         Boolean: Check the folder recursively (sub-directory), set to true by default
+
+##### Response
+
+Parameters:
+
+* user:              Integer: a unique id of the user for this watch folder or the one given as input
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_List_Watch_Folders
+
+URI format for the parameters.
+URL: /$API_VERSION/mediaconch_list_watch_folders
+
+##### Request
+
+Parameters:
+
+No parameters for the request
+
+##### Response
+
+Parameters:
+
+* folders:           Array of String: List the folders watched
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_Edit_Watch_Folder
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_edit_watch_folder
+
+##### Request
+
+Parameters:
+
+* folder:            String with the old directory watched
+* folder_reports:    String with the name of the directory where to put the reports of the file analyzed in the watched folders
+
+##### Response
+
+Parameters:
+
+* nok:               MediaConch_Nok when error occurs
+
+#### MediaConch_Remove_Watch_Folder
+
+JSON format for the parameters.
+URL: /$API_VERSION/mediaconch_remove_watch_folder
+
+##### Request
+
+Parameters:
+
+* folder:            String with the directory to stop to watch
+
+##### Response
+
+Parameters:
+
+* nok:               MediaConch_Nok when error occurs
 
 #### Checker_Analyze
 
@@ -122,7 +268,9 @@ Parameters:
 * args:              Array of arguments
 
 - file:              String: Name of the file to analyze
+- user:              Integer: a unique id for the user
 - id:                Integer: a unique id for the request
+- plugins:           Array of Integer: List of Plugins to use (other than format plugins)
 - force:             Boolean: force to analyze the file even if registered in database (introduced in v1.1)
 
 ##### Response
@@ -149,6 +297,8 @@ URL: /$API_VERSION/checker_status
 
 Parameters:
 
+- user:              Integer: a unique id for the user
+
 * List of:
 
 - id:                Integer: id given by the Analyze command
@@ -161,8 +311,12 @@ Parameters:
 
 - id:                Integer: id given by the request
 - finished:          Boolean: if the file is finished to be analyzed
+- has_error:         Boolean: if the file analyze has error (optional, no error if not present)
+- error_log:         String: if the file has error (has_error = true), give the error logs if any
 - done:              Double: Percent done by the analysis
 - tool:              REPORT: give the report tool used to analyze, when it is finished, optionnal (Default is IMPLEMENTATION) (since API v1.3)
+- generated_id:      Integer: id of the last file generated, if any.
+- source_id:         Integer: id of the source file if generated by the daemon
 
 * nok:               Array of invalid arguments
 
@@ -177,6 +331,8 @@ URL: /$API_VERSION/checker_report
 ##### Request
 
 Parameters:
+
+- user:              Integer: a unique id for the user
 
 * args:              Array of arguments
 
@@ -212,7 +368,8 @@ URL: /$API_VERSION/checker_retry
 
 Parameters:
 
-* ids:              Array of id given by the Analyze command
+- user:              Integer: a unique id for the user
+- ids:               Array of id given by the Analyze command
 
 ##### Response
 
@@ -236,7 +393,8 @@ Parameters:
 
 * List of:
 
-- id:                Integer: id given by the Analyze command
+- user:              Integer: a unique id for the user
+- ids:               Array of integers: ids given by the Analyze command
 
 ##### Response
 
@@ -258,6 +416,8 @@ URL: /$API_VERSION/checker_list
 
 Parameters:
 
+- user:              Integer: a unique id for the user
+
 ##### Response
 
 Parameters:
@@ -276,6 +436,7 @@ URL: /$API_VERSION/checker_validate
 
 Parameters:
 
+- user:              Integer: a unique id for the user
 * args:              Array of arguments
 
 - id:                Integer: id given by the Analyze command
@@ -308,13 +469,59 @@ URL: /$API_VERSION/checker_file_from_id
 
 Parameters:
 
+- user:              Integer: a unique id for the user
 - id:                Integer: id given by the Analyze command
 
 ##### Response
 
 Parameter:
 
-* file:              String: File corresponding to the id, left empty if id not matching
+- file:              String: File corresponding to the id, left empty if id not matching
+
+#### Checker_Id_From_Filename
+
+JSON format for the parameters.
+URL: /$API_VERSION/checker_id_from_filename
+
+##### Request
+
+Parameters:
+
+- user:              Integer: a unique id for the user
+- filename:          String: Requested filename for id
+
+##### Response
+
+Parameter:
+
+- id:                Integer: id of the file, same value as the one from analyze command
+
+#### Checker_File_Information
+
+JSON format for the parameters.
+URL: /$API_VERSION/checker_file_information
+
+##### Request
+
+Parameters:
+
+- user:              Integer: a unique id for the user
+- id:                Integer: id given by the Analyze command
+
+##### Response
+
+Parameter:
+
+- filename:               String: File corresponding to the id
+- file_last_modifciation: String: Time of the file last modification, correspond to the creation time for generated file
+- generated_id:           Integer: id of the last file generated, if any
+- source_id:              Integer: id of the source file if generated by the daemon
+- generated_time:         Integer: Time in milliseconds to generate this file
+- generated_log:          String: Output log when generating this file (stdout)
+- generated_error_log:    String: Output error log when generating this file (stderr)
+- analyzed:               Boolean: If this file is already analyzed
+- has_error:              Boolean: if the file analyze has error (optional, no error if not present)
+- error_log:              String: if the file has error (has_error = true), give the error logs if any
 
 #### Default_Values_For_type
 
@@ -326,6 +533,7 @@ URL: /$API_VERSION/default_values_for_type
 Parameters:
 
 * type:              String: name of the type wanted
+* field:             String: name of the field wanted
 
 ##### Response
 
@@ -403,14 +611,15 @@ Parameters:
 #### Policy_Dump
 
 URI format for the parameters.
-URL: /$API_VERSION/policy_dump?id=0
+URL: /$API_VERSION/policy_dump?id=0&must_be_public=true
 
 ##### Request
 
 Parameters:
 
-user:  User ID
-id:    Policy ID to dump
+user:           User ID
+id:             Policy ID to dump
+must_be_public: Return an error if the policy is not public
 
 ##### Response
 
@@ -449,9 +658,11 @@ URL: /$API_VERSION/policy_duplicate?id=0
 
 Parameters:
 
-user:          User ID
-id:            Policy ID to duplicate
-dst_policy_id: Policy ID used as parent (default is -1, root node)
+user:           User ID
+id:             Policy ID to duplicate
+dst_policy_id:  Policy ID used as parent (default is -1, root node)
+dst_user:       Copy the policy to this user ID (optional, if not present, copy to the "user")
+must_be_public: Return an error if the policy is not public
 
 ##### Response
 
@@ -515,7 +726,8 @@ user:        User ID
 id:          Policy ID to retrieve information
 name:        New name for the policy
 description: New description for the policy
-'{"POLICY_CHANGE_INFO":{"id": 0, "name": "changed name", "description": "changed description"}}'
+license:     New license for the policy
+'{"POLICY_CHANGE_INFO":{"id": 0, "name": "changed name", "description": "changed description", "license": "MIT"}}'
 
 ##### Response
 
@@ -547,6 +759,28 @@ Parameters:
 - Otherwise, return a "nok" object with a Policy_Error
 {"POLICY_CHANGE_TYPE_RESULT": {"nok": {\"error\":\"ERROR\"}}}
 
+#### Policy_Change_Is_Public
+
+JSON format for the parameters.
+URL: /$API_VERSION/policy_change_is_public"
+
+##### Request
+
+Parameters:
+
+user:        User ID
+id:          Policy ID to retrieve information (must be a root policy)
+is_public:   Boolean to set the policy to public or not
+'{"POLICY_CHANGE_IS_PUBLIC":{"id": 0, "is_public": true}}'
+
+##### Response
+
+Parameters:
+
+- If command is ok, return an empty object '{"POLICY_CHANGE_IS_PUBLIC_RESULT": {}}'
+- Otherwise, return a "nok" object with a Policy_Error
+{"POLICY_CHANGE_IS_PUBLIC_RESULT": {"nok": {\"error\":\"ERROR\"}}}
+
 #### Policy_Get
 
 Parameters:
@@ -558,9 +792,10 @@ URL: /$API_VERSION/policy_get?id=0&format=JSTREE
 
 Parameters:
 
-user:   User ID
-id:     Policy ID
-format: Output format, can be "JSTREE" or "JSON"
+user:           User ID
+id:             Policy ID
+format:         Output format, can be "JSTREE" or "JSON"
+must_be_public: Return an error if the policy is not public
 
 ##### Response
 
@@ -611,6 +846,27 @@ Parameters:
 
 - if command is ok, format is "JSON", return an object with an array of policies (Policy_Policy): '{"POLICY_GET_POLICIES_RESULT": {"policies": []}}'
 - if command is ok, format is "JSTREE", return an object with a jstree string policies: '{"POLICY_GET_POLICIES_RESULT": {"policiesTree": "[]"}}'
+- otherwise, return a "nok" object with a Policy_Error
+{"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
+
+#### Policy_Get_Public_Policies
+
+Parameters:
+
+URI format for the parameters.
+URL: /$API_VERSION/policy_get_public_policies
+
+##### Request
+
+Parameters:
+
+- No parameters for Policy_Get_Public_Policies
+
+##### Response
+
+Parameters:
+
+- if command is ok, return an object with an array of public policies (Policy_Public_Policy): '{"POLICY_GET_PUBLIC_POLICIES_RESULT": {"policies": []}}'
 - otherwise, return a "nok" object with a Policy_Error
 {"POLICY_GET_POLICIES_RESULT": {"nok": {"error":"ERROR"}}}
 
@@ -852,7 +1108,9 @@ Parameters:
 * kind:        string containing the policy kind ("UNKNOWN" or "XSLT")
 * type:        string containing the policy operator (optional; value: "and", "or"; default is "and")
 * is_system:   boolean set to true if it is a system policy
-* description: string containing the name of the policy (optional)
+* is_public:   boolean set to true if it is a public policy
+* description: string containing the description of the policy (optional)
+* license:     string containing the license of the policy (optional)
 * children:    list of children of the policy (sub-policies, rules)
 
 {"id":0, "parent_id":-1, "name": "NAME", "description":"", "type":"and", "children":[]}
@@ -873,6 +1131,19 @@ Parameters:
 * value:      Value of the rule
 
 {"id":0, "name": "NAME", "tracktype": "TYPE", "field":"FIELD", "occurrence":-1, "ope":"is_existing", value=""}
+
+#### Policy_Public_Policy
+
+Public Policy Object
+
+Parameters:
+
+* id:          ID of the policy
+* user:        ID of the user owning this policy
+* name:        string containing the name of the policy (optional)
+* description: string containing the name of the policy (optional)
+
+{"id":0, "user":-1, "name": "NAME", "description":""}
 
 #### Policy_Error
 

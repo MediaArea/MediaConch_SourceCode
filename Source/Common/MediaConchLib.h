@@ -92,7 +92,26 @@ public:
     enum PluginType
     {
         PLUGIN_FORMAT = 0,
+        PLUGIN_PRE_HOOK,
+        PLUGIN_LOG,
         PLUGIN_MAX,
+    };
+
+    struct Checker_StatusRes
+    {
+        Checker_StatusRes() : id(-1), finished(false), has_error(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
+
+        long         id;
+        bool         finished;
+
+        bool         has_error;
+        std::string  error_log;
+
+        double      *percent;
+
+        int         *tool;
+        long         generated_id;
+        long         source_id;
     };
 
     struct Checker_ReportRes
@@ -105,9 +124,25 @@ public:
 
     struct Checker_ValidateRes
     {
-        std::string             file;
+        long                    id;
         bool                    valid;
         Checker_ValidateRes() : valid(true) {}
+    };
+
+    struct Checker_FileInfo
+    {
+        Checker_FileInfo() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false), has_error(false) {}
+
+        std::string filename;
+        std::string file_last_modification;
+        std::string generated_log;
+        std::string generated_error_log;
+        long        generated_id;
+        long        source_id;
+        size_t      generated_time;
+        bool        analyzed;
+        bool        has_error;
+        std::string error_log;
     };
 
     union XSLT_Child;
@@ -130,22 +165,35 @@ public:
     struct Policy_Policy
     {
         Policy_Policy() : id(-1), parent_id(-1), is_system(false) {}
-        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), kind(p->kind), type(p->type), name(p->name), description(p->description), children(p->children) {}
+        Policy_Policy(const Policy_Policy* p) : id(p->id), parent_id(p->parent_id), is_system(p->is_system), is_public(p->is_public), kind(p->kind), type(p->type), name(p->name), description(p->description), license(p->license), children(p->children) {}
         int                                       id;
         int                                       parent_id;
         bool                                      is_system;
+        bool                                      is_public;
         std::string                               kind;
         std::string                               type;
         std::string                               name;
         std::string                               description;
+        std::string                               license;
         std::vector<std::pair<int, XSLT_Child> >  children;
-        std::string to_str() const;
+        std::string                               to_str() const;
     };
 
     union XSLT_Child
     {
         XSLT_Policy_Rule *rule;
         Policy_Policy    *policy;
+    };
+
+    struct Policy_Public_Policy
+    {
+        Policy_Public_Policy() : id(-1), user(-1) {}
+        Policy_Public_Policy(const Policy_Public_Policy* p) : id(p->id), user(p->user), name(p->name), description(p->description), license(p->license) {}
+        long                                      id;
+        long                                      user;
+        std::string                               name;
+        std::string                               description;
+        std::string                               license;
     };
 
     struct Get_Policies
@@ -207,32 +255,50 @@ public:
     //Options
     int add_option(const std::string& option, std::string& report);
 
-    // Analyze
-    int  checker_analyze(const std::vector<std::string>& files, bool force_analyze = false);
-    int  checker_analyze(const std::string& file, bool& registered, bool force_analyze = false);
-    int  checker_is_done(const std::vector<std::string>& files, double& percent);
-    int  checker_is_done(const std::string& file, double& percent, report& report_kind);
+    // MediaConch
+    int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);
+    int  mediaconch_list_watch_folders(std::vector<std::string>& folders, std::string& error);
+    int  mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
+                                 const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
+                                 long* in_user, bool recursive,
+                                 long& user_id, std::string& error);
+    int  mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports, std::string& error);
+    int  mediaconch_remove_watch_folder(const std::string& folder, std::string& error);
 
-    void checker_list(std::vector<std::string>& vec);
-    void checker_file_from_id(int id, std::string& filename);
+    // Analyze
+    int  checker_analyze(int user, const std::vector<std::string>& files,
+                         const std::vector<std::string>& plugins,
+                         std::vector<long>& files_id, bool force_analyze = false);
+    int  checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                         bool& registered, long& file_id, bool force_analyze = false);
+
+    // Status
+    int  checker_status(int user, const std::vector<long>& files_id,
+                        std::vector<Checker_StatusRes>& res);
+    int  checker_status(int user, long file_id, Checker_StatusRes& res);
+
+    void checker_list(int user, std::vector<std::string>& vec);
+    void checker_file_from_id(int user, long id, std::string& filename);
+    long checker_id_from_filename(int user, const std::string& filename);
+    int  checker_file_information(int user, long id, Checker_FileInfo& info);
 
     // Output
     int  checker_get_report(int user, const std::bitset<report_Max>& Report, format f,
-                            const std::vector<std::string>& files,
+                            const std::vector<long>& files,
                             const std::vector<size_t>& policies_ids,
                             const std::vector<std::string>& policies_contents,
                             const std::map<std::string, std::string>& options,
                             Checker_ReportRes* result,
                             const std::string* display_name = NULL,
                             const std::string* display_content = NULL);
-    int checker_validate(int user, MediaConchLib::report report, const std::vector<std::string>& files,
+    int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
                          const std::map<std::string, std::string>& options,
                          std::vector<Checker_ValidateRes*>& result);
 
     //Clear
-    int remove_report(const std::vector<std::string>& files);
+    int remove_report(int user, const std::vector<long>& files);
 
     // Implementation checker arguments
     void               set_implementation_schema_file(const std::string& file);
@@ -264,24 +330,27 @@ public:
 
     // Policies
     //   Create policy
-    int                          policy_duplicate(int user, int id, int dst_policy_id, std::string& err);
+    int                          policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err);
     int                          policy_move(int user, int id, int dst_policy_id, std::string& err);
-    int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
+    int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, const std::string& license, std::string& err);
     int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
+    int                          policy_change_is_public(int user, int id, bool is_public, std::string& err);
     int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);
-    int                          xslt_policy_create_from_file(int user, const std::string& file, std::string& err);
+    int                          xslt_policy_create_from_file(int user, long file, std::string& err);
     //   Import policy
     int                          policy_import(int user, const std::string& memory, std::string& err, const char* filename=NULL, bool is_system_policy=false);
 
     //   Policy helper
     size_t                       policy_get_policies_count(int user) const;
-    int                          policy_get(int user, int pos, const std::string& format, Get_Policy&, std::string& err);
+    int                          policy_get(int user, int pos, const std::string& format, bool must_be_public,
+                                            Get_Policy&, std::string& err);
     int                          policy_get_name(int user, int id, std::string& name, std::string& err);
     void                         policy_get_policies(int user, const std::vector<int>&, const std::string& format, Get_Policies&);
+    int                          policy_get_public_policies(std::vector<Policy_Public_Policy*>& policies, std::string& err);
     void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
     int                          policy_save(int user, int pos, std::string& err);
     int                          policy_remove(int user, int pos, std::string& err);
-    int                          policy_dump(int user, int id, std::string& memory, std::string& err);
+    int                          policy_dump(int user, int id, bool must_be_public, std::string& memory, std::string& err);
     int                          policy_clear_policies(int user, std::string& err);
 
     // XSLT Policy Rule

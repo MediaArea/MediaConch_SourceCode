@@ -13,7 +13,9 @@
 #include <algorithm>
 #include <map>
 #include <ZenLib/Ztring.h>
+#include <ZenLib/File.h>
 #include "Common/Httpd.h"
+#include "Common/Core.h"
 #include "Common/LibEventHttpd.h"
 #include "Common/Policy.h"
 #include "Common/XsltPolicy.h"
@@ -26,7 +28,6 @@
 #endif //_WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <ctime>
 
 //****************************************************************************
 // Extern
@@ -43,7 +44,8 @@ namespace MediaConch
     std::string Daemon::version = "16.09.0";
 
     //--------------------------------------------------------------------------
-    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL)
+    Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), watch_folder_user(NULL),
+                       watch_folder_recursive(true), mode(DAEMON_MODE_DAEMON)
     {
         MCL = new MediaConchLib(true);
         clog_buffer = std::clog.rdbuf();
@@ -58,6 +60,9 @@ namespace MediaConch
             std::clog.rdbuf(clog_buffer);
             delete logger;
         }
+
+        if (watch_folder_user)
+            delete watch_folder_user;
     }
 
     //--------------------------------------------------------------------------
@@ -87,6 +92,12 @@ namespace MediaConch
             return -1;
         }
 
+        httpd->commands.mediaconch_get_plugins_cb = on_mediaconch_get_plugins_command;
+        httpd->commands.mediaconch_watch_folder_cb = on_mediaconch_watch_folder_command;
+        httpd->commands.mediaconch_list_watch_folders_cb = on_mediaconch_list_watch_folders_command;
+        httpd->commands.mediaconch_edit_watch_folder_cb = on_mediaconch_edit_watch_folder_command;
+        httpd->commands.mediaconch_remove_watch_folder_cb = on_mediaconch_remove_watch_folder_command;
+
         httpd->commands.analyze_cb = on_analyze_command;
         httpd->commands.status_cb = on_status_command;
         httpd->commands.report_cb = on_report_command;
@@ -95,6 +106,8 @@ namespace MediaConch
         httpd->commands.list_cb = on_list_command;
         httpd->commands.validate_cb = on_validate_command;
         httpd->commands.file_from_id_cb = on_file_from_id_command;
+        httpd->commands.id_from_filename_cb = on_id_from_filename_command;
+        httpd->commands.file_information_cb = on_file_information_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
 
         httpd->commands.xslt_policy_create_cb = on_xslt_policy_create_command;
@@ -106,11 +119,13 @@ namespace MediaConch
         httpd->commands.policy_move_cb = on_policy_move_command;
         httpd->commands.policy_change_info_cb = on_policy_change_info_command;
         httpd->commands.policy_change_type_cb = on_policy_change_type_command;
+        httpd->commands.policy_change_is_public_cb = on_policy_change_is_public_command;
         httpd->commands.policy_get_cb = on_policy_get_command;
         httpd->commands.policy_get_name_cb = on_policy_get_name_command;
         httpd->commands.policy_get_policies_count_cb = on_policy_get_policies_count_command;
         httpd->commands.policy_clear_policies_cb = on_policy_clear_policies_command;
         httpd->commands.policy_get_policies_cb = on_policy_get_policies_command;
+        httpd->commands.policy_get_public_policies_cb = on_policy_get_public_policies_command;
         httpd->commands.policy_get_policies_names_list_cb = on_policy_get_policies_names_list_command;
         httpd->commands.xslt_policy_create_from_file_cb = on_xslt_policy_create_from_file_command;
         httpd->commands.xslt_policy_rule_create_cb = on_xslt_policy_rule_create_command;
@@ -148,8 +163,29 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int Daemon::run()
     {
+        switch (mode)
+        {
+            case DAEMON_MODE_PLUGINS_LIST:
+                return run_plugins_list();
+            case DAEMON_MODE_DAEMON:
+                //default, continue
+                break;
+        }
+
         if (is_daemon)
             daemonize();
+
+        if (MCL && watch_folder.size())
+        {
+            std::string err;
+            long user_id = -1;
+            int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
+                                                   watch_folder_user, watch_folder_recursive, user_id, err);
+            if (ret < 0)
+                std::clog << "Cannot watch folder:" << watch_folder << ":" << err << std::endl;
+            else
+                std::clog << "Watching folder:" << watch_folder << ", user:" << user_id << std::endl;
+        }
         if (!httpd)
             return -1;
 
@@ -166,6 +202,29 @@ namespace MediaConch
             return -1;
         }
         return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::run_plugins_list()
+    {
+        std::stringstream out;
+        std::vector<std::string> list;
+        std::string error;
+        if (MCL->mediaconch_get_plugins(list, error) < 0)
+            return MediaConchLib::errorHttp_INTERNAL;
+
+        out << "plugins:[";
+
+        for (size_t i = 0; i < list.size(); ++i)
+        {
+            if (i)
+                out << ", ";
+            out << "\"" << list[i] << "\"";
+        }
+
+        out << "]" << std::endl;
+        TEXTOUT(out.str().c_str());
+        return DAEMON_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -235,16 +294,23 @@ namespace MediaConch
             argument = "--compression=zlib";
 
         if (0);
-        OPTION("--help",                    help)
-        OPTION("--version",                 version)
-        OPTION("--fork",                    fork)
-        OPTION("--configuration",           configuration)
-        OPTION("--pluginsconfiguration",    plugins_configuration)
-        OPTION("--compression",             compression)
-        OPTION("--implementationschema",    implementationschema)
-        OPTION("--implementationverbosity", implementationverbosity)
-        OPTION("--outputlog",               outputlog)
-        OPTION("--",                        other)
+        OPTION("--help",                      help)
+        OPTION("--version",                   version)
+        OPTION("--fork",                      fork)
+        OPTION("--configuration",             configuration)
+        OPTION("--pluginsconfiguration",      plugins_configuration)
+        OPTION("--pluginslist",               plugins_list)
+        OPTION("--plugin",                    plugin)
+        OPTION("--policy",                    policy)
+        OPTION("--compression",               compression)
+        OPTION("--implementationschema",      implementationschema)
+        OPTION("--implementationverbosity",   implementationverbosity)
+        OPTION("--outputlog",                 outputlog)
+        OPTION("--watchfolder-reports",       watchfolder_reports)
+        OPTION("--watchfolder-not-recursive", watchfolder_not_recursive)
+        OPTION("--watchfolder-user",          watchfolder_user)
+        OPTION("--watchfolder",               watchfolder)
+        OPTION("--",                          other)
         else
         {
             Help();
@@ -390,6 +456,132 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::parse_plugin(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string plugin = argument.substr(equal_pos + 1);
+        plugins.push_back(plugin);
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_plugins_list(const std::string& argument)
+    {
+        (void)argument;
+
+        mode = DAEMON_MODE_PLUGINS_LIST;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_policy(const std::string& argument)
+    {
+        size_t equal_pos = argument.find('=');
+        if (equal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string filename = argument.substr(equal_pos + 1);
+        ZenLib::Ztring z_filename = ZenLib::Ztring().From_UTF8(filename);
+        if (!ZenLib::File::Exists(z_filename))
+        {
+            TEXTOUT("Policiy file does not exists");
+            return DAEMON_RETURN_ERROR;
+        }
+
+        ZenLib::File file(z_filename);
+
+        ZenLib::int64u size = file.Size_Get();
+        if (size == (ZenLib::int64u)-1)
+        {
+            TEXTOUT("Cannot read the policiy file");
+            return DAEMON_RETURN_ERROR;
+        }
+
+        ZenLib::int8u* Buffer = new ZenLib::int8u[size + 1];
+        size_t len = file.Read(Buffer, size);
+        Buffer[len] = '\0';
+
+        ZenLib::Ztring FromFile;
+        FromFile.From_UTF8((char*)Buffer);
+        if (FromFile.empty())
+            FromFile.From_Local((char*)Buffer);
+
+        file.Close();
+        policies.push_back(FromFile.To_UTF8());
+        delete [] Buffer;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder(const std::string& argument)
+    {
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+        std::string folder;
+        folder.assign(argument, egal_pos + 1 , std::string::npos);
+        watch_folder = folder;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder_reports(const std::string& argument)
+    {
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+        std::string dir;
+        dir.assign(argument, egal_pos + 1 , std::string::npos);
+        watch_folder_reports = dir;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder_user(const std::string& argument)
+    {
+        size_t egal_pos = argument.find('=');
+        if (egal_pos == std::string::npos)
+        {
+            Help();
+            return DAEMON_RETURN_ERROR;
+        }
+
+        std::string user;
+        user.assign(argument, egal_pos + 1 , std::string::npos);
+
+        if (user.size())
+        {
+            char *end = NULL;
+            watch_folder_user = new long;
+            *watch_folder_user = strtol(user.c_str(), &end, 10);
+        }
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::parse_watchfolder_not_recursive(const std::string& argument)
+    {
+        (void)argument;
+        watch_folder_recursive = false;
+        return DAEMON_RETURN_NONE;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::parse_other(const std::string& argument)
     {
         std::string report;
@@ -443,6 +635,128 @@ namespace MediaConch
 #endif
 
     //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_get_plugins_command(const RESTAPI::MediaConch_Get_Plugins_Req* req, RESTAPI::MediaConch_Get_Plugins_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch get plugins command" << std::endl;
+        std::vector<std::string> vec;
+        std::string error;
+        if (d->MCL->mediaconch_get_plugins(vec, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+        else
+        {
+            for (size_t i = 0; i < vec.size(); ++i)
+                res.plugins.push_back(vec[i]);
+        }
+
+        std::clog << d->get_date() << "Daemon send get mediaconch plugins result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_watch_folder_command(const RESTAPI::MediaConch_Watch_Folder_Req* req,
+                                                   RESTAPI::MediaConch_Watch_Folder_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch watch folder command: ";
+        std::clog << req->to_str() << std::endl;
+        std::string error;
+        long user_id = -1;
+        if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports,
+                                            req->plugins, req->policies,
+                                            req->user, req->recursive, user_id, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+        else
+            res.user = user_id;
+
+        std::clog << d->get_date() << "Daemon send mediaconch watch folder result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_list_watch_folders_command(const RESTAPI::MediaConch_List_Watch_Folders_Req* req,
+                                                         RESTAPI::MediaConch_List_Watch_Folders_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch list watch folders command" << std::endl;
+        std::string error;
+        std::vector<std::string> list;
+        if (d->MCL->mediaconch_list_watch_folders(list, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+        else
+            for (size_t i = 0; i < list.size(); ++i)
+                res.folders.push_back(list[i]);
+
+        std::clog << d->get_date() << "Daemon send mediaconch list watch folders result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_edit_watch_folder_command(const RESTAPI::MediaConch_Edit_Watch_Folder_Req* req,
+                                                        RESTAPI::MediaConch_Edit_Watch_Folder_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch edit watch folder command: ";
+        std::clog << req->to_str() << std::endl;
+        std::string error;
+        if (d->MCL->mediaconch_edit_watch_folder(req->folder, req->folder_reports, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+
+        std::clog << d->get_date() << "Daemon send mediaconch edit watch folder result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_mediaconch_remove_watch_folder_command(const RESTAPI::MediaConch_Remove_Watch_Folder_Req* req,
+                                                          RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a mediaconch remove watch folder command: ";
+        std::clog << req->to_str() << std::endl;
+        std::string error;
+        if (d->MCL->mediaconch_remove_watch_folder(req->folder, error) < 0)
+        {
+            res.nok = new RESTAPI::MediaConch_Nok;
+            res.nok->error = error;
+        }
+
+        std::clog << d->get_date() << "Daemon send mediaconch remove watch folder result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_analyze_command(const RESTAPI::Checker_Analyze_Req* req, RESTAPI::Checker_Analyze_Res& res, void *arg)
     {
         Daemon *d = (Daemon*)arg;
@@ -457,8 +771,12 @@ namespace MediaConch
             bool force = false;
             if (req->args[i].has_force_analyze)
                 force = req->args[i].force_analyze;
+            std::vector<std::string> plugins;
+            for (size_t j = 0; j < req->args[i].plugins.size(); ++j)
+                plugins.push_back(req->args[i].plugins[j]);
             bool registered = false;
-            int ret = d->MCL->checker_analyze(req->args[i].file, registered, force);
+            long out_id = -1;
+            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, registered, out_id, force);
             if (ret < 0)
             {
                 RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;
@@ -470,29 +788,12 @@ namespace MediaConch
 
             RESTAPI::Checker_Analyze_Ok *ok = new RESTAPI::Checker_Analyze_Ok;
             ok->inId = req->args[i].id;
-            if (registered)
-            {
-                size_t id = 0;
-                for (; id < d->current_files.size(); ++id)
-                    if (d->id_is_existing(id) && *d->current_files[id] == req->args[i].file)
-                    {
-                        ok->outId = id;
-                        break;
-                    }
-                if (id < d->current_files.size())
-                {
-                    ok->create = false;
-                    res.ok.push_back(ok);
-                    continue;
-                }
-            }
-
-            size_t new_id = d->get_first_free_slot();
-            d->current_files[new_id] = new std::string(req->args[i].file);
-            ok->outId = new_id;
+            ok->outId = out_id;
             ok->create = !registered;
+
             res.ok.push_back(ok);
         }
+
         std::clog << d->get_date() << "Daemon send checker analyze result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -509,8 +810,8 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
-            int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            long id = req->ids[i];
+            if (id < 0)
             {
                 RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
                 nok->id = id;
@@ -519,11 +820,10 @@ namespace MediaConch
                 continue;
             }
 
-            MediaConchLib::report report_kind;
-            double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
+            MediaConchLib::Checker_StatusRes st_res;
+            int ret = d->MCL->checker_status(req->user, id, st_res);
 
-            if (is_done < 0)
+            if (ret < 0)
             {
                 RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
                 nok->id = id;
@@ -534,27 +834,37 @@ namespace MediaConch
             RESTAPI::Checker_Status_Ok *ok = new RESTAPI::Checker_Status_Ok;
 
             ok->id = id;
-            if (is_done == MediaConchLib::errorHttp_TRUE)
+            ok->finished = st_res.finished;
+            ok->has_error = st_res.has_error;
+            if (ok->has_error)
+                ok->error_log = st_res.error_log;
+
+            if (st_res.tool)
             {
-                ok->finished = true;
-                ok->has_tool = false;
-                if (report_kind == MediaConchLib::report_MediaVeraPdf)
+                if (*st_res.tool == (int)MediaConchLib::report_MediaVeraPdf)
                 {
-                    ok->has_tool = true;
-                    ok->tool = RESTAPI::VERAPDF;
+                    ok->tool = new RESTAPI::Report;
+                    *ok->tool = RESTAPI::VERAPDF;
                 }
-                else if (report_kind == MediaConchLib::report_MediaDpfManager)
+                else if (*st_res.tool == (int)MediaConchLib::report_MediaDpfManager)
                 {
-                    ok->has_tool = true;
-                    ok->tool = RESTAPI::DPFMANAGER;
+                    ok->tool = new RESTAPI::Report;
+                    *ok->tool = RESTAPI::DPFMANAGER;
                 }
             }
-            else
+
+            if (st_res.percent)
             {
-                ok->finished = false;
-                ok->has_percent = true;
-                ok->done = percent_done;
+                ok->percent = new double;
+                *ok->percent = *st_res.percent;
             }
+
+            if (st_res.generated_id >= 0)
+                ok->generated_id = st_res.generated_id;
+
+            if (st_res.source_id >= 0)
+                ok->source_id = st_res.source_id;
+
             res.ok.push_back(ok);
         }
         std::clog << d->get_date() << "Daemon send checker status result: " << res.to_str() << std::endl;
@@ -609,11 +919,11 @@ namespace MediaConch
 
         bool has_valid = false;
         bool valid = true;
-        std::vector<std::string> files;
+        std::vector<long> files;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
-            int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            long id = req->ids[i];
+            if (id < 0)
             {
                 RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
                 nok->id = id;
@@ -622,10 +932,9 @@ namespace MediaConch
                 continue;
             }
 
-            MediaConchLib::report report_kind;
-            double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
-            if (is_done != MediaConchLib::errorHttp_TRUE)
+            MediaConchLib::Checker_StatusRes cs_res;
+            int is_done = d->MCL->checker_status(req->user, id, cs_res);
+            if (is_done < 0 || !cs_res.finished)
             {
                 RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
                 nok->id = id;
@@ -634,7 +943,7 @@ namespace MediaConch
                 continue;
             }
 
-            files.push_back(*d->current_files[id]);
+            files.push_back(id);
         }
 
         std::map<std::string, std::string> options;
@@ -677,8 +986,8 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
-            int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            long id = req->ids[i];
+            if (id < 0)
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
                 nok->id = id;
@@ -687,11 +996,25 @@ namespace MediaConch
                 continue;
             }
 
-            std::vector<std::string> files;
-            files.push_back(*d->current_files[id]);
-            d->MCL->remove_report(files);
+            std::string filename;
+            d->MCL->checker_file_from_id(req->user, id, filename);
+            if (!filename.size())
+            {
+                RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
+                nok->id = id;
+                nok->error = RESTAPI::ID_NOT_EXISTING;
+                res.nok.push_back(nok);
+                continue;
+            }
+
+            std::vector<long> files;
+            files.push_back(id);
+            d->MCL->remove_report(req->user, files);
+
             bool registered = false;
-            int ret = d->MCL->checker_analyze(*d->current_files[id], registered);
+            long new_id = -1;
+            std::vector<std::string> plugins;
+            int ret = d->MCL->checker_analyze(req->user, filename, plugins, registered, new_id);
             if (ret < 0)
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
@@ -700,7 +1023,7 @@ namespace MediaConch
                 res.nok.push_back(nok);
                 continue;
             }
-            res.ok.push_back(id);
+            res.ok.push_back(new_id);
         }
         std::clog << d->get_date() << "Daemon send checker retry result: " << res.to_str() << std::endl;
         return 0;
@@ -719,7 +1042,7 @@ namespace MediaConch
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            if (id < 0)
             {
                 RESTAPI::Checker_Clear_Nok *nok = new RESTAPI::Checker_Clear_Nok;
                 nok->id = id;
@@ -728,13 +1051,12 @@ namespace MediaConch
                 continue;
             }
 
-            std::vector<std::string> files;
-            files.push_back(*d->current_files[id]);
-            d->MCL->remove_report(files);
-            delete d->current_files[id];
-            d->current_files[id] = NULL;
+            std::vector<long> files;
+            files.push_back(id);
+            d->MCL->remove_report(req->user, files);
             res.ok.push_back(id);
         }
+
         std::clog << d->get_date() << "Daemon send checker clear result: " << res.to_str() << std::endl;
         return 0;
     }
@@ -747,22 +1069,16 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a checker list command" << std::endl;
+        std::clog << d->get_date() << "Daemon received a checker list command: ";
+        std::clog << req->to_str() << std::endl;
         std::vector<std::string> vec;
-        d->MCL->checker_list(vec);
+        d->MCL->checker_list(req->user, vec);
         for (size_t i = 0; i < vec.size(); ++i)
         {
             RESTAPI::Checker_List_File *file = new RESTAPI::Checker_List_File;
             file->file = vec[i];
 
-            size_t id = 0;
-            if (!d->file_is_registered(vec[i], id))
-            {
-                id = d->get_first_free_slot();
-                d->current_files[id] = new std::string(vec[i]);
-            }
-
-            file->id = id;
+            file->id = d->MCL->checker_id_from_filename(req->user, vec[i]);
             res.files.push_back(file);
         }
         std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
@@ -792,12 +1108,11 @@ namespace MediaConch
         else
             report = MediaConchLib::report_Max;
 
-        std::map<std::string, int> saved_ids;
-        std::vector<std::string> files;
+        std::vector<long> files;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
-            if (!d->id_is_existing(id))
+            if (id < 0)
             {
                 RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
                 nok->id = id;
@@ -806,10 +1121,9 @@ namespace MediaConch
                 continue;
             }
 
-            MediaConchLib::report report_kind;
-            double percent_done = 0.0;
-            int is_done = d->MCL->checker_is_done(*d->current_files[id], percent_done, report_kind);
-            if (is_done != MediaConchLib::errorHttp_TRUE)
+            MediaConchLib::Checker_StatusRes st_res;
+            int is_done = d->MCL->checker_status(req->user, id, st_res);
+            if (is_done < 0 || !st_res.finished)
             {
                 RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
                 nok->id = id;
@@ -819,8 +1133,7 @@ namespace MediaConch
             }
 
             // Output
-            files.push_back(*d->current_files[id]);
-            saved_ids[*d->current_files[id]] = id;
+            files.push_back(id);
         }
 
         std::map<std::string, std::string> options;
@@ -842,7 +1155,7 @@ namespace MediaConch
         for (size_t i = 0; i < result.size(); ++i)
         {
             RESTAPI::Checker_Validate_Ok* ok = new RESTAPI::Checker_Validate_Ok;
-            ok->id = saved_ids[result[i]->file];
+            ok->id = result[i]->id;
             ok->valid = result[i]->valid;
             res.ok.push_back(ok);
         }
@@ -858,13 +1171,58 @@ namespace MediaConch
         if (!d || !req)
             return -1;
 
-        std::clog << d->get_date() << "Daemon received a checker_file_from_id command" << std::endl;
+        std::clog << d->get_date() << "Daemon received a checker_file_from_id command:";
         std::clog << req->to_str() << std::endl;
 
-        if (d->id_is_existing(req->id))
-            res.file = *d->current_files[req->id];
+        d->MCL->checker_file_from_id(req->user, req->id, res.file);
 
         std::clog << d->get_date() << "Daemon send checker_file_from_id result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_id_from_filename_command(const RESTAPI::Checker_Id_From_Filename_Req* req, RESTAPI::Checker_Id_From_Filename_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a checker_id_from_filename command:";
+        std::clog << req->to_str() << std::endl;
+
+        res.id = d->MCL->checker_id_from_filename(req->user, req->filename);
+
+        std::clog << d->get_date() << "Daemon send checker_id_from_filename result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int Daemon::on_file_information_command(const RESTAPI::Checker_File_Information_Req* req, RESTAPI::Checker_File_Information_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a checker_file_information command" << std::endl;
+        std::clog << req->to_str() << std::endl;
+
+        MediaConchLib::Checker_FileInfo info;
+        d->MCL->checker_file_information(req->user, req->id, info);
+
+        res.filename = info.filename;
+        res.file_last_modification = info.file_last_modification;
+        res.analyzed = info.analyzed;
+        res.generated_id = info.generated_id;
+        res.source_id = info.source_id;
+        res.generated_time = info.generated_time;
+        res.generated_log = info.generated_log;
+        res.generated_error_log = info.generated_error_log;
+        res.has_error = info.has_error;
+        res.error_log = info.error_log;
+
+        std::clog << d->get_date() << "Daemon send checker_file_information result: " << res.to_str() << std::endl;
         return 0;
     }
 
@@ -973,7 +1331,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_dump(req->user, req->id, res.xml, err) == -1)
+        if (d->MCL->policy_dump(req->user, req->id, req->must_be_public, res.xml, err) == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1019,7 +1377,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        res.id = d->MCL->policy_duplicate(req->user, req->id, req->dst_policy_id, err);
+        res.id = d->MCL->policy_duplicate(req->user, req->id, req->dst_policy_id, req->dst_user, req->must_be_public, err);
         if (res.id == -1)
         {
             res.nok = new RESTAPI::Policy_Nok;
@@ -1067,7 +1425,7 @@ namespace MediaConch
         std::clog << req->to_str() << std::endl;
 
         std::string err;
-        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, err) < 0)
+        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, req->license, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1101,6 +1459,29 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_policy_change_is_public_command(const RESTAPI::Policy_Change_Is_Public_Req* req,
+                                                   RESTAPI::Policy_Change_Is_Public_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_change_is_public command: ";
+        std::clog << req->to_str() << std::endl;
+
+        std::string err;
+        if (d->MCL->policy_change_is_public(req->user, req->id, req->is_public, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+
+        std::clog << d->get_date() << "Daemon send policy_change_is_public result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
                                       RESTAPI::Policy_Get_Res& res, void *arg)
     {
@@ -1114,7 +1495,7 @@ namespace MediaConch
 
         std::string err;
         MediaConchLib::Get_Policy p;
-        if (d->MCL->policy_get(req->user, req->id, req->format, p, err) < 0)
+        if (d->MCL->policy_get(req->user, req->id, req->format, req->must_be_public, p, err) < 0)
         {
             res.nok = new RESTAPI::Policy_Nok;
             res.nok->error = err;
@@ -1221,6 +1602,45 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
+    int Daemon::on_policy_get_public_policies_command(const RESTAPI::Policy_Get_Public_Policies_Req* req,
+                                                      RESTAPI::Policy_Get_Public_Policies_Res& res, void *arg)
+    {
+        Daemon *d = (Daemon*)arg;
+
+        if (!d || !req)
+            return -1;
+
+        std::clog << d->get_date() << "Daemon received a policy_get_public_policies command" << std::endl;
+
+        std::vector<MediaConchLib::Policy_Public_Policy*> policies;
+        std::string err;
+        if (d->MCL->policy_get_public_policies(policies, err) < 0)
+        {
+            res.nok = new RESTAPI::Policy_Nok;
+            res.nok->error = err;
+        }
+        else
+        {
+            for (size_t i = 0; i < policies.size(); ++i)
+            {
+                if (!policies[i])
+                    continue;
+
+                RESTAPI::Policy_Public_Policy *policy = new RESTAPI::Policy_Public_Policy;
+                policy->id = policies[i]->id;
+                policy->user = policies[i]->user;
+                policy->name = policies[i]->name;
+                policy->description = policies[i]->description;
+                policy->license = policies[i]->license;
+                res.policies.push_back(policy);
+            }
+        }
+
+        std::clog << d->get_date() << "Daemon send policy_get_public_policies result: " << res.to_str() << std::endl;
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
     int Daemon::on_policy_get_policies_names_list_command(const RESTAPI::Policy_Get_Policies_Names_List_Req* req,
                                                           RESTAPI::Policy_Get_Policies_Names_List_Res& res, void *arg)
     {
@@ -1251,7 +1671,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a xslt_policy_create_from_file command: ";
         std::clog << req->to_str() << std::endl;
 
-        if (!d->id_is_existing(req->id))
+        if (req->id < 0)
         {
             RESTAPI::XSLT_Policy_Create_From_File_Nok *nok = new RESTAPI::XSLT_Policy_Create_From_File_Nok;
             nok->id = req->id;
@@ -1261,7 +1681,7 @@ namespace MediaConch
         else
         {
             std::string err;
-            int pos = d->MCL->xslt_policy_create_from_file(req->user, *d->current_files[req->id], err);
+            int pos = d->MCL->xslt_policy_create_from_file(req->user, req->id, err);
 
             if (pos == -1)
             {
@@ -1442,46 +1862,11 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    size_t Daemon::get_first_free_slot()
-    {
-        size_t i = 0;
-        for (; i < current_files.size();  ++i)
-            if (!current_files[i])
-                return i;
-        current_files.push_back(NULL);
-        return current_files.size() - 1;
-    }
-
-    //--------------------------------------------------------------------------
-    bool Daemon::id_is_existing(int id) const
-    {
-        if (id < 0 || id >= (int)current_files.size() || !current_files[id])
-            return false;
-        return true;
-    }
-
-    //--------------------------------------------------------------------------
     std::string Daemon::get_date() const
     {
         std::stringstream out;
-        time_t            t;
-
-        time(&t);
-        std::string str(ctime(&t));
-        str = str.substr(0, str.length() - 1);
-        out << "[" << str << "]";
+        std::string time = Core::get_date();
+        out << "[" << time << "]";
         return out.str();
-    }
-
-    //--------------------------------------------------------------------------
-    bool Daemon::file_is_registered(const std::string& file, size_t& id)
-    {
-        for (size_t i = 0; i < current_files.size(); ++i)
-            if (current_files[i] && !current_files[i]->compare(file))
-            {
-                id = i;
-                return true;
-            }
-        return false;
     }
 }

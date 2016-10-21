@@ -57,10 +57,12 @@ public:
     std::string          filename;
     std::string          name;
     std::string          description;
+    std::string          license;
     Policies::PolicyType type;
+    size_t               id;
     bool                 is_system;
     bool                 no_https;
-    size_t               id;
+    bool                 is_public;
 
 protected:
     Policies            *policies;

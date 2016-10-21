@@ -75,9 +75,9 @@ public:
     void                        remove_widget_from_layout(QWidget* w);
     int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
-    int                         analyze(const std::vector<std::string>& files);
-    int                         is_analyze_finished(const std::vector<std::string>& files, double& percent_done);
-    int                         is_analyze_finished(const std::string& file, double& percent_done, MediaConchLib::report& report_kind);
+    int                         analyze(const std::vector<std::string>& files, std::vector<long>& files_id);
+    int                         is_analyze_finished(const std::vector<std::string>& files, std::vector<MediaConchLib::Checker_StatusRes>& res);
+    int                         is_analyze_finished(const std::string& file, MediaConchLib::Checker_StatusRes& res);
     int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,
                                          const std::vector<size_t>& policies_ids,
                                          const std::vector<std::string>& policies_contents,
@@ -111,7 +111,8 @@ public:
     int                         xslt_policy_create(int parent_id, std::string& err);
     int                         policy_duplicate(int id, int dst_policy_id, std::string& err);
     int                         policy_move(int id, int dst_policy_id, std::string& err);
-    int                         policy_change_info(int id, const std::string& name, const std::string& description, std::string& err);
+    int                         policy_change_info(int id, const std::string& name, const std::string& description,
+                                                   const std::string& license, std::string& err);
     int                         policy_change_type(int id, const std::string& type, std::string& err);
     int                         policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p);
     int                         policy_save(int pos, std::string& err);

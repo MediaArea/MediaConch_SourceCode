@@ -63,16 +63,18 @@ public:
     int         create_xslt_policy(int user, const std::string& type, int parent_id, std::string& err);
     int         import_policy_from_memory(int user, const std::string& memory, std::string& err, const char* filename, bool is_system_policy);
     int         import_policy_from_file(int user, const std::string& file, std::string& err);
-    int         duplicate_policy(int user, int id, int dst_policy_id, std::string& err, bool copy_name=true);
+    int         duplicate_policy(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err, bool copy_name=true);
     int         move_policy(int user, int id, int dst_policy_id, std::string& err);
-    int         create_xslt_policy_from_file(int user, const std::string& file, std::string& err);
+    int         create_xslt_policy_from_file(int user, long file, std::string& err);
 
     int         save_policy(int user, int id, std::string& err);
     int         export_policy(int user, const char* filename, int id, std::string& err);
-    int         dump_policy_to_memory(int user, int pos, std::string& memory, std::string& err);
+    int         dump_policy_to_memory(int user, int pos, bool must_be_public, std::string& memory, std::string& err);
 
-    int         policy_change_info(int user, int id, const std::string& name, const std::string& description, std::string& err);
+    int         policy_change_info(int user, int id, const std::string& name, const std::string& description,
+                                   const std::string& license, std::string& err);
     int         policy_change_type(int user, int id, const std::string& type, std::string& err);
+    int         policy_change_is_public(int user, int id, bool is_public, std::string& err);
 
     int         erase_policy(int user, int index, std::string& err);
     int         clear_policies(int user, std::string& err);
@@ -81,8 +83,10 @@ public:
     Policy*     get_policy(int user, int pos, std::string& err);
     int         policy_get_name(int user, int id, std::string& name, std::string& err);
     void        get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies& ps);
+    int         get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& policies, std::string& err);
     void        get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps);
-    int         policy_get(int user, int pos, const std::string& format, MediaConchLib::Get_Policy& policy, std::string& err);
+    int         policy_get(int user, int pos, const std::string& format, bool must_be_public,
+                           MediaConchLib::Get_Policy& policy, std::string& err);
 
     int         policy_get_policies(int user, const std::vector<size_t>* policies_ids,
                                     const std::vector<std::string>* policies_contents,

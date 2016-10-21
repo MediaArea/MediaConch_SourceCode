@@ -38,7 +38,68 @@ Http::~Http()
 {
 }
 
-// Policy
+// MediaConch
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::MediaConch_Get_Plugins_Req& req)
+{
+    std::string query;
+    rest.serialize_mediaconch_get_plugins_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_get_plugins" << query;
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::MediaConch_Watch_Folder_Req& req)
+{
+    std::string cmd;
+    rest.serialize_mediaconch_watch_folder_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_watch_folder";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::MediaConch_List_Watch_Folders_Req& req)
+{
+    std::string query;
+    rest.serialize_mediaconch_list_watch_folders_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_list_watch_folders" << query;
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::MediaConch_Edit_Watch_Folder_Req& req)
+{
+    std::string cmd;
+    rest.serialize_mediaconch_edit_watch_folder_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_edit_watch_folder";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::MediaConch_Remove_Watch_Folder_Req& req)
+{
+    std::string cmd;
+    rest.serialize_mediaconch_remove_watch_folder_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_remove_watch_folder";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+// Checker
 //---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Checker_Analyze_Req& req)
 {
@@ -102,11 +163,16 @@ int Http::send_request(RESTAPI::Checker_Clear_Req& req)
 }
 
 //---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_List_Req&)
+int Http::send_request(RESTAPI::Checker_List_Req& req)
 {
-    std::string uri("/");
-    uri +=  RESTAPI::API_VERSION + "/checker_list";
-    return send_request_get(uri);
+    std::string query;
+    rest.serialize_list_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/checker_list" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
 }
 
 //---------------------------------------------------------------------------
@@ -129,6 +195,30 @@ int Http::send_request(RESTAPI::Checker_File_From_Id_Req& req)
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/checker_file_from_id";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Checker_Id_From_Filename_Req& req)
+{
+    std::string cmd;
+    rest.serialize_id_from_filename_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/checker_id_from_filename";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Checker_File_Information_Req& req)
+{
+    std::string cmd;
+    rest.serialize_file_information_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/checker_file_information";
     std::string uri_str = uri.str();
     return send_request_post(uri_str, cmd);
 }
@@ -262,6 +352,18 @@ int Http::send_request(RESTAPI::Policy_Change_Type_Req& req)
 }
 
 //---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Policy_Change_Is_Public_Req& req)
+{
+    std::string cmd;
+    rest.serialize_policy_change_is_public_req(req, cmd);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/policy_change_is_public";
+    std::string uri_str = uri.str();
+    return send_request_post(uri_str, cmd);
+}
+
+//---------------------------------------------------------------------------
 int Http::send_request(RESTAPI::Policy_Get_Req& req)
 {
     std::string query;
@@ -309,6 +411,19 @@ int Http::send_request(RESTAPI::Policy_Get_Policies_Req& req)
     std::stringstream uri;
 
     uri << "/" << RESTAPI::API_VERSION << "/policy_get_policies" << query;
+
+    std::string uri_str = uri.str();
+    return send_request_get(uri_str);
+}
+
+//---------------------------------------------------------------------------
+int Http::send_request(RESTAPI::Policy_Get_Public_Policies_Req& req)
+{
+    std::string query;
+    rest.serialize_policy_get_public_policies_req(req, query);
+    std::stringstream uri;
+
+    uri << "/" << RESTAPI::API_VERSION << "/policy_get_public_policies" << query;
 
     std::string uri_str = uri.str();
     return send_request_get(uri_str);

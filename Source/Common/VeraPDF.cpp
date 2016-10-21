@@ -36,13 +36,6 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int VeraPDF::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
     {
-        if (obj.find("name") == obj.end() || obj.at("name").type != Container::Value::CONTAINER_TYPE_STRING)
-        {
-            error += "Field 'name' is not present\n";
-            return -1;
-        }
-        name = obj.at("name").s;
-
         if (obj.find("format") == obj.end() || obj.at("format").type != Container::Value::CONTAINER_TYPE_STRING)
         {
             error += "Field 'format' is not present\n";

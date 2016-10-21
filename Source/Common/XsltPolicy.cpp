@@ -354,6 +354,22 @@ int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* c
         return -1;
     }
 
+    xmlChar *is_public = xmlGetNoNsProp(node, (const unsigned char*)"isPublic");
+    if (is_public && is_root)
+    {
+        std::string is_public_str = std::string((const char*)is_public);
+        if (is_public_str == "true")
+            p->is_public = true;
+        xmlFree(is_public);
+    }
+
+    xmlChar *license = xmlGetNoNsProp(node, (const unsigned char*)"license");
+    if (license && is_root)
+    {
+        p->license = std::string((const char*)license);
+        xmlFree(license);
+    }
+
     if (!node->children)
         return 0;
 
@@ -489,6 +505,14 @@ int XsltPolicy::create_node_policy_child(xmlNodePtr& node, XsltPolicy *current)
             return -1;
         }
     }
+
+    //isPublic
+    if (current->is_public)
+        xmlNewProp(node, (const xmlChar *)"isPublic", (const xmlChar *)"true");
+
+    //license
+    if (current->license.size())
+        xmlNewProp(node, (const xmlChar *)"license", (const xmlChar *)current->license.c_str());
 
     if (write_nodes_children(node, current) < 0)
     {

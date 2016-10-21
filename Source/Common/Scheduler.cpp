@@ -17,8 +17,14 @@
 #include "Plugin.h"
 #include "PluginFormat.h"
 #include "PluginsManager.h"
+#include "FFmpeg.h"
 #include <ZenLib/Ztring.h>
-//---------------------------------------------------------------------------
+
+#if defined(_WIN32) || defined(WIN32)
+#include <Winbase.h>
+#else
+#include <sys/time.h>
+#endif
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -53,11 +59,13 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int Scheduler::add_element_to_queue(const std::string& filename, const std::vector<std::string>& options)
+    int Scheduler::add_element_to_queue(int user, const std::string& filename, long file_id,
+                                        const std::vector<std::string>& options,
+                                        const std::vector<std::string>& plugins)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, filename, options);
+        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins);
         run_element();
         return index - 1;
     }
@@ -88,16 +96,24 @@ namespace MediaConch {
         if (!el)
             return;
 
+        core->set_file_analyzed_to_database(el->user, el->file_id);
+
+        if (!MI)
+        {
+            CS.Enter();
+            remove_element(el);
+            CS.Leave();
+            run_element();
+            return;
+        }
+
         if (another_work_to_do(el, MI) <= 0)
             return;
 
         CS.Enter();
-        core->register_file_to_database(el->filename, MI);
-        std::map<QueueElement*, QueueElement*>::iterator it = working.find(el);
-        if (it != working.end())
-            working.erase(it);
+        core->register_reports_to_database(el->user, el->file_id, MI);
+        remove_element(el);
         CS.Leave();
-
         run_element();
     }
 
@@ -109,32 +125,34 @@ namespace MediaConch {
         return size == 0;
     }
 
-    void Scheduler::get_elements(std::vector<std::string>& vec)
+    void Scheduler::get_elements(int user, std::vector<std::string>& vec)
     {
         CS.Enter();
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first)
+            if (it->first && it->first->user == user)
                 vec.push_back(it->first->filename);
         CS.Leave();
     }
 
-    bool Scheduler::element_is_finished(const std::string& filename, double& percent_done)
+    bool Scheduler::element_is_finished(int user, long file_id, double& percent_done)
     {
         bool ret = true;
         CS.Enter();
 
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first->filename == filename)
+            if (it->first->file_id == file_id && it->first->user == user)
                 break;
+
         if (it != working.end())
         {
             percent_done = it->first->percent_done();
             CS.Leave();
             return false;
         }
-        if (queue->has_element(filename))
+
+        if (queue->has_id(user, file_id) >= 0)
         {
             percent_done = 0.0;
             ret = false;
@@ -144,19 +162,25 @@ namespace MediaConch {
         return ret;
     }
 
-    bool Scheduler::element_exists(const std::string& filename)
+    long Scheduler::element_exists(int user, const std::string& filename)
     {
         CS.Enter();
-        bool ret = queue->has_element(filename);
+        long file_id = queue->has_element(user, filename);
+        if (file_id >= 0)
+        {
+            CS.Leave();
+            return file_id;
+        }
 
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first->filename == filename)
+            if (it->first->filename == filename && user == it->first->user)
                 break;
+
         if (it != working.end())
-            ret = true;
+            file_id = it->first->file_id;
         CS.Leave();
-        return ret;
+        return file_id;
     }
 
     int Scheduler::another_work_to_do(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
@@ -166,27 +190,110 @@ namespace MediaConch {
         std::string format_str = ZenLib::Ztring(format).To_UTF8().c_str();
 
         std::map<std::string, Plugin*> plugins = core->get_format_plugins();
-        if (plugins.find(format_str) != plugins.end() && plugins[format_str])
-        {
-            std::string error;
-            ((PluginFormat*)plugins[format_str])->set_file(el->filename);
-            plugins[format_str]->run(error);
-            const std::string& report = plugins[format_str]->get_report();
-            MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
-            core->register_file_to_database(el->filename, report, report_kind, MI);
-        }
-        else
+        if (plugins.find(format_str) == plugins.end() || !plugins[format_str])
             return 1;
 
+        std::string error;
+        ((PluginFormat*)plugins[format_str])->set_file(el->filename);
+        if (plugins[format_str]->run(error) < 0)
+            core->plugin_add_log(error);
+        const std::string& report = plugins[format_str]->get_report();
+        MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
+
         CS.Enter();
-        //core->register_plugin_report_to_database(el->filename, MI);
+        core->register_reports_to_database(el->user, el->file_id, report, report_kind, MI);
+        remove_element(el);
+        CS.Leave();
+        run_element();
+
+        return 0;
+    }
+
+    void Scheduler::remove_element(QueueElement *el)
+    {
         std::map<QueueElement*, QueueElement*>::iterator it = working.find(el);
         if (it != working.end())
             working.erase(it);
-        CS.Leave();
+    }
 
-        run_element();
-        return 0;
+    int Scheduler::execute_pre_hook_plugins(QueueElement *el, std::string& err, bool& analyze_file)
+    {
+        // Before registering, check the format
+        std::vector<Plugin*> plugins = core->get_pre_hook_plugins();
+        std::string          new_file = el->filename;
+        long                 old_id = el->file_id;
+        int                  ret = 0;
+
+        for (size_t i = 0; i < plugins.size(); ++i)
+        {
+            if (!plugins[i])
+                continue;
+
+            bool is_el_plugin = false;
+            for (size_t j = 0; j < el->plugins.size(); ++j)
+                if (el->plugins[j] == plugins[i]->get_id())
+                    is_el_plugin = true;
+            if (!is_el_plugin)
+                continue;
+
+            ((PluginPreHook*)plugins[i])->set_input_file(new_file);
+
+#if defined(_WIN32) || defined(WIN32)
+            unsigned long time_before = GetTickCount();
+#else
+            struct timeval time_before;
+            gettimeofday(&time_before, NULL);
+#endif
+
+            ret = plugins[i]->run(err);
+
+#if defined(_WIN32) || defined(WIN32)
+            unsigned long time_after = GetTickCount();
+            size_t time_passed = time_after - time_before;
+#else
+            struct timeval time_after;
+            gettimeofday(&time_after, NULL);
+
+            size_t time_passed = (time_after.tv_sec - time_before.tv_sec) * 1000 + (time_after.tv_usec - time_before.tv_usec) / 1000;
+#endif
+
+            if (ret == 0 && ((PluginPreHook*)plugins[i])->is_creating_file())
+            {
+                std::string generated_log = ((PluginPreHook*)plugins[i])->get_report();
+                std::string generated_error_log = ((PluginPreHook*)plugins[i])->get_report_err();
+                new_file = ((PluginPreHook*)plugins[i])->get_output_file();
+
+                std::vector<std::string> options;
+                std::map<std::string, std::string>::iterator it = el->options.begin();
+                for (; it != el->options.end(); ++it)
+                {
+                    if (it->second.length())
+                        options.push_back(it->first + "=" + it->second);
+                    else
+                        options.push_back(it->first);
+                }
+
+                std::vector<std::string> plugins;
+                long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log, generated_error_log, options, plugins);
+                if (id >= 0)
+                    core->file_update_generated_file(el->user, old_id, id);
+                old_id = id;
+            }
+            else if (ret)
+            {
+                std::string error_log = ((PluginPreHook*)plugins[i])->get_report_err();
+                core->update_file_error(el->user, old_id, true, error_log);
+                return ret;
+            }
+
+            if (!((PluginPreHook*)plugins[i])->analyzing_source())
+                analyze_file = false;
+        }
+
+        if (!analyze_file)
+            remove_element(el);
+
+        return ret;
     }
 
 }

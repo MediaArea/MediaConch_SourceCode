@@ -33,18 +33,33 @@ namespace MediaConch
         int parse_args(int ac, char** av);
         int init();
         int run();
+        int run_plugins_list();
         int finish();
 
       private:
         Daemon(const Daemon&);
         Daemon& operator=(const Daemon&);
 
-        MediaConchLib  *MCL;
-        bool            is_daemon;
-        Httpd          *httpd;
-        std::string     last_argument;
-        std::ofstream  *logger;
-        std::streambuf *clog_buffer;
+        MediaConchLib            *MCL;
+        bool                      is_daemon;
+        Httpd                    *httpd;
+        std::string               last_argument;
+        std::ofstream            *logger;
+        std::streambuf           *clog_buffer;
+        std::string               watch_folder;
+        std::string               watch_folder_reports;
+        long                     *watch_folder_user;
+        bool                      watch_folder_recursive;
+        std::vector<std::string>  plugins;
+        std::vector<std::string>  policies;
+
+        //Mode
+        enum daemon_mode
+        {
+            DAEMON_MODE_DAEMON,
+            DAEMON_MODE_PLUGINS_LIST,
+        };
+        daemon_mode mode;
 
         // Helper
         int daemonize();
@@ -56,13 +71,31 @@ namespace MediaConch
         int parse_fork(const std::string& argument);
         int parse_configuration(const std::string& argument);
         int parse_plugins_configuration(const std::string& argument);
+        int parse_plugins_list(const std::string& argument);
+        int parse_plugin(const std::string& argument);
+        int parse_policy(const std::string& argument);
         int parse_compression(const std::string& argument);
         int parse_implementationschema(const std::string& argument);
         int parse_implementationverbosity(const std::string& argument);
         int parse_outputlog(const std::string& argument);
+        int parse_watchfolder(const std::string& argument);
+        int parse_watchfolder_reports(const std::string& argument);
+        int parse_watchfolder_not_recursive(const std::string& argument);
+        int parse_watchfolder_user(const std::string& argument);
         int parse_other(const std::string& argument);
 
         // Request received callbacks
+        //  MediaConch
+        static int on_mediaconch_get_plugins_command(const RESTAPI::MediaConch_Get_Plugins_Req* req, RESTAPI::MediaConch_Get_Plugins_Res& res, void *arg);
+        static int on_mediaconch_watch_folder_command(const RESTAPI::MediaConch_Watch_Folder_Req* req,
+                                                      RESTAPI::MediaConch_Watch_Folder_Res& res, void *arg);
+        static int on_mediaconch_list_watch_folders_command(const RESTAPI::MediaConch_List_Watch_Folders_Req* req,
+                                                            RESTAPI::MediaConch_List_Watch_Folders_Res& res, void *arg);
+        static int on_mediaconch_edit_watch_folder_command(const RESTAPI::MediaConch_Edit_Watch_Folder_Req* req,
+                                                           RESTAPI::MediaConch_Edit_Watch_Folder_Res& res, void *arg);
+        static int on_mediaconch_remove_watch_folder_command(const RESTAPI::MediaConch_Remove_Watch_Folder_Req* req,
+                                                             RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void *arg);
+
         //  Checker
         static int on_analyze_command(const RESTAPI::Checker_Analyze_Req* req,
                                       RESTAPI::Checker_Analyze_Res& res, void *arg);
@@ -80,6 +113,10 @@ namespace MediaConch
                                        RESTAPI::Checker_Validate_Res& res, void *arg);
         static int on_file_from_id_command(const RESTAPI::Checker_File_From_Id_Req* req,
                                            RESTAPI::Checker_File_From_Id_Res& res, void *arg);
+        static int on_id_from_filename_command(const RESTAPI::Checker_Id_From_Filename_Req* req,
+                                               RESTAPI::Checker_Id_From_Filename_Res& res, void *arg);
+        static int on_file_information_command(const RESTAPI::Checker_File_Information_Req* req,
+                                               RESTAPI::Checker_File_Information_Res& res, void *arg);
         static int on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void *arg);
 
@@ -102,6 +139,8 @@ namespace MediaConch
                                                  RESTAPI::Policy_Change_Info_Res& res, void *arg);
         static int on_policy_change_type_command(const RESTAPI::Policy_Change_Type_Req* req,
                                                  RESTAPI::Policy_Change_Type_Res& res, void *arg);
+        static int on_policy_change_is_public_command(const RESTAPI::Policy_Change_Is_Public_Req* req,
+                                                      RESTAPI::Policy_Change_Is_Public_Res& res, void *arg);
         static int on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
                                          RESTAPI::Policy_Get_Res& res, void *arg);
         static int on_policy_get_name_command(const RESTAPI::Policy_Get_Name_Req* req,
@@ -112,6 +151,8 @@ namespace MediaConch
                                                     RESTAPI::Policy_Clear_Policies_Res& res, void *arg);
         static int on_policy_get_policies_command(const RESTAPI::Policy_Get_Policies_Req* req,
                                                   RESTAPI::Policy_Get_Policies_Res& res, void *arg);
+        static int on_policy_get_public_policies_command(const RESTAPI::Policy_Get_Public_Policies_Req* req,
+                                                         RESTAPI::Policy_Get_Public_Policies_Res& res, void *arg);
         static int on_policy_get_policies_names_list_command(const RESTAPI::Policy_Get_Policies_Names_List_Req* req,
                                                              RESTAPI::Policy_Get_Policies_Names_List_Res& res, void *arg);
         static int on_xslt_policy_create_from_file_command(const RESTAPI::XSLT_Policy_Create_From_File_Req* req,
@@ -129,12 +170,7 @@ namespace MediaConch
         static int on_xslt_policy_rule_delete_command(const RESTAPI::XSLT_Policy_Rule_Delete_Req* req,
                                                       RESTAPI::XSLT_Policy_Rule_Delete_Res& res, void *arg);
 
-        size_t get_first_free_slot();
-        bool id_is_existing(int id) const;
-        bool file_is_registered(const std::string& file, size_t& id);
         std::string get_date() const;
-
-        std::vector<std::string*> current_files;
     };
 
 }

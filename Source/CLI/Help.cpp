@@ -35,6 +35,10 @@ int Help()
     TEXTOUT("                    Display the version and exit");
     TEXTOUT("");
 
+    TEXTOUT("--User=UserID, -u UserID");
+    TEXTOUT("                    CLI user will be UserID");
+    TEXTOUT("");
+
     TEXTOUT("Configuration Element:");
     TEXTOUT("--Configuration=ConfigurationFile, -c ConfigurationFile");
     TEXTOUT("                    Use ConfigurationFile as configuration file");
@@ -42,7 +46,6 @@ int Help()
     TEXTOUT("--PluginsConfiguration=PluginsConfigurationFile, -pc PluginsConfigurationFile");
     TEXTOUT("                    Use PluginsConfigurationFile as plugins configuration file");
     TEXTOUT("                    Default, it uses the struct in the configuration file or no plugins configured if not inside.");
-    TEXTOUT("");
 
     TEXTOUT("Reporting Elements:");
     TEXTOUT("--Mediaconch, -mc");
@@ -75,6 +78,33 @@ int Help()
     TEXTOUT("                    Output MediaConch report in HTML format");
     TEXTOUT("--Display=DisplayFileName, -d DisplayFileName");
     TEXTOUT("                    Apply the display transformation (XSL)");
+    TEXTOUT("");
+
+    TEXTOUT("Watch folder:");
+    TEXTOUT("--WatchFolders-List, -wfl");
+    TEXTOUT("                    List the folder watched");
+    TEXTOUT("--WatchFolder=folder -wf folder");
+    TEXTOUT("                    Send to the server a folder to watch");
+    TEXTOUT("--WatchFolder-Reports=folder -wfr folder");
+    TEXTOUT("                    Create reports of the selected watch folder to this folder");
+    TEXTOUT("--WatchFolder-Not-Recursive");
+    TEXTOUT("                    If watch folder is enabled, do not check recursively the folder");
+    TEXTOUT("--WatchFolder-User=userId -wfu userId");
+    TEXTOUT("                    Create reports of the watch folder for the selected user ID");
+    TEXTOUT("");
+
+    TEXTOUT("Plugins:");
+    TEXTOUT("--PluginsList");
+    TEXTOUT("                    Output the plugins information ID");
+    TEXTOUT("--UsePlugin=PluginId, -up PluginId");
+    TEXTOUT("                    By default, only format plugin are used.");
+    TEXTOUT("                    With this command, you can give the plugin ID you want to use.");
+    TEXTOUT("                    Plugin ID can be get using the --pluginslist.");
+    TEXTOUT("");
+
+    TEXTOUT("File:");
+    TEXTOUT("--FileInformation, -fi");
+    TEXTOUT("                 Print files information and quit");
 
     return CLI_RETURN_FINISH;
 }
