@@ -12,6 +12,7 @@
 
 #include <ZenLib/Ztring.h>
 #include <ZenLib/File.h>
+#include <ZenLib/Dir.h>
 #include <ZenLib/FileName.h>
 #include "FFmpeg.h"
 
@@ -67,6 +68,9 @@ namespace MediaConch {
         if (outputDir[outputDir.length() - 1] != '/')
             outputDir += "/";
 #endif
+
+        if (!ZenLib::Dir::Exists(ZenLib::Ztring().From_UTF8(outputDir)))
+            ZenLib::Dir::Create(ZenLib::Ztring().From_UTF8(outputDir));
 
         if (obj.find("outputExt") == obj.end() || obj.at("outputExt").type != Container::Value::CONTAINER_TYPE_STRING)
         {
