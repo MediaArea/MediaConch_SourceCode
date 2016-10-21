@@ -172,6 +172,9 @@ namespace MediaConch
                 break;
         }
 
+        if (is_daemon)
+            daemonize();
+
         if (MCL && watch_folder.size())
         {
             std::string err;
@@ -183,9 +186,6 @@ namespace MediaConch
             else
                 std::clog << "Watching folder:" << watch_folder << ", user:" << user_id << std::endl;
         }
-
-        if (is_daemon)
-            daemonize();
         if (!httpd)
             return -1;
 
