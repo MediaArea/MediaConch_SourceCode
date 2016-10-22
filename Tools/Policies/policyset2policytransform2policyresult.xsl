@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" version="1.0" exclude-result-prefixes="aliasxsl">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" xmlns:mp="https://mediaarea.net/mediapolicy" version="1.0" exclude-result-prefixes="aliasxsl">
   <xsl:param name="compare" as="xsl:string"/>
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
   <xsl:template match="/">
-    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
+    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:mp="https://mediaarea.net/mediapolicy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc mp">
       <aliasxsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
       <aliasxsl:template match="ma:MediaArea">
         <MediaConch>
@@ -20,12 +20,12 @@
                   <xsl:value-of select="document($compare)//ma:media[1]/@ref"/>
                 </aliasxsl:attribute>
               </xsl:if>
-              <xsl:for-each select="policy">
+              <xsl:for-each select="mp:policy">
                 <xsl:call-template name="policycheck">
                   <xsl:with-param name="policy" select="."/>
                 </xsl:call-template>
               </xsl:for-each>
-              <xsl:for-each select="rule">
+              <xsl:for-each select="mp:rule">
                 <xsl:call-template name="rulecheck">
                   <xsl:with-param name="rule" select="."/>
                 </xsl:call-template>
@@ -184,14 +184,14 @@
           <xsl:value-of select="@type"/>
         </aliasxsl:with-param>
         <aliasxsl:with-param name="ruleresults">
-          <xsl:for-each select="rule">
+          <xsl:for-each select="mp:rule">
             <xsl:call-template name="rulecheck">
               <xsl:with-param name="rule" select="."/>
             </xsl:call-template>
           </xsl:for-each>
         </aliasxsl:with-param>
         <aliasxsl:with-param name="morepolicies">
-          <xsl:for-each select="policy">
+          <xsl:for-each select="mp:policy">
             <xsl:call-template name="policycheck">
               <xsl:with-param name="policy" select="."/>
             </xsl:call-template>
