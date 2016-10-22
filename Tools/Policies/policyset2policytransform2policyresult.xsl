@@ -17,7 +17,7 @@
               </aliasxsl:attribute>
               <xsl:if test="string-length($compare)>0">
                 <aliasxsl:attribute name="compare">
-                  <xsl:value-of select="$compare"/>
+                  <xsl:value-of select="document($compare)//ma:media[1]/@ref"/>
                 </aliasxsl:attribute>
               </xsl:if>
               <xsl:for-each select="policy">
