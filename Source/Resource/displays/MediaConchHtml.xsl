@@ -358,8 +358,28 @@
             <xsl:value-of select="mc:description"/>
           </p>
         </xsl:if>
+        <xsl:if test="@value != ''">
+          <strong>Value: </strong>  <xsl:value-of select="@value"/>
+          <br/>
+        </xsl:if>
+        <xsl:if test="@tracktype != ''">
+          <strong>Tracktype: </strong>  <xsl:value-of select="@tracktype"/>
+          <br/>
+        </xsl:if>
+        <xsl:if test="@occurence != ''">
+          <strong>Occurence: </strong>  <xsl:value-of select="@occurence"/>
+          <br/>
+        </xsl:if>
+        <xsl:if test="@operator != ''">
+          <strong>Operator: </strong>  <xsl:value-of select="@operator"/>
+          <br/>
+        </xsl:if>
         <xsl:if test="@actual != ''">
           <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
+          <br/>
+        </xsl:if>
+        <xsl:if test="@compared_to != ''">
+          <strong>Compared to: </strong>  <xsl:value-of select="@compared_to"/>
           <br/>
         </xsl:if>
         <strong><xsl:text>Xpath:  </xsl:text></strong>
