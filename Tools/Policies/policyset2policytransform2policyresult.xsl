@@ -36,6 +36,11 @@
       </aliasxsl:template>
       <aliasxsl:template name="rule">
         <aliasxsl:param name="name"/>
+        <aliasxsl:param name="scope"/>
+        <aliasxsl:param name="value"/>
+        <aliasxsl:param name="tracktype"/>
+        <aliasxsl:param name="occurrence"/>
+        <aliasxsl:param name="operator"/>
         <aliasxsl:param name="xpath"/>
         <aliasxsl:param name="outcome"/>
         <aliasxsl:param name="actual"/>
@@ -59,6 +64,31 @@
           <aliasxsl:if test="$name">
             <aliasxsl:attribute name="name">
               <aliasxsl:value-of select="$name"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$scope">
+            <aliasxsl:attribute name="scope">
+              <aliasxsl:value-of select="$scope"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$value">
+            <aliasxsl:attribute name="value">
+              <aliasxsl:value-of select="$value"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$tracktype">
+            <aliasxsl:attribute name="tracktype">
+              <aliasxsl:value-of select="$tracktype"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$occurrence">
+            <aliasxsl:attribute name="occurrence">
+              <aliasxsl:value-of select="$occurrence"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$operator">
+            <aliasxsl:attribute name="operator">
+              <aliasxsl:value-of select="$operator"/>
             </aliasxsl:attribute>
           </aliasxsl:if>
           <aliasxsl:attribute name="xpath">
@@ -330,6 +360,21 @@
     <aliasxsl:call-template name="rule">
       <aliasxsl:with-param name="name">
         <xsl:value-of select="@name"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="scope">
+        <xsl:value-of select="@scope"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="value">
+        <xsl:value-of select="@value"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="tracktype">
+        <xsl:value-of select="@tracktype"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="occurrence">
+        <xsl:value-of select="@occurrence"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="operator">
+        <xsl:value-of select="@operator"/>
       </aliasxsl:with-param>
       <aliasxsl:with-param name="xpath">
         <xsl:value-of select="$equationfull"/>
