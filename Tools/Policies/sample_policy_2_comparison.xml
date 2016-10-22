@@ -1,4 +1,4 @@
-<policy type="and" name="Is DAR and EBMLVersion alike?">
+<policy xmlns="https://mediaarea.net/mediapolicy" type="and" name="Is DAR and EBMLVersion alike?">
     <description>Make sure EBMLVersion and DAR are the same between this file and a reference.</description>
     <rule value="DisplayAspectRatio" tracktype="Video" occurrence="1" operator="=">compare</rule>
     <rule scope="mt" value="EBML/EBMLVersion/Data" operator="=">compare</rule>

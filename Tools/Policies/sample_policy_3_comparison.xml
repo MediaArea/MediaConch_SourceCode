@@ -1,4 +1,4 @@
-<policy type="and" name="Comparing Significant Characteristics">
+<policy xmlns="https://mediaarea.net/mediapolicy" type="and" name="Comparing Significant Characteristics">
     <description>Test to make sure that two files share significant characteristics such as when creating a derivative from a source file.</description>
     <rule name="Same DAR?" value="DisplayAspectRatio" tracktype="Video" occurrence="1" operator="=">compare</rule>
     <rule name="Same Duration?" value="Duration" tracktype="Video" occurrence="1" operator="=">compare</rule>
