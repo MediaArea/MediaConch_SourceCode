@@ -234,13 +234,18 @@
                     </xsl:if>
                     <xsl:if test="@outcome = 'fail'">
                       <xsl:text> &#x274C;  </xsl:text>
-                      <xsl:text>(Reason: </xsl:text>
-                      <xsl:value-of select="@reason"/>
-                      <xsl:text>)</xsl:text>
+                      <xsl:if test="@reason">
+                        <xsl:text>(Reason: </xsl:text>
+                        <xsl:value-of select="@reason"/>
+                        <xsl:text>)</xsl:text>
+                      </xsl:if>
                     </xsl:if>
                     <xsl:if test="@outcome = 'n/a'">
-                    (Reason: <xsl:value-of select="@reason"/>
-                    <xsl:text>) </xsl:text>
+                      <xsl:if test="@reason">
+                        <xsl:text>(Reason: </xsl:text>
+                        <xsl:value-of select="@reason"/>
+                        <xsl:text>)</xsl:text>
+                      </xsl:if>
                     </xsl:if>
                     <br/>
                     <xsl:for-each select="../mc:context">
