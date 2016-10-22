@@ -274,6 +274,7 @@
                    <xsl:if test="mc:value/. !=''">
                      <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
                    </xsl:if>
+                   <hr/>
                   </div> 
                 </xsl:for-each>
               </td>
