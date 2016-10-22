@@ -228,6 +228,10 @@
                 </xsl:choose>
               <xsl:for-each select="mc:test">
                 <div class="extra">
+                  <xsl:if test="../@name">
+                    <strong><xsl:text>Name: </xsl:text></strong> <xsl:value-of select="../@name"/>
+                    <br/>
+                  </xsl:if>
                   <strong><xsl:value-of select="/mc:context/@name"/></strong>
                   <strong><xsl:text>Results: </xsl:text></strong> 
                   <xsl:value-of select="@outcome"/>
