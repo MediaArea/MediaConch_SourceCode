@@ -183,5 +183,11 @@
       <xsl:value-of select="@actual"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
+    <xsl:if test="@compared_to != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Compared to: </xsl:text>
+      <xsl:value-of select="@compared_to"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>  
   </xsl:template>
 </xsl:stylesheet>
