@@ -584,8 +584,10 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
     else
     {
         // For VeraPDF and DPFManager, to get the original XML
-        if ((report_set[MediaConchLib::report_MediaVeraPdf] || report_set[MediaConchLib::report_MediaVeraPdf]) &&
-            f == MediaConchLib::format_Xml && !display_content && !display_name)
+        if ((report_set[MediaConchLib::report_MediaVeraPdf] || report_set[MediaConchLib::report_MediaDpfManager]) &&
+            f == MediaConchLib::format_Xml &&
+            (!display_content || !display_content->size()) &&
+            (!display_name || !display_name->size()))
             f = MediaConchLib::format_OrigXml;
 
         switch (f)

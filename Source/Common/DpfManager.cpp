@@ -17,6 +17,7 @@
 #include <ZenLib/Dir.h>
 #include <sstream>
 #include <fstream>
+#include <libxml/tree.h>
 
 #if defined(WINDOWS)
 #include <windows.h>
@@ -70,6 +71,16 @@ namespace MediaConch {
                 const Container::Value& val = obj.at("params").array[i];
                 if (val.type == Container::Value::CONTAINER_TYPE_STRING)
                     params.push_back(val.s);
+            }
+        }
+
+        if (obj.find("isos") != obj.end() && obj.at("isos").type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t i = 0; i < obj.at("isos").array.size(); ++i)
+            {
+                const Container::Value& val = obj.at("isos").array[i];
+                if (val.type == Container::Value::CONTAINER_TYPE_STRING)
+                    isos.push_back(val.s);
             }
         }
 
@@ -185,20 +196,52 @@ namespace MediaConch {
                 break;
         }
 
-        std::ofstream ofs;
-        ofs.open(path.str().c_str(), std::ofstream::out | std::ofstream::trunc);
-        if (!ofs.is_open())
-            return -1;
+        xmlDocPtr doc = xmlNewDoc((const xmlChar *)"1.0");
+        xmlNodePtr root_node = xmlNewNode(NULL, (const xmlChar*)"configuration");
+        xmlDocSetRootElement(doc, root_node);
 
-        ofs << "ISO\tBaseline\n";
-        ofs << "ISO\tTiff/EP\n";
-        ofs << "ISO\tTiff/IT\n";
-        ofs << "ISO\tTiff/IT-1\n";
-        ofs << "ISO\tTiff/IT-2\n";
-        ofs << "FORMAT\tXML\n";
-        ofs << "OUTPUT\t" << report_dir << "\n";
+        //Version
+        xmlNodePtr version_node = xmlNewNode(NULL, (const xmlChar*)"version");
+        xmlNodeSetContent(version_node, (const xmlChar*)"1");
+        xmlAddChild(root_node, version_node);
 
-        ofs.close();
+        //Isos
+        xmlNodePtr isos_node = xmlNewNode(NULL, (const xmlChar*)"isos");
+        for (size_t i = 0; i < isos.size(); ++i)
+        {
+            xmlNodePtr iso_node = xmlNewNode(NULL, (const xmlChar*)"iso");
+            xmlNodeSetContent(iso_node, (const xmlChar*)isos[i].c_str());
+            xmlAddChild(isos_node, iso_node);
+        }
+        xmlAddChild(root_node, isos_node);
+
+        //Formats
+        xmlNodePtr formats_node = xmlNewNode(NULL, (const xmlChar*)"formats");
+        xmlNodePtr format_node = xmlNewNode(NULL, (const xmlChar*)"format");
+        xmlNodeSetContent(format_node, (const xmlChar*)"XML");
+        xmlAddChild(formats_node, format_node);
+        xmlAddChild(root_node, formats_node);
+
+        //Rules
+        xmlNodePtr rules_node = xmlNewNode(NULL, (const xmlChar*)"rules");
+        xmlAddChild(root_node, rules_node);
+
+        //Fixes
+        xmlNodePtr fixes_node = xmlNewNode(NULL, (const xmlChar*)"fixes");
+        xmlAddChild(root_node, fixes_node);
+
+        //Output
+        xmlNodePtr output_node = xmlNewNode(NULL, (const xmlChar*)"output");
+        xmlNodeSetContent(output_node, (const xmlChar*)report_dir.c_str());
+        xmlAddChild(root_node, output_node);
+
+        //Description
+        xmlNodePtr description_node = xmlNewNode(NULL, (const xmlChar*)"description");
+        xmlAddChild(root_node, description_node);
+
+        xmlSaveFormatFileEnc(path.str().c_str(), doc, "UTF-8", 1);
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
 
         file = path.str();
         return 0;

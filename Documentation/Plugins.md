@@ -72,6 +72,7 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "format": "TIFF",
                 "bin": "$PATH_TO_DPF_MANAGER",
                 "params": ["-s"]
+                "isos": ["Baseline","Tiff/EP","Tiff/IT"]
             },
             {
                 "id": "plugin3",
