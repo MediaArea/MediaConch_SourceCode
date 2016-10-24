@@ -90,9 +90,9 @@ if test -e MediaInfoLib/Project/GNU/Library/configure; then
     test -e Makefile && rm Makefile
     chmod +x configure
     if [ "$OS" = "mac" ]; then
-        ./configure --enable-staticlibs --enable-static --disable-shared $MacOptions --with-libcurl=runtime $*
+        ./configure --enable-static --disable-shared $MacOptions --with-libcurl=runtime $*
     else
-        ./configure --enable-staticlibs --enable-static --disable-shared --with-libcurl $*
+        ./configure --enable-static --disable-shared --with-libcurl $*
     fi
     if test ! -e Makefile; then
         echo Problem while configuring MediaInfoLib

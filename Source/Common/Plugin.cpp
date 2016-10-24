@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <dirent.h>
-extern char **environ;
 #include <sys/wait.h>
 #endif
 
@@ -234,7 +233,7 @@ namespace MediaConch {
                 args[i] = const_cast<char*>(params[i].c_str());
             args[i] = NULL;
 
-            execvpe(bin, args, environ);
+            execvp(bin, args);
             exit(1);
         }
         else
