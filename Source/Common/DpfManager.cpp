@@ -17,6 +17,7 @@
 #include <ZenLib/Dir.h>
 #include <sstream>
 #include <fstream>
+#include <libxml/tree.h>
 
 #if defined(WINDOWS)
 #include <windows.h>
@@ -73,6 +74,16 @@ namespace MediaConch {
             }
         }
 
+        if (obj.find("isos") != obj.end() && obj.at("isos").type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t i = 0; i < obj.at("isos").array.size(); ++i)
+            {
+                const Container::Value& val = obj.at("isos").array[i];
+                if (val.type == Container::Value::CONTAINER_TYPE_STRING)
+                    isos.push_back(val.s);
+            }
+        }
+
         return 0;
     }
 
@@ -87,7 +98,7 @@ namespace MediaConch {
             exec_params.push_back(params[i]);
 
         std::string report_dir;
-        if (create_report_dir(report_dir) < 0)
+        if (create_report_dir("DPFTemp/", "DPFReportDir", report_dir) < 0)
             return -1;
 
         std::string config_file;
@@ -124,43 +135,6 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int DPFManager::create_report_dir(std::string& report_dir)
-    {
-        std::string local_data = Core::get_local_data_path();
-        local_data += "DPFTemp/";
-
-        Ztring z_local = ZenLib::Ztring().From_UTF8(local_data);
-        if (!ZenLib::Dir::Exists(z_local))
-            ZenLib::Dir::Create(z_local);
-
-        if (!ZenLib::Dir::Exists(z_local))
-            return -1;
-
-        std::stringstream path;
-        for (size_t i = 0; ; ++i)
-        {
-            path.str("");
-            path << local_data << "DPFReportDir";
-            if (i)
-                path << i;
-            path << "/";
-
-            Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
-            if (!ZenLib::Dir::Exists(z_path))
-                break;
-        }
-
-        Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
-        ZenLib::Dir::Create(z_path);
-
-        if (!ZenLib::Dir::Exists(z_path))
-            return -1;
-
-        report_dir = path.str();
-        return 0;
-    }
-
-    //---------------------------------------------------------------------------
     int DPFManager::create_configuration_file(const std::string& report_dir, std::string& file)
     {
         std::string local_data = Core::get_local_data_path();
@@ -185,79 +159,54 @@ namespace MediaConch {
                 break;
         }
 
-        std::ofstream ofs;
-        ofs.open(path.str().c_str(), std::ofstream::out | std::ofstream::trunc);
-        if (!ofs.is_open())
-            return -1;
+        xmlDocPtr doc = xmlNewDoc((const xmlChar *)"1.0");
+        xmlNodePtr root_node = xmlNewNode(NULL, (const xmlChar*)"configuration");
+        xmlDocSetRootElement(doc, root_node);
 
-        ofs << "ISO\tBaseline\n";
-        ofs << "ISO\tTiff/EP\n";
-        ofs << "ISO\tTiff/IT\n";
-        ofs << "ISO\tTiff/IT-1\n";
-        ofs << "ISO\tTiff/IT-2\n";
-        ofs << "FORMAT\tXML\n";
-        ofs << "OUTPUT\t" << report_dir << "\n";
+        //Version
+        xmlNodePtr version_node = xmlNewNode(NULL, (const xmlChar*)"version");
+        xmlNodeSetContent(version_node, (const xmlChar*)"1");
+        xmlAddChild(root_node, version_node);
 
-        ofs.close();
+        //Isos
+        xmlNodePtr isos_node = xmlNewNode(NULL, (const xmlChar*)"isos");
+        for (size_t i = 0; i < isos.size(); ++i)
+        {
+            xmlNodePtr iso_node = xmlNewNode(NULL, (const xmlChar*)"iso");
+            xmlNodeSetContent(iso_node, (const xmlChar*)isos[i].c_str());
+            xmlAddChild(isos_node, iso_node);
+        }
+        xmlAddChild(root_node, isos_node);
+
+        //Formats
+        xmlNodePtr formats_node = xmlNewNode(NULL, (const xmlChar*)"formats");
+        xmlNodePtr format_node = xmlNewNode(NULL, (const xmlChar*)"format");
+        xmlNodeSetContent(format_node, (const xmlChar*)"XML");
+        xmlAddChild(formats_node, format_node);
+        xmlAddChild(root_node, formats_node);
+
+        //Rules
+        xmlNodePtr rules_node = xmlNewNode(NULL, (const xmlChar*)"rules");
+        xmlAddChild(root_node, rules_node);
+
+        //Fixes
+        xmlNodePtr fixes_node = xmlNewNode(NULL, (const xmlChar*)"fixes");
+        xmlAddChild(root_node, fixes_node);
+
+        //Output
+        xmlNodePtr output_node = xmlNewNode(NULL, (const xmlChar*)"output");
+        xmlNodeSetContent(output_node, (const xmlChar*)report_dir.c_str());
+        xmlAddChild(root_node, output_node);
+
+        //Description
+        xmlNodePtr description_node = xmlNewNode(NULL, (const xmlChar*)"description");
+        xmlAddChild(root_node, description_node);
+
+        xmlSaveFormatFileEnc(path.str().c_str(), doc, "UTF-8", 1);
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
 
         file = path.str();
-        return 0;
-    }
-
-    //---------------------------------------------------------------------------
-    int DPFManager::delete_report_dir(const std::string& report_dir)
-    {
-        Ztring z_path = ZenLib::Ztring().From_UTF8(report_dir);
-        if (!ZenLib::Dir::Exists(z_path))
-            return 0;
-
-        //ZenLib::Dir::Delete(z_path);
-#if defined(WINDOWS)
-        WIN32_FIND_DATA find_file_data;
-        HANDLE handler = FindFirstFile(z_path.c_str(), &find_file_data);
-
-        if (handler == INVALID_HANDLE_VALUE)
-            return -1;
-
-        do
-        {
-            if (ZenLib::Ztring(__T(".")) == find_file_data.cFileName || ZenLib::Ztring(__T("..")) == find_file_data.cFileName)
-                continue;
-
-            ZenLib::Ztring full_path(z_path);
-            full_path += find_file_data.cFileName;
-            if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                delete_report_dir(full_path.To_UTF8());
-            else
-                DeleteFile(full_path.c_str());
-        } while (FindNextFile(handler, &find_file_data));
-        FindClose(handler);
-
-        if (!RemoveDirectory(z_path.c_str()))
-            return -1;
-#else
-        DIR* handler = opendir(report_dir.c_str());
-        if (!handler)
-            return -1;
-
-        struct dirent* entry = NULL;
-        while ((entry = readdir(handler)))
-        {
-            std::string full_path(entry->d_name);
-            if (full_path == "." || full_path == "..")
-                continue;
-
-            full_path = report_dir + full_path;
-            if (entry->d_type & DT_DIR)
-                delete_report_dir(full_path.c_str());
-            else
-                unlink(full_path.c_str());
-        }
-        closedir(handler);
-
-        if (rmdir(report_dir.c_str()) < 0)
-            return -1;
-#endif
         return 0;
     }
 

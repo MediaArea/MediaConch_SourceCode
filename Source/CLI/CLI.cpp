@@ -154,7 +154,7 @@ namespace MediaConch
                 return ready;
 
             if (report_set[MediaConchLib::report_MediaConch] &&
-                report_kind > MediaConchLib::report_MediaTrace && report_kind != MediaConchLib::report_Max &&
+                report_kind > MediaConchLib::report_MediaTrace && report_kind < MediaConchLib::report_Max &&
                 files.size() == 1)
             {
                 set_report_reset();

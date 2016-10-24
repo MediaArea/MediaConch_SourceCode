@@ -12,19 +12,25 @@
 
 //---------------------------------------------------------------------------
 #include "Plugin.h"
+#include "Core.h"
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <cstdio>
-#if defined(_WIN32)
+#include <ZenLib/File.h>
+#include <ZenLib/Dir.h>
 #include <ZenLib/Ztring.h>
+#if defined(WINDOWS)
 #include <windows.h>
+#include <conio.h>
 #include <tchar.h>
 #include <stdio.h>
 #include <strsafe.h>
 #else
-#include <stdlib.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <dirent.h>
 extern char **environ;
 #include <sys/wait.h>
 #endif
@@ -271,6 +277,43 @@ namespace MediaConch {
 #endif
 
     //---------------------------------------------------------------------------
+    int Plugin::create_report_dir(const std::string& base_dir, const std::string& template_dir, std::string& report_dir)
+    {
+        std::string local_data = Core::get_local_data_path();
+        local_data += base_dir;
+
+        Ztring z_local = ZenLib::Ztring().From_UTF8(local_data);
+        if (!ZenLib::Dir::Exists(z_local))
+            ZenLib::Dir::Create(z_local);
+
+        if (!ZenLib::Dir::Exists(z_local))
+            return -1;
+
+        std::stringstream path;
+        for (size_t i = 0; ; ++i)
+        {
+            path.str("");
+            path << local_data << template_dir;
+            if (i)
+                path << i;
+            path << "/";
+
+            Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
+            if (!ZenLib::Dir::Exists(z_path))
+                break;
+        }
+
+        Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
+        ZenLib::Dir::Create(z_path);
+
+        if (!ZenLib::Dir::Exists(z_path))
+            return -1;
+
+        report_dir = path.str();
+        return 0;
+    }
+
+    //---------------------------------------------------------------------------
     int Plugin::read_report(const std::string& file, std::string& report)
     {
         std::ifstream file_handler(file.c_str(), std::ios_base::ate);
@@ -304,6 +347,63 @@ namespace MediaConch {
             str.replace(pos, 1, "\\ ");
             pos += 2;
         }
+    }
+
+    //---------------------------------------------------------------------------
+    int Plugin::delete_report_dir(const std::string& report_dir)
+    {
+        Ztring z_path = ZenLib::Ztring().From_UTF8(report_dir);
+        if (!ZenLib::Dir::Exists(z_path))
+            return 0;
+
+        //ZenLib::Dir::Delete(z_path);
+#if defined(WINDOWS)
+        WIN32_FIND_DATA find_file_data;
+        HANDLE handler = FindFirstFile(z_path.c_str(), &find_file_data);
+
+        if (handler == INVALID_HANDLE_VALUE)
+            return -1;
+
+        do
+        {
+            if (ZenLib::Ztring(__T(".")) == find_file_data.cFileName || ZenLib::Ztring(__T("..")) == find_file_data.cFileName)
+                continue;
+
+            ZenLib::Ztring full_path(z_path);
+            full_path += find_file_data.cFileName;
+            if (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                delete_report_dir(full_path.To_UTF8());
+            else
+                DeleteFile(full_path.c_str());
+        } while (FindNextFile(handler, &find_file_data));
+        FindClose(handler);
+
+        if (!RemoveDirectory(z_path.c_str()))
+            return -1;
+#else
+        DIR* handler = opendir(report_dir.c_str());
+        if (!handler)
+            return -1;
+
+        struct dirent* entry = NULL;
+        while ((entry = readdir(handler)))
+        {
+            std::string full_path(entry->d_name);
+            if (full_path == "." || full_path == "..")
+                continue;
+
+            full_path = report_dir + full_path;
+            if (entry->d_type & DT_DIR)
+                delete_report_dir(full_path.c_str());
+            else
+                unlink(full_path.c_str());
+        }
+        closedir(handler);
+
+        if (rmdir(report_dir.c_str()) < 0)
+            return -1;
+#endif
+        return 0;
     }
 
 }

@@ -57,7 +57,9 @@ protected:
     std::string               report_err;
     std::string               error;
     int                       exec_bin(const std::vector<std::string>& params, std::string& error);
+    int                       create_report_dir(const std::string& base_dir, const std::string& template_dir, std::string& report_dir);
     int                       read_report(const std::string& file, std::string& report);
+    int                       delete_report_dir(const std::string& report_dir);
 
 #if defined(_WIN32)
     int                       create_pipe(HANDLE* handler_out_rd, HANDLE* handler_out_wr);
