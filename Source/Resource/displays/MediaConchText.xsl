@@ -57,6 +57,9 @@
             <xsl:text>[O]  </xsl:text><xsl:value-of select="@outcome"/>
           </xsl:otherwise>
         </xsl:choose>
+          <xsl:text>&#xa;</xsl:text>
+          <xsl:if test="@name"><xsl:text>Name: </xsl:text><xsl:value-of select="@name"/>
+        </xsl:if>    
         <xsl:text>&#xa;</xsl:text>
         <xsl:for-each select="mc:test">
           <xsl:value-of select="@outcome"/>
@@ -96,14 +99,16 @@
           <xsl:text>&#xa;</xsl:text>
         </xsl:if>
       </xsl:for-each>
-    <xsl:text>Outcome: </xsl:text>
-    <xsl:value-of select="@outcome"/>
-    <xsl:text>&#xa;</xsl:text>
-    <xsl:if test="@reason != ''">
-      <xsl:text>Reason: </xsl:text>
-      <xsl:value-of select="@reason"/>
-      <xsl:text>&#xa;</xsl:text>
-    </xsl:if>
+      <xsl:if test="@outcome">
+        <xsl:text>Outcome: </xsl:text>
+        <xsl:value-of select="@outcome"/>
+        <xsl:text>&#xa;</xsl:text>
+      </xsl:if>
+      <xsl:if test="@reason != ''">
+        <xsl:text>Reason: </xsl:text>
+        <xsl:value-of select="@reason"/>
+        <xsl:text>&#xa;</xsl:text>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
 
@@ -178,5 +183,11 @@
       <xsl:value-of select="@actual"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
+    <xsl:if test="@compared_to != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Compared to: </xsl:text>
+      <xsl:value-of select="@compared_to"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>    
   </xsl:template>
 </xsl:stylesheet>
