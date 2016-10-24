@@ -34,6 +34,7 @@ It should be a struct named *Plugins* which contains an array of plugin.
 * **format**: Format given by MediaInfoLib to be used by the plugin. Here, it should be *TIFF*
 * **bin**:    Full path to the Command Line Interface
 * **params**: CLI parameters to be given to DPF Manager CLI
+* **isos**:   TIFF standarts to check
 
 ##### FFmpeg
 
