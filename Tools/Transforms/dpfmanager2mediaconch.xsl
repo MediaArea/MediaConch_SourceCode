@@ -11,25 +11,26 @@
           <xsl:attribute name="ref">
             <xsl:value-of select="file_info/fullpath"/>
           </xsl:attribute>
-          <xsl:for-each select="implementation_checker/*[result]">
+          <xsl:for-each select="implementation_checker">
             <implementationChecks>
               <xsl:attribute name="checks_run">
-                <xsl:value-of select="count(result)"/>
+                <xsl:value-of select="count(implementation_check/rule_result)"/>
               </xsl:attribute>
               <xsl:attribute name="fail_count">
-                <xsl:value-of select="count(result[level='critical'])"/>
-              </xsl:attribute>
-              <xsl:attribute name="pass_count">
-                <xsl:value-of select="count(result[level!='critical'])"/>
+                <xsl:value-of select="@totalErrors"/>
               </xsl:attribute>
               <name>
                 <xsl:text>dpfmanager:</xsl:text>
-                <xsl:value-of select="name(.)"/>
+                <xsl:value-of select="implementation_check/name"/>
               </name>
-              <xsl:for-each select="result">
+              <xsl:for-each select="implementation_check/rule_result">
                 <check>
-                  <xsl:attribute name="icid">n/a</xsl:attribute>
-                  <xsl:attribute name="version">0</xsl:attribute>
+                  <xsl:attribute name="icid">
+                    <xsl:value-of select="ruleTest"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="name">
+                    <xsl:value-of select="message"/>
+                  </xsl:attribute>
                   <xsl:attribute name="tests_run">1</xsl:attribute>
                   <xsl:attribute name="fail_count">
                     <xsl:choose>
@@ -38,6 +39,18 @@
                     </xsl:choose>
                   </xsl:attribute>
                   <xsl:attribute name="pass_count">0</xsl:attribute>
+                  <context>
+                    <xsl:attribute name="name">context</xsl:attribute>
+                    <xsl:value-of select="context"/>
+                  </context>
+                  <context>
+                    <xsl:attribute name="name">ruleId</xsl:attribute>
+                    <xsl:value-of select="ruleId"/>
+                  </context>
+                  <context>
+                    <xsl:attribute name="name">iso_reference</xsl:attribute>
+                    <xsl:value-of select="iso_reference"/>
+                  </context>
                   <test>
                     <xsl:attribute name="outcome">
                       <xsl:choose>
@@ -46,8 +59,15 @@
                       </xsl:choose>
                     </xsl:attribute>
                     <xsl:attribute name="reason">
-                      <xsl:value-of select="msg"/>
+                      <xsl:value-of select="ruleValue"/>
                     </xsl:attribute>
+                    <xsl:if test="location">
+                      <value>
+                        <xsl:attribute name="context">
+                          <xsl:value-of select="location"/>
+                        </xsl:attribute>
+                      </value>
+                    </xsl:if>
                   </test>
                 </check>
               </xsl:for-each>
