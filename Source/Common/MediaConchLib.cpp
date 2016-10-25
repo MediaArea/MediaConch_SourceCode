@@ -142,7 +142,7 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
 {
     if (reports[MediaConchLib::report_MicroMediaTrace] && Format != MediaConchLib::format_Xml)
     {
-        reason = "MicroMediaTrace can be get only in XML";
+        reason = "MicroMediaTrace requires an XML output.";
         return false;
     }
 

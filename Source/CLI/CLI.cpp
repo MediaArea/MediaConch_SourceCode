@@ -70,6 +70,8 @@ namespace MediaConch
             if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
                                                         format, reason))
             {
+                if (reason == "MicroMediaTrace requires an XML output.")
+                    reason += " Add -fx.";
                 STRINGOUT(ZenLib::Ztring().From_UTF8(reason));
                 return -1;
             }
