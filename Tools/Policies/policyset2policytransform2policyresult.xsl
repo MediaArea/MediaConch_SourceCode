@@ -94,7 +94,7 @@
           <aliasxsl:attribute name="xpath">
             <aliasxsl:value-of select="$xpath"/>
           </aliasxsl:attribute>
-          <aliasxsl:if test="$outcome='fail' or $operator='starts with' or $operator='must not start with'">
+          <aliasxsl:if test="$outcome='fail' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
             <aliasxsl:attribute name="actual">
               <aliasxsl:value-of select="$actual"/>
             </aliasxsl:attribute>
