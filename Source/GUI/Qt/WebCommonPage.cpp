@@ -21,6 +21,8 @@ namespace MediaConch {
             mainwindow->checker_selected();
         else if (!name.compare("Policies"))
             mainwindow->policies_selected();
+        else if (!name.compare("Public Policies"))
+            mainwindow->public_policies_selected();
         else if (!name.compare("Display"))
             mainwindow->display_selected();
         else if (!name.compare("Settings"))
@@ -812,6 +814,28 @@ namespace MediaConch {
         return json;
     }
 
+    QString WebCommonPage::policy_import_data(const QString& data)
+    {
+
+        QString json;
+        std::string err;
+        int id;
+        if ((id = mainwindow->policy_import_data(data, err)) < 0)
+        {
+            QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)id, error);
+            string_to_json(error);
+            json = QString("{\"error\":\"%1\"}").arg(error);
+            return json;
+        }
+
+        mainwindow->policy_save(id, err);
+
+        json = "{}";
+        return json;
+    }
+
     int WebCommonPage::import_policy(const QStringList& files)
     {
         int ret = 0;
@@ -975,13 +999,34 @@ namespace MediaConch {
         return json;
     }
 
-    QString WebCommonPage::policy_edit(int id, const QString& name, const QString& description, const QString& type)
+    QString WebCommonPage::policy_export_data(const QString& report)
+    {
+        QString json;
+        std::string err;
+        int code;
+        if ((code = mainwindow->policy_export_data(report, "Policy", err)) < 0)
+        {
+            QString error = QString().fromUtf8(err.c_str(), err.length());
+            if (!error.size())
+                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
+            string_to_json(error);
+            json = QString("{\"error\":\"%1\"}").arg(error);
+            return json;
+        }
+
+        json = QString("{}");
+        return json;
+    }
+
+    QString WebCommonPage::policy_edit(int id, const QString& name, const QString& description, const QString& license,
+                                       const QString& type, const QString& visibility)
     {
         //return: error?
         QString json;
         std::string err;
         int code;
-        if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(), "", err)) < 0)
+        if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(),
+                                                   license.toUtf8().data(), err)) < 0)
         {
             QString error = QString().fromUtf8(err.c_str(), err.length());
             if (!error.size())
@@ -998,6 +1043,18 @@ namespace MediaConch {
             json = QString("{\"error\":\"%1\"}").arg(error);
             return json;
         }
+
+        //TODO: when publipolicies API is ready
+        // bool is_public = false;
+        // if (visibility == "1")
+        //     is_public = true;
+        // if (mainwindow->policy_change_is_public(id, is_public, err) < 0)
+        // {
+        //     QString error = QString().fromUtf8(err.c_str(), err.length());
+        //     string_to_json(error);
+        //     json = QString("{\"error\":\"%1\"}").arg(error);
+        //     return json;
+        // }
 
         mainwindow->policy_save(id, err);
 

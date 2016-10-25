@@ -97,7 +97,8 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/GUI/Qt/DatabaseUi.cpp \
                     ../../Source/GUI/Qt/NoDatabaseUi.cpp \
                     ../../Source/GUI/Qt/SQLLiteUi.cpp \
-                    ../../Source/GUI/Qt/uisettings.cpp
+                    ../../Source/GUI/Qt/uisettings.cpp \
+                    ../../Source/GUI/Qt/publicpolicieswindow.cpp
 
 HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Core.h \
@@ -160,7 +161,8 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/GUI/Qt/DatabaseUi.h \
                     ../../Source/GUI/Qt/NoDatabaseUi.h \
                     ../../Source/GUI/Qt/SQLLiteUi.h \
-                    ../../Source/GUI/Qt/uisettings.h
+                    ../../Source/GUI/Qt/uisettings.h \
+                    ../../Source/GUI/Qt/publicpolicieswindow.h
 
 FORMS            += ../../Source/GUI/Qt/mainwindow.ui \
                     ../../Source/GUI/Qt/progressbar.ui

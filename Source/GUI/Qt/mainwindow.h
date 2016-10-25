@@ -32,6 +32,7 @@ class MenuMainWindow;
 class SettingsWindow;
 class CheckerWindow;
 class PoliciesWindow;
+class PublicPoliciesWindow;
 class DisplayWindow;
 class VerbositySpinbox;
 class PolicyCombobox;
@@ -53,6 +54,7 @@ public:
         RUN_POLICIES_VIEW,
         RUN_DISPLAY_VIEW,
         RUN_SETTINGS_VIEW,
+        RUN_PUBLIC_POLICIES_VIEW,
     };
     void Run();
 
@@ -97,6 +99,7 @@ public:
     QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();
+    void                        public_policies_selected();
     void                        display_selected();
     void                        settings_selected();
     void                        add_default_displays();
@@ -108,18 +111,21 @@ public:
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
     int                         policy_import(const QString& file, std::string& err);
+    int                         policy_import_data(const QString& data, std::string& err);
     int                         xslt_policy_create(int parent_id, std::string& err);
     int                         policy_duplicate(int id, int dst_policy_id, std::string& err);
     int                         policy_move(int id, int dst_policy_id, std::string& err);
     int                         policy_change_info(int id, const std::string& name, const std::string& description,
                                                    const std::string& license, std::string& err);
     int                         policy_change_type(int id, const std::string& type, std::string& err);
+    int                         policy_change_is_public(int id, bool is_public, std::string& err);
     int                         policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p);
     int                         policy_save(int pos, std::string& err);
     int                         policy_get_name(int pos, std::string& name, std::string& err);
     int                         policy_dump(int pos, std::string& memory, std::string& err);
     int                         policy_remove(int pos, std::string& err);
     int                         policy_export(int pos, std::string& err);
+    int                         policy_export_data(const QString& policy, const QString& p_name, std::string& err);
     int                         clear_policies(std::string& err);
     size_t                      get_policies_count() const;
     int                         xslt_policy_rule_create(int policy_id, std::string& err);
@@ -187,6 +193,7 @@ private:
     QVBoxLayout*                Layout;
     CheckerWindow*              checkerView;
     PoliciesWindow*             policiesView;
+    PublicPoliciesWindow*       publicPoliciesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
     SettingsWindow*             settingsView;
@@ -194,8 +201,10 @@ private:
     void                        create_and_configure_ui_database();
     int                         clearVisualElements();
     void                        clearPoliciesElements();
+    void                        clearPublicPoliciesElements();
     void                        createCheckerView();
     void                        createPoliciesView();
+    void                        createPublicPoliciesView();
     void                        createDisplayView();
     void                        createSettingsView();
 
@@ -216,6 +225,7 @@ private Q_SLOTS:
     // View
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
+    void on_actionPublicPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
 

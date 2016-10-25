@@ -793,7 +793,8 @@ int Policies::policy_change_info(int user, int id, const std::string& name, cons
     if (p->type == POLICY_XSLT)
         ((XsltPolicy*)p)->node_name = p->name;
     p->description = description;
-    p->license = license;
+    if (license.size())
+        p->license = license;
 
     return 0;
 }

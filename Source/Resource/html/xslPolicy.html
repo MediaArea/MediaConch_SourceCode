@@ -14,10 +14,10 @@
 </div>
 <div class="col-md-4 policyRightCol">
   <div id="policyFix" class="row">
-    <div id="policyInfo" class="row">
+    <div id="policyInfo">
       <div></div>
     </div>
-    <div class="row policyManage">
+    <div class="policyManage">
       <div>
         <h2>Import a policy</h2>
         <form name="xslPolicyImport" method="post" action="" enctype="multipart/form-data">
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="row policyEdit hidden">
+    <div class="policyEdit hidden">
       <div>
         <h4>Edition:</h4>
         <form name="xslPolicyInfo" method="post" action="">
@@ -50,13 +50,30 @@
             </div>
             <div class="form-group">
               <label class="control-label" for="xslPolicyInfo_policyDescription">Policy description</label>
-              <input type="text" id="xslPolicyInfo_policyDescription" name="xslPolicyInfo[policyDescription]" class="form-control" />
+              <textarea id="xslPolicyInfo_policyDescription" name="xslPolicyInfo[policyDescription]" class="form-control"></textarea>
             </div>
             <div class="form-group">
               <label class="control-label required" for="xslPolicyInfo_policyType">Policy type</label>
               <select id="xslPolicyInfo_policyType" name="xslPolicyInfo[policyType]" class="form-control">
                 <option value="and" >AND</option>
                 <option value="or" >OR</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label required" for="xslPolicyInfo_policyLicense">Policy license</label>
+              <select id="xslPolicyInfo_policyLicense" name="xslPolicyInfo[policyLicense]" class="form-control">
+                <option value="CC0-1.0+">Creative Commons Zero</option>
+                <option value="CC-BY-4.0+">Creative Commons Attribution</option>
+                <option value="CC-BY-SA-4.0+">Creative Commons Attribution-ShareAlike</option>
+                <option value="">Other</option>
+              </select>
+            </div>
+            <input type="hidden" id="xslPolicyInfo_policyTopLevel" name="xslPolicyInfo[policyTopLevel]" />
+            <div class="form-group hidden">
+              <label class="control-label required" for="xslPolicyInfo_policyVisibility">Policy visibility</label>
+              <select id="xslPolicyInfo_policyVisibility" name="xslPolicyInfo[policyVisibility]" class="form-control">
+                <option value="0">Private</option>
+                <option value="1">Public</option>
               </select>
             </div>
             <div class="form-group">
@@ -79,7 +96,7 @@
       </div>
     </div>
 
-    <div class="row policyEditRule hidden">
+    <div class="policyEditRule hidden">
       <div class="form-group">
         <label class="control-label">Rule type</label>
         <div class="btn-group btn-group-sm" role="group">
@@ -111,7 +128,9 @@
               <label class="control-label required" for="xslPolicyRule_field">Field</label>
               <select id="xslPolicyRule_field" name="xslPolicyRule[field]" required="required" class="form-control">
                 <option value="" selected="selected">Choose a field</option>
-            </select></div><div class="form-group">
+              </select>
+            </div>
+            <div class="form-group">
               <label class="control-label" for="xslPolicyRule_occurrence">Occurrence</label>
               <input type="number" id="xslPolicyRule_occurrence" name="xslPolicyRule[occurrence]" min="1" class="form-control" />
             </div>
@@ -125,10 +144,14 @@
                 <option value="&lt;=">Is less or equal than (&lt;=)</option>
                 <option value="&gt;">Is greater than (&gt;)</option>
                 <option value="&gt;=">Is greater or equal than (&gt;=)</option>
+                <option value="exists">Exists</option>
+                <option value="must not exist">Must not exist</option>
+                <option value="starts with">Starts with</option>
+                <option value="must not start with">Must not start with</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="control-label required" for="xslPolicyRule_value">Value</label>
+              <label class="control-label required" for="xslPolicyRule_value">Content</label>
               <input type="text" id="xslPolicyRule_value" name="xslPolicyRule[value]" required="required" class="form-control" />
             </div>
             <input type="hidden" id="xslPolicyRule_scope" name="xslPolicyRule[scope]" />
@@ -165,13 +188,17 @@
                 <option value="&lt;=">Is less or equal than (&lt;=)</option>
                 <option value="&gt;">Is greater than (&gt;)</option>
                 <option value="&gt;=">Is greater or equal than (&gt;=)</option>
+                <option value="exists">Exists</option>
+                <option value="must not exist">Must not exist</option>
+                <option value="starts with">Starts with</option>
+                <option value="must not start with">Must not start with</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="control-label" for="xslPolicyRuleMt_value">Value</label>
+              <label class="control-label" for="xslPolicyRuleMt_value">Content</label>
               <input type="text" id="xslPolicyRuleMt_value" name="xslPolicyRuleMt[value]" class="form-control" />
             </div>
-            <input type="hidden" id="xslPolicyRuleMt_scope" name="xslPolicyRuleMt[scope]" value="mt" />
+            <input type="hidden" id="xslPolicyRuleMt_scope" name="xslPolicyRuleMt[scope]" value="mmt" />
             <div class="form-group">
               <button type="submit" id="xslPolicyRuleMt_SaveRule" name="xslPolicyRuleMt[SaveRule]" class="btn-warning btn">Save</button>
             </div>

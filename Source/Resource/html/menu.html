@@ -10,22 +10,33 @@
         <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     </head>
     <body id="body" class="container">
-      <nav class="navbar-default page-scroll">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapse-1">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <span class="navbar-brand serif" href=""><img src="qrc:///icon/icon-61x38.png" alt="🐚" title="MediaConch" height="38" width="61"/> <strong>MediaConch</strong></span>
-      </nav>
-      <nav class="collapse navbar-collapse" id="collapse-1">
-        <ul class="nav navbar navbar-nav navbar-right">
-          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Checker</a></li>
-          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Policies</a></li>
-          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Display</a></li>
-          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Settings</a></li>
-          <li><a href="" onclick="webpage.menu_link_checker(this.text);">Help</a></li>
-        </ul>
+      <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mco-navbar" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand serif" href="">
+              <img src="qrc:///icon/icon-61x38.png" alt="🐚" title="MediaConch" height="38" width="61"/>
+              <span class="hidden-sm"><strong>MediaConch</strong></span>
+            </a>
+          </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse" id="mco-navbar">
+            <ul class="nav navbar navbar-nav navbar-right">
+              <li><a href="" onclick="webpage.menu_link_checker(this.text);">Checker</a></li>
+              <li><a href="" onclick="webpage.menu_link_checker(this.text);">Policies</a></li>
+              <li><a href="" onclick="webpage.menu_link_checker(this.text);">Public Policies</a></li>
+              <li><a href="" onclick="webpage.menu_link_checker(this.text);">Display</a></li>
+              <li><a href="" onclick="webpage.menu_link_checker(this.text);">Settings</a></li>
+              <li><a href="" onclick="webpage.menu_link_checker(this.text);">Help</a></li>
+            </ul>
+          </div>
       </nav>
 
         <script src="qrc:/jquery.js"></script>

@@ -106,12 +106,15 @@ public Q_SLOTS:
     QString      import_policy();
     QString      import_policy(const QString& file);
     int          import_policy(const QStringList& files);
+    QString      policy_import_data(const QString& data);
     QString      xslt_policy_create(int parent_id);
     QString      policy_duplicate(int id, int dst_policy_id);
     QString      policy_move(int id, int dst_policy_id);
     QString      policy_export(int id);
+    QString      policy_export_data(const QString& report);
     QString      policy_remove(int id);
-    QString      policy_edit(int id, const QString& name, const QString& description, const QString& type);
+    QString      policy_edit(int id, const QString& name, const QString& description, const QString& license,
+                             const QString& type, const QString& visibility);
     QString      xslt_policy_rule_create(int policy_id);
     QString      xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope);
     QString      xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id);

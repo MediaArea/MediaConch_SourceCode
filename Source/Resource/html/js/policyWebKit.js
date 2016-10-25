@@ -79,7 +79,15 @@ var policyTreeAjax = (function() {
         if (type === null)
             type = "";
 
-        res = webpage.policy_edit(policyNode.data.policyId, name, description, type);
+        var license = $("#xslPolicyInfo_policyLicense").val();
+        if (license === null || license === "Other")
+            license = "";
+
+        var visibility = $("#xslPolicyInfo_policyVisibility").val();
+        if (visibility === null)
+            visibility = "";
+
+        res = webpage.policy_edit(policyNode.data.policyId, name, description, license, type, visibility);
         data = JSON.parse(res);
         if (!data.error)
             policyTree.policyEdit(data.policyTree, policyNode);
@@ -287,7 +295,7 @@ var policyTreeAjax = (function() {
          * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
          */
 
-        res = webpage.xslt_policy_rule_move(policyId, ruleNode.data.ruleId, dstNode.data.policyId);
+        res = webpage.xslt_policy_rule_move(policyId, ruleNode.data.ruleId, policyTree.getPolicyId(dstNode));
         data = JSON.parse(res);
         if (!data.error)
             policyTree.ruleMove(data.rule, dstNode, ruleNode);
