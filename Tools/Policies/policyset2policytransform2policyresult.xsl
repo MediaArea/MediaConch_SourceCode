@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" version="1.0" exclude-result-prefixes="aliasxsl">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" xmlns:mp="https://mediaarea.net/mediapolicy" version="1.0" exclude-result-prefixes="aliasxsl">
   <xsl:param name="compare" as="xsl:string"/>
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
   <xsl:template match="/">
-    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
+    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mt="https://mediaarea.net/mediatrace" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:mp="https://mediaarea.net/mediapolicy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc mp">
       <aliasxsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
       <aliasxsl:template match="ma:MediaArea">
         <MediaConch>
@@ -17,15 +17,15 @@
               </aliasxsl:attribute>
               <xsl:if test="string-length($compare)>0">
                 <aliasxsl:attribute name="compare">
-                  <xsl:value-of select="$compare"/>
+                  <xsl:value-of select="document($compare)//ma:media[1]/@ref"/>
                 </aliasxsl:attribute>
               </xsl:if>
-              <xsl:for-each select="policy">
+              <xsl:for-each select="mp:policy">
                 <xsl:call-template name="policycheck">
                   <xsl:with-param name="policy" select="."/>
                 </xsl:call-template>
               </xsl:for-each>
-              <xsl:for-each select="rule">
+              <xsl:for-each select="mp:rule">
                 <xsl:call-template name="rulecheck">
                   <xsl:with-param name="rule" select="."/>
                 </xsl:call-template>
@@ -36,6 +36,11 @@
       </aliasxsl:template>
       <aliasxsl:template name="rule">
         <aliasxsl:param name="name"/>
+        <aliasxsl:param name="scope"/>
+        <aliasxsl:param name="value"/>
+        <aliasxsl:param name="tracktype"/>
+        <aliasxsl:param name="occurrence"/>
+        <aliasxsl:param name="operator"/>
         <aliasxsl:param name="xpath"/>
         <aliasxsl:param name="outcome"/>
         <aliasxsl:param name="actual"/>
@@ -59,6 +64,31 @@
           <aliasxsl:if test="$name">
             <aliasxsl:attribute name="name">
               <aliasxsl:value-of select="$name"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$scope">
+            <aliasxsl:attribute name="scope">
+              <aliasxsl:value-of select="$scope"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$value">
+            <aliasxsl:attribute name="value">
+              <aliasxsl:value-of select="$value"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$tracktype">
+            <aliasxsl:attribute name="tracktype">
+              <aliasxsl:value-of select="$tracktype"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$occurrence">
+            <aliasxsl:attribute name="occurrence">
+              <aliasxsl:value-of select="$occurrence"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
+          <aliasxsl:if test="$operator">
+            <aliasxsl:attribute name="operator">
+              <aliasxsl:value-of select="$operator"/>
             </aliasxsl:attribute>
           </aliasxsl:if>
           <aliasxsl:attribute name="xpath">
@@ -154,14 +184,14 @@
           <xsl:value-of select="@type"/>
         </aliasxsl:with-param>
         <aliasxsl:with-param name="ruleresults">
-          <xsl:for-each select="rule">
+          <xsl:for-each select="mp:rule">
             <xsl:call-template name="rulecheck">
               <xsl:with-param name="rule" select="."/>
             </xsl:call-template>
           </xsl:for-each>
         </aliasxsl:with-param>
         <aliasxsl:with-param name="morepolicies">
-          <xsl:for-each select="policy">
+          <xsl:for-each select="mp:policy">
             <xsl:call-template name="policycheck">
               <xsl:with-param name="policy" select="."/>
             </xsl:call-template>
@@ -237,8 +267,10 @@
             <xsl:value-of select="@occurrence"/>
             <xsl:text>]</xsl:text>
           </xsl:if>
-          <xsl:text>/mi:</xsl:text>
-          <xsl:value-of select="@value"/>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
           <xsl:if test="@operator">
             <xsl:value-of select="@operator"/>
             <xsl:choose>
@@ -267,7 +299,8 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="equationbase"><xsl:choose>
+    <xsl:variable name="equationbase">
+      <xsl:choose>
         <xsl:when test="@scope='mt'">
           <xsl:text>mt:MediaTrace</xsl:text>
           <xsl:call-template name="tokenize">
@@ -291,8 +324,10 @@
             <xsl:value-of select="@occurrence"/>
             <xsl:text>]</xsl:text>
           </xsl:if>
-          <xsl:text>/mi:</xsl:text>
-          <xsl:value-of select="@value"/>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -321,8 +356,11 @@
             <xsl:value-of select="@tracktype"/>
             <xsl:text>'][</xsl:text>
             <xsl:value-of select="@occurrence"/>
-            <xsl:text>]/mi:</xsl:text>
-            <xsl:value-of select="@value"/>
+            <xsl:text>]</xsl:text>
+            <xsl:call-template name="tokenize">
+              <xsl:with-param name="list" select="@value"/>
+              <xsl:with-param name="delimiter" select="'/'"/>
+            </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
@@ -330,6 +368,21 @@
     <aliasxsl:call-template name="rule">
       <aliasxsl:with-param name="name">
         <xsl:value-of select="@name"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="scope">
+        <xsl:value-of select="@scope"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="value">
+        <xsl:value-of select="@value"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="tracktype">
+        <xsl:value-of select="@tracktype"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="occurrence">
+        <xsl:value-of select="@occurrence"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="operator">
+        <xsl:value-of select="@operator"/>
       </aliasxsl:with-param>
       <aliasxsl:with-param name="xpath">
         <xsl:value-of select="$equationfull"/>
@@ -382,12 +435,22 @@
           <xsl:when test="@scope='mmt'">
             <xsl:text>/mmt:b[@n='</xsl:text>
           </xsl:when>
-          <xsl:otherwise>
+          <xsl:when test="@scope='mt'">
             <xsl:text>/mt:block[@name='</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>/mi:</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:value-of select="$first"/>
-        <xsl:text>']</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@scope='mmt'">
+            <xsl:text>']</xsl:text>
+          </xsl:when>
+          <xsl:when test="@scope='mt'">
+            <xsl:text>']</xsl:text>
+          </xsl:when>
+        </xsl:choose>
         <xsl:call-template name="tokenize">
           <xsl:with-param name="list" select="$remaining"/>
           <xsl:with-param name="delimiter">
@@ -402,9 +465,9 @@
               <xsl:when test="@scope='mmt'">
                 <xsl:text>/mmt:d</xsl:text>
               </xsl:when>
-              <xsl:otherwise>
+              <xsl:when test="@scope='mt'">
                 <xsl:text>/mt:data</xsl:text>
-              </xsl:otherwise>
+              </xsl:when>
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
@@ -412,12 +475,20 @@
               <xsl:when test="@scope='mmt'">
                 <xsl:text>/mmt:d[@n='</xsl:text>
               </xsl:when>
-              <xsl:otherwise>
+              <xsl:when test="@scope='mmt'">
                 <xsl:text>/mt:data[@name='</xsl:text>
-              </xsl:otherwise>
+              </xsl:when>
+              <xsl:otherwise>/mi:</xsl:otherwise>
             </xsl:choose>
             <xsl:value-of select="$first"/>
-            <xsl:text>']</xsl:text>
+            <xsl:choose>
+              <xsl:when test="@scope='mmt'">
+                <xsl:text>']</xsl:text>
+              </xsl:when>
+              <xsl:when test="@scope='mt'">
+                <xsl:text>']</xsl:text>
+              </xsl:when>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
