@@ -94,7 +94,7 @@
           <aliasxsl:attribute name="xpath">
             <aliasxsl:value-of select="$xpath"/>
           </aliasxsl:attribute>
-          <aliasxsl:if test="$outcome='fail'">
+          <aliasxsl:if test="$outcome='fail' or $operator='starts with' or $operator='must not start with'">
             <aliasxsl:attribute name="actual">
               <aliasxsl:value-of select="$actual"/>
             </aliasxsl:attribute>
@@ -202,103 +202,6 @@
   </xsl:template>
   <xsl:template name="rulecheck">
     <xsl:param name="rule"/>
-    <xsl:variable name="equationfull">
-      <xsl:choose>
-        <xsl:when test="@scope='mt'">
-          <xsl:text>mt:MediaTrace</xsl:text>
-          <xsl:call-template name="tokenize">
-            <xsl:with-param name="list" select="@value"/>
-            <xsl:with-param name="delimiter" select="'/'"/>
-          </xsl:call-template>
-          <xsl:if test="@operator">
-            <xsl:value-of select="@operator"/>
-            <xsl:choose>
-              <xsl:when test=".='compare' and string-length($compare)>0">
-                <xsl:text>document('</xsl:text>
-                <xsl:value-of select="$compare"/>
-                <xsl:text>')//</xsl:text>
-                <xsl:text>mt:MediaTrace</xsl:text>
-                <xsl:call-template name="tokenize">
-                  <xsl:with-param name="list" select="@value"/>
-                  <xsl:with-param name="delimiter" select="'/'"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>'</xsl:text>
-                <xsl:value-of select="."/>
-                <xsl:text>'</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
-        </xsl:when>
-        <xsl:when test="@scope='mmt'">
-          <xsl:text>mmt:MicroMediaTrace</xsl:text>
-          <xsl:call-template name="tokenize">
-            <xsl:with-param name="list" select="@value"/>
-            <xsl:with-param name="delimiter" select="'/'"/>
-          </xsl:call-template>
-          <xsl:if test="@operator">
-            <xsl:value-of select="@operator"/>
-            <xsl:choose>
-              <xsl:when test=".='compare' and string-length($compare)>0">
-                <xsl:text>document('</xsl:text>
-                <xsl:value-of select="$compare"/>
-                <xsl:text>')//</xsl:text>
-                <xsl:text>mmt:MicroMediaTrace</xsl:text>
-                <xsl:call-template name="tokenize">
-                  <xsl:with-param name="list" select="@value"/>
-                  <xsl:with-param name="delimiter" select="'/'"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>'</xsl:text>
-                <xsl:value-of select="."/>
-                <xsl:text>'</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
-          <xsl:value-of select="@tracktype"/>
-          <xsl:text>']</xsl:text>
-          <xsl:if test="@occurrence">
-            <xsl:text>[</xsl:text>
-            <xsl:value-of select="@occurrence"/>
-            <xsl:text>]</xsl:text>
-          </xsl:if>
-          <xsl:call-template name="tokenize">
-            <xsl:with-param name="list" select="@value"/>
-            <xsl:with-param name="delimiter" select="'/'"/>
-          </xsl:call-template>
-          <xsl:if test="@operator">
-            <xsl:value-of select="@operator"/>
-            <xsl:choose>
-              <xsl:when test=".='compare' and string-length($compare)>0">
-                <xsl:text>document('</xsl:text>
-                <xsl:value-of select="$compare"/>
-                <xsl:text>')//</xsl:text>
-                <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
-                <xsl:value-of select="@tracktype"/>
-                <xsl:text>']</xsl:text>
-                <xsl:if test="@occurrence">
-                  <xsl:text>[</xsl:text>
-                  <xsl:value-of select="@occurrence"/>
-                  <xsl:text>]</xsl:text>
-                </xsl:if>
-                <xsl:text>/mi:</xsl:text>
-                <xsl:value-of select="@value"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>'</xsl:text>
-                <xsl:value-of select="."/>
-                <xsl:text>'</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
     <xsl:variable name="equationbase">
       <xsl:choose>
         <xsl:when test="@scope='mt'">
@@ -314,6 +217,55 @@
             <xsl:with-param name="list" select="@value"/>
             <xsl:with-param name="delimiter" select="'/'"/>
           </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
+          <xsl:value-of select="@tracktype"/>
+          <xsl:text>']</xsl:text>
+          <xsl:if test="@occurrence">
+            <xsl:text>[</xsl:text>
+            <xsl:value-of select="@occurrence"/>
+            <xsl:text>]</xsl:text>
+          </xsl:if>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="equationfull">
+      <xsl:choose>
+        <xsl:when test="not(@operator) or @operator='exists'"></xsl:when>
+        <xsl:when test="@operator='must not exist'">not(</xsl:when>
+        <xsl:when test="@operator='starts with'">starts-with(</xsl:when>
+        <xsl:when test="@operator='must not start with'">not(starts-with(</xsl:when>
+      </xsl:choose>
+      <xsl:value-of select="$equationbase"/>
+      <xsl:choose>
+        <xsl:when test="not(@operator) or @operator='exists'"></xsl:when>
+        <xsl:when test="@operator='must not exist'">)</xsl:when>
+        <xsl:when test="@operator='starts with' or @operator='must not start with'">
+          <xsl:text>,'</xsl:text>
+          <xsl:value-of select="."/>
+          <xsl:text>')</xsl:text>
+          <xsl:if test="@operator='must not start with'">)</xsl:if>
+        </xsl:when>
+        <xsl:when test="@operator">
+          <xsl:value-of select="@operator"/>
+          <xsl:choose>
+            <xsl:when test=".='compare' and string-length($compare)>0">
+              <xsl:text>document('</xsl:text>
+              <xsl:value-of select="$compare"/>
+              <xsl:text>')//</xsl:text>
+              <xsl:value-of select="$equationbase"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>'</xsl:text>
+              <xsl:value-of select="."/>
+              <xsl:text>'</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>mi:MediaInfo/mi:track[@type='</xsl:text>
@@ -428,7 +380,6 @@
     <xsl:variable name="first" select="substring-before($newlist, $delimiter)"/>
     <xsl:variable name="remaining" select="substring-after($newlist, $delimiter)"/>
     <xsl:variable name="count" select="position()"/>
-
     <xsl:choose>
       <xsl:when test="$remaining">
         <xsl:choose>
@@ -444,10 +395,7 @@
         </xsl:choose>
         <xsl:value-of select="$first"/>
         <xsl:choose>
-          <xsl:when test="@scope='mmt'">
-            <xsl:text>']</xsl:text>
-          </xsl:when>
-          <xsl:when test="@scope='mt'">
+          <xsl:when test="@scope='mmt' or @scope='mt'">
             <xsl:text>']</xsl:text>
           </xsl:when>
         </xsl:choose>
@@ -482,10 +430,7 @@
             </xsl:choose>
             <xsl:value-of select="$first"/>
             <xsl:choose>
-              <xsl:when test="@scope='mmt'">
-                <xsl:text>']</xsl:text>
-              </xsl:when>
-              <xsl:when test="@scope='mt'">
+              <xsl:when test="@scope='mmt' or @scope='mt'">
                 <xsl:text>']</xsl:text>
               </xsl:when>
             </xsl:choose>
