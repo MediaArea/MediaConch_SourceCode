@@ -267,8 +267,10 @@
             <xsl:value-of select="@occurrence"/>
             <xsl:text>]</xsl:text>
           </xsl:if>
-          <xsl:text>/mi:</xsl:text>
-          <xsl:value-of select="@value"/>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
           <xsl:if test="@operator">
             <xsl:value-of select="@operator"/>
             <xsl:choose>
@@ -297,7 +299,8 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="equationbase"><xsl:choose>
+    <xsl:variable name="equationbase">
+      <xsl:choose>
         <xsl:when test="@scope='mt'">
           <xsl:text>mt:MediaTrace</xsl:text>
           <xsl:call-template name="tokenize">
@@ -321,8 +324,10 @@
             <xsl:value-of select="@occurrence"/>
             <xsl:text>]</xsl:text>
           </xsl:if>
-          <xsl:text>/mi:</xsl:text>
-          <xsl:value-of select="@value"/>
+          <xsl:call-template name="tokenize">
+            <xsl:with-param name="list" select="@value"/>
+            <xsl:with-param name="delimiter" select="'/'"/>
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -351,8 +356,11 @@
             <xsl:value-of select="@tracktype"/>
             <xsl:text>'][</xsl:text>
             <xsl:value-of select="@occurrence"/>
-            <xsl:text>]/mi:</xsl:text>
-            <xsl:value-of select="@value"/>
+            <xsl:text>]</xsl:text>
+            <xsl:call-template name="tokenize">
+              <xsl:with-param name="list" select="@value"/>
+              <xsl:with-param name="delimiter" select="'/'"/>
+            </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
@@ -427,12 +435,22 @@
           <xsl:when test="@scope='mmt'">
             <xsl:text>/mmt:b[@n='</xsl:text>
           </xsl:when>
-          <xsl:otherwise>
+          <xsl:when test="@scope='mt'">
             <xsl:text>/mt:block[@name='</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>/mi:</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:value-of select="$first"/>
-        <xsl:text>']</xsl:text>
+        <xsl:choose>
+          <xsl:when test="@scope='mmt'">
+            <xsl:text>']</xsl:text>
+          </xsl:when>
+          <xsl:when test="@scope='mt'">
+            <xsl:text>']</xsl:text>
+          </xsl:when>
+        </xsl:choose>
         <xsl:call-template name="tokenize">
           <xsl:with-param name="list" select="$remaining"/>
           <xsl:with-param name="delimiter">
@@ -447,9 +465,9 @@
               <xsl:when test="@scope='mmt'">
                 <xsl:text>/mmt:d</xsl:text>
               </xsl:when>
-              <xsl:otherwise>
+              <xsl:when test="@scope='mt'">
                 <xsl:text>/mt:data</xsl:text>
-              </xsl:otherwise>
+              </xsl:when>
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
@@ -457,12 +475,20 @@
               <xsl:when test="@scope='mmt'">
                 <xsl:text>/mmt:d[@n='</xsl:text>
               </xsl:when>
-              <xsl:otherwise>
+              <xsl:when test="@scope='mmt'">
                 <xsl:text>/mt:data[@name='</xsl:text>
-              </xsl:otherwise>
+              </xsl:when>
+              <xsl:otherwise>/mi:</xsl:otherwise>
             </xsl:choose>
             <xsl:value-of select="$first"/>
-            <xsl:text>']</xsl:text>
+            <xsl:choose>
+              <xsl:when test="@scope='mmt'">
+                <xsl:text>']</xsl:text>
+              </xsl:when>
+              <xsl:when test="@scope='mt'">
+                <xsl:text>']</xsl:text>
+              </xsl:when>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
