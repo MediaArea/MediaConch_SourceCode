@@ -1,0 +1,6 @@
+<policy type="and" name="Smaller frame size and same aspect ratio?">
+    <description>Test to see if a file has a smaller frame size than another file but same aspect ratio.</description>
+    <rule name="Width is less?" value="Width" tracktype="Video" occurrence="1" operator="&lt;">compare</rule>
+    <rule name="Height is less?" value="Height" tracktype="Video" occurrence="1" operator="&lt;">compare</rule>
+    <rule name="Display Aspect Ratio is same?" value="DisplayAspectRatio" tracktype="Video" occurrence="1" operator="=">compare</rule>
+</policy>
