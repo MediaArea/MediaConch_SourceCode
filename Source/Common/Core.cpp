@@ -993,12 +993,10 @@ void Core::unify_policy_options(int user, std::map<std::string, std::string>& op
             return;
 
         std::vector<long> files;
-        std::string time = get_last_modification_file(file);
         std::string report;
+        char *end = NULL;
 
-        db_mutex.Enter();
-        long file_id = get_db()->get_file_id(user, file, time);
-        db_mutex.Leave();
+        long file_id = strtol(file.c_str(), &end, 10);
 
         files.push_back(file_id);
         create_report_ma_xml(user, files, opts, report, get_bitset_with_mi_mmt());
@@ -2126,7 +2124,7 @@ bool Core::policy_is_valid(const std::string& report)
 //---------------------------------------------------------------------------
 bool Core::verapdf_report_is_valid(const std::string& report)
 {
-    size_t pos = report.find(" isCompliant=\"false\"");
+    size_t pos = report.find(" compliant=\"false\"");
     if (pos != std::string::npos)
         return false;
     return true;
