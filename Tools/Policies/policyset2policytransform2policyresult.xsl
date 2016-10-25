@@ -26,9 +26,11 @@
                 </xsl:call-template>
               </xsl:for-each>
               <xsl:for-each select="rule">
-                <xsl:call-template name="rulecheck">
-                  <xsl:with-param name="rule" select="."/>
-                </xsl:call-template>
+                <xsl:if test="@tracktype or @scope">
+                  <xsl:call-template name="rulecheck">
+                    <xsl:with-param name="rule" select="."/>
+                  </xsl:call-template>
+                </xsl:if>
               </xsl:for-each>
             </media>
           </aliasxsl:for-each>
@@ -185,9 +187,11 @@
         </aliasxsl:with-param>
         <aliasxsl:with-param name="ruleresults">
           <xsl:for-each select="rule">
-            <xsl:call-template name="rulecheck">
-              <xsl:with-param name="rule" select="."/>
-            </xsl:call-template>
+            <xsl:if test="@tracktype or @scope">
+              <xsl:call-template name="rulecheck">
+                <xsl:with-param name="rule" select="."/>
+              </xsl:call-template>
+            </xsl:if>
           </xsl:for-each>
         </aliasxsl:with-param>
         <aliasxsl:with-param name="morepolicies">
