@@ -285,14 +285,21 @@ make
 ##### Under Linux:
 
 ```sh
-./configure --enable-shared
+./configure
 make
 ```
 
-Or, if you also build ZenLib and MediaInfoLib:
+If you also build ZenLib and MediaInfoLib:
 ```sh
 ./configure --enable-staticlibs
 make
+```
+
+Or, with shared ZenLib and MediaInfoLib:
+```sh
+./configure
+make
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DIR/ZenLib/Project/GNU/Library/.libs:$BUILD_DIR/MediaInfoLib/Project/GNU/Library/.libs
 ```
 
 #### Launch the CLI
@@ -318,16 +325,22 @@ cd MediaConch_SourceCode/Project/Qt
 Run:
 
 ```sh
-./prepare
+./prepare NO_LIBCURL=1
 make
 ```
 
 Under Mac, or if you also build ZenLib and MediaInfoLib, run:
 ```sh
-./prepare STATIC_LIBS=1
+./prepare STATIC_LIBS=1 NO_LIBCURL=1
 make
 ```
 
+With shared ZenLib and MediaInfoLib:
+```sh
+./prepare NO_LIBCURL=1
+make
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DIR/ZenLib/Project/GNU/Library/.libs:$BUILD_DIR/MediaInfoLib/Project/GNU/Library/.libs
+```
 
 ##### With online checker
 
@@ -342,6 +355,13 @@ Under Mac, or if you also build ZenLib and MediaInfoLib, run:
 ```sh
 ./prepare STATIC_LIBS=1 "DEFINES+=MEDIAINFO_LIBCURL_YES"
 make
+```
+
+With shared ZenLib and MediaInfoLib:
+```sh
+./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+make
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DIR/ZenLib/Project/GNU/Library/.libs:$BUILD_DIR/MediaInfoLib/Project/GNU/Library/.libs
 ```
 
 #### Launch the GUI
@@ -389,7 +409,7 @@ cd MediaInfoLib/Project/GNU/Library
 Run:
 
 ```sh
-./configure --enable-static --with-libcurl=runtime
+./configure --enable-static
 make
 ```
 
