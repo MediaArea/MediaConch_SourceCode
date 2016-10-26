@@ -1303,13 +1303,13 @@ void Policies::find_save_name(int user, const char* basename, std::string& save_
     std::stringstream data_path;
 
     data_path << Core::get_local_data_path();
-	data_path << "policies/";
+    data_path << "policies/";
 
-	ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(data_path.str());
-	if (!ZenLib::Dir::Exists(z_path))
-		ZenLib::Dir::Create(z_path);
+    ZenLib::Ztring z_path = ZenLib::Ztring().From_UTF8(data_path.str());
+    if (!ZenLib::Dir::Exists(z_path))
+        ZenLib::Dir::Create(z_path);
 
-	data_path << user << "/";
+    data_path << user << "/";
 
     z_path = ZenLib::Ztring().From_UTF8(data_path.str());
     if (!ZenLib::Dir::Exists(z_path))
@@ -1330,7 +1330,11 @@ void Policies::find_save_name(int user, const char* basename, std::string& save_
     {
         std::stringstream ss;
         if (filename)
-            ss << data_path.str() << filename;
+        {
+            std::string filename_str(filename);
+            unified_file_name(filename_str);
+            ss << data_path.str() << filename_str;
+        }
         else
             ss << data_path.str() << "policy";
         if (i)
@@ -1430,6 +1434,26 @@ int Policies::transform_with_xslt_memory(const std::string& report, const std::s
                                          std::string& result)
 {
     return core->transform_with_xslt_memory(report, memory, opts, result);
+}
+
+//---------------------------------------------------------------------------
+void Policies::unified_file_name(std::string& filename)
+{
+    size_t pos = 0;
+    while (pos != std::string::npos)
+    {
+        pos = filename.find("/", pos);
+        if (pos != std::string::npos)
+            filename.replace(pos, 1, "");
+    }
+
+    pos = 0;
+    while (pos != std::string::npos)
+    {
+        pos = filename.find(" ", pos);
+        if (pos != std::string::npos)
+            filename.replace(pos, 1, "");
+    }
 }
 
 }
