@@ -1,0 +1,128 @@
+{
+    "app-id": "net.mediaarea.mediaconch-gui",
+    "sdk": "org.freedesktop.Sdk",
+    "runtime": "org.freedesktop.Platform",
+    "runtime-version": "1.4",
+    "command": "mediaconch-gui",
+    "rename-desktop-file": "mediaconch-gui.desktop",
+    "rename-appdata-file": "mediaconch-gui.appdata.xml",
+    "rename-icon": "mediaconch",
+    "finish-args": [ "--filesystem=host",
+                     "--share=network",
+                     "--socket=wayland",
+                     "--socket=x11",
+                     "--share=ipc" ],
+
+    "modules": [
+        {
+            "name": "qt5-qtbase",
+            "cleanup": [ "/bin", "/doc", "/mkspecs", "/include", "/lib/cmake", "/lib/pkgconfig" ],
+            "config-opts": [ "--confirm-license", "--opensource",
+                             "--release", "--shared",
+                             "-platform", "linux-g++",
+                             "-optimized-qmake",
+                             "-nomake", "examples",
+                             "-nomake", "tests",
+                             "-system-harfbuzz",
+                             "-system-sqlite",
+                             "-no-alsa",
+                             "-accessibility",
+                             "-dbus-linked",
+                             "-fontconfig",
+                             "-glib",
+                             "-iconv",
+                             "-icu",
+                             "-openssl-linked",
+                             "-no-pch",
+                             "-no-rpath",
+                             "-no-separate-debug-info",
+                             "-reduce-relocations",
+                             "-no-directfb",
+                             "-no-linuxfb",
+                             "-no-kms",
+                             "-no-cups",
+                             "-system-proxies"
+                           ],
+            "sources": [ { "type": "git", "url": "git://code.qt.io/qt/qtbase.git", "branch": "5.7.1" } ]
+        },
+        {
+            "name": "qt5-qtwebkit",
+            "cleanup": [ "/bin", "/doc", "/mkspecs", "/include", "/lib/cmake", "/lib/pkgconfig" ],
+            "sources": [
+                { "type": "git", "url": "git://code.qt.io/qt/qtwebkit.git", "branch": "5.7" },
+                { "type": "script", "commands": [ "qmake" ], "dest-filename": "configure" }
+            ]
+        },
+        {
+            "name": "libxml2",
+            "config-opts": [ "--enable-shared", "--disable-static", "--without-python" ],
+            "cleanup": [ "/bin", "/share", "/include", "/lib/cmake", "/lib/pkgconfig", "/lib/xml2Conf.sh" ],
+            "sources": [
+                { "type": "git", "url": "https://github.com/MediaArea/libxml2.git" }
+            ]
+        },
+        {
+            "name": "libxslt",
+            "config-opts": [ "--enable-shared", "--disable-static", "--without-python" ],
+            "cleanup": [ "/bin", "/share", "/include", "/lib/pkgconfig", "/lib/xslt2Conf.sh" ],
+            "sources": [
+                { "type": "git", "url": "https://github.com/MediaArea/libxslt.git" }
+            ]
+        },
+        {
+            "name": "libevent",
+            "config-opts": [ "--enable-shared", "--disable-static" ],
+            "cleanup": [ "/bin", "/include", "/lib/pkgconfig" ],
+            "sources": [
+                { "type": "git", "url": "https://github.com/MediaArea/libevent.git" }
+            ]
+        },
+        {
+            "name": "jansson",
+            "config-opts": [ "--enable-shared", "--disable-static" ],
+            "cleanup": [ "/include", "/lib/pkgconfig" ],
+            "sources": [
+                { "type": "git", "url": "https://github.com/MediaArea/jansson.git" },
+                { "type": "script", "commands": [ "autoreconf --force --install" ] }
+            ]
+        },
+        {
+            "name": "libzen",
+            "subdir": "Project/GNU/Library",
+            "config-opts": [ "--enable-shared", "--disable-static" ],
+            "cleanup": [ "/bin", "/include", "/lib/pkgconfig" ],
+            "sources": [
+                { "type": "git", "url": "https://github.com/MediaArea/ZenLib.git" }
+            ]
+        },
+        {
+            "name": "libmediainfo",
+            "subdir": "Project/GNU/Library",
+            "config-opts": [ "--enable-shared", "--disable-static", "--with-libcurl" ],
+            "cleanup": [ "/bin", "/include", "/lib/pkgconfig" ],
+            "sources": [
+                { "type": "git", "url": "https://github.com/MediaArea/MediaInfoLib.git" }
+            ]
+        },
+        {
+            "name": "mediaconch-gui",
+            "subdir": "Project/Qt",
+            "sources": [
+                { "type": "git", "url": "https://github.com/MediaArea/MediaConch_SourceCode.git" },
+                {
+                     "type": "script", 
+                     "commands": [ "qmake USE_WEBKIT=1 \"DEFINES+=MEDIAINFO_LIBCURL_YES\" -after target.path=/app/bin" ], 
+                     "dest-filename": "Project/Qt/configure"
+                }
+            ],
+            "post-install": [
+                "install -m 0755 -d /app/share/appdata",
+                "install -m 0644 ../GNU/GUI/mediaconch-gui.appdata.xml /app/share/appdata/mediaconch-gui.appdata.xml",
+                "install -m 0755 -d /app/share/applications",
+                "install -m 0644 ../GNU/GUI/mediaconch-gui.desktop /app/share/applications/mediaconch-gui.desktop",
+                "install -m 0755 -d /app/share/icons/hicolor/256x256/apps",
+                "install -m 0644 ../../Source/Resource/Image/MediaConch.png /app/share/icons/hicolor/256x256/apps/mediaconch.png"
+            ]
+        }
+    ]
+}
