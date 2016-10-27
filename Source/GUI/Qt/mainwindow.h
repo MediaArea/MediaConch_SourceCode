@@ -61,10 +61,10 @@ public:
     // Functions
     void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display, const QString& verbosity);
     void remove_file_to_list(const QString& file);
-    void update_policy_of_file_in_list(const QString& file, const QString& policy);
+    void update_policy_of_file_in_list(long file_id, const QString& policy);
     void clear_file_list();
     void policy_to_delete(int row);
-    int  xslt_policy_create_from_file(const QString& file);
+    long                        xslt_policy_create_from_file(long file_id);
 
     // UI
     void                        Ui_Init();
@@ -91,11 +91,11 @@ public:
                                          const std::map<std::string, std::string>& options,
                                          std::vector<MediaConchLib::Checker_ValidateRes*>& result);
 
-    QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
-    QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
-    QString                     get_mediainfo_jstree(const std::string& file);
-    QString                     get_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
-    QString                     get_mediatrace_jstree(const std::string& file);
+    QString                     get_mediainfo_and_mediatrace_xml(long file_id, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediainfo_xml(long file_id, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediainfo_jstree(long file_id);
+    QString                     get_mediatrace_xml(long file_id, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediatrace_jstree(long file_id);
     QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();
@@ -103,8 +103,8 @@ public:
     void                        display_selected();
     void                        settings_selected();
     void                        add_default_displays();
-    void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
-    int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);
+    void                        get_implementation_report(long file_id, QString& report, int *display=NULL, int *verbosity=NULL);
+    int                         validate_policy(long file_id, QString& report, int policy=-1, int *display=NULL);
 
     void                        add_policy_to_list(const QString& policy);
     void                        clear_policy_list();
@@ -154,6 +154,8 @@ public:
     void                        set_last_load_display_path(const std::string& path);
 
     FileRegistered*             get_file_registered_from_file(const std::string& file);
+    FileRegistered*             get_file_registered_from_id(long file_id);
+    std::string                 get_filename_from_registered_file_id(long file_id);
     void                        remove_file_registered_from_file(const std::string& file);
 
     int                         get_ui_database_path(std::string& path);

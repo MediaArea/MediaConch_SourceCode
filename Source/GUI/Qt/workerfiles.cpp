@@ -76,6 +76,27 @@ FileRegistered* WorkerFiles::get_file_registered_from_file(const std::string& fi
 }
 
 //---------------------------------------------------------------------------
+FileRegistered* WorkerFiles::get_file_registered_from_id(long id)
+{
+    FileRegistered* fr = NULL;
+    working_files_mutex.lock();
+    std::map<std::string, FileRegistered*>::iterator it = working_files.begin();
+    for (; it != working_files.end(); ++it)
+    {
+        if (!it->second)
+            continue;
+
+        if (it->second->file_id == id)
+        {
+            fr = new FileRegistered(*it->second);
+            break;
+        }
+    }
+    working_files_mutex.unlock();
+    return fr;
+}
+
+//---------------------------------------------------------------------------
 long WorkerFiles::get_id_from_registered_file(const std::string& file)
 {
     long id = -1;
@@ -84,6 +105,27 @@ long WorkerFiles::get_id_from_registered_file(const std::string& file)
         id = working_files[file]->file_id;
     working_files_mutex.unlock();
     return id;
+}
+
+//---------------------------------------------------------------------------
+std::string WorkerFiles::get_filename_from_registered_file_id(long file_id)
+{
+    std::string filename;
+    working_files_mutex.lock();
+    std::map<std::string, FileRegistered*>::iterator it = working_files.begin();
+    for (; it != working_files.end(); ++it)
+    {
+        if (!it->second)
+            continue;
+
+        if (it->second->file_id == file_id)
+        {
+            filename = it->second->filename;
+            break;
+        }
+    }
+    working_files_mutex.unlock();
+    return filename;
 }
 
 //---------------------------------------------------------------------------
@@ -177,13 +219,28 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     to_add_files_mutex.lock();
     to_add_files[full_file] = new FileRegistered(*fr);
     to_add_files_mutex.unlock();
+
+    working_files_mutex.lock();
+    working_files[full_file]->file_id = files_id[0];
+    working_files_mutex.unlock();
 }
 
 //---------------------------------------------------------------------------
-void WorkerFiles::update_policy_of_file_registered_from_file(const std::string& file, int policy)
+void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int policy)
 {
+    std::string file;
     working_files_mutex.lock();
-    if (working_files.find(file) == working_files.end() || !working_files[file])
+    std::map<std::string, FileRegistered*>::iterator it = working_files.begin();
+    for (; it != working_files.end(); ++it)
+    {
+        if (!it->second || it->second->file_id != file_id)
+            continue;
+
+        file = it->first;
+        break;
+    }
+
+    if (!file.size())
     {
         // file is not existing
         working_files_mutex.unlock();

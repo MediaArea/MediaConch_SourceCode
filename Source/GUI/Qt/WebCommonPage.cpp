@@ -37,11 +37,13 @@ namespace MediaConch {
     {
         select_file_name = inputName;
     }
-    void WebCommonPage::on_download_report(const QString& report, const QString& filename, const QString& report_name)
+
+    void WebCommonPage::on_download_report(const QString& report, long file_id, const QString& report_name)
     {
         if (report.isEmpty())
             return;
 
+        QString filename = QString().fromUtf8(mainwindow->get_filename_from_registered_file_id(file_id).c_str());
         std::string proposed_path_str = mainwindow->select_correct_save_report_path();
         QDir proposed_dir(QString().fromUtf8(proposed_path_str.c_str(), proposed_path_str.length()));
         QString proposed_filename = QFileInfo(filename).fileName() + "_" + report_name + ".txt";
@@ -77,9 +79,8 @@ namespace MediaConch {
         out << report;
     }
 
-    QString WebCommonPage::on_fill_implementation_report(const QString& file, const QString& display, const QString& verbosity)
+    QString WebCommonPage::on_fill_implementation_report(long file_id, const QString& display, const QString& verbosity)
     {
-        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int display_i = display.toInt();
         int *verbosity_p = NULL;
@@ -90,13 +91,12 @@ namespace MediaConch {
             verbosity_p = &verbosity_i;
         }
 
-        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
+        mainwindow->get_implementation_report(file_id, report, &display_i, verbosity_p);
         return report;
     }
 
-    void WebCommonPage::on_save_implementation_report(const QString& file, const QString& display, const QString& verbosity)
+    void WebCommonPage::on_save_implementation_report(long file_id, const QString& display, const QString& verbosity)
     {
-        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int display_i = display.toInt();
         int *verbosity_p = NULL;
@@ -106,64 +106,58 @@ namespace MediaConch {
             verbosity_i = verbosity.toInt();
             verbosity_p = &verbosity_i;
         }
-        mainwindow->get_implementation_report(file_s, report, &display_i, verbosity_p);
-        on_download_report(report, file, "ImplementationReport");
+        mainwindow->get_implementation_report(file_id, report, &display_i, verbosity_p);
+        on_download_report(report, file_id, "ImplementationReport");
     }
 
-    QString WebCommonPage::on_fill_policy_report(const QString& file, const QString& policy, const QString& display)
+    QString WebCommonPage::on_fill_policy_report(long file_id, const QString& policy, const QString& display)
     {
         int policy_i = policy.toInt();
         QString report;
         if (policy_i != -1)
         {
-            std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
             int display_i = display.toInt();
-            mainwindow->validate_policy(file_s, report, policy_i, &display_i);
+            mainwindow->validate_policy(file_id, report, policy_i, &display_i);
         }
         return report;
     }
 
-    void WebCommonPage::on_save_policy_report(const QString& file, const QString& policy, const QString& display)
+    void WebCommonPage::on_save_policy_report(long file_id, const QString& policy, const QString& display)
     {
-        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         QString report;
         int policy_i = policy.toInt();
         int display_i = display.toInt();
-        mainwindow->validate_policy(file_s, report, policy_i, &display_i);
-        on_download_report(report, file, "MediaConchReport");
+        mainwindow->validate_policy(file_id, report, policy_i, &display_i);
+        on_download_report(report, file_id, "MediaConchReport");
     }
 
-    QString WebCommonPage::on_fill_mediainfo_report(const QString& file)
+    QString WebCommonPage::on_fill_mediainfo_report(long file_id)
     {
-        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
-        return mainwindow->get_mediainfo_jstree(file_s);
+        return mainwindow->get_mediainfo_jstree(file_id);
     }
 
-    void WebCommonPage::on_save_mediainfo_report(const QString& file)
+    void WebCommonPage::on_save_mediainfo_report(long file_id)
     {
-        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         std::string display_name, display_content;
-        QString report = mainwindow->get_mediainfo_xml(file_s, display_name, display_content);
-        on_download_report(report, file, "MediaInfo");
+        QString report = mainwindow->get_mediainfo_xml(file_id, display_name, display_content);
+        on_download_report(report, file_id, "MediaInfo");
     }
 
-    QString WebCommonPage::on_fill_mediatrace_report(const QString& file)
+    QString WebCommonPage::on_fill_mediatrace_report(long file_id)
     {
-        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
-        return mainwindow->get_mediatrace_jstree(file_s);
+        return mainwindow->get_mediatrace_jstree(file_id);
     }
 
-    void WebCommonPage::on_save_mediatrace_report(const QString& file)
+    void WebCommonPage::on_save_mediatrace_report(long file_id)
     {
-        std::string file_s = std::string(file.toUtf8().data(), file.toUtf8().length());
         std::string display_name, display_content;
-        QString report = mainwindow->get_mediatrace_xml(file_s, display_name, display_content);
-        on_download_report(report, file, "MediaTrace");
+        QString report = mainwindow->get_mediatrace_xml(file_id, display_name, display_content);
+        on_download_report(report, file_id, "MediaTrace");
     }
 
-    QString WebCommonPage::on_create_policy_from_file(const QString& file)
+    QString WebCommonPage::on_create_policy_from_file(long file_id)
     {
-        int id = mainwindow->xslt_policy_create_from_file(file);
+        int id = mainwindow->xslt_policy_create_from_file(file_id);
         std::string n, err;
         if (mainwindow->policy_get_name(id, n, err) < 0)
             n = std::string();
@@ -570,66 +564,108 @@ namespace MediaConch {
         return QString().setNum(verbosity);
     }
 
-    bool WebCommonPage::policy_is_valid(const QString& file)
+    QString WebCommonPage::policy_is_valid(long file_id)
     {
-        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        //{"valid":false,"fileId":"fileId","error":null}
+        QString json = QString("{\"fileId\":\"%1\",").arg(file_id);
+        FileRegistered* fr = mainwindow->get_file_registered_from_id(file_id);
         if (!fr)
-            return false;
+        {
+            json += QString("\"valid\":%1,\"error\":\"%2\"}")
+                .arg("false").arg("File not reachable");
+            return json;
+        }
 
         if (!fr->analyzed)
         {
+            json += QString("\"valid\":%1,\"error\":\"%2\"}")
+                .arg("false").arg("File not analyzed");
             delete fr;
-            return false;
+            return json;
         }
 
-        bool policy_valid = fr->policy_valid;
-        delete fr;
+        json += QString("\"valid\":%1,\"error\":%2}")
+            .arg(fr->policy_valid ? "true" : "false").arg("null");
 
-        return policy_valid;
+        delete fr;
+        return json;
     }
 
-    bool WebCommonPage::implementation_is_valid(const QString& file)
+    QString WebCommonPage::implementation_is_valid(long file_id)
     {
-        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
+        //{"valid":true,"fileId":"fileId","error":null}
+        QString json = QString("{\"fileId\":\"%1\",").arg(file_id);
+        FileRegistered* fr = mainwindow->get_file_registered_from_id(file_id);
         if (!fr)
-            return false;
+        {
+            json += QString("\"valid\":%1,\"error\":\"%2\"}")
+                .arg("false").arg("File not reachable");
+            return json;
+        }
 
         if (!fr->analyzed)
         {
+            json += QString("\"valid\":%1,\"error\":\"%2\"}")
+                .arg("false").arg("File not analyzed");
             delete fr;
-            return false;
+            return json;
         }
 
-        bool implementation_valid = fr->implementation_valid;
-        delete fr;
+        json += QString("\"valid\":%1,\"error\":%2}")
+            .arg(fr->implementation_valid ? "true" : "false").arg("null");
 
-        return implementation_valid;
+        delete fr;
+        return json;
     }
 
-    QString WebCommonPage::file_is_analyzed(const QString& file)
+    QString WebCommonPage::implementation_and_policy_is_valid(long file_id)
     {
-        FileRegistered* fr = mainwindow->get_file_registered_from_file(file.toUtf8().data());
-        if (!fr)
-            return QString();
-
-        int report_kind = fr->report_kind;
-
-        if (report_kind >= 0 && report_kind <= 2)
-            report_kind = 2;
-
-        QString analyzed = QString("{\"finish\":%1,\"tool\":%2,\"percent\":%3}")
-            .arg(fr->analyzed ? "true" : "false") // finish
-            .arg(report_kind)                     // tool
-            .arg(fr->analyze_percent);            // percent
-        delete fr;
-
-        return analyzed;
+        //{"implemReport":{"valid":true,"fileId":"fileId","error":null},"statusReport":{"valid":false,"fileId":"fileId","error":null}}
+        QString json = QString("{\"implemReport\":");
+        json += implementation_is_valid(file_id);
+        json += ",\"statusReport\":";
+        json += policy_is_valid(file_id);
+        json += "}";
+        return json;
     }
 
-    QString WebCommonPage::change_policy_for_file(const QString& filename, const QString& policy, const QString& fileId)
+    QString WebCommonPage::file_is_analyzed(const QStringList& ids)
     {
-        mainwindow->update_policy_of_file_in_list(filename, policy);
-        return fileId;
+        QString json = QString("{\"status\":{");
+        bool one_added = false;
+        for (int i = 0; i < ids.size(); ++i)
+        {
+            long file = ids[i].toInt();
+            FileRegistered* fr = mainwindow->get_file_registered_from_id(file);
+            if (!fr)
+                continue;
+
+            int report_kind = fr->report_kind;
+            if ((report_kind >= 0 && report_kind <= 2) || report_kind == 5) //MC/MI/MT/MMT
+                report_kind = 2;
+
+            QString analyzed = QString("\"%1\": {\"finish\":%2,\"tool\":%3,\"percent\":%4}")
+                .arg(fr->file_id)                     // id
+                .arg(fr->analyzed ? "true" : "false") // finish
+                .arg(report_kind)                     // tool
+                .arg(fr->analyze_percent);            // percent
+            delete fr;
+
+            if (one_added)
+                json += ",";
+            json += analyzed;
+
+            one_added = true;
+        }
+
+        json += "}}";
+
+        return json;
+    }
+
+    void WebCommonPage::change_policy_for_file(long file_id, const QString& policy)
+    {
+        mainwindow->update_policy_of_file_in_list(file_id, policy);
     }
 
     void WebCommonPage::add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list)
