@@ -423,16 +423,32 @@ void JsTree::interpret_offset(std::string& offset, bool coma, std::string& json)
 std::string JsTree::unified_json_value(const std::string& v)
 {
     std::string value(v);
+
+    // \n
     size_t pos = 0;
     while (pos != std::string::npos)
     {
-        pos = value.find("\n", pos);
+        pos = value.find("\\", pos);
         if (pos != std::string::npos)
         {
-            value.replace(pos, 1, "\\n");
+            value.replace(pos, 1, "\\\\");
             pos += 2;
         }
     }
+
+    // \r
+    pos = 0;
+    while (pos != std::string::npos)
+    {
+        pos = value.find("\r", pos);
+        if (pos != std::string::npos)
+        {
+            value.replace(pos, 1, "\\r");
+            pos += 2;
+        }
+    }
+
+    // "
     pos = 0;
     while (pos != std::string::npos)
     {
@@ -440,6 +456,18 @@ std::string JsTree::unified_json_value(const std::string& v)
         if (pos != std::string::npos)
         {
             value.replace(pos, 1, "\\\"");
+            pos += 2;
+        }
+    }
+
+    // back-slash
+    pos = 0;
+    while (pos != std::string::npos)
+    {
+        pos = value.find("\n", pos);
+        if (pos != std::string::npos)
+        {
+            value.replace(pos, 1, "\\n");
             pos += 2;
         }
     }
