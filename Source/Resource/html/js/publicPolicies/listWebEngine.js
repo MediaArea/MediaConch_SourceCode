@@ -1,4 +1,5 @@
 var publicPoliciesListAjax = (function() {
+    var address = "https://mediaarea.net/MediaConchOnline/api/public/v1/publicpolicies/";
     var getList = function() {
         /**
          * Get the json for jstree
@@ -7,7 +8,7 @@ var publicPoliciesListAjax = (function() {
          * {"policiesTree":POLICIES_JSTREE_JSON}
          */
         $.get({
-            url: "https://mediaarea.net/MediaConchOnlineTest/api/public/v1/publicpolicies/list",
+            url: address + "list",
             dataType: "json",
             async: false
         }).done(function(data) {
@@ -26,7 +27,7 @@ var publicPoliciesListAjax = (function() {
          * @return string
          * /api/public/v1/publicpolicies/policy/POLICYID/POLICYUSERID
          */
-        return "https://mediaarea.net/MediaConchOnlineTest/api/public/v1/publicpolicies/policy/" + policyId + "/" + policyUserId;
+        return address + "policy/" + policyId + "/" + policyUserId;
     };
 
     var policyExport = function(policyId, policyUserId) {
@@ -38,7 +39,7 @@ var publicPoliciesListAjax = (function() {
         * @return XML
         */
         $.get({
-            url: "https://mediaarea.net/MediaConchOnlineTest/api/public/v1/publicpolicies/policy/export/" + policyId + "/" + policyUserId,
+            url: address + "policy/export/" + policyId + "/" + policyUserId,
             dataType: "text",
             async: false
         }).done(function(data) {
@@ -62,7 +63,7 @@ var publicPoliciesListAjax = (function() {
         * {"policyId":ID}
         */
         $.get({
-            url: "https://mediaarea.net/MediaConchOnlineTest/api/public/v1/publicpolicies/policy/export/" + policyId + "/" + policyUserId,
+            url: address + "policy/export/" + policyId + "/" + policyUserId,
             dataType: "text",
             async: false
         }).done(function(data) {
