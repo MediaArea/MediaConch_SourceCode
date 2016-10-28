@@ -308,13 +308,12 @@ p.registration {
     line-height: 1.1;
     border-radius: 4px;
     display: block;
-    word-wrap: break-word;
-    word-break: break-all;
 }
 
 .policyBox h4 {
     margin-top: 0;
     text-align: center;
+    word-wrap: break-word;
 }
 
 .policyBox h4 a:hover {

@@ -123,6 +123,20 @@ var importPolicy = (function() {
     };
 })();
 
+var policyListSpinner = (function() {
+    var show = function() {
+        $('.publicPoliciesListSpinner').removeClass('hidden');
+    };
+    var hide = function() {
+        $('.publicPoliciesListSpinner').addClass('hidden');
+    };
+
+    return {
+        show: show,
+        hide: hide,
+    };
+})();
+
 $(document).ready(function () {
     (function loop_init(time) {
         setTimeout(function() {

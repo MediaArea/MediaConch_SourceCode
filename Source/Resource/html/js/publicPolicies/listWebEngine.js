@@ -12,8 +12,10 @@ var publicPoliciesListAjax = (function() {
             dataType: "json",
             async: false
         }).done(function(data) {
+            policyListSpinner.hide();
             publicPoliciesList.displayList(data.list);
         }).fail(function (jqXHR) {
+            policyListSpinner.hide();
             mcoMessage.fail(jqXHR);
         });
     };

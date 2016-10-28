@@ -293,7 +293,7 @@ function policyRuleHelp() {
     addHelp('field', 'Specifies the field (within the track) that the rule should target.', 'Field');
 
     // Occurrence
-    addHelp('occurrence', 'Number of times this should tested (for multiple tracks).', 'Occurrence');
+    addHelp('occurrence', 'Optional field to specify which track should be tested. Leaving this field blank will test all tracks.', 'Occurrence');
 
     // Validator
     addHelp('validator', 'Applies the appropriate operator to the rule.', 'Validator');

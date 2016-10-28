@@ -2,6 +2,15 @@ var policyTree = (function() {
     var instance;
 
     var init = function() {
+        // Disable F2 shortcut (rename) in jstree, needs to be done before jstree initialization
+        $('#policiesTree').on('keydown.jstree', '.jstree-anchor', function(event) {
+            if (113 == event.keyCode) {
+                event.stopImmediatePropagation();
+
+                return false;
+            }
+        });
+
         $('#policiesTree').jstree({
             core: {
                 check_callback: function (operation, node, parent, position, more) {
