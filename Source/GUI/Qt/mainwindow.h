@@ -32,6 +32,7 @@ class MenuMainWindow;
 class SettingsWindow;
 class CheckerWindow;
 class PoliciesWindow;
+class PublicPoliciesWindow;
 class DisplayWindow;
 class VerbositySpinbox;
 class PolicyCombobox;
@@ -53,16 +54,17 @@ public:
         RUN_POLICIES_VIEW,
         RUN_DISPLAY_VIEW,
         RUN_SETTINGS_VIEW,
+        RUN_PUBLIC_POLICIES_VIEW,
     };
     void Run();
 
     // Functions
     void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display, const QString& verbosity);
     void remove_file_to_list(const QString& file);
-    void update_policy_of_file_in_list(const QString& file, const QString& policy);
+    void update_policy_of_file_in_list(long file_id, const QString& policy);
     void clear_file_list();
     void policy_to_delete(int row);
-    int  xslt_policy_create_from_file(const QString& file);
+    long                        xslt_policy_create_from_file(long file_id);
 
     // UI
     void                        Ui_Init();
@@ -89,37 +91,41 @@ public:
                                          const std::map<std::string, std::string>& options,
                                          std::vector<MediaConchLib::Checker_ValidateRes*>& result);
 
-    QString                     get_mediainfo_and_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
-    QString                     get_mediainfo_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
-    QString                     get_mediainfo_jstree(const std::string& file);
-    QString                     get_mediatrace_xml(const std::string& file, const std::string& display_name, const std::string& display_content);
-    QString                     get_mediatrace_jstree(const std::string& file);
+    QString                     get_mediainfo_and_mediatrace_xml(long file_id, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediainfo_xml(long file_id, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediainfo_jstree(long file_id);
+    QString                     get_mediatrace_xml(long file_id, const std::string& display_name, const std::string& display_content);
+    QString                     get_mediatrace_jstree(long file_id);
     QString                     ask_for_schema_file();
     void                        checker_selected();
     void                        policies_selected();
+    void                        public_policies_selected();
     void                        display_selected();
     void                        settings_selected();
     void                        add_default_displays();
-    void                        get_implementation_report(const std::string& file, QString& report, int *display=NULL, int *verbosity=NULL);
-    int                         validate_policy(const std::string& file, QString& report, int policy=-1, int *display=NULL);
+    void                        get_implementation_report(long file_id, QString& report, int *display=NULL, int *verbosity=NULL);
+    int                         validate_policy(long file_id, QString& report, int policy=-1, int *display=NULL);
 
     void                        add_policy_to_list(const QString& policy);
     void                        clear_policy_list();
     void                        add_xslt_display(const QString& display_xslt);
     void                        remove_xslt_display();
     int                         policy_import(const QString& file, std::string& err);
+    int                         policy_import_data(const QString& data, std::string& err);
     int                         xslt_policy_create(int parent_id, std::string& err);
     int                         policy_duplicate(int id, int dst_policy_id, std::string& err);
     int                         policy_move(int id, int dst_policy_id, std::string& err);
     int                         policy_change_info(int id, const std::string& name, const std::string& description,
                                                    const std::string& license, std::string& err);
     int                         policy_change_type(int id, const std::string& type, std::string& err);
+    int                         policy_change_is_public(int id, bool is_public, std::string& err);
     int                         policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p);
     int                         policy_save(int pos, std::string& err);
     int                         policy_get_name(int pos, std::string& name, std::string& err);
     int                         policy_dump(int pos, std::string& memory, std::string& err);
     int                         policy_remove(int pos, std::string& err);
     int                         policy_export(int pos, std::string& err);
+    int                         policy_export_data(const QString& policy, const QString& p_name, std::string& err);
     int                         clear_policies(std::string& err);
     size_t                      get_policies_count() const;
     int                         xslt_policy_rule_create(int policy_id, std::string& err);
@@ -148,6 +154,8 @@ public:
     void                        set_last_load_display_path(const std::string& path);
 
     FileRegistered*             get_file_registered_from_file(const std::string& file);
+    FileRegistered*             get_file_registered_from_id(long file_id);
+    std::string                 get_filename_from_registered_file_id(long file_id);
     void                        remove_file_registered_from_file(const std::string& file);
 
     int                         get_ui_database_path(std::string& path);
@@ -187,6 +195,7 @@ private:
     QVBoxLayout*                Layout;
     CheckerWindow*              checkerView;
     PoliciesWindow*             policiesView;
+    PublicPoliciesWindow*       publicPoliciesView;
     DisplayWindow*              displayView;
     MenuMainWindow*             MenuView;
     SettingsWindow*             settingsView;
@@ -194,8 +203,10 @@ private:
     void                        create_and_configure_ui_database();
     int                         clearVisualElements();
     void                        clearPoliciesElements();
+    void                        clearPublicPoliciesElements();
     void                        createCheckerView();
     void                        createPoliciesView();
+    void                        createPublicPoliciesView();
     void                        createDisplayView();
     void                        createSettingsView();
 
@@ -216,6 +227,7 @@ private Q_SLOTS:
     // View
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
+    void on_actionPublicPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
 

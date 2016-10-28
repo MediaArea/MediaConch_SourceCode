@@ -596,7 +596,7 @@ std::string RESTAPI::Policy_Duplicate_Req::to_str() const
 
     out << "{\"user\":" << user;
     if (dst_user)
-        out << ",\"dst_user\":" << dst_user;
+        out << ",\"dst_user\":" << *dst_user;
     out << ",\"must_be_public\":" << std::boolalpha << must_be_public;
     out << ",\"id\": " << id << ",\"dst_policy_id\": " << dst_policy_id << "}";
     return out.str();

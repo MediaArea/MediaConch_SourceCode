@@ -2,7 +2,9 @@ $(document).ready(function() {
     result = $('#result-table').DataTable({
         'order': [],
         'autoWidth': false,
-        'fixedHeader': true,
+        'fixedHeader': {
+            headerOffset: $('#mco-navbar').outerHeight(true)
+        },
         'columnDefs': [
             { 'orderable': true, targets: 0 },
             { 'orderable': true, 'searchable': false, targets: [1, 2, 5] },
@@ -14,6 +16,9 @@ $(document).ready(function() {
 
     // Waiting loop ID value
     waitingLoopId = null;
+
+    // Avoid call to checker status if it's already running
+    checkerStatusInProgress = false;
 
     // Upload form
     $('#file form').on('submit', function (e) {
@@ -47,6 +52,9 @@ $(document).ready(function() {
         webpage.close_all();
         // Remove close all button
         $(this).addClass('hidden');
+
+        // Remove apply to all
+        $('#checkerApplyAll').addClass('hidden');
     });
 
     // Apply policy to all
@@ -59,12 +67,23 @@ $(document).ready(function() {
     policyList.children('option:first').text('Choose a new policy to apply').prop('selected', true);
     $('#checkerApplyAll div.applyAll').append('<div class="col-md-12"><div class="form-group"><label class="pull-left control-label">Apply a policy to all results</label><div class="col-sm-4 policy">')
     $('#checkerApplyAll div.applyAll div.policy').html(policyList);
+    resetSelectList('applyAllPolicy');
 
     $('#applyAllPolicy').on('change', function(e) {
         applyPolicyToAll();
         resetSelectList('applyAllPolicy');
     });
 });
+
+function getDataFromForm(form) {
+    formValues = {policy:form.find('.policyList').val(),
+                  policyText:form.find('.policyList option:selected').text(),
+                  display:form.find('.displayList').val(),
+                  verbosity:form.find('.verbosityList').val()
+                 };
+
+    return formValues;
+}
 
 function updateFileOrAddFile(sourceName, fileName, fileId, values) {
     var formValues = JSON.parse(values);
@@ -79,7 +98,7 @@ function updateFile(fileId, formValues) {
     node = result.$('#result-' + fileId);
 
     // Update policy if it has changed
-    if (node.data('policy') != formValues.policy && (2 == node.data('tool') || undefined == node.data('tool'))) {
+    if (node.data('policy') != formValues.policy) {
         node.data('policy', formValues.policy);
         node.data('policyName', formValues.policyText);
 
@@ -87,7 +106,7 @@ function updateFile(fileId, formValues) {
     }
 
     // Update display if it has changed
-    if (node.data('display') != formValues.display && (2 == node.data('tool') || undefined == node.data('tool'))) {
+    if (node.data('display') != formValues.display) {
         node.data('display', formValues.display);
 
         removeImplemModalIfExists(fileId);
@@ -103,7 +122,7 @@ function updateFile(fileId, formValues) {
 }
 
 function addFile(sourceName, fileName, fileId, formValues) {
-    node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 30) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).node();
+    node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 28) + '</span>', '', '', '', '', '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button><button type="button" class="btn btn-link hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).node();
 
     // Add id
     resultId = 'result-' + fileId;
@@ -137,6 +156,12 @@ function addFile(sourceName, fileName, fileId, formValues) {
         $('#checkerResultTitle .close').removeClass('hidden');
         $('#checkerApplyAll').removeClass('hidden');
     }
+
+    addSpinnerToCell(result.cell(node, 1));
+    if (formValues.policy != -1)
+        addSpinnerToCell(result.cell(node, 2));
+    else
+        policyCellEmptyWithModal(resultId, fileId)
 };
 
 function startWaitingLoop() {
@@ -157,43 +182,53 @@ function waitingLoop(time, iteration) {
     if (null === waitingLoopId) {
         time = 500;
     }
+
     waitingLoopId = setTimeout(function () {
         nbProcess = 0;
         nbProcessInProgress = 0;
+        nbProcessLimit = 10; //5?
+        fileIds = [];
         // Process visible results first
         if ($('.statusCell.info').size() > 0) {
             $.each($('.statusCell.info'), function(index, waitingNode) {
                 if (!$(waitingNode).hasClass('checkInProgress')) {
-                    if (nbProcess++ < 5) {
-                        checkerStatusRequest($(waitingNode), $(waitingNode).parent());
+                    if (nbProcess++ < nbProcessLimit) {
+                        fileIds.push($(waitingNode).parent().data('fileId'));
                     }
                 }
                 else {
-                    if (nbProcessInProgress++ < 5) {
-                        checkerStatusRequest($(waitingNode), $(waitingNode).parent());
-                    }
-                }
-            })
-        }
-        // Process hidden results
-        else {
-            result.cells('.statusCell.info').every(function(currentCell) {
-                if (!$(this.node()).hasClass('checkInProgress')) {
-                    if (nbProcess++ < 5) {
-                        checkerStatusRequest($(this.node()), $(result.row(currentCell).node()));
-                    }
-                }
-                else {
-                    if (nbProcessInProgress++ < 5) {
-                        checkerStatusRequest($(this.node()), $(result.row(currentCell).node()));
+                    if (nbProcessInProgress++ < nbProcessLimit) {
+                        fileIds.push($(waitingNode).parent().data('fileId'));
                     }
                 }
             })
         }
 
+        // Process hidden results
+        else {
+            result.cells('.statusCell.info').every(function(currentCell) {
+                if (!$(this.node()).hasClass('checkInProgress')) {
+                    if (nbProcess++ < nbProcessLimit) {
+                        fileIds.push($(result.row(currentCell).node()).data('fileId'));
+                    }
+                }
+                else {
+                    if (nbProcessInProgress++ < nbProcessLimit) {
+                        fileIds.push($(result.row(currentCell).node()).data('fileId'));
+                    }
+                }
+            })
+        }
+
+        // Send IDs to server if not already running
+        if (fileIds.length > 0 && !checkerStatusInProgress) {
+            checkerStatusRequest(fileIds);
+        }
+
+        // Call the loop again
         if (result.cells('.statusCell.info').count() > 0 && --iteration > 0) {
             // Increase loop delay each ten iteration
-            if (0 == iteration % 10 && time < 10000) {
+            if (0 == iteration % 50 && time < 10000) {
                 time += 500;
             }
             waitingLoop(time, iteration);
@@ -212,89 +247,85 @@ function waitingLoop(time, iteration) {
     }, time);
 }
 
-function checkerStatusRequest(nodeStatus, nodeChecker) {
-    sourceName = nodeChecker.find('span').attr('title');
+function checkerStatusRequest(ids) {
+    checkerStatusInProgress = true;
     if (WEBMACHINE == "WEB_MACHINE_KIT") {
-        analyzed = webpage.file_is_analyzed(sourceName);
+        analyzed = webpage.file_is_analyzed(ids);
+        checkerStatusInProgress = false;
         var data = JSON.parse(analyzed);
-        processCheckerStatusRequest(data, nodeChecker.prop('id'), nodeChecker.data('fileId'));
+        processCheckerStatusRequest(data.status);
     }
     else {
-        webpage.file_is_analyzed(sourceName, function (analyzed) {
+        webpage.file_is_analyzed(ids, function (analyzed) {
+            checkerStatusInProgress = false;
             var data = JSON.parse(analyzed);
-            processCheckerStatusRequest(data, nodeChecker.prop('id'), nodeChecker.data('fileId'));
+            processCheckerStatusRequest(data.status);
         });
     }
 }
 
-function processCheckerStatusRequest(data, resultId, fileId) {
-    sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
-    if (data.finish) {
-        node = result.$('#' + resultId);
-        // Report type
-        node.data('tool', data.tool);
+function processCheckerStatusRequest(statusMulti) {
+    $.each(statusMulti, function(statusFileId, status) {
+        if (status.finish) {
+            statusResultId = 'result-' + statusFileId;
+            node = result.$('#' + statusResultId);
+            // Report type
+            node.data('tool', status.tool);
 
-        // Status
-        statusCellSuccess($(result.cell(node, 5).node()));
+            // Status
+            statusCellSuccess($(result.cell(node, 5).node()));
 
-        // Implementation
-        addSpinnerToCell(result.cell(node, 1));
-
-        if (WEBMACHINE == "WEB_MACHINE_KIT") {
-            valid = webpage.implementation_is_valid(sourceName);
-            var implemData = {};
-            implemData.valid = valid;
-            implementationCell(implemData, resultId, fileId);
-        } else {
-            webpage.implementation_is_valid(sourceName, function (valid) {
-                var implemData = {};
-                implemData["valid"] = valid;
-                implementationCell(implemData, resultId, fileId);
-            });
-        }
-
-        // Policy
-        if (2 == data.tool)
-        {
-            if (node.data('policy') && node.data('policy') != -1)
-            {
-                addSpinnerToCell(result.cell(node, 2));
+            // Implementation and Policy
+            if (node.data('policy') && node.data('policy') != -1) {
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
-                    valid = webpage.policy_is_valid(sourceName);
-                    var policyData = {};
-                    policyData["valid"] = valid;
-                    policyCell(policyData, resultId, fileId);
-                }
-                else {
-                    webpage.policy_is_valid(sourceName, function (valid) {
-                        var policyData = {};
-                        policyData["valid"] = valid;
-                        policyCell(policyData, resultId, fileId);
+                    valid = webpage.implementation_and_policy_is_valid(statusFileId);
+                    var data = JSON.parse(valid);
+                    implementationCell(data.implemReport, 'result-' + data.implemReport.fileId, data.implemReport.fileId);
+                    policyCell(data.statusReport, 'result-' + data.statusReport.fileId, data.statusReport.fileId)
+                } else {
+                    webpage.implementation_and_policy_is_valid(statusFileId, function (valid) {
+                        var data = JSON.parse(valid);
+                        implementationCell(data.implemReport, 'result-' + data.implemReport.fileId, data.implemReport.fileId);
+                        policyCell(data.statusReport, 'result-' + data.statusReport.fileId, data.statusReport.fileId)
                     });
                 }
             }
+            else
+            {
+                // Implementation only
+                if (WEBMACHINE == "WEB_MACHINE_KIT") {
+                    valid = webpage.implementation_is_valid(statusFileId);
+                    var data = JSON.parse(valid);
+                    implementationCell(data, 'result-' + data.fileId, data.fileId);
+                } else {
+                    webpage.implementation_is_valid(statusFileId, function (valid) {
+                        var data = JSON.parse(valid);
+                        implementationCell(data, 'result-' + data.fileId, data.fileId);
+                    });
+                }
+            }
+
+            // MediaInfo
+            mediaInfoCell(statusResultId, statusFileId);
+
+            // MediaTrace
+            mediaTraceCell(statusResultId, statusFileId);
+        }
+        else if (status.percent > 0) {
+            statusResultId = 'result-' + statusFileId;
+            $(result.cell('#' + statusResultId, 5).node()).addClass('checkInProgress');
+            if (undefined == status.tool || 2 != status.tool || 100 == status.percent) {
+                $(result.cell('#' + statusResultId, 5).node()).find('.status-text').html('<span class="spinner-status"></span>');
+            }
             else {
-                policyCellEmptyWithModal(resultId, fileId)
+                $(result.cell('#' + statusResultId, 5).node()).find('.status-text').html('<span class="spinner-status"></span>&nbsp;' + Math.round(status.percent) + '%');
             }
         }
-        else {
-            policyCellEmptyWithoutModal(resultId)
+        else if (status.error) {
+            nodeCell = result.$('#result-' + statusFileId);
+            statusCellError($(result.cell(nodeCell, 5).node()));
         }
-
-        // MediaInfo
-        mediaInfoCell(resultId, fileId);
-
-        // MediaTrace
-        mediaTraceCell(resultId, fileId);
-    }
-    else if (data.percent > 0) {
-        $(result.cell('#' + resultId, 5).node()).addClass('checkInProgress');
-        if (undefined == data.tool || 2 != data.tool || 100 == data.percent) {
-            $(result.cell('#' + resultId, 5).node()).find('.status-text').html('<span class="spinner-status"></span>');
-        } else {
-            $(result.cell('#' + resultId, 5).node()).find('.status-text').html('<span class="spinner-status"></span>&nbsp;' + Math.round(data.percent) + '%');
-        }
-    }
+    })
 }
 
 function statusCellSuccess(nodeStatus) {
@@ -322,7 +353,6 @@ function implementationCell(data, resultId, fileId) {
     result.cell(nodeCell, 1).data(implemResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalConformance' + resultId + '" title="View implementation report"><span class="glyphicon glyphicon-eye-open implem-view" aria-hidden="true"></span></a><a href="#" class="implem-dld" data-target="#modalConformance' + resultId + '" title="Download implementation report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>');
 
     nodeImplem.find('.implem-view').on('click', function(e) {
-        name = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
         e.preventDefault();
         nodeModal = result.$('#' + resultId);
         if (!$('#modalConformance' + resultId).length) {
@@ -353,10 +383,10 @@ function implementationCell(data, resultId, fileId) {
             addSpinnerToModal('#modalConformance' + resultId);
 
             if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                data = webpage.on_fill_implementation_report(name, nodeModal.data('display'), nodeModal.data('verbosity'));
+                data = webpage.on_fill_implementation_report(fileId, nodeModal.data('display'), nodeModal.data('verbosity'));
                 displayReport('#modalConformance' + resultId, data);
             } else {
-                webpage.on_fill_implementation_report(name, nodeModal.data('display'), nodeModal.data('verbosity'), function (data) {
+                webpage.on_fill_implementation_report(fileId, nodeModal.data('display'), nodeModal.data('verbosity'), function (data) {
                     displayReport('#modalConformance' + resultId, data);
                 });
             }
@@ -365,13 +395,14 @@ function implementationCell(data, resultId, fileId) {
                 e.preventDefault();
                 modalDisplay = $('#modalConformanceDisplay' + resultId).val();
                 modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
-                webpage.on_save_implementation_report(name, modalDisplay, modalVerbosity);
+                webpage.on_save_implementation_report(fileId, modalDisplay, modalVerbosity);
             });
 
             // Update report when display is changed
             displayList = $('.tab-content .active .displayList').clone();
-            displayList.find('option').prop("selected", false);
             displayList.attr('id', 'modalConformanceDisplay' + resultId);
+            displayList.find('option').prop("selected", false);
+            displayList.find("option[value = '" + nodeModal.data('display') + "']").prop('selected', true);
             displayList.find("option[value = '" + nodeModal.data('display') + "']").attr('selected', 'selected');
             $('#modalConformanceDisplay' + resultId).replaceWith(displayList);
             $('#modalConformanceDisplay' + resultId).on('change', function(e) {
@@ -379,11 +410,13 @@ function implementationCell(data, resultId, fileId) {
                 modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
                 addSpinnerToModal('#modalConformance' + resultId);
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    data = webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity);
+                    data = webpage.on_fill_implementation_report(fileId, modalDisplay, modalVerbosity);
                     displayReport('#modalConformance' + resultId, data);
+                    $('#modalConformance' + resultId + ' .implem-dld').prop('disabled', false);
                 } else {
-                    webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity, function (data) {
+                    webpage.on_fill_implementation_report(fileId, modalDisplay, modalVerbosity, function (data) {
                         displayReport('#modalConformance' + resultId, data);
+                        $('#modalConformance' + resultId + ' .implem-dld').prop('disabled', false);
                     });
                 }
             });
@@ -399,10 +432,10 @@ function implementationCell(data, resultId, fileId) {
                 modalVerbosity = $('#modalConformanceVerbosity' + resultId).val();
                 addSpinnerToModal('#modalConformance' + resultId);
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    data = webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity);
+                    data = webpage.on_fill_implementation_report(fileId, modalDisplay, modalVerbosity);
                     displayReport('#modalConformance' + resultId, data);
                 } else {
-                    webpage.on_fill_implementation_report(name, modalDisplay, modalVerbosity, function (data) {
+                    webpage.on_fill_implementation_report(fileId, modalDisplay, modalVerbosity, function (data) {
                         displayReport('#modalConformance' + resultId, data);
                     });
                 }
@@ -417,9 +450,15 @@ function implementationCell(data, resultId, fileId) {
     nodeImplem.find('.implem-dld').on('click', function(e) {
         e.preventDefault();
         nodeDld = result.$('#' + resultId);
-        sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
-        webpage.on_save_implementation_report(sourceName, nodeDld.data('display'), nodeDld.data('verbosity'));
+        webpage.on_save_implementation_report(fileId, nodeDld.data('display'), nodeDld.data('verbosity'));
     });
+}
+
+function implementationCellError(fileId) {
+    nodeCell = result.$('#result-' + fileId);
+    nodeImplem = $(result.cell(nodeCell, 1).node());
+    nodeImplem.addClass('danger');
+    result.cell(nodeCell, 1).data('<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> Server Error')
 }
 
 function policyCell(data, resultId, fileId)
@@ -433,7 +472,7 @@ function policyCell(data, resultId, fileId)
     }
     else {
         nodePolicy.removeClass().addClass('danger');
-        policyResultText += '<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> ';
+        policyResultText += '<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span><span class="hidden">F</span>  ';
     }
 
     policyResultText += '<span title="' + nodeCell.data('policyName') + '">' + truncateString(nodeCell.data('policyName'), 20) + '</span>';
@@ -458,6 +497,13 @@ function policyCellEmptyWithoutModal(resultId)
     nodePolicy = $(result.cell('#' + resultId, 2).node());
     nodePolicy.removeClass().addClass('info');
     result.cell('#' + resultId, 2).data('N/A');
+}
+
+function policyCellError(fileId) {
+    nodeCell = result.$('#result-' + fileId);
+    nodePolicy = $(result.cell(nodeCell, 2).node());
+    nodePolicy.addClass('danger');
+    result.cell(nodeCell, 2).data('<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span><span class="hidden">F</span> Server Error')
 }
 
 function policyModal(resultId, fileId)
@@ -494,13 +540,14 @@ function policyModal(resultId, fileId)
 
             if (nodeModal.data('policy')) {
                 addSpinnerToModal('#modalPolicy' + resultId);
-                sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    data = webpage.on_fill_policy_report(sourceName, nodeModal.data('policy'), nodeModal.data('display'));
+                    data = webpage.on_fill_policy_report(fileId, nodeModal.data('policy'), nodeModal.data('display'));
                     displayReport('#modalPolicy' + resultId, data);
+                    $('#modalPolicy' + resultId + ' .policy-dld').prop('disabled', false);
                 } else {
-                    webpage.on_fill_policy_report(sourceName, nodeModal.data('policy'), nodeModal.data('display'), function (data) {
+                    webpage.on_fill_policy_report(fileId, nodeModal.data('policy'), nodeModal.data('display'), function (data) {
                         displayReport('#modalPolicy' + resultId, data);
+                        $('#modalPolicy' + resultId + ' .policy-dld').prop('disabled', false);
                     });
                 }
             }
@@ -511,15 +558,15 @@ function policyModal(resultId, fileId)
                 modalPolicy = $('#modalPolicyPolicy' + resultId).val();
                 if (modalPolicy)
                 {
-                    sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
-                    webpage.on_save_policy_report(sourceName, modalPolicy, modalDisplay);
+                    webpage.on_save_policy_report(fileId, modalPolicy, modalDisplay);
                 }
             });
 
             // Update report when display is changed
             displayList = $('.tab-content .active .displayList').clone();
-            displayList.find('option').prop("selected", false);
             displayList.attr('id', 'modalPolicyDisplay' + resultId);
+            displayList.find('option').prop("selected", false);
+            displayList.find("option[value = '" + nodeModal.data('display') + "']").prop('selected', true);
             displayList.find("option[value = '" + nodeModal.data('display') + "']").attr('selected', 'selected');
             $('#modalPolicyDisplay' + resultId).replaceWith(displayList);
             $('#modalPolicyDisplay' + resultId).on('change', function(e) {
@@ -527,13 +574,14 @@ function policyModal(resultId, fileId)
                 modalPolicy = $('#modalPolicyPolicy' + resultId).val();
                 if (modalPolicy) {
                     addSpinnerToModal('#modalPolicy' + resultId);
-                    sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                     if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                        data = webpage.on_fill_policy_report(sourceName, modalPolicy, modalDisplay);
+                        data = webpage.on_fill_policy_report(fileId, modalPolicy, modalDisplay);
                         displayReport('#modalPolicy' + resultId, data);
+                        $('#modalPolicy' + resultId + ' .policy-dld').prop('disabled', false);
                     } else {
-                        webpage.on_fill_policy_report(sourceName, modalPolicy, modalDisplay, function (data) {
+                        webpage.on_fill_policy_report(fileId, modalPolicy, modalDisplay, function (data) {
                             displayReport('#modalPolicy' + resultId, data);
+                            $('#modalPolicy' + resultId + ' .policy-dld').prop('disabled', false);
                         });
                     }
                 }
@@ -544,8 +592,9 @@ function policyModal(resultId, fileId)
 
             // Update report when policy is changed
             policyList = $('.tab-content .active .policyList').clone();
-            policyList.find('option').prop("selected", false);
             policyList.attr('id', 'modalPolicyPolicy' + resultId);
+            policyList.find('option').prop("selected", false);
+            policyList.find("option[value = '" + nodeModal.data('policy') + "']").prop('selected', true);
             policyList.find("option[value = '" + nodeModal.data('policy') + "']").attr('selected', 'selected');
             $('#modalPolicyPolicy' + resultId).replaceWith(policyList);
             $('#modalPolicyPolicy' + resultId).on('change', function(e) {
@@ -554,13 +603,14 @@ function policyModal(resultId, fileId)
                 if (modalPolicy)
                 {
                     addSpinnerToModal('#modalPolicy' + resultId);
-                    sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
                     if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                        data = webpage.on_fill_policy_report(sourceName, modalPolicy, modalDisplay);
+                        data = webpage.on_fill_policy_report(fileId, modalPolicy, modalDisplay);
                         displayReport('#modalPolicy' + resultId, data);
+                        $('#modalPolicy' + resultId + ' .policy-dld').prop('disabled', false);
                     } else {
-                        webpage.on_fill_policy_report(sourceName, modalPolicy, modalDisplay, function (data) {
+                        webpage.on_fill_policy_report(fileId, modalPolicy, modalDisplay, function (data) {
                             displayReport('#modalPolicy' + resultId, data);
+                            $('#modalPolicy' + resultId + ' .policy-dld').prop('disabled', false);
                         });
                     }
                 }
@@ -574,8 +624,7 @@ function policyModal(resultId, fileId)
     nodePolicy.find('.policy-dld').on('click', function(e) {
         e.preventDefault();
         nodeDld = result.$('#' + resultId);
-        sourceName = $(result.cell('#' + resultId, 0).node()).find('span').attr('title');
-        webpage.on_save_policy_report(sourceName, nodeDld.data('policy'), nodeDld.data('display'));
+        webpage.on_save_policy_report(fileId, nodeDld.data('policy'), nodeDld.data('display'));
     });
 }
 
@@ -598,20 +647,19 @@ function updatePolicyCell(fileId, policyId) {
 
     // Update cell if analysis of file is succeeded
     if ($(result.cell('#result-' + fileId, 5).node()).hasClass('success')) {
-        if (policyId.length && policyId >= 0) {
+        if (policyId.length && policyId != -1) {
             resetPolicyCell(fileId);
             addSpinnerToCell(result.cell('#result-' + fileId, 2));
             setTimeout(function () {
-                sourceName = $(result.cell('#result-' + fileId, 0).node()).find('span').attr('title');
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
-                    valid = webpage.policy_is_valid(sourceName);
+                    valid = webpage.policy_is_valid(fileId);
                     var policyData = {};
                     policyData["valid"] = valid;
                     resultId = 'result-' + fileId;
                     policyCell(policyData, resultId, fileId);
                 }
                 else {
-                    webpage.policy_is_valid(sourceName, function (valid) {
+                    webpage.policy_is_valid(fileId, function (valid) {
                         var policyData = {};
                         policyData["valid"] = valid;
                         resultId = 'result-' + fileId;
@@ -621,7 +669,7 @@ function updatePolicyCell(fileId, policyId) {
             }, 50);
         }
         else {
-            policyCellEmptyWithModal(resultId, fileId)
+            policyCellEmptyWithModal('result-' + fileId, fileId)
         }
     }
 }
@@ -671,16 +719,16 @@ function mediaInfoCell(resultId, fileId)
 
             $('#modalInfo' + resultId + ' .mi-dld').on('click', function(e) {
                 e.preventDefault();
-                webpage.on_save_mediainfo_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+                webpage.on_save_mediainfo_report(fileId);
             });
 
             $('#modalInfo' + resultId + ' .mi-create-report').on('click', function(e) {
                 e.preventDefault();
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    var data = webpage.on_create_policy_from_file($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+                    var data = webpage.on_create_policy_from_file(fileId);
                     mediaInfoCreatePolicy(JSON.parse(data), 'result-' + fileId, fileId);
                 } else {
-                    webpage.on_create_policy_from_file($(result.cell('#' + resultId, 0).node()).find('span').attr('title'), function(data) {
+                    webpage.on_create_policy_from_file(fileId, function(data) {
                         mediaInfoCreatePolicy(JSON.parse(data), 'result-' + fileId, fileId);
                     });
                 }
@@ -690,7 +738,7 @@ function mediaInfoCell(resultId, fileId)
 
     nodeMI.find('.mi-dld').on('click', function(e) {
         e.preventDefault();
-        webpage.on_save_mediainfo_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+        webpage.on_save_mediainfo_report(fileId);
     });
 };
 
@@ -710,10 +758,10 @@ function mediaInfoTree(resultId, fileId)
             'dblclick_toggle' : false,
             'data' : function (obj, callback) {
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    report = webpage.on_fill_mediainfo_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+                    report = webpage.on_fill_mediainfo_report(fileId);
                     callback.call(this, eval(report));
                 } else {
-                    webpage.on_fill_mediainfo_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'), function (report) {
+                    webpage.on_fill_mediainfo_report(fileId, function (report) {
                         callback.call(this, eval(report));
                     });
                 }
@@ -812,14 +860,14 @@ function mediaTraceCell(resultId, fileId)
 
             $('#modalTrace' + resultId + ' .mt-dld').on('click', function(e) {
                 e.preventDefault();
-                webpage.on_save_mediatrace_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+                webpage.on_save_mediatrace_report(fileId);
             });
         }
     });
 
     nodeMT.find('.mt-dld').on('click', function(e) {
         e.preventDefault();
-        webpage.on_save_mediatrace_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+        webpage.on_save_mediatrace_report(fileId);
     });
 };
 
@@ -839,10 +887,10 @@ function mediaTraceTree(resultId, fileId)
             'dblclick_toggle' : false,
             'data' : function (obj, callback) {
                 if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    report = webpage.on_fill_mediatrace_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'));
+                    report = webpage.on_fill_mediatrace_report(fileId);
                     callback.call(this, eval(report));
                 } else {
-                    webpage.on_fill_mediatrace_report($(result.cell('#' + resultId, 0).node()).find('span').attr('title'), function (report) {
+                    webpage.on_fill_mediatrace_report(fileId, function (report) {
                         callback.call(this, eval(report));
                     });
                 }
@@ -892,23 +940,21 @@ function applyPolicyToAll()
 {
     var policy = $('#applyAllPolicy').val();
     var policyText = $('#applyAllPolicy option:selected').text();
+
     result.$('tr').each(function () {
         var node = result.$('#' + $(this).prop('id'));
 
-        if (2 == node.data('tool') || undefined == node.data('tool')) {
-            if (node.data('policy') != policy) {
-                // Update policy
-                node.data('policy', policy);
-                node.data('policyName', policyText);
-                sourceName = $(result.cell('#' + $(this).prop('id'), 0).node()).find('span').attr('title');
-                if (WEBMACHINE === 'WEB_MACHINE_KIT') {
-                    fileId = webpage.change_policy_for_file(sourceName, policy, node.data('fileId'));
-                    updatePolicyCell(fileId, policy);
-                } else {
-                    webpage.change_policy_for_file(sourceName, policy, node.data('fileId'), function(fileId) {
-                        updatePolicyCell(fileId, policy);
-                    });
-                }
+        if (node.data('policy') != policy) {
+            // Update policy
+            node.data('policy', policy);
+            node.data('policyName', policyText);
+            if (WEBMACHINE === 'WEB_MACHINE_KIT') {
+                webpage.change_policy_for_file(node.data('fileId'), policy);
+                updatePolicyCell(node.data('fileId'), node.data('policy'));
+            } else {
+                webpage.change_policy_for_file(node.data('fileId'), policy, function() {
+                    updatePolicyCell(node.data('fileId'), node.data('policy'));
+                });
             }
         }
     });

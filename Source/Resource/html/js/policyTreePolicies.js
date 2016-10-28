@@ -18,6 +18,13 @@ var policyTreePolicies = (function() {
             $('#xslPolicyInfo_policyType').prop('disabled', true);
             $('#xslPolicyInfo_SavePolicyInfo').addClass('hidden');
             $('.policyEditActions.policyEditUser').addClass('hidden');
+            $('.policyEditActions.policyVisibility').addClass('hidden');
+            // if ($('#xslPolicyInfo_policyVisibility').length) {
+            //     $('#xslPolicyInfo_policyVisibility').prop('disabled', true);
+            // }
+            if ($('#xslPolicyInfo_policyLicense').length) {
+                $('#xslPolicyInfo_policyLicense').prop('disabled', true);
+            }
         }
         else {
             $('#policyDelete').removeClass('hidden');
@@ -27,10 +34,50 @@ var policyTreePolicies = (function() {
             $('#xslPolicyInfo_policyType').prop('disabled', false);
             $('#xslPolicyInfo_SavePolicyInfo').removeClass('hidden');
             $('.policyEditActions.policyEditUser').removeClass('hidden');
+            $('.policyEditActions.policyVisibility').addClass('hidden');
+            // if ($('#xslPolicyInfo_policyVisibility').length) {
+            //     $('#xslPolicyInfo_policyVisibility').prop('disabled', false);
+            // }
+            if ($('#xslPolicyInfo_policyLicense').length) {
+                $('#xslPolicyInfo_policyLicense').prop('disabled', false);
+            }
         }
 
         if ('s' == node.type) {
             $('#policyDelete').addClass('hidden');
+        }
+
+        // Top level
+        if ('u_p' == node.parent || 's_p' == node.parent) {
+            $('#xslPolicyInfo_policyTopLevel').val(1);
+
+            // License
+            $('#xslPolicyInfo_policyLicense').parent().removeClass('hidden');
+            if (undefined === node.data.license || !$('#xslPolicyInfo_policyLicense option[value="' + node.data.license + '"]').length) {
+                // Select Other license by default if field is empty (old policy)
+                $('#xslPolicyInfo_policyLicense option:last').prop('selected', true);
+            }
+            else {
+                $('#xslPolicyInfo_policyLicense option[value="' + node.data.license + '"]').prop('selected', true);
+            }
+
+            // Visibility
+            if ($('#xslPolicyInfo_policyVisibility').length) {
+                $('#xslPolicyInfo_policyVisibility').parent().addClass('hidden');
+                // $('#xslPolicyInfo_policyVisibility').parent().removeClass('hidden');
+                // $('#xslPolicyInfo_policyVisibility option[value="' + (true == node.data.isPublic ? 1 : 0) + '"]').prop('selected', true);
+            }
+        }
+        else {
+            $('#xslPolicyInfo_policyTopLevel').val(0);
+
+            // License
+            $('#xslPolicyInfo_policyLicense').parent().addClass('hidden');
+
+            // Visibility
+            if ($('#xslPolicyInfo_policyVisibility').length) {
+                $('#xslPolicyInfo_policyVisibility').parent().addClass('hidden');
+            }
         }
 
         $('.policyManage').addClass('hidden');

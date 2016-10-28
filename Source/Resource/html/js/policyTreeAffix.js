@@ -13,7 +13,7 @@ var policyTreeAffix = (function () {
         node.affix({
             offset: {
                 top: function () {
-                    return $('#collapse-1').outerHeight(true)
+                    return $('#mco-navbar').outerHeight(true)
                 },
                 bottom: function () {
                     return ($('footer').outerHeight(true))

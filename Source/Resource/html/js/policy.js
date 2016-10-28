@@ -17,6 +17,8 @@ function initPage() {
     formBindings();
     buttonBindings();
     setSelect2Plugin();
+    policyEditHelp();
+    policyRuleHelp();
 }
 
 function setSelect2Plugin() {
@@ -204,9 +206,100 @@ function buttonBindings() {
     $('.ruleMediaTrace').on('click', function () {
         policyTreeRulesMT.display(policyTree.getSelectedNode());
     });
+
+    // Reload page
+    $('.reload-page').on('click', function () {
+        location.reload();
+    });
 }
 
-$(document).ready(function() {
+var popoverHelp = (function() {
+    // Keep popover open while hover on the popover content
+    var popoverManualBinding = function(elem) {
+        elem.on('mouseenter', function () {
+            var _this = this;
+            $(this).popover('show');
+            $(this).siblings('.popover').on('mouseleave', function () {
+                $(_this).popover('hide');
+            });
+        }).on('mouseleave', function () {
+            var _this = this;
+            setTimeout(function () {
+                if (!$('.popover:hover').length) {
+                    $(_this).popover('hide');
+                }
+            }, 300);
+        });
+    };
+
+    // Add help sign and bind popover
+    var add = function(elem, content, title, elemClass) {
+        if (undefined === title) {
+            var title = 'Help';
+        }
+
+        if (undefined === elemClass) {
+            var elemClass = elem + 'Help';
+        }
+        else {
+            var elemClass = elemClass + 'Help';
+        }
+
+        $(elem).append('&nbsp;<span class="glyphicon glyphicon-info-sign ' + elemClass + '" aria-hidden="true"></span>');
+        var popHelp = $('.' + elemClass).popover({title: title, content: content, placement: 'auto top', trigger: 'manual', html: true});
+        popoverManualBinding(popHelp);
+    };
+
+    return {
+        add: add,
+    }
+})();
+
+function policyEditHelp() {
+    // Add help
+    var addHelp = function(elem, content, title) {
+        popoverHelp.add('label[for="xslPolicyInfo_' + elem + '"]', content, title, elem);
+    };
+
+    // Name
+    addHelp('policyName', 'Brief summary of policy purpose.', 'Policy name');
+
+    // Description
+    addHelp('policyDescription', 'Optional description of the intent of the created policy, or policy and nested rules.', 'Policy description');
+
+    // Type
+    addHelp('policyType', 'Clarifies how subsequent rules should exist in relation to each other: <ul><li>AND: Each rule works independently from other rules in policy. One failing rule causes the policy to fail.</li><li>OR: All rules set within the policy work in relation to each other and only one rule passing is necessary for the policy to pass.</li></ul>', 'Policy type');
+
+    // License
+    addHelp('policyLicense', '<ul><li>Creative Commons Zero (1.0 or later): I like public domain</li><li>Creative Commons Attribution (4.0 or later): I want it permissive</li><li>Creative Commons Attribution-ShareAlike (4.0 or later): I care about sharing improvements</li><li>Other: a license not in the predefined list</li><footer>More information about how to choose a license for your policies may be found on <a href="https://creativecommons.org/share-your-work/" target="_blank">Creative Commons website</a></footer>', 'Policy license');
+
+    // Visibility
+    addHelp('policyVisibility', 'Allow your policy to be public and visible on the public policies list:<ul><li>Private: your policy won\'t be visible to others.</li><li>Public : your policy will be visible by others.</li></ul>', 'Policy visibility')
+}
+
+function policyRuleHelp() {
+    // Add help
+    var addHelp = function(elem, content, title) {
+        popoverHelp.add('label[for="xslPolicyRule_' + elem + '"]', content, title, elem);
+    };
+
+    // Name
+    addHelp('title', 'Brief summary of rule purpose.', 'Rule name');
+
+    // trackType
+    addHelp('trackType', 'Specifies which section of the file the rule should  target.', 'Track type');
+
+    // Field
+    addHelp('field', 'Specifies the field (within the track) that the rule should target.', 'Field');
+
+    // Occurrence
+    addHelp('occurrence', 'Optional field to specify which track should be tested. Leaving this field blank will test all tracks.', 'Occurrence');
+
+    // Validator
+    addHelp('validator', 'Applies the appropriate operator to the rule.', 'Validator');
+}
+
+$(document).ready(function () {
     (function loop_init(time) {
         setTimeout(function() {
             if (webpage === undefined)

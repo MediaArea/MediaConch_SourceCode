@@ -4,6 +4,7 @@ html, body {
 
 body {
     font-family: OpenSans;
+    padding-top: 70px;
 }
 
 footer {
@@ -11,42 +12,69 @@ footer {
     border-bottom: 2px solid #3472A1;
 }
 
-.navbar {
-    margin-bottom: 0px;
-    border: 0px;
-    padding-right: 40px;
-}
-
 footer .navbar {
     padding-right: 0;
 }
 
-.navbar-collapse {
+.navbar {
+    border: 0px;
+}
+
+.navbar-default {
+    background-color: #fff;
+}
+
+.navbar-right {
+    margin-right: 0;
+}
+
+.navbar-default .navbar-collapse {
     border-top: 6px solid #3472A1;
     margin-bottom: 0px;
     border-bottom: 2px solid #3472A1;
 }
 
-.navbar a, .navbar-default a.navbar-brand {
+.navbar-default .navbar-nav > li > a, .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > .open > a,
+    .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover, .navbar-default a.navbar-brand, .navbar a {
     color: black;
 }
 
-.navbar li {
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+.navbar-default .navbar li {
+    border-left: 1px solid #3472A1;
+    border-right: 1px solid #3472A1;
     padding: 5px;
     color: black;
     padding-top: 6px;
     padding-bottom: 6px;
 }
 
-.navbar ul.dropdown-menu li {
+.navbar-collapse.collapse.in .navbar li {
+    border: none;
+}
+
+.navbar-default .navbar ul.dropdown-menu li {
     border-left: none;
     border-right: none;
 }
 
+.navbar > .container .navbar-brand {
+    padding: 0;
+    margin-left: 20px;
+    margin-top: 5px;
+}
+
+@media (min-width: 768px) {
+    .navbar > .container .navbar-brand {
+        margin-top: 15px;
+    }
+}
+
 .navbar-brand img {
     display: inline;
+}
+
+footer .navbar {
+    margin-bottom: 0;
 }
 
 .serif {
@@ -74,13 +102,18 @@ footer .navbar {
 }
 
 .content {
-    padding-top: 40px;
+    padding-top: 25px;
     background-color: #F2F5F8;
-    padding-bottom: 80px;
+    padding-bottom: 30px;
 }
 
 .content .col-lg-offset-1 {
     margin-left: 4.16666667%;
+}
+
+.main {
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .panel {
@@ -134,7 +167,8 @@ footer .navbar {
     text-align: left;
 }
 
-#file label.col-sm-2, #url label.col-sm-2, #repository label.col-sm-2 {
+#file label.col-sm-2, #url label.col-sm-2, #repository label.col-sm-2,
+    #file label.col-sm-3, #url label.col-sm-3, #repository label.col-sm-3 {
     padding-right: 0;
     padding-left: 0;
 }
@@ -225,8 +259,12 @@ p.registration {
     padding-bottom: 50px;
 }
 
+.policyEditRule .btn-group > .btn:first-child {
+    margin-left: 15px;
+}
+
 .spinner-cell, .spinner-status {
-    background: transparent url("/static/ajax-spinner-small.gif");
+    background: transparent url("qrc:/ajax-spinner-small.gif");
     width: 16px;
     height: 14px;
     display: block;
@@ -238,7 +276,7 @@ p.registration {
 }
 
 .spinner-modal {
-    background: transparent url("/static/ajax-spinner-big.gif");
+    background: transparent url("qrc:/ajax-spinner-big.gif");
     width: 66px;
     height: 66px;
     display: block;
@@ -247,12 +285,71 @@ p.registration {
 
 .alert-modal-create-policy {
     display: inline-block;
-    margin-top: inherit;
+    margin-top: 0;
     margin-bottom: inherit;
     font-size: 16px;
     padding: 6px 12px;
+    line-height: 1.42857143;
 }
 
 .alert-modal-create-policy a {
     text-decoration: underline;
+}
+
+.policiesList .col-xs-12 {
+    margin-bottom: 20px;
+}
+
+.policiesList .col-xs-12 .policyBox {
+    border: 1px solid #ddd;
+    padding: 15px 30px;
+    font-size: 14px;
+    line-height: 1.1;
+    border-radius: 4px;
+    display: block;
+}
+
+.policyBox h4 {
+    margin-top: 0;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.policyBox h4 a:hover {
+    text-decoration: none;
+}
+
+.policyBox .policyDescription {
+    color: #808080;
+    display: block;
+    text-align: justify;
+}
+
+.policyBox .policyInfos {
+    color: #808080;
+    margin-top: 10px;
+}
+
+.policyBox .policyAuthor, .policyBox .policyLicense {
+    display: block;
+}
+
+.policyBox .policyActions {
+    margin-top: 20px;
+}
+
+#policyTree .popover-content ul, .policyEdit .popover-content ul {
+    padding-left: 14px;
+    list-style-type: initial;
+}
+
+.popover-content footer {
+    border-top: 1px solid #ccc;
+    border-bottom: none;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.popover-content {
+    word-wrap: break-word;
 }

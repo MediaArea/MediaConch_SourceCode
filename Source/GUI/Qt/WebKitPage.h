@@ -18,6 +18,8 @@ class WebPage : public WebCommonPage
 
 public:
     explicit WebPage(MainWindow *m, QWidget *parent = 0);
+    virtual ~WebPage();
+
     virtual void use_javascript(const QString& js);
 
 protected:

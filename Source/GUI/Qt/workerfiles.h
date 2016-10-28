@@ -40,10 +40,12 @@ public:
     void add_file_to_list(const std::string& file, const std::string& path, int policy, int display, int verbosity);
     void clear_files();
     FileRegistered* get_file_registered_from_file(const std::string& file);
+    FileRegistered* get_file_registered_from_id(long id);
     void remove_file_registered_from_file(const std::string& file);
     void get_registered_files(std::map<std::string, FileRegistered>& files);
     long get_id_from_registered_file(const std::string& file);
-    void update_policy_of_file_registered_from_file(const std::string& file, int policy);
+    std::string get_filename_from_registered_file_id(long file_id);
+    void update_policy_of_file_registered_from_file(long file_id, int policy);
 
 private:
     void add_registered_file_to_db(const FileRegistered* file);

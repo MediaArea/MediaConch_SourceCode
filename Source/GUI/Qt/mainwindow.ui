@@ -71,6 +71,7 @@
     </property>
     <addaction name="actionChecker"/>
     <addaction name="actionPolicies"/>
+    <addaction name="actionPublicPolicies"/>
     <addaction name="actionDisplay"/>
     <addaction name="actionSettings"/>
    </widget>
@@ -108,7 +109,7 @@
   </action>
   <action name="actionSavePolicies">
    <property name="text">
-    <string>Save policies to Schematron file</string>
+    <string>Save policies to file</string>
    </property>
   </action>
   <action name="actionChecker">
@@ -128,6 +129,14 @@
    </property>
    <property name="text">
     <string>&amp;Policies</string>
+   </property>
+  </action>
+  <action name="actionPublicPolicies">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>P&amp;ublic Policies</string>
    </property>
   </action>
   <action name="actionDisplay">

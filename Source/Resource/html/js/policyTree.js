@@ -2,6 +2,15 @@ var policyTree = (function() {
     var instance;
 
     var init = function() {
+        // Disable F2 shortcut (rename) in jstree, needs to be done before jstree initialization
+        $('#policiesTree').on('keydown.jstree', '.jstree-anchor', function(event) {
+            if (113 == event.keyCode) {
+                event.stopImmediatePropagation();
+
+                return false;
+            }
+        });
+
         $('#policiesTree').jstree({
             core: {
                 check_callback: function (operation, node, parent, position, more) {
@@ -450,6 +459,9 @@ var policyTree = (function() {
     }
 
     var policyCreate = function(policy, selectedPolicy) {
+        // Force CC-BY-SA-4.0+ license by default
+        policy.data.license = 'CC-BY-SA-4.0+';
+
         if ('s_p' == selectedPolicy.id) {
             var policyNodeId = instance.create_node('u_p', policy);
         }
@@ -464,7 +476,11 @@ var policyTree = (function() {
     var policyEdit = function(policy, selectedPolicy) {
         instance.rename_node(selectedPolicy, policy.text);
         selectedPolicy.data.description = policy.data.description;
+        selectedPolicy.data.license = policy.data.license;
         selectedPolicy.data.type = policy.data.type;
+        if (undefined !== policy.data.isPublic) {
+            selectedPolicy.data.isPublic = policy.data.isPublic;
+        }
         mcoMessage.success('Policy info changed successfuly');
     }
 

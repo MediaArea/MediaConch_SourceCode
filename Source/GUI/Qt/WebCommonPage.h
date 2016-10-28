@@ -70,16 +70,16 @@ public Q_SLOTS:
     void         menu_link_checker(const QString& name);
     void         on_input_changed(const QString& inputName);
 
-    void         on_download_report(const QString& report, const QString& file, const QString& report_name);
-    QString      on_fill_implementation_report(const QString& name, const QString& display, const QString& verbosity);
-    void         on_save_implementation_report(const QString& file, const QString& display = "-1", const QString& verbosity="");
-    QString      on_fill_policy_report(const QString& file, const QString& policy, const QString& display);
-    void         on_save_policy_report(const QString& file, const QString& policy = "-1", const QString& display = "-1");
-    QString      on_fill_mediainfo_report(const QString& file);
-    void         on_save_mediainfo_report(const QString& file);
-    QString      on_fill_mediatrace_report(const QString& file);
-    void         on_save_mediatrace_report(const QString& file);
-    QString      on_create_policy_from_file(const QString& file);
+    void         on_download_report(const QString& report, long file_id, const QString& report_name);
+    QString      on_fill_implementation_report(long file_id, const QString& display, const QString& verbosity);
+    void         on_save_implementation_report(long file_id, const QString& display = "-1", const QString& verbosity="");
+    QString      on_fill_policy_report(long file_id, const QString& policy, const QString& display);
+    void         on_save_policy_report(long file_id, const QString& policy = "-1", const QString& display = "-1");
+    QString      on_fill_mediainfo_report(long file_id);
+    void         on_save_mediainfo_report(long file_id);
+    QString      on_fill_mediatrace_report(long file_id);
+    void         on_save_mediatrace_report(long file_id);
+    QString      on_create_policy_from_file(long file_id);
 
     void         close_all();
     void         close_element(const QString& file);
@@ -91,10 +91,11 @@ public Q_SLOTS:
     QString      get_file_policy_id(const QString& file);
     QString      get_file_display_id(const QString& file);
     QString      get_file_verbosity_id(const QString& file);
-    bool         policy_is_valid(const QString& file);
-    bool         implementation_is_valid(const QString& file);
-    QString      file_is_analyzed(const QString& file);
-    QString      change_policy_for_file(const QString& file, const QString& policy, const QString& fileId);
+    QString      policy_is_valid(long file_id);
+    QString      implementation_is_valid(long file_id);
+    QString      implementation_and_policy_is_valid(long file_id);
+    QString      file_is_analyzed(const QStringList& ids);
+    void         change_policy_for_file(long file_id, const QString& policy);
 
 
     QString      display_add_file(const QString& name);
@@ -106,12 +107,15 @@ public Q_SLOTS:
     QString      import_policy();
     QString      import_policy(const QString& file);
     int          import_policy(const QStringList& files);
+    QString      policy_import_data(const QString& data);
     QString      xslt_policy_create(int parent_id);
     QString      policy_duplicate(int id, int dst_policy_id);
     QString      policy_move(int id, int dst_policy_id);
     QString      policy_export(int id);
+    QString      policy_export_data(const QString& report);
     QString      policy_remove(int id);
-    QString      policy_edit(int id, const QString& name, const QString& description, const QString& type);
+    QString      policy_edit(int id, const QString& name, const QString& description, const QString& license,
+                             const QString& type, const QString& visibility);
     QString      xslt_policy_rule_create(int policy_id);
     QString      xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope);
     QString      xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id);

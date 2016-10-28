@@ -82,7 +82,15 @@ var policyTreeAjax = (function() {
         if (type === null)
             type = "";
 
-        webpage.policy_edit(policyNode.data.policyId, name, description, type, function(res){
+        var license = $("#xslPolicyInfo_policyLicense").val();
+        if (license === null || license === "Other")
+            license = "";
+
+        var visibility = $("#xslPolicyInfo_policyVisibility").val();
+        if (visibility === null)
+            visibility = "";
+
+        webpage.policy_edit(policyNode.data.policyId, name, description, license, type, visibility, function(res){
             data = JSON.parse(res);
             if (!data.error)
                 policyTree.policyEdit(data.policyTree, policyNode);

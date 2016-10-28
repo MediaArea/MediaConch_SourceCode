@@ -74,7 +74,7 @@ void ResultTable::add_file_to_result_table(const std::string& full_path)
     script += "', '";
     script += info.fileName();
     script += "', '";
-    script += QString().number(file->index);
+    script += QString().number(file->file_id);
     script += "', '";
     script += formValues;
     script += "');";
