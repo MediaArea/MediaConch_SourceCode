@@ -7,6 +7,16 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 16.10, 2016-10-31
+-------------
+Update implementation tests, policies and displays
+Public policies page
+Handle latest versions of VeraPDF and DPF Manager
+FFmpeg plugin
+Watch folder plugin
+Fixer (see https://mediaarea.net/MediaConch/fixity.html )
+Several minor fixes
+
 Version 16.09, 2016-09-30
 -------------
 New policy format to allow complex policies
