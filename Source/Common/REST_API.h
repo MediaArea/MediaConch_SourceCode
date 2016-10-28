@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 #include "Container.h"
 #include "MediaConchLib.h"
 //---------------------------------------------------------------------------
@@ -246,6 +247,7 @@ public:
         int                      user;
         int                      id;
         std::vector<std::string> plugins;
+        std::vector<std::pair<std::string,std::string> > options;
         bool                     has_force_analyze;
         bool                     force_analyze;
     };

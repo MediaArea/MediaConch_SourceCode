@@ -111,7 +111,8 @@ Queue::~Queue()
 }
 
 int Queue::add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
-                       const std::vector<std::string>& options, const std::vector<std::string>& plugins)
+                       const std::vector<std::pair<std::string,std::string> >& options,
+                       const std::vector<std::string>& plugins)
 {
     QueueElement *el = new QueueElement(scheduler);
 
@@ -122,22 +123,16 @@ int Queue::add_element(QueuePriority priority, int id, int user, const std::stri
 
     for (size_t i = 0; i < options.size(); ++i)
     {
-        std::string option = options[i];
-        transform(option.begin(), option.end(), option.begin(), (int(*)(int))tolower);
-        size_t pos = option.find("=");
-        std::string key;
-        std::string value("1");
+        std::string key_option = options[i].first;
+        std::string value_option = options[i].second;
 
-        if (pos == std::string::npos && option.size() >= 2)
-            key.assign(option, 2, pos);
-        else if (pos == std::string::npos)
+        if (!key_option.size())
             continue;
-        else
-        {
-            key.assign(option, 2, pos - 2);
-            value.assign(options[i], pos + 1, std::string::npos);
-        }
-        el->options[key] = value;
+
+        transform(key_option.begin(), key_option.end(), key_option.begin(), (int(*)(int))tolower);
+        transform(value_option.begin(), value_option.end(), value_option.begin(), (int(*)(int))tolower);
+
+        el->options[key_option] = value_option;
     }
 
     for (size_t i = 0; i < plugins.size(); ++i)

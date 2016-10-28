@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include <string>
 #include <vector>
+#include <utility>
 #include "MediaInfo/MediaInfo.h"
 #include "Common/MediaConchLib.h"
 
@@ -36,7 +37,7 @@ namespace MediaConch
         int  set_format(const std::string& f);
         int  add_policy(const std::string& filename);
         void set_display_file(const std::string& file);
-        int  register_option(const std::string& opt);
+        int  register_option(const std::string& opt, std::string& value);
         void set_use_daemon(bool use) { use_daemon = use; }
         void set_configuration_file(const std::string& file);
         void set_plugins_configuration_file(const std::string& file);
@@ -78,6 +79,7 @@ namespace MediaConch
         std::vector<std::string> files;
         std::vector<std::string> policies;
         std::vector<std::string> plugins;
+        std::vector<std::pair<std::string,std::string> > options;
         std::string              error;
         std::string              display_file;
         std::string              configuration_file;

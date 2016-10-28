@@ -253,7 +253,7 @@ public:
     void reset_daemon_client();
 
     //Options
-    int add_option(const std::string& option, std::string& report);
+    int test_mil_option(const std::string& key, std::string& value, std::string& report);
 
     // MediaConch
     int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);
@@ -268,8 +268,10 @@ public:
     // Analyze
     int  checker_analyze(int user, const std::vector<std::string>& files,
                          const std::vector<std::string>& plugins,
+                         const std::vector<std::pair<std::string,std::string> >& options,
                          std::vector<long>& files_id, bool force_analyze = false);
     int  checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                         const std::vector<std::pair<std::string,std::string> >& options,
                          bool& registered, long& file_id, bool force_analyze = false);
 
     // Status
@@ -379,7 +381,6 @@ public:
 private:
     MediaConchLib (const MediaConchLib&);
 
-    std::vector<std::string>  Options;
     bool                      use_daemon;
     bool                      force_no_daemon;
     Core                     *core;

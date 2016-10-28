@@ -1040,10 +1040,17 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::analyze(const std::vector<std::string>& files, std::vector<long>& files_id)
+int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, std::vector<long>& files_id)
 {
     std::vector<std::string> plugins;
-    return MCL.checker_analyze(-1, files, plugins, files_id);
+    std::vector<std::pair<std::string, std::string> > options;
+    if (with_fixer)
+    {
+        //TODO: add MIL option for the fixer
+        // options.push_back(std::make_pair("", ""));
+    }
+
+    return MCL.checker_analyze(-1, files, plugins, options, files_id);
 }
 
 //---------------------------------------------------------------------------

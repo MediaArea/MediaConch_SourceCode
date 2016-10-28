@@ -60,7 +60,7 @@ namespace MediaConch {
 
     //---------------------------------------------------------------------------
     int Scheduler::add_element_to_queue(int user, const std::string& filename, long file_id,
-                                        const std::vector<std::string>& options,
+                                        const std::vector<std::pair<std::string,std::string> >& options,
                                         const std::vector<std::string>& plugins)
     {
         static int index = 0;
@@ -263,15 +263,10 @@ namespace MediaConch {
                 std::string generated_error_log = ((PluginPreHook*)plugins[i])->get_report_err();
                 new_file = ((PluginPreHook*)plugins[i])->get_output_file();
 
-                std::vector<std::string> options;
+                std::vector<std::pair<std::string,std::string> > options;
                 std::map<std::string, std::string>::iterator it = el->options.begin();
                 for (; it != el->options.end(); ++it)
-                {
-                    if (it->second.length())
-                        options.push_back(it->first + "=" + it->second);
-                    else
-                        options.push_back(it->first);
-                }
+                    options.push_back(std::make_pair(it->first, it->second));
 
                 std::vector<std::string> plugins;
                 long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log, generated_error_log, options, plugins);

@@ -211,7 +211,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
 
     int ret;
     std::vector<long> files_id;
-    if ((ret = mainwindow->analyze(vec, files_id)) < 0 || files_id.size() != 1)
+    if ((ret = mainwindow->analyze(vec, false, files_id)) < 0 || files_id.size() != 1)
         mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
 
     fr->file_id = files_id[0];
@@ -624,7 +624,7 @@ void WorkerFiles::fill_registered_files_from_db()
 
         int ret;
         std::vector<long> files_id;
-        if ((ret = mainwindow->analyze(tmp, files_id)) < 0 && files_id.size() != 1)
+        if ((ret = mainwindow->analyze(tmp, false, files_id)) < 0 && files_id.size() != 1)
             mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
         else
             fr->file_id = files_id[0];

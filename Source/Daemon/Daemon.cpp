@@ -584,8 +584,22 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int Daemon::parse_other(const std::string& argument)
     {
+        if (argument.size() < 2)
+            return DAEMON_RETURN_NONE;
+
+        std::string key;
+        std::string value;
+        size_t egal_pos = argument.find('=');
+        if (egal_pos != std::string::npos)
+        {
+            key.assign(argument, 2 , egal_pos - 2);
+            value.assign(argument, egal_pos + 1, std::string::npos);
+        }
+        else
+            key.assign(argument, 2, std::string::npos);
+
         std::string report;
-        if (MCL->add_option(argument, report) < 0)
+        if (MCL->test_mil_option(key, value, report) < 0)
         {
             ZenLib::Ztring str;
             str.From_UTF8(report);
@@ -594,6 +608,8 @@ namespace MediaConch
                 return DAEMON_RETURN_ERROR;
             return DAEMON_RETURN_FINISH;
         }
+
+        options.push_back(std::make_pair(key, value));
         return DAEMON_RETURN_NONE;
     }
 
@@ -774,9 +790,14 @@ namespace MediaConch
             std::vector<std::string> plugins;
             for (size_t j = 0; j < req->args[i].plugins.size(); ++j)
                 plugins.push_back(req->args[i].plugins[j]);
+
+            std::vector<std::pair<std::string, std::string> > options;
+            for (size_t j = 0; j < req->args[i].options.size(); ++j)
+                options.push_back(std::make_pair(req->args[i].options[j].first, req->args[i].options[j].second));
+
             bool registered = false;
             long out_id = -1;
-            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, registered, out_id, force);
+            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, options, registered, out_id, force);
             if (ret < 0)
             {
                 RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;
@@ -1014,7 +1035,7 @@ namespace MediaConch
             bool registered = false;
             long new_id = -1;
             std::vector<std::string> plugins;
-            int ret = d->MCL->checker_analyze(req->user, filename, plugins, registered, new_id);
+            int ret = d->MCL->checker_analyze(req->user, filename, plugins, d->options, registered, new_id);
             if (ret < 0)
             {
                 RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
