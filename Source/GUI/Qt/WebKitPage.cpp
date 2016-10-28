@@ -30,12 +30,23 @@ namespace MediaConch
         connect(this, SIGNAL(loadFinished(bool)), this, SLOT(on_load_finished(bool)));
     }
 
+    WebPage::~WebPage()
+    {
+        disconnect(this, SLOT(on_load_finished(bool)));
+        QWebFrame* frame = mainFrame();
+        if (frame)
+            disconnect(frame, SLOT(loadFinished(bool)));
+        triggerAction(QWebPage::Stop);
+    }
+
     void WebPage::on_load_finished(bool ok)
     {
         if (!ok)
             return;
 
-        mainFrame()->addToJavaScriptWindowObject("webpage", this);
+        QWebFrame* frame = mainFrame();
+        if (frame)
+            frame->addToJavaScriptWindowObject("webpage", this);
     }
 
     bool WebPage::acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request,

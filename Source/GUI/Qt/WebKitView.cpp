@@ -26,6 +26,9 @@ namespace MediaConch
     WebView::~WebView()
     {
         stop();
+        QWebPage* wpage = page();
+        if (wpage)
+            delete wpage;
     }
 
     void WebView::dragEnterEvent(QDragEnterEvent *event)

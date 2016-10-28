@@ -137,16 +137,25 @@ var policyListSpinner = (function() {
     };
 })();
 
+var timer_for_ready = null;
 $(document).ready(function () {
     (function loop_init(time) {
-        setTimeout(function() {
+        timer_for_ready = setTimeout(function() {
             if (webpage === undefined)
                 loop_init(100);
             else
             {
+                timer_for_ready = null;
                 initPage();
                 publicPoliciesListAjax.getList();
             }
         }, time);
     })(0);
+});
+
+
+$(window).unload(function() {
+    if (timer_for_ready)
+        clearTimeout(timer_for_ready);
+    publicPoliciesListAjax.leave();
 });
