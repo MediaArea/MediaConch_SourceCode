@@ -1748,7 +1748,7 @@ bool Core::get_implementation_report(int user, const std::vector<long>& files,
     std::string r;
     bool valid = validate_xslt_from_memory(user, files, options, memory, r, true);
     if (valid)
-        valid = policy_is_valid(r);
+        valid = implementation_is_valid(r);
     report += r;
     return valid;
 }
@@ -2102,13 +2102,30 @@ bool Core::has_outcome_fail(const std::string& report)
 //---------------------------------------------------------------------------
 bool Core::implementation_is_valid(const std::string& report)
 {
-    return has_outcome_fail(report);
+    size_t pos = report.find("<implementationChecks ");
+    if (pos == std::string::npos)
+        return true;
+
+    size_t end = report.find(">", pos);
+    if (end == std::string::npos)
+        return true;
+
+    std::string search("fail_count=\"");
+    size_t f = report.find(search, pos);
+
+    if (f > end || f + search.size() + 2 > report.size())
+        return true;
+
+    if (report[f + search.size()] != '0')
+        return false;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
 bool Core::policy_is_valid(const std::string& report)
 {
-    size_t pos = report.find("outcome=\"");
+    size_t pos = report.find("fail_count=\"");
     if (pos == std::string::npos)
         return true;
 
