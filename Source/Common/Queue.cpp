@@ -126,10 +126,12 @@ int Queue::add_element(QueuePriority priority, int id, int user, const std::stri
         transform(option.begin(), option.end(), option.begin(), (int(*)(int))tolower);
         size_t pos = option.find("=");
         std::string key;
-        std::string value;
+        std::string value("1");
 
-        if (pos == std::string::npos)
-            key = option;
+        if (pos == std::string::npos && option.size() >= 2)
+            key.assign(option, 2, pos);
+        else if (pos == std::string::npos)
+            continue;
         else
         {
             key.assign(option, 2, pos - 2);
