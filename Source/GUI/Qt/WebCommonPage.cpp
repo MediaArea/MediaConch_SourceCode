@@ -170,7 +170,7 @@ namespace MediaConch {
     }
 
     void WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
-                                          const QString& verbosity)
+                                                const QString& verbosity, bool fixer)
     {
         QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
@@ -180,7 +180,7 @@ namespace MediaConch {
         for (int i = 0; i < files.size(); ++i)
         {
             QFileInfo f = QFileInfo(files[i]);
-            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display, verbosity);
+            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display, verbosity, fixer);
         }
         file_selector.clear();
         clean_forms();
@@ -188,19 +188,19 @@ namespace MediaConch {
     }
 
     void WebCommonPage::on_file_online_selected(const QString& url, const QString& policy,
-                                          const QString& display, const QString& verbosity)
+                                          const QString& display, const QString& verbosity, bool fixer)
     {
         if (!url.length())
             return;
 
-        mainwindow->add_file_to_list(url, "", policy, display, verbosity);
+        mainwindow->add_file_to_list(url, "", policy, display, verbosity, fixer);
         file_selector.clear();
         clean_forms();
         use_javascript(QString("startWaitingLoop()"));
     }
 
     void WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
-                                              const QString& verbosity)
+                                                    const QString& verbosity, bool fixer)
     {
         QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
         if (dirname.empty())
@@ -213,7 +213,7 @@ namespace MediaConch {
             return;
 
         for (int i = 0; i < list.size(); ++i)
-            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display, verbosity);
+            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display, verbosity, fixer);
         file_selector.clear();
         clean_forms();
         use_javascript(QString("startWaitingLoop()"));
@@ -495,7 +495,8 @@ namespace MediaConch {
 
         on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
                                 QString().setNum(mainwindow->select_correct_display()),
-                                QString().setNum(mainwindow->select_correct_verbosity()));
+                                QString().setNum(mainwindow->select_correct_verbosity()),
+                                false);
     }
 
     //---------------------------------------------------------------------------

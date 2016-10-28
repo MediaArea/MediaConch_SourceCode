@@ -135,7 +135,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id = -1;
-            int ret = MCL.checker_analyze(use_as_user, files[i], plugins, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(use_as_user, files[i], plugins, options, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
 
@@ -175,7 +175,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id;
-            int ret = MCL.checker_analyze(use_as_user, policy_reference_file, plugins, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(use_as_user, policy_reference_file, plugins, this->options, registered, file_id, force_analyze);
             if (ret < 0)
                 return ret;
             if ((ret = run_policy_reference_file(file_id)) != MediaConchLib::errorHttp_TRUE)
@@ -525,10 +525,11 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int CLI::register_option(const std::string& opt)
+    int CLI::register_option(const std::string& key, std::string& value)
     {
         std::string report;
-        if (MCL.add_option(opt, report) < 0)
+
+        if (MCL.test_mil_option(key, value, report) < 0)
         {
             ZenLib::Ztring str;
             str.From_UTF8(report);
@@ -537,6 +538,8 @@ namespace MediaConch
                 return CLI_RETURN_ERROR;
             return CLI_RETURN_FINISH;
         }
+
+        options.push_back(std::make_pair(key, value));
         return CLI_RETURN_NONE;
     }
 

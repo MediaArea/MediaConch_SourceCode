@@ -59,7 +59,8 @@ public:
     void Run();
 
     // Functions
-    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display, const QString& verbosity);
+    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display,
+                          const QString& verbosity, bool fixer);
     void remove_file_to_list(const QString& file);
     void update_policy_of_file_in_list(long file_id, const QString& policy);
     void clear_file_list();
@@ -77,7 +78,7 @@ public:
     void                        remove_widget_from_layout(QWidget* w);
     int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
-    int                         analyze(const std::vector<std::string>& files, std::vector<long>& files_id);
+    int                         analyze(const std::vector<std::string>& files, bool with_fixer, std::vector<long>& files_id);
     int                         is_analyze_finished(const std::vector<std::string>& files, std::vector<MediaConchLib::Checker_StatusRes>& res);
     int                         is_analyze_finished(const std::string& file, MediaConchLib::Checker_StatusRes& res);
     int                         validate(MediaConchLib::report report, const std::vector<std::string>& files,

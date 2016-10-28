@@ -147,7 +147,7 @@ void WatchFolder::Entry()
             if (wffile->state == WatchFolderFile::WFFS_ANALYZING)
                 continue;
 
-            std::vector<std::string> options;
+            std::vector<std::pair<std::string, std::string> > options;
             bool registered = false;
             wffile->file_id = core->checker_analyze(user, filename, registered, options, plugins, false);
             if (wffile->file_id == -1)

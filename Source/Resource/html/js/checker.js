@@ -25,7 +25,8 @@ $(document).ready(function() {
         e.preventDefault();
         webpage.on_file_upload_selected($('.tab-content .active .policyList').val(),
                                         $('.tab-content .active .displayList').val(),
-                                        $('.tab-content .active .verbosityList').val());
+                                        $('.tab-content .active .verbosityList').val(),
+                                        $('#checkerUpload_fixer').is(':checked'));
     });
 
     // Online form
@@ -34,7 +35,8 @@ $(document).ready(function() {
         webpage.on_file_online_selected($('#checkerOnline_file').val(),
                                         $('.tab-content .active .policyList').val(),
                                         $('.tab-content .active .displayList').val(),
-                                        $('.tab-content .active .verbosityList').val());
+                                        $('.tab-content .active .verbosityList').val(),
+                                        false);
     });
 
     // Repository form
@@ -42,7 +44,8 @@ $(document).ready(function() {
         e.preventDefault();
         webpage.on_file_repository_selected($('.tab-content .active .policyList').val(),
                                             $('.tab-content .active .displayList').val(),
-                                            $('.tab-content .active .verbosityList').val());
+                                            $('.tab-content .active .verbosityList').val(),
+                                            $('#checkerRepository_fixer').is(':checked'));
     });
 
     // Remove all results blocks
@@ -73,6 +76,45 @@ $(document).ready(function() {
         applyPolicyToAll();
         resetSelectList('applyAllPolicy');
     });
+
+    // Keep popover open while hover on the popover content
+    var popoverManualBinding = function(elem) {
+        elem.on('mouseenter', function () {
+            var _this = this;
+            $(this).popover('show');
+            $(this).siblings('.popover').on('mouseleave', function () {
+                $(_this).popover('hide');
+            });
+        }).on('mouseleave', function () {
+            var _this = this;
+            setTimeout(function () {
+                if (!$('.popover:hover').length) {
+                    $(_this).popover('hide');
+                }
+            }, 300);
+        });
+    };
+
+    // Add help sign and bind popover
+    var addHelp = function(elem, content, title, elemClass) {
+        if (undefined === title) {
+            var title = 'Help';
+        }
+
+        if (undefined === elemClass) {
+            var elemClass = elem + 'Help';
+        }
+        else {
+            var elemClass = elemClass + 'Help';
+        }
+
+        $(elem).append('&nbsp;<span class="glyphicon glyphicon-info-sign ' + elemClass + '" aria-hidden="true"></span>');
+        var popHelp = $('.' + elemClass).popover({title: title, content: content, placement: 'auto top', trigger: 'manual', html: true});
+        popoverManualBinding(popHelp);
+    };
+
+    // help
+    addHelp('.checkerFixer label', 'Try to fix buggy files, technology preview, see <a href="https://mediaarea.net/MediaConch/fixity.html" target="_blank">the fixity webpage</a> for how to test it.', 'Fixer', 'checkerFixerHelp');
 });
 
 function getDataFromForm(form) {
@@ -744,6 +786,15 @@ function mediaInfoCell(resultId, fileId)
 
 function mediaInfoTree(resultId, fileId)
 {
+    // Disable F2 shortcut (rename) in jstree, needs to be done before jstree initialization
+    $('#info' + resultId).on('keydown.jstree', '.jstree-anchor', function(event) {
+        if (113 == event.keyCode) {
+            event.stopImmediatePropagation();
+
+            return false;
+        }
+    });
+
     $('#info' + resultId).jstree({
         'core' : {
             'check_callback' : function (operation, node, parent, position, more) {
@@ -873,6 +924,15 @@ function mediaTraceCell(resultId, fileId)
 
 function mediaTraceTree(resultId, fileId)
 {
+    // Disable F2 shortcut (rename) in jstree, needs to be done before jstree initialization
+    $('#trace' + resultId).on('keydown.jstree', '.jstree-anchor', function(event) {
+        if (113 == event.keyCode) {
+            event.stopImmediatePropagation();
+
+            return false;
+        }
+    });
+
     $('#trace' + resultId).jstree({
         'core' : {
             'check_callback' : function (operation, node, parent, position, more) {

@@ -145,7 +145,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
 
 //---------------------------------------------------------------------------
 void WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
-                                   int policy, int display, int verbosity)
+                                   int policy, int display, int verbosity, bool fixer)
 {
     std::string full_file(path);
     if (path.length())
@@ -159,7 +159,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     {
         exists = true;
         // nothing to do
-        if (policy == working_files[full_file]->policy && display == working_files[full_file]->display
+        if (!fixer && policy == working_files[full_file]->policy && display == working_files[full_file]->display
             && verbosity == working_files[full_file]->verbosity)
         {
             working_files_mutex.unlock();
@@ -198,7 +198,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     unfinished_files.push_back(full_file);
     unfinished_files_mutex.unlock();
 
-    if (exists)
+    if (!fixer && exists)
     {
         to_update_files_mutex.lock();
         to_update_files[full_file] = new FileRegistered(*fr);
@@ -211,7 +211,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
 
     int ret;
     std::vector<long> files_id;
-    if ((ret = mainwindow->analyze(vec, files_id)) < 0 || files_id.size() != 1)
+    if ((ret = mainwindow->analyze(vec, fixer, files_id)) < 0 || files_id.size() != 1)
         mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
 
     fr->file_id = files_id[0];
@@ -624,7 +624,7 @@ void WorkerFiles::fill_registered_files_from_db()
 
         int ret;
         std::vector<long> files_id;
-        if ((ret = mainwindow->analyze(tmp, files_id)) < 0 && files_id.size() != 1)
+        if ((ret = mainwindow->analyze(tmp, false, files_id)) < 0 && files_id.size() != 1)
             mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
         else
             fr->file_id = files_id[0];

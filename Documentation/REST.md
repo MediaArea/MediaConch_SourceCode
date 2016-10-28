@@ -17,6 +17,7 @@ It is used above an HTTP connection.
   * Policy_Duplicate: add dst_user
   * Policy_Change_Info: add license
   * Policy_Policy: add license
+  * Checker_Analyze: add array of options for analyze
  * Create new command for the Policy
   * Policy_Get_Public_Policies
   * Policy_Change_Is_Public
@@ -271,6 +272,7 @@ Parameters:
 - user:              Integer: a unique id for the user
 - id:                Integer: a unique id for the request
 - plugins:           Array of Integer: List of Plugins to use (other than format plugins)
+- options:           Array of Object of 2 Strings: List of Options to be given to MediaInfoLib
 - force:             Boolean: force to analyze the file even if registered in database (introduced in v1.1)
 
 ##### Response

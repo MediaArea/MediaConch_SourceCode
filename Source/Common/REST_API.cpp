@@ -360,6 +360,13 @@ std::string RESTAPI::Checker_Analyze_Arg::to_str() const
             out << ",";
         out << plugins[i];
     }
+    out << "],options:[";
+    for (size_t i = 0; i < options.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "{\"" << options[i].first << "\":\"" << options[i].second << "\"}";
+    }
     out << "]]";
     return out.str();
 }
@@ -7903,7 +7910,7 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        Container::Value arg, file, user, id, force, plugins;
+        Container::Value arg, file, user, id, force, plugins, options;
         arg.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         file.type = Container::Value::CONTAINER_TYPE_STRING;
@@ -7934,6 +7941,20 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
             plugins.array.push_back(plugin);
         }
         arg.obj["plugins"] = plugins;
+
+        options.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t j = 0; j < args[i].options.size(); ++j)
+        {
+            Container::Value option, value;
+            option.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+            value.type = Container::Value::CONTAINER_TYPE_STRING;
+            value.s = args[i].options[j].second;
+            option.obj[args[i].options[j].first] = value;
+
+            options.array.push_back(option);
+        }
+        arg.obj["options"] = options;
 
         args_val.array.push_back(arg);
     }
@@ -8477,6 +8498,7 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
         Container::Value *id = model->get_value_by_key(*obj, "id");
         Container::Value *force = model->get_value_by_key(*obj, "force");
         Container::Value *plugins = model->get_value_by_key(*obj, "plugins");
+        Container::Value *options = model->get_value_by_key(*obj, "options");
 
         if (!file || !id || file->type != Container::Value::CONTAINER_TYPE_STRING ||
             id->type != Container::Value::CONTAINER_TYPE_INTEGER)
@@ -8500,6 +8522,22 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
             for (size_t j = 0; j < plugins->array.size(); ++j)
                 if (plugins->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
                     arg.plugins.push_back(plugins->array[j].s);
+        }
+
+        if (options && options->type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t j = 0; j < options->array.size(); ++j)
+            {
+                std::map<std::string, Container::Value>::iterator it = options->array[j].obj.begin();
+                for (; it != options->array[j].obj.end(); ++it)
+                {
+                    std::string key = it->first;
+                    std::string value;
+                    if (it->second.type == Container::Value::CONTAINER_TYPE_STRING)
+                        value = it->second.s;
+                    arg.options.push_back(std::make_pair(key, value));
+                }
+            }
         }
 
         args.push_back(arg);

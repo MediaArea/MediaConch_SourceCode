@@ -388,7 +388,8 @@ void Core::get_users_ids(std::vector<long>& ids, std::string& err)
 
 //---------------------------------------------------------------------------
 long Core::checker_analyze(int user, const std::string& file, bool& registered,
-                           const std::vector<std::string>& options, const std::vector<std::string>& plugins,
+                           const std::vector<std::pair<std::string,std::string> >& options,
+                           const std::vector<std::string>& plugins,
                            bool force_analyze)
 {
     long id = -1;
@@ -421,7 +422,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 //---------------------------------------------------------------------------
 long Core::checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                            const std::string generated_log, const std::string generated_error_log,
-                           const std::vector<std::string>& options,
+                           const std::vector<std::pair<std::string,std::string> >& options,
                            const std::vector<std::string>& plugins)
 {
     long id = -1;

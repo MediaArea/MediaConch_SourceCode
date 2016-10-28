@@ -660,7 +660,22 @@ CL_OPTION(User)
 //---------------------------------------------------------------------------
 CL_OPTION(Default)
 {
-    return cli->register_option(argument);
+    //Form : --Option=Value, --Option
+
+    if (argument.size() < 2)
+        return CLI_RETURN_NONE;
+
+    std::string key, value;
+    size_t egal_pos = argument.find('=');
+    if (egal_pos != std::string::npos)
+    {
+        key.assign(argument, 2, egal_pos - 2);
+        value.assign(argument, egal_pos + 1 , std::string::npos);
+    }
+    else
+        key.assign(argument, 2, std::string::npos);
+
+    return cli->register_option(key, value);
 }
 
 //---------------------------------------------------------------------------
@@ -679,8 +694,9 @@ void CallBack_Set(MediaConch::CLI* cli, void* Event_CallBackFunction)
 {
     //CallBack configuration
     std::stringstream callback_mem;
-    callback_mem << "--Event_CallBackFunction=";
     callback_mem << "CallBack=memory://";
     callback_mem << (size_t)Event_CallBackFunction;
-    cli->register_option(callback_mem.str());
+
+    std::string value = callback_mem.str();
+    cli->register_option("Event_CallBackFunction", value);
 }

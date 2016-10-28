@@ -111,26 +111,21 @@ void MediaConchLib::reset_daemon_client()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::add_option(const std::string& option, std::string& report)
+int MediaConchLib::test_mil_option(const std::string& key, std::string& value, std::string& report)
 {
-    size_t egal_pos = option.find('=');
-    if (egal_pos == std::string::npos || egal_pos > 2)
-    {
-        MediaInfoNameSpace::String Option(ZenLib::Ztring().From_UTF8(option), 2, egal_pos-2);
-        MediaInfoNameSpace::String Value;
-        if (egal_pos != std::string::npos)
-            Value.assign(Ztring().From_UTF8(option), egal_pos + 1, std::string::npos);
-        else
-            Value=__T('1');
+    if (!value.size())
+        value = "1";
 
-        String Result = core->Menu_Option_Preferences_Option(Option, Value);
-        if (!Result.empty())
-        {
-            report = Ztring(Result).To_UTF8();
-            return -1;
-        }
+    MediaInfoNameSpace::String Option(ZenLib::Ztring().From_UTF8(key));
+    MediaInfoNameSpace::String Value(ZenLib::Ztring().From_UTF8(value));
+
+    String Result = core->Menu_Option_Preferences_Option(Option, Value);
+    if (!Result.empty())
+    {
+        report = Ztring(Result).To_UTF8();
+        return -1;
     }
-    Options.push_back(option);
+
     return 0;
 }
 
@@ -230,13 +225,14 @@ int MediaConchLib::mediaconch_remove_watch_folder(const std::string& folder, std
 //---------------------------------------------------------------------------
 int MediaConchLib::checker_analyze(int user, const std::vector<std::string>& files,
                                    const std::vector<std::string>& plugins,
+                                   const std::vector<std::pair<std::string,std::string> >& options,
                                    std::vector<long>& files_id, bool force_analyze)
 {
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
     {
         long file_id;
-        int ret = checker_analyze(user, files[i], plugins, registered, file_id, force_analyze);
+        int ret = checker_analyze(user, files[i], plugins, options, registered, file_id, force_analyze);
         if (ret < 0)
             return ret;
         files_id.push_back(file_id);
@@ -246,16 +242,16 @@ int MediaConchLib::checker_analyze(int user, const std::vector<std::string>& fil
 
 //---------------------------------------------------------------------------
 int MediaConchLib::checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                                   const std::vector<std::pair<std::string,std::string> >& options,
                                    bool& registered, long& file_id, bool force_analyze)
 {
     if (!file.length())
         return errorHttp_INVALID_DATA;
 
-    // Send Options by API
     if (use_daemon)
-        return daemon_client->checker_analyze(user, file, plugins, registered, force_analyze, file_id);
+        return daemon_client->checker_analyze(user, file, plugins, options, registered, force_analyze, file_id);
 
-    long id = core->checker_analyze(user, file, registered, Options, plugins, force_analyze);
+    long id = core->checker_analyze(user, file, registered, options, plugins, force_analyze);
     if (id < 0)
         return -1;
 

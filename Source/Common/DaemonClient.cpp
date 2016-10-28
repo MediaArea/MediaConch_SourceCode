@@ -482,7 +482,8 @@ int DaemonClient::default_values_for_type(const std::string& type, std::vector<s
 }
 
 //---------------------------------------------------------------------------
-    int DaemonClient::checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+int DaemonClient::checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
+                                  const std::vector<std::pair<std::string,std::string> >& options,
                                   bool& registered, bool force_analyze, long& file_id)
 {
     if (!http_client)
@@ -496,6 +497,9 @@ int DaemonClient::default_values_for_type(const std::string& type, std::vector<s
 
     for (size_t i = 0; i < plugins.size(); ++i)
         arg.plugins.push_back(plugins[i]);
+
+    for (size_t i = 0; i < options.size(); ++i)
+        arg.options.push_back(std::make_pair(options[i].first, options[i].second));
 
     std::string real_file(file);
 #ifdef _WIN32

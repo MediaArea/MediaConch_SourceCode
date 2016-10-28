@@ -86,7 +86,8 @@ namespace MediaConch
         ~Queue();
 
         int add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
-                        const std::vector<std::string>& options, const std::vector<std::string>& plugins);
+                        const std::vector<std::pair<std::string,std::string> >& options,
+                        const std::vector<std::string>& plugins);
         long has_element(int user, const std::string& filename);
         int  has_id(int user, long file_id);
         int remove_element(int id);

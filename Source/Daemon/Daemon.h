@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include <string>
 #include <vector>
+#include <utility>
 #include "MediaInfo/MediaInfo.h"
 #include "Common/MediaConchLib.h"
 #include "Common/REST_API.h"
@@ -52,6 +53,7 @@ namespace MediaConch
         bool                      watch_folder_recursive;
         std::vector<std::string>  plugins;
         std::vector<std::string>  policies;
+        std::vector<std::pair<std::string, std::string> >  options;
 
         //Mode
         enum daemon_mode

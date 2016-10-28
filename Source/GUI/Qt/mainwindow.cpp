@@ -152,7 +152,7 @@ MainWindow::~MainWindow()
 //---------------------------------------------------------------------------
 void MainWindow::add_file_to_list(const QString& file, const QString& path,
                                   const QString& policy, const QString& display,
-                                  const QString& v)
+                                  const QString& v, bool fixer)
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
@@ -170,7 +170,7 @@ void MainWindow::add_file_to_list(const QString& file, const QString& path,
         full_path += "/";
     full_path += filename;
 
-    workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i);
+    workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer);
     checkerView->add_file_to_result_table(full_path);
 }
 
@@ -1040,10 +1040,18 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::analyze(const std::vector<std::string>& files, std::vector<long>& files_id)
+int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, std::vector<long>& files_id)
 {
+    bool force = false;
     std::vector<std::string> plugins;
-    return MCL.checker_analyze(-1, files, plugins, files_id);
+    std::vector<std::pair<std::string, std::string> > options;
+    if (with_fixer)
+    {
+        options.push_back(std::make_pair("File_TryToFix", "1"));
+        force = true;
+    }
+
+    return MCL.checker_analyze(-1, files, plugins, options, files_id, force);
 }
 
 //---------------------------------------------------------------------------
