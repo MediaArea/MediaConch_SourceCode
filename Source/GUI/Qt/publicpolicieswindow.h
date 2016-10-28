@@ -9,6 +9,7 @@
 
 #include <QFileInfo>
 #include <QString>
+#include "WebChoose.h"
 
 class QVBoxLayout;
 class QLabel;
@@ -29,7 +30,7 @@ class PublicPoliciesWindow : public QObject
 
 public:
     explicit PublicPoliciesWindow(MainWindow *parent = 0);
-    ~PublicPoliciesWindow();
+    virtual ~PublicPoliciesWindow();
 
 //***************************************************************************
 // HELPER

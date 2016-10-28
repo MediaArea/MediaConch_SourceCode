@@ -14,7 +14,7 @@
 namespace MediaConch
 {
 
-    class MenuMainWindow : QObject
+class MenuMainWindow : QObject
 {
     Q_OBJECT
 

@@ -209,6 +209,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\menumainwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\settingswindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\policieswindow.cpp" />
@@ -228,6 +229,7 @@
     <ClCompile Include="_Automated\moc_helpwindow.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
     <ClCompile Include="_Automated\moc_menumainwindow.cpp" />
+    <ClCompile Include="_Automated\moc_publicpolicieswindow.cpp" />
     <ClCompile Include="_Automated\moc_settingswindow.cpp" />
     <ClCompile Include="_Automated\moc_policieswindow.cpp" />
     <ClCompile Include="_Automated\moc_progressbar.cpp" />
@@ -312,6 +314,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\menumainwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\settingswindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h" />

@@ -10,7 +10,6 @@ var publicPoliciesListAjax = (function() {
         $.get({
             url: address + "list",
             dataType: "json",
-            async: false
         }).done(function(data) {
             policyListSpinner.hide();
             publicPoliciesList.displayList(data.list);
@@ -80,10 +79,14 @@ var publicPoliciesListAjax = (function() {
 
     };
 
+    var leave = function () {
+    };
+
     return {
         getList: getList,
         getApiPolicyUrl: getApiPolicyUrl,
         policyExport: policyExport,
         policyImport: policyImport,
+        leave: leave,
     };
 })();
