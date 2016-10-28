@@ -634,7 +634,16 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
 
         MediaConchLib::Checker_ValidateRes* res = new MediaConchLib::Checker_ValidateRes;
         res->id = files[i];
-        if (report == MediaConchLib::report_MediaConch)
+        if (!policies_ids.empty() || !policies_contents.empty())
+        {
+            MediaConchLib::Checker_ReportRes tmp_res;
+            if (check_policies(user, file_tmp, options, &tmp_res,
+                               policies_ids.size() ? &policies_ids : NULL,
+                               policies_contents.size() ? &policies_contents : NULL) < 0)
+                continue;
+            res->valid = tmp_res.has_valid ? tmp_res.valid : true;
+        }
+        else if (report == MediaConchLib::report_MediaConch)
         {
             //XXX
             std::string report;
@@ -649,15 +658,6 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
         {
             std::string report;
             res->valid = get_dpfmanager_report(user, files[i], report);
-        }
-        else if (!policies_ids.empty() || !policies_contents.empty())
-        {
-            MediaConchLib::Checker_ReportRes tmp_res;
-            if (check_policies(user, file_tmp, options, &tmp_res,
-                               policies_ids.size() ? &policies_ids : NULL,
-                               policies_contents.size() ? &policies_contents : NULL) < 0)
-                continue;
-            res->valid = tmp_res.has_valid ? tmp_res.valid : true;
         }
         result.push_back(res);
     }
@@ -1748,7 +1748,7 @@ bool Core::get_implementation_report(int user, const std::vector<long>& files,
     std::string r;
     bool valid = validate_xslt_from_memory(user, files, options, memory, r, true);
     if (valid)
-        valid = policy_is_valid(r);
+        valid = implementation_is_valid(r);
     report += r;
     return valid;
 }
@@ -2102,21 +2102,44 @@ bool Core::has_outcome_fail(const std::string& report)
 //---------------------------------------------------------------------------
 bool Core::implementation_is_valid(const std::string& report)
 {
-    return has_outcome_fail(report);
+    size_t pos = report.find("<implementationChecks ");
+    if (pos == std::string::npos)
+        return true;
+
+    size_t end = report.find(">", pos);
+    if (end == std::string::npos)
+        return true;
+
+    std::string search("fail_count=\"");
+    size_t f = report.find(search, pos);
+
+    if (f > end || f + search.size() + 2 > report.size())
+        return true;
+
+    if (report[f + search.size()] != '0')
+        return false;
+
+    return true;
 }
 
 //---------------------------------------------------------------------------
 bool Core::policy_is_valid(const std::string& report)
 {
-    size_t pos = report.find("outcome=\"");
+    size_t pos = report.find("<policy ");
     if (pos == std::string::npos)
         return true;
 
-    pos += 9;
-    if (report.size() - pos < 5)
-        return false;
+    size_t end = report.find(">", pos);
+    if (end == std::string::npos)
+        return true;
 
-    if (report[pos] == 'f' && report[pos + 1] == 'a' && report[pos + 2] == 'i' && report[pos + 3] == 'l' && report[pos + 4] == '"')
+    std::string search("outcome=\"");
+    size_t f = report.find(search, pos);
+
+    if (f > end || f + search.size() + 4 > report.size())
+        return true;
+
+    if (report[f + search.size()] == 'f' && report[f + search.size() + 1] == 'a' && report[f + search.size() + 2] == 'i' && report[f + search.size() + 3] == 'l')
         return false;
 
     return true;
