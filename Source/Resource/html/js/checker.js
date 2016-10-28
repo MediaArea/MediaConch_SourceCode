@@ -156,6 +156,12 @@ function addFile(sourceName, fileName, fileId, formValues) {
         $('#checkerResultTitle .close').removeClass('hidden');
         $('#checkerApplyAll').removeClass('hidden');
     }
+
+    addSpinnerToCell(result.cell(node, 1));
+    if (formValues.policy != -1)
+        addSpinnerToCell(result.cell(node, 2));
+    else
+        policyCellEmptyWithModal(resultId, fileId)
 };
 
 function startWaitingLoop() {
@@ -271,9 +277,6 @@ function processCheckerStatusRequest(statusMulti) {
 
             // Implementation and Policy
             if (node.data('policy') && node.data('policy') != -1) {
-                addSpinnerToCell(result.cell(node, 1));
-                addSpinnerToCell(result.cell(node, 2));
-
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
                     valid = webpage.implementation_and_policy_is_valid(statusFileId);
                     var data = JSON.parse(valid);
@@ -290,8 +293,6 @@ function processCheckerStatusRequest(statusMulti) {
             else
             {
                 // Implementation only
-                addSpinnerToCell(result.cell(node, 1));
-
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
                     valid = webpage.implementation_is_valid(statusFileId);
                     var data = JSON.parse(valid);
@@ -302,8 +303,6 @@ function processCheckerStatusRequest(statusMulti) {
                         implementationCell(data, 'result-' + data.fileId, data.fileId);
                     });
                 }
-
-                policyCellEmptyWithModal(statusResultId, statusFileId)
             }
 
             // MediaInfo
@@ -648,7 +647,7 @@ function updatePolicyCell(fileId, policyId) {
 
     // Update cell if analysis of file is succeeded
     if ($(result.cell('#result-' + fileId, 5).node()).hasClass('success')) {
-        if (policyId.length && policyId >= 0) {
+        if (policyId.length && policyId != -1) {
             resetPolicyCell(fileId);
             addSpinnerToCell(result.cell('#result-' + fileId, 2));
             setTimeout(function () {
