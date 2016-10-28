@@ -783,6 +783,15 @@ function mediaInfoCell(resultId, fileId)
 
 function mediaInfoTree(resultId, fileId)
 {
+    // Disable F2 shortcut (rename) in jstree, needs to be done before jstree initialization
+    $('#info' + resultId).on('keydown.jstree', '.jstree-anchor', function(event) {
+        if (113 == event.keyCode) {
+            event.stopImmediatePropagation();
+
+            return false;
+        }
+    });
+
     $('#info' + resultId).jstree({
         'core' : {
             'check_callback' : function (operation, node, parent, position, more) {
@@ -912,6 +921,15 @@ function mediaTraceCell(resultId, fileId)
 
 function mediaTraceTree(resultId, fileId)
 {
+    // Disable F2 shortcut (rename) in jstree, needs to be done before jstree initialization
+    $('#trace' + resultId).on('keydown.jstree', '.jstree-anchor', function(event) {
+        if (113 == event.keyCode) {
+            event.stopImmediatePropagation();
+
+            return false;
+        }
+    });
+
     $('#trace' + resultId).jstree({
         'core' : {
             'check_callback' : function (operation, node, parent, position, more) {
