@@ -248,7 +248,7 @@ void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int p
     }
 
     bool policy_valid = false;
-    if (working_files[file]->analyzed && working_files[file]->report_kind == MediaConchLib::report_MediaConch && policy >= 0)
+    if (working_files[file]->analyzed && policy >= 0)
     {
         working_files_mutex.unlock();
 

@@ -695,17 +695,16 @@ function updatePolicyCell(fileId, policyId) {
             setTimeout(function () {
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
                     valid = webpage.policy_is_valid(fileId);
-                    var policyData = {};
+                    var data = JSON.parse(valid);
                     policyData["valid"] = valid;
                     resultId = 'result-' + fileId;
-                    policyCell(policyData, resultId, fileId);
+                    policyCell(data, resultId, fileId);
                 }
                 else {
                     webpage.policy_is_valid(fileId, function (valid) {
-                        var policyData = {};
-                        policyData["valid"] = valid;
+                        var data = JSON.parse(valid);
                         resultId = 'result-' + fileId;
-                        policyCell(policyData, resultId, fileId);
+                        policyCell(data, resultId, fileId);
                     });
                 }
             }, 50);
