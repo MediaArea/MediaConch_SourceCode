@@ -25,7 +25,8 @@ $(document).ready(function() {
         e.preventDefault();
         webpage.on_file_upload_selected($('.tab-content .active .policyList').val(),
                                         $('.tab-content .active .displayList').val(),
-                                        $('.tab-content .active .verbosityList').val());
+                                        $('.tab-content .active .verbosityList').val(),
+                                        $('#checkerUpload_fixer').is(':checked'));
     });
 
     // Online form
@@ -34,7 +35,8 @@ $(document).ready(function() {
         webpage.on_file_online_selected($('#checkerOnline_file').val(),
                                         $('.tab-content .active .policyList').val(),
                                         $('.tab-content .active .displayList').val(),
-                                        $('.tab-content .active .verbosityList').val());
+                                        $('.tab-content .active .verbosityList').val(),
+                                        false);
     });
 
     // Repository form
@@ -42,7 +44,8 @@ $(document).ready(function() {
         e.preventDefault();
         webpage.on_file_repository_selected($('.tab-content .active .policyList').val(),
                                             $('.tab-content .active .displayList').val(),
-                                            $('.tab-content .active .verbosityList').val());
+                                            $('.tab-content .active .verbosityList').val(),
+                                            $('#checkerRepository_fixer').is(':checked'));
     });
 
     // Remove all results blocks

@@ -145,7 +145,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
 
 //---------------------------------------------------------------------------
 void WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
-                                   int policy, int display, int verbosity)
+                                   int policy, int display, int verbosity, bool fixer)
 {
     std::string full_file(path);
     if (path.length())
@@ -211,7 +211,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
 
     int ret;
     std::vector<long> files_id;
-    if ((ret = mainwindow->analyze(vec, false, files_id)) < 0 || files_id.size() != 1)
+    if ((ret = mainwindow->analyze(vec, fixer, files_id)) < 0 || files_id.size() != 1)
         mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
 
     fr->file_id = files_id[0];

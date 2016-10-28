@@ -59,7 +59,8 @@ public:
     void Run();
 
     // Functions
-    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display, const QString& verbosity);
+    void add_file_to_list(const QString& file, const QString& path, const QString& policy, const QString& display,
+                          const QString& verbosity, bool fixer);
     void remove_file_to_list(const QString& file);
     void update_policy_of_file_in_list(long file_id, const QString& policy);
     void clear_file_list();

@@ -37,7 +37,7 @@ public:
     void set_database(DatabaseUi* database);
 
     // functions
-    void add_file_to_list(const std::string& file, const std::string& path, int policy, int display, int verbosity);
+    void add_file_to_list(const std::string& file, const std::string& path, int policy, int display, int verbosity, bool fixer);
     void clear_files();
     FileRegistered* get_file_registered_from_file(const std::string& file);
     FileRegistered* get_file_registered_from_id(long id);
