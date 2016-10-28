@@ -109,6 +109,7 @@ void PublicPoliciesWindow::change_qt_scripts_in_template(QString& html)
               "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
               "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/listWebEngine.js\"></script>\n";
 #endif
+    script += "        <script type=\"text/javascript\" src=\"qrc:/utils/text.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/list.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/listPolicyTree.js\"></script>\n";
     if ((pos = reg.indexIn(html, pos)) != -1)

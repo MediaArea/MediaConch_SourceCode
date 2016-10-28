@@ -24,6 +24,7 @@
         <file alias="jstreegrid.js">html/js/jstreegrid.js</file>
         <file alias="datatables.js">html/js/datatables.min.js</file>
         <file alias="select2.full.js">html/js/select2.full.min.js</file>
+        <file alias="utils/text.js">html/js/utils/text.js</file>
         <file alias="checker.js">html/js/checker.js</file>
         <file alias="policy.js">html/js/policy.js</file>
         <file alias="policyTree.js">html/js/policyTree.js</file>

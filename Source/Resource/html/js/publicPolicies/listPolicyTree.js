@@ -105,7 +105,7 @@ var policyTree = (function() {
         var data = '';
         if ('u' == node.type) {
             if ('' != node.data.description) {
-                data = node.data.description;
+                data = textUtils.nl2br(textUtils.sanitizeHtml(node.data.description));;
             }
         }
         else if ('r' == node.type) {

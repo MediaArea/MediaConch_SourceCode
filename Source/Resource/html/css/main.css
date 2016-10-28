@@ -350,3 +350,7 @@ p.registration {
     margin-top: 10px;
     padding-top: 10px;
 }
+
+.popover-content {
+    word-wrap: break-word;
+}
