@@ -159,7 +159,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     {
         exists = true;
         // nothing to do
-        if (policy == working_files[full_file]->policy && display == working_files[full_file]->display
+        if (!fixer && policy == working_files[full_file]->policy && display == working_files[full_file]->display
             && verbosity == working_files[full_file]->verbosity)
         {
             working_files_mutex.unlock();
@@ -198,7 +198,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     unfinished_files.push_back(full_file);
     unfinished_files_mutex.unlock();
 
-    if (exists)
+    if (!fixer && exists)
     {
         to_update_files_mutex.lock();
         to_update_files[full_file] = new FileRegistered(*fr);

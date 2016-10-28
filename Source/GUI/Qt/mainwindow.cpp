@@ -1042,14 +1042,16 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 //---------------------------------------------------------------------------
 int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, std::vector<long>& files_id)
 {
+    bool force = false;
     std::vector<std::string> plugins;
     std::vector<std::pair<std::string, std::string> > options;
     if (with_fixer)
     {
         options.push_back(std::make_pair("File_TryToFix", "1"));
+        force = true;
     }
 
-    return MCL.checker_analyze(-1, files, plugins, options, files_id);
+    return MCL.checker_analyze(-1, files, plugins, options, files_id, force);
 }
 
 //---------------------------------------------------------------------------
