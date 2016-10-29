@@ -2394,11 +2394,11 @@ int get_generated_values_from_csv(std::map<std::string, std::map<std::string, st
         }
         {
             std::vector<std::string> tmp_vec;
-            tmp_vec.push_back("Version 0");
-            tmp_vec.push_back("Version 1");
-            tmp_vec.push_back("Version 2");
-            tmp_vec.push_back("Version 3");
-            tmp_vec.push_back("Version 3.4");
+            tmp_vec.push_back("0");
+            tmp_vec.push_back("1");
+            tmp_vec.push_back("2");
+            tmp_vec.push_back("3");
+            tmp_vec.push_back("3.4");
             tmp["Format_Version"] = tmp_vec;
         }
         {
