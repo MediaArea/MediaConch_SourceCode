@@ -114,7 +114,7 @@ var policyTree = (function() {
                 data += '<li>Scope: MediaInfo</li>';
             }
             else {
-                data += '<li>Scope: MicroMediaTrace</li>';
+                data += '<li>Scope: MediaTrace</li>';
             }
 
             if (undefined != node.data.tracktype) {
