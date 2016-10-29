@@ -123,6 +123,7 @@ public Q_SLOTS:
     QString      xslt_policy_rule_delete(int policy_id, int rule_id);
     QString      get_values_list(const QString& type, const QString& field, const QString& value);
     QString      get_fields_list(const QString& type, const QString& field);
+    void         call_tooltip(const QString&);
 
 protected:
     MainWindow                 *mainwindow;

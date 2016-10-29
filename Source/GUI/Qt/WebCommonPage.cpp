@@ -5,6 +5,8 @@
  */
 
 #include "WebCommonPage.h"
+#include "WebChoose.h"
+#include "WebView.h"
 #include "mainwindow.h"
 #include <Common/FileRegistered.h>
 #include <Common/XsltPolicy.h>
@@ -1340,5 +1342,12 @@ namespace MediaConch {
     {
         str.replace("\"", "\\\"");
         str.replace("\n", "\\\n");
+    }
+
+    void WebCommonPage::call_tooltip(const QString& link)
+    {
+        WebView *view = new WebView(NULL);
+        view->load(QUrl(link));
+        view->show();
     }
 }
