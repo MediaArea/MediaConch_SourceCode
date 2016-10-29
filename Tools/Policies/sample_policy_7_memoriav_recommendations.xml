@@ -14,7 +14,7 @@
       <rule name="Chromasubsampling is 4:4:4?" value="ChromaSubsampling" tracktype="Video" occurrence="*" operator="=">4:4:4</rule>
       <rule name="BitDepth is 10?" value="BitDepth" tracktype="Video" occurrence="*" operator="=">10</rule>
     </policy>
-    <policy type="and" name="Format is 8 bit 4:4:4 uncompressed?">
+    <policy type="and" name="Format is 8 bit 4:2:2 uncompressed?">
       <description>This test uses characteristics rather than encoding ids</description>
       <rule name="Format is YUV?" value="Format" tracktype="Video" occurrence="*" operator="=">YUV</rule>
       <rule name="Chromasubsampling is 4:2:2?" value="ChromaSubsampling" tracktype="Video" occurrence="*" operator="=">4:2:2</rule>
