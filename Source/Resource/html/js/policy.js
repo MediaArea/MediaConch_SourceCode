@@ -271,10 +271,16 @@ function policyEditHelp() {
     addHelp('policyType', 'Clarifies how subsequent rules should exist in relation to each other: <ul><li>AND: Each rule works independently from other rules in policy. One failing rule causes the policy to fail.</li><li>OR: All rules set within the policy work in relation to each other and only one rule passing is necessary for the policy to pass.</li></ul>', 'Policy type');
 
     // License
-    addHelp('policyLicense', '<ul><li>Creative Commons Zero (1.0 or later): I like public domain</li><li>Creative Commons Attribution (4.0 or later): I want it permissive</li><li>Creative Commons Attribution-ShareAlike (4.0 or later): I care about sharing improvements</li><li>Other: a license not in the predefined list</li><footer>More information about how to choose a license for your policies may be found on <a href="https://creativecommons.org/share-your-work/" target="_blank">Creative Commons website</a></footer>', 'Policy license');
+    addHelp('policyLicense', '<ul><li>Creative Commons Zero (1.0 or later): I like public domain</li><li>Creative Commons Attribution (4.0 or later): I want it permissive</li><li>Creative Commons Attribution-ShareAlike (4.0 or later): I care about sharing improvements</li><li>Other: a license not in the predefined list</li><footer>More information about how to choose a license for your policies may be found on <a href="https://creativecommons.org/share-your-work/" onclick="call_tooltip_policy_license(event);">Creative Commons website</a></footer>', 'Policy license');
 
     // Visibility
     addHelp('policyVisibility', 'Allow your policy to be public and visible on the public policies list:<ul><li>Private: your policy won\'t be visible to others.</li><li>Public : your policy will be visible by others.</li></ul>', 'Policy visibility')
+}
+
+function call_tooltip_policy_license(e)
+{
+    e.preventDefault();
+    webpage.call_tooltip("https://creativecommons.org/share-your-work/");
 }
 
 function policyRuleHelp() {
