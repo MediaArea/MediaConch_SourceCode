@@ -725,17 +725,17 @@ namespace MediaConch {
             rule_data += QString(",\"name\":\"%1\"").arg(name);
         }
         else
-            rule_data += ",\"trackType\":\"\"";
+            rule_data += ",\"name\":\"\"";
 
         len = r->track_type.length();
         if (len > 0)
         {
             QString type = QString().fromUtf8(r->track_type.c_str(), r->track_type.length());
             string_to_json(type);
-            rule_data += QString(",\"trackType\":\"%1\"").arg(type);
+            rule_data += QString(",\"tracktype\":\"%1\"").arg(type);
         }
         else
-            rule_data += ",\"trackType\":\"\"";
+            rule_data += ",\"tracktype\":\"\"";
 
         len = r->field.length();
         if (len > 0)
