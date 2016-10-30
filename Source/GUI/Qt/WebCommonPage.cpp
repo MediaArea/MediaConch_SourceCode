@@ -5,8 +5,6 @@
  */
 
 #include "WebCommonPage.h"
-#include "WebChoose.h"
-#include "WebView.h"
 #include "mainwindow.h"
 #include <Common/FileRegistered.h>
 #include <Common/XsltPolicy.h>
@@ -14,6 +12,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QDesktopServices>
 
 namespace MediaConch {
 
@@ -1346,8 +1345,6 @@ namespace MediaConch {
 
     void WebCommonPage::call_tooltip(const QString& link)
     {
-        WebView *view = new WebView(NULL);
-        view->load(QUrl(link));
-        view->show();
+        QDesktopServices::openUrl(link);
     }
 }
