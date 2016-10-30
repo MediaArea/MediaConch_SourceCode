@@ -22,12 +22,14 @@
 #include "mainwindow.h"
 #include "WebPage.h"
 #include <QtGlobal>
+#include <QWebSettings>
 
 namespace MediaConch
 {
     WebPage::WebPage(MainWindow *m, QWidget *parent) : WebCommonPage(m, parent)
     {
         connect(this, SIGNAL(loadFinished(bool)), this, SLOT(on_load_finished(bool)));
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
     }
 
     WebPage::~WebPage()
