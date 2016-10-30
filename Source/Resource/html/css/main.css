@@ -215,6 +215,10 @@ p.registration {
     margin-top: 10px;
 }
 
+#policyFix {
+    width: 370px;
+}
+
 #xslPolicyRule_editor {
     display: inline-block;
     margin-left: 10px;
