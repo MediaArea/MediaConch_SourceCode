@@ -1,6 +1,15 @@
 <h1>Public policies</h1>
 
 <div class="row displayMessages"></div>
+<script type="text/javascript">
+function call_tooltip_policyeditor(e)
+{
+    e.preventDefault();
+    webpage.call_tooltip("https://mediaarea.net/MediaConchOnline/policyEditor");
+}
+</script>
+<p>Public policies page lists policies our users would like to share with you.<br />
+If you want to share yours, export the policy (button "Export" in the policy editor) to a file then go to <a href="https://mediaarea.net/MediaConchOnline/policyEditor" onclick="call_tooltip_policyeditor(event);">policy editor online page</a> (don't forget to login in order to associate your policy to your account), import the file (button "Import" in the policy editor), and set the "policy visibility" field to "public".</p>
 
 <div id="publicPoliciesList" class="row policiesList">
   <div class="publicPoliciesListSpinner col-xs-12"><span class="spinner-status"></span> Please wait while loading public policies list</div>
