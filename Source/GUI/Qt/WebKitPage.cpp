@@ -23,6 +23,7 @@
 #include "WebPage.h"
 #include <QtGlobal>
 #include <QWebSettings>
+#include <QWebInspector>
 
 namespace MediaConch
 {
@@ -30,6 +31,12 @@ namespace MediaConch
     {
         connect(this, SIGNAL(loadFinished(bool)), this, SLOT(on_load_finished(bool)));
         QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+#if defined(QT_DEBUG)
+        settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+        QWebInspector *inspector = new QWebInspector;
+        inspector->setPage(this);
+        inspector->setVisible(true);
+#endif
     }
 
     WebPage::~WebPage()
