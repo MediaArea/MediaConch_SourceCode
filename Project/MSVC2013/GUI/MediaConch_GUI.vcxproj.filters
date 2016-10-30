@@ -68,45 +68,6 @@
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\Schematron.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policiesmenu.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_policiesmenu.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\groupofrules.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policiestree.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policymenu.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\ruleedit.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\rulemenu.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_policiestree.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_policymenu.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_ruleedit.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_rulemenu.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_groupofrules.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\JS_Tree.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -119,22 +80,10 @@
     <ClCompile Include="..\..\..\Source\Common\Policy.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\SchematronPolicy.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\policieswindow.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policywindow.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\schematronwindow.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\xsltwindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp">
@@ -145,18 +94,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\settingswindow.cpp">
       <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\xsltruleedit.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_schematronwindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_xsltwindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_checkerwindow.cpp">
       <Filter>Source Files\_Automated</Filter>
@@ -170,12 +107,6 @@
     <ClCompile Include="_Automated\moc_policieswindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_policywindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_xsltruleedit.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
@@ -185,16 +116,10 @@
     <ClCompile Include="_Automated\moc_displaywindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_progressbar.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_xsltpolicymenu.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Configuration.cpp">
@@ -204,6 +129,9 @@
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\DaemonClient.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Database.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\Http.cpp">
@@ -236,11 +164,11 @@
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c">
       <Filter>ThirdParty\sqlite</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp">
-      <Filter>Source Files\GUI</Filter>
+    <ClCompile Include="_Automated\moc_WebEnginePage.cpp">
+      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp">
-      <Filter>Source Files\GUI</Filter>
+    <ClCompile Include="_Automated\moc_WebEngineView.cpp">
+      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp">
       <Filter>Source Files\GUI</Filter>
@@ -248,11 +176,11 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_WebEnginePage.cpp">
-      <Filter>Source Files\_Automated</Filter>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_WebEngineView.cpp">
-      <Filter>Source Files\_Automated</Filter>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_WebKitPage.cpp">
       <Filter>Source Files\_Automated</Filter>
@@ -263,29 +191,11 @@
     <ClCompile Include="..\..\..\Source\Common\UnknownPolicy.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\unknownwindow.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_unknownpolicymenu.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_unknownwindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\workerfiles.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_workerfiles.cpp">
       <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\PluginsManager.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\VeraPDF.cpp">
-      <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\DpfManager.cpp">
       <Filter>Source Files\Core</Filter>
@@ -296,32 +206,62 @@
     <ClCompile Include="..\..\..\Source\Common\PluginsConfig.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\PluginsManager.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\VeraPDF.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\DatabaseReport.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\Database.cpp">
+    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Common\SQLLiteReport.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\NoDatabaseReport.cpp">
-      <Filter>Source Files\Core</Filter>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.cpp">
       <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebCommonPage.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebCommonPage.cpp">
+      <Filter>Source Files\_Automated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\FFmpeg.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\PluginFileLog.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\WatchFolder.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\WatchFoldersManager.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_publicpolicieswindow.cpp">
+      <Filter>Source Files\_Automated</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -335,9 +275,6 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Policies.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Common\Schematron.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="_Automated\ui_policiesmenu.h">
@@ -358,31 +295,13 @@
     <ClInclude Include="_Automated\ui_rulemenu.h">
       <Filter>Header Files\_Automated</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Policy.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\Common\SchematronPolicy.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\xsltruleedit.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\groupofrules.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\menumainwindow.h">
@@ -391,28 +310,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\settingswindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policiesmenu.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policiestree.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policymenu.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policywindow.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\ruleedit.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\rulemenu.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\schematronwindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="_Automated\ui_xsltpolicymenu.h">
@@ -436,32 +334,32 @@
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h">
       <Filter>ThirdParty\sqlite</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitPage.h">
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitView.h">
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebChoose.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\UnknownPolicy.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\unknownpolicymenu.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\unknownwindow.h">
-      <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="_Automated\ui_unknownpolicymenu.h">
       <Filter>Header Files\_Automated</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\workerfiles.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\DpfManager.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Plugin.h">
       <Filter>Header Files\Core</Filter>
@@ -478,79 +376,178 @@
     <ClInclude Include="..\..\..\Source\Common\VeraPDF.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Common\DpfManager.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Source\GUI\Qt\uisettings.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Database.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\DatabaseReport.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\SQLLiteReport.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h">
-      <Filter>Header Files\Core</Filter>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\DatabaseUi.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\WebCommonPage.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\FFmpeg.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Configuration.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Container.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\DaemonClient.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\FileRegistered.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Http.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Httpd.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\JS_Tree.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Json.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\LibEventHttp.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\LibEventHttpd.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\MediaConchLib.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\NoContainer.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\NoDatabaseReport.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\PluginFileLog.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\PluginLog.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\PluginPreHook.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Queue.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\REST_API.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Scheduler.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Schema.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\WatchFolder.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\WatchFoldersManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Xslt.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\GeneratedCSVVideos.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\ImplementationReportDisplayHtmlXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\ImplementationReportDisplayTextUnicodeXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\ImplementationReportDisplayTextXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\ImplementationReportDPFManagerXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\ImplementationReportMatroskaSchema.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\ImplementationReportVeraPDFXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\ImplementationReportXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\MediaTraceDisplayHtmlXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\MediaTraceDisplayTextXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\MicroMediaTraceToMediaTraceXsl.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\PolicySample1.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\PolicySample4.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\PolicySample5.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\PolicySample6.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\PolicySample7.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\generated\PolicyTransformXml.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="..\..\..\Source\Resource\Resources.qrc">
+      <Filter>Resource Files</Filter>
+    </Xml>
     <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html">
-      <Filter>Resource Files\HTML</Filter>
-    </Xml>
-    <Xml Include="..\..\..\License.html">
-      <Filter>Resource Files\HTML</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html">
       <Filter>Resource Files\HTML</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html">
       <Filter>Resource Files\HTML</Filter>
     </Xml>
-    <Xml Include="..\..\..\Source\Resource\Resources.qrc">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\xsltruleedit.ui">
-      <Filter>Resource Files\UI</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\groupofrules.ui">
-      <Filter>Resource Files\UI</Filter>
-    </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\mainwindow.ui">
-      <Filter>Resource Files\UI</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policiesmenu.ui">
-      <Filter>Resource Files\UI</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policiestree.ui">
-      <Filter>Resource Files\UI</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\policymenu.ui">
       <Filter>Resource Files\UI</Filter>
     </Xml>
     <Xml Include="..\..\..\Source\GUI\Qt\progressbar.ui">
       <Filter>Resource Files\UI</Filter>
     </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\ruleedit.ui">
-      <Filter>Resource Files\UI</Filter>
+    <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html">
+      <Filter>Resource Files\HTML</Filter>
     </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\rulemenu.ui">
-      <Filter>Resource Files\UI</Filter>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\xsltpolicymenu.ui">
-      <Filter>Resource Files\UI</Filter>
+    <Xml Include="..\..\..\License.html">
+      <Filter>Resource Files\HTML</Filter>
     </Xml>
   </ItemGroup>
 </Project>
