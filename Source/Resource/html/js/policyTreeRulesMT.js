@@ -19,13 +19,18 @@ var policyTreeRulesMT = (function() {
 
         if (policyTreeRules.isRuleMT(node)) {
             $('#xslPolicyRuleMt_field').val(node.data.field);
-            $('#xslPolicyRuleMt_validator option[value="' + node.data.ope + '"]').prop('selected', true);
+            if ('' != node.data.ope && $('#xslPolicyRuleMt_validator option[value="' + node.data.ope + '"]').length) {
+                $('#xslPolicyRuleMt_validator option[value="' + node.data.ope + '"]').prop('selected', true);
+            }
+            else {
+                $('#xslPolicyRuleMt_validator option[value="exists"]').prop('selected', true);
+            }
             $('#xslPolicyRuleMt_validator').trigger('change');
             $('#xslPolicyRuleMt_value').val(node.data.value);
         }
         else {
             $('#xslPolicyRuleMt_field').val('');
-            $('#xslPolicyRuleMt_validator option[value=""]').prop('selected', true);
+            $('#xslPolicyRuleMt_validator option[value="exists"]').prop('selected', true);
             $('#xslPolicyRuleMt_validator').trigger('change');
             $('#xslPolicyRuleMt_value').val('');
         }
@@ -54,7 +59,7 @@ var policyTreeRulesMT = (function() {
 
     var displayValueField = function(validator) {
         // If validator is empty do not display the value field
-        if ('' == validator) {
+        if ('' == validator || 'exists' == validator || 'must not exist' == validator) {
             $('#xslPolicyRuleMt_value').parent().addClass('hidden');
         }
         else {

@@ -28,7 +28,12 @@ var policyTreeRulesMI = (function() {
             $('#xslPolicyRule_trackType option[value="' + node.data.tracktype + '"]').prop('selected', true);
             $('#xslPolicyRule_trackType').trigger('change');
             $('#xslPolicyRule_occurrence').val(-1 == node.data.occurrence ? '' : node.data.occurrence);
-            $('#xslPolicyRule_validator option[value="' + node.data.ope + '"]').prop('selected', true);
+            if ('' != node.data.ope && $('#xslPolicyRule_validator option[value="' + node.data.ope + '"]').length) {
+                $('#xslPolicyRule_validator option[value="' + node.data.ope + '"]').prop('selected', true);
+            }
+            else {
+                $('#xslPolicyRule_validator option[value="exists"]').prop('selected', true);
+            }
             $('#xslPolicyRule_validator').trigger('change');
         }
         else {
@@ -41,7 +46,7 @@ var policyTreeRulesMI = (function() {
             $('#xslPolicyRule_trackType option[value=""]').prop('selected', true);
             $('#xslPolicyRule_trackType').trigger('change');
             $('#xslPolicyRule_occurrence').val('');
-            $('#xslPolicyRule_validator option[value=""]').prop('selected', true);
+            $('#xslPolicyRule_validator option[value="exists"]').prop('selected', true);
             $('#xslPolicyRule_validator').trigger('change');
         }
 
@@ -131,7 +136,7 @@ var policyTreeRulesMI = (function() {
 
     var displayValueField = function(validator) {
         // If validator is empty do not display the value field
-        if ('' == validator) {
+        if ('' == validator || 'exists' == validator || 'must not exist' == validator) {
             $('#xslPolicyRule_value').parent().addClass('hidden');
         }
         else {
