@@ -25,7 +25,7 @@ namespace MediaConch {
 // RESTAPI
 //***************************************************************************
 
-const std::string RESTAPI::API_VERSION = "1.11";
+const std::string RESTAPI::API_VERSION = "1.12";
 
 //***************************************************************************
 // Constructor/Destructor
@@ -367,7 +367,8 @@ std::string RESTAPI::Checker_Analyze_Arg::to_str() const
             out << ",";
         out << "{\"" << options[i].first << "\":\"" << options[i].second << "\"}";
     }
-    out << "]]";
+    out << "],\"mil_analyze\":" << std::boolalpha << mil_analyze;
+    out << "]";
     return out.str();
 }
 
@@ -7910,7 +7911,7 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        Container::Value arg, file, user, id, force, plugins, options;
+        Container::Value arg, file, user, id, force, plugins, options, mil_analyze;
         arg.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
         file.type = Container::Value::CONTAINER_TYPE_STRING;
@@ -7955,6 +7956,13 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
             options.array.push_back(option);
         }
         arg.obj["options"] = options;
+
+        if (!args[i].mil_analyze)
+        {
+            mil_analyze.type = Container::Value::CONTAINER_TYPE_BOOL;
+            mil_analyze.b = args[i].mil_analyze;
+            arg.obj["mil_analyze"] = mil_analyze;
+        }
 
         args_val.array.push_back(arg);
     }
@@ -8499,6 +8507,7 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
         Container::Value *force = model->get_value_by_key(*obj, "force");
         Container::Value *plugins = model->get_value_by_key(*obj, "plugins");
         Container::Value *options = model->get_value_by_key(*obj, "options");
+        Container::Value *mil_analyze = model->get_value_by_key(*obj, "mil_analyze");
 
         if (!file || !id || file->type != Container::Value::CONTAINER_TYPE_STRING ||
             id->type != Container::Value::CONTAINER_TYPE_INTEGER)
@@ -8539,6 +8548,9 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
                 }
             }
         }
+
+        if (mil_analyze && mil_analyze->type == Container::Value::CONTAINER_TYPE_BOOL)
+            arg.mil_analyze = mil_analyze->b;
 
         args.push_back(arg);
     }

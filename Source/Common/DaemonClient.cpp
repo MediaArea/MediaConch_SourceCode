@@ -484,7 +484,7 @@ int DaemonClient::default_values_for_type(const std::string& type, std::vector<s
 //---------------------------------------------------------------------------
 int DaemonClient::checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
                                   const std::vector<std::pair<std::string,std::string> >& options,
-                                  bool& registered, bool force_analyze, long& file_id)
+                                  bool& registered, bool force_analyze, bool mil_analyze, long& file_id)
 {
     if (!http_client)
         return MediaConchLib::errorHttp_INIT;
@@ -494,6 +494,7 @@ int DaemonClient::checker_analyze(int user, const std::string& file, const std::
 
     arg.user = user;
     arg.id = 0;
+    arg.mil_analyze = mil_analyze;
 
     for (size_t i = 0; i < plugins.size(); ++i)
         arg.plugins.push_back(plugins[i]);

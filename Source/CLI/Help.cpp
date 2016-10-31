@@ -148,6 +148,8 @@ int Help_Advanced()
     TEXTOUT("");
     TEXTOUT("--Force");
     TEXTOUT("                    Force to parse the file if registered in database");
+    TEXTOUT("--NoMilAnalyze, -nmil");
+    TEXTOUT("                    Do not analyze with MediaInfoLib");
     TEXTOUT("--Async=yes, -as");
     TEXTOUT("                    Analyze asynchronously the files, need to launch again the command to have the result");
     TEXTOUT("--Https=0, --no-https");

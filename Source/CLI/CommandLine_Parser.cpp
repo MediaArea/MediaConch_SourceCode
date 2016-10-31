@@ -124,6 +124,8 @@ static void change_short_options_to_long(std::string& argument)
         argument = "--version";
     if (argument=="-f")
         argument = "--force";
+    if (argument=="-nmil")
+        argument = "--nomilanalyze";
 
     // Backward compatibility
     if (argument=="-tc")
@@ -218,6 +220,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--implementationverbosity",                     ImplementationVerbosity)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
+    OPTION("--nomilanalyze",                                NoMilAnalyze)
     OPTION("--async",                                       Asynchronous)
     OPTION("--pluginslist",                                 PluginsList)
     OPTION("--useplugin",                                   UsePlugin)
@@ -441,6 +444,14 @@ CL_OPTION(Force)
 {
     (void)argument;
     cli->set_force_analyze(true);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(NoMilAnalyze)
+{
+    (void)argument;
+    cli->set_mil_analyze(false);
     return CLI_RETURN_NONE;
 }
 

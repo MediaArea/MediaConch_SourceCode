@@ -48,6 +48,7 @@ namespace MediaConch
         int  set_user_to_use(const std::string& user);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
+        void set_mil_analyze(bool analyze);
         void set_asynchronous(bool async);
         void set_create_policy_mode();
         void set_file_information_mode();
@@ -95,6 +96,7 @@ namespace MediaConch
         bool                    use_daemon;
         bool                    asynchronous;
         bool                    force_analyze;
+        bool                    mil_analyze;
         bool                    watch_folder_recursive;
         bool                    create_policy_mode;
         bool                    file_information;

@@ -390,7 +390,7 @@ void Core::get_users_ids(std::vector<long>& ids, std::string& err)
 long Core::checker_analyze(int user, const std::string& file, bool& registered,
                            const std::vector<std::pair<std::string,std::string> >& options,
                            const std::vector<std::string>& plugins,
-                           bool force_analyze)
+                           bool force_analyze, bool mil_analyze)
 {
     long id = -1;
     registered = false;
@@ -413,7 +413,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
     else
         registered = true;
 
-    if (!analyzed && scheduler->add_element_to_queue(user, file, id, options, plugins) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, file, id, options, plugins, mil_analyze) < 0)
         return -1;
 
     return id;
@@ -423,7 +423,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 long Core::checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                            const std::string generated_log, const std::string generated_error_log,
                            const std::vector<std::pair<std::string,std::string> >& options,
-                           const std::vector<std::string>& plugins)
+                           const std::vector<std::string>& plugins, bool mil_analyze)
 {
     long id = -1;
     bool analyzed = false;
@@ -456,7 +456,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
             return -1;
     }
 
-    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, plugins) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, plugins, mil_analyze) < 0)
         return -1;
 
     return id;
