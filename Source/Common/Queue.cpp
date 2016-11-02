@@ -14,6 +14,7 @@
 #include "ZenLib/Ztring.h"
 #include "Queue.h"
 #include "Scheduler.h"
+#include "PluginLog.h"
 
 #if !defined(WINDOWS)
 #include <unistd.h>
@@ -57,16 +58,27 @@ void QueueElement::Entry()
     //Pre hook plugins
     int ret = 0;
     bool analyze_file = true;
+
+    std::stringstream log;
+    log << "start analyze:" << filename;
+    scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
+
     ret = scheduler->execute_pre_hook_plugins(this, err, analyze_file);
 
     if (!analyze_file || ret)
     {
+        log.str("");
+        log << "end analyze:" << filename;
+        scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
         scheduler->work_finished(this, NULL);
         return;
     }
 
     if (!mil_analyze)
     {
+        log.str("");
+        log << "end analyze:" << filename;
+        scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
         scheduler->work_finished(this, NULL);
         return;
     }
@@ -94,6 +106,9 @@ void QueueElement::Entry()
     MI->Close();
     delete MI;
     MI = NULL;
+    log.str("");
+    log << "end analyze:" << filename;
+    scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
 }
 
 //---------------------------------------------------------------------------

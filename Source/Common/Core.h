@@ -203,6 +203,7 @@ public:
     //***************************************************************************
     static std::string get_date();
     void plugin_add_log(int level, const std::string& log);
+    void plugin_add_log_timestamp(int level, const std::string& log);
 
 private:
     Core (const Core&);

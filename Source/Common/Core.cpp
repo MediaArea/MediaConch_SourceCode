@@ -2236,4 +2236,11 @@ void Core::plugin_add_log(int level, const std::string& log)
         plugins_manager->write_log(level, log);
 }
 
+//--------------------------------------------------------------------------
+void Core::plugin_add_log_timestamp(int level, const std::string& log)
+{
+    if (plugins_manager)
+        plugins_manager->write_log_timestamp(level, log);
+}
+
 }

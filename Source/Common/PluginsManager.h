@@ -42,6 +42,7 @@ public:
     int   load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
 
     int   write_log(int level, const std::string& log);
+    int   write_log_timestamp(int level, const std::string& log);
 
 private:
     PluginsManager(const PluginsManager&);
