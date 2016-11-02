@@ -72,7 +72,7 @@ namespace MediaConch {
         mainwindow->set_last_save_report_path(info.absolutePath().toUtf8().data());
 
         QFile file(dl_file);
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
             return;
 
         QTextStream out(&file);
