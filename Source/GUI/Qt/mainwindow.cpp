@@ -877,7 +877,7 @@ int MainWindow::policy_export_data(const QString& policy, const QString& p_name,
     set_last_save_policy_path(info.absolutePath().toUtf8().data());
 
     QFile file(filename);
-    if (file.open(QIODevice::ReadWrite))
+    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
     {
         QTextStream stream(&file);
         stream << policy;
