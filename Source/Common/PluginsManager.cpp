@@ -96,7 +96,7 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int PluginsManager::write_log(const std::string& log)
+    int PluginsManager::write_log(int level, const std::string& log)
     {
         int ret = 0;
         std::string time = Core::get_date();
@@ -106,7 +106,7 @@ namespace MediaConch {
             if (!log_plugins[i])
                 continue;
 
-            ((PluginLog*)log_plugins[i])->add_log(time, log);
+            ((PluginLog*)log_plugins[i])->add_log(time, level, log);
         }
 
         return ret;

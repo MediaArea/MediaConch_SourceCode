@@ -17,6 +17,7 @@
 #include "Plugin.h"
 #include "PluginFormat.h"
 #include "PluginsManager.h"
+#include "PluginLog.h"
 #include "FFmpeg.h"
 #include <ZenLib/Ztring.h>
 
@@ -196,7 +197,7 @@ namespace MediaConch {
         std::string error;
         ((PluginFormat*)plugins[format_str])->set_file(el->filename);
         if (plugins[format_str]->run(error) < 0)
-            core->plugin_add_log(error);
+            core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, error);
         const std::string& report = plugins[format_str]->get_report();
         MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
 

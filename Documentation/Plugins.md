@@ -51,9 +51,10 @@ It should be a struct named *Plugins* which contains an array of plugin.
 
 ##### LogFile
 
-* **id**:   Id of the plugin
-* **name**: Has to be *LogFile*
-* **file**: File name where log are wrote
+* **id**:    Id of the plugin
+* **name**:  Has to be *LogFile*
+* **file**:  File name where log are wrote
+* **level**: verbosity of the log (can be "nothing", "debug", "warning", "error"), default is only error.
 
 ### Example
 
@@ -90,8 +91,9 @@ It should be a struct named *Plugins* which contains an array of plugin.
             {
                 "id": "plugin4",
                 "name": "LogFile",
-                "file": "/tmp/mediaconch.log"
-            }
+                "file": "/tmp/mediaconch.log",
+                "level": "error"
+           }
         ]
     }
 ```

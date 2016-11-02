@@ -35,7 +35,7 @@ public:
 
     virtual int              load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
     virtual int              run(std::string& error);
-    virtual void             add_log(const std::string& time, const std::string& log);
+    virtual void             add_log(const std::string& time, int level, const std::string& log);
     void                     set_file(const std::string& file);
     const std::string&       get_file() const { return filename; }
 
