@@ -702,7 +702,6 @@ function updatePolicyCell(fileId, policyId) {
                 if (WEBMACHINE == "WEB_MACHINE_KIT") {
                     valid = webpage.policy_is_valid(fileId);
                     var data = JSON.parse(valid);
-                    policyData["valid"] = valid;
                     resultId = 'result-' + fileId;
                     policyCell(data, resultId, fileId);
                 }

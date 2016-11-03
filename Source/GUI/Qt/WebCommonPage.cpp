@@ -586,8 +586,17 @@ namespace MediaConch {
             return json;
         }
 
+        bool policy_valid = false;
+        std::vector<MediaConchLib::Checker_ValidateRes*> res;
+        if (mainwindow->validate_policy(file_id, fr->policy, res) == 0 && res.size() == 1)
+            policy_valid = res[0]->valid;
+
+        for (size_t j = 0; j < res.size() ; ++j)
+            delete res[j];
+        res.clear();
+
         json += QString("\"valid\":%1,\"error\":%2}")
-            .arg(fr->policy_valid ? "true" : "false").arg("null");
+            .arg(policy_valid ? "true" : "false").arg("null");
 
         delete fr;
         return json;
