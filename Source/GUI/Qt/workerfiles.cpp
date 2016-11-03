@@ -247,6 +247,8 @@ void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int p
         return;
     }
 
+    working_files[file]->policy = policy;
+
     bool policy_valid = false;
     if (working_files[file]->analyzed && policy >= 0)
     {
@@ -270,7 +272,6 @@ void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int p
         working_files_mutex.lock();
     }
 
-    working_files[file]->policy = policy;
     working_files[file]->policy_valid = policy_valid;
     FileRegistered fr = *working_files[file];
     working_files_mutex.unlock();

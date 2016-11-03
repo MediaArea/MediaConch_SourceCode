@@ -1118,6 +1118,22 @@ int MainWindow::validate(MediaConchLib::report report, const std::string& file,
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::validate_policy(long file_id, size_t policy_id,
+                                std::vector<MediaConchLib::Checker_ValidateRes*>& result)
+{
+    std::vector<long> files_id;
+    files_id.push_back(file_id);
+
+    std::vector<size_t> policies_ids;
+    policies_ids.push_back(policy_id);
+
+    std::vector<std::string> policies_contents;
+    std::map<std::string, std::string> options;
+    return MCL.checker_validate(-1, MediaConchLib::report_Max, files_id, policies_ids,
+                                policies_contents, options, result);
+}
+
+//---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_and_mediatrace_xml(long file_id,
                                                      const std::string& display_name,
                                                      const std::string& display_content)

@@ -91,6 +91,8 @@ public:
                                          const std::vector<std::string>& policies_contents,
                                          const std::map<std::string, std::string>& options,
                                          std::vector<MediaConchLib::Checker_ValidateRes*>& result);
+    int                         validate_policy(long file_id, size_t policy_id,
+                                                std::vector<MediaConchLib::Checker_ValidateRes*>& result);
 
     QString                     get_mediainfo_and_mediatrace_xml(long file_id, const std::string& display_name, const std::string& display_content);
     QString                     get_mediainfo_xml(long file_id, const std::string& display_name, const std::string& display_content);
