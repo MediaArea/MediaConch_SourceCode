@@ -8529,7 +8529,7 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
         if (plugins && plugins->type == Container::Value::CONTAINER_TYPE_ARRAY)
         {
             for (size_t j = 0; j < plugins->array.size(); ++j)
-                if (plugins->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                if (plugins->array[j].type == Container::Value::CONTAINER_TYPE_STRING)
                     arg.plugins.push_back(plugins->array[j].s);
         }
 
