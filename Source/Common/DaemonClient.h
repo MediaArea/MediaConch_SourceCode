@@ -73,7 +73,7 @@ public:
     // Analyze
     int checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
                         const std::vector<std::pair<std::string,std::string> >& options,
-                        bool& registered, bool force_analyze, long& file_id);
+                        bool& registered, bool force_analyze, bool mil_analyze, long& file_id);
 
     // Status
     int checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res);

@@ -38,6 +38,19 @@ int PluginFileLog::load_plugin(const std::map<std::string, Container::Value>& ob
     }
     this->set_file(obj.at("file").s);
 
+    if (obj.find("level") != obj.end() && obj.at("level").type == Container::Value::CONTAINER_TYPE_STRING)
+    {
+        std::string level(obj.at("level").s);
+        if (level == "nothing")
+            this->set_level(PluginLog::LOG_LEVEL_NOTHING);
+        else if (level == "all" || level == "debug")
+            this->set_level(PluginLog::LOG_LEVEL_DEBUG);
+        else if (level == "warning")
+            this->set_level(PluginLog::LOG_LEVEL_WARNING);
+        else if (level == "error")
+            this->set_level(PluginLog::LOG_LEVEL_ERROR);
+    }
+
     return 0;
 }
 
@@ -60,9 +73,9 @@ void PluginFileLog::set_file(const std::string& file)
 }
 
 //---------------------------------------------------------------------------
-void PluginFileLog::add_log(const std::string& time, const std::string& log)
+void PluginFileLog::add_log(const std::string& time, int l, const std::string& log)
 {
-    if (this->is_open())
+    if (l >= this->level && this->is_open())
     {
         file_mutex.Enter();
         this->file_handle << time << ":" << log << std::endl;

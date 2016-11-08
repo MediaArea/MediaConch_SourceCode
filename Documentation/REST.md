@@ -8,6 +8,10 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.12
+ * Update command:
+  * Checker_Analyze: add a flag to not analyze with MIL
+
 #### Version 1.11
  * Update command:
   * Policy_Get: add is_public
@@ -274,6 +278,7 @@ Parameters:
 - plugins:           Array of Integer: List of Plugins to use (other than format plugins)
 - options:           Array of Object of 2 Strings: List of Options to be given to MediaInfoLib
 - force:             Boolean: force to analyze the file even if registered in database (introduced in v1.1)
+- mil_analyze:       Boolean: force to not analyze with MediaInfoLib
 
 ##### Response
 

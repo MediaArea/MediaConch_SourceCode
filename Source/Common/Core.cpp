@@ -17,6 +17,7 @@
 #include "SQLLiteReport.h"
 #include "Configuration.h"
 #include "Json.h"
+#include "PluginLog.h"
 #include "Common/Xslt.h"
 #include "Common/JS_Tree.h"
 #include "Common/WatchFoldersManager.h"
@@ -390,7 +391,7 @@ void Core::get_users_ids(std::vector<long>& ids, std::string& err)
 long Core::checker_analyze(int user, const std::string& file, bool& registered,
                            const std::vector<std::pair<std::string,std::string> >& options,
                            const std::vector<std::string>& plugins,
-                           bool force_analyze)
+                           bool force_analyze, bool mil_analyze)
 {
     long id = -1;
     registered = false;
@@ -413,7 +414,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
     else
         registered = true;
 
-    if (!analyzed && scheduler->add_element_to_queue(user, file, id, options, plugins) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, file, id, options, plugins, mil_analyze) < 0)
         return -1;
 
     return id;
@@ -423,7 +424,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 long Core::checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                            const std::string generated_log, const std::string generated_error_log,
                            const std::vector<std::pair<std::string,std::string> >& options,
-                           const std::vector<std::string>& plugins)
+                           const std::vector<std::string>& plugins, bool mil_analyze)
 {
     long id = -1;
     bool analyzed = false;
@@ -456,7 +457,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
             return -1;
     }
 
-    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, plugins) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, plugins, mil_analyze) < 0)
         return -1;
 
     return id;
@@ -479,7 +480,7 @@ int Core::update_file_error(int user, long id, bool has_error, const std::string
     int ret = get_db()->update_file_error(user, id, has_error, error_log);
     db_mutex.Leave();
 
-    plugin_add_log(error_log);
+    plugin_add_log(PluginLog::LOG_LEVEL_ERROR, error_log);
 
     return ret;
 }
@@ -612,6 +613,9 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
         transform_with_xslt_file(result->report, *display_name, options, result->report);
     else if (display_content)
         transform_with_xslt_memory(result->report, *display_content, options, result->report);
+
+    if (result->has_valid && !result->valid)
+        plugin_add_log(PluginLog::LOG_LEVEL_DEBUG, "Implementation report is not valid");
     return 0;
 }
 
@@ -660,7 +664,10 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
             res->valid = get_dpfmanager_report(user, files[i], report);
         }
         result.push_back(res);
+        if (!res->valid)
+            plugin_add_log(PluginLog::LOG_LEVEL_DEBUG, "Implementation report is not valid");
     }
+
     return 0;
 }
 
@@ -2216,10 +2223,10 @@ std::string Core::get_date()
 }
 
 //--------------------------------------------------------------------------
-void Core::plugin_add_log(const std::string& log)
+void Core::plugin_add_log(int level, const std::string& log)
 {
     if (plugins_manager)
-        plugins_manager->write_log(log);
+        plugins_manager->write_log(level, log);
 }
 
 }

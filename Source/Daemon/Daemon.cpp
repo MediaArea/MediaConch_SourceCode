@@ -797,7 +797,7 @@ namespace MediaConch
 
             bool registered = false;
             long out_id = -1;
-            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, options, registered, out_id, force);
+            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, options, registered, out_id, force, req->args[i].mil_analyze);
             if (ret < 0)
             {
                 RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;

@@ -269,10 +269,10 @@ public:
     int  checker_analyze(int user, const std::vector<std::string>& files,
                          const std::vector<std::string>& plugins,
                          const std::vector<std::pair<std::string,std::string> >& options,
-                         std::vector<long>& files_id, bool force_analyze = false);
+                         std::vector<long>& files_id, bool force_analyze = false, bool mil_analyze = true);
     int  checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
                          const std::vector<std::pair<std::string,std::string> >& options,
-                         bool& registered, long& file_id, bool force_analyze = false);
+                         bool& registered, long& file_id, bool force_analyze = false, bool mil_analyze = true);
 
     // Status
     int  checker_status(int user, const std::vector<long>& files_id,

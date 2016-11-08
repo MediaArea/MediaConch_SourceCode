@@ -240,7 +240,7 @@ public:
     // Analyze
     struct Checker_Analyze_Arg
     {
-        Checker_Analyze_Arg() : user(-1), has_force_analyze(false) {}
+        Checker_Analyze_Arg() : user(-1), has_force_analyze(false), mil_analyze(true) {}
 
         std::string              to_str() const;
         std::string              file;
@@ -250,6 +250,7 @@ public:
         std::vector<std::pair<std::string,std::string> > options;
         bool                     has_force_analyze;
         bool                     force_analyze;
+        bool                     mil_analyze;
     };
 
     struct Checker_Analyze_Req

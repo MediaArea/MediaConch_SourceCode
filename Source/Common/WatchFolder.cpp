@@ -14,6 +14,7 @@
 #include "WatchFolder.h"
 #include "MediaConchLib.h"
 #include "Core.h"
+#include "PluginLog.h"
 
 #include <ZenLib/Ztring.h>
 #include <ZenLib/ZtringList.h>
@@ -154,7 +155,7 @@ void WatchFolder::Entry()
             {
                 std::stringstream out;
                 out << "Cannot parse:" << filename;
-                core->plugin_add_log(out.str());
+                core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, out.str());
             }
             else
                 wffile->state = WatchFolderFile::WFFS_ANALYZING;
@@ -247,7 +248,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
         std::stringstream out;
 
         out << wffile->name << ": implementation is not valid";
-        core->plugin_add_log(out.str());
+        core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, out.str());
     }
 
     std::string filename = wffile->report_file + ".ImplementationReport.html";
@@ -311,7 +312,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
             std::stringstream out;
 
             out << wffile->name << ": policy is not valid";
-            core->plugin_add_log(out.str());
+            core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, out.str());
         }
         report_set.reset();
 

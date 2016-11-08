@@ -46,6 +46,7 @@ CL_OPTION(ImplementationVerbosity);
 CL_OPTION(PolicyReferenceFile);
 CL_OPTION(Compression);
 CL_OPTION(Force);
+CL_OPTION(NoMilAnalyze);
 CL_OPTION(Asynchronous);
 CL_OPTION(UsePlugin);
 CL_OPTION(PluginsList);

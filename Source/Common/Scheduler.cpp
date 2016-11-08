@@ -17,6 +17,7 @@
 #include "Plugin.h"
 #include "PluginFormat.h"
 #include "PluginsManager.h"
+#include "PluginLog.h"
 #include "FFmpeg.h"
 #include <ZenLib/Ztring.h>
 
@@ -61,11 +62,11 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int Scheduler::add_element_to_queue(int user, const std::string& filename, long file_id,
                                         const std::vector<std::pair<std::string,std::string> >& options,
-                                        const std::vector<std::string>& plugins)
+                                        const std::vector<std::string>& plugins, bool mil_analyze)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins);
+        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins, mil_analyze);
         run_element();
         return index - 1;
     }
@@ -196,7 +197,7 @@ namespace MediaConch {
         std::string error;
         ((PluginFormat*)plugins[format_str])->set_file(el->filename);
         if (plugins[format_str]->run(error) < 0)
-            core->plugin_add_log(error);
+            core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, error);
         const std::string& report = plugins[format_str]->get_report();
         MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
 
@@ -269,7 +270,8 @@ namespace MediaConch {
                     options.push_back(std::make_pair(it->first, it->second));
 
                 std::vector<std::string> plugins;
-                long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log, generated_error_log, options, plugins);
+                long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log,
+                                                generated_error_log, options, plugins, el->mil_analyze);
                 if (id >= 0)
                     core->file_update_generated_file(el->user, old_id, id);
                 old_id = id;

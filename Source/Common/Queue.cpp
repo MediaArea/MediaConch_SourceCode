@@ -65,6 +65,12 @@ void QueueElement::Entry()
         return;
     }
 
+    if (!mil_analyze)
+    {
+        scheduler->work_finished(this, NULL);
+        return;
+    }
+
     MI = new MediaInfoNameSpace::MediaInfo;
     // Currently avoiding to have a big trace
     if (options.find("parsespeed") == options.end())
@@ -112,7 +118,7 @@ Queue::~Queue()
 
 int Queue::add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
                        const std::vector<std::pair<std::string,std::string> >& options,
-                       const std::vector<std::string>& plugins)
+                       const std::vector<std::string>& plugins, bool mil_analyze)
 {
     QueueElement *el = new QueueElement(scheduler);
 
@@ -120,6 +126,7 @@ int Queue::add_element(QueuePriority priority, int id, int user, const std::stri
     el->user = user;
     el->filename = filename;
     el->file_id = file_id;
+    el->mil_analyze = mil_analyze;
 
     for (size_t i = 0; i < options.size(); ++i)
     {

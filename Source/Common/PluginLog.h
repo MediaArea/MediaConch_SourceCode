@@ -28,10 +28,23 @@ namespace MediaConch {
 class PluginLog : public Plugin
 {
 public:
-    PluginLog() {}
+
+    enum LogLevel
+    {
+        LOG_LEVEL_NOTHING = 0,
+        LOG_LEVEL_DEBUG,
+        LOG_LEVEL_WARNING,
+        LOG_LEVEL_ERROR,
+    };
+
+    PluginLog() : level(LOG_LEVEL_ERROR) {}
     virtual      ~PluginLog() {}
 
-    virtual void  add_log(const std::string& time, const std::string& log) = 0;
+    virtual void  add_log(const std::string& time, int level, const std::string& log) = 0;
+    void          set_level(LogLevel l) { level = (int)l; }
+
+protected:
+    int           level;
 
 private:
     PluginLog(const PluginLog&);

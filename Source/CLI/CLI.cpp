@@ -38,7 +38,8 @@ namespace MediaConch
 
     //--------------------------------------------------------------------------
     CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false),
-                 force_analyze(false), watch_folder_recursive(true), create_policy_mode(false), file_information(false),
+                 force_analyze(false), mil_analyze(true),
+                 watch_folder_recursive(true), create_policy_mode(false), file_information(false),
                  plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
     {
         format = MediaConchLib::format_Text;
@@ -135,7 +136,8 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id = -1;
-            int ret = MCL.checker_analyze(use_as_user, files[i], plugins, options, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(use_as_user, files[i], plugins, options, registered,
+                                          file_id, force_analyze, mil_analyze);
             if (ret < 0)
                 return ret;
 
@@ -175,7 +177,8 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id;
-            int ret = MCL.checker_analyze(use_as_user, policy_reference_file, plugins, this->options, registered, file_id, force_analyze);
+            int ret = MCL.checker_analyze(use_as_user, policy_reference_file, plugins, this->options, registered,
+                                          file_id, force_analyze, mil_analyze);
             if (ret < 0)
                 return ret;
             if ((ret = run_policy_reference_file(file_id)) != MediaConchLib::errorHttp_TRUE)
@@ -613,6 +616,12 @@ namespace MediaConch
     void CLI::set_force_analyze(bool force)
     {
         force_analyze = force;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_mil_analyze(bool analyze)
+    {
+        mil_analyze = analyze;
     }
 
     //--------------------------------------------------------------------------

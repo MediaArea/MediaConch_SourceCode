@@ -226,13 +226,13 @@ int MediaConchLib::mediaconch_remove_watch_folder(const std::string& folder, std
 int MediaConchLib::checker_analyze(int user, const std::vector<std::string>& files,
                                    const std::vector<std::string>& plugins,
                                    const std::vector<std::pair<std::string,std::string> >& options,
-                                   std::vector<long>& files_id, bool force_analyze)
+                                   std::vector<long>& files_id, bool force_analyze, bool mil_analyze)
 {
     bool registered = false;
     for (size_t i = 0; i < files.size(); ++i)
     {
         long file_id;
-        int ret = checker_analyze(user, files[i], plugins, options, registered, file_id, force_analyze);
+        int ret = checker_analyze(user, files[i], plugins, options, registered, file_id, force_analyze, mil_analyze);
         if (ret < 0)
             return ret;
         files_id.push_back(file_id);
@@ -243,15 +243,15 @@ int MediaConchLib::checker_analyze(int user, const std::vector<std::string>& fil
 //---------------------------------------------------------------------------
 int MediaConchLib::checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
                                    const std::vector<std::pair<std::string,std::string> >& options,
-                                   bool& registered, long& file_id, bool force_analyze)
+                                   bool& registered, long& file_id, bool force_analyze, bool mil_analyze)
 {
     if (!file.length())
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)
-        return daemon_client->checker_analyze(user, file, plugins, options, registered, force_analyze, file_id);
+        return daemon_client->checker_analyze(user, file, plugins, options, registered, force_analyze, mil_analyze, file_id);
 
-    long id = core->checker_analyze(user, file, registered, options, plugins, force_analyze);
+    long id = core->checker_analyze(user, file, registered, options, plugins, force_analyze, mil_analyze);
     if (id < 0)
         return -1;
 

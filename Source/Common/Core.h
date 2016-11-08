@@ -98,11 +98,11 @@ public:
     long        checker_analyze(int user, const std::string& filename, bool& registered,
                                 const std::vector<std::pair<std::string,std::string> >& options,
                                 const std::vector<std::string>& plugins,
-                                bool force_analyze = false);
+                                bool force_analyze = false, bool mil_analyze=true);
     long        checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                                 const std::string generated_log, const std::string generated_error_log,
                                 const std::vector<std::pair<std::string,std::string> >& options,
-                                const std::vector<std::string>& plugins);
+                                const std::vector<std::string>& plugins, bool mil_analyze=true);
 
     int         checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res);
     int         remove_report(int user, const std::vector<long>& files);
@@ -202,7 +202,7 @@ public:
     // Helper
     //***************************************************************************
     static std::string get_date();
-    void plugin_add_log(const std::string& log);
+    void plugin_add_log(int level, const std::string& log);
 
 private:
     Core (const Core&);

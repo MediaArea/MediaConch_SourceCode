@@ -41,7 +41,7 @@ public:
     const std::vector<Plugin*>& get_pre_hook_plugins() const { return pre_hook_plugins; }
     int   load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
 
-    int   write_log(const std::string& log);
+    int   write_log(int level, const std::string& log);
 
 private:
     PluginsManager(const PluginsManager&);
