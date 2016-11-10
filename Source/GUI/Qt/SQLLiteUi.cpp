@@ -28,7 +28,7 @@ namespace MediaConch {
 // SQLLiteUi
 //***************************************************************************
 
-int SQLLiteUi::ui_current_version          = 9;
+int SQLLiteUi::ui_current_version          = 10;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -109,6 +109,7 @@ int SQLLiteUi::ui_update_table()
     // UPDATE_UI_TABLE_FOR_VERSION(6); nothing to do
     // UPDATE_UI_TABLE_FOR_VERSION(7); nothing to do
     // UPDATE_UI_TABLE_FOR_VERSION(8); nothing to do
+    // UPDATE_UI_TABLE_FOR_VERSION(9); nothing to do
 
 #undef UPDATE_UI_TABLE_FOR_VERSION
 
@@ -607,7 +608,7 @@ int SQLLiteUi::ui_settings_update_table()
             q = end;                                                    \
         }                                                               \
     } while(0);
-    
+
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(0); nothing to do
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(1);
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(2);
@@ -617,6 +618,7 @@ int SQLLiteUi::ui_settings_update_table()
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(6);
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(7);
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(8);
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(9);
 
 #undef UPDATE_UI_SETTINGS_TABLE_FOR_VERSION
 
@@ -1708,6 +1710,63 @@ int SQLLiteUi::ui_settings_get_last_save_display_path(std::string& save_path, in
 
     if (reports[0].find("LAST_SAVE_DISPLAY_PATH") != reports[0].end())
         save_path = reports[0]["LAST_SAVE_DISPLAY_PATH"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_mco_token(const std::string& token, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   MCO_TOKEN    = ? ";
+    create << "WHERE USER_ID        = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, token.c_str(), token.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_mco_token(std::string& token, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT MCO_TOKEN FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("MCO_TOKEN") != reports[0].end())
+        token = reports[0]["MCO_TOKEN"];
     return 0;
 }
 

@@ -19,7 +19,7 @@ class UiSettings
 public:
     UiSettings();
     ~UiSettings();
-    
+
 //***************************************************************************
 // Functions
 //***************************************************************************
@@ -67,6 +67,10 @@ public:
     std::string  get_last_save_display_path() const;
     void         change_last_save_display_path(const std::string& path);
 
+    // MCO Token
+    std::string  get_mco_token() const;
+    void         change_mco_token(const std::string& token);
+
 private:
     // default
     std::string  default_policy;
@@ -79,6 +83,7 @@ private:
     std::string  default_save_policy_path;
     std::string  default_save_display_path;
 
+    //Last used
     std::string  last_policy;
     std::string  last_display;
     int          last_verbosity;
@@ -88,6 +93,9 @@ private:
     std::string  last_save_report_path;
     std::string  last_save_policy_path;
     std::string  last_save_display_path;
+
+    //MCO Token
+    std::string  mco_token;
 
     DatabaseUi  *database;
 };

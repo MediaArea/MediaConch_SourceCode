@@ -1363,4 +1363,18 @@ namespace MediaConch {
         mainwindow->get_version(version);
         return QString().fromUtf8(version.c_str(), version.size());
     }
+
+    QString WebCommonPage::get_mco_token()
+    {
+        UiSettings& settings = mainwindow->get_settings();
+        std::string token = settings.get_mco_token();
+        return QString().fromUtf8(token.c_str(), token.size());
+    }
+
+    QString WebCommonPage::save_mco_token(const QString& token)
+    {
+        UiSettings& settings = mainwindow->get_settings();
+        settings.change_mco_token(token.toUtf8().data());
+        return QString("{}");
+    }
 }

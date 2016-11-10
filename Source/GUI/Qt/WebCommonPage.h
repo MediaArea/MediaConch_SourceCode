@@ -126,6 +126,8 @@ public Q_SLOTS:
     void         call_tooltip(const QString&);
 
     QString      get_version();
+    QString      get_mco_token();
+    QString      save_mco_token(const QString& token);
 
 protected:
     MainWindow                 *mainwindow;

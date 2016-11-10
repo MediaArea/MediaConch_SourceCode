@@ -324,4 +324,16 @@ int NoDatabaseUi::ui_settings_get_last_save_display_path(std::string&, int)
     return 0;
 }
 
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_save_mco_token(const std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_get_mco_token(std::string&, int)
+{
+    return 0;
+}
+
 }
