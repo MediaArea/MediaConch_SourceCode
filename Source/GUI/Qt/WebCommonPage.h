@@ -125,6 +125,8 @@ public Q_SLOTS:
     QString      get_fields_list(const QString& type, const QString& field);
     void         call_tooltip(const QString&);
 
+    QString      get_version();
+
 protected:
     MainWindow                 *mainwindow;
     QMap<QString, QStringList>  file_selector;

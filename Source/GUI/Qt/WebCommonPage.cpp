@@ -1356,4 +1356,11 @@ namespace MediaConch {
     {
         QDesktopServices::openUrl(link);
     }
+
+    QString WebCommonPage::get_version()
+    {
+        std::string version;
+        mainwindow->get_version(version);
+        return QString().fromUtf8(version.c_str(), version.size());
+    }
 }
