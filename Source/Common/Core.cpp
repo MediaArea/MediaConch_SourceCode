@@ -2109,22 +2109,29 @@ bool Core::has_outcome_fail(const std::string& report)
 //---------------------------------------------------------------------------
 bool Core::implementation_is_valid(const std::string& report)
 {
-    size_t pos = report.find("<implementationChecks ");
-    if (pos == std::string::npos)
-        return true;
+    size_t pos = 0;
+    std::string search("<implementationChecks ");
+    while (1)
+    {
+        pos = report.find(search.c_str(), pos);
+        if (pos == std::string::npos)
+            return true;
 
-    size_t end = report.find(">", pos);
-    if (end == std::string::npos)
-        return true;
+        size_t end = report.find(">", pos);
+        if (end == std::string::npos)
+            return true;
 
-    std::string search("fail_count=\"");
-    size_t f = report.find(search, pos);
+        std::string search("fail_count=\"");
+        size_t f = report.find(search, pos);
 
-    if (f > end || f + search.size() + 2 > report.size())
-        return true;
+        if (f > end || f + search.size() + 2 > report.size())
+            return true;
 
-    if (report[f + search.size()] != '0')
-        return false;
+        if (report[f + search.size()] != '0')
+            return false;
+
+        pos += search.size();
+    }
 
     return true;
 }
