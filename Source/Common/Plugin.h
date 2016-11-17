@@ -35,6 +35,7 @@ class Plugin
 public:
     Plugin();
     virtual ~Plugin();
+    Plugin(const Plugin&);
 
     virtual int load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error) = 0;
     virtual int run(std::string& error) = 0;
@@ -70,7 +71,6 @@ protected:
     void                      unified_string(std::string& str);
 
 private:
-    Plugin(const Plugin&);
     Plugin&     operator=(const Plugin&);
 };
 

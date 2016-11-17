@@ -24,7 +24,7 @@ namespace MediaConch {
     //***************************************************************************
 
     //---------------------------------------------------------------------------
-    FFmpeg::FFmpeg()
+    FFmpeg::FFmpeg() : PluginPreHook()
     {
         type = MediaConchLib::PLUGIN_PRE_HOOK;
     }
@@ -32,6 +32,21 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     FFmpeg::~FFmpeg()
     {
+    }
+
+    //---------------------------------------------------------------------------
+    FFmpeg::FFmpeg(const FFmpeg& f) : PluginPreHook(f)
+    {
+        bin = f.bin;
+        outputDir = f.outputDir;
+        outputExt = f.outputExt;
+
+        for (size_t i = 0; i < f.inputParams.size(); ++i)
+            inputParams.push_back(f.inputParams[i]);
+        for (size_t i = 0; i < f.outputParams.size(); ++i)
+            outputParams.push_back(f.outputParams[i]);
+        for (size_t i = 0; i < f.params.size(); ++i)
+            params.push_back(f.params[i]);
     }
 
     //---------------------------------------------------------------------------

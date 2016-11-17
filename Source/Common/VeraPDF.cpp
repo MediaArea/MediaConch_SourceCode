@@ -35,6 +35,15 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
+    VeraPDF::VeraPDF(const VeraPDF& v): PluginFormat(v)
+    {
+        bin = v.bin;
+
+        for (size_t i = 0; i < v.params.size(); ++i)
+            params.push_back(v.params[i]);
+    }
+
+    //---------------------------------------------------------------------------
     int VeraPDF::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
     {
         if (obj.find("format") == obj.end() || obj.at("format").type != Container::Value::CONTAINER_TYPE_STRING)

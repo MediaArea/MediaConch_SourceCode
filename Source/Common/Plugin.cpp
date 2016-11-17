@@ -51,6 +51,17 @@ namespace MediaConch {
     {
     }
 
+    //---------------------------------------------------------------------------
+    Plugin::Plugin(const Plugin& p)
+    {
+        type = p.type;
+        name = p.name;
+        id = p.id;
+        report = p.report;
+        report_err = p.report_err;
+        error = p.error;
+    }
+
 #if defined(_WIN32)
 
     //---------------------------------------------------------------------------

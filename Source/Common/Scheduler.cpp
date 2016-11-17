@@ -17,7 +17,10 @@
 #include "Plugin.h"
 #include "PluginFormat.h"
 #include "PluginsManager.h"
+#include "VeraPDF.h"
+#include "DpfManager.h"
 #include "PluginLog.h"
+#include "PluginFileLog.h"
 #include "FFmpeg.h"
 #include <ZenLib/Ztring.h>
 
@@ -195,17 +198,27 @@ namespace MediaConch {
             return 1;
 
         std::string error;
-        ((PluginFormat*)plugins[format_str])->set_file(el->filename);
-        if (plugins[format_str]->run(error) < 0)
+        Plugin *p = NULL;
+        if (plugins[format_str]->get_name() == "VeraPDF")
+            p = new VeraPDF(*(VeraPDF*)plugins[format_str]);
+        else if (plugins[format_str]->get_name() == "DPFManager")
+            p = new DPFManager(*(DPFManager*)plugins[format_str]);
+        else
+            return 1;
+
+        ((PluginFormat*)p)->set_file(el->filename);
+        if (p->run(error) < 0)
             core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, error);
-        const std::string& report = plugins[format_str]->get_report();
-        MediaConchLib::report report_kind = ((PluginFormat*)plugins[format_str])->get_report_kind();
+        const std::string& report = p->get_report();
+        MediaConchLib::report report_kind = ((PluginFormat*)p)->get_report_kind();
 
         CS.Enter();
         core->register_reports_to_database(el->user, el->file_id, report, report_kind, MI);
         remove_element(el);
         CS.Leave();
         run_element();
+
+        delete p;
 
         return 0;
     }
@@ -237,7 +250,15 @@ namespace MediaConch {
             if (!is_el_plugin)
                 continue;
 
-            ((PluginPreHook*)plugins[i])->set_input_file(new_file);
+            Plugin *p = NULL;
+            if (plugins[i]->get_name() == "FFmpeg")
+                p = new FFmpeg(*(FFmpeg*)plugins[i]);
+            else if (plugins[i]->get_name() == "FileLog")
+                p = new PluginFileLog(*(PluginFileLog*)plugins[i]);
+            else
+                continue;
+
+            ((PluginPreHook*)p)->set_input_file(new_file);
 
 #if defined(_WIN32) || defined(WIN32)
             unsigned long time_before = GetTickCount();
@@ -246,7 +267,7 @@ namespace MediaConch {
             gettimeofday(&time_before, NULL);
 #endif
 
-            ret = plugins[i]->run(err);
+            ret = p->run(err);
 
 #if defined(_WIN32) || defined(WIN32)
             unsigned long time_after = GetTickCount();
@@ -258,11 +279,11 @@ namespace MediaConch {
             size_t time_passed = (time_after.tv_sec - time_before.tv_sec) * 1000 + (time_after.tv_usec - time_before.tv_usec) / 1000;
 #endif
 
-            if (ret == 0 && ((PluginPreHook*)plugins[i])->is_creating_file())
+            if (ret == 0 && ((PluginPreHook*)p)->is_creating_file())
             {
-                std::string generated_log = ((PluginPreHook*)plugins[i])->get_report();
-                std::string generated_error_log = ((PluginPreHook*)plugins[i])->get_report_err();
-                new_file = ((PluginPreHook*)plugins[i])->get_output_file();
+                std::string generated_log = ((PluginPreHook*)p)->get_report();
+                std::string generated_error_log = ((PluginPreHook*)p)->get_report_err();
+                new_file = ((PluginPreHook*)p)->get_output_file();
 
                 std::vector<std::pair<std::string,std::string> > options;
                 std::map<std::string, std::string>::iterator it = el->options.begin();
@@ -278,13 +299,15 @@ namespace MediaConch {
             }
             else if (ret)
             {
-                std::string error_log = ((PluginPreHook*)plugins[i])->get_report_err();
+                std::string error_log = ((PluginPreHook*)p)->get_report_err();
                 core->update_file_error(el->user, old_id, true, error_log);
+                delete p;
                 return ret;
             }
 
-            if (!((PluginPreHook*)plugins[i])->analyzing_source())
+            if (!((PluginPreHook*)p)->analyzing_source())
                 analyze_file = false;
+            delete p;
         }
 
         if (!analyze_file)

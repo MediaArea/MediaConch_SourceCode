@@ -29,6 +29,12 @@ PluginFileLog::~PluginFileLog()
 }
 
 //---------------------------------------------------------------------------
+PluginFileLog::PluginFileLog(const PluginFileLog& p) : PluginLog(p)
+{
+    filename = p.filename;
+}
+
+//---------------------------------------------------------------------------
 int PluginFileLog::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
 {
     if (obj.find("file") == obj.end() || obj.at("file").type != Container::Value::CONTAINER_TYPE_STRING)

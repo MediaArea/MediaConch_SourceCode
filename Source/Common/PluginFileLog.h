@@ -32,6 +32,7 @@ class PluginFileLog : public PluginLog
 public:
     PluginFileLog();
     virtual                 ~PluginFileLog();
+    PluginFileLog(const PluginFileLog&);
 
     virtual int              load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
     virtual int              run(std::string& error);
@@ -48,7 +49,6 @@ private:
     bool                     open();
     bool                     is_open();
 
-    PluginFileLog(const PluginFileLog&);
     PluginFileLog&           operator=(const PluginFileLog&);
 };
 

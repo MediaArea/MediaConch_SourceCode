@@ -32,12 +32,12 @@ class DPFManager : public PluginFormat
 public:
     DPFManager();
     virtual ~DPFManager();
+    DPFManager(const DPFManager&);
 
     virtual int load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
     virtual int run(std::string& error);
 
 private:
-    DPFManager(const DPFManager&);
     DPFManager&    operator=(const DPFManager&);
 
     int                       create_configuration_file(const std::string& report_dir, std::string& file);

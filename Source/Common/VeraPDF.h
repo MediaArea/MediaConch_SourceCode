@@ -32,12 +32,12 @@ class VeraPDF : public PluginFormat
 public:
     VeraPDF();
     virtual ~VeraPDF();
+    VeraPDF(const VeraPDF&);
 
     virtual int load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
     virtual int run(std::string& error);
 
 private:
-    VeraPDF(const VeraPDF&);
     VeraPDF&    operator=(const VeraPDF&);
 
     std::string               bin;

@@ -30,6 +30,13 @@ class PluginPreHook : public Plugin
 public:
     PluginPreHook() : create_file(false), analyze_source(true) {}
     virtual      ~PluginPreHook() {}
+    PluginPreHook(const PluginPreHook& p) : Plugin(p)
+    {
+        input_file = p.input_file;
+        output_file = p.output_file;
+        create_file = p.create_file;
+        analyze_source = p.analyze_source;
+    }
 
     void          set_input_file(const std::string& file) { input_file = file; }
 
@@ -45,7 +52,6 @@ protected:
     bool          analyze_source;
 
 private:
-    PluginPreHook(const PluginPreHook&);
     PluginPreHook &operator=(const PluginPreHook&);
 };
 
