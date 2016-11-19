@@ -103,11 +103,13 @@ void PublicPoliciesWindow::change_qt_scripts_in_template(QString& html)
 
     reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
-    script += "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/listWebKit.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/listWebKit.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/users/userWebKit.js\"></script>\n";
 #elif defined(WEB_MACHINE_ENGINE)
     script += "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
               "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
-              "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/listWebEngine.js\"></script>\n";
+              "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/listWebEngine.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/users/userWebEngine.js\"></script>\n";
 #endif
     script += "        <script type=\"text/javascript\" src=\"qrc:/utils/text.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/publicPolicies/list.js\"></script>\n";

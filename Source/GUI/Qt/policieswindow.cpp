@@ -112,11 +112,13 @@ void PoliciesWindow::change_qt_scripts_in_template(QString& html)
 
     reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
-    script += "        <script type=\"text/javascript\" src=\"qrc:/policyWebKit.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/policyWebKit.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/users/userWebKit.js\"></script>\n";
 #elif defined(WEB_MACHINE_ENGINE)
     script += "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
               "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
-              "        <script type=\"text/javascript\" src=\"qrc:/policyWebEngine.js\"></script>\n";
+              "        <script type=\"text/javascript\" src=\"qrc:/policyWebEngine.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/users/userWebEngine.js\"></script>\n";
 #endif
     script += "        <script type=\"text/javascript\" src=\"qrc:/policyTree.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreeAffix.js\"></script>\n";
@@ -125,6 +127,8 @@ void PoliciesWindow::change_qt_scripts_in_template(QString& html)
     script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreeRulesMI.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/policyTreeRulesMT.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/policy.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/utils/functions.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n";
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), script);
 }

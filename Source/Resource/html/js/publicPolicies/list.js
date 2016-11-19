@@ -1,4 +1,5 @@
 function initPage() {
+    user.loadToken();
     mcoMessage.init('.displayMessages');
     modalBinding();
 
@@ -16,6 +17,17 @@ function modalBinding() {
 
         // Set policyId and userId in modal
         $(this).data('policy-id', policyElem.data('policy-id')).data('user-id', policyElem.data('user-id'));
+
+        // Add to my policies or unpublish button
+        if (true === policyElem.data('allow-edit')) {
+            $('.modalPolicyImport').hide();
+            $('.alert-modal-create-policy').hide();
+            $('.modalPolicyUnpublish').show();
+        }
+        else {
+            $('.modalPolicyUnpublish').hide();
+            $('.modalPolicyImport').show();
+        }
     });
 
     $('.modalPolicyExport').on('click', function (event) {
@@ -29,6 +41,12 @@ function modalBinding() {
 
         publicPoliciesListAjax.policyImport(policyElem.data('policy-id'), policyElem.data('user-id'), $(this));
     });
+
+    $('.modalPolicyUnpublish').on('click', function (event) {
+        var policyElem = $('#modalPolicy');
+
+        user.policyUnpublish(policyElem.data('policy-id'), $(this));
+    });
 }
 
 var publicPoliciesList = (function() {
@@ -38,9 +56,22 @@ var publicPoliciesList = (function() {
                 policy.license = 'Other';
             }
 
+            // Start wrapper line
+            if (0 == index % 2) {
+                $('#publicPoliciesList').append('<div class="col-xs-12 policiesLineWrapper">');
+            }
+
+            // Add to my policies or unpublish button
+            if (true === policy.allowEdit) {
+                var userButton = '<button type="button" class="btn btn-default policyUnpublish" title="Remove my policy from the public policies list">Unpublish</button>'
+            }
+            else {
+                var userButton = '<button type="button" class="btn btn-default policyImport">Add to my policies</button>';
+            }
+
             $('#publicPoliciesList').append(
 '<div class="col-xs-12 col-sm-6"> \
-    <div class="policyBox" data-policy-id="' + policy.id + '" data-user-id="' + policy.user.id + '"> \
+    <div class="policyBox policyBox-' + policy.id + '" data-policy-id="' + policy.id + '" data-user-id="' + policy.user.id + '" data-allow-edit="' + policy.allowEdit + '"> \
         <header> \
             <h4><a href="#" data-toggle="modal" data-target="#modalPolicy" title="View policy">' + policy.name + '</a></h4> \
             <span class="policyDescription">' + policy.description + '</span> \
@@ -49,13 +80,23 @@ var publicPoliciesList = (function() {
             <span class="policyAuthor">Maintainer: ' + policy.user.name + '</span> \
             <span class="policyLicense">License: ' + policy.license + '</span> \
         </p> \
-        <div class="policyActions"> \
-            <button type="button" class="btn btn-default policyImport">Add to my policies</button> \
-            <button type="button" class="btn btn-default pull-right policyExport">Export</button> \
+        <div class="policyActions row text-left"> \
+            ' + userButton + ' \
+            <button type="button" class="btn btn-default policyExport pull-right">Export</button> \
         </div> \
     </div> \
 </div>'
             );
+
+            // End wrapper line
+            if (1 == index % 2) {
+                $('#publicPoliciesList').append('</div>');
+            }
+            else {
+                if (list.length == (index + 1)) {
+                    $('#publicPoliciesList').append('</div>');
+                }
+            }
         });
 
         policyDescriptionHeight();
@@ -100,6 +141,12 @@ var publicPoliciesList = (function() {
 
             publicPoliciesListAjax.policyImport(policyElem.data('policy-id'), policyElem.data('user-id'), $(this));
         });
+
+        $('.policyUnpublish').on('click', function (event) {
+            var policyElem = $(this).parent().parent();
+
+            user.policyUnpublish(policyElem.data('policy-id'), $(this));
+        });
     }
 
     return {
@@ -110,11 +157,44 @@ var publicPoliciesList = (function() {
 
 var importPolicy = (function() {
     var success = function(data, button) {
-        button.fadeOut(200).replaceWith('<div class="alert alert-success alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <a href="' + Routing.generate('app_xslpolicy_xslpolicytree') + '" target="_blank" title="View the new policy" class="alert-link">Policy</a> successfuly added</div>');
+        button.fadeOut(200).replaceWith('<div class="alert alert-success alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Policy successfuly added</div>');
     }
 
     var error = function(button) {
         button.fadeOut(200).replaceWith('<div class="alert alert-danger alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> Error policy not created</div>');
+    }
+
+    return {
+        success: success,
+        error: error,
+    };
+})();
+
+var unpublishPolicy = (function () {
+    var success = function(button) {
+        // Disable button and links in policyBox and modal
+        if (button.hasClass('policyUnpublish')) {
+            button.parent().find('button').prop('disabled', true);
+            button.parent().parent().addClass('policyBoxDisabled').find('h4 a').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        }
+        else {
+            button.parent().find('button.btn-primary').prop('disabled', true);
+            var policyBoxId = $('#modalPolicy').data('policy-id');
+            $('.policyBox-' + policyBoxId).addClass('policyBoxDisabled').find('button').prop('disabled', true);
+            $('.policyBox-' + policyBoxId).find('h4 a').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+        }
+       button.hide().after('<div class="alert alert-success alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Policy successfuly unpublished</div>');
+    }
+
+    var error = function(button) {
+        button.hide().after('<div class="alert alert-danger alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> Error policy not unpublished</div>');
     }
 
     return {
@@ -147,7 +227,10 @@ $(document).ready(function () {
             {
                 timer_for_ready = null;
                 initPage();
-                publicPoliciesListAjax.getList();
+                setTimeout(function() {
+                    publicPoliciesListAjax.getList();
+
+                }, 100)
             }
         }, time);
     })(0);

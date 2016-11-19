@@ -1,6 +1,7 @@
 function initPage() {
     mcoMessage.init('#policyInfo div');
     policyTree.init();
+    user.loadToken();
 
     // Make buttons in policy rule form display inline
     // Duplicate button
@@ -168,7 +169,43 @@ function formBindings() {
         $('form[name="xslPolicyRule"] button[type=submit]').removeAttr('clicked');
         $(this).attr('clicked', true);
     });
+
+    // User login for token form
+    $('form[name="userLoginToken"]').on('submit', function(e) {
+        e.preventDefault();
+
+        user.loginForToken($(this), 'userConnectModal.formSuccess', 'userConnectModal.formError');
+    });
 }
+
+var userConnectModal = (function() {
+    var show = function() {
+        $('#userConnectModal').modal('show');
+    }
+
+    var hide = function() {
+        $('#userConnectModal').modal('hide');
+    }
+
+    var formSuccess = function() {
+        // Close modal
+        hide();
+        // Export policy to MCO
+        user.pushPolicyToPublicPoliciesOnMCO(policyTree.getPolicyId());
+    }
+
+    var formError = function(error) {
+
+        $('.userConnectModalError').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Login fail, please check your login and password</div>');
+    }
+
+    return {
+        show: show,
+        hide: hide,
+        formSuccess: formSuccess,
+        formError: formError,
+    }
+})();
 
 function buttonBindings() {
     $('#policyDuplicate').on('click', function() {
@@ -195,6 +232,17 @@ function buttonBindings() {
     // Create policy
     $('.policyCreate').on('click', function () {
         policyTreeAjax.policyCreate(policyTree.getSelectedNode(), policyTree.getPolicyId());
+    });
+
+    // Push policy to public policies
+    $('.policyPushPublic').on('click', function () {
+        var token = user.getMcoUserToken();
+        if ('' == token) {
+            userConnectModal.show();
+        }
+        else {
+            user.pushPolicyToPublicPoliciesOnMCO(policyTree.getPolicyId());
+        }
     });
 
     // MediaInfo rule

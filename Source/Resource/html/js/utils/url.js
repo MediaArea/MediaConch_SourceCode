@@ -1,5 +1,5 @@
 var urlUtils = (function() {
-    var baseUrl = 'http://mediaconch/app_dev.php/';
+    var baseUrl = 'https://mediaarea.net/MediaConchOnline/';
 
     var publicApi = function(path) {
         var url = baseUrl + 'api/public/v1/';
@@ -11,7 +11,18 @@ var urlUtils = (function() {
         return url;
     }
 
+    var protectedApi = function(path) {
+        var url = baseUrl + 'api/protected/v1/';
+
+        if (undefined !== path) {
+            url += path;
+        }
+
+        return url;
+    }
+
     return {
         publicApi: publicApi,
+        protectedApi: protectedApi,
     }
 })();
