@@ -1,5 +1,4 @@
 var publicPoliciesListAjax = (function() {
-    var address = "https://mediaarea.net/MediaConchOnline/api/public/v1/publicpolicies/";
     var get_cb = null;
 
     var getList = function() {
@@ -10,7 +9,7 @@ var publicPoliciesListAjax = (function() {
          * {"policiesTree":POLICIES_JSTREE_JSON}
          */
         var cb = $.get({
-            url: address + "list",
+            url: urlUtils.publicApi("publicpolicies/list"),
             dataType: "json"
         }).done(function(data) {
             publicPoliciesListAjax.setGetCb(null);
@@ -33,7 +32,7 @@ var publicPoliciesListAjax = (function() {
          * @return string
          * /api/public/v1/publicpolicies/policy/POLICYID/POLICYUSERID
          */
-        return address + "policy/" + policyId + "/" + policyUserId;
+        return urlUtils.publicApi("publicpolicies/policy/" + policyId + "/" + policyUserId)
     };
 
     var policyExport = function(policyId, policyUserId) {
@@ -45,7 +44,7 @@ var publicPoliciesListAjax = (function() {
         * @return XML
         */
         $.get({
-            url: address + "policy/export/" + policyId + "/" + policyUserId,
+            url: urlUtils.publicApi("publicpolicies/policy/export/" + policyId + "/" + policyUserId),
             dataType: "text",
             async: false
         }).done(function(data) {
@@ -68,7 +67,7 @@ var publicPoliciesListAjax = (function() {
         * {"policyId":ID}
         */
         $.get({
-            url: address + "policy/export/" + policyId + "/" + policyUserId,
+            url: urlUtils.publicApi("publicpolicies/policy/export/" + policyId + "/" + policyUserId),
             dataType: "text",
             async: false
         }).done(function(data) {
