@@ -3,3 +3,7 @@
 .navbar-default .navbar-brand, .navbar-default .navbar-brand:hover {
     color: inherit;
 }
+
+body {
+    padding-top: 0;
+}
