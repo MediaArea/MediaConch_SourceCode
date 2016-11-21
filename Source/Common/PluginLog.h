@@ -39,6 +39,7 @@ public:
 
     PluginLog() : level(LOG_LEVEL_ERROR) {}
     virtual      ~PluginLog() {}
+    PluginLog(const PluginLog& p) : Plugin(p) { level = p.level; }
 
     virtual void  add_log(const std::string& time, int level, const std::string& log) = 0;
     void          set_level(LogLevel l) { level = (int)l; }
@@ -47,7 +48,6 @@ protected:
     int           level;
 
 private:
-    PluginLog(const PluginLog&);
     PluginLog&    operator=(const PluginLog&);
 };
 

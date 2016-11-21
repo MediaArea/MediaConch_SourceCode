@@ -30,6 +30,12 @@ class PluginFormat : public Plugin
 public:
     PluginFormat() {}
     virtual ~PluginFormat() {}
+    PluginFormat(const PluginFormat& p) : Plugin(p)
+    {
+        format = p.format;
+        filename = p.filename;
+        report_kind = p.report_kind;
+    }
 
     std::string            get_format() const { return format; }
     MediaConchLib::report  get_report_kind() const { return report_kind; }
@@ -42,7 +48,6 @@ protected:
     MediaConchLib::report  report_kind;
 
 private:
-    PluginFormat(const PluginFormat&);
     PluginFormat&          operator=(const PluginFormat&);
 };
 

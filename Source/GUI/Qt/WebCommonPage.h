@@ -103,6 +103,7 @@ public Q_SLOTS:
     void         display_delete_id(const QString& name);
 
     QString      get_policies_tree();
+    QString      policy_get_xml(int id);
     void         create_rule_tree(XsltPolicyRule *r, QString& rule_data);
     QString      import_policy();
     QString      import_policy(const QString& file);

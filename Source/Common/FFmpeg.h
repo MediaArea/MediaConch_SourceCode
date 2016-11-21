@@ -32,12 +32,12 @@ class FFmpeg : public PluginPreHook
 public:
     FFmpeg();
     virtual ~FFmpeg();
+    FFmpeg(const FFmpeg&);
 
     virtual int load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
     virtual int run(std::string& error);
 
 private:
-    FFmpeg(const FFmpeg&);
     FFmpeg&    operator=(const FFmpeg&);
 
     std::string               bin;

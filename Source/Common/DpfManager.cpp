@@ -48,6 +48,17 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
+    DPFManager::DPFManager(const DPFManager& d) : PluginFormat(d)
+    {
+        bin = d.bin;
+
+        for (size_t i = 0; i < d.isos.size(); ++i)
+            isos.push_back(isos[i]);
+        for (size_t i = 0; i < d.params.size(); ++i)
+            params.push_back(params[i]);
+    }
+
+    //---------------------------------------------------------------------------
     int DPFManager::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
     {
         if (obj.find("format") == obj.end() || obj.at("format").type != Container::Value::CONTAINER_TYPE_STRING)

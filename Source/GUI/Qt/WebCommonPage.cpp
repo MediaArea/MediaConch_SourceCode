@@ -811,6 +811,15 @@ namespace MediaConch {
         return res;
     }
 
+    QString WebCommonPage::policy_get_xml(int id)
+    {
+        std::string policy, err;
+        if (mainwindow->policy_dump(id, policy, err))
+            return QString().fromUtf8(err.c_str());
+
+        return QString().fromUtf8(policy.c_str());
+    }
+
     QString WebCommonPage::import_policy()
     {
         QString file;
