@@ -93,6 +93,9 @@ public:
     virtual int ui_settings_save_last_save_display_path(const std::string&, int user_id = -1);
     virtual int ui_settings_get_last_save_display_path(std::string&, int user_id = -1);
 
+    virtual int  ui_settings_save_mco_token(const std::string&, int user_id=-1);
+    virtual int  ui_settings_get_mco_token(std::string&, int user_id = -1);
+
     // UI
     int          ui_create_table();
     virtual int  ui_update_table();

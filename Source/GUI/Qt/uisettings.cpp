@@ -68,6 +68,9 @@ int UiSettings::init()
         return -1;
     if (database->ui_settings_get_last_load_display_path(last_load_display_path))
         return -1;
+
+    if (database->ui_settings_get_mco_token(mco_token))
+        return -1;
     return 0;
 }
 
@@ -401,6 +404,25 @@ void UiSettings::change_last_load_display_path(const std::string& path)
         return;
 
     last_load_display_path = path;
+}
+
+// Last used
+//---------------------------------------------------------------------------
+std::string UiSettings::get_mco_token() const
+{
+    return mco_token;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_mco_token(const std::string& token)
+{
+    if (!database || mco_token == token)
+        return;
+
+    if (database->ui_settings_save_mco_token(token) < 0)
+        return;
+
+    mco_token = token;
 }
 
 }

@@ -58,6 +58,7 @@ namespace MediaConch {
 //***************************************************************************
 
 const std::string MainWindow::database_filename = std::string("MediaConchUi.db");
+const std::string MainWindow::version = "16.10";
 
 //***************************************************************************
 // Constructor / Desructor
@@ -1428,6 +1429,12 @@ void MainWindow::set_error_http(MediaConchLib::errorHttp code)
 int MainWindow::get_ui_database_path(std::string& path)
 {
     return MCL.get_ui_database_path(path);
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::get_version(std::string& v)
+{
+    v = version;
 }
 
 //---------------------------------------------------------------------------

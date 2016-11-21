@@ -162,6 +162,7 @@ public:
     void                        remove_file_registered_from_file(const std::string& file);
 
     int                         get_ui_database_path(std::string& path);
+    void                        get_version(std::string& version);
     void                        get_error_http(MediaConchLib::errorHttp code, QString& error_msg);
     void                        set_error_http(MediaConchLib::errorHttp code);
 
@@ -188,6 +189,7 @@ private:
     // Internal
     DatabaseUi                   *db;
     static const std::string      database_filename;
+    static const std::string      version;
     MediaConchLib                 MCL;
     std::vector<QString>          displays_list;
     WorkerFiles                   workerfiles;

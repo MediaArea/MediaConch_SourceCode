@@ -125,6 +125,10 @@ public Q_SLOTS:
     QString      get_fields_list(const QString& type, const QString& field);
     void         call_tooltip(const QString&);
 
+    QString      get_version();
+    QString      get_mco_token();
+    QString      save_mco_token(const QString& token);
+
 protected:
     MainWindow                 *mainwindow;
     QMap<QString, QStringList>  file_selector;
