@@ -62,6 +62,7 @@ public:
     void get_elements(int user, std::vector<std::string>& vec);
     int  another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     int  execute_pre_hook_plugins(QueueElement *el, std::string& err, bool& analyze_file);
+    void write_log_timestamp(int level, std::string log);
 
 private:
     Scheduler(const Scheduler&);

@@ -18,6 +18,12 @@
 #include "DpfManager.h"
 #include "FFmpeg.h"
 #include "PluginFileLog.h"
+#if defined(WIN32)
+#include <Windows.h>
+#else
+#include <sys/time.h>
+#endif
+#include <sstream>
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -107,6 +113,36 @@ namespace MediaConch {
                 continue;
 
             ((PluginLog*)log_plugins[i])->add_log(time, level, log);
+        }
+
+        return ret;
+    }
+
+    //---------------------------------------------------------------------------
+    int PluginsManager::write_log_timestamp(int level, const std::string& log)
+    {
+        int ret = 0;
+        std::stringstream t;
+#if defined(WIN32)
+        t << GetTickCount64();
+#else
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        suseconds_t micro = tv.tv_usec / 1000;
+        t << tv.tv_sec;
+        if (micro < 10)
+            t << "00";
+        else if (micro < 100)
+            t << "0";
+        t << micro;
+#endif
+
+        for (size_t i = 0; i < log_plugins.size(); ++i)
+        {
+            if (!log_plugins[i])
+                continue;
+
+            ((PluginLog*)log_plugins[i])->add_log(t.str(), level, log);
         }
 
         return ret;

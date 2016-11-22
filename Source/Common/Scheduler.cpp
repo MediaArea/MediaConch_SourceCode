@@ -316,4 +316,9 @@ namespace MediaConch {
         return ret;
     }
 
+    void Scheduler::write_log_timestamp(int level, std::string log)
+    {
+        core->plugin_add_log_timestamp(level, log);
+    }
+
 }
