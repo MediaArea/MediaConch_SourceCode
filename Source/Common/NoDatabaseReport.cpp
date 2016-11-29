@@ -99,13 +99,14 @@ void NoDatabaseReport::get_users_id(std::vector<long>& ids, std::string&)
 
 //---------------------------------------------------------------------------
 long NoDatabaseReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
-                                std::string&, long generated_id,
+                                const std::string& options, std::string&, long generated_id,
                                 long source_id, size_t generated_time,
                                 const std::string& generated_log, const std::string& generated_error_log)
 {
     MC_File* f = new MC_File;
     f->filename = filename;
     f->file_last_modification = file_last_modification;
+    f->options = options;
     f->user = user;
 
     f->source_id = source_id;
@@ -122,11 +123,11 @@ long NoDatabaseReport::add_file(int user, const std::string& filename, const std
 
 //---------------------------------------------------------------------------
 long NoDatabaseReport::update_file(int user, long file_id, const std::string& file_last_modification,
-                                   std::string&, long generated_id,
+                                   const std::string& options, std::string&, long generated_id,
                                    long source_id, size_t generated_time,
                                    const std::string& generated_log, const std::string& generated_error_log)
 {
-    if (file_id < 0 || file_id >= (long)files_saved.size() || files_saved[file_id]->user != user)
+    if (file_id < 0 || file_id >= (long)files_saved.size() || files_saved[file_id]->user != user || files_saved[file_id]->options != options)
         return -1;
 
     MC_File* f = files_saved[file_id];
@@ -146,12 +147,13 @@ long NoDatabaseReport::update_file(int user, long file_id, const std::string& fi
 }
 
 //---------------------------------------------------------------------------
-long NoDatabaseReport::get_file_id(int user, const std::string& file, const std::string& file_last_modification)
+long NoDatabaseReport::get_file_id(int user, const std::string& file, const std::string& file_last_modification,
+                                   const std::string& options)
 {
     for (long id = 0; id < (long)files_saved.size(); ++id)
         if (files_saved[id] && file == files_saved[id]->filename &&
             (!file_last_modification.size() || file_last_modification == files_saved[id]->file_last_modification) &&
-            files_saved[id]->user == user)
+            files_saved[id]->user == user && files_saved[id]->options == options)
             return id;
     return -1;
 }
@@ -169,7 +171,8 @@ void NoDatabaseReport::get_file_name_from_id(int user, long id, std::string& fil
 //---------------------------------------------------------------------------
 void NoDatabaseReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
                                                     long& generated_id, long& source_id, size_t& generated_time,
-                                                    std::string& generated_log, std::string& generated_error_log, bool& analyzed,
+                                                    std::string& generated_log, std::string& generated_error_log,
+                                                    std::string& options, bool& analyzed,
                                                     bool& has_error, std::string& error_log)
 {
     if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
@@ -182,6 +185,7 @@ void NoDatabaseReport::get_file_information_from_id(int user, long id, std::stri
         generated_time = files_saved[id]->generated_time;
         generated_log = files_saved[id]->generated_log;
         generated_error_log = files_saved[id]->generated_error_log;
+        options = files_saved[id]->options;
         analyzed = files_saved[id]->analyzed;
         has_error = files_saved[id]->has_error;
         error_log = files_saved[id]->error_log;
@@ -195,6 +199,7 @@ void NoDatabaseReport::get_file_information_from_id(int user, long id, std::stri
         generated_time = (size_t)-1;
         generated_log = std::string();
         generated_error_log = std::string();
+        options = std::string();
         analyzed = false;
         has_error = false;
         error_log = std::string();
@@ -204,9 +209,9 @@ void NoDatabaseReport::get_file_information_from_id(int user, long id, std::stri
 //---------------------------------------------------------------------------
 bool NoDatabaseReport::file_is_analyzed(int user, long id)
 {
-    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+    if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
-        return files_saved[id]->analyzed;
+        return true;
 
     return false;
 }
@@ -359,6 +364,18 @@ void NoDatabaseReport::get_elements(int user, std::vector<std::string>& vec)
             continue;
 
         vec.push_back(files_saved[i]->filename);
+    }
+}
+
+//---------------------------------------------------------------------------
+void NoDatabaseReport::get_elements(int user, std::vector<long>& vec)
+{
+    for (size_t i = 0; i < files_saved.size(); ++i)
+    {
+        if (!files_saved[i] || files_saved[i]->user != user)
+            continue;
+
+        vec.push_back((long)i);
     }
 }
 

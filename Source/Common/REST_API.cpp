@@ -528,7 +528,15 @@ std::string RESTAPI::Checker_Id_From_Filename_Req::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"user\":" << user << ",\"filename\":\"" << filename << "\"}";
+    out << "{\"user\":" << user << ",\"filename\":\"" << filename << "\"";
+    out << "\"options\":[";
+    for (size_t i = 0; i < options.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "{\"" << options[i].first << "\":" << "\"" << options[i].second << "\"}";
+    }
+    out << "]}";
     return out.str();
 }
 
@@ -1208,7 +1216,14 @@ std::string RESTAPI::Checker_File_Information_Res::to_str() const
     out << ",\"generated_time\":" << generated_time;
     out << ",\"generated_log\":\"" << generated_log << "\"";
     out << ",\"generated_error_log\":\"" << generated_error_log << "\"";
-    out << ",\"analyzed\":" << analyzed;
+    out << ",\"options\":[";
+    for (size_t i = 0; i < options.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "{\"" << options[i].first << "\":" << "\"" << options[i].second << "\"}";
+    }
+    out << "],\"analyzed\":" << analyzed;
     out << ",\"has_error\":" << has_error;
     out << ",\"error_log\":\"" << error_log << "\"";
     out << "]";
@@ -1963,7 +1978,7 @@ int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::stri
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string& data)
 {
-    Container::Value v, child, filename, user;
+    Container::Value v, child, filename, user, options;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -1974,6 +1989,19 @@ int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, s
     filename.type = Container::Value::CONTAINER_TYPE_STRING;
     filename.s = req.filename;
     child.obj["filename"] = filename;
+
+    options.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < req.options.size(); ++i)
+    {
+        Container::Value option, val;
+        option.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        val.type = Container::Value::CONTAINER_TYPE_STRING;
+        val.s = req.options[i].second;
+        option.obj[req.options[i].first] = val;
+        options.array.push_back(option);
+    }
+    child.obj["options"] = options;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_ID_FROM_FILENAME"] = child;
@@ -2905,7 +2933,7 @@ int RESTAPI::serialize_id_from_filename_res(Checker_Id_From_Filename_Res& res, s
 int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, std::string& data)
 {
     Container::Value v, child, filename, file_last_modification, generated_id, source_id, generated_time,
-        generated_log, generated_error_log, analyzed, has_error, error_log;
+        generated_log, generated_error_log, options, analyzed, has_error, error_log;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -2936,6 +2964,18 @@ int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, s
     generated_error_log.type = Container::Value::CONTAINER_TYPE_STRING;
     generated_error_log.s = res.generated_error_log;
     child.obj["generated_error_log"] = generated_error_log;
+
+    options.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t i = 0; i < res.options.size(); ++i)
+    {
+        Container::Value option, val;
+        option.type = Container::Value::CONTAINER_TYPE_OBJECT;
+        val.type = Container::Value::CONTAINER_TYPE_STRING;
+        val.s = res.options[i].second;
+        option.obj[res.options[i].first] = val;
+        options.array.push_back(option);
+    }
+    child.obj["options"] = options;
 
     analyzed.type = Container::Value::CONTAINER_TYPE_BOOL;
     analyzed.b = res.analyzed;
@@ -4158,8 +4198,7 @@ RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_id_from_filename_req(const
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
         return NULL;
 
-    Container::Value *filename;
-    filename = model->get_value_by_key(*child, "filename");
+    Container::Value *filename = model->get_value_by_key(*child, "filename");
     if (!filename || filename->type != Container::Value::CONTAINER_TYPE_STRING)
         return NULL;
 
@@ -4169,6 +4208,21 @@ RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_id_from_filename_req(const
     Container::Value *user = model->get_value_by_key(*child, "user");
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
+
+    Container::Value *options = model->get_value_by_key(*child, "options");
+    if (options && options->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < options->array.size(); ++i)
+        {
+            if (options->array[i].type == Container::Value::CONTAINER_TYPE_OBJECT)
+            {
+                std::map<std::string, Container::Value>::iterator it = options->array[i].obj.begin();
+                for (; it != options->array[i].obj.end(); ++it)
+                    if (it->second.type == Container::Value::CONTAINER_TYPE_STRING)
+                    req->options.push_back(std::make_pair(it->first, it->second.s));
+            }
+        }
+    }
 
     return req;
 }
@@ -7049,6 +7103,21 @@ RESTAPI::Checker_File_Information_Res *RESTAPI::parse_file_information_res(const
     Container::Value *generated_error_log = model->get_value_by_key(*child, "generated_error_log");
     if (generated_error_log && generated_error_log->type == Container::Value::CONTAINER_TYPE_STRING)
         res->generated_error_log = generated_error_log->s;
+
+    Container::Value *options = model->get_value_by_key(*child, "options");
+    if (options && options->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < options->array.size(); ++i)
+        {
+            if (options->array[i].type == Container::Value::CONTAINER_TYPE_OBJECT)
+            {
+                std::map<std::string, Container::Value>::iterator it = options->array[i].obj.begin();
+                for (; it != options->array[i].obj.end(); ++it)
+                    if (it->second.type == Container::Value::CONTAINER_TYPE_STRING)
+                        res->options.push_back(std::make_pair(it->first, it->second.s));
+            }
+        }
+    }
 
     Container::Value *analyzed = model->get_value_by_key(*child, "analyzed");
     if (analyzed && analyzed->type == Container::Value::CONTAINER_TYPE_BOOL)

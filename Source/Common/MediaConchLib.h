@@ -133,16 +133,17 @@ public:
     {
         Checker_FileInfo() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false), has_error(false) {}
 
-        std::string filename;
-        std::string file_last_modification;
-        std::string generated_log;
-        std::string generated_error_log;
-        long        generated_id;
-        long        source_id;
-        size_t      generated_time;
-        bool        analyzed;
-        bool        has_error;
-        std::string error_log;
+        std::string                                      filename;
+        std::string                                      file_last_modification;
+        std::string                                      generated_log;
+        std::string                                      generated_error_log;
+        std::vector<std::pair<std::string,std::string> > options;
+        long                                             generated_id;
+        long                                             source_id;
+        size_t                                           generated_time;
+        bool                                             analyzed;
+        bool                                             has_error;
+        std::string                                      error_log;
     };
 
     union XSLT_Child;
@@ -280,8 +281,10 @@ public:
     int  checker_status(int user, long file_id, Checker_StatusRes& res);
 
     void checker_list(int user, std::vector<std::string>& vec);
+    void checker_list(int user, std::vector<long>& vec);
     void checker_file_from_id(int user, long id, std::string& filename);
-    long checker_id_from_filename(int user, const std::string& filename);
+    long checker_id_from_filename(int user, const std::string& filename,
+                                  const std::vector<std::pair<std::string,std::string> >& options);
     int  checker_file_information(int user, long id, Checker_FileInfo& info);
 
     // Output

@@ -301,6 +301,18 @@ void MediaConchLib::checker_list(int user, std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
+void MediaConchLib::checker_list(int user, std::vector<long>& vec)
+{
+    //TODO?
+    // if (use_daemon)
+    // {
+    //     daemon_client->checker_list_ids(user, vec);
+    //     return;
+    // }
+    core->checker_list(user, vec);
+}
+
+//---------------------------------------------------------------------------
 void MediaConchLib::checker_file_from_id(int user, long id, std::string& filename)
 {
     if (use_daemon)
@@ -313,12 +325,13 @@ void MediaConchLib::checker_file_from_id(int user, long id, std::string& filenam
 }
 
 //---------------------------------------------------------------------------
-long MediaConchLib::checker_id_from_filename(int user, const std::string& filename)
+long MediaConchLib::checker_id_from_filename(int user, const std::string& filename,
+                                             const std::vector<std::pair<std::string,std::string> >& options)
 {
     if (use_daemon)
-        return daemon_client->checker_id_from_filename(user, filename);
+        return daemon_client->checker_id_from_filename(user, filename, options);
 
-    return core->checker_id_from_filename(user, filename);
+    return core->checker_id_from_filename(user, filename, options);
 }
 
 //---------------------------------------------------------------------------

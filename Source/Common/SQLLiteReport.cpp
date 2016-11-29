@@ -27,7 +27,7 @@ namespace MediaConch {
 // SQLLiteReport
 //***************************************************************************
 
-int SQLLiteReport::current_report_version = 4;
+int SQLLiteReport::current_report_version = 5;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -117,6 +117,7 @@ int SQLLiteReport::update_report_table()
     UPDATE_REPORT_TABLE_FOR_VERSION(1);
     UPDATE_REPORT_TABLE_FOR_VERSION(2);
     UPDATE_REPORT_TABLE_FOR_VERSION(3);
+    UPDATE_REPORT_TABLE_FOR_VERSION(4);
 
 #undef UPDATE_REPORT_TABLE_FOR_VERSION
 
@@ -151,12 +152,16 @@ void SQLLiteReport::get_users_id(std::vector<long>& ids, std::string& err)
 }
 
 long SQLLiteReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
-                             std::string& err,
+                             const std::string& options, std::string& err,
                              long generated_id,
                              long source_id, size_t generated_time,
                              const std::string& generated_log, const std::string& generated_error_log)
 {
-    long id = get_file_id(user, filename, file_last_modification);
+    std::string opt = options;
+    if (!opt.size())
+        opt = "";
+
+    long id = get_file_id(user, filename, file_last_modification, opt);
     if (id >= 0)
         return id;
 
@@ -164,8 +169,8 @@ long SQLLiteReport::add_file(int user, const std::string& filename, const std::s
 
     reports.clear();
     create << "INSERT INTO MEDIACONCH_FILE";
-    create << " (USER, FILENAME, FILE_LAST_MODIFICATION, GENERATED_ID, SOURCE_ID, GENERATED_TIME, GENERATED_LOG, GENERATED_ERROR_LOG)";
-    create << " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+    create << " (USER, FILENAME, FILE_LAST_MODIFICATION, GENERATED_ID, SOURCE_ID, GENERATED_TIME, GENERATED_LOG, GENERATED_ERROR_LOG, OPTIONS)";
+    create << " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
     query = create.str();
 
     const char* end = NULL;
@@ -205,18 +210,22 @@ long SQLLiteReport::add_file(int user, const std::string& filename, const std::s
     if (ret != SQLITE_OK)
         return -1;
 
+    ret = sqlite3_bind_blob(stmt, 9, opt.c_str(), opt.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
     if (execute() < 0)
     {
         err = error;
         return -1;
     }
 
-    id = get_file_id(user, filename, file_last_modification);
+    id = get_file_id(user, filename, file_last_modification, opt);
     return id;
 }
 
 long SQLLiteReport::update_file(int user, long file_id, const std::string& file_last_modification,
-                                std::string& err,
+                                const std::string& options, std::string& err,
                                 long generated_id, long source_id, size_t generated_time,
                                 const std::string& generated_log, const std::string& generated_error_log)
 {
@@ -227,7 +236,7 @@ long SQLLiteReport::update_file(int user, long file_id, const std::string& file_
     create << " SET FILE_LAST_MODIFICATION = ?, GENERATED_ID = ?, SOURCE_ID = ?,";
     create << " GENERATED_TIME = ?, GENERATED_LOG = ?, GENERATED_ERROR_LOG = ?,";
     create << " ANALYZED = 0";
-    create << " WHERE ID = ? AND USER = ?;";
+    create << " WHERE ID = ? AND USER = ? AND OPTIONS = ?;";
     query = create.str();
 
     const char* end = NULL;
@@ -267,6 +276,10 @@ long SQLLiteReport::update_file(int user, long file_id, const std::string& file_
     if (ret != SQLITE_OK)
         return -1;
 
+    ret = sqlite3_bind_blob(stmt, 9, options.c_str(), options.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
     if (execute() < 0)
     {
         err = error;
@@ -276,7 +289,7 @@ long SQLLiteReport::update_file(int user, long file_id, const std::string& file_
     return file_id;
 }
 
-long SQLLiteReport::get_file_id(int user, const std::string& filename, const std::string& file_last_modification)
+long SQLLiteReport::get_file_id(int user, const std::string& filename, const std::string& file_last_modification, const std::string& options)
 {
     std::stringstream create;
     std::string key("ID");
@@ -285,6 +298,7 @@ long SQLLiteReport::get_file_id(int user, const std::string& filename, const std
     create << "SELECT " << key << " FROM MEDIACONCH_FILE";
     create << " WHERE FILENAME = ?";
     create << " AND USER = ?";
+    create << " AND OPTIONS = ?";
     if (file_last_modification.size())
         create << " AND FILE_LAST_MODIFICATION = ?";
     create << ";";
@@ -303,14 +317,24 @@ long SQLLiteReport::get_file_id(int user, const std::string& filename, const std
     if (ret != SQLITE_OK)
         return -1;
 
+    std::string opt = options;
+    if (!opt.size())
+        opt = "";
+    ret = sqlite3_bind_blob(stmt, 3, opt.c_str(), opt.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
     if (file_last_modification.size())
     {
-        ret = sqlite3_bind_blob(stmt, 3, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
+        ret = sqlite3_bind_blob(stmt, 4, file_last_modification.c_str(), file_last_modification.length(), SQLITE_STATIC);
         if (ret != SQLITE_OK)
             return -1;
     }
 
-    if (execute() || !reports.size() || reports[0].find(key) == reports[0].end())
+    if (execute())
+        return -1;
+
+    if (!reports.size() || reports[0].find(key) == reports[0].end())
         return -1;
 
     return std_string_to_int(reports[0][key]);
@@ -348,7 +372,8 @@ void SQLLiteReport::get_file_name_from_id(int user, long id, std::string& file)
 
 void SQLLiteReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
                                                  long& generated_id, long& source_id, size_t& generated_time,
-                                                 std::string& generated_log, std::string& generated_error_log, bool& analyzed,
+                                                 std::string& generated_log, std::string& generated_error_log,
+                                                 std::string& options, bool& analyzed,
                                                  bool& has_error, std::string& error_log)
 {
     std::stringstream create;
@@ -360,6 +385,7 @@ void SQLLiteReport::get_file_information_from_id(int user, long id, std::string&
     std::string gen_time("GENERATED_TIME");
     std::string gen_log("GENERATED_LOG");
     std::string gen_error_log("GENERATED_ERROR_LOG");
+    std::string opt("OPTIONS");
     std::string has_err("HAS_ERROR");
     std::string err_log("ERROR_LOG");
 
@@ -372,6 +398,7 @@ void SQLLiteReport::get_file_information_from_id(int user, long id, std::string&
     create << ", " << gen_time;
     create << ", " << gen_log;
     create << ", " << gen_error_log;
+    create << ", " << opt;
     create << ", " << has_err;
     create << ", " << err_log;
     create << " FROM MEDIACONCH_FILE";
@@ -417,6 +444,9 @@ void SQLLiteReport::get_file_information_from_id(int user, long id, std::string&
 
     if (reports[0].find(gen_error_log) != reports[0].end())
         generated_error_log = reports[0][gen_error_log];
+
+    if (reports[0].find(opt) != reports[0].end())
+        options = reports[0][opt];
 
     if (reports[0].find(has_err) != reports[0].end())
         has_error = (bool)std_string_to_int(reports[0][has_err]);
@@ -539,16 +569,12 @@ bool SQLLiteReport::file_is_analyzed(int user, long id)
 
     ret = sqlite3_bind_int(stmt, 2, user);
     if (ret != SQLITE_OK)
-        return -1;
-
-    if (execute() || reports.size() != 1)
         return false;
 
-    bool analyzed = false;
-    if (reports[0].find("ANALYZED") != reports[0].end())
-        analyzed = (bool)std_string_to_int(reports[0]["ANALYZED"]);
+    if (execute() || reports.size() <= 0)
+        return false;
 
-    return analyzed;
+    return true;
 }
 
 int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
@@ -711,7 +737,8 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
     }
 }
 
-bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format)
+bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
+                                         MediaConchLib::format format)
 {
     std::stringstream create;
     std::string key("COUNT(REPORT)");
@@ -799,6 +826,34 @@ void SQLLiteReport::get_elements(int user, std::vector<std::string>& vec)
     {
         if (reports[i].find(key) != reports[i].end())
             vec.push_back(reports[i][key]);
+    }
+}
+
+void SQLLiteReport::get_elements(int user, std::vector<long>& vec)
+{
+    std::stringstream create;
+    std::string key("ID");
+
+    reports.clear();
+    create << "SELECT " << key << " FROM MEDIACONCH_FILE WHERE USER = ?;";
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return;
+
+    ret = sqlite3_bind_int(stmt, 1, user);
+    if (ret != SQLITE_OK)
+        return;
+
+    if (execute() || !reports.size())
+        return;
+
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        if (reports[i].find(key) != reports[i].end())
+            vec.push_back((long)std_string_to_int(reports[i][key]));
     }
 }
 

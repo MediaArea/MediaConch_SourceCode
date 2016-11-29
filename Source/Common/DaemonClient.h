@@ -64,7 +64,8 @@ public:
 
     // filename_from_id
     int checker_file_from_id(int user, long id, std::string& filename);
-    long checker_id_from_filename(int user, const std::string& filename);
+    long checker_id_from_filename(int user, const std::string& filename,
+                                  const std::vector<std::pair<std::string,std::string> >& options);
     int checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info);
 
     // default_values_for_type

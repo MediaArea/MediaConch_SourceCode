@@ -121,4 +121,13 @@ void DatabaseReport::get_sql_query_for_update_report_table_v3(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseReport::get_sql_query_for_update_report_table_v4(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE MEDIACONCH_FILE ";
+    create << "ADD OPTIONS TEXT DEFAULT \"\" NOT NULL;";
+    q = create.str();
+}
+
 }

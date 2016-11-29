@@ -232,7 +232,7 @@ namespace MediaConch
     {
         for  (size_t i = 0; i < files.size(); ++i)
         {
-            long id = MCL.checker_id_from_filename(use_as_user, files[i]);
+            long id = MCL.checker_id_from_filename(use_as_user, files[i], options);
             if (id < 0)
             {
                 error = "File is not registered";
@@ -723,6 +723,15 @@ namespace MediaConch
             ss << "generated log:          " << info->generated_log << "\n";
             ss << "generated error log:    " << info->generated_error_log << "\n";
         }
+
+        ss << "options:                ";
+        for (size_t i = 0; i < info->options.size(); ++i)
+        {
+            if (i)
+                ss << ",";
+            ss << info->options[i].first << "=" << info->options[i].second;
+        }
+        ss << "\n";
 
         report = ss.str();
     }
