@@ -298,8 +298,9 @@ std::string RESTAPI::MediaConch_Watch_Folder_Req::to_str() const
             out << ",";
         out << "\"" << policies[i].size() << "\"";
     }
+    out << "]";
     if (user)
-        out << "],\"user\":" << user;
+        out << ",\"user\":" << user;
     out << ",\"recursive\":" << std::boolalpha << recursive;
     out << "}";
     return out.str();

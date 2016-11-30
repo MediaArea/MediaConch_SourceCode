@@ -92,11 +92,6 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--user=";
         return true;
     }
-    else if (argument=="-wfl")
-    {
-        Last_Argument = "--watchfolders-list=";
-        return true;
-    }
     else if (argument=="-wf")
     {
         Last_Argument = "--watchfolder=";
@@ -181,6 +176,9 @@ static void change_short_options_to_long(std::string& argument)
     // Watch Folder short options
     if (argument=="-wfnr")
         argument = "--watchfolder-not-recursive";
+
+    if (argument=="-wfl")
+        argument = "--watchfolders-list";
 }
 
 int Parse(MediaConch::CLI* cli, std::string& argument)
