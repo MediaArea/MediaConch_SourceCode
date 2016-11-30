@@ -7,6 +7,14 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 16.11, 2016-11-30
+-------------
+Publish a policy to MediaConchOnline public policies
+MediaTrace optimization for Matroska
+Fixed parsing of FFV1 v0/v1
+Minor UI fixes
+Improve support of plugins
+
 Version 16.10, 2016-10-31
 -------------
 Update implementation tests, policies and displays
