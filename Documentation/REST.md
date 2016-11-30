@@ -8,6 +8,11 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.13
+ * Update command:
+  * Checker_Id_From_Filename: add options in request
+  * Checker_File_Information: add options in result
+
 #### Version 1.12
  * Update command:
   * Checker_Analyze: add a flag to not analyze with MIL
@@ -121,7 +126,7 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.11
+Current API version: $API_VERSION = 1.13
 
 #### Command
 
@@ -496,6 +501,7 @@ Parameters:
 
 - user:              Integer: a unique id for the user
 - filename:          String: Requested filename for id
+- options:           Array of String: Options associated to the analyze
 
 ##### Response
 
@@ -514,6 +520,7 @@ Parameters:
 
 - user:              Integer: a unique id for the user
 - id:                Integer: id given by the Analyze command
+- options:           Array of String: Options associated to the analyze
 
 ##### Response
 
