@@ -25,6 +25,8 @@
         <file alias="datatables.js">html/js/datatables.min.js</file>
         <file alias="select2.full.js">html/js/select2.full.min.js</file>
         <file alias="utils/text.js">html/js/utils/text.js</file>
+        <file alias="utils/functions.js">html/js/utils/functions.js</file>
+        <file alias="utils/url.js">html/js/utils/url.js</file>
         <file alias="checker.js">html/js/checker.js</file>
         <file alias="policy.js">html/js/policy.js</file>
         <file alias="policyTree.js">html/js/policyTree.js</file>
@@ -39,6 +41,8 @@
         <file alias="publicPolicies/listPolicyTree.js">html/js/publicPolicies/listPolicyTree.js</file>
         <file alias="publicPolicies/listWebKit.js">html/js/publicPolicies/listWebKit.js</file>
         <file alias="publicPolicies/listWebEngine.js">html/js/publicPolicies/listWebEngine.js</file>
+        <file alias="users/userWebEngine.js">html/js/users/userWebEngine.js</file>
+        <file alias="users/userWebKit.js">html/js/users/userWebKit.js</file>
         <file alias="message.js">html/js/message.js</file>
         <file alias="display.js">html/js/display.js</file>
         <file alias="settings.js">html/js/settings.js</file>
@@ -51,6 +55,7 @@
         <file alias="datatables.css">html/css/datatables.min.css</file>
         <file alias="32px.png">html/css/32px.png</file>
         <file alias="40px.png">html/css/40px.png</file>
+        <file alias="throbber.gif">html/css/throbber.gif</file>
         <file alias="glyphicons-halflings-regular.ttf">html/fonts/glyphicons-halflings-regular.ttf</file>
         <file alias="glyphicons-halflings-regular.eot">html/fonts/glyphicons-halflings-regular.eot</file>
         <file alias="glyphicons-halflings-regular.svg">html/fonts/glyphicons-halflings-regular.svg</file>

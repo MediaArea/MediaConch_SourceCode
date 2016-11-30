@@ -1,6 +1,12 @@
 var publicPoliciesListAjax = (function() {
-    var address = "https://mediaarea.net/MediaConchOnline/api/public/v1/publicpolicies/";
     var getList = function() {
+        if (undefined === user.getMcoUserToken() || '' == user.getMcoUserToken()) {
+            var apiAddress = urlUtils.publicApi("publicpolicies/list");
+        }
+        else {
+            var apiAddress = urlUtils.protectedApi("publicpolicies/list");
+        }
+
         /**
          * Get the json for jstree
          *
@@ -8,8 +14,13 @@ var publicPoliciesListAjax = (function() {
          * {"policiesTree":POLICIES_JSTREE_JSON}
          */
         $.get({
-            url: address + "list",
+            url: apiAddress,
             dataType: "json",
+            beforeSend: function(xhr) {
+                if (undefined !== user.getMcoUserToken() && '' != user.getMcoUserToken()) {
+                    xhr.setRequestHeader('X-apiKey', user.getMcoUserToken());
+                }
+            }
         }).done(function(data) {
             policyListSpinner.hide();
             publicPoliciesList.displayList(data.list);
@@ -28,7 +39,7 @@ var publicPoliciesListAjax = (function() {
          * @return string
          * /api/public/v1/publicpolicies/policy/POLICYID/POLICYUSERID
          */
-        return address + "policy/" + policyId + "/" + policyUserId;
+         return urlUtils.publicApi("publicpolicies/policy/" + policyId + "/" + policyUserId)
     };
 
     var policyExport = function(policyId, policyUserId) {
@@ -40,7 +51,7 @@ var publicPoliciesListAjax = (function() {
         * @return XML
         */
         $.get({
-            url: address + "policy/export/" + policyId + "/" + policyUserId,
+            url: urlUtils.publicApi("publicpolicies/policy/export/" + policyId + "/" + policyUserId),
             dataType: "text",
             async: false
         }).done(function(data) {
@@ -64,17 +75,20 @@ var publicPoliciesListAjax = (function() {
         * {"policyId":ID}
         */
         $.get({
-            url: address + "policy/export/" + policyId + "/" + policyUserId,
+            url: urlUtils.publicApi("publicpolicies/policy/export/" + policyId + "/" + policyUserId),
             dataType: "text",
             async: false
         }).done(function(data) {
             webpage.policy_import_data(data, function (res) {
                 var json = JSON.parse(res);
-                if (json.error)
-                    mcoMessage.error(json.error);
+                if (json.error) {
+                    importPolicy.error(button);
+                }
+
+                importPolicy.success(data.policyId, button);
             });
         }).fail(function (jqXHR) {
-            mcoMessage.fail(jqXHR);
+            importPolicy.error(button);
         });
 
     };

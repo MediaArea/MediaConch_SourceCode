@@ -83,8 +83,13 @@
         </form>
 
         <div class="policyEditActions policyEditUser">
-          <button class="policyCreate btn btn-warning">Add a new policy</button>
-          <button id="policyRuleCreate" class="btn btn-warning">Add a new rule</button>
+            <div>
+                <button class="policyPushPublic btn btn-warning">Add to public policies</button>
+            </div>
+            <div>
+                <button class="policyCreate btn btn-warning">Add a new policy</button>
+                <button id="policyRuleCreate" class="btn btn-warning">Add a new rule</button>
+            </div>
         </div>
       </div>
 
@@ -213,3 +218,55 @@
     </div>
   </div>
 </div>
+
+<div id="userConnectModal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Connect to your MediaConchOnline account</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>
+                            To publish your policy to the public policy list you need to connect to your MediaConchOnline account.<br>
+                            If you do not have an account yet you can create one <a href="https://mediaarea.net/MediaConchOnline/register/" onclick="call_browser(event);">here</a>
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <form name="userLoginToken" action="" method="post">
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" name="_username" value="" required="required" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="_password" required="required" />
+                            </div>
+
+                            <div class="form-group">
+                                <input type="submit" id="_submit" name="_submit" value="Login" />
+                            </div>
+                        </form>
+                        <div class="col-md-12 userConnectModalError"></div>
+                        <p><a href="https://mediaarea.net/MediaConchOnline/resetting/request" onclick="call_browser(event);">I forgot my password</a></p>
+                        <p><a href="https://mediaarea.net/MediaConchOnline/register/" onclick="call_browser(event);">Create an account</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+function call_browser(e)
+{
+    e.preventDefault();
+    webpage.call_tooltip(e.target.href);
+}
+</script>
