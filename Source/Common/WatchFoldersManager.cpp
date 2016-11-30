@@ -58,6 +58,7 @@ std::map<std::string, std::string> WatchFoldersManager::get_watch_folders()
 int WatchFoldersManager::add_watch_folder(const std::string& folder, const std::string& folder_reports,
                                           const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
                                           long *in_user, bool recursive,
+                                          const std::vector<std::pair<std::string,std::string> >& options,
                                           long& user_id, std::string& error)
 {
     CS.Enter();
@@ -103,6 +104,9 @@ int WatchFoldersManager::add_watch_folder(const std::string& folder, const std::
 
     for (size_t i = 0; i < policies.size(); ++i)
         wf->policies.push_back(policies[i]);
+
+    for (size_t i = 0; i < options.size(); ++i)
+        wf->options.push_back(std::make_pair(options[i].first, options[i].second));
 
     watch_folders[folder] = wf;
     wf->Run();

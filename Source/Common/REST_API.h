@@ -178,14 +178,15 @@ public:
         MediaConch_Watch_Folder_Req() : user(NULL), recursive(true) {}
         ~MediaConch_Watch_Folder_Req();
 
-        std::string               to_str() const;
+        std::string                                       to_str() const;
 
-        std::string               folder;
-        std::string               folder_reports;
-        std::vector<std::string>  plugins;
-        std::vector<std::string>  policies;
-        long                     *user;
-        bool                      recursive;
+        std::string                                       folder;
+        std::string                                       folder_reports;
+        std::vector<std::string>                          plugins;
+        std::vector<std::string>                          policies;
+        std::vector<std::pair<std::string,std::string> >  options;
+        long                                             *user;
+        bool                                              recursive;
     };
 
     struct MediaConch_Watch_Folder_Res

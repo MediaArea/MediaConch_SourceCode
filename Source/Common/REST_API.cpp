@@ -302,7 +302,14 @@ std::string RESTAPI::MediaConch_Watch_Folder_Req::to_str() const
     if (user)
         out << ",\"user\":" << user;
     out << ",\"recursive\":" << std::boolalpha << recursive;
-    out << "}";
+    out << ",options:[";
+    for (size_t i = 0; i < options.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "{\"" << options[i].first << "\":\"" << options[i].second << "\"}";
+    }
+    out << "]}";
     return out.str();
 }
 
@@ -1639,7 +1646,7 @@ int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, s
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string& data)
 {
-    Container::Value v, child, folder, folder_reports, plugins, policies, user, recursive;
+    Container::Value v, child, folder, folder_reports, plugins, policies, user, recursive, options;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -1681,6 +1688,20 @@ int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& 
     recursive.type = Container::Value::CONTAINER_TYPE_BOOL;
     recursive.b = req.recursive;
     child.obj["recursive"] = recursive;
+
+    options.type = Container::Value::CONTAINER_TYPE_ARRAY;
+    for (size_t j = 0; j < req.options.size(); ++j)
+    {
+        Container::Value option, value;
+        option.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        value.type = Container::Value::CONTAINER_TYPE_STRING;
+        value.s = req.options[j].second;
+        option.obj[req.options[j].first] = value;
+
+        options.array.push_back(option);
+    }
+    child.obj["options"] = options;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["MEDIACONCH_WATCH_FOLDER"] = child;
@@ -3738,6 +3759,23 @@ RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req
     Container::Value *recursive = model->get_value_by_key(*child, "recursive");
     if (recursive && recursive->type == Container::Value::CONTAINER_TYPE_BOOL)
         req->recursive = recursive->b;
+
+    Container::Value *options = model->get_value_by_key(*child, "options");
+    if (options && options->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t j = 0; j < options->array.size(); ++j)
+        {
+            std::map<std::string, Container::Value>::iterator it = options->array[j].obj.begin();
+            for (; it != options->array[j].obj.end(); ++it)
+            {
+                std::string key = it->first;
+                std::string value;
+                if (it->second.type == Container::Value::CONTAINER_TYPE_STRING)
+                    value = it->second.s;
+                req->options.push_back(std::make_pair(key, value));
+            }
+        }
+    }
 
     return req;
 }

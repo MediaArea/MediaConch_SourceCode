@@ -10,6 +10,7 @@ It is used above an HTTP connection.
 
 #### Version 1.13
  * Update command:
+  * Mediaconch_Watch_Folder: add options in request
   * Checker_Id_From_Filename: add options in request
   * Checker_File_Information: add options in result
 
@@ -205,6 +206,7 @@ Parameters:
 * policies:          Array of String with the policies contents
 * user:              Integer: Use this User ID for the watch folder. If not present, find a unique ID
 * recursive:         Boolean: Check the folder recursively (sub-directory), set to true by default
+- options:           Array of Object of 2 Strings: List of Options to be given to MediaInfoLib
 
 ##### Response
 

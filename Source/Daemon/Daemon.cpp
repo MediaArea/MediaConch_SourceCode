@@ -180,7 +180,7 @@ namespace MediaConch
             std::string err;
             long user_id = -1;
             int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
-                                                   watch_folder_user, watch_folder_recursive, user_id, err);
+                                                   watch_folder_user, watch_folder_recursive, options, user_id, err);
             if (ret < 0)
                 std::clog << "Cannot watch folder:" << watch_folder << ":" << err << std::endl;
             else
@@ -691,7 +691,7 @@ namespace MediaConch
         long user_id = -1;
         if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports,
                                             req->plugins, req->policies,
-                                            req->user, req->recursive, user_id, error) < 0)
+                                            req->user, req->recursive, req->options, user_id, error) < 0)
         {
             res.nok = new RESTAPI::MediaConch_Nok;
             res.nok->error = error;

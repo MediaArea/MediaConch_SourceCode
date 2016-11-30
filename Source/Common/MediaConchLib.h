@@ -262,6 +262,7 @@ public:
     int  mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                  const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
                                  long* in_user, bool recursive,
+                                 const std::vector<std::pair<std::string,std::string> >& options,
                                  long& user_id, std::string& error);
     int  mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports, std::string& error);
     int  mediaconch_remove_watch_folder(const std::string& folder, std::string& error);
