@@ -251,8 +251,8 @@
                             </div>
                         </form>
                         <div class="col-md-12 userConnectModalError"></div>
-                        <p><a href="https://mediaarea.net/MediaConchOnline/resetting/request" onclick="call_browser(event);">I forgot my password</a></p>
-                        <p><a href="https://mediaarea.net/MediaConchOnline/register/" onclick="call_browser(event);">Create an account</a></p>
+                        <p><a href="https://mediaarea.net/MediaConchOnline/resetting/request" onclick="urlUtils.openInBrowser(event);">I forgot my password</a></p>
+                        <p><a href="https://mediaarea.net/MediaConchOnline/register/" onclick="urlUtils.openInBrowser(event);">Create an account</a></p>
                     </div>
                 </div>
             </div>
@@ -262,11 +262,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-function call_browser(e)
-{
-    e.preventDefault();
-    webpage.call_tooltip(e.target.href);
-}
-</script>

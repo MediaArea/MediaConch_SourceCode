@@ -21,8 +21,14 @@ var urlUtils = (function() {
         return url;
     }
 
+    var openInBrowser = function(e) {
+        e.preventDefault();
+        webpage.call_tooltip(e.target.href);
+    }
+
     return {
         publicApi: publicApi,
         protectedApi: protectedApi,
+        openInBrowser: openInBrowser,
     }
 })();
