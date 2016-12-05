@@ -1,5 +1,5 @@
 [
-   {"Use_Daemon": true}, 
+   {"Use_Daemon": true},
    {"Daemon_Address": "127.0.0.1"},
-   {"Daemon_Port": 8080} 
+   {"Daemon_Port": 8080}
 ]
