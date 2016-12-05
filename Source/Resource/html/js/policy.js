@@ -190,8 +190,14 @@ var userConnectModal = (function() {
     var formSuccess = function() {
         // Close modal
         hide();
+
         // Export policy to MCO
-        user.pushPolicyToPublicPoliciesOnMCO(policyTree.getPolicyId());
+        if ('pushPublic' == getAction()) {
+            user.pushPolicyToMCO(policyTree.getPolicyId(), 'public');
+        }
+        else if ('pushPrivate' == getAction()) {
+            user.pushPolicyToMCO(policyTree.getPolicyId(), 'private');
+        }
     }
 
     var formError = function(error) {
@@ -199,11 +205,20 @@ var userConnectModal = (function() {
         $('.userConnectModalError').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Login fail, please check your login and password</div>');
     }
 
+    var setAction = function(action) {
+        $('#userConnectModal').data('action', action);
+    }
+
+    var getAction = function() {
+        return $('#userConnectModal').data('action');
+    }
+
     return {
         show: show,
         hide: hide,
         formSuccess: formSuccess,
         formError: formError,
+        setAction: setAction,
     }
 })();
 
@@ -238,10 +253,23 @@ function buttonBindings() {
     $('.policyPushPublic').on('click', function () {
         var token = user.getMcoUserToken();
         if ('' == token) {
+            userConnectModal.setAction('pushPublic');
             userConnectModal.show();
         }
         else {
-            user.pushPolicyToPublicPoliciesOnMCO(policyTree.getPolicyId());
+            user.pushPolicyToMCO(policyTree.getPolicyId(), 'public');
+        }
+    });
+
+    // Push policy to public policies
+    $('.policyPushPrivate').on('click', function () {
+        var token = user.getMcoUserToken();
+        if ('' == token) {
+            userConnectModal.setAction('pushPrivate');
+            userConnectModal.show();
+        }
+        else {
+            user.pushPolicyToMCO(policyTree.getPolicyId(), 'private');
         }
     });
 
