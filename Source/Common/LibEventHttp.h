@@ -41,22 +41,23 @@ public:
     LibEventHttp();
     virtual ~LibEventHttp();
 
-    int init();
-    int start();
+    int init(std::string& err);
+    int start(std::string& err);
     int stop();
     int finish();
 
 private:
     struct event_base          *base;
     struct evhttp_connection   *connection;
+    std::string                 error;
 
     static void result_coming(struct evhttp_request *req, void *arg);
 
-    virtual int send_request_get(std::string& uri);
-    virtual int send_request_post(std::string& uri, std::string& str);
-    virtual int send_request_put(std::string& uri, std::string& str);
-    virtual int send_request_delete(std::string& uri);
-    int send_request(std::string& uri, std::string& str, enum evhttp_cmd_type type);
+    virtual int send_request_get(std::string& uri, std::string& err);
+    virtual int send_request_post(std::string& uri, std::string& str, std::string& err);
+    virtual int send_request_put(std::string& uri, std::string& str, std::string& err);
+    virtual int send_request_delete(std::string& uri, std::string& err);
+    int send_request(std::string& uri, std::string& str, enum evhttp_cmd_type type, std::string& err);
 
     LibEventHttp (const LibEventHttp&);
     LibEventHttp& operator=(const LibEventHttp&);

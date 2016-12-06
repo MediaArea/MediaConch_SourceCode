@@ -47,11 +47,13 @@ protected:
     sqlite3_stmt                                    *stmt; // Statement handler
 
     // Helper
-    long std_string_to_int(const std::string& str);
-    size_t std_string_to_uint(const std::string& str);
-    int  get_db_version(int& version);
-    int  set_db_version(int version);
-    const std::string& get_error() const;
+    long                std_string_to_int(const std::string& str);
+    size_t              std_string_to_uint(const std::string& str);
+    int                 get_db_version(int& version);
+    int                 set_db_version(int version);
+    const std::string&  get_error() const;
+    std::string         get_sqlite_error(int err);
+    int                 prepare_v2(std::string& query, std::string& err);
 
     SQLLite (const SQLLite&);
     SQLLite& operator=(const SQLLite&);

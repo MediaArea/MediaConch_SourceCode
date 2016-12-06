@@ -52,30 +52,32 @@ public:
                              long generated_id=-1, long source_id=-1, size_t generated_time=(size_t)-1,
                              const std::string& generated_log="", const std::string& generated_error_log="");
     virtual long get_file_id(int user, const std::string& file, const std::string& file_last_modification,
-                             const std::string& options);
-    virtual void get_file_name_from_id(int user, long id, std::string& file);
-    virtual void get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
+                             const std::string& options, std::string& err);
+    virtual int  get_file_name_from_id(int user, long id, std::string& file, std::string& err);
+    virtual int  get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
                                               long& generated_id, long& source_id, size_t& generated_time,
                                               std::string& generated_log, std::string& generated_error_log,
                                               std::string& options,
-                                              bool& analyzed, bool& has_error, std::string& error_log);
-    virtual bool file_is_analyzed(int user, long id);
-    virtual int  update_file_generated_id(int user, long source_id, long generated_id);
-    virtual int  update_file_analyzed(int user, long id, bool analyzed=true);
-    virtual int  update_file_error(int user, long id, bool has_error=true, const std::string& error_log="");
+                                              bool& analyzed, bool& has_error, std::string& error_log,
+                                              std::string& err);
+    virtual bool file_is_analyzed(int user, long id, std::string& err);
+    virtual int  update_file_generated_id(int user, long source_id, long generated_id, std::string& err);
+    virtual int  update_file_analyzed(int user, long id, std::string& err, bool analyzed=true);
+    virtual int  update_file_error(int user, long id, std::string& err, bool has_error=true, const std::string& error_log="");
 
     // Report
     virtual int  save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
-                             const std::string& report, MediaConchLib::compression, int);
-    virtual int  remove_report(int user, long file_id);
+                             const std::string& report, MediaConchLib::compression, int, std::string&);
+    virtual int  remove_report(int user, long file_id, std::string& err);
     virtual void get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
-                            std::string& report, MediaConchLib::compression&);
+                            std::string& report, MediaConchLib::compression&, std::string&);
     virtual bool report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
-                                      MediaConchLib::format format);
-    virtual int  version_registered(int user, long file_id);
-    virtual void get_elements(int user, std::vector<std::string>& vec);
-    virtual void get_elements(int user, std::vector<long>& vec);
-    virtual void get_element_report_kind(int user, long file_id, MediaConchLib::report& report_kind);
+                                      MediaConchLib::format format, std::string&);
+    virtual int  version_registered(int user, long file_id, std::string&);
+    virtual int  get_elements(int user, std::vector<std::string>& vec, std::string& err);
+    virtual int  get_elements(int user, std::vector<long>& vec, std::string& err);
+    virtual int  get_element_report_kind(int user, long file_id, MediaConchLib::report& report_kind,
+                                         std::string& err);
 
 protected:
     virtual int  execute();

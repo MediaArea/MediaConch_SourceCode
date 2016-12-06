@@ -538,7 +538,7 @@ int Policies::policy_get_name(int user, int id, std::string& name, std::string& 
     return 0;
 }
 
-size_t Policies::get_policies_size(int user)
+size_t Policies::get_policies_size(int user, std::string&)
 {
     size_t count = 0;
     std::map<int, std::map<size_t, Policy *> >::const_iterator it = policies.find(user);
@@ -563,7 +563,8 @@ size_t Policies::get_policies_size(int user)
     return count;
 }
 
-void Policies::get_policies(int user, const std::vector<int>& ids, const std::string& format, MediaConchLib::Get_Policies& ps)
+int Policies::get_policies(int user, const std::vector<int>& ids, const std::string& format,
+                            MediaConchLib::Get_Policies& ps, std::string&)
 {
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
 
@@ -572,7 +573,7 @@ void Policies::get_policies(int user, const std::vector<int>& ids, const std::st
 
     it = policies.find(user);
     if (it == policies.end())
-        return;
+        return 0;
 
     std::vector<MediaConchLib::Policy_Policy*> vec;
     std::map<size_t, Policy*>::iterator it_p = it->second.begin();
@@ -619,6 +620,8 @@ void Policies::get_policies(int user, const std::vector<int>& ids, const std::st
         ps.policies = new std::vector<MediaConchLib::Policy_Policy*>;
         *ps.policies = vec;
     }
+
+    return 0;
 }
 
 int Policies::get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& ps, std::string&)
@@ -649,7 +652,7 @@ int Policies::get_public_policies(std::vector<MediaConchLib::Policy_Public_Polic
     return 0;
 }
 
-void Policies::get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps)
+int Policies::get_policies_names_list(int user, std::vector<std::pair<int, std::string> >& ps, std::string&)
 {
     std::map<int, std::map<size_t, Policy*> >::iterator it = policies.find(user);
 
@@ -659,7 +662,7 @@ void Policies::get_policies_names_list(int user, std::vector<std::pair<int, std:
     it = policies.find(user);
 
     if (it == policies.end())
-        return;
+        return 0;
 
     std::map<size_t, Policy*>::iterator it_p = it->second.begin();
     for (; it_p != it->second.end(); ++it_p)
@@ -672,6 +675,8 @@ void Policies::get_policies_names_list(int user, std::vector<std::pair<int, std:
 
         ps.push_back(std::make_pair(it_p->second->id, it_p->second->name));
     }
+
+    return 0;
 }
 
 int Policies::erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, int id, std::string& err)
@@ -896,7 +901,7 @@ int Policies::create_xslt_policy_from_file(int user, long file_id, std::string& 
 
     core->checker_get_report(user, report_set, MediaConchLib::format_Xml, files,
                              policies_ids, policies_contents,
-                             options, &result,
+                             options, &result, err,
                              NULL, NULL);
     if (!result.valid || !result.report.length())
     {
@@ -910,7 +915,7 @@ int Policies::create_xslt_policy_from_file(int user, long file_id, std::string& 
     find_save_name(user, NULL, p->filename);
 
     std::string file;
-    core->checker_file_from_id(user, file_id, file);
+    core->checker_file_from_id(user, file_id, file, err);
     size_t name_pos = file.rfind("/");
     if (name_pos == std::string::npos)
         name_pos = 0;

@@ -149,7 +149,8 @@ void WatchFolder::Entry()
                 continue;
 
             bool registered = false;
-            wffile->file_id = core->checker_analyze(user, filename, registered, options, plugins, false);
+            std::string err;
+            wffile->file_id = core->checker_analyze(user, filename, registered, options, plugins, err, false);
             if (wffile->file_id == -1)
             {
                 std::stringstream out;
@@ -169,7 +170,8 @@ void WatchFolder::Entry()
                 continue;
 
             MediaConchLib::Checker_StatusRes status;
-            core->checker_status(user, wffile->file_id, status);
+            std::string err;
+            core->checker_status(user, wffile->file_id, status, err);
             if (status.finished)
             {
                 wffile->state = WatchFolderFile::WFFS_DONE;
@@ -178,7 +180,8 @@ void WatchFolder::Entry()
                 {
                     WatchFolderFile *new_wffile = new WatchFolderFile;
                     std::string filename;
-                    core->checker_file_from_id(user, status.generated_id, filename);
+                    std::string err;
+                    core->checker_file_from_id(user, status.generated_id, filename, err);
                     new_wffile->file_id = status.generated_id;
                     new_wffile->name = filename;
                     new_wffile->time = ZenLib::File::Modified_Get(ZenLib::Ztring().From_UTF8(filename)).To_UTF8();
@@ -233,13 +236,13 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
 
     MediaConchLib::Checker_ReportRes result;
 
-    std::string display_name, display_content;
+    std::string err, display_name, display_content;
 
     //Implementation report HTML
     report_set.set(MediaConchLib::report_MediaConch);
     int ret = core->checker_get_report(user, report_set, format,
                                        files, policies_ids, policies_contents, options,
-                                       &result, &display_name, &display_content);
+                                       &result, err, &display_name, &display_content);
     report_set.reset();
 
     if (ret || (result.has_valid && !result.valid))
@@ -261,8 +264,8 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     result.report = std::string();
     report_set.set(MediaConchLib::report_MediaConch);
     ret = core->checker_get_report(user, report_set, format,
-                                       files, policies_ids, policies_contents, options,
-                                       &result, &display_name, &display_content);
+                                   files, policies_ids, policies_contents, options,
+                                   &result, err, &display_name, &display_content);
     report_set.reset();
 
     filename = wffile->report_file + ".ImplementationReport.xml";
@@ -276,7 +279,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     report_set.set(MediaConchLib::report_MediaInfo);
     ret = core->checker_get_report(user, report_set, format,
                                    files, policies_ids, policies_contents, options,
-                                   &result, &display_name, &display_content);
+                                   &result, err, &display_name, &display_content);
     report_set.reset();
 
     filename = wffile->report_file + ".MediaInfo.xml";
@@ -290,7 +293,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     report_set.set(MediaConchLib::report_MediaTrace);
     ret = core->checker_get_report(user, report_set, format,
                                    files, policies_ids, policies_contents, options,
-                                   &result, &display_name, &display_content);
+                                   &result, err, &display_name, &display_content);
     report_set.reset();
 
     filename = wffile->report_file + ".MediaTrace.xml";
@@ -305,7 +308,7 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
         result.report = std::string();
         ret = core->checker_get_report(user, report_set, format,
                                        files, policies_ids, policies, options,
-                                       &result, &display_name, &display_content);
+                                       &result, err, &display_name, &display_content);
         if (ret || (result.has_valid && !result.valid))
         {
             std::stringstream out;

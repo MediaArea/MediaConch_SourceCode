@@ -92,11 +92,7 @@ int SQLLite::execute()
         else
         {
             ret = sqlite3_reset(stmt);
-            #if SQLITE_VERSION_NUMBER >= 3007015
-            error = sqlite3_errstr(ret);
-            #else
-            error = "An error occurs during execution";
-            #endif
+            error = get_sqlite_error(ret);
             break;
         }
     }
@@ -159,9 +155,8 @@ int SQLLite::set_db_version(int version)
     create << "PRAGMA user_version=" << version << ";";
     query = create.str();
 
-    const char* end = NULL;
-    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
-    if (ret != SQLITE_OK || !stmt || (end && *end))
+    std::string err;
+    if (prepare_v2(query, err) < 0)
         return -1;
 
     if (execute() < 0)
@@ -174,6 +169,33 @@ int SQLLite::set_db_version(int version)
 const std::string& SQLLite::get_error() const
 {
     return error;
+}
+
+//---------------------------------------------------------------------------
+std::string SQLLite::get_sqlite_error(int err)
+{
+#if SQLITE_VERSION_NUMBER >= 3007015
+    return sqlite3_errstr(err);
+#else
+    return "An error occurs during execution";
+#endif
+}
+
+//---------------------------------------------------------------------------
+int SQLLite::prepare_v2(std::string& query, std::string& err)
+{
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+    {
+        if (ret != SQLITE_OK)
+            err = get_sqlite_error(ret);
+        else
+            err = "Internal error when creating SQLLite query.";
+        return -1;
+    }
+
+    return 0;
 }
 
 }

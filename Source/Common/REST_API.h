@@ -136,6 +136,10 @@ public:
     // Generic error
     struct MediaConch_Nok
     {
+        MediaConch_Nok() : id(NULL) {}
+        ~MediaConch_Nok();
+
+        long        *id;
         std::string  error;
         std::string  to_str() const;
     };
@@ -262,16 +266,9 @@ public:
 
     struct Checker_Analyze_Ok
     {
-        int                    inId;
-        int                    outId;
+        long                   inId;
+        long                   outId;
         bool                   create;
-        std::string            to_str() const;
-    };
-
-    struct Checker_Analyze_Nok
-    {
-        int                    id;
-        Reason                 error;
         std::string            to_str() const;
     };
 
@@ -279,7 +276,7 @@ public:
     {
         ~Checker_Analyze_Res();
         std::vector<Checker_Analyze_Ok*>  ok;
-        std::vector<Checker_Analyze_Nok*> nok;
+        std::vector<MediaConch_Nok*>      nok;
         std::string                       to_str() const;
     };
 
@@ -289,7 +286,7 @@ public:
         Checker_Status_Req() :  user(-1) {}
 
         int                     user;
-        std::vector<int>        ids;
+        std::vector<long>       ids;
         std::string             to_str() const;
     };
 
@@ -309,18 +306,11 @@ public:
         std::string             to_str() const;
     };
 
-    struct Checker_Status_Nok
-    {
-        int                     id;
-        Reason                  error;
-        std::string             to_str() const;
-    };
-
     struct Checker_Status_Res
     {
         ~Checker_Status_Res();
         std::vector<Checker_Status_Ok*>  ok;
-        std::vector<Checker_Status_Nok*> nok;
+        std::vector<MediaConch_Nok*>     nok;
         std::string                      to_str() const;
     };
 
@@ -330,7 +320,7 @@ public:
         Checker_Report_Req() :             user(-1) {}
 
         int                                user;
-        std::vector<int>                   ids;
+        std::vector<long>                  ids;
         std::vector<Report>                reports;
         std::vector<size_t>                policies_ids;
         std::vector<std::string>           policies_contents;
@@ -349,44 +339,14 @@ public:
         std::string             to_str() const;
     };
 
-    struct Checker_Report_Nok
-    {
-        int                     id;
-        Reason                  error;
-        std::string             to_str() const;
-    };
-
     struct Checker_Report_Res
     {
+        Checker_Report_Res() : ok(NULL), nok(NULL) {}
         ~Checker_Report_Res();
-        Checker_Report_Ok                ok;
-        std::vector<Checker_Report_Nok*> nok;
+
+        Checker_Report_Ok               *ok;
+        MediaConch_Nok                  *nok;
         std::string                      to_str() const;
-    };
-
-    // Retry
-    struct Checker_Retry_Req
-    {
-        Checker_Retry_Req() :   user(-1) {}
-
-        int                     user;
-        std::vector<int>        ids;
-        std::string             to_str() const;
-    };
-
-    struct Checker_Retry_Nok
-    {
-        int                     id;
-        Reason                  error;
-        std::string             to_str() const;
-    };
-
-    struct Checker_Retry_Res
-    {
-        ~Checker_Retry_Res();
-        std::vector<int>                ok;
-        std::vector<Checker_Retry_Nok*> nok;
-        std::string                     to_str() const;
     };
 
     // Clear
@@ -395,22 +355,16 @@ public:
         Checker_Clear_Req() :   user(-1) {}
 
         int                     user;
-        std::vector<int>        ids;
-        std::string             to_str() const;
-    };
-
-    struct Checker_Clear_Nok
-    {
-        int                     id;
-        Reason                  error;
+        std::vector<long>       ids;
         std::string             to_str() const;
     };
 
     struct Checker_Clear_Res
     {
         ~Checker_Clear_Res();
-        std::vector<int>                ok;
-        std::vector<Checker_Clear_Nok*> nok;
+
+        std::vector<long>               ok;
+        std::vector<MediaConch_Nok*>    nok;
         std::string                     to_str() const;
     };
 
@@ -426,14 +380,17 @@ public:
     struct Checker_List_File
     {
         std::string            file;
-        int                    id;
+        long                   id;
     };
 
     struct Checker_List_Res
     {
+        Checker_List_Res() : nok(NULL) {}
         ~Checker_List_Res();
-        std::vector<Checker_List_File*> files;
-        std::string                     to_str() const;
+
+        std::vector<Checker_List_File*>  files;
+        MediaConch_Nok                  *nok;
+        std::string                      to_str() const;
     };
 
     // Validate
@@ -442,7 +399,7 @@ public:
         Checker_Validate_Req() :           user(-1) {}
 
         int                                user;
-        std::vector<int>                   ids;
+        std::vector<long>                  ids;
         Report                             report;
         std::vector<size_t>                policies_ids;
         std::vector<std::string>           policies_contents;
@@ -453,23 +410,19 @@ public:
     struct Checker_Validate_Ok
     {
         Checker_Validate_Ok() :    valid(false) {}
-        int                        id;
-        bool                       valid;
-        std::string                to_str() const;
-    };
 
-    struct Checker_Validate_Nok
-    {
-        int                        id;
-        Reason                     error;
+        long                       id;
+        bool                       valid;
         std::string                to_str() const;
     };
 
     struct Checker_Validate_Res
     {
+        Checker_Validate_Res() : nok(NULL) {}
         ~Checker_Validate_Res();
+
         std::vector<Checker_Validate_Ok*>  ok;
-        std::vector<Checker_Validate_Nok*> nok;
+        MediaConch_Nok                    *nok;
         std::string                        to_str() const;
     };
 
@@ -484,8 +437,12 @@ public:
 
     struct Checker_File_From_Id_Res
     {
-        std::string  file;
-        std::string  to_str() const;
+        Checker_File_From_Id_Res() : nok(NULL) {}
+        ~Checker_File_From_Id_Res();
+
+        std::string     file;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Checker_Id_From_Filename_Req
@@ -500,8 +457,12 @@ public:
 
     struct Checker_Id_From_Filename_Res
     {
-        long         id;
-        std::string  to_str() const;
+        Checker_Id_From_Filename_Res() : id(-1), nok(NULL) {}
+        ~Checker_Id_From_Filename_Res();
+
+        long            id;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Checker_File_Information_Req
@@ -515,18 +476,22 @@ public:
 
     struct Checker_File_Information_Res
     {
-        Checker_File_Information_Res() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false), has_error(false) {}
+        Checker_File_Information_Res() : generated_id(-1), source_id(-1), generated_time((size_t)-1),
+                                         analyzed(false), has_error(false), nok(NULL) {}
+        ~Checker_File_Information_Res();
+
         std::string                                       filename;
         std::string                                       file_last_modification;
-        long                                              generated_id;
-        long                                              source_id;
-        size_t                                            generated_time;
         std::string                                       generated_log;
         std::string                                       generated_error_log;
         std::vector<std::pair<std::string,std::string> >  options;
+        std::string                                       error_log;
+        long                                              generated_id;
+        long                                              source_id;
+        size_t                                            generated_time;
         bool                                              analyzed;
         bool                                              has_error;
-        std::string                                       error_log;
+        MediaConch_Nok                                   *nok;
         std::string                                       to_str() const;
     };
 
@@ -539,21 +504,17 @@ public:
 
     struct Default_Values_For_Type_Res
     {
-        std::vector<std::string> values;
-        std::string              to_str() const;
+        Default_Values_For_Type_Res() : nok(NULL) {}
+        ~Default_Values_For_Type_Res();
+
+        std::vector<std::string>  values;
+        MediaConch_Nok           *nok;
+        std::string               to_str() const;
     };
 
 //***************************************************************************
 // Policy
 //***************************************************************************
-
-    // Generic Policy error
-    struct Policy_Nok
-    {
-        std::string  error;
-        std::string  to_str() const;
-    };
-
     struct XSLT_Policy_Create_Req
     {
         XSLT_Policy_Create_Req() : user(-1), parent_id(-1) {}
@@ -567,14 +528,16 @@ public:
     {
         XSLT_Policy_Create_Res() : id(-1), nok(NULL) {}
         ~XSLT_Policy_Create_Res();
-        int          id;
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        int             id;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Import_Req
     {
         Policy_Import_Req() : user(-1) {}
+
         int         user;
         std::string xml;
         std::string to_str() const;
@@ -584,14 +547,16 @@ public:
     {
         Policy_Import_Res() : id(-1), nok(NULL) {}
         ~Policy_Import_Res();
-        int          id;
-        Policy_Nok  *nok;
-        std::string to_str() const;
+
+        int             id;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Remove_Req
     {
         Policy_Remove_Req() : user(-1), id(-1) {}
+
         int         user;
         int         id;
         std::string to_str() const;
@@ -601,13 +566,15 @@ public:
     {
         Policy_Remove_Res() : nok(NULL) {}
         ~Policy_Remove_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Dump_Req
     {
         Policy_Dump_Req() : user(-1), id(-1), must_be_public(false) {}
+
         int         user;
         int         id;
         bool        must_be_public;
@@ -618,14 +585,16 @@ public:
     {
         Policy_Dump_Res() : nok(NULL) {}
         ~Policy_Dump_Res();
-        std::string  xml;
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        std::string     xml;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Save_Req
     {
         Policy_Save_Req() : user(-1), id(-1) {}
+
         int         user;
         int         id;
         std::string to_str() const;
@@ -635,14 +604,16 @@ public:
     {
         Policy_Save_Res() : nok(NULL) {}
         ~Policy_Save_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Duplicate_Req
     {
         Policy_Duplicate_Req() : user(-1), dst_user(NULL), id(-1), dst_policy_id(-1), must_be_public(false) {}
         ~Policy_Duplicate_Req();
+
         int         user;
         int        *dst_user;
         int         id;
@@ -655,14 +626,16 @@ public:
     {
         Policy_Duplicate_Res() : id(-1), nok(NULL) {}
         ~Policy_Duplicate_Res();
-        int         id;
-        Policy_Nok *nok;
-        std::string to_str() const;
+
+        int             id;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Move_Req
     {
         Policy_Move_Req() : user(-1), id(-1), dst_policy_id(-1) {}
+
         int         user;
         int         id;
         int         dst_policy_id;
@@ -673,19 +646,21 @@ public:
     {
         Policy_Move_Res() : id(-1), nok(NULL) {}
         ~Policy_Move_Res();
-        int         id;
-        Policy_Nok *nok;
-        std::string to_str() const;
+
+        int             id;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Change_Info_Req
     {
         Policy_Change_Info_Req() : user(-1), id(-1) {}
-        int          user;
-        int          id;
+
         std::string  name;
         std::string  description;
         std::string  license;
+        int          user;
+        int          id;
         std::string  to_str() const;
     };
 
@@ -693,13 +668,15 @@ public:
     {
         Policy_Change_Info_Res() : nok(NULL) {}
         ~Policy_Change_Info_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Change_Type_Req
     {
         Policy_Change_Type_Req() : user(-1), id(-1) {}
+
         int          user;
         int          id;
         std::string  type;
@@ -710,8 +687,9 @@ public:
     {
         Policy_Change_Type_Res() : nok(NULL) {}
         ~Policy_Change_Type_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Change_Is_Public_Req
@@ -727,13 +705,15 @@ public:
     {
         Policy_Change_Is_Public_Res() : nok(NULL) {}
         ~Policy_Change_Is_Public_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Get_Req
     {
         Policy_Get_Req() : user(-1), id(-1), must_be_public(false), format("JSON") {}
+
         int         user;
         int         id;
         bool        must_be_public;
@@ -745,15 +725,17 @@ public:
     {
         Policy_Get_Res() : policy(NULL), nok(NULL) {}
         ~Policy_Get_Res();
+
         MediaConchLib::Policy_Policy *policy;
         std::string                   policyTree;
-        Policy_Nok                   *nok;
-        std::string  to_str() const;
+        MediaConch_Nok               *nok;
+        std::string                   to_str() const;
     };
 
     struct Policy_Get_Name_Req
     {
         Policy_Get_Name_Req() : user(-1), id(-1) {}
+
         int          user;
         int          id;
         std::string  to_str() const;
@@ -763,14 +745,16 @@ public:
     {
         Policy_Get_Name_Res() : nok(NULL) {}
         ~Policy_Get_Name_Res();
-        std::string  name;
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        std::string     name;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Policy_Get_Policies_Count_Req
     {
         Policy_Get_Policies_Count_Req() : user(-1) {}
+
         int         user;
         std::string to_str() const;
     };
@@ -779,14 +763,16 @@ public:
     {
         Policy_Get_Policies_Count_Res() : size(0), nok(NULL) {}
         ~Policy_Get_Policies_Count_Res();
-        int          size;
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        int              size;
+        MediaConch_Nok  *nok;
+        std::string      to_str() const;
     };
 
     struct Policy_Clear_Policies_Req
     {
         Policy_Clear_Policies_Req() : user(-1) {}
+
         int         user;
         std::string to_str() const;
     };
@@ -795,13 +781,15 @@ public:
     {
         Policy_Clear_Policies_Res() : nok(NULL) {}
         ~Policy_Clear_Policies_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok  *nok;
+        std::string      to_str() const;
     };
 
     struct Policy_Get_Policies_Req
     {
         Policy_Get_Policies_Req() : user(-1), format("JSON") {}
+
         int              user;
         std::vector<int> ids;
         std::string      format;
@@ -812,14 +800,17 @@ public:
     {
         Policy_Get_Policies_Res() : nok(NULL) {}
         ~Policy_Get_Policies_Res();
+
         std::vector<MediaConchLib::Policy_Policy*>  policies;
         std::string                                 policiesTree;
-        Policy_Nok                                 *nok;
+        MediaConch_Nok                             *nok;
         std::string                                 to_str() const;
     };
 
     struct Policy_Public_Policy
     {
+        Policy_Public_Policy() : id(-1), user(-1) {}
+
         long             id;
         long             user;
         std::string      name;
@@ -837,14 +828,16 @@ public:
     {
         Policy_Get_Public_Policies_Res() :  nok(NULL) {}
         ~Policy_Get_Public_Policies_Res();
+
         std::vector<Policy_Public_Policy*>  policies;
-        Policy_Nok                         *nok;
+        MediaConch_Nok                     *nok;
         std::string                         to_str() const;
     };
 
     struct Policy_Get_Policies_Names_List_Req
     {
         Policy_Get_Policies_Names_List_Req() : user(-1) {}
+
         int              user;
         std::string      to_str() const;
     };
@@ -853,23 +846,18 @@ public:
     {
         Policy_Get_Policies_Names_List_Res() : nok(NULL) {}
         ~Policy_Get_Policies_Names_List_Res();
+
         std::vector<std::pair<int, std::string> >   policies;
-        Policy_Nok                                 *nok;
+        MediaConch_Nok                             *nok;
         std::string                                 to_str() const;
     };
 
     struct XSLT_Policy_Create_From_File_Req
     {
         XSLT_Policy_Create_From_File_Req() : user(-1), id(-1) {}
+
         int         user;
         int         id;
-        std::string to_str() const;
-    };
-
-    struct XSLT_Policy_Create_From_File_Nok
-    {
-        int         id;
-        Reason      error;
         std::string to_str() const;
     };
 
@@ -877,15 +865,17 @@ public:
     {
         XSLT_Policy_Create_From_File_Res() : policy_id(-1), nok(NULL) {}
         ~XSLT_Policy_Create_From_File_Res();
-        int                               policy_id;
-        XSLT_Policy_Create_From_File_Nok *nok;
-        std::string                       to_str() const;
+
+        int               policy_id;
+        MediaConch_Nok   *nok;
+        std::string       to_str() const;
     };
 
     // XSLT Rule
     struct XSLT_Policy_Rule_Create_Req
     {
         XSLT_Policy_Rule_Create_Req() : user(-1), policy_id(-1) {}
+
         int         user;
         int         policy_id;
         std::string to_str() const;
@@ -895,14 +885,16 @@ public:
     {
         XSLT_Policy_Rule_Create_Res() : id(-1), nok(NULL) {}
         ~XSLT_Policy_Rule_Create_Res();
-        int          id;
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        int              id;
+        MediaConch_Nok  *nok;
+        std::string      to_str() const;
     };
 
     struct XSLT_Policy_Rule_Get_Req
     {
         XSLT_Policy_Rule_Get_Req() : user(-1), policy_id(-1), id(-1) {}
+
         int         user;
         int         policy_id;
         int         id;
@@ -913,7 +905,8 @@ public:
     {
         XSLT_Policy_Rule_Get_Res() : nok(NULL) {}
         ~XSLT_Policy_Rule_Get_Res();
-        Policy_Nok                      *nok;
+
+        MediaConch_Nok                  *nok;
         MediaConchLib::XSLT_Policy_Rule  rule;
         std::string                      to_str() const;
     };
@@ -921,6 +914,7 @@ public:
     struct XSLT_Policy_Rule_Edit_Req
     {
         XSLT_Policy_Rule_Edit_Req() : user(-1), policy_id(-1) {}
+
         int                             user;
         int                             policy_id;
         MediaConchLib::XSLT_Policy_Rule rule;
@@ -931,13 +925,15 @@ public:
     {
         XSLT_Policy_Rule_Edit_Res() : nok(NULL) {}
         ~XSLT_Policy_Rule_Edit_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok  *nok;
+        std::string      to_str() const;
     };
 
     struct XSLT_Policy_Rule_Duplicate_Req
     {
         XSLT_Policy_Rule_Duplicate_Req() : user(-1), policy_id(-1), id(-1), dst_policy_id(-1) {}
+
         int         user;
         int         policy_id;
         int         id;
@@ -949,14 +945,16 @@ public:
     {
         XSLT_Policy_Rule_Duplicate_Res() : id(-1), nok(NULL) {}
         ~XSLT_Policy_Rule_Duplicate_Res();
-        int          id;
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        int              id;
+        MediaConch_Nok  *nok;
+        std::string      to_str() const;
     };
 
     struct XSLT_Policy_Rule_Move_Req
     {
         XSLT_Policy_Rule_Move_Req() : user(-1), policy_id(-1), id(-1), dst_policy_id(-1) {}
+
         int         user;
         int         policy_id;
         int         id;
@@ -968,14 +966,16 @@ public:
     {
         XSLT_Policy_Rule_Move_Res() : id(-1), nok(NULL) {}
         ~XSLT_Policy_Rule_Move_Res();
-        int          id;
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        int              id;
+        MediaConch_Nok  *nok;
+        std::string      to_str() const;
     };
 
     struct XSLT_Policy_Rule_Delete_Req
     {
         XSLT_Policy_Rule_Delete_Req() : user(-1), policy_id(-1), id(-1) {}
+
         int         user;
         int         policy_id;
         int         id;
@@ -986,8 +986,9 @@ public:
     {
         XSLT_Policy_Rule_Delete_Res() : nok(NULL) {}
         ~XSLT_Policy_Rule_Delete_Res();
-        Policy_Nok  *nok;
-        std::string  to_str() const;
+
+        MediaConch_Nok  *nok;
+        std::string      to_str() const;
     };
 
 public:
@@ -996,226 +997,222 @@ public:
     virtual ~RESTAPI();
 
     // Serialize: Request
-    int serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req& req, std::string&);
-    int serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string&);
-    int serialize_mediaconch_list_watch_folders_req(MediaConch_List_Watch_Folders_Req& req, std::string&);
-    int serialize_mediaconch_edit_watch_folder_req(MediaConch_Edit_Watch_Folder_Req& req, std::string&);
-    int serialize_mediaconch_remove_watch_folder_req(MediaConch_Remove_Watch_Folder_Req& req, std::string&);
+    int serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req& req, std::string&, std::string& err);
+    int serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string&, std::string& err);
+    int serialize_mediaconch_list_watch_folders_req(MediaConch_List_Watch_Folders_Req& req, std::string&, std::string& err);
+    int serialize_mediaconch_edit_watch_folder_req(MediaConch_Edit_Watch_Folder_Req& req, std::string&, std::string& err);
+    int serialize_mediaconch_remove_watch_folder_req(MediaConch_Remove_Watch_Folder_Req& req, std::string&, std::string& err);
 
-    int serialize_analyze_req(Checker_Analyze_Req& req, std::string&);
-    int serialize_status_req(Checker_Status_Req& req, std::string&);
-    int serialize_report_req(Checker_Report_Req& req, std::string&);
-    int serialize_retry_req(Checker_Retry_Req& req, std::string&);
-    int serialize_clear_req(Checker_Clear_Req& req, std::string&);
-    int serialize_list_req(Checker_List_Req& req, std::string&);
-    int serialize_validate_req(Checker_Validate_Req& req, std::string&);
-    int serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::string&);
-    int serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string&);
-    int serialize_file_information_req(Checker_File_Information_Req& req, std::string&);
-    int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&);
+    int serialize_checker_analyze_req(Checker_Analyze_Req& req, std::string&, std::string& err);
+    int serialize_checker_status_req(Checker_Status_Req& req, std::string&, std::string& err);
+    int serialize_checker_report_req(Checker_Report_Req& req, std::string&, std::string& err);
+    int serialize_checker_clear_req(Checker_Clear_Req& req, std::string&, std::string& err);
+    int serialize_checker_list_req(Checker_List_Req& req, std::string&, std::string& err);
+    int serialize_checker_validate_req(Checker_Validate_Req& req, std::string&, std::string& err);
+    int serialize_checker_file_from_id_req(Checker_File_From_Id_Req& req, std::string&, std::string& err);
+    int serialize_checker_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string&, std::string& err);
+    int serialize_checker_file_information_req(Checker_File_Information_Req& req, std::string&, std::string& err);
+    int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&, std::string& err);
 
-    int serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string&);
-    int serialize_policy_import_req(Policy_Import_Req& req, std::string&);
-    int serialize_policy_remove_req(Policy_Remove_Req& req, std::string&);
-    int serialize_policy_dump_req(Policy_Dump_Req& req, std::string&);
-    int serialize_policy_save_req(Policy_Save_Req& req, std::string&);
-    int serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string&);
-    int serialize_policy_move_req(Policy_Move_Req& req, std::string&);
-    int serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string&);
-    int serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string&);
-    int serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& req, std::string&);
-    int serialize_policy_get_req(Policy_Get_Req& req, std::string&);
-    int serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string&);
-    int serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string&);
-    int serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req, std::string&);
-    int serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string&);
-    int serialize_policy_get_public_policies_req(Policy_Get_Public_Policies_Req& req, std::string&);
-    int serialize_policy_get_policies_names_list_req(Policy_Get_Policies_Names_List_Req& req, std::string&);
-    int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&);
-    int serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string&);
-    int serialize_xslt_policy_rule_get_req(XSLT_Policy_Rule_Get_Req& req, std::string&);
-    int serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, Container::Value&);
-    int serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string&);
-    int serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string&);
-    int serialize_xslt_policy_rule_move_req(XSLT_Policy_Rule_Move_Req& req, std::string&);
-    int serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string&);
+    int serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string&, std::string& err);
+    int serialize_policy_import_req(Policy_Import_Req& req, std::string&, std::string& err);
+    int serialize_policy_remove_req(Policy_Remove_Req& req, std::string&, std::string& err);
+    int serialize_policy_dump_req(Policy_Dump_Req& req, std::string&, std::string& err);
+    int serialize_policy_save_req(Policy_Save_Req& req, std::string&, std::string& err);
+    int serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string&, std::string& err);
+    int serialize_policy_move_req(Policy_Move_Req& req, std::string&, std::string& err);
+    int serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string&, std::string& err);
+    int serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string&, std::string& err);
+    int serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& req, std::string&, std::string& err);
+    int serialize_policy_get_req(Policy_Get_Req& req, std::string&, std::string& err);
+    int serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string&, std::string& err);
+    int serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string&, std::string& err);
+    int serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req, std::string&, std::string& err);
+    int serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string&, std::string& err);
+    int serialize_policy_get_public_policies_req(Policy_Get_Public_Policies_Req& req, std::string&, std::string& err);
+    int serialize_policy_get_policies_names_list_req(Policy_Get_Policies_Names_List_Req& req, std::string&, std::string& err);
+    int serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_get_req(XSLT_Policy_Rule_Get_Req& req, std::string&, std::string& err);
+    int serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, Container::Value&, std::string& err);
+    int serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_move_req(XSLT_Policy_Rule_Move_Req& req, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string&, std::string& err);
 
     // Serialize: Result
-    int serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string&);
-    int serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& res, std::string&);
-    int serialize_mediaconch_list_watch_folders_res(MediaConch_List_Watch_Folders_Res& res, std::string&);
-    int serialize_mediaconch_edit_watch_folder_res(MediaConch_Edit_Watch_Folder_Res& res, std::string&);
-    int serialize_mediaconch_remove_watch_folder_res(MediaConch_Remove_Watch_Folder_Res& res, std::string&);
+    int serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string&, std::string& err);
+    int serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& res, std::string&, std::string& err);
+    int serialize_mediaconch_list_watch_folders_res(MediaConch_List_Watch_Folders_Res& res, std::string&, std::string& err);
+    int serialize_mediaconch_edit_watch_folder_res(MediaConch_Edit_Watch_Folder_Res& res, std::string&, std::string& err);
+    int serialize_mediaconch_remove_watch_folder_res(MediaConch_Remove_Watch_Folder_Res& res, std::string&, std::string& err);
 
-    int serialize_analyze_res(Checker_Analyze_Res& res, std::string&);
-    int serialize_status_res(Checker_Status_Res& res, std::string&);
-    int serialize_report_res(Checker_Report_Res& res, std::string&);
-    int serialize_retry_res(Checker_Retry_Res& res, std::string&);
-    int serialize_clear_res(Checker_Clear_Res& res, std::string&);
-    int serialize_list_res(Checker_List_Res& res, std::string&);
-    int serialize_validate_res(Checker_Validate_Res& res, std::string&);
-    int serialize_file_from_id_res(Checker_File_From_Id_Res& res, std::string&);
-    int serialize_id_from_filename_res(Checker_Id_From_Filename_Res& res, std::string&);
-    int serialize_file_information_res(Checker_File_Information_Res& res, std::string&);
-    int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&);
+    int serialize_checker_analyze_res(Checker_Analyze_Res& res, std::string&, std::string& err);
+    int serialize_checker_status_res(Checker_Status_Res& res, std::string&, std::string& err);
+    int serialize_checker_report_res(Checker_Report_Res& res, std::string&, std::string& err);
+    int serialize_checker_clear_res(Checker_Clear_Res& res, std::string&, std::string& err);
+    int serialize_checker_list_res(Checker_List_Res& res, std::string&, std::string& err);
+    int serialize_checker_validate_res(Checker_Validate_Res& res, std::string&, std::string& err);
+    int serialize_checker_file_from_id_res(Checker_File_From_Id_Res& res, std::string&, std::string& err);
+    int serialize_checker_id_from_filename_res(Checker_Id_From_Filename_Res& res, std::string&, std::string& err);
+    int serialize_checker_file_information_res(Checker_File_Information_Res& res, std::string&, std::string& err);
+    int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&, std::string& err);
 
-    int serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string&);
-    int serialize_policy_import_res(Policy_Import_Res& res, std::string&);
-    int serialize_policy_remove_res(Policy_Remove_Res& res, std::string&);
-    int serialize_policy_dump_res(Policy_Dump_Res& res, std::string&);
-    int serialize_policy_save_res(Policy_Save_Res& res, std::string&);
-    int serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string&);
-    int serialize_policy_move_res(Policy_Move_Res& res, std::string&);
-    int serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string&);
-    int serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string&);
-    int serialize_policy_change_is_public_res(Policy_Change_Is_Public_Res& res, std::string&);
-    int serialize_policy_get_res(Policy_Get_Res& res, std::string&);
-    int serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string&);
-    int serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string&);
-    int serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res, std::string&);
-    int serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string&);
-    int serialize_policy_get_public_policies_res(Policy_Get_Public_Policies_Res& res, std::string&);
-    int serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Names_List_Res& res, std::string&);
-    int serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string&);
-    int serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string&);
-    int serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, std::string&);
-    int serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string&);
-    int serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string&);
-    int serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res, std::string&);
-    int serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string&);
+    int serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string&, std::string& err);
+    int serialize_policy_import_res(Policy_Import_Res& res, std::string&, std::string& err);
+    int serialize_policy_remove_res(Policy_Remove_Res& res, std::string&, std::string& err);
+    int serialize_policy_dump_res(Policy_Dump_Res& res, std::string&, std::string& err);
+    int serialize_policy_save_res(Policy_Save_Res& res, std::string&, std::string& err);
+    int serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string&, std::string& err);
+    int serialize_policy_move_res(Policy_Move_Res& res, std::string&, std::string& err);
+    int serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string&, std::string& err);
+    int serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string&, std::string& err);
+    int serialize_policy_change_is_public_res(Policy_Change_Is_Public_Res& res, std::string&, std::string& err);
+    int serialize_policy_get_res(Policy_Get_Res& res, std::string&, std::string& err);
+    int serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string&, std::string& err);
+    int serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string&, std::string& err);
+    int serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res, std::string&, std::string& err);
+    int serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string&, std::string& err);
+    int serialize_policy_get_public_policies_res(Policy_Get_Public_Policies_Res& res, std::string&, std::string& err);
+    int serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Names_List_Res& res, std::string&, std::string& err);
+    int serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res, std::string&, std::string& err);
+    int serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string&, std::string& err);
 
     // Parse: Request
-    MediaConch_Get_Plugins_Req          *parse_mediaconch_get_plugins_req(const std::string& data);
-    MediaConch_Watch_Folder_Req         *parse_mediaconch_watch_folder_req(const std::string& data);
-    MediaConch_List_Watch_Folders_Req   *parse_mediaconch_list_watch_folders_req(const std::string& data);
-    MediaConch_Edit_Watch_Folder_Req    *parse_mediaconch_edit_watch_folder_req(const std::string& data);
-    MediaConch_Remove_Watch_Folder_Req  *parse_mediaconch_remove_watch_folder_req(const std::string& data);
+    MediaConch_Get_Plugins_Req          *parse_mediaconch_get_plugins_req(const std::string& data, std::string& err);
+    MediaConch_Watch_Folder_Req         *parse_mediaconch_watch_folder_req(const std::string& data, std::string& err);
+    MediaConch_List_Watch_Folders_Req   *parse_mediaconch_list_watch_folders_req(const std::string& data, std::string& err);
+    MediaConch_Edit_Watch_Folder_Req    *parse_mediaconch_edit_watch_folder_req(const std::string& data, std::string& err);
+    MediaConch_Remove_Watch_Folder_Req  *parse_mediaconch_remove_watch_folder_req(const std::string& data, std::string& err);
 
-    Checker_Analyze_Req                 *parse_analyze_req(const std::string& data);
-    Checker_Status_Req                  *parse_status_req(const std::string& data);
-    Checker_Report_Req                  *parse_report_req(const std::string& data);
-    Checker_Retry_Req                   *parse_retry_req(const std::string& data);
-    Checker_Clear_Req                   *parse_clear_req(const std::string& data);
-    Checker_List_Req                    *parse_list_req(const std::string& data);
-    Checker_Validate_Req                *parse_validate_req(const std::string& data);
-    Checker_File_From_Id_Req            *parse_file_from_id_req(const std::string& data);
-    Checker_Id_From_Filename_Req        *parse_id_from_filename_req(const std::string& data);
-    Checker_File_Information_Req        *parse_file_information_req(const std::string& data);
-    Default_Values_For_Type_Req         *parse_default_values_for_type_req(const std::string& data);
+    Checker_Analyze_Req                 *parse_checker_analyze_req(const std::string& data, std::string& err);
+    Checker_Status_Req                  *parse_checker_status_req(const std::string& data, std::string& err);
+    Checker_Report_Req                  *parse_checker_report_req(const std::string& data, std::string& err);
+    Checker_Clear_Req                   *parse_checker_clear_req(const std::string& data, std::string& err);
+    Checker_List_Req                    *parse_checker_list_req(const std::string& data, std::string& err);
+    Checker_Validate_Req                *parse_checker_validate_req(const std::string& data, std::string& err);
+    Checker_File_From_Id_Req            *parse_checker_file_from_id_req(const std::string& data, std::string& err);
+    Checker_Id_From_Filename_Req        *parse_checker_id_from_filename_req(const std::string& data, std::string& err);
+    Checker_File_Information_Req        *parse_checker_file_information_req(const std::string& data, std::string& err);
+    Default_Values_For_Type_Req         *parse_default_values_for_type_req(const std::string& data, std::string& err);
 
-    XSLT_Policy_Create_Req              *parse_xslt_policy_create_req(const std::string&);
-    Policy_Import_Req                   *parse_policy_import_req(const std::string&);
-    Policy_Remove_Req                   *parse_policy_remove_req(const std::string&);
-    Policy_Dump_Req                     *parse_policy_dump_req(const std::string&);
-    Policy_Save_Req                     *parse_policy_save_req(const std::string&);
-    Policy_Duplicate_Req                *parse_policy_duplicate_req(const std::string&);
-    Policy_Move_Req                     *parse_policy_move_req(const std::string&);
-    Policy_Change_Info_Req              *parse_policy_change_info_req(const std::string&);
-    Policy_Change_Type_Req              *parse_policy_change_type_req(const std::string&);
-    Policy_Change_Is_Public_Req         *parse_policy_change_is_public_req(const std::string&);
-    Policy_Get_Req                      *parse_policy_get_req(const std::string&);
-    Policy_Get_Name_Req                 *parse_policy_get_name_req(const std::string&);
-    Policy_Get_Policies_Count_Req       *parse_policy_get_policies_count_req(const std::string&);
-    Policy_Clear_Policies_Req           *parse_policy_clear_policies_req(const std::string&);
-    Policy_Get_Policies_Req             *parse_policy_get_policies_req(const std::string&);
-    Policy_Get_Public_Policies_Req      *parse_policy_get_public_policies_req(const std::string&);
-    Policy_Get_Policies_Names_List_Req  *parse_policy_get_policies_names_list_req(const std::string&);
-    XSLT_Policy_Create_From_File_Req    *parse_xslt_policy_create_from_file_req(const std::string&);
-    XSLT_Policy_Rule_Create_Req         *parse_xslt_policy_rule_create_req(const std::string&);
-    XSLT_Policy_Rule_Get_Req            *parse_xslt_policy_rule_get_req(const std::string&);
-    int                                  parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_Policy_Rule *);
-    XSLT_Policy_Rule_Edit_Req           *parse_xslt_policy_rule_edit_req(const std::string&);
-    XSLT_Policy_Rule_Duplicate_Req      *parse_xslt_policy_rule_duplicate_req(const std::string&);
-    XSLT_Policy_Rule_Move_Req           *parse_xslt_policy_rule_move_req(const std::string&);
-    XSLT_Policy_Rule_Delete_Req         *parse_xslt_policy_rule_delete_req(const std::string&);
+    XSLT_Policy_Create_Req              *parse_xslt_policy_create_req(const std::string&, std::string& err);
+    Policy_Import_Req                   *parse_policy_import_req(const std::string&, std::string& err);
+    Policy_Remove_Req                   *parse_policy_remove_req(const std::string&, std::string& err);
+    Policy_Dump_Req                     *parse_policy_dump_req(const std::string&, std::string& err);
+    Policy_Save_Req                     *parse_policy_save_req(const std::string&, std::string& err);
+    Policy_Duplicate_Req                *parse_policy_duplicate_req(const std::string&, std::string& err);
+    Policy_Move_Req                     *parse_policy_move_req(const std::string&, std::string& err);
+    Policy_Change_Info_Req              *parse_policy_change_info_req(const std::string&, std::string& err);
+    Policy_Change_Type_Req              *parse_policy_change_type_req(const std::string&, std::string& err);
+    Policy_Change_Is_Public_Req         *parse_policy_change_is_public_req(const std::string&, std::string& err);
+    Policy_Get_Req                      *parse_policy_get_req(const std::string&, std::string& err);
+    Policy_Get_Name_Req                 *parse_policy_get_name_req(const std::string&, std::string& err);
+    Policy_Get_Policies_Count_Req       *parse_policy_get_policies_count_req(const std::string&, std::string& err);
+    Policy_Clear_Policies_Req           *parse_policy_clear_policies_req(const std::string&, std::string& err);
+    Policy_Get_Policies_Req             *parse_policy_get_policies_req(const std::string&, std::string& err);
+    Policy_Get_Public_Policies_Req      *parse_policy_get_public_policies_req(const std::string&, std::string& err);
+    Policy_Get_Policies_Names_List_Req  *parse_policy_get_policies_names_list_req(const std::string&, std::string& err);
+    XSLT_Policy_Create_From_File_Req    *parse_xslt_policy_create_from_file_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Create_Req         *parse_xslt_policy_rule_create_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Get_Req            *parse_xslt_policy_rule_get_req(const std::string&, std::string& err);
+    int                                  parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_Policy_Rule *,
+                                                                std::string& err);
+    XSLT_Policy_Rule_Edit_Req           *parse_xslt_policy_rule_edit_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Duplicate_Req      *parse_xslt_policy_rule_duplicate_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Move_Req           *parse_xslt_policy_rule_move_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Delete_Req         *parse_xslt_policy_rule_delete_req(const std::string&, std::string& err);
 
     // Parse: URI Request
-    MediaConch_Get_Plugins_Req          *parse_uri_mediaconch_get_plugins_req(const std::string& uri);
-    MediaConch_Watch_Folder_Req         *parse_uri_mediaconch_watch_folder_req(const std::string& uri);
-    MediaConch_List_Watch_Folders_Req   *parse_uri_mediaconch_list_watch_folders_req(const std::string& uri);
-    MediaConch_Edit_Watch_Folder_Req    *parse_uri_mediaconch_edit_watch_folder_req(const std::string& uri);
-    MediaConch_Remove_Watch_Folder_Req  *parse_uri_mediaconch_remove_watch_folder_req(const std::string& uri);
+    MediaConch_Get_Plugins_Req          *parse_uri_mediaconch_get_plugins_req(const std::string& uri, std::string& err);
+    MediaConch_Watch_Folder_Req         *parse_uri_mediaconch_watch_folder_req(const std::string& uri, std::string& err);
+    MediaConch_List_Watch_Folders_Req   *parse_uri_mediaconch_list_watch_folders_req(const std::string& uri, std::string& err);
+    MediaConch_Edit_Watch_Folder_Req    *parse_uri_mediaconch_edit_watch_folder_req(const std::string& uri, std::string& err);
+    MediaConch_Remove_Watch_Folder_Req  *parse_uri_mediaconch_remove_watch_folder_req(const std::string& uri, std::string& err);
 
-    Checker_Analyze_Req                 *parse_uri_analyze_req(const std::string& uri);
-    Checker_Status_Req                  *parse_uri_status_req(const std::string& uri);
-    Checker_Report_Req                  *parse_uri_report_req(const std::string& uri);
-    Checker_Retry_Req                   *parse_uri_retry_req(const std::string& uri);
-    Checker_Clear_Req                   *parse_uri_clear_req(const std::string& uri);
-    Checker_List_Req                    *parse_uri_list_req(const std::string& uri);
-    Checker_Validate_Req                *parse_uri_validate_req(const std::string& uri);
-    Checker_File_From_Id_Req            *parse_uri_file_from_id_req(const std::string& uri);
-    Checker_Id_From_Filename_Req        *parse_uri_id_from_filename_req(const std::string& uri);
-    Checker_File_Information_Req        *parse_uri_file_information_req(const std::string& uri);
-    Default_Values_For_Type_Req         *parse_uri_default_values_for_type_req(const std::string& uri);
+    Checker_Analyze_Req                 *parse_uri_checker_analyze_req(const std::string& uri, std::string& err);
+    Checker_Status_Req                  *parse_uri_checker_status_req(const std::string& uri, std::string& err);
+    Checker_Report_Req                  *parse_uri_checker_report_req(const std::string& uri, std::string& err);
+    Checker_Clear_Req                   *parse_uri_checker_clear_req(const std::string& uri, std::string& err);
+    Checker_List_Req                    *parse_uri_checker_list_req(const std::string& uri, std::string& err);
+    Checker_Validate_Req                *parse_uri_checker_validate_req(const std::string& uri, std::string& err);
+    Checker_File_From_Id_Req            *parse_uri_checker_file_from_id_req(const std::string& uri, std::string& err);
+    Checker_Id_From_Filename_Req        *parse_uri_checker_id_from_filename_req(const std::string& uri, std::string& err);
+    Checker_File_Information_Req        *parse_uri_checker_file_information_req(const std::string& uri, std::string& err);
+    Default_Values_For_Type_Req         *parse_uri_default_values_for_type_req(const std::string& uri, std::string& err);
 
-    XSLT_Policy_Create_Req              *parse_uri_xslt_policy_create_req(const std::string&);
-    Policy_Import_Req                   *parse_uri_policy_import_req(const std::string&);
-    Policy_Remove_Req                   *parse_uri_policy_remove_req(const std::string&);
-    Policy_Dump_Req                     *parse_uri_policy_dump_req(const std::string&);
-    Policy_Save_Req                     *parse_uri_policy_save_req(const std::string&);
-    Policy_Duplicate_Req                *parse_uri_policy_duplicate_req(const std::string&);
-    Policy_Move_Req                     *parse_uri_policy_move_req(const std::string&);
-    Policy_Change_Info_Req              *parse_uri_policy_change_info_req(const std::string&);
-    Policy_Change_Type_Req              *parse_uri_policy_change_type_req(const std::string&);
-    Policy_Change_Is_Public_Req         *parse_uri_policy_change_is_public_req(const std::string&);
-    Policy_Get_Req                      *parse_uri_policy_get_req(const std::string&);
-    Policy_Get_Name_Req                 *parse_uri_policy_get_name_req(const std::string&);
-    Policy_Get_Policies_Count_Req       *parse_uri_policy_get_policies_count_req(const std::string&);
-    Policy_Clear_Policies_Req           *parse_uri_policy_clear_policies_req(const std::string&);
-    Policy_Get_Policies_Req             *parse_uri_policy_get_policies_req(const std::string&);
-    Policy_Get_Public_Policies_Req      *parse_uri_policy_get_public_policies_req(const std::string&);
-    Policy_Get_Policies_Names_List_Req  *parse_uri_policy_get_policies_names_list_req(const std::string&);
-    XSLT_Policy_Create_From_File_Req    *parse_uri_xslt_policy_create_from_file_req(const std::string&);
-    XSLT_Policy_Rule_Create_Req         *parse_uri_xslt_policy_rule_create_req(const std::string&);
-    XSLT_Policy_Rule_Get_Req            *parse_uri_xslt_policy_rule_get_req(const std::string&);
-    XSLT_Policy_Rule_Edit_Req           *parse_uri_xslt_policy_rule_edit_req(const std::string&);
-    XSLT_Policy_Rule_Duplicate_Req      *parse_uri_xslt_policy_rule_duplicate_req(const std::string&);
-    XSLT_Policy_Rule_Move_Req           *parse_uri_xslt_policy_rule_move_req(const std::string&);
-    XSLT_Policy_Rule_Delete_Req         *parse_uri_xslt_policy_rule_delete_req(const std::string&);
+    XSLT_Policy_Create_Req              *parse_uri_xslt_policy_create_req(const std::string&, std::string& err);
+    Policy_Import_Req                   *parse_uri_policy_import_req(const std::string&, std::string& err);
+    Policy_Remove_Req                   *parse_uri_policy_remove_req(const std::string&, std::string& err);
+    Policy_Dump_Req                     *parse_uri_policy_dump_req(const std::string&, std::string& err);
+    Policy_Save_Req                     *parse_uri_policy_save_req(const std::string&, std::string& err);
+    Policy_Duplicate_Req                *parse_uri_policy_duplicate_req(const std::string&, std::string& err);
+    Policy_Move_Req                     *parse_uri_policy_move_req(const std::string&, std::string& err);
+    Policy_Change_Info_Req              *parse_uri_policy_change_info_req(const std::string&, std::string& err);
+    Policy_Change_Type_Req              *parse_uri_policy_change_type_req(const std::string&, std::string& err);
+    Policy_Change_Is_Public_Req         *parse_uri_policy_change_is_public_req(const std::string&, std::string& err);
+    Policy_Get_Req                      *parse_uri_policy_get_req(const std::string&, std::string& err);
+    Policy_Get_Name_Req                 *parse_uri_policy_get_name_req(const std::string&, std::string& err);
+    Policy_Get_Policies_Count_Req       *parse_uri_policy_get_policies_count_req(const std::string&, std::string& err);
+    Policy_Clear_Policies_Req           *parse_uri_policy_clear_policies_req(const std::string&, std::string& err);
+    Policy_Get_Policies_Req             *parse_uri_policy_get_policies_req(const std::string&, std::string& err);
+    Policy_Get_Public_Policies_Req      *parse_uri_policy_get_public_policies_req(const std::string&, std::string& err);
+    Policy_Get_Policies_Names_List_Req  *parse_uri_policy_get_policies_names_list_req(const std::string&, std::string& err);
+    XSLT_Policy_Create_From_File_Req    *parse_uri_xslt_policy_create_from_file_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Create_Req         *parse_uri_xslt_policy_rule_create_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Get_Req            *parse_uri_xslt_policy_rule_get_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Edit_Req           *parse_uri_xslt_policy_rule_edit_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Duplicate_Req      *parse_uri_xslt_policy_rule_duplicate_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Move_Req           *parse_uri_xslt_policy_rule_move_req(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Delete_Req         *parse_uri_xslt_policy_rule_delete_req(const std::string&, std::string& err);
 
     // Parse: Result
-    MediaConch_Get_Plugins_Res         *parse_mediaconch_get_plugins_res(const std::string& data);
-    MediaConch_Watch_Folder_Res        *parse_mediaconch_watch_folder_res(const std::string& data);
-    MediaConch_List_Watch_Folders_Res  *parse_mediaconch_list_watch_folders_res(const std::string& data);
-    MediaConch_Edit_Watch_Folder_Res   *parse_mediaconch_edit_watch_folder_res(const std::string& data);
-    MediaConch_Remove_Watch_Folder_Res *parse_mediaconch_remove_watch_folder_res(const std::string& data);
+    MediaConch_Get_Plugins_Res         *parse_mediaconch_get_plugins_res(const std::string& data, std::string& err);
+    MediaConch_Watch_Folder_Res        *parse_mediaconch_watch_folder_res(const std::string& data, std::string& err);
+    MediaConch_List_Watch_Folders_Res  *parse_mediaconch_list_watch_folders_res(const std::string& data, std::string& err);
+    MediaConch_Edit_Watch_Folder_Res   *parse_mediaconch_edit_watch_folder_res(const std::string& data, std::string& err);
+    MediaConch_Remove_Watch_Folder_Res *parse_mediaconch_remove_watch_folder_res(const std::string& data, std::string& err);
 
-    Checker_Analyze_Res                *parse_analyze_res(const std::string& data);
-    Checker_Status_Res                 *parse_status_res(const std::string& data);
-    Checker_Report_Res                 *parse_report_res(const std::string& data);
-    Checker_Retry_Res                  *parse_retry_res(const std::string& data);
-    Checker_Clear_Res                  *parse_clear_res(const std::string& data);
-    Checker_List_Res                   *parse_list_res(const std::string& data);
-    Checker_Validate_Res               *parse_validate_res(const std::string& data);
-    Checker_File_From_Id_Res           *parse_file_from_id_res(const std::string& data);
-    Checker_Id_From_Filename_Res       *parse_id_from_filename_res(const std::string& data);
-    Checker_File_Information_Res       *parse_file_information_res(const std::string& data);
-    Default_Values_For_Type_Res        *parse_default_values_for_type_res(const std::string& data);
+    Checker_Analyze_Res                *parse_checker_analyze_res(const std::string& data, std::string& err);
+    Checker_Status_Res                 *parse_checker_status_res(const std::string& data, std::string& err);
+    Checker_Report_Res                 *parse_checker_report_res(const std::string& data, std::string& err);
+    Checker_Clear_Res                  *parse_checker_clear_res(const std::string& data, std::string& err);
+    Checker_List_Res                   *parse_checker_list_res(const std::string& data, std::string& err);
+    Checker_Validate_Res               *parse_checker_validate_res(const std::string& data, std::string& err);
+    Checker_File_From_Id_Res           *parse_checker_file_from_id_res(const std::string& data, std::string& err);
+    Checker_Id_From_Filename_Res       *parse_checker_id_from_filename_res(const std::string& data, std::string& err);
+    Checker_File_Information_Res       *parse_checker_file_information_res(const std::string& data, std::string& err);
+    Default_Values_For_Type_Res        *parse_default_values_for_type_res(const std::string& data, std::string& err);
 
-    XSLT_Policy_Create_Res             *parse_xslt_policy_create_res(const std::string&);
-    Policy_Import_Res                  *parse_policy_import_res(const std::string&);
-    Policy_Remove_Res                  *parse_policy_remove_res(const std::string&);
-    Policy_Dump_Res                    *parse_policy_dump_res(const std::string&);
-    Policy_Save_Res                    *parse_policy_save_res(const std::string&);
-    Policy_Duplicate_Res               *parse_policy_duplicate_res(const std::string&);
-    Policy_Move_Res                    *parse_policy_move_res(const std::string&);
-    Policy_Change_Info_Res             *parse_policy_change_info_res(const std::string&);
-    Policy_Change_Type_Res             *parse_policy_change_type_res(const std::string&);
-    Policy_Change_Is_Public_Res        *parse_policy_change_is_public_res(const std::string&);
-    Policy_Get_Res                     *parse_policy_get_res(const std::string&);
-    Policy_Get_Name_Res                *parse_policy_get_name_res(const std::string&);
-    Policy_Get_Policies_Count_Res      *parse_policy_get_policies_count_res(const std::string&);
-    Policy_Clear_Policies_Res          *parse_policy_clear_policies_res(const std::string&);
-    Policy_Get_Policies_Res            *parse_policy_get_policies_res(const std::string&);
-    Policy_Get_Public_Policies_Res     *parse_policy_get_public_policies_res(const std::string&);
-    Policy_Get_Policies_Names_List_Res *parse_policy_get_policies_names_list_res(const std::string&);
-    XSLT_Policy_Create_From_File_Res   *parse_xslt_policy_create_from_file_res(const std::string&);
-    XSLT_Policy_Rule_Create_Res        *parse_xslt_policy_rule_create_res(const std::string&);
-    XSLT_Policy_Rule_Get_Res           *parse_xslt_policy_rule_get_res(const std::string&);
-    XSLT_Policy_Rule_Edit_Res          *parse_xslt_policy_rule_edit_res(const std::string&);
-    XSLT_Policy_Rule_Duplicate_Res     *parse_xslt_policy_rule_duplicate_res(const std::string&);
-    XSLT_Policy_Rule_Move_Res          *parse_xslt_policy_rule_move_res(const std::string&);
-    XSLT_Policy_Rule_Delete_Res        *parse_xslt_policy_rule_delete_res(const std::string&);
+    XSLT_Policy_Create_Res             *parse_xslt_policy_create_res(const std::string&, std::string& err);
+    Policy_Import_Res                  *parse_policy_import_res(const std::string&, std::string& err);
+    Policy_Remove_Res                  *parse_policy_remove_res(const std::string&, std::string& err);
+    Policy_Dump_Res                    *parse_policy_dump_res(const std::string&, std::string& err);
+    Policy_Save_Res                    *parse_policy_save_res(const std::string&, std::string& err);
+    Policy_Duplicate_Res               *parse_policy_duplicate_res(const std::string&, std::string& err);
+    Policy_Move_Res                    *parse_policy_move_res(const std::string&, std::string& err);
+    Policy_Change_Info_Res             *parse_policy_change_info_res(const std::string&, std::string& err);
+    Policy_Change_Type_Res             *parse_policy_change_type_res(const std::string&, std::string& err);
+    Policy_Change_Is_Public_Res        *parse_policy_change_is_public_res(const std::string&, std::string& err);
+    Policy_Get_Res                     *parse_policy_get_res(const std::string&, std::string& err);
+    Policy_Get_Name_Res                *parse_policy_get_name_res(const std::string&, std::string& err);
+    Policy_Get_Policies_Count_Res      *parse_policy_get_policies_count_res(const std::string&, std::string& err);
+    Policy_Clear_Policies_Res          *parse_policy_clear_policies_res(const std::string&, std::string& err);
+    Policy_Get_Policies_Res            *parse_policy_get_policies_res(const std::string&, std::string& err);
+    Policy_Get_Public_Policies_Res     *parse_policy_get_public_policies_res(const std::string&, std::string& err);
+    Policy_Get_Policies_Names_List_Res *parse_policy_get_policies_names_list_res(const std::string&, std::string& err);
+    XSLT_Policy_Create_From_File_Res   *parse_xslt_policy_create_from_file_res(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Create_Res        *parse_xslt_policy_rule_create_res(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Get_Res           *parse_xslt_policy_rule_get_res(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Edit_Res          *parse_xslt_policy_rule_edit_res(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Duplicate_Res     *parse_xslt_policy_rule_duplicate_res(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Move_Res          *parse_xslt_policy_rule_move_res(const std::string&, std::string& err);
+    XSLT_Policy_Rule_Delete_Res        *parse_xslt_policy_rule_delete_res(const std::string&, std::string& err);
 
     std::string                         get_error() const { return error; }
 
@@ -1225,42 +1222,38 @@ private:
     std::string error;
 
     //Helper
-    Container::Value serialize_mediaconch_nok(MediaConch_Nok* nok);
-    Container::Value serialize_analyze_args(std::vector<Checker_Analyze_Arg>& args);
-    Container::Value serialize_ids(std::vector<int>& ids);
-    Container::Value serialize_report_reports(std::vector<Report>& args);
-    Container::Value serialize_report_string(const std::string& args);
-    Container::Value serialize_report_int(int val);
-    Container::Value serialize_report_arr_str(const std::vector<std::string>& reports);
-    Container::Value serialize_report_arr_long_u(const std::vector<size_t>& reports);
-    Container::Value serialize_generic_nok(int id, Reason error);
-    Container::Value serialize_analyze_oks(std::vector<Checker_Analyze_Ok*>& array);
-    Container::Value serialize_status_oks(std::vector<Checker_Status_Ok*>& array);
-    Container::Value serialize_report_ok(Checker_Report_Ok& ok);
-    Container::Value serialize_list_file(const std::string& file, int id);
-    Container::Value serialize_validate_ok(Checker_Validate_Ok* ok);
-    Container::Value serialize_policy_nok(Policy_Nok* nok);
-    void serialize_policies_get_policies(const std::vector<MediaConchLib::Policy_Policy*>&, Container::Value& policies);
-    void serialize_policy_public_policy(const std::vector<Policy_Public_Policy*>&, Container::Value& policies);
-    void serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p);
-    void serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v);
-    void serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v);
+    Container::Value serialize_mediaconch_nok(MediaConch_Nok* nok, std::string& err);
+    Container::Value serialize_checker_analyze_args(std::vector<Checker_Analyze_Arg>& args, std::string& err);
+    Container::Value serialize_ids(std::vector<long>& ids, std::string& err);
+    Container::Value serialize_checker_report_reports(std::vector<Report>& args, std::string& err);
+    Container::Value serialize_checker_report_string(const std::string& args, std::string& err);
+    Container::Value serialize_checker_report_int(int val, std::string& err);
+    Container::Value serialize_checker_report_arr_str(const std::vector<std::string>& reports, std::string& err);
+    Container::Value serialize_checker_report_arr_long_u(const std::vector<size_t>& reports, std::string& err);
+    Container::Value serialize_checker_analyze_oks(std::vector<Checker_Analyze_Ok*>& array, std::string& err);
+    Container::Value serialize_checker_status_oks(std::vector<Checker_Status_Ok*>& array, std::string& err);
+    int serialize_checker_report_ok(Checker_Report_Ok* ok, Container::Value&, std::string& err);
+    Container::Value serialize_checker_list_file(const std::string& file, int id, std::string& err);
+    Container::Value serialize_checker_validate_ok(Checker_Validate_Ok* ok, std::string& err);
+    void serialize_policies_get_policies(const std::vector<MediaConchLib::Policy_Policy*>&, Container::Value& policies, std::string& err);
+    void serialize_policy_public_policy(const std::vector<Policy_Public_Policy*>&, Container::Value& policies, std::string& err);
+    void serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p, std::string& err);
+    void serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v, std::string& err);
+    void serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v, std::string& err);
 
-    int parse_mediaconch_nok(Container::Value *v, MediaConch_Nok** n);
-    int parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args);
-    int parse_report_reports(Container::Value *v, std::vector<Report>& reports);
-    int parse_generic_nok(Container::Value *v, int& id, Reason& error);
-    int parse_analyze_ok(Container::Value *v, std::vector<Checker_Analyze_Ok*>& ok);
-    int parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*>& ok);
-    int parse_report_ok(Container::Value *v, Checker_Report_Ok& ok);
-    int parse_list_file(Container::Value *v, std::string& file, int& id);
-    int parse_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks);
-    int parse_policy_nok(Container::Value *v, Policy_Nok** n);
-    int parse_policies_get_policies(Container::Value* policies, std::vector<MediaConchLib::Policy_Policy*>&);
-    int parse_policy_public_policy(Container::Value* policies, std::vector<Policy_Public_Policy*>&);
-    int parse_policies_get_policies_names(Container::Value* policies, std::vector<std::pair<int, std::string> >&);
-    MediaConchLib::Policy_Policy* parse_a_policy(Container::Value* policy);
-    MediaConchLib::XSLT_Policy_Rule* parse_a_xslt_policy_rule(Container::Value* rule);
+    int parse_mediaconch_nok(Container::Value *v, MediaConch_Nok** n, std::string& err);
+    int parse_checker_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args, std::string& err);
+    int parse_checker_report_reports(Container::Value *v, std::vector<Report>& reports, std::string& err);
+    int parse_checker_analyze_ok(Container::Value *v, std::vector<Checker_Analyze_Ok*>& ok, std::string& err);
+    int parse_checker_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*>& ok, std::string& err);
+    int parse_checker_report_ok(Container::Value *v, Checker_Report_Ok** ok, std::string& err);
+    int parse_checker_list_file(Container::Value *v, std::string& file, long& id, std::string& err);
+    int parse_checker_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks, std::string& err);
+    int parse_policies_get_policies(Container::Value* policies, std::vector<MediaConchLib::Policy_Policy*>&, std::string& err);
+    int parse_policy_public_policy(Container::Value* policies, std::vector<Policy_Public_Policy*>&, std::string& err);
+    int parse_policies_get_policies_names(Container::Value* policies, std::vector<std::pair<int, std::string> >&, std::string& err);
+    MediaConchLib::Policy_Policy* parse_a_policy(Container::Value* policy, std::string& err);
+    MediaConchLib::XSLT_Policy_Rule* parse_a_xslt_policy_rule(Container::Value* rule, std::string& err);
 
     RESTAPI (const RESTAPI&);
     RESTAPI& operator=(const RESTAPI&);

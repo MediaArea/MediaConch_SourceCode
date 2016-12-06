@@ -70,22 +70,22 @@ int Httpd::send_result()
 #define MAKE_REQ_FUNC(name, type)                                         \
     void Httpd::get_request(std::string& json, RESTAPI::type##_Req** req) \
     {                                                                     \
-        *req = rest.parse_##name##_req(json);                             \
+        std::string err;                                                  \
+        *req = rest.parse_##name##_req(json, err);                        \
         if (!*req)                                                        \
-            error = rest.get_error();                                     \
+            error = err;                                                  \
     }
 
     MAKE_REQ_FUNC(mediaconch_watch_folder, MediaConch_Watch_Folder)
     MAKE_REQ_FUNC(mediaconch_edit_watch_folder, MediaConch_Edit_Watch_Folder)
     MAKE_REQ_FUNC(mediaconch_remove_watch_folder, MediaConch_Remove_Watch_Folder)
 
-    MAKE_REQ_FUNC(analyze, Checker_Analyze)
-    MAKE_REQ_FUNC(report, Checker_Report)
-    MAKE_REQ_FUNC(validate, Checker_Validate)
-    MAKE_REQ_FUNC(retry, Checker_Retry)
-    MAKE_REQ_FUNC(file_from_id, Checker_File_From_Id)
-    MAKE_REQ_FUNC(id_from_filename, Checker_Id_From_Filename)
-    MAKE_REQ_FUNC(file_information, Checker_File_Information)
+    MAKE_REQ_FUNC(checker_analyze, Checker_Analyze)
+    MAKE_REQ_FUNC(checker_report, Checker_Report)
+    MAKE_REQ_FUNC(checker_validate, Checker_Validate)
+    MAKE_REQ_FUNC(checker_file_from_id, Checker_File_From_Id)
+    MAKE_REQ_FUNC(checker_id_from_filename, Checker_Id_From_Filename)
+    MAKE_REQ_FUNC(checker_file_information, Checker_File_Information)
 
     MAKE_REQ_FUNC(policy_import, Policy_Import);
     MAKE_REQ_FUNC(policy_change_info, Policy_Change_Info);
@@ -100,17 +100,18 @@ int Httpd::send_result()
     void Httpd::get_uri_request(std::string& uri_query,                    \
                                 RESTAPI::type##_Req** req)                 \
     {                                                                      \
-        *req = rest.parse_uri_##name##_req(uri_query);                     \
+        std::string err;                                                   \
+        *req = rest.parse_uri_##name##_req(uri_query, err);                \
         if (!*req)                                                         \
-            error = rest.get_error();                                      \
+            error = err;                                                   \
     }
 
     MAKE_URI_REQ_FUNC(mediaconch_get_plugins, MediaConch_Get_Plugins)
     MAKE_URI_REQ_FUNC(mediaconch_list_watch_folders, MediaConch_List_Watch_Folders)
 
-    MAKE_URI_REQ_FUNC(status, Checker_Status)
-    MAKE_URI_REQ_FUNC(clear, Checker_Clear)
-    MAKE_URI_REQ_FUNC(list, Checker_List)
+    MAKE_URI_REQ_FUNC(checker_status, Checker_Status)
+    MAKE_URI_REQ_FUNC(checker_clear, Checker_Clear)
+    MAKE_URI_REQ_FUNC(checker_list, Checker_List)
     MAKE_URI_REQ_FUNC(default_values_for_type, Default_Values_For_Type)
 
     MAKE_URI_REQ_FUNC(xslt_policy_create, XSLT_Policy_Create)

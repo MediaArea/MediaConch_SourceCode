@@ -129,7 +129,7 @@ namespace MediaConch {
         return size == 0;
     }
 
-    void Scheduler::get_elements(int user, std::vector<std::string>& vec)
+    int Scheduler::get_elements(int user, std::vector<std::string>& vec, std::string&)
     {
         CS.Enter();
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
@@ -137,9 +137,11 @@ namespace MediaConch {
             if (it->first && it->first->user == user)
                 vec.push_back(it->first->filename);
         CS.Leave();
+
+        return 0;
     }
 
-    void Scheduler::get_elements(int user, std::vector<long>& vec)
+    int Scheduler::get_elements(int user, std::vector<long>& vec, std::string&)
     {
         CS.Enter();
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
@@ -147,6 +149,8 @@ namespace MediaConch {
             if (it->first && it->first->user == user)
                 vec.push_back(it->first->file_id);
         CS.Leave();
+
+        return 0;
     }
 
     bool Scheduler::element_is_finished(int user, long file_id, double& percent_done)
@@ -176,7 +180,8 @@ namespace MediaConch {
         return ret;
     }
 
-    long Scheduler::element_exists(int user, const std::string& filename, const std::string& options)
+    long Scheduler::element_exists(int user, const std::string& filename,
+                                   const std::string& options, std::string& err)
     {
         CS.Enter();
         long file_id = queue->has_element(user, filename);
@@ -194,6 +199,9 @@ namespace MediaConch {
         if (it != working.end())
             file_id = it->first->file_id;
         CS.Leave();
+
+        if (file_id == -1)
+            err = "File not in scheduler.";
         return file_id;
     }
 
@@ -300,16 +308,17 @@ namespace MediaConch {
                     options.push_back(std::make_pair(el->options[i].first, el->options[i].second));
 
                 std::vector<std::string> plugins;
+                std::string err;
                 long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log,
-                                                generated_error_log, options, plugins, el->mil_analyze);
+                                                generated_error_log, options, plugins, err, el->mil_analyze);
                 if (id >= 0)
-                    core->file_update_generated_file(el->user, old_id, id);
+                    core->file_update_generated_file(el->user, old_id, id, err);
                 old_id = id;
             }
             else if (ret)
             {
                 std::string error_log = ((PluginPreHook*)p)->get_report_err();
-                core->update_file_error(el->user, old_id, true, error_log);
+                core->update_file_error(el->user, old_id, true, error_log, err);
                 delete p;
                 return ret;
             }

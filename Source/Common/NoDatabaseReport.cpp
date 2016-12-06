@@ -148,32 +148,39 @@ long NoDatabaseReport::update_file(int user, long file_id, const std::string& fi
 
 //---------------------------------------------------------------------------
 long NoDatabaseReport::get_file_id(int user, const std::string& file, const std::string& file_last_modification,
-                                   const std::string& options)
+                                   const std::string& options, std::string& err)
 {
     for (long id = 0; id < (long)files_saved.size(); ++id)
         if (files_saved[id] && file == files_saved[id]->filename &&
             (!file_last_modification.size() || file_last_modification == files_saved[id]->file_last_modification) &&
             files_saved[id]->user == user && files_saved[id]->options == options)
             return id;
+
+    err = "File not found";
     return -1;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_file_name_from_id(int user, long id, std::string& file)
+int NoDatabaseReport::get_file_name_from_id(int user, long id, std::string& file, std::string& err)
 {
     if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
+    {
         file = files_saved[id]->filename;
-    else
-        file = std::string();
+        return 0;
+    }
+
+    file = std::string();
+    err = "File not found";
+    return -1;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
+int NoDatabaseReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
                                                     long& generated_id, long& source_id, size_t& generated_time,
                                                     std::string& generated_log, std::string& generated_error_log,
                                                     std::string& options, bool& analyzed,
-                                                    bool& has_error, std::string& error_log)
+                                                    bool& has_error, std::string& error_log, std::string& err)
 {
     if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
@@ -203,21 +210,32 @@ void NoDatabaseReport::get_file_information_from_id(int user, long id, std::stri
         analyzed = false;
         has_error = false;
         error_log = std::string();
+        err = "File not found";
+        return -1;
     }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabaseReport::file_is_analyzed(int user, long id)
+bool NoDatabaseReport::file_is_analyzed(int user, long id, std::string& err)
 {
+    err = std::string();
     if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
-        return true;
+    {
+        if (reports_saved.find(id) != reports_saved.end())
+            return true;
 
+        return false;
+    }
+
+    err = "File not found";
     return false;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::update_file_generated_id(int user, long source_id, long generated_id)
+int NoDatabaseReport::update_file_generated_id(int user, long source_id, long generated_id, std::string& err)
 {
     if (source_id > 0 && source_id < (long)files_saved.size() && files_saved[source_id] &&
         files_saved[source_id]->user == user)
@@ -225,11 +243,13 @@ int NoDatabaseReport::update_file_generated_id(int user, long source_id, long ge
         files_saved[source_id]->generated_id = generated_id;
         return 0;
     }
+
+    err = "File not found";
     return -1;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::update_file_analyzed(int user, long id, bool analyzed)
+int NoDatabaseReport::update_file_analyzed(int user, long id, std::string& err, bool analyzed)
 {
     if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
@@ -237,11 +257,13 @@ int NoDatabaseReport::update_file_analyzed(int user, long id, bool analyzed)
         files_saved[id]->analyzed = analyzed;
         return 0;
     }
+
+    err = "File not found";
     return -1;
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::update_file_error(int user, long id, bool has_error, const std::string& error_log)
+int NoDatabaseReport::update_file_error(int user, long id, std::string& err, bool has_error, const std::string& error_log)
 {
     if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
@@ -250,17 +272,22 @@ int NoDatabaseReport::update_file_error(int user, long id, bool has_error, const
         files_saved[id]->error_log = error_log;
         return 0;
     }
+
+    err = "File not found";
     return -1;
 }
 
 //---------------------------------------------------------------------------
 int NoDatabaseReport::save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                   const std::string& report, MediaConchLib::compression c,
-                                  int mil_version)
+                                  int mil_version, std::string& err)
 {
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
+    {
+        err = "File not found";
         return -1;
+    }
 
     MC_Report* r = new MC_Report;
     r->reportKind = reportKind;
@@ -289,11 +316,14 @@ int NoDatabaseReport::save_report(int user, long file_id, MediaConchLib::report 
 
 //---------------------------------------------------------------------------
 void NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
-                                  std::string& report, MediaConchLib::compression& c)
+                                  std::string& report, MediaConchLib::compression& c, std::string& err)
 {
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
+    {
+        err = "File not found";
         return;
+    }
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
     {
@@ -305,30 +335,42 @@ void NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report 
         c = r->compression;
         return;
     }
+
+    err = "Report not found";
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::remove_report(int user, long file_id)
+int NoDatabaseReport::remove_report(int user, long file_id, std::string& err)
 {
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
+    {
+        err = "File not found";
         return -1;
+    }
 
     std::map<long, std::vector<MC_Report*> >::iterator it = reports_saved.find(file_id);
 
     if (it == reports_saved.end())
+    {
+        err = "Report not found";
         return -1;
+    }
 
     reports_saved.erase(it);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format)
+bool NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+                                            std::string& err)
 {
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
+    {
+        err = "File not found";
         return false;
+    }
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
     {
@@ -337,14 +379,19 @@ bool NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLi
         if (r && r->format == format && r->reportKind == reportKind)
             return true;
     }
+
+    err = "Report not found";
     return false;
 }
 
-int NoDatabaseReport::version_registered(int user, long file_id)
+int NoDatabaseReport::version_registered(int user, long file_id, std::string& err)
 {
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
+    {
+        err = "File not found";
         return -1;
+    }
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
     {
@@ -352,11 +399,12 @@ int NoDatabaseReport::version_registered(int user, long file_id)
             return reports_saved[file_id][i]->mil_version;
     }
 
+    err = "Report not found";
     return -1;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_elements(int user, std::vector<std::string>& vec)
+int NoDatabaseReport::get_elements(int user, std::vector<std::string>& vec, std::string&)
 {
     for (size_t i = 0; i < files_saved.size(); ++i)
     {
@@ -365,10 +413,12 @@ void NoDatabaseReport::get_elements(int user, std::vector<std::string>& vec)
 
         vec.push_back(files_saved[i]->filename);
     }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_elements(int user, std::vector<long>& vec)
+int NoDatabaseReport::get_elements(int user, std::vector<long>& vec, std::string&)
 {
     for (size_t i = 0; i < files_saved.size(); ++i)
     {
@@ -377,15 +427,21 @@ void NoDatabaseReport::get_elements(int user, std::vector<long>& vec)
 
         vec.push_back((long)i);
     }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_element_report_kind(int user, long file_id, MediaConchLib::report& report_kind)
+int NoDatabaseReport::get_element_report_kind(int user, long file_id, MediaConchLib::report& report_kind,
+                                              std::string& err)
 {
     report_kind = MediaConchLib::report_MediaConch;
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
-        return;
+    {
+        err = "File not found";
+        return -1;
+    }
 
     if (file_id >= 0 && reports_saved[file_id].size())
     {
@@ -401,6 +457,8 @@ void NoDatabaseReport::get_element_report_kind(int user, long file_id, MediaConc
             report_kind = tool_i;
         }
     }
+
+    return 0;
 }
 
 }

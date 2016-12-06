@@ -98,21 +98,21 @@ public:
     //***************************************************************************
     long        checker_analyze(int user, const std::string& filename, bool& registered,
                                 const std::vector<std::pair<std::string,std::string> >& options,
-                                const std::vector<std::string>& plugins,
+                                const std::vector<std::string>& plugins, std::string& error,
                                 bool force_analyze = false, bool mil_analyze=true);
     long        checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                                 const std::string generated_log, const std::string generated_error_log,
                                 const std::vector<std::pair<std::string,std::string> >& options,
-                                const std::vector<std::string>& plugins, bool mil_analyze=true);
+                                const std::vector<std::string>& plugins, std::string& error, bool mil_analyze=true);
 
-    int         checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res);
-    int         remove_report(int user, const std::vector<long>& files);
+    int         checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res, std::string& error);
+    int         remove_report(int user, const std::vector<long>& files, std::string& error);
     int         checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& Report, MediaConchLib::format f,
                                    const std::vector<long>& files,
                                    const std::vector<size_t>& policies_ids,
                                    const std::vector<std::string>& policies_contents,
                                    const std::map<std::string, std::string>& options,
-                                   MediaConchLib::Checker_ReportRes* res,
+                                   MediaConchLib::Checker_ReportRes* res, std::string& error,
                                    const std::string* display_names = NULL,
                                    const std::string* display_contents = NULL);
     int         checker_validate(int user, MediaConchLib::report report,
@@ -120,25 +120,25 @@ public:
                                  const std::vector<size_t>& policies_ids,
                                  const std::vector<std::string>& policies_contents,
                                  const std::map<std::string, std::string>& options,
-                                 std::vector<MediaConchLib::Checker_ValidateRes*>& result);
+                                 std::vector<MediaConchLib::Checker_ValidateRes*>& result, std::string& error);
     int         check_policies(int user, const std::vector<long>& files,
                                const std::map<std::string, std::string>& options,
-                               MediaConchLib::Checker_ReportRes *result,
+                               MediaConchLib::Checker_ReportRes *result, std::string& error,
                                const std::vector<size_t>* policies_ids = NULL,
                                const std::vector<std::string>* policies_contents = NULL);
 
-    void        checker_list(int user, std::vector<std::string>& vec);
-    void        checker_list(int user, std::vector<long>& vec);
-    void        checker_file_from_id(int user, long id, std::string& file);
+    int         checker_list(int user, std::vector<std::string>& vec, std::string& error);
+    int         checker_list(int user, std::vector<long>& vec, std::string& error);
+    int         checker_file_from_id(int user, long id, std::string& file, std::string& error);
     long        checker_id_from_filename(int user, const std::string& filename,
-                                         const std::vector<std::pair<std::string,std::string> >& options);
-    int         checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info);
+                                         const std::vector<std::pair<std::string,std::string> >& options, std::string& error);
+    int         checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info, std::string& error);
 
     //***************************************************************************
     // Checker Helper
     //***************************************************************************
-    int         file_update_generated_file(int user, long src_id, long generated_id);
-    int         update_file_error(int user, long id, bool has_error, const std::string& error_log);
+    int         file_update_generated_file(int user, long src_id, long generated_id, std::string& err);
+    int         update_file_error(int user, long id, bool has_error, const std::string& error_log, std::string& err);
     int         get_reports_output_JStree(int user, const std::vector<long>& file,
                                           const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         get_reports_output_Html(int user, const std::vector<long>& file,
@@ -158,8 +158,9 @@ public:
     //***************************************************************************
     // Policy
     //***************************************************************************
-    int  policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
-    int  policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
+    int  policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values,
+                                          std::string& err);
+    int  policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields, std::string& err);
     Policies policies;
 
     //***************************************************************************
@@ -253,9 +254,11 @@ private:
     int transform_with_xslt_text_memory(const std::string& report, std::string& result);
     int transform_with_xslt_html_memory(const std::string& report, std::string& result);
 
-    long   file_is_registered_and_analyzed(int user, const std::string& file, bool& analyzed, const std::string& options);
-    long   file_is_registered_and_analyzed_in_db(int user, const std::string& file, bool& analyzed, const std::string& options);
-    long   file_is_registered_in_queue(int user, const std::string& file, const std::string& options);
+    long   file_is_registered_and_analyzed(int user, const std::string& file, bool& analyzed,
+                                           const std::string& options, std::string& err);
+    long   file_is_registered_and_analyzed_in_db(int user, const std::string& file, bool& analyzed,
+                                                 const std::string& options, std::string& err);
+    long   file_is_registered_in_queue(int user, const std::string& file, const std::string& options, std::string& err);
     std::string get_last_modification_file(const std::string& file);
     bool   file_is_existing(const std::string& filename);
     void compress_report(std::string& report, MediaConchLib::compression& compress);

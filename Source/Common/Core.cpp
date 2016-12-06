@@ -393,7 +393,7 @@ void Core::get_users_ids(std::vector<long>& ids, std::string& err)
 //---------------------------------------------------------------------------
 long Core::checker_analyze(int user, const std::string& file, bool& registered,
                            const std::vector<std::pair<std::string,std::string> >& options,
-                           const std::vector<std::string>& plugins,
+                           const std::vector<std::string>& plugins, std::string& err,
                            bool force_analyze, bool mil_analyze)
 {
     long id = -1;
@@ -401,14 +401,13 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
     bool analyzed = false;
 
     std::string options_str = serialize_string_from_options_vec(options);
-    id = file_is_registered_and_analyzed(user, file, analyzed, options_str);
+    id = file_is_registered_and_analyzed(user, file, analyzed, options_str, err);
     if (force_analyze)
         analyzed = false;
 
     if (id < 0)
     {
         std::string file_last_modification = get_last_modification_file(file);
-        std::string err;
         db_mutex.Enter();
         id = get_db()->add_file(user, file, file_last_modification, options_str, err);
         db_mutex.Leave();
@@ -428,19 +427,18 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 long Core::checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                            const std::string generated_log, const std::string generated_error_log,
                            const std::vector<std::pair<std::string,std::string> >& options,
-                           const std::vector<std::string>& plugins, bool mil_analyze)
+                           const std::vector<std::string>& plugins, std::string& err, bool mil_analyze)
 {
     long id = -1;
     bool analyzed = false;
     bool force_analyze = true;
     std::string options_str = serialize_string_from_options_vec(options);
 
-    id = file_is_registered_and_analyzed(user, filename, analyzed, options_str);
+    id = file_is_registered_and_analyzed(user, filename, analyzed, options_str, err);
     if (force_analyze)
         analyzed = false;
 
     std::string file_last_modification = get_last_modification_file(filename);
-    std::string err;
     if (id < 0)
     {
         db_mutex.Enter();
@@ -469,20 +467,20 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
 }
 
 //---------------------------------------------------------------------------
-int Core::file_update_generated_file(int user, long src_id, long generated_id)
+int Core::file_update_generated_file(int user, long src_id, long generated_id, std::string& err)
 {
     db_mutex.Enter();
-    int ret = get_db()->update_file_generated_id(user, src_id, generated_id);
+    int ret = get_db()->update_file_generated_id(user, src_id, generated_id, err);
     db_mutex.Leave();
 
     return ret;
 }
 
 //---------------------------------------------------------------------------
-int Core::update_file_error(int user, long id, bool has_error, const std::string& error_log)
+int Core::update_file_error(int user, long id, bool has_error, const std::string& error_log, std::string& err)
 {
     db_mutex.Enter();
-    int ret = get_db()->update_file_error(user, id, has_error, error_log);
+    int ret = get_db()->update_file_error(user, id, err, has_error, error_log);
     db_mutex.Leave();
 
     plugin_add_log(PluginLog::LOG_LEVEL_ERROR, error_log);
@@ -491,11 +489,11 @@ int Core::update_file_error(int user, long id, bool has_error, const std::string
 }
 
 //---------------------------------------------------------------------------
-int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res)
+int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res, std::string& err)
 {
     double percent_done = 0.0;
     bool is_finished = scheduler->element_is_finished(user, file_id, percent_done);
-    int ret = MediaConchLib::errorHttp_NONE;
+    int ret = 0;
 
     res.id = file_id;
     res.finished = is_finished;
@@ -512,11 +510,12 @@ int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRe
         std::string options;
 
         db_mutex.Enter();
-        get_db()->get_file_information_from_id(user, file_id, filename, file_time,
+        ret = get_db()->get_file_information_from_id(user, file_id, filename, file_time,
                                                res.generated_id, res.source_id, generated_time,
-                                               generated_log, generated_error_log, options, is_finished, res.has_error, res.error_log);
-        if (is_finished)
-            get_db()->get_element_report_kind(user, file_id, (MediaConchLib::report&)*res.tool);
+                                               generated_log, generated_error_log, options, is_finished,
+                                               res.has_error, res.error_log, err);
+        if (ret == 0 && is_finished)
+            ret = get_db()->get_element_report_kind(user, file_id, (MediaConchLib::report&)*res.tool, err);
         db_mutex.Leave();
     }
     else
@@ -529,57 +528,73 @@ int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRe
 }
 
 //---------------------------------------------------------------------------
-void Core::checker_file_from_id(int user, long id, std::string& file)
+int Core::checker_file_from_id(int user, long id, std::string& file, std::string& err)
 {
     db_mutex.Enter();
-    get_db()->get_file_name_from_id(user, id, file);
+    int ret = get_db()->get_file_name_from_id(user, id, file, err);
     db_mutex.Leave();
+
+    return ret;
 }
 
 //---------------------------------------------------------------------------
 long Core::checker_id_from_filename(int user, const std::string& filename,
-                                    const std::vector<std::pair<std::string,std::string> >& options)
+                                    const std::vector<std::pair<std::string,std::string> >& options,
+                                    std::string& err)
 {
     std::string time = get_last_modification_file(filename);
     std::string options_str = serialize_string_from_options_vec(options);
 
     db_mutex.Enter();
-    long id = get_db()->get_file_id(user, filename, time, options_str);
+    long id = get_db()->get_file_id(user, filename, time, options_str, err);
     db_mutex.Leave();
 
     return id;
 }
 
 //---------------------------------------------------------------------------
-int Core::checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info)
+int Core::checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info, std::string& err)
 {
     std::string options;
+    int ret = 0;
     db_mutex.Enter();
-    get_db()->get_file_information_from_id(user, id, info.filename, info.file_last_modification, info.generated_id,
-                                           info.source_id, info.generated_time, info.generated_log,
-                                           info.generated_error_log, options, info.analyzed, info.has_error, info.error_log);
+    ret = get_db()->get_file_information_from_id(user, id, info.filename, info.file_last_modification,
+                                                 info.generated_id, info.source_id, info.generated_time,
+                                                 info.generated_log, info.generated_error_log, options,
+                                                 info.analyzed, info.has_error, info.error_log, err);
     db_mutex.Leave();
 
-    info.options = parse_options_vec_from_string(options);
-    return 0;
+    if (ret == 0)
+        info.options = parse_options_vec_from_string(options);
+    return ret;
 }
 
 //---------------------------------------------------------------------------
-void Core::checker_list(int user, std::vector<std::string>& vec)
+int Core::checker_list(int user, std::vector<std::string>& vec, std::string& err)
 {
-    scheduler->get_elements(user, vec);
+    int ret = 0;
+    ret = scheduler->get_elements(user, vec, err);
+    if (ret < 0)
+        return ret;
+
     db_mutex.Enter();
-    get_db()->get_elements(user, vec);
+    ret = get_db()->get_elements(user, vec, err);
     db_mutex.Leave();
+    return ret;
 }
 
 //---------------------------------------------------------------------------
-void Core::checker_list(int user, std::vector<long>& vec)
+int Core::checker_list(int user, std::vector<long>& vec, std::string& err)
 {
-    scheduler->get_elements(user, vec);
+    int ret = scheduler->get_elements(user, vec, err);
+    if (ret < 0)
+        return ret;
+
     db_mutex.Enter();
-    get_db()->get_elements(user, vec);
+    ret = get_db()->get_elements(user, vec, err);
     db_mutex.Leave();
+
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -588,13 +603,13 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
                              const std::vector<size_t>& policies_ids,
                              const std::vector<std::string>& policies_contents,
                              const std::map<std::string, std::string>& options,
-                             MediaConchLib::Checker_ReportRes* result,
+                             MediaConchLib::Checker_ReportRes* result, std::string& err,
                              const std::string* display_name,
                              const std::string* display_content)
 {
     if (!policies_ids.empty() || !policies_contents.empty())
     {
-        if (check_policies(user, files, options, result,
+        if (check_policies(user, files, options, result, err,
                            policies_ids.size() ? &policies_ids : NULL,
                            policies_contents.size() ? &policies_contents : NULL) < 0)
             return -1;
@@ -644,7 +659,7 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
                            const std::vector<size_t>& policies_ids,
                            const std::vector<std::string>& policies_contents,
                            const std::map<std::string, std::string>& options,
-                           std::vector<MediaConchLib::Checker_ValidateRes*>& result)
+                           std::vector<MediaConchLib::Checker_ValidateRes*>& result, std::string& err)
 {
     if (report != MediaConchLib::report_MediaConch && !policies_ids.size() && !policies_contents.size() &&
         report != MediaConchLib::report_MediaVeraPdf && report != MediaConchLib::report_MediaDpfManager)
@@ -661,7 +676,7 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
         if (!policies_ids.empty() || !policies_contents.empty())
         {
             MediaConchLib::Checker_ReportRes tmp_res;
-            if (check_policies(user, file_tmp, options, &tmp_res,
+            if (check_policies(user, file_tmp, options, &tmp_res, err,
                                policies_ids.size() ? &policies_ids : NULL,
                                policies_contents.size() ? &policies_contents : NULL) < 0)
                 continue;
@@ -692,17 +707,24 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
 }
 
 //---------------------------------------------------------------------------
-int Core::remove_report(int user, const std::vector<long>& files)
+int Core::remove_report(int user, const std::vector<long>& files, std::string& err)
 {
     if (!get_db())
+    {
+        err = "Internal error. Database cannot be loaded";
         return -1;
+    }
 
+    int ret = 0;
     db_mutex.Enter();
     for (size_t i = 0; i < files.size(); ++i)
-        db->remove_report(user, files[i]);
+    {
+        if (db->remove_report(user, files[i], err) < 0)
+            ret = -1;
+    }
     db_mutex.Leave();
 
-    return 0;
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -764,13 +786,13 @@ bool Core::check_policies_xslts(int user, const std::vector<long>& files,
 //---------------------------------------------------------------------------
 int Core::check_policies(int user, const std::vector<long>& files,
                          const std::map<std::string, std::string>& opts,
-                         MediaConchLib::Checker_ReportRes* result,
+                         MediaConchLib::Checker_ReportRes* result, std::string& err,
                          const std::vector<size_t>* policies_ids,
                          const std::vector<std::string>* policies_contents)
 {
     if (!files.size())
     {
-        result->report = "No file to validate";
+        err = "No file to validate";
         return -1;
     }
 
@@ -782,7 +804,7 @@ int Core::check_policies(int user, const std::vector<long>& files,
     unify_policy_options(user, options);
 
     std::vector<std::string> policies;
-    if (this->policies.policy_get_policies(user, policies_ids, policies_contents, options, policies, result->report) < 0)
+    if (this->policies.policy_get_policies(user, policies_ids, policies_contents, options, policies, err) < 0)
         return -1;
 
     std::stringstream Out;
@@ -1193,9 +1215,10 @@ void Core::register_report_xml_to_database(int user, long file, const std::strin
     std::string new_report(report);
     compress_report(new_report, mode);
 
+    std::string err;
     db_mutex.Enter();
-    db->save_report(user, file, report_kind, MediaConchLib::format_Xml,
-                    new_report, mode, true);
+    get_db()->save_report(user, file, report_kind, MediaConchLib::format_Xml,
+                          new_report, mode, true, err);
     db_mutex.Leave();
 }
 
@@ -1209,9 +1232,10 @@ void Core::register_report_mediainfo_text_to_database(int user, long file, Media
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
 
+    std::string err;
     db_mutex.Enter();
     get_db()->save_report(user, file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
-                    report, mode, true);
+                          report, mode, true, err);
     db_mutex.Leave();
 }
 
@@ -1223,9 +1247,11 @@ void Core::register_report_mediainfo_xml_to_database(int user, long file, MediaI
     std::string report = Ztring(curMI->Inform()).To_UTF8();
     MediaConchLib::compression mode = compression_mode;
     compress_report(report, mode);
+
+    std::string err;
     db_mutex.Enter();
-    db->save_report(user, file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
-                    report, mode, true);
+    get_db()->save_report(user, file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
+                    report, mode, true, err);
     db_mutex.Leave();
 }
 
@@ -1257,9 +1283,10 @@ void Core::register_report_micromediatrace_xml_to_database(int user, long file, 
         compress_report(report, mode);
     }
 
+    std::string err;
     db_mutex.Enter();
-    db->save_report(user, file, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml,
-                    report, mode, true);
+    get_db()->save_report(user, file, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml,
+                          report, mode, true, err);
     db_mutex.Leave();
 }
 
@@ -1291,8 +1318,9 @@ void Core::get_content_of_media_in_xml(std::string& report)
 //---------------------------------------------------------------------------
 void Core::set_file_analyzed_to_database(int user, long id)
 {
+    std::string err;
     db_mutex.Enter();
-    get_db()->update_file_analyzed(user, id, true);
+    get_db()->update_file_analyzed(user, id, err, true);
     db_mutex.Leave();
 }
 
@@ -1358,8 +1386,8 @@ void Core::create_report_mi_xml(int user, const std::vector<long>& files, std::s
         vec.clear();
         vec.push_back(files[i]);
 
-        std::string file;
-        checker_file_from_id(user, files[i], file);
+        std::string file, err;
+        checker_file_from_id(user, files[i], file, err);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
 
@@ -1402,8 +1430,8 @@ void Core::create_report_mt_xml(int user, const std::vector<long>& files, std::s
         vec.clear();
         vec.push_back(files[i]);
 
-        std::string file;
-        checker_file_from_id(user, files[i], file);
+        std::string file, err;
+        checker_file_from_id(user, files[i], file, err);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
 
@@ -1451,8 +1479,8 @@ void Core::create_report_mmt_xml(int user, const std::vector<long>& files, std::
         vec.clear();
         vec.push_back(files[i]);
 
-        std::string file;
-        checker_file_from_id(user, files[i], file);
+        std::string file, err;
+        checker_file_from_id(user, files[i], file, err);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">";
 
@@ -1498,8 +1526,8 @@ void Core::create_report_ma_xml(int user, const std::vector<long>& files,
         vec.clear();
         vec.push_back(files[i]);
 
-        std::string file;
-        checker_file_from_id(user, files[i], file);
+        std::string file, err;
+        checker_file_from_id(user, files[i], file, err);
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
 
@@ -1596,8 +1624,9 @@ void Core::get_report_saved(int user, const std::vector<long>& files,
     {
         std::string raw;
         MediaConchLib::compression compress;
+        std::string err;
         db_mutex.Enter();
-        db->get_report(user, files[i], reportKind, f, raw, compress);
+        get_db()->get_report(user, files[i], reportKind, f, raw, compress, err);
         db_mutex.Leave();
         uncompress_report(raw, compress);
         report += raw;
@@ -1796,8 +1825,10 @@ bool Core::get_dpfmanager_report(int user, long file, std::string& report)
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& filename, bool& analyzed, const std::string& options)
+long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& filename, bool& analyzed,
+                                                 const std::string& options, std::string& err)
 {
+    err.clear();
     bool is_existing = file_is_existing(filename);
 
     std::string time;
@@ -1806,7 +1837,7 @@ long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& fi
 
     db_mutex.Enter();
 
-    long id = get_db()->get_file_id(user, filename, time, options);
+    long id = get_db()->get_file_id(user, filename, time, options, err);
     if (id < 0)
     {
         analyzed = false;
@@ -1814,7 +1845,7 @@ long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& fi
         return id;
     }
 
-    analyzed = get_db()->file_is_analyzed(user, id);
+    analyzed = get_db()->file_is_analyzed(user, id, err);
     db_mutex.Leave();
 
     if (!is_existing && !analyzed)
@@ -1824,23 +1855,28 @@ long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& fi
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_in_queue(int user, const std::string& filename, const std::string& options)
+long Core::file_is_registered_in_queue(int user, const std::string& filename,
+                                       const std::string& options, std::string& err)
 {
     if (!scheduler)
+    {
+        err = "Internal Error: Scheduler is not loaded.";
         return -1;
+    }
 
-    return scheduler->element_exists(user, filename, options);
+    return scheduler->element_exists(user, filename, options, err);
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_and_analyzed(int user, const std::string& filename, bool& analyzed, const std::string& options)
+long Core::file_is_registered_and_analyzed(int user, const std::string& filename, bool& analyzed,
+                                           const std::string& options, std::string& err)
 {
     long id;
     analyzed = false;
-    if ((id = file_is_registered_in_queue(user, filename, options)) >= 0)
+    if ((id = file_is_registered_in_queue(user, filename, options, err)) >= 0)
         return id;
 
-    return file_is_registered_and_analyzed_in_db(user, filename, analyzed, options);
+    return file_is_registered_and_analyzed_in_db(user, filename, analyzed, options, err);
 }
 
 //---------------------------------------------------------------------------
@@ -2268,12 +2304,15 @@ bool Core::dpfmanager_report_is_valid(const std::string& report)
 }
 
 //---------------------------------------------------------------------------
-int Core::policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields)
+int Core::policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields, std::string& err)
 {
     const std::map<std::string, std::list<std::string> >& types = Policies::existing_type;
 
     if (types.find(type) == types.end())
+    {
+        err = "Type is not existing";
         return -1;
+    }
 
     const std::list<std::string>& list = types.at(type);
     std::list<std::string>::const_iterator it = list.begin();
@@ -2283,11 +2322,15 @@ int Core::policy_get_fields_for_type(const std::string& type, std::vector<std::s
 }
 
 //---------------------------------------------------------------------------
-int Core::policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values)
+int Core::policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values,
+                                           std::string& err)
 {
     std::map<std::string, std::map<std::string, std::vector<std::string> > > vs;
     if (get_generated_values_from_csv(vs) < 0)
+    {
+        err = "Internal error, cannot generate values";
         return -1;
+    }
 
     if (vs.find(type) != vs.end())
     {

@@ -81,10 +81,10 @@ public:
     {
         errorHttp_TRUE           = 1,
         errorHttp_NONE           = 0,
-        errorHttp_INVALID_DATA   = -1,
-        errorHttp_INIT           = -2,
-        errorHttp_CONNECT        = -3,
-        errorHttp_INTERNAL       = -4,
+        errorHttp_INTERNAL       = -1,
+        errorHttp_INVALID_DATA   = -2,
+        errorHttp_INIT           = -3,
+        errorHttp_CONNECT        = -4,
         errorHttp_DAEMON_RESTART = -5,
         errorHttp_MAX            = -6,
     };
@@ -249,7 +249,7 @@ public:
     static const std::string display_jstree_name;
 
     // General
-    int  init();
+    int  init(std::string& err);
     int  close();
     void reset_daemon_client();
 
@@ -271,22 +271,24 @@ public:
     int  checker_analyze(int user, const std::vector<std::string>& files,
                          const std::vector<std::string>& plugins,
                          const std::vector<std::pair<std::string,std::string> >& options,
-                         std::vector<long>& files_id, bool force_analyze = false, bool mil_analyze = true);
+                         std::vector<long>& files_id, std::string& error, bool force_analyze = false,
+                         bool mil_analyze = true);
     int  checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
                          const std::vector<std::pair<std::string,std::string> >& options,
-                         bool& registered, long& file_id, bool force_analyze = false, bool mil_analyze = true);
+                         bool& registered, long& file_id, std::string& error, bool force_analyze = false,
+                         bool mil_analyze = true);
 
     // Status
     int  checker_status(int user, const std::vector<long>& files_id,
-                        std::vector<Checker_StatusRes>& res);
-    int  checker_status(int user, long file_id, Checker_StatusRes& res);
+                        std::vector<Checker_StatusRes>& res, std::string& error);
+    int  checker_status(int user, long file_id, Checker_StatusRes& res, std::string& error);
 
-    void checker_list(int user, std::vector<std::string>& vec);
-    void checker_list(int user, std::vector<long>& vec);
-    void checker_file_from_id(int user, long id, std::string& filename);
+    int  checker_list(int user, std::vector<std::string>& vec, std::string& error);
+    int  checker_list(int user, std::vector<long>& vec, std::string& error);
+    int  checker_file_from_id(int user, long id, std::string& filename, std::string& error);
     long checker_id_from_filename(int user, const std::string& filename,
-                                  const std::vector<std::pair<std::string,std::string> >& options);
-    int  checker_file_information(int user, long id, Checker_FileInfo& info);
+                                  const std::vector<std::pair<std::string,std::string> >& options, std::string& error);
+    int  checker_file_information(int user, long id, Checker_FileInfo& info, std::string& error);
 
     // Output
     int  checker_get_report(int user, const std::bitset<report_Max>& Report, format f,
@@ -294,17 +296,54 @@ public:
                             const std::vector<size_t>& policies_ids,
                             const std::vector<std::string>& policies_contents,
                             const std::map<std::string, std::string>& options,
-                            Checker_ReportRes* result,
+                            Checker_ReportRes* result, std::string& error,
                             const std::string* display_name = NULL,
                             const std::string* display_content = NULL);
     int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
                          const std::map<std::string, std::string>& options,
-                         std::vector<Checker_ValidateRes*>& result);
+                         std::vector<Checker_ValidateRes*>& result, std::string& error);
 
     //Clear
-    int remove_report(int user, const std::vector<long>& files);
+    int remove_report(int user, const std::vector<long>& files, std::string& error);
+
+    // Policies
+    //   Create policy
+    int                          policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err);
+    int                          policy_move(int user, int id, int dst_policy_id, std::string& err);
+    int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, const std::string& license, std::string& err);
+    int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
+    int                          policy_change_is_public(int user, int id, bool is_public, std::string& err);
+    int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);
+    int                          xslt_policy_create_from_file(int user, long file, std::string& err);
+    //   Import policy
+    int                          policy_import(int user, const std::string& memory, std::string& err, const char* filename=NULL, bool is_system_policy=false);
+
+    //   Policy helper
+    size_t                       policy_get_policies_count(int user, std::string& err) const;
+    int                          policy_get(int user, int pos, const std::string& format, bool must_be_public,
+                                            Get_Policy&, std::string& err);
+    int                          policy_get_name(int user, int id, std::string& name, std::string& err);
+    int                          policy_get_policies(int user, const std::vector<int>&, const std::string& format, Get_Policies&, std::string& error);
+    int                          policy_get_public_policies(std::vector<Policy_Public_Policy*>& policies, std::string& err);
+    int                          policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&, std::string& error);
+    int                          policy_save(int user, int pos, std::string& err);
+    int                          policy_remove(int user, int pos, std::string& err);
+    int                          policy_dump(int user, int id, bool must_be_public, std::string& memory, std::string& err);
+    int                          policy_clear_policies(int user, std::string& err);
+
+    // XSLT Policy Rule
+    int                         xslt_policy_rule_create(int user, int policy_id, std::string& err);
+    XsltPolicyRule*             xslt_policy_rule_get(int user, int policy_id, int id, std::string& err);
+    int                         xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
+    int                         xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
+    int                         xslt_policy_rule_move(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
+    int                         xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);
+
+    //Generated Values
+    int                         policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values, std::string& error);
+    int                         policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields, std::string& error);
 
     // Implementation checker arguments
     void               set_implementation_schema_file(const std::string& file);
@@ -333,43 +372,6 @@ public:
                                             const std::bitset<MediaConchLib::report_Max>& reports,
                                             const std::string& display, MediaConchLib::format& Format,
                                             std::string& reason);
-
-    // Policies
-    //   Create policy
-    int                          policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err);
-    int                          policy_move(int user, int id, int dst_policy_id, std::string& err);
-    int                          policy_change_info(int user, int id, const std::string& name, const std::string& description, const std::string& license, std::string& err);
-    int                          policy_change_type(int user, int id, const std::string& type, std::string& err);
-    int                          policy_change_is_public(int user, int id, bool is_public, std::string& err);
-    int                          xslt_policy_create(int user, std::string& err, const std::string& type="and", int parent_id=-1);
-    int                          xslt_policy_create_from_file(int user, long file, std::string& err);
-    //   Import policy
-    int                          policy_import(int user, const std::string& memory, std::string& err, const char* filename=NULL, bool is_system_policy=false);
-
-    //   Policy helper
-    size_t                       policy_get_policies_count(int user) const;
-    int                          policy_get(int user, int pos, const std::string& format, bool must_be_public,
-                                            Get_Policy&, std::string& err);
-    int                          policy_get_name(int user, int id, std::string& name, std::string& err);
-    void                         policy_get_policies(int user, const std::vector<int>&, const std::string& format, Get_Policies&);
-    int                          policy_get_public_policies(std::vector<Policy_Public_Policy*>& policies, std::string& err);
-    void                         policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
-    int                          policy_save(int user, int pos, std::string& err);
-    int                          policy_remove(int user, int pos, std::string& err);
-    int                          policy_dump(int user, int id, bool must_be_public, std::string& memory, std::string& err);
-    int                          policy_clear_policies(int user, std::string& err);
-
-    // XSLT Policy Rule
-    int                         xslt_policy_rule_create(int user, int policy_id, std::string& err);
-    XsltPolicyRule*             xslt_policy_rule_get(int user, int policy_id, int id, std::string& err);
-    int                         xslt_policy_rule_edit(int user, int policy_id, int rule_id, const XsltPolicyRule *rule, std::string& err);
-    int                         xslt_policy_rule_duplicate(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
-    int                         xslt_policy_rule_move(int user, int policy_id, int rule_id, int dst_policy_id, std::string& err);
-    int                         xslt_policy_rule_delete(int user, int policy_id, int rule_id, std::string& err);
-
-    //Generated Values
-    int                         policy_get_values_for_type_field(const std::string& type, const std::string& field, std::vector<std::string>& values);
-    int                         policy_get_fields_for_type(const std::string& type, std::vector<std::string>& fields);
 
     // Daemon
     void set_use_daemon(bool use);

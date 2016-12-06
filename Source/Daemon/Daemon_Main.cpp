@@ -52,16 +52,20 @@ int main(int argc, char* argv_ansi[])
     // GETCOMMANDLINE();
 
     MediaConch::Daemon daemon;
+    std::string error;
     //Parse command line
     int ret = daemon.parse_args(argc, argv_ansi);
     if (ret == DAEMON_RETURN_ERROR)
         ret = 1;
     else if (ret == DAEMON_RETURN_FINISH)
         ret = 0;
-    else if (daemon.init() < 0)
-        ret = 1;
-    else if (daemon.run() < 0)
-        ret = 1;
+    else if (daemon.init(error) < 0)
+        ret = 2;
+    else if (daemon.run(error) < 0)
+        ret = 2;
+
+    if (ret == 2)
+        STRINGERR(ZenLib::Ztring().From_UTF8(error));
 
 #ifdef _WIN32
     WSACleanup();
