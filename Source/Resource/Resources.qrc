@@ -37,6 +37,7 @@
         <file alias="policyTreeAffix.js">html/js/policyTreeAffix.js</file>
         <file alias="policyWebEngine.js">html/js/policyWebEngine.js</file>
         <file alias="policyWebKit.js">html/js/policyWebKit.js</file>
+        <file alias="policyUser.js">html/js/policyUser.js</file>
         <file alias="publicPolicies/list.js">html/js/publicPolicies/list.js</file>
         <file alias="publicPolicies/listPolicyTree.js">html/js/publicPolicies/listPolicyTree.js</file>
         <file alias="publicPolicies/listWebKit.js">html/js/publicPolicies/listWebKit.js</file>

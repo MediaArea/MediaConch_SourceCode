@@ -85,11 +85,66 @@ var user = (function() {
         })
     };
 
+    getPoliciesList = function() {
+        /**
+         * User policies list
+         *
+         * @return json
+         */
+        $.get({
+            url: urlUtils.protectedApi('userpolicies/list'),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-apiKey', getMcoUserToken());
+            }
+        })
+        .done(function(data) {
+            userPoliciesModal.displayPoliciesList(data.list);
+        })
+        .fail(function (jqXHR) {
+            userPoliciesModal.policiesListError();
+        })
+    };
+
+    getPolicy = function(policyId, button) {
+        $.get({
+            url: urlUtils.protectedApi('userpolicies/policy/' + policyId),
+            dataType: 'text',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-apiKey', getMcoUserToken());
+            }
+        })
+        .done(function(data) {
+            // Save policy
+            var res = webpage.policy_import_data(data);
+            var json = JSON.parse(res);
+            if (json.error) {
+                userPoliciesModal.policyImportError(button);
+            }
+            else {
+                // Get policy to display in jstree
+                var res = webpage.policy_get_jstree(json.policyId);
+                var json = JSON.parse(res);
+                if (json.error) {
+                    userPoliciesModal.policyImportError(button);
+                }
+                else {
+                    userPoliciesModal.policyImportSuccess(button);
+                    policyTree.policyImport(json.policyTree);
+                }
+            }
+        })
+        .fail(function (jqXHR) {
+            userPoliciesModal.policyImportError(button);
+        })
+    };
+
     return {
         loadToken: loadToken,
         getMcoUserToken: getMcoUserToken,
         loginForToken: loginForToken,
         pushPolicyToMCO: pushPolicyToMCO,
         policyUnpublish: policyUnpublish,
+        getPoliciesList: getPoliciesList,
+        getPolicy: getPolicy,
     };
 })();

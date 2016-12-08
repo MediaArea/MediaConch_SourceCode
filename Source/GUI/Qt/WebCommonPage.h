@@ -104,6 +104,7 @@ public Q_SLOTS:
 
     QString      get_policies_tree();
     QString      policy_get_xml(int id);
+    QString      policy_get_jstree(int id);
     void         create_rule_tree(XsltPolicyRule *r, QString& rule_data);
     QString      import_policy();
     QString      import_policy(const QString& file);
