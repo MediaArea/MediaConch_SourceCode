@@ -77,7 +77,7 @@ curl -L -O https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rp
 rpm -i --nodeps epel-release-*.rpm
 
 # Install build and AppImage dependencies
-yum install -y file wget tar fuse-libs gcc-c++ pkgconfig libtool automake autoconf git zlib-devel libxml2-devel \
+yum install -y file wget tar fuse-libs fuse gcc-c++ pkgconfig libtool automake autoconf git zlib-devel libxml2-devel \
                libxslt-devel sqlite-devel libcurl-devel jansson-devel qt5-qtbase-devel qt5-qtwebkit-devel
 
 # Compile libevent (too old on CentOS 6)
