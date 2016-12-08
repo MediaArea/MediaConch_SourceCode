@@ -114,14 +114,8 @@ $(document).ready(function() {
     };
 
     // help
-    addHelp('.checkerFixer label', 'Try to fix buggy files, technology preview, see <a href="https://mediaarea.net/MediaConch/fixity.html" onclick="call_tooltip_fixer(event);">the fixity webpage</a> for how to test it.', 'Fixer', 'checkerFixerHelp');
+    addHelp('.checkerFixer label', 'Try to fix buggy files, technology preview, see <a href="https://mediaarea.net/MediaConch/fixity.html" onclick="urlUtils.openInBrowser(event);">the fixity webpage</a> for how to test it.', 'Fixer', 'checkerFixerHelp');
 });
-
-function call_tooltip_fixer(e)
-{
-    e.preventDefault();
-    webpage.call_tooltip("https://mediaarea.net/MediaConch/fixity.html");
-}
 
 function getDataFromForm(form) {
     formValues = {policy:form.find('.policyList').val(),

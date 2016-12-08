@@ -84,9 +84,6 @@
 
         <div class="policyEditActions policyEditUser">
             <div>
-                <button class="policyPushPublic btn btn-warning">Add to public policies</button>
-            </div>
-            <div>
                 <button class="policyCreate btn btn-warning">Add a new policy</button>
                 <button id="policyRuleCreate" class="btn btn-warning">Add a new rule</button>
             </div>
@@ -95,9 +92,16 @@
 
       <div class="policyEditActions">
         <h4>Actions:</h4>
-        <button id="policyDuplicate" class="btn btn-warning">Duplicate</button>
-        <button id="policyExport" class="btn btn-warning">Export</button>
-        <button id="policyDelete" class="btn btn-danger">Delete</button>
+        <div>
+            <button id="policyDuplicate" class="btn btn-warning">Duplicate</button>
+            <button id="policyExport" class="btn btn-warning">Export</button>
+            <button id="policyDelete" class="btn btn-danger">Delete</button>
+        </div>
+        <div class="policyPushContainer">
+            <span class="policyPush">Add this policy to MediaConchOnline</span>
+            <button class="policyPushPublic btn btn-warning" title="Add to online policies as public">Add as public</button>
+            <button class="policyPushPrivate btn btn-warning" title="Add to online policies as private">Add as private</button>
+        </div>
       </div>
     </div>
 
@@ -251,8 +255,8 @@
                             </div>
                         </form>
                         <div class="col-md-12 userConnectModalError"></div>
-                        <p><a href="https://mediaarea.net/MediaConchOnline/resetting/request" onclick="call_browser(event);">I forgot my password</a></p>
-                        <p><a href="https://mediaarea.net/MediaConchOnline/register/" onclick="call_browser(event);">Create an account</a></p>
+                        <p><a href="https://mediaarea.net/MediaConchOnline/resetting/request" onclick="urlUtils.openInBrowser(event);">I forgot my password</a></p>
+                        <p><a href="https://mediaarea.net/MediaConchOnline/register/" onclick="urlUtils.openInBrowser(event);">Create an account</a></p>
                     </div>
                 </div>
             </div>
@@ -262,11 +266,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-function call_browser(e)
-{
-    e.preventDefault();
-    webpage.call_tooltip(e.target.href);
-}
-</script>

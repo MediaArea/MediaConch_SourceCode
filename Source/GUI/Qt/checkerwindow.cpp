@@ -594,6 +594,8 @@ void CheckerWindow::change_body_script_in_template(QString& html)
              "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
              "        <script type=\"text/javascript\" src=\"qrc:/checker.js\"></script>\n";
 #endif
+    script += "        <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n";
+
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), script);
 }

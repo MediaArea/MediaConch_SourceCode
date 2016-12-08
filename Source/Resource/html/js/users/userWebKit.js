@@ -39,17 +39,18 @@ var user = (function() {
         });
     };
 
-    var pushPolicyToPublicPoliciesOnMCO = function(policy) {
+    var pushPolicyToMCO = function(policy, visibility) {
         $.post({
-            url: urlUtils.protectedApi('publicpolicies/import'),
+            url: urlUtils.protectedApi('policies/import'),
             data: {
-                xml: webpage.policy_get_xml(policy)
+                xml: webpage.policy_get_xml(policy),
+                visibility: visibility
             },
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-apiKey', getMcoUserToken());
             }
         }).done(function(data) {
-            mcoMessage.success('Successfuly added to public policies list');
+            mcoMessage.success('Successfuly added to MediaConchOnline');
         }).fail(function (jqXHR) {
             var data = JSON.parse(jqXHR.responseText);
             if (undefined !== data.message) {
@@ -88,7 +89,7 @@ var user = (function() {
         loadToken: loadToken,
         getMcoUserToken: getMcoUserToken,
         loginForToken: loginForToken,
-        pushPolicyToPublicPoliciesOnMCO: pushPolicyToPublicPoliciesOnMCO,
+        pushPolicyToMCO: pushPolicyToMCO,
         policyUnpublish: policyUnpublish,
     };
 })();
