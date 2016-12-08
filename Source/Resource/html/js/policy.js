@@ -178,50 +178,6 @@ function formBindings() {
     });
 }
 
-var userConnectModal = (function() {
-    var show = function() {
-        $('#userConnectModal').modal('show');
-    }
-
-    var hide = function() {
-        $('#userConnectModal').modal('hide');
-    }
-
-    var formSuccess = function() {
-        // Close modal
-        hide();
-
-        // Export policy to MCO
-        if ('pushPublic' == getAction()) {
-            user.pushPolicyToMCO(policyTree.getPolicyId(), 'public');
-        }
-        else if ('pushPrivate' == getAction()) {
-            user.pushPolicyToMCO(policyTree.getPolicyId(), 'private');
-        }
-    }
-
-    var formError = function(error) {
-
-        $('.userConnectModalError').html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Login fail, please check your login and password</div>');
-    }
-
-    var setAction = function(action) {
-        $('#userConnectModal').data('action', action);
-    }
-
-    var getAction = function() {
-        return $('#userConnectModal').data('action');
-    }
-
-    return {
-        show: show,
-        hide: hide,
-        formSuccess: formSuccess,
-        formError: formError,
-        setAction: setAction,
-    }
-})();
-
 function buttonBindings() {
     $('#policyDuplicate').on('click', function() {
         if ('s' == policyTree.getSelectedNode().type) {
@@ -270,6 +226,18 @@ function buttonBindings() {
         }
         else {
             user.pushPolicyToMCO(policyTree.getPolicyId(), 'private');
+        }
+    });
+
+    // Import policy from MCO
+    $('.userPolicies').on('click', function () {
+        var token = user.getMcoUserToken();
+        if ('' == token) {
+            userConnectModal.setAction('userPolicyList');
+            userConnectModal.show();
+        }
+        else {
+            userPoliciesModal.show();
         }
     });
 

@@ -89,11 +89,64 @@ var user = (function() {
         })
     };
 
+    getPoliciesList = function() {
+        $.get({
+            url: urlUtils.protectedApi('userpolicies/list'),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-apiKey', getMcoUserToken());
+            }
+        })
+        .done(function(data) {
+            userPoliciesModal.displayPoliciesList(data.list);
+        })
+        .fail(function (jqXHR) {
+            userPoliciesModal.policiesListError();
+        })
+    };
+
+    getPolicy = function(policyId, button) {
+        $.get({
+            url: urlUtils.protectedApi('userpolicies/policy/' + policyId),
+            dataType: 'text',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-apiKey', getMcoUserToken());
+            }
+        })
+        .done(function(data) {
+            // Save policy
+            webpage.policy_import_data(data, function(res) {
+                var json = JSON.parse(res);
+                if (json.error) {
+                    userPoliciesModal.policyImportError(button);
+                }
+                else {
+                    // Get policy to display in jstree
+                    webpage.policy_get_jstree(json.policyId, function(res) {
+                        var json = JSON.parse(res);
+                        if (json.error) {
+                            userPoliciesModal.policyImportError(button);
+                        }
+                        else {
+                            userPoliciesModal.policyImportSuccess(button);
+                            policyTree.policyImport(json.policyTree);
+                        }
+                    });
+                }
+
+            });
+        })
+        .fail(function (jqXHR) {
+            userPoliciesModal.policyImportError(button);
+        })
+    };
+
     return {
         loadToken: loadToken,
         getMcoUserToken: getMcoUserToken,
         loginForToken: loginForToken,
         pushPolicyToMCO: pushPolicyToMCO,
         policyUnpublish: policyUnpublish,
+        getPoliciesList: getPoliciesList,
+        getPolicy: getPolicy,
     };
 })();

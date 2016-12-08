@@ -820,6 +820,28 @@ namespace MediaConch {
         return QString().fromUtf8(policy.c_str());
     }
 
+    QString WebCommonPage::policy_get_jstree(int id)
+    {
+        QString json;
+        std::string err;
+
+        MediaConchLib::Get_Policy p;
+        if (mainwindow->policy_get(id, "JSTREE", p) < 0)
+        {
+            json = "{\"error\":\"Cannot find the policy\"}";
+            return json;
+        }
+
+        if (p.format != "JSTREE")
+        {
+            json = "{\"error\":\"Cannot generate the policy\"}";
+            return json;
+        }
+
+        json = QString().fromUtf8(p.jstree->c_str(), p.jstree->length());
+        return json;
+    }
+
     QString WebCommonPage::import_policy()
     {
         QString file;
@@ -888,7 +910,8 @@ namespace MediaConch {
 
         mainwindow->policy_save(id, err);
 
-        json = "{}";
+        json = QString("{\"policyId\":%1}").arg(id);
+
         return json;
     }
 
