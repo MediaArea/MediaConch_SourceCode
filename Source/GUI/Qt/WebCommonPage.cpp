@@ -1098,7 +1098,7 @@ namespace MediaConch {
     }
 
     QString WebCommonPage::policy_edit(int id, const QString& name, const QString& description, const QString& license,
-                                       const QString& type, const QString& visibility)
+                                       const QString& type, const QString&)
     {
         //return: error?
         QString json;
