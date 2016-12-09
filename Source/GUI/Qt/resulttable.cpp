@@ -53,7 +53,8 @@ void ResultTable::add_file_to_result_table(const std::string& full_path)
     QFileInfo info(url.path());
 
     QString policyName;
-    std::string name, err;
+    std::string name;
+    QString err;
     if (mainwindow->policy_get_name(file->policy, name, err) >= 0 && name.size())
         policyName = QString().fromUtf8(name.c_str(), name.length());
     else

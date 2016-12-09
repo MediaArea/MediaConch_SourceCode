@@ -92,7 +92,8 @@ namespace MediaConch {
             verbosity_p = &verbosity_i;
         }
 
-        mainwindow->get_implementation_report(file_id, report, &display_i, verbosity_p);
+        std::string err;
+        mainwindow->get_implementation_report(file_id, report, err, &display_i, verbosity_p);
         return report;
     }
 
@@ -107,7 +108,9 @@ namespace MediaConch {
             verbosity_i = verbosity.toInt();
             verbosity_p = &verbosity_i;
         }
-        mainwindow->get_implementation_report(file_id, report, &display_i, verbosity_p);
+
+        std::string err;
+        mainwindow->get_implementation_report(file_id, report, err, &display_i, verbosity_p);
         on_download_report(report, file_id, "ImplementationReport");
     }
 
@@ -118,7 +121,8 @@ namespace MediaConch {
         if (policy_i != -1)
         {
             int display_i = display.toInt();
-            mainwindow->validate_policy(file_id, report, policy_i, &display_i);
+            std::string err;
+            mainwindow->validate_policy(file_id, report, err, policy_i, &display_i);
         }
         return report;
     }
@@ -128,38 +132,45 @@ namespace MediaConch {
         QString report;
         int policy_i = policy.toInt();
         int display_i = display.toInt();
-        mainwindow->validate_policy(file_id, report, policy_i, &display_i);
+        std::string err;
+        mainwindow->validate_policy(file_id, report, err, policy_i, &display_i);
         on_download_report(report, file_id, "MediaConchReport");
     }
 
     QString WebCommonPage::on_fill_mediainfo_report(long file_id)
     {
-        return mainwindow->get_mediainfo_jstree(file_id);
+        std::string err;
+        return mainwindow->get_mediainfo_jstree(file_id, err);
     }
 
     void WebCommonPage::on_save_mediainfo_report(long file_id)
     {
         std::string display_name, display_content;
-        QString report = mainwindow->get_mediainfo_xml(file_id, display_name, display_content);
+        std::string err;
+        QString report = mainwindow->get_mediainfo_xml(file_id, display_name, display_content, err);
         on_download_report(report, file_id, "MediaInfo");
     }
 
     QString WebCommonPage::on_fill_mediatrace_report(long file_id)
     {
-        return mainwindow->get_mediatrace_jstree(file_id);
+        std::string err;
+        return mainwindow->get_mediatrace_jstree(file_id, err);
     }
 
     void WebCommonPage::on_save_mediatrace_report(long file_id)
     {
         std::string display_name, display_content;
-        QString report = mainwindow->get_mediatrace_xml(file_id, display_name, display_content);
+        std::string err;
+        QString report = mainwindow->get_mediatrace_xml(file_id, display_name, display_content, err);
         on_download_report(report, file_id, "MediaTrace");
     }
 
     QString WebCommonPage::on_create_policy_from_file(long file_id)
     {
-        int id = mainwindow->xslt_policy_create_from_file(file_id);
-        std::string n, err;
+        std::string n;
+        QString err;
+
+        int id = mainwindow->xslt_policy_create_from_file(file_id, err);
         if (mainwindow->policy_get_name(id, n, err) < 0)
             n = std::string();
         QString name = QString().fromUtf8(n.c_str(), n.length());
@@ -170,54 +181,79 @@ namespace MediaConch {
         return script;
     }
 
-    void WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
-                                                const QString& verbosity, bool fixer)
+    int WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
+                                                const QString& verbosity, bool fixer, QString& err)
     {
+        int ret = 0;
         QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
         if (!files.size())
-            return;
+            return ret;
 
         for (int i = 0; i < files.size(); ++i)
         {
             QFileInfo f = QFileInfo(files[i]);
-            mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy, display, verbosity, fixer);
+            std::string error;
+            if (mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy,
+                                             display, verbosity, fixer, error) < 0)
+            {
+                err += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
+                return -1;
+            }
         }
         file_selector.clear();
         clean_forms();
         use_javascript(QString("startWaitingLoop()"));
+
+        return ret;
     }
 
-    void WebCommonPage::on_file_online_selected(const QString& url, const QString& policy,
-                                          const QString& display, const QString& verbosity, bool fixer)
+    int WebCommonPage::on_file_online_selected(const QString& url, const QString& policy,
+                                                const QString& display, const QString& verbosity,
+                                                bool fixer, QString& err)
     {
+        int ret = 0;
         if (!url.length())
-            return;
+            return ret;
 
-        mainwindow->add_file_to_list(url, "", policy, display, verbosity, fixer);
+        std::string error;
+        if ((ret = mainwindow->add_file_to_list(url, "", policy, display, verbosity, fixer, error)) < 0)
+            err += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         file_selector.clear();
         clean_forms();
         use_javascript(QString("startWaitingLoop()"));
+        return ret;
     }
 
-    void WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
-                                                    const QString& verbosity, bool fixer)
+    int WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
+                                                    const QString& verbosity, bool fixer, QString& err)
     {
+        int ret = 0;
         QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
         if (dirname.empty())
-            return;
+            return ret;
 
         QDir dir(dirname.last());
         QFileInfoList list;
         add_sub_directory_files_to_list(dir, list);
         if (!list.count())
-            return;
+            return ret;
 
         for (int i = 0; i < list.size(); ++i)
-            mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy, display, verbosity, fixer);
+        {
+            std::string error;
+            if (mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy,
+                                             display, verbosity, fixer, error))
+            {
+                err += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
+                ret = -1;
+            }
+        }
         file_selector.clear();
         clean_forms();
         use_javascript(QString("startWaitingLoop()"));
+
+        return ret;
     }
 
     void WebCommonPage::on_save_settings_selected(const QString& policy,
@@ -494,10 +530,12 @@ namespace MediaConch {
             mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
         }
 
-        on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
-                                QString().setNum(mainwindow->select_correct_display()),
-                                QString().setNum(mainwindow->select_correct_verbosity()),
-                                false);
+        QString err;
+        if (on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
+                                    QString().setNum(mainwindow->select_correct_display()),
+                                    QString().setNum(mainwindow->select_correct_verbosity()),
+                                    false, err) < 0)
+            mainwindow->set_str_msg_to_status_bar(err.toUtf8().data());
     }
 
     //---------------------------------------------------------------------------
@@ -569,6 +607,7 @@ namespace MediaConch {
     QString WebCommonPage::policy_is_valid(long file_id)
     {
         //{"valid":false,"fileId":"fileId","error":null}
+        std::string err;
         QString json = QString("{\"fileId\":\"%1\",").arg(file_id);
         FileRegistered* fr = mainwindow->get_file_registered_from_id(file_id);
         if (!fr)
@@ -588,7 +627,15 @@ namespace MediaConch {
 
         bool policy_valid = false;
         std::vector<MediaConchLib::Checker_ValidateRes*> res;
-        if (mainwindow->validate_policy(file_id, fr->policy, res) == 0 && res.size() == 1)
+        if (mainwindow->validate_policy(file_id, fr->policy, res, err) < 0)
+        {
+            json += QString("\"valid\":false,\"error\":\"%2\"}")
+                .arg(QString().fromUtf8(err.c_str(), err.size()));
+            delete fr;
+            return json;
+        }
+
+        if (res.size() == 1)
             policy_valid = res[0]->valid;
 
         for (size_t j = 0; j < res.size() ; ++j)
@@ -799,8 +846,15 @@ namespace MediaConch {
     {
         MediaConchLib::Get_Policies policies;
         QString res;
+        QString err;
 
-        mainwindow->get_policies("JSTREE", policies);
+        if (mainwindow->get_policies("JSTREE", policies, err) < 0)
+        {
+            string_to_json(err);
+            res = "{\"error\":\"" + err + "\"}";
+            return res;
+        }
+
         if (policies.format != "JSTREE")
         {
             res = "{\"error\":\"Cannot generate the policies tree\"}";
@@ -813,9 +867,10 @@ namespace MediaConch {
 
     QString WebCommonPage::policy_get_xml(int id)
     {
-        std::string policy, err;
-        if (mainwindow->policy_dump(id, policy, err))
-            return QString().fromUtf8(err.c_str());
+        std::string policy;
+        QString err;
+        if (mainwindow->policy_dump(id, policy, err) < 0)
+            return err;
 
         return QString().fromUtf8(policy.c_str());
     }
@@ -823,12 +878,12 @@ namespace MediaConch {
     QString WebCommonPage::policy_get_jstree(int id)
     {
         QString json;
-        std::string err;
+        QString err;
 
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(id, "JSTREE", p) < 0)
+        if (mainwindow->policy_get(id, "JSTREE", p, err) < 0)
         {
-            json = "{\"error\":\"Cannot find the policy\"}";
+            json = QString("{\"error\":\"") + err + "\"}";
             return json;
         }
 
@@ -861,24 +916,22 @@ namespace MediaConch {
     {
 
         QString json;
-        std::string err;
+        QString err;
         int id;
         if ((id = mainwindow->policy_import(file, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)id, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
         mainwindow->policy_save(id, err);
 
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(id, "JSTREE", p) < 0)
+        if (mainwindow->policy_get(id, "JSTREE", p, err) < 0)
         {
-            json = "{\"error\":\"Cannot import the policy\"}";
+            string_to_json(err);
+            json = QString("{\"error\":\"") + err + "\"}";
             return json;
         }
 
@@ -896,15 +949,12 @@ namespace MediaConch {
     {
 
         QString json;
-        std::string err;
+        QString err;
         int id;
         if ((id = mainwindow->policy_import_data(data, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)id, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -936,25 +986,22 @@ namespace MediaConch {
     QString WebCommonPage::xslt_policy_create(int parent_id)
     {
         QString json;
-        std::string err;
+        QString err;
 
         int id;
         if ((id = mainwindow->xslt_policy_create(parent_id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)id, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
         mainwindow->policy_save(id, err);
 
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(id, "JSTREE", p) < 0)
+        if (mainwindow->policy_get(id, "JSTREE", p, err) < 0)
         {
-            json = "{\"error\":\"Cannot create the policy\"}";
+            json = QString("{\"error\":\"") + err + "\"}";
             return json;
         }
 
@@ -971,24 +1018,21 @@ namespace MediaConch {
     QString WebCommonPage::policy_duplicate(int id, int dst_policy_id)
     {
         QString json;
-        std::string err;
+        QString err;
         int ret = -1;
 
         if ((ret = mainwindow->policy_duplicate(id, dst_policy_id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)ret, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
         mainwindow->policy_save(ret, err);
 
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(ret, "JSTREE", p) < 0)
+        if (mainwindow->policy_get(ret, "JSTREE", p, err) < 0)
         {
-            json = "{\"error\":\"Cannot duplicate the policy\"}";
+            json = QString("{\"error\":\"") + err + "\"}";
             return json;
         }
 
@@ -1005,25 +1049,23 @@ namespace MediaConch {
     QString WebCommonPage::policy_move(int id, int dst_policy_id)
     {
         QString json;
-        std::string err;
+        QString err;
         int ret = -1;
 
         if ((ret = mainwindow->policy_move(id, dst_policy_id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)ret, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
         mainwindow->policy_save(ret, err);
 
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(ret, "JSTREE", p) < 0)
+        if (mainwindow->policy_get(ret, "JSTREE", p, err) < 0)
         {
-            json = "{\"error\":\"Cannot move the policy\"}";
+            string_to_json(err);
+            json = QString("{\"error\":\"") + err + "\"}";
             return json;
         }
 
@@ -1042,15 +1084,12 @@ namespace MediaConch {
         //return:
         QString json;
 
-        std::string err;
+        QString err;
         int code;
         if ((code = mainwindow->policy_remove(id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1062,15 +1101,12 @@ namespace MediaConch {
     {
         //return: error?
         QString json;
-        std::string err;
+        QString err;
         int code;
         if ((code = mainwindow->policy_export((size_t)id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1081,15 +1117,12 @@ namespace MediaConch {
     QString WebCommonPage::policy_export_data(const QString& report)
     {
         QString json;
-        std::string err;
+        QString err;
         int code;
         if ((code = mainwindow->policy_export_data(report, "Policy", err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1102,24 +1135,20 @@ namespace MediaConch {
     {
         //return: error?
         QString json;
-        std::string err;
+        QString err;
         int code;
         if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(),
                                                    license.toUtf8().data(), err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
         if (mainwindow->policy_change_type((size_t)id, type.toUtf8().data(), err) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1138,9 +1167,9 @@ namespace MediaConch {
         mainwindow->policy_save(id, err);
 
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(id, "JSTREE", p) < 0)
+        if (mainwindow->policy_get(id, "JSTREE", p, err) < 0)
         {
-            json = "{\"error\":\"Cannot import the policy\"}";
+            json = QString("{\"error\":\"") + err + "\"}";
             return json;
         }
 
@@ -1156,16 +1185,13 @@ namespace MediaConch {
 
     QString WebCommonPage::xslt_policy_rule_create(int policy_id)
     {
-        std::string err;
+        QString err;
         QString json;
         int new_rule_id = -1;
         if ((new_rule_id = mainwindow->xslt_policy_rule_create(policy_id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)new_rule_id, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1174,7 +1200,7 @@ namespace MediaConch {
         XsltPolicyRule* r = mainwindow->xslt_policy_rule_get(policy_id, new_rule_id, err);
         if (!r)
         {
-            json = "{\"error\":\"Cannot get the policy rule created\"}";
+            json = QString("{\"error\":\"") + err + "\"}";
             return json;
         }
 
@@ -1188,7 +1214,7 @@ namespace MediaConch {
 
     QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope)
     {
-        std::string err;
+        QString err;
         QString json;
 
         XsltPolicyRule rule;
@@ -1203,11 +1229,8 @@ namespace MediaConch {
         int code;
         if ((code = mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1231,16 +1254,13 @@ namespace MediaConch {
     QString WebCommonPage::xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id)
     {
         //return: rule
-        std::string err;
+        QString err;
         QString json;
         int new_rule_id = -1;
         if ((new_rule_id = mainwindow->xslt_policy_rule_duplicate(policy_id, rule_id, dst_policy_id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)new_rule_id, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1264,16 +1284,13 @@ namespace MediaConch {
     QString WebCommonPage::xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id)
     {
         //return: rule
-        std::string err;
+        QString err;
         QString json;
         int new_rule_id = -1;
         if ((new_rule_id = mainwindow->xslt_policy_rule_move(policy_id, rule_id, dst_policy_id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)new_rule_id, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
@@ -1297,16 +1314,14 @@ namespace MediaConch {
 
     QString WebCommonPage::xslt_policy_rule_delete(int policy_id, int rule_id)
     {
-        std::string err;
+        QString err;
         QString json;
         int code;
+
         if ((code = mainwindow->xslt_policy_rule_delete(policy_id, rule_id, err)) < 0)
         {
-            QString error = QString().fromUtf8(err.c_str(), err.length());
-            if (!error.size())
-                mainwindow->get_error_http((MediaConchLib::errorHttp)code, error);
-            string_to_json(error);
-            json = QString("{\"error\":\"%1\"}").arg(error);
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
             return json;
         }
 
