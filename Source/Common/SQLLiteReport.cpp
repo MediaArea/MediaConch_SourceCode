@@ -598,7 +598,7 @@ int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report rep
     return execute();
 }
 
-int SQLLiteReport::update_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+int SQLLiteReport::update_report(int /*user*/, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                  const std::string& report, MediaConchLib::compression compress,
                                  int mil_version)
 {
@@ -642,7 +642,7 @@ int SQLLiteReport::update_report(int user, long file_id, MediaConchLib::report r
     return execute();
 }
 
-int SQLLiteReport::remove_report(int user, long file_id)
+int SQLLiteReport::remove_report(int /*user*/, long file_id)
 {
     std::stringstream delete_query;
 
@@ -661,7 +661,7 @@ int SQLLiteReport::remove_report(int user, long file_id)
     return execute();
 }
 
-void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+void SQLLiteReport::get_report(int /*user*/, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                std::string& report, MediaConchLib::compression& compress)
 {
     std::stringstream create;
@@ -711,7 +711,7 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
     }
 }
 
-bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format)
+bool SQLLiteReport::report_is_registered(int /*user*/, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format)
 {
     std::stringstream create;
     std::string key("COUNT(REPORT)");
@@ -749,7 +749,7 @@ bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::
     return true;
 }
 
-int SQLLiteReport::version_registered(int user, long file_id)
+int SQLLiteReport::version_registered(int /*user*/, long file_id)
 {
     std::stringstream create;
     std::string key("MIL_VERSION");
@@ -803,7 +803,7 @@ void SQLLiteReport::get_elements(int user, std::vector<std::string>& vec)
 }
 
 //---------------------------------------------------------------------------
-void SQLLiteReport::get_element_report_kind(int user, long file_id, MediaConchLib::report& report_kind)
+void SQLLiteReport::get_element_report_kind(int /*user*/, long file_id, MediaConchLib::report& report_kind)
 {
     report_kind = MediaConchLib::report_MediaConch;
     reports.clear();
