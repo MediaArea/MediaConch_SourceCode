@@ -1,4 +1,5 @@
 usr/bin/mediaconch-gui
+usr/share/doc/mediaconch-gui/*
 usr/share/appdata/*
 usr/share/applications/*
 usr/share/apps/konqueror/servicemenus/*

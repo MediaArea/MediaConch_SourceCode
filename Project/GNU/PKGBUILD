@@ -8,7 +8,7 @@ pkgrel=1
 pkgdesc="Implementation checker and policy checker for video and audio files"
 url="http://MediaArea.net/MediaConch"
 license=('custom:MPL2' 'GPL3')
-source=(${pkgname}_${pkgver}.tar.xz)
+source=(${pkgname}_${pkgver}.orig.tar.xz)
 md5sums=('00000000000000000000000000000000')
 arch=('i686' 'x86_64')
 
@@ -86,7 +86,7 @@ package_mediaconch-server() {
 
 package_mediaconch-gui() {
     pkgdesc="${pkgdesc} (GUI)"
-    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webengine' 'libzen>=0.4.34' 'libmediainfo>=0.7.91')
+    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webkit' 'libzen>=0.4.34' 'libmediainfo>=0.7.91')
 
     cd "${srcdir}"/MediaConch
     install -D -m 0755 Project/Qt/mediaconch-gui "${pkgdir}"/usr/bin/mediaconch-gui
