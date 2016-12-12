@@ -40,10 +40,16 @@ private:
     bool          is_finished;
 
     void clear_display();
-    void create_html();
-    void create_html_display(QString& html);
-    void change_body_script_in_template(QString& html);
-    void set_webmachine_script_in_template(QString& html);
+    void create_html(QString& html);
+
+    void create_html_display(QString& display);
+
+    void create_html_base(QString& base, const QString& display);
+    void set_webmachine_script_in_template(QString& base);
+    void change_qt_scripts_in_template(QString& base);
+    void change_checker_in_template(QString& base, const QString& display);
+    void remove_result_in_template(QString& base);
+
     void fill_table();
 
 private Q_SLOTS:

@@ -58,6 +58,9 @@ protected:
     QString      choose_file_import_policy();
     void         string_to_json(QString& str);
 
+private Q_SLOTS:
+    void         timer_menu_link();
+
 public Q_SLOTS:
     int          on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity,
                                          bool fixer, QString& err);
@@ -138,6 +141,7 @@ protected:
     MainWindow                 *mainwindow;
     QMap<QString, QStringList>  file_selector;
     QString                     select_file_name;
+    QString                     menu_name;
 };
 
 }

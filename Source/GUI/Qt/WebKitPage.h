@@ -9,6 +9,7 @@
 
 #include "mainwindow.h"
 #include "WebCommonPage.h"
+#include <QWebInspector>
 
 namespace MediaConch {
 
@@ -28,8 +29,11 @@ protected:
     bool    extension(Extension extension, const ExtensionOption * option = 0, ExtensionReturn *output = 0);
     bool    supportsExtension(Extension extension) const;
 
-private Q_SLOTS:
+public Q_SLOTS:
     void    on_load_finished(bool ok);
+
+private:
+    QWebInspector *inspector;
 };
 
 }

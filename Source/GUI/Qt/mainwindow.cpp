@@ -6,7 +6,6 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "menumainwindow.h"
 #include "settingswindow.h"
 #include "checkerwindow.h"
 #include "policieswindow.h"
@@ -103,7 +102,6 @@ MainWindow::MainWindow(QWidget *parent) :
     Layout=(QVBoxLayout*)ui->centralWidget->layout();
     Layout->setContentsMargins(0, 0, 0, 0);
     Layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    MenuView = new MenuMainWindow(this);
     checkerView=NULL;
     policiesView = NULL;
     publicPoliciesView = NULL;
@@ -143,13 +141,27 @@ MainWindow::~MainWindow()
     workerfiles.quit();
     workerfiles.wait();
     delete ui;
-    if (checkerView)
-        delete checkerView;
+    clearVisualElements();
 }
 
 //***************************************************************************
 // Functions
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+bool MainWindow::close()
+{
+    clearVisualElements();
+    return QWidget::close();
+}
+
+
+//---------------------------------------------------------------------------
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    clearVisualElements();
+    QWidget::closeEvent(event);
+}
 
 //---------------------------------------------------------------------------
 int MainWindow::add_file_to_list(const QString& file, const QString& path,
