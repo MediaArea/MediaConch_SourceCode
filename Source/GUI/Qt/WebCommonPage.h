@@ -62,12 +62,12 @@ private Q_SLOTS:
     void         timer_menu_link();
 
 public Q_SLOTS:
-    int          on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity,
-                                         bool fixer, QString& err);
-    int          on_file_online_selected(const QString& url, const QString& policy, const QString& display,
-                                         const QString& verbosity, bool fixer, QString& err);
-    int          on_file_repository_selected(const QString& policy, const QString& display,
-                                             const QString& verbosity, bool fixer, QString& err);
+    QString      on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity,
+                                         bool fixer);
+    QString      on_file_online_selected(const QString& url, const QString& policy, const QString& display,
+                                         const QString& verbosity, bool fixer);
+    QString      on_file_repository_selected(const QString& policy, const QString& display,
+                                             const QString& verbosity, bool fixer);
     void         on_save_settings_selected(const QString& policy, const QString& display, const QString& verbosity,
                                            const QString& save_report, const QString& load_files,
                                            const QString& save_policy, const QString& load_policy,

@@ -23,10 +23,13 @@ $(document).ready(function() {
     // Upload form
     $('#file form').on('submit', function (e) {
         e.preventDefault();
-        webpage.on_file_upload_selected($('.tab-content .active .policyList').val(),
-                                        $('.tab-content .active .displayList').val(),
-                                        $('.tab-content .active .verbosityList').val(),
-                                        $('#checkerUpload_fixer').is(':checked'));
+        var err = webpage.on_file_upload_selected($('.tab-content .active .policyList').val(),
+                                                  $('.tab-content .active .displayList').val(),
+                                                  $('.tab-content .active .verbosityList').val(),
+                                                  $('#checkerUpload_fixer').is(':checked'));
+
+        if (err && err.length)
+            mcoMessage.error(err);
     });
 
     // Online form

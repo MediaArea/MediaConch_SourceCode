@@ -188,14 +188,14 @@ namespace MediaConch
         return script;
     }
 
-    int WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
-                                                const QString& verbosity, bool fixer, QString& err)
+    QString WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
+                                                const QString& verbosity, bool fixer)
     {
         int ret = 0;
         QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
         if (!files.size())
-            return ret;
+            return QString();
 
         for (int i = 0; i < files.size(); ++i)
         {
@@ -203,39 +203,35 @@ namespace MediaConch
             std::string error;
             if (mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy,
                                              display, verbosity, fixer, error) < 0)
-            {
-                err += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
-                return -1;
-            }
+                return QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         }
         file_selector.clear();
         clean_forms();
         use_javascript(QString("startWaitingLoop()"));
 
-        return ret;
+        return QString();
     }
 
-    int WebCommonPage::on_file_online_selected(const QString& url, const QString& policy,
-                                                const QString& display, const QString& verbosity,
-                                                bool fixer, QString& err)
+    QString WebCommonPage::on_file_online_selected(const QString& url, const QString& policy,
+                                                   const QString& display, const QString& verbosity,
+                                                   bool fixer)
     {
-        int ret = 0;
+        QString ret;
         if (!url.length())
             return ret;
 
         std::string error;
-        if ((ret = mainwindow->add_file_to_list(url, "", policy, display, verbosity, fixer, error)) < 0)
-            err += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
+        if (mainwindow->add_file_to_list(url, "", policy, display, verbosity, fixer, error) < 0)
+            ret += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         file_selector.clear();
         clean_forms();
         use_javascript(QString("startWaitingLoop()"));
-        return ret;
-    }
+        return ret;    }
 
-    int WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
-                                                    const QString& verbosity, bool fixer, QString& err)
+    QString WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
+                                                    const QString& verbosity, bool fixer)
     {
-        int ret = 0;
+        QString ret;
         QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
         if (dirname.empty())
             return ret;
@@ -251,10 +247,7 @@ namespace MediaConch
             std::string error;
             if (mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy,
                                              display, verbosity, fixer, error))
-            {
-                err += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
-                ret = -1;
-            }
+                ret += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         }
         file_selector.clear();
         clean_forms();
@@ -537,11 +530,11 @@ namespace MediaConch
             mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
         }
 
-        QString err;
-        if (on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
-                                    QString().setNum(mainwindow->select_correct_display()),
-                                    QString().setNum(mainwindow->select_correct_verbosity()),
-                                    false, err) < 0)
+        QString err = on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
+                                              QString().setNum(mainwindow->select_correct_display()),
+                                              QString().setNum(mainwindow->select_correct_verbosity()),
+                                              false);
+        if (err.size())
             mainwindow->set_str_msg_to_status_bar(err.toUtf8().data());
     }
 
