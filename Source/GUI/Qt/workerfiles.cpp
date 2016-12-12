@@ -443,7 +443,7 @@ void WorkerFiles::update_unfinished_files()
             std::vector<MediaConchLib::Checker_ValidateRes*> res;
 
             if (mainwindow->validate((MediaConchLib::report)fr->report_kind, files[i],
-                                     policies_ids, policies_contents, options, res, err) < 0)
+                policies_ids, policies_contents, options, res, err) < 0)
             {
                 mainwindow->set_str_msg_to_status_bar(err);
                 continue;
@@ -455,7 +455,7 @@ void WorkerFiles::update_unfinished_files()
             }
             fr->implementation_valid = res[0]->valid;
 
-            for (size_t j = 0; j < res.size() ; ++j)
+            for (size_t j = 0; j < res.size(); ++j)
                 delete res[j];
             res.clear();
 
@@ -464,24 +464,24 @@ void WorkerFiles::update_unfinished_files()
                 policies_ids.push_back(fr->policy);
 
                 if (mainwindow->validate(MediaConchLib::report_Max, files[i],
-                                         policies_ids, policies_contents, options, res, err) < 0)
+                    policies_ids, policies_contents, options, res, err) < 0)
                     continue;
 
                 if (!res.size())
                     continue;
 
                 fr->policy_valid = res[0]->valid;
-                for (size_t j = 0; j < res.size() ; ++j)
+                for (size_t j = 0; j < res.size(); ++j)
                     delete res[j];
                 res.clear();
             }
-            else
-            {
-                fr->analyze_percent = 0.0;
-                if (st_res.percent)
-                    fr->analyze_percent = *st_res.percent;
-                vec.push_back(files[i]);
-            }
+        }
+        else
+        {
+            fr->analyze_percent = 0.0;
+            if (st_res.percent)
+                fr->analyze_percent = *st_res.percent;
+            vec.push_back(files[i]);
         }
 
         to_update_files_mutex.lock();
