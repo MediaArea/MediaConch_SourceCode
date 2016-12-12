@@ -64,8 +64,6 @@ void SettingsWindow::create_settings_finished(bool ok)
 //---------------------------------------------------------------------------
 void SettingsWindow::display_settings()
 {
-    QFile settings_file(":/settings.html");
-
     clear_visual_elements();
 
     progress_bar = new ProgressBar(parent);
@@ -73,32 +71,70 @@ void SettingsWindow::display_settings()
     progress_bar->get_progress_bar()->setValue(0);
     progress_bar->show();
 
-    settings_view = new WebView(parent);
-    settings_view->hide();
-    WebPage* page = new WebPage(parent, settings_view);
-    settings_view->setPage(page);
-
-    settings_file.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray base = settings_file.readAll();
-    settings_file.close();
-
-    QObject::connect(settings_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(settings_view, SIGNAL(loadFinished(bool)), this, SLOT(create_settings_finished(bool)));
-
-    QString html(base);
-    fill_html(html);
+    QString html;
+    create_html(html);
 
     QUrl url = QUrl("qrc:/html");
     if (!url.isValid())
         return;
 
+    settings_view = new WebView(parent);
+    settings_view->hide();
+
+    WebPage* page = new WebPage(parent, settings_view);
+    settings_view->setPage(page);
+
+    QObject::connect(settings_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
+    QObject::connect(settings_view, SIGNAL(loadFinished(bool)), this, SLOT(create_settings_finished(bool)));
+
 #if defined(WEB_MACHINE_ENGINE)
     QWebChannel *channel = new QWebChannel(page);
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
+    settings_view->setHtml(html.toUtf8(), url);
 #endif
+#if defined(WEB_MACHINE_KIT)
     settings_view->setContent(html.toUtf8(), "text/html", url);
+#endif
+}
 
+
+//---------------------------------------------------------------------------
+void SettingsWindow::create_html(QString& html)
+{
+    QString settings;
+    create_html_settings(settings);
+
+    QString base;
+    create_html_base(base, settings);
+
+    html = QString(base);
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::create_html_settings(QString& settings)
+{
+    QFile settings_file(":/settings.html");
+
+    settings_file.open(QIODevice::ReadOnly | QIODevice::Text);
+    settings = QString(settings_file.readAll());
+    settings_file.close();
+
+    fill_settings_html(settings);
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::create_html_base(QString& base, const QString& settings)
+{
+    QFile template_html(":/base.html");
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    base = QString(template_html.readAll());
+    template_html.close();
+
+    set_webmachine_script_in_template(base);
+    change_qt_scripts_in_template(base);
+    change_checker_in_template(base, settings);
+    remove_result_in_template(base);
 }
 
 //---------------------------------------------------------------------------
@@ -130,7 +166,7 @@ void SettingsWindow::clear_visual_elements()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void SettingsWindow::fill_html(QString& html)
+void SettingsWindow::fill_settings_html(QString& html)
 {
     QString policies;
     create_policy_options(policies);
@@ -323,6 +359,67 @@ void SettingsWindow::add_verbosity_to_html_selection(QString& verbosity, QString
         pos += reg.matchedLength();
         html.insert(pos, verbosity);
     }
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::change_checker_in_template(QString& html, const QString& settings)
+{
+    QRegExp reg("\\{% block checker %\\}\\{% endblock %\\}");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), settings);
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::remove_result_in_template(QString& html)
+{
+    QRegExp reg("\\{% block result %\\}\\{% endblock %\\}");
+    int pos = 0;
+
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), "");
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::change_qt_scripts_in_template(QString& html)
+{
+    QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
+    QString script;
+    int     pos = 0;
+
+    reg.setMinimal(true);
+#if defined(WEB_MACHINE_KIT)
+    script = "        <script type=\"text/javascript\" src=\"qrc:/settings.js\"></script>\n";
+#elif defined(WEB_MACHINE_ENGINE)
+    script = "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/settings.js\"></script>\n";
+#endif
+    script += "        <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/menu.js\"></script>\n";
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), script);
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::set_webmachine_script_in_template(QString& html)
+{
+    QRegExp reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}");
+    QString machine;
+    int     pos = 0;
+
+    reg.setMinimal(true);
+#if defined(WEB_MACHINE_KIT)
+    machine = "WEB_MACHINE_KIT";
+#elif defined(WEB_MACHINE_ENGINE)
+    machine = "WEB_MACHINE_ENGINE";
+#endif
+    if ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), machine);
 }
 
 //---------------------------------------------------------------------------

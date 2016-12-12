@@ -28,7 +28,6 @@ class QLineEdit;
 
 namespace MediaConch {
 
-class MenuMainWindow;
 class SettingsWindow;
 class CheckerWindow;
 class PoliciesWindow;
@@ -208,7 +207,6 @@ private:
     PoliciesWindow*             policiesView;
     PublicPoliciesWindow*       publicPoliciesView;
     DisplayWindow*              displayView;
-    MenuMainWindow*             MenuView;
     SettingsWindow*             settingsView;
 
     void                        create_and_configure_ui_database();
@@ -227,6 +225,9 @@ private:
                                                   FileRegistered* fr);
     void                        fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p);
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 Q_SIGNALS:
     void status_bar_clear_message();
     void status_bar_show_message(const QString& message, int timeout);
@@ -235,6 +236,7 @@ private Q_SLOTS:
     void on_actionOpen_triggered();
     void on_actionChooseSchema_triggered();
 
+public Q_SLOTS:
     // View
     void on_actionChecker_triggered();
     void on_actionPolicies_triggered();
@@ -242,12 +244,13 @@ private Q_SLOTS:
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
 
-public Q_SLOTS:
     //Help
     void on_actionAbout_triggered();
     void on_actionGettingStarted_triggered();
     void on_actionHowToUse_triggered();
     void on_actionDataFormat_triggered();
+
+    bool close();
 };
 
 }

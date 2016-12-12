@@ -640,7 +640,7 @@ void WorkerFiles::fill_registered_files_from_db()
 
         //check if policy still exists
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(fr->policy, "JSON", p, err) < 0)
+        if (fr->policy != -1 && mainwindow->policy_get(fr->policy, "JSON", p, err) < 0)
         {
             mainwindow->set_msg_to_status_bar(err);
             fr->policy = -1;

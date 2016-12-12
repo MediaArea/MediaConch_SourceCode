@@ -10,28 +10,35 @@
 #include <Common/XsltPolicy.h>
 
 #include <QDir>
+#include <QTimer>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QDesktopServices>
 
-namespace MediaConch {
-
+namespace MediaConch
+{
     void WebCommonPage::menu_link_checker(const QString& name)
     {
-        if (!name.compare("Checker"))
-            mainwindow->checker_selected();
-        else if (!name.compare("Policies"))
-            mainwindow->policies_selected();
-        else if (!name.compare("Public Policies"))
-            mainwindow->public_policies_selected();
-        else if (!name.compare("Display"))
-            mainwindow->display_selected();
-        else if (!name.compare("Settings"))
-            mainwindow->settings_selected();
-        else if (!name.compare("Help"))
-            mainwindow->on_actionGettingStarted_triggered();
+        menu_name = name;
+        QTimer::singleShot(0, this, SLOT(timer_menu_link()));
+    }
+
+    void WebCommonPage::timer_menu_link()
+    {
+        if (!menu_name.compare("Checker"))
+            mainwindow->on_actionChecker_triggered();
+        else if (!menu_name.compare("Policies"))
+            Q_EMIT mainwindow->on_actionPolicies_triggered();
+        else if (!menu_name.compare("Public Policies"))
+            Q_EMIT mainwindow->on_actionPublicPolicies_triggered();
+        else if (!menu_name.compare("Display"))
+            Q_EMIT mainwindow->on_actionDisplay_triggered();
+        else if (!menu_name.compare("Settings"))
+            Q_EMIT mainwindow->on_actionSettings_triggered();
+        else if (!menu_name.compare("Help"))
+            Q_EMIT mainwindow->on_actionGettingStarted_triggered();
         else
-            mainwindow->checker_selected();
+            mainwindow->on_actionChecker_triggered();
     }
 
     void WebCommonPage::on_input_changed(const QString& inputName)

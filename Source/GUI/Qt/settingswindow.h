@@ -33,13 +33,23 @@ private:
     WebView*      settings_view;
     ProgressBar*  progress_bar;
 
-    void fill_html(QString& html);
+    void create_html(QString& html);
+
+    void create_html_settings(QString& settings);
+    void fill_settings_html(QString& html);
     void add_policy_to_html_selection(QString& policies, QString& html, const QString& selector);
     void create_policy_options(QString& policies);
     void add_display_to_html_selection(QString& displays, QString& html, const QString& selector);
     void create_displays_options(QString& displays);
     void add_verbosity_to_html_selection(QString& verbosity, QString& html, const QString& selector);
     void create_verbosity_options(QString& verbosity);
+
+    void create_html_base(QString& base, const QString& settings);
+    void change_qt_scripts_in_template(QString& html);
+    void set_webmachine_script_in_template(QString& html);
+    void remove_result_in_template(QString& html);
+    void change_checker_in_template(QString& html, const QString& settings);
+
     void add_save_report_path_to_js_input(WebPage *page);
     void add_load_files_path_to_js_input(WebPage *page);
     void add_save_policy_path_to_js_input(WebPage *page);

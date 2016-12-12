@@ -39,7 +39,37 @@ DisplayWindow::~DisplayWindow()
 void DisplayWindow::display_display()
 {
     clear_display();
-    create_html();
+
+    progress_bar = new ProgressBar(mainwindow);
+    mainwindow->set_widget_to_layout(progress_bar);
+    progress_bar->get_progress_bar()->setValue(0);
+    progress_bar->show();
+
+    QString html;
+    create_html(html);
+
+    web_view = new WebView(mainwindow);
+    web_view->hide();
+
+    WebPage* page = new WebPage(mainwindow, web_view);
+    web_view->setPage(page);
+
+    QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
+    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
+
+    QUrl url = QUrl("qrc:/html");
+    if (!url.isValid())
+        return;
+
+#if defined(WEB_MACHINE_ENGINE)
+    QWebChannel *channel = new QWebChannel(page);
+    page->setWebChannel(channel);
+    channel->registerObject("webpage", page);
+    web_view->setHtml(html.toUtf8(), url);
+#endif
+#if defined(WEB_MACHINE_KIT)
+    web_view->setContent(html.toUtf8(), "text/html", url);
+#endif
 }
 
 void DisplayWindow::clear_display()
@@ -63,6 +93,29 @@ void DisplayWindow::clear_display()
         delete web_view;
         web_view = NULL;
     }
+}
+
+//---------------------------------------------------------------------------
+void DisplayWindow::create_web_view_finished(bool ok)
+{
+    if (!web_view || !ok)
+    {
+        mainwindow->set_msg_to_status_bar("Problem to load the checker page");
+        return;
+    }
+    is_finished = true;
+
+    if (progress_bar)
+    {
+        mainwindow->remove_widget_from_layout(progress_bar);
+        delete progress_bar;
+        progress_bar = NULL;
+    }
+
+    web_view->show();
+    fill_table();
+    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mainwindow->set_widget_to_layout(web_view);
 }
 
 void DisplayWindow::fill_table()
@@ -235,7 +288,47 @@ void DisplayWindow::delete_file(const QString& name)
 }
 
 //---------------------------------------------------------------------------
-void DisplayWindow::change_body_script_in_template(QString& html)
+void DisplayWindow::create_html(QString& html)
+{
+    QString display;
+    create_html_display(display);
+
+    QString base;
+    create_html_base(base, display);
+
+    html = QString(base);
+}
+
+//---------------------------------------------------------------------------
+void DisplayWindow::create_html_display(QString& display)
+{
+    QFile display_file(":/display.html");
+
+    display_file.open(QIODevice::ReadOnly | QIODevice::Text);
+    display = QString(display_file.readAll());
+    display_file.close();
+}
+
+//---------------------------------------------------------------------------
+void DisplayWindow::create_html_base(QString& base, const QString& display)
+{
+    QFile template_html(":/base.html");
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    base = QString(template_html.readAll());
+    template_html.close();
+
+    set_webmachine_script_in_template(base);
+    change_qt_scripts_in_template(base);
+    change_checker_in_template(base, display);
+    remove_result_in_template(base);
+}
+
+//***************************************************************************
+// HELPER
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void DisplayWindow::change_qt_scripts_in_template(QString& html)
 {
     QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
     QString script;
@@ -243,11 +336,14 @@ void DisplayWindow::change_body_script_in_template(QString& html)
 
     reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
-    script = "";
+    script = "        <script type=\"text/javascript\" src=\"qrc:/display.js\"></script>\n";
 #elif defined(WEB_MACHINE_ENGINE)
-    script = "        <script type=\"text/javascript\" src=\"qrc:///qtwebchannel/qwebchannel.js\"></script>\n"
-             "        <script type=\"text/javascript\" src=\"qrc:///webengine.js\"></script>";
+    script = "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
+             "        <script type=\"text/javascript\" src=\"qrc:/display.js\"></script>\n";
 #endif
+    script += "        <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/menu.js\"></script>\n";
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), script);
 }
@@ -270,73 +366,25 @@ void DisplayWindow::set_webmachine_script_in_template(QString& html)
 }
 
 //---------------------------------------------------------------------------
-void DisplayWindow::create_html_display(QString& display)
+void DisplayWindow::change_checker_in_template(QString& html, const QString& display)
 {
-    QFile template_html(":/display.html");
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = template_html.readAll();
-    template_html.close();
+    QRegExp reg("\\{% block checker %\\}\\{% endblock %\\}");
+    int pos = 0;
 
-    display = QString(html);
-
-    set_webmachine_script_in_template(display);
-    change_body_script_in_template(display);
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), display);
 }
 
 //---------------------------------------------------------------------------
-void DisplayWindow::create_web_view_finished(bool ok)
+void DisplayWindow::remove_result_in_template(QString& html)
 {
-    if (!web_view || !ok)
-    {
-        create_html();
-        mainwindow->set_msg_to_status_bar("Problem to load the checker page");
-        return;
-    }
-    is_finished = true;
+    QRegExp reg("\\{% block result %\\}\\{% endblock %\\}");
+    int pos = 0;
 
-    if (progress_bar)
-    {
-        mainwindow->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    web_view->show();
-    fill_table();
-    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainwindow->set_widget_to_layout(web_view);
-}
-
-//---------------------------------------------------------------------------
-void DisplayWindow::create_html()
-{
-    QString html;
-    create_html_display(html);
-
-    progress_bar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progress_bar);
-    progress_bar->get_progress_bar()->setValue(0);
-    progress_bar->show();
-
-    web_view = new WebView(mainwindow);
-    web_view->hide();
-
-    WebPage* page = new WebPage(mainwindow, web_view);
-    web_view->setPage(page);
-
-    QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
-
-    QUrl url = QUrl("qrc:/html");
-    if (!url.isValid())
-        return;
-
-#if defined(WEB_MACHINE_ENGINE)
-    QWebChannel *channel = new QWebChannel(page);
-    page->setWebChannel(channel);
-    channel->registerObject("webpage", page);
-#endif
-    web_view->setContent(html.toUtf8(), "text/html", url);
+    reg.setMinimal(true);
+    while ((pos = reg.indexIn(html, pos)) != -1)
+        html.replace(pos, reg.matchedLength(), "");
 }
 
 }

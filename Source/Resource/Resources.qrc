@@ -7,7 +7,6 @@
     <qresource>
         <file alias="base.html">html/base.html</file>
         <file alias="webengine.js">html/js/webengine.js</file>
-        <file alias="menu.html">html/menu.html</file>
         <file alias="settings.html">html/settings.html</file>
         <file alias="checker.html">html/checker.html</file>
         <file alias="result.html">html/result.html</file>
@@ -28,6 +27,7 @@
         <file alias="utils/functions.js">html/js/utils/functions.js</file>
         <file alias="utils/url.js">html/js/utils/url.js</file>
         <file alias="checker.js">html/js/checker.js</file>
+        <file alias="menu.js">html/js/menu.js</file>
         <file alias="policy.js">html/js/policy.js</file>
         <file alias="policyTree.js">html/js/policyTree.js</file>
         <file alias="policyTreePolicies.js">html/js/policyTreePolicies.js</file>
