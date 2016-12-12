@@ -139,6 +139,16 @@ namespace MediaConch {
         CS.Leave();
     }
 
+    void Scheduler::get_elements(int user, std::vector<long>& vec)
+    {
+        CS.Enter();
+        std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
+        for (; it != working.end(); ++it)
+            if (it->first && it->first->user == user)
+                vec.push_back(it->first->file_id);
+        CS.Leave();
+    }
+
     bool Scheduler::element_is_finished(int user, long file_id, double& percent_done)
     {
         bool ret = true;
@@ -166,7 +176,7 @@ namespace MediaConch {
         return ret;
     }
 
-    long Scheduler::element_exists(int user, const std::string& filename)
+    long Scheduler::element_exists(int user, const std::string& filename, const std::string& options)
     {
         CS.Enter();
         long file_id = queue->has_element(user, filename);
@@ -178,7 +188,7 @@ namespace MediaConch {
 
         std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
         for (; it != working.end(); ++it)
-            if (it->first->filename == filename && user == it->first->user)
+            if (it->first->filename == filename && user == it->first->user && options == it->first->options_str)
                 break;
 
         if (it != working.end())
@@ -286,9 +296,8 @@ namespace MediaConch {
                 new_file = ((PluginPreHook*)p)->get_output_file();
 
                 std::vector<std::pair<std::string,std::string> > options;
-                std::map<std::string, std::string>::iterator it = el->options.begin();
-                for (; it != el->options.end(); ++it)
-                    options.push_back(std::make_pair(it->first, it->second));
+                for (size_t i = 0; i < el->options.size(); ++i)
+                    options.push_back(std::make_pair(el->options[i].first, el->options[i].second));
 
                 std::vector<std::string> plugins;
                 long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log,

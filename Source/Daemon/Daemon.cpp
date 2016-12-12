@@ -180,7 +180,7 @@ namespace MediaConch
             std::string err;
             long user_id = -1;
             int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
-                                                   watch_folder_user, watch_folder_recursive, user_id, err);
+                                                   watch_folder_user, watch_folder_recursive, options, user_id, err);
             if (ret < 0)
                 std::clog << "Cannot watch folder:" << watch_folder << ":" << err << std::endl;
             else
@@ -691,7 +691,7 @@ namespace MediaConch
         long user_id = -1;
         if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports,
                                             req->plugins, req->policies,
-                                            req->user, req->recursive, user_id, error) < 0)
+                                            req->user, req->recursive, req->options, user_id, error) < 0)
         {
             res.nok = new RESTAPI::MediaConch_Nok;
             res.nok->error = error;
@@ -1092,14 +1092,14 @@ namespace MediaConch
 
         std::clog << d->get_date() << "Daemon received a checker list command: ";
         std::clog << req->to_str() << std::endl;
-        std::vector<std::string> vec;
+        std::vector<long> vec;
         d->MCL->checker_list(req->user, vec);
         for (size_t i = 0; i < vec.size(); ++i)
         {
             RESTAPI::Checker_List_File *file = new RESTAPI::Checker_List_File;
-            file->file = vec[i];
+            file->id = vec[i];
 
-            file->id = d->MCL->checker_id_from_filename(req->user, vec[i]);
+            d->MCL->checker_file_from_id(req->user, vec[i], file->file);
             res.files.push_back(file);
         }
         std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
@@ -1212,7 +1212,7 @@ namespace MediaConch
         std::clog << d->get_date() << "Daemon received a checker_id_from_filename command:";
         std::clog << req->to_str() << std::endl;
 
-        res.id = d->MCL->checker_id_from_filename(req->user, req->filename);
+        res.id = d->MCL->checker_id_from_filename(req->user, req->filename, req->options);
 
         std::clog << d->get_date() << "Daemon send checker_id_from_filename result: " << res.to_str() << std::endl;
         return 0;
@@ -1240,6 +1240,8 @@ namespace MediaConch
         res.generated_time = info.generated_time;
         res.generated_log = info.generated_log;
         res.generated_error_log = info.generated_error_log;
+        for (size_t i = 0; i < info.options.size(); ++i)
+            res.options.push_back(std::make_pair(info.options[i].first, info.options[i].second));
         res.has_error = info.has_error;
         res.error_log = info.error_log;
 

@@ -15,6 +15,7 @@
 #include "Queue.h"
 #include "Scheduler.h"
 #include "PluginLog.h"
+#include "Core.h"
 
 #if !defined(WINDOWS)
 #include <unistd.h>
@@ -85,11 +86,19 @@ void QueueElement::Entry()
 
     MI = new MediaInfoNameSpace::MediaInfo;
     // Currently avoiding to have a big trace
-    if (options.find("parsespeed") == options.end())
+    bool found = false;
+    for (size_t i = 0; i < options.size(); ++i)
+        if (options[i].first == "parsespeed")
+            found = true;
+    if (found == false)
         MI->Option(__T("ParseSpeed"), __T("0"));
 
     // Configuration of the parsing
-    if (options.find("details") == options.end())
+    found = false;
+    for (size_t i = 0; i < options.size(); ++i)
+        if (options[i].first == "details")
+            found = true;
+    if (found == false)
         MI->Option(__T("Details"), __T("1"));
 
     // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
@@ -97,9 +106,8 @@ void QueueElement::Entry()
     MI->Option(__T("Language"), __T("raw"));
     MI->Option(__T("Inform"), __T("MICRO_XML"));
 
-    std::map<std::string, std::string>::iterator it = options.begin();
-    for (; it != options.end(); ++it)
-        MI->Option(Ztring().From_UTF8(it->first), Ztring().From_UTF8(it->second));
+    for (size_t i = 0; i < options.size(); ++i)
+        MI->Option(Ztring().From_UTF8(options[i].first), Ztring().From_UTF8(options[i].second));
 
     MI->Open(ZenLib::Ztring().From_UTF8(file));
     scheduler->work_finished(this, MI);
@@ -143,6 +151,7 @@ int Queue::add_element(QueuePriority priority, int id, int user, const std::stri
     el->file_id = file_id;
     el->mil_analyze = mil_analyze;
 
+    std::vector<std::pair<std::string,std::string> > opts;
     for (size_t i = 0; i < options.size(); ++i)
     {
         std::string key_option = options[i].first;
@@ -152,10 +161,14 @@ int Queue::add_element(QueuePriority priority, int id, int user, const std::stri
             continue;
 
         transform(key_option.begin(), key_option.end(), key_option.begin(), (int(*)(int))tolower);
-        transform(value_option.begin(), value_option.end(), value_option.begin(), (int(*)(int))tolower);
+        // transform(value_option.begin(), value_option.end(), value_option.begin(), (int(*)(int))tolower);
 
-        el->options[key_option] = value_option;
+        opts.push_back(std::make_pair(key_option, value_option));
     }
+
+    el->options_str = Core::serialize_string_from_options_vec(opts);
+    for (size_t i = 0; i < opts.size(); ++i)
+        el->options.push_back(std::make_pair(opts[i].first, opts[i].second));
 
     for (size_t i = 0; i < plugins.size(); ++i)
         el->plugins.push_back(plugins[i]);

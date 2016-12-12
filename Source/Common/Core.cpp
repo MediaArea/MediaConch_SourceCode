@@ -43,6 +43,7 @@
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
 #include <zlib.h>
+#include <algorithm>
 #include <sstream>
 #include <fstream>
 #include <sys/stat.h>
@@ -318,6 +319,7 @@ int Core::mediaconch_get_plugins(std::vector<std::string>& plugins, std::string&
 int Core::mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                   const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
                                   long *in_user, bool recursive,
+                                  const std::vector<std::pair<std::string,std::string> >& options,
                                   long& user_id, std::string& error)
 {
     if (!watch_folders_manager)
@@ -326,7 +328,8 @@ int Core::mediaconch_watch_folder(const std::string& folder, const std::string& 
         return -1;
     }
 
-    return watch_folders_manager->add_watch_folder(folder, folder_reports, plugins, policies, in_user, recursive, user_id, error);
+    return watch_folders_manager->add_watch_folder(folder, folder_reports, plugins, policies,
+                                                   in_user, recursive, options, user_id, error);
 }
 
 //---------------------------------------------------------------------------
@@ -397,7 +400,8 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
     registered = false;
     bool analyzed = false;
 
-    id = file_is_registered_and_analyzed(user, file, analyzed);
+    std::string options_str = serialize_string_from_options_vec(options);
+    id = file_is_registered_and_analyzed(user, file, analyzed, options_str);
     if (force_analyze)
         analyzed = false;
 
@@ -406,7 +410,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
         std::string file_last_modification = get_last_modification_file(file);
         std::string err;
         db_mutex.Enter();
-        id = get_db()->add_file(user, file, file_last_modification, err);
+        id = get_db()->add_file(user, file, file_last_modification, options_str, err);
         db_mutex.Leave();
         if (id < 0)
             return -1;
@@ -429,8 +433,9 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
     long id = -1;
     bool analyzed = false;
     bool force_analyze = true;
+    std::string options_str = serialize_string_from_options_vec(options);
 
-    id = file_is_registered_and_analyzed(user, filename, analyzed);
+    id = file_is_registered_and_analyzed(user, filename, analyzed, options_str);
     if (force_analyze)
         analyzed = false;
 
@@ -439,7 +444,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
     if (id < 0)
     {
         db_mutex.Enter();
-        id = get_db()->add_file(user, filename, file_last_modification, err,
+        id = get_db()->add_file(user, filename, file_last_modification, options_str, err,
                                 -1, src_id, generated_time,
                                 generated_log, generated_error_log);
         db_mutex.Leave();
@@ -449,7 +454,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
     else
     {
         db_mutex.Enter();
-        id = get_db()->update_file(user, id, file_last_modification, err,
+        id = get_db()->update_file(user, id, file_last_modification, options_str, err,
                                    -1, src_id, generated_time,
                                    generated_log, generated_error_log);
         db_mutex.Leave();
@@ -504,11 +509,12 @@ int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRe
         size_t generated_time;
         std::string generated_log;
         std::string generated_error_log;
+        std::string options;
 
         db_mutex.Enter();
         get_db()->get_file_information_from_id(user, file_id, filename, file_time,
                                                res.generated_id, res.source_id, generated_time,
-                                               generated_log, generated_error_log, is_finished, res.has_error, res.error_log);
+                                               generated_log, generated_error_log, options, is_finished, res.has_error, res.error_log);
         if (is_finished)
             get_db()->get_element_report_kind(user, file_id, (MediaConchLib::report&)*res.tool);
         db_mutex.Leave();
@@ -531,12 +537,14 @@ void Core::checker_file_from_id(int user, long id, std::string& file)
 }
 
 //---------------------------------------------------------------------------
-long Core::checker_id_from_filename(int user, const std::string& filename)
+long Core::checker_id_from_filename(int user, const std::string& filename,
+                                    const std::vector<std::pair<std::string,std::string> >& options)
 {
     std::string time = get_last_modification_file(filename);
+    std::string options_str = serialize_string_from_options_vec(options);
 
     db_mutex.Enter();
-    long id = get_db()->get_file_id(user, filename, time);
+    long id = get_db()->get_file_id(user, filename, time, options_str);
     db_mutex.Leave();
 
     return id;
@@ -545,16 +553,28 @@ long Core::checker_id_from_filename(int user, const std::string& filename)
 //---------------------------------------------------------------------------
 int Core::checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info)
 {
+    std::string options;
     db_mutex.Enter();
     get_db()->get_file_information_from_id(user, id, info.filename, info.file_last_modification, info.generated_id,
                                            info.source_id, info.generated_time, info.generated_log,
-                                           info.generated_error_log, info.analyzed, info.has_error, info.error_log);
+                                           info.generated_error_log, options, info.analyzed, info.has_error, info.error_log);
     db_mutex.Leave();
+
+    info.options = parse_options_vec_from_string(options);
     return 0;
 }
 
 //---------------------------------------------------------------------------
 void Core::checker_list(int user, std::vector<std::string>& vec)
+{
+    scheduler->get_elements(user, vec);
+    db_mutex.Enter();
+    get_db()->get_elements(user, vec);
+    db_mutex.Leave();
+}
+
+//---------------------------------------------------------------------------
+void Core::checker_list(int user, std::vector<long>& vec)
 {
     scheduler->get_elements(user, vec);
     db_mutex.Enter();
@@ -1269,15 +1289,6 @@ void Core::get_content_of_media_in_xml(std::string& report)
 }
 
 //---------------------------------------------------------------------------
-void Core::add_file_to_db(int user, std::string& filename, const std::string& time)
-{
-    std::string err;
-    db_mutex.Enter();
-    get_db()->add_file(user, filename, time, err);
-    db_mutex.Leave();
-}
-
-//---------------------------------------------------------------------------
 void Core::set_file_analyzed_to_database(int user, long id)
 {
     db_mutex.Enter();
@@ -1785,7 +1796,7 @@ bool Core::get_dpfmanager_report(int user, long file, std::string& report)
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& filename, bool& analyzed)
+long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& filename, bool& analyzed, const std::string& options)
 {
     bool is_existing = file_is_existing(filename);
 
@@ -1795,7 +1806,7 @@ long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& fi
 
     db_mutex.Enter();
 
-    long id = get_db()->get_file_id(user, filename, time);
+    long id = get_db()->get_file_id(user, filename, time, options);
     if (id < 0)
     {
         analyzed = false;
@@ -1804,30 +1815,109 @@ long Core::file_is_registered_and_analyzed_in_db(int user, const std::string& fi
     }
 
     analyzed = get_db()->file_is_analyzed(user, id);
-
     db_mutex.Leave();
+
+    if (!is_existing && !analyzed)
+        return -1;
 
     return id;
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_in_queue(int user, const std::string& filename)
+long Core::file_is_registered_in_queue(int user, const std::string& filename, const std::string& options)
 {
     if (!scheduler)
         return -1;
 
-    return scheduler->element_exists(user, filename);
+    return scheduler->element_exists(user, filename, options);
 }
 
 //---------------------------------------------------------------------------
-long Core::file_is_registered_and_analyzed(int user, const std::string& filename, bool& analyzed)
+long Core::file_is_registered_and_analyzed(int user, const std::string& filename, bool& analyzed, const std::string& options)
 {
     long id;
     analyzed = false;
-    if ((id = file_is_registered_in_queue(user, filename)) >= 0)
+    if ((id = file_is_registered_in_queue(user, filename, options)) >= 0)
         return id;
 
-    return file_is_registered_and_analyzed_in_db(user, filename, analyzed);
+    return file_is_registered_and_analyzed_in_db(user, filename, analyzed, options);
+}
+
+//---------------------------------------------------------------------------
+bool Core::sort_pair_options(const std::pair<std::string,std::string>& a, const std::pair<std::string,std::string>& b)
+{
+    return a.first.compare(b.first) <= 0;
+}
+
+//---------------------------------------------------------------------------
+std::string Core::serialize_string_from_options_vec(const std::vector<std::pair<std::string,std::string> >& options)
+{
+    std::stringstream toreturn;
+
+    std::vector<std::pair<std::string,std::string> > opts;
+    for (size_t i = 0; i < options.size(); ++i)
+    {
+        std::string key_option = options[i].first;
+        std::string value_option = options[i].second;
+
+        if (!key_option.size())
+            continue;
+
+        transform(key_option.begin(), key_option.end(), key_option.begin(), (int(*)(int))tolower);
+
+        if (key_option == "event_callbackfunction")
+            continue;
+
+        // transform(value_option.begin(), value_option.end(), value_option.begin(), (int(*)(int))tolower);
+
+        opts.push_back(std::make_pair(key_option, value_option));
+    }
+
+    std::sort(opts.begin(), opts.end(), Core::sort_pair_options);
+
+    for (size_t i = 0; i < opts.size(); ++i)
+        toreturn << opts[i].first.size() << "," << opts[i].first << opts[i].second.size() << "," << opts[i].second;
+
+    return toreturn.str();
+}
+
+//---------------------------------------------------------------------------
+std::vector<std::pair<std::string,std::string> > Core::parse_options_vec_from_string(const std::string& options)
+{
+    std::vector<std::pair<std::string,std::string> > toreturn;
+
+    size_t pos = 0;
+    size_t start;
+
+    std::vector<std::string> opt;
+    while (pos != std::string::npos)
+    {
+        start = pos;
+        pos = options.find(",", start);
+        if (pos == std::string::npos)
+            continue;
+
+        std::string size = options.substr(start, pos - start);
+        pos += 1;
+        char *end = NULL;
+        long len = strtol(size.c_str(), &end, 10);
+        if (len < 0 || pos + len > options.size())
+        {
+            pos = std::string::npos;
+            continue;
+        }
+
+        opt.push_back(options.substr(pos, len));
+        pos += len;
+    }
+
+    for (size_t i = 0; i + 1 < opt.size();)
+    {
+        toreturn.push_back(std::make_pair(opt[i], opt[i + 1]));
+        i += 2;
+    }
+
+    return toreturn;
 }
 
 //---------------------------------------------------------------------------

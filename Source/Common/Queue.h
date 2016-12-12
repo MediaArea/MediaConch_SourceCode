@@ -50,7 +50,8 @@ namespace MediaConch
         int                                user;
         int                                id;
         std::string                        filename;
-        std::map<std::string, std::string> options;
+        std::string                        options_str;
+        std::vector<std::pair<std::string, std::string> > options;
         std::vector<std::string>           plugins;
         long                               file_id;
         bool                               mil_analyze;

@@ -178,14 +178,15 @@ public:
         MediaConch_Watch_Folder_Req() : user(NULL), recursive(true) {}
         ~MediaConch_Watch_Folder_Req();
 
-        std::string               to_str() const;
+        std::string                                       to_str() const;
 
-        std::string               folder;
-        std::string               folder_reports;
-        std::vector<std::string>  plugins;
-        std::vector<std::string>  policies;
-        long                     *user;
-        bool                      recursive;
+        std::string                                       folder;
+        std::string                                       folder_reports;
+        std::vector<std::string>                          plugins;
+        std::vector<std::string>                          policies;
+        std::vector<std::pair<std::string,std::string> >  options;
+        long                                             *user;
+        bool                                              recursive;
     };
 
     struct MediaConch_Watch_Folder_Res
@@ -491,9 +492,10 @@ public:
     {
         Checker_Id_From_Filename_Req() : user(-1) {}
 
-        int          user;
-        std::string  filename;
-        std::string  to_str() const;
+        int                                               user;
+        std::string                                       filename;
+        std::vector<std::pair<std::string,std::string> >  options;
+        std::string                                       to_str() const;
     };
 
     struct Checker_Id_From_Filename_Res
@@ -514,17 +516,18 @@ public:
     struct Checker_File_Information_Res
     {
         Checker_File_Information_Res() : generated_id(-1), source_id(-1), generated_time((size_t)-1), analyzed(false), has_error(false) {}
-        std::string  filename;
-        std::string  file_last_modification;
-        long         generated_id;
-        long         source_id;
-        size_t       generated_time;
-        std::string  generated_log;
-        std::string  generated_error_log;
-        bool         analyzed;
-        bool         has_error;
-        std::string  error_log;
-        std::string  to_str() const;
+        std::string                                       filename;
+        std::string                                       file_last_modification;
+        long                                              generated_id;
+        long                                              source_id;
+        size_t                                            generated_time;
+        std::string                                       generated_log;
+        std::string                                       generated_error_log;
+        std::vector<std::pair<std::string,std::string> >  options;
+        bool                                              analyzed;
+        bool                                              has_error;
+        std::string                                       error_log;
+        std::string                                       to_str() const;
     };
 
     struct Default_Values_For_Type_Req

@@ -51,6 +51,7 @@ public:
     int  mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                  const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
                                  long *in_user, bool recursive,
+                                 const std::vector<std::pair<std::string,std::string> >& options,
                                  long& user_id, std::string& error);
     int  mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
                                       std::string& error);
@@ -64,7 +65,8 @@ public:
 
     // filename_from_id
     int checker_file_from_id(int user, long id, std::string& filename);
-    long checker_id_from_filename(int user, const std::string& filename);
+    long checker_id_from_filename(int user, const std::string& filename,
+                                  const std::vector<std::pair<std::string,std::string> >& options);
     int checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info);
 
     // default_values_for_type

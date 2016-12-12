@@ -70,6 +70,7 @@ public:
     std::string                              folder_reports;
     std::vector<std::string>                 plugins;
     std::vector<std::string>                 policies;
+    std::vector<std::pair<std::string,std::string> > options;
     long                                     user;
 
 private:

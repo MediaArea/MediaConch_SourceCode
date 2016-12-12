@@ -82,6 +82,7 @@ public:
     int  mediaconch_watch_folder(const std::string& folder, const std::string& folder_reports,
                                  const std::vector<std::string>& plugins, const std::vector<std::string>& policies,
                                  long *in_user, bool recursive,
+                                 const std::vector<std::pair<std::string,std::string> >& options,
                                  long& user_id, std::string& error);
     int  mediaconch_edit_watch_folder(const std::string& folder, const std::string& folder_reports,
                                         std::string& error);
@@ -127,8 +128,10 @@ public:
                                const std::vector<std::string>* policies_contents = NULL);
 
     void        checker_list(int user, std::vector<std::string>& vec);
+    void        checker_list(int user, std::vector<long>& vec);
     void        checker_file_from_id(int user, long id, std::string& file);
-    long        checker_id_from_filename(int user, const std::string& filename);
+    long        checker_id_from_filename(int user, const std::string& filename,
+                                         const std::vector<std::pair<std::string,std::string> >& options);
     int         checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info);
 
     //***************************************************************************
@@ -140,6 +143,8 @@ public:
                                           const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     int         get_reports_output_Html(int user, const std::vector<long>& file,
                                         const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
+    static std::string serialize_string_from_options_vec(const std::vector<std::pair<std::string,std::string> >& options);
+    static std::vector<std::pair<std::string,std::string> > parse_options_vec_from_string(const std::string& options);
 
     //***************************************************************************
     // Display
@@ -248,9 +253,9 @@ private:
     int transform_with_xslt_text_memory(const std::string& report, std::string& result);
     int transform_with_xslt_html_memory(const std::string& report, std::string& result);
 
-    long   file_is_registered_and_analyzed(int user, const std::string& file, bool& analyzed);
-    long   file_is_registered_and_analyzed_in_db(int user, const std::string& file, bool& analyzed);
-    long   file_is_registered_in_queue(int user, const std::string& file);
+    long   file_is_registered_and_analyzed(int user, const std::string& file, bool& analyzed, const std::string& options);
+    long   file_is_registered_and_analyzed_in_db(int user, const std::string& file, bool& analyzed, const std::string& options);
+    long   file_is_registered_in_queue(int user, const std::string& file, const std::string& options);
     std::string get_last_modification_file(const std::string& file);
     bool   file_is_existing(const std::string& filename);
     void compress_report(std::string& report, MediaConchLib::compression& compress);
@@ -268,7 +273,6 @@ private:
     bool get_verapdf_report(int user, long file, std::string& report);
     bool get_dpfmanager_report(int user, long file, std::string& report);
 
-    void add_file_to_db(int user, std::string& filename, const std::string& time);
     void register_reports_to_database(int user, long file);
     void register_report_xml_to_database(int user, long file, const std::string& report,
                                          MediaConchLib::report report_kind);
@@ -284,6 +288,7 @@ private:
     std::string get_database_path();
     DatabaseReport *get_db();
     void xml_escape_attributes(std::string& xml);
+    static bool sort_pair_options(const std::pair<std::string,std::string>& a, const std::pair<std::string,std::string>& b);
 };
 
 }

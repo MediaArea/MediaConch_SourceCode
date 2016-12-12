@@ -8,6 +8,12 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.13
+ * Update command:
+  * Mediaconch_Watch_Folder: add options in request
+  * Checker_Id_From_Filename: add options in request
+  * Checker_File_Information: add options in result
+
 #### Version 1.12
  * Update command:
   * Checker_Analyze: add a flag to not analyze with MIL
@@ -121,7 +127,7 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.11
+Current API version: $API_VERSION = 1.13
 
 #### Command
 
@@ -200,6 +206,7 @@ Parameters:
 * policies:          Array of String with the policies contents
 * user:              Integer: Use this User ID for the watch folder. If not present, find a unique ID
 * recursive:         Boolean: Check the folder recursively (sub-directory), set to true by default
+- options:           Array of Object of 2 Strings: List of Options to be given to MediaInfoLib
 
 ##### Response
 
@@ -496,6 +503,7 @@ Parameters:
 
 - user:              Integer: a unique id for the user
 - filename:          String: Requested filename for id
+- options:           Array of String: Options associated to the analyze
 
 ##### Response
 
@@ -514,6 +522,7 @@ Parameters:
 
 - user:              Integer: a unique id for the user
 - id:                Integer: id given by the Analyze command
+- options:           Array of String: Options associated to the analyze
 
 ##### Response
 
