@@ -144,8 +144,9 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
 }
 
 //---------------------------------------------------------------------------
-void WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
-                                   int policy, int display, int verbosity, bool fixer)
+int WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
+                                  int policy, int display, int verbosity, bool fixer,
+                                  std::string& err)
 {
     std::string full_file(path);
     if (path.length())
@@ -163,7 +164,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
             && verbosity == working_files[full_file]->verbosity)
         {
             working_files_mutex.unlock();
-            return;
+            return 0;
         }
         else
             fr = new FileRegistered;
@@ -203,7 +204,7 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
         to_update_files_mutex.lock();
         to_update_files[full_file] = new FileRegistered(*fr);
         to_update_files_mutex.unlock();
-        return;
+        return 0;
     }
 
     std::vector<std::string> vec;
@@ -211,8 +212,17 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
 
     int ret;
     std::vector<long> files_id;
-    if ((ret = mainwindow->analyze(vec, fixer, files_id)) < 0 || files_id.size() != 1)
-        mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
+    if ((ret = mainwindow->analyze(vec, fixer, files_id, err)) < 0)
+    {
+        mainwindow->set_str_msg_to_status_bar(err);
+        return -1;
+    }
+
+    if (files_id.size() != 1)
+    {
+        err = "Internal error: analyze result is not correct, no id returned.";
+        return -1;
+    }
 
     fr->file_id = files_id[0];
 
@@ -223,6 +233,8 @@ void WorkerFiles::add_file_to_list(const std::string& file, const std::string& p
     working_files_mutex.lock();
     working_files[full_file]->file_id = files_id[0];
     working_files_mutex.unlock();
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -254,6 +266,7 @@ void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int p
     {
         working_files_mutex.unlock();
 
+        std::string err;
         std::vector<size_t> policies_ids;
         std::vector<std::string> policies_contents;
         std::vector<MediaConchLib::Checker_ValidateRes*> res;
@@ -261,7 +274,7 @@ void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int p
         policies_ids.push_back(policy);
 
         if (mainwindow->validate(MediaConchLib::report_Max, file,
-                                 policies_ids, policies_contents, options, res) == 0 && res.size() == 1)
+                                 policies_ids, policies_contents, options, res, err) == 0 && res.size() == 1)
         {
             policy_valid = res[0]->valid;
             for (size_t j = 0; j < res.size() ; ++j)
@@ -393,6 +406,8 @@ void WorkerFiles::update_delete_files_registered()
 //---------------------------------------------------------------------------
 void WorkerFiles::update_unfinished_files()
 {
+    std::string err;
+
     unfinished_files_mutex.lock();
     std::vector<std::string> files = unfinished_files;
     unfinished_files_mutex.unlock();
@@ -408,11 +423,11 @@ void WorkerFiles::update_unfinished_files()
         }
 
         MediaConchLib::Checker_StatusRes st_res;
-        int ret = mainwindow->is_analyze_finished(files[i], st_res);
+        int ret = mainwindow->is_analyze_finished(files[i], st_res, err);
         if (ret < 0)
         {
-            mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
-            return;
+            mainwindow->set_str_msg_to_status_bar(err);
+            continue;
         }
 
         fr->analyzed = st_res.finished;
@@ -428,32 +443,45 @@ void WorkerFiles::update_unfinished_files()
             std::vector<MediaConchLib::Checker_ValidateRes*> res;
 
             if (mainwindow->validate((MediaConchLib::report)fr->report_kind, files[i],
-                                     policies_ids, policies_contents, options, res) == 0
-                && res.size() == 1)
-                fr->implementation_valid = res[0]->valid;
+                                     policies_ids, policies_contents, options, res, err) < 0)
+            {
+                mainwindow->set_str_msg_to_status_bar(err);
+                continue;
+            }
+            else if (!res.size())
+            {
+                mainwindow->set_str_msg_to_status_bar("Internal error: Validate result is not correct.");
+                continue;
+            }
+            fr->implementation_valid = res[0]->valid;
 
             for (size_t j = 0; j < res.size() ; ++j)
                 delete res[j];
             res.clear();
 
-            if (fr->report_kind == MediaConchLib::report_MediaConch && fr->policy >= 0)
+            if (fr->policy >= 0)
             {
                 policies_ids.push_back(fr->policy);
 
                 if (mainwindow->validate(MediaConchLib::report_Max, files[i],
-                                         policies_ids, policies_contents, options, res) == 0 && res.size() == 1)
-                    fr->policy_valid = res[0]->valid;
+                                         policies_ids, policies_contents, options, res, err) < 0)
+                    continue;
+
+                if (!res.size())
+                    continue;
+
+                fr->policy_valid = res[0]->valid;
                 for (size_t j = 0; j < res.size() ; ++j)
                     delete res[j];
                 res.clear();
             }
-        }
-        else
-        {
-            fr->analyze_percent = 0.0;
-            if (st_res.percent)
-                fr->analyze_percent = *st_res.percent;
-            vec.push_back(files[i]);
+            else
+            {
+                fr->analyze_percent = 0.0;
+                if (st_res.percent)
+                    fr->analyze_percent = *st_res.percent;
+                vec.push_back(files[i]);
+            }
         }
 
         to_update_files_mutex.lock();
@@ -601,6 +629,8 @@ void WorkerFiles::fill_registered_files_from_db()
     working_files_mutex.lock();
     for (size_t i = 0; i < vec.size(); ++i)
     {
+        std::string err2;
+        QString err;
         FileRegistered *fr = vec[i];
 
         std::string full_file(fr->filepath);
@@ -610,8 +640,11 @@ void WorkerFiles::fill_registered_files_from_db()
 
         //check if policy still exists
         MediaConchLib::Get_Policy p;
-        if (mainwindow->policy_get(fr->policy, "JSON", p) < 0)
+        if (mainwindow->policy_get(fr->policy, "JSON", p, err) < 0)
+        {
+            mainwindow->set_msg_to_status_bar(err);
             fr->policy = -1;
+        }
 
         fr->index = file_index++;
         fr->analyzed = false;
@@ -625,8 +658,10 @@ void WorkerFiles::fill_registered_files_from_db()
 
         int ret;
         std::vector<long> files_id;
-        if ((ret = mainwindow->analyze(tmp, false, files_id)) < 0 && files_id.size() != 1)
-            mainwindow->set_error_http((MediaConchLib::errorHttp)ret);
+        if ((ret = mainwindow->analyze(tmp, false, files_id, err2)) < 0)
+            mainwindow->set_str_msg_to_status_bar(err2);
+        else if (!files_id.size())
+            mainwindow->set_str_msg_to_status_bar("Internal error: Analyze result is not correct.");
         else
             fr->file_id = files_id[0];
     }

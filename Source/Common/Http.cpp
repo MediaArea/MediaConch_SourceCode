@@ -38,493 +38,120 @@ Http::~Http()
 {
 }
 
+//***************************************************************************
+// send_request generator
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+#define SEND_REQUEST_GET(NAME, DEF)                                     \
+int Http::send_request(RESTAPI::NAME& req, std::string& err)            \
+{                                                                       \
+    std::string query;                                                  \
+    if (rest.serialize_##DEF##_req(req, query, err) < 0)                \
+        return -1;                                                      \
+                                                                        \
+    std::stringstream uri;                                              \
+    uri << "/" << RESTAPI::API_VERSION << "/"#DEF << query;             \
+    std::string uri_str = uri.str();                                    \
+                                                                        \
+    return send_request_get(uri_str, err);                              \
+}
+
+//---------------------------------------------------------------------------
+#define SEND_REQUEST_POST(NAME, DEF)                                    \
+int Http::send_request(RESTAPI::NAME& req, std::string& err)            \
+{                                                                       \
+    std::string cmd;                                                    \
+    if (rest.serialize_##DEF##_req(req, cmd, err) < 0)                  \
+        return -1;                                                      \
+                                                                        \
+    std::stringstream uri;                                              \
+    uri << "/" << RESTAPI::API_VERSION << "/"#DEF;                      \
+    std::string uri_str = uri.str();                                    \
+                                                                        \
+    return send_request_post(uri_str, cmd, err);                        \
+}
+
+//---------------------------------------------------------------------------
+#define SEND_REQUEST_PUT(NAME, DEF)                                     \
+int Http::send_request(RESTAPI::NAME& req, std::string& err)            \
+{                                                                       \
+    std::string cmd;                                                    \
+    if (rest.serialize_##DEF##_req(req, cmd, err) < 0)                  \
+        return -1;                                                      \
+                                                                        \
+    std::stringstream uri;                                              \
+    uri << "/" << RESTAPI::API_VERSION << "/"#DEF;                      \
+    std::string uri_str = uri.str();                                    \
+                                                                        \
+    return send_request_put(uri_str, cmd, err);                         \
+}
+
+//---------------------------------------------------------------------------
+#define SEND_REQUEST_DELETE(NAME, DEF)                                  \
+int Http::send_request(RESTAPI::NAME& req, std::string& err)            \
+{                                                                       \
+    std::string query;                                                  \
+    if (rest.serialize_##DEF##_req(req, query, err) < 0)                \
+        return -1;                                                      \
+                                                                        \
+    std::stringstream uri;                                              \
+    uri << "/" << RESTAPI::API_VERSION << "/"#DEF << query;             \
+    std::string uri_str = uri.str();                                    \
+                                                                        \
+    return send_request_delete(uri_str, err);                           \
+}
+
+//***************************************************************************
 // MediaConch
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::MediaConch_Get_Plugins_Req& req)
-{
-    std::string query;
-    rest.serialize_mediaconch_get_plugins_req(req, query);
-    std::stringstream uri;
+//***************************************************************************
+SEND_REQUEST_GET(MediaConch_Get_Plugins_Req, mediaconch_get_plugins);
+SEND_REQUEST_POST(MediaConch_Watch_Folder_Req, mediaconch_watch_folder);
+SEND_REQUEST_GET(MediaConch_List_Watch_Folders_Req, mediaconch_list_watch_folders);
+SEND_REQUEST_POST(MediaConch_Edit_Watch_Folder_Req, mediaconch_edit_watch_folder);
+SEND_REQUEST_POST(MediaConch_Remove_Watch_Folder_Req, mediaconch_remove_watch_folder);
 
-    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_get_plugins" << query;
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::MediaConch_Watch_Folder_Req& req)
-{
-    std::string cmd;
-    rest.serialize_mediaconch_watch_folder_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_watch_folder";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::MediaConch_List_Watch_Folders_Req& req)
-{
-    std::string query;
-    rest.serialize_mediaconch_list_watch_folders_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_list_watch_folders" << query;
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::MediaConch_Edit_Watch_Folder_Req& req)
-{
-    std::string cmd;
-    rest.serialize_mediaconch_edit_watch_folder_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_edit_watch_folder";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::MediaConch_Remove_Watch_Folder_Req& req)
-{
-    std::string cmd;
-    rest.serialize_mediaconch_remove_watch_folder_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/mediaconch_remove_watch_folder";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
+//***************************************************************************
 // Checker
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_Analyze_Req& req)
-{
-    std::string cmd;
-    rest.serialize_analyze_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_analyze";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_Status_Req& req)
-{
-    std::string query;
-    rest.serialize_status_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_status" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_Report_Req& req)
-{
-    std::string cmd;
-    rest.serialize_report_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_report";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_Retry_Req& req)
-{
-    std::string cmd;
-    rest.serialize_retry_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_retry";
-    std::string uri_str = uri.str();
-    return send_request_put(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_Clear_Req& req)
-{
-    std::string query;
-    rest.serialize_clear_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_clear" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_delete(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_List_Req& req)
-{
-    std::string query;
-    rest.serialize_list_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_list" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_Validate_Req& req)
-{
-    std::string cmd;
-    rest.serialize_validate_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_validate";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_File_From_Id_Req& req)
-{
-    std::string cmd;
-    rest.serialize_file_from_id_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_file_from_id";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_Id_From_Filename_Req& req)
-{
-    std::string cmd;
-    rest.serialize_id_from_filename_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_id_from_filename";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Checker_File_Information_Req& req)
-{
-    std::string cmd;
-    rest.serialize_file_information_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/checker_file_information";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Default_Values_For_Type_Req& req)
-{
-    std::string query;
-    rest.serialize_default_values_for_type_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/default_values_for_type" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-// Checker
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Create_Req& req)
-{
-    std::string query;
-    rest.serialize_xslt_policy_create_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_create" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Import_Req& req)
-{
-    std::string cmd;
-    rest.serialize_policy_import_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_import";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Remove_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_remove_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_remove" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Dump_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_dump_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_dump" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Save_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_save_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_save" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Duplicate_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_duplicate_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_duplicate" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Move_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_move_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_move" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Change_Info_Req& req)
-{
-    std::string cmd;
-    rest.serialize_policy_change_info_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_change_info";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Change_Type_Req& req)
-{
-    std::string cmd;
-    rest.serialize_policy_change_type_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_change_type";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Change_Is_Public_Req& req)
-{
-    std::string cmd;
-    rest.serialize_policy_change_is_public_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_change_is_public";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Get_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_get_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_get" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Get_Name_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_get_name_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_get_name" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Get_Policies_Count_Req&)
-{
-    std::string uri = "/" + RESTAPI::API_VERSION + "/policy_get_policies_count";
-    return send_request_get(uri);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Clear_Policies_Req&)
-{
-    std::string uri = "/" + RESTAPI::API_VERSION + "/policy_clear_policies";
-    return send_request_get(uri);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Get_Policies_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_get_policies_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_get_policies" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Get_Public_Policies_Req& req)
-{
-    std::string query;
-    rest.serialize_policy_get_public_policies_req(req, query);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/policy_get_public_policies" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::Policy_Get_Policies_Names_List_Req&)
-{
-    std::string uri = "/" + RESTAPI::API_VERSION + "/policy_get_policies_names_list";
-    return send_request_get(uri);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Create_From_File_Req& req)
-{
-    std::string query;
-    rest.serialize_xslt_policy_create_from_file_req(req, query);
-
-    std::stringstream uri;
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_create_from_file" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Rule_Create_Req& req)
-{
-    std::string query;
-    rest.serialize_xslt_policy_rule_create_req(req, query);
-
-    std::stringstream uri;
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_create" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Rule_Get_Req& req)
-{
-    std::string query;
-    rest.serialize_xslt_policy_rule_get_req(req, query);
-
-    std::stringstream uri;
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_get" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Rule_Edit_Req& req)
-{
-    std::string cmd;
-    rest.serialize_xslt_policy_rule_edit_req(req, cmd);
-    std::stringstream uri;
-
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_edit";
-    std::string uri_str = uri.str();
-    return send_request_post(uri_str, cmd);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Rule_Duplicate_Req& req)
-{
-    std::string query;
-    rest.serialize_xslt_policy_rule_duplicate_req(req, query);
-
-    std::stringstream uri;
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_duplicate" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Rule_Move_Req& req)
-{
-    std::string query;
-    rest.serialize_xslt_policy_rule_move_req(req, query);
-
-    std::stringstream uri;
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_move" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
-
-//---------------------------------------------------------------------------
-int Http::send_request(RESTAPI::XSLT_Policy_Rule_Delete_Req& req)
-{
-    std::string query;
-    rest.serialize_xslt_policy_rule_delete_req(req, query);
-
-    std::stringstream uri;
-    uri << "/" << RESTAPI::API_VERSION << "/xslt_policy_rule_delete" << query;
-
-    std::string uri_str = uri.str();
-    return send_request_get(uri_str);
-}
+//***************************************************************************
+SEND_REQUEST_POST(Checker_Analyze_Req, checker_analyze);
+SEND_REQUEST_GET(Checker_Status_Req, checker_status);
+SEND_REQUEST_POST(Checker_Report_Req, checker_report);
+SEND_REQUEST_DELETE(Checker_Clear_Req, checker_clear);
+SEND_REQUEST_GET(Checker_List_Req, checker_list);
+SEND_REQUEST_POST(Checker_Validate_Req, checker_validate);
+SEND_REQUEST_POST(Checker_File_From_Id_Req, checker_file_from_id);
+SEND_REQUEST_POST(Checker_Id_From_Filename_Req, checker_id_from_filename);
+SEND_REQUEST_POST(Checker_File_Information_Req, checker_file_information);
+SEND_REQUEST_GET(Default_Values_For_Type_Req, default_values_for_type);
+
+//***************************************************************************
+// Policy
+//***************************************************************************
+SEND_REQUEST_GET(XSLT_Policy_Create_Req, xslt_policy_create);
+SEND_REQUEST_POST(Policy_Import_Req, policy_import);
+SEND_REQUEST_GET(Policy_Remove_Req, policy_remove);
+SEND_REQUEST_GET(Policy_Dump_Req, policy_dump);
+SEND_REQUEST_GET(Policy_Save_Req, policy_save);
+SEND_REQUEST_GET(Policy_Duplicate_Req, policy_duplicate);
+SEND_REQUEST_GET(Policy_Move_Req, policy_move);
+SEND_REQUEST_POST(Policy_Change_Info_Req, policy_change_info);
+SEND_REQUEST_POST(Policy_Change_Type_Req, policy_change_type);
+SEND_REQUEST_POST(Policy_Change_Is_Public_Req, policy_change_is_public);
+SEND_REQUEST_GET(Policy_Get_Req, policy_get);
+SEND_REQUEST_GET(Policy_Get_Name_Req, policy_get_name);
+SEND_REQUEST_GET(Policy_Get_Policies_Count_Req, policy_get_policies_count);
+SEND_REQUEST_GET(Policy_Clear_Policies_Req, policy_clear_policies);
+SEND_REQUEST_GET(Policy_Get_Policies_Req, policy_get_policies);
+SEND_REQUEST_GET(Policy_Get_Public_Policies_Req, policy_get_public_policies);
+SEND_REQUEST_GET(Policy_Get_Policies_Names_List_Req, policy_get_policies_names_list);
+SEND_REQUEST_GET(XSLT_Policy_Create_From_File_Req, xslt_policy_create_from_file);
+SEND_REQUEST_GET(XSLT_Policy_Rule_Create_Req, xslt_policy_rule_create);
+SEND_REQUEST_GET(XSLT_Policy_Rule_Get_Req, xslt_policy_rule_get);
+SEND_REQUEST_POST(XSLT_Policy_Rule_Edit_Req, xslt_policy_rule_edit);
+SEND_REQUEST_GET(XSLT_Policy_Rule_Duplicate_Req, xslt_policy_rule_duplicate);
+SEND_REQUEST_GET(XSLT_Policy_Rule_Move_Req, xslt_policy_rule_move);
+SEND_REQUEST_GET(XSLT_Policy_Rule_Delete_Req, xslt_policy_rule_delete);
 
 //---------------------------------------------------------------------------
 void Http::set_port(int port)

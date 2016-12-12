@@ -38,27 +38,30 @@ LibEventHttp::~LibEventHttp()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::init()
+int LibEventHttp::init(std::string& err)
 {
     base = event_base_new();
     if (!base)
     {
-        error = MediaConchLib::errorHttp_INIT;
-        return MediaConchLib::errorHttp_INIT;
+        err = "Cannot initialize LibEvent.";
+        return -1;
     }
-    return MediaConchLib::errorHttp_NONE;
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::start()
+int LibEventHttp::start(std::string& err)
 {
     connection = evhttp_connection_base_new(base, NULL, address.c_str(), port);
     if (!connection)
     {
-        error = MediaConchLib::errorHttp_CONNECT;
-        return MediaConchLib::errorHttp_CONNECT;
+        std::stringstream ss;
+        ss << "Cannot connect to " << address << ":" << port;
+        err = ss.str();
+        return -1;
     }
-    return MediaConchLib::errorHttp_NONE;
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -69,7 +72,7 @@ int LibEventHttp::stop()
         evhttp_connection_free(connection);
         connection = NULL;
     }
-    return MediaConchLib::errorHttp_NONE;
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -81,47 +84,48 @@ int LibEventHttp::finish()
         event_base_free(base);
         base = NULL;
     }
-    return MediaConchLib::errorHttp_NONE;
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::send_request_get(std::string& uri)
+int LibEventHttp::send_request_get(std::string& uri, std::string& err)
 {
     std::string str;
-    return send_request(uri, str, EVHTTP_REQ_GET);
+    return send_request(uri, str, EVHTTP_REQ_GET, err);
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::send_request_post(std::string& uri, std::string& cmd)
+int LibEventHttp::send_request_post(std::string& uri, std::string& cmd, std::string& err)
 {
-    return send_request(uri, cmd, EVHTTP_REQ_POST);
+    return send_request(uri, cmd, EVHTTP_REQ_POST, err);
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::send_request_put(std::string& uri, std::string& cmd)
+int LibEventHttp::send_request_put(std::string& uri, std::string& cmd, std::string& err)
 {
-    return send_request(uri, cmd, EVHTTP_REQ_PUT);
+    return send_request(uri, cmd, EVHTTP_REQ_PUT, err);
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::send_request_delete(std::string& uri)
+int LibEventHttp::send_request_delete(std::string& uri, std::string& err)
 {
     std::string str;
-    return send_request(uri, str, EVHTTP_REQ_DELETE);
+    return send_request(uri, str, EVHTTP_REQ_DELETE, err);
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_cmd_type type)
+int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_cmd_type type, std::string& err)
 {
-    // clean error
-    error = MediaConchLib::errorHttp_NONE;
+    // clean result
     result.clear();
+    error.clear();
+    http_code = 0;
 
     struct evhttp_request *req = evhttp_request_new(result_coming, this);
-    if (req == NULL)
+    if (!req)
     {
-        error = MediaConchLib::errorHttp_CONNECT;
-        return MediaConchLib::errorHttp_CONNECT;
+        err = "Cannot create HTTP (LibEvent) request.";
+        return -1;
     }
 
     struct evkeyvalq *evOutHeaders;
@@ -137,8 +141,8 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
         struct evbuffer *evOutBuf = evhttp_request_get_output_buffer(req);;
         if (!evOutBuf)
         {
-            error = MediaConchLib::errorHttp_CONNECT;
-            return MediaConchLib::errorHttp_MAX;
+            err = "Cannot create output HTTP (LibEvent) buffer.";
+            return -1;
         }
 
         evbuffer_add(evOutBuf, str.c_str(), str.length());
@@ -152,13 +156,17 @@ int LibEventHttp::send_request(std::string& uri, std::string& str, enum evhttp_c
     int r = evhttp_make_request(connection, req, type, uri.c_str());
     if (r)
     {
-        error = MediaConchLib::errorHttp_INVALID_DATA;
-        return MediaConchLib::errorHttp_INVALID_DATA;
+        err = "The HTTP (LibEvent) request created has invalid data.";
+        return -1;
     }
 
-    if (event_base_dispatch(base) < 0)
-        return MediaConchLib::errorHttp_MAX;
-    return MediaConchLib::errorHttp_NONE;
+    if (event_base_dispatch(base) < 0 || error.size())
+    {
+        err = error;
+        return -1;
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -168,7 +176,7 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
 
     if (!req)
     {
-        evHttp->error = MediaConchLib::errorHttp_CONNECT;
+        evHttp->error = "Invalid request";
         return;
     }
 
@@ -176,12 +184,15 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
     if (code != HTTP_OK)
     {
         if (code == 410)
-            evHttp->error = MediaConchLib::errorHttp_DAEMON_RESTART;
+            evHttp->error = "Daemon restarted";
         else if (code >= 400 && code < 500)
-            evHttp->error = MediaConchLib::errorHttp_INVALID_DATA;
+            evHttp->error = "Invalid Data in request";
         else
-            evHttp->error = MediaConchLib::errorHttp_CONNECT;
-        event_base_loopexit(evHttp->base, 0);
+        {
+            evHttp->http_code = code;
+            evHttp->error = "Internal error: HTTP (LibEvent) connection failed";
+        }
+        event_base_loopexit(evHttp->base, NULL);
         return;
     }
 
@@ -208,6 +219,7 @@ void LibEventHttp::result_coming(struct evhttp_request *req, void *arg)
 
         delete[] buff;
     }
+
     evHttp->result = data;
     event_base_loopexit(evHttp->base, 0);
 }

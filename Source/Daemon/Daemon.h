@@ -32,9 +32,9 @@ namespace MediaConch
         static std::string version;
 
         int parse_args(int ac, char** av);
-        int init();
-        int run();
-        int run_plugins_list();
+        int init(std::string& err);
+        int run(std::string& err);
+        int run_plugins_list(std::string& err);
         int finish();
 
       private:
@@ -99,26 +99,24 @@ namespace MediaConch
                                                              RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void *arg);
 
         //  Checker
-        static int on_analyze_command(const RESTAPI::Checker_Analyze_Req* req,
-                                      RESTAPI::Checker_Analyze_Res& res, void *arg);
-        static int on_status_command(const RESTAPI::Checker_Status_Req* req,
-                                     RESTAPI::Checker_Status_Res& res, void *arg);
-        static int on_report_command(const RESTAPI::Checker_Report_Req* req,
-                                     RESTAPI::Checker_Report_Res& res, void *arg);
-        static int on_retry_command(const RESTAPI::Checker_Retry_Req* req,
-                                    RESTAPI::Checker_Retry_Res& res, void *arg);
-        static int on_clear_command(const RESTAPI::Checker_Clear_Req* req,
-                                    RESTAPI::Checker_Clear_Res& res, void *arg);
-        static int on_list_command(const RESTAPI::Checker_List_Req* req,
-                                   RESTAPI::Checker_List_Res& res, void *arg);
-        static int on_validate_command(const RESTAPI::Checker_Validate_Req* req,
-                                       RESTAPI::Checker_Validate_Res& res, void *arg);
-        static int on_file_from_id_command(const RESTAPI::Checker_File_From_Id_Req* req,
-                                           RESTAPI::Checker_File_From_Id_Res& res, void *arg);
-        static int on_id_from_filename_command(const RESTAPI::Checker_Id_From_Filename_Req* req,
-                                               RESTAPI::Checker_Id_From_Filename_Res& res, void *arg);
-        static int on_file_information_command(const RESTAPI::Checker_File_Information_Req* req,
-                                               RESTAPI::Checker_File_Information_Res& res, void *arg);
+        static int on_checker_analyze_command(const RESTAPI::Checker_Analyze_Req* req,
+                                              RESTAPI::Checker_Analyze_Res& res, void *arg);
+        static int on_checker_status_command(const RESTAPI::Checker_Status_Req* req,
+                                             RESTAPI::Checker_Status_Res& res, void *arg);
+        static int on_checker_report_command(const RESTAPI::Checker_Report_Req* req,
+                                             RESTAPI::Checker_Report_Res& res, void *arg);
+        static int on_checker_clear_command(const RESTAPI::Checker_Clear_Req* req,
+                                            RESTAPI::Checker_Clear_Res& res, void *arg);
+        static int on_checker_list_command(const RESTAPI::Checker_List_Req* req,
+                                           RESTAPI::Checker_List_Res& res, void *arg);
+        static int on_checker_validate_command(const RESTAPI::Checker_Validate_Req* req,
+                                               RESTAPI::Checker_Validate_Res& res, void *arg);
+        static int on_checker_file_from_id_command(const RESTAPI::Checker_File_From_Id_Req* req,
+                                                   RESTAPI::Checker_File_From_Id_Res& res, void *arg);
+        static int on_checker_id_from_filename_command(const RESTAPI::Checker_Id_From_Filename_Req* req,
+                                                       RESTAPI::Checker_Id_From_Filename_Res& res, void *arg);
+        static int on_checker_file_information_command(const RESTAPI::Checker_File_Information_Req* req,
+                                                       RESTAPI::Checker_File_Information_Res& res, void *arg);
         static int on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void *arg);
 

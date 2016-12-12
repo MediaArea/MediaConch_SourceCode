@@ -38,9 +38,10 @@ public:
     ~DaemonClient();
 
     // General
-    int  init();
+    int  init(std::string& err);
     int  close();
     void reset();
+    bool is_init(std::string& err);
 
     //***************************************************************************
     // MediaConch General
@@ -61,24 +62,24 @@ public:
     // Checker
     //***************************************************************************
     // List
-    int checker_list(int user, std::vector<std::string>& vec);
+    int checker_list(int user, std::vector<std::string>& vec, std::string& error);
 
     // filename_from_id
-    int checker_file_from_id(int user, long id, std::string& filename);
+    int checker_file_from_id(int user, long id, std::string& filename, std::string& error);
     long checker_id_from_filename(int user, const std::string& filename,
-                                  const std::vector<std::pair<std::string,std::string> >& options);
-    int checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info);
+                                  const std::vector<std::pair<std::string,std::string> >& options, std::string& error);
+    int checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info, std::string& error);
 
     // default_values_for_type
-    int default_values_for_type(const std::string& type, std::vector<std::string>& values);
+    int default_values_for_type(const std::string& type, std::vector<std::string>& values, std::string& error);
 
     // Analyze
     int checker_analyze(int user, const std::string& file, const std::vector<std::string>& plugins,
                         const std::vector<std::pair<std::string,std::string> >& options,
-                        bool& registered, bool force_analyze, bool mil_analyze, long& file_id);
+                        bool& registered, bool force_analyze, bool mil_analyze, long& file_id, std::string& error);
 
     // Status
-    int checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res);
+    int checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res, std::string& error);
 
     // Report
     int checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
@@ -86,14 +87,14 @@ public:
                            const std::vector<size_t>& policies_names,
                            const std::vector<std::string>& policies_contents,
                            const std::map<std::string, std::string>& options,
-                           MediaConchLib::Checker_ReportRes* result,
+                           MediaConchLib::Checker_ReportRes* result, std::string& error,
                            const std::string* display_name = NULL,
                            const std::string* display_content = NULL);
     int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
                          const std::map<std::string, std::string>& options,
-                         std::vector<MediaConchLib::Checker_ValidateRes*>& result);
+                         std::vector<MediaConchLib::Checker_ValidateRes*>& result, std::string& error);
 
 
     //***************************************************************************
@@ -138,22 +139,23 @@ public:
     int policy_get_name(int user, int id, std::string& name, std::string& err);
 
     // get the number of policies
-    size_t policy_get_policies_count(int user);
+    size_t policy_get_policies_count(int user, std::string& error);
 
     // clear policies
     int policy_clear_policies(int user, std::string& err);
 
     // get all policies
-    void policy_get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies&);
+    int  policy_get_policies(int user, const std::vector<int>&, const std::string& format, MediaConchLib::Get_Policies&,
+                             std::string& error);
 
     // get all public policies
     int policy_get_public_policies(std::vector<MediaConchLib::Policy_Public_Policy*>& policies, std::string& err);
 
     // get all policies with ID && name
-    void policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&);
+    int  policy_get_policies_names_list(int user, std::vector<std::pair<int, std::string> >&, std::string& err);
 
     // policy_create_from_file
-    int xslt_policy_create_from_file(int user, long id);
+    int xslt_policy_create_from_file(int user, long id, std::string& err);
 
     // create XSLT rule
     int xslt_policy_rule_create(int user, int policy_id, std::string& err);

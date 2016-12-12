@@ -130,14 +130,18 @@ int main(int argc, char* argv_ansi[])
     else if (ret == CLI_RETURN_FINISH)
         return 0;
 
-    if (cli.init() < 0)
+    std::string err;
+    if (cli.init(err) < 0)
+    {
+        STRINGOUT(ZenLib::Ztring().From_UTF8(err));
         return 1;
+    }
 
     //Callback for error handling
     CallBack_Set(&cli, (void*)Event_CallBackFunction);
 
-    if ((ret = cli.run()) < 0)
-        cli.print_error((MediaConch::MediaConchLib::errorHttp)ret);
+    if (cli.run(err) < 0)
+        STRINGOUT(ZenLib::Ztring().From_UTF8(err));
 
     cli.finish();
 

@@ -28,8 +28,8 @@ namespace MediaConch
         ~CLI();
 
         int  parse_args(const std::vector<std::string>& args);
-        int  init();
-        int  run();
+        int  init(std::string& err);
+        int  run(std::string& err);
         int  finish();
         void set_report_set(std::string& report_kind);
         void set_report_reset();
@@ -60,19 +60,17 @@ namespace MediaConch
         int  set_watch_folder_user(const std::string& user);
         void set_list_watch_folders_mode();
 
-        void print_error(MediaConchLib::errorHttp code);
-
       private:
         CLI(const CLI&);
         CLI& operator=(const CLI&);
 
         int  run_create_policy(const std::vector<long>& files_ids);
-        int  run_policy_reference_file(long file_id);
-        int  run_file_information();
-        int  run_plugins_list();
-        int  run_watch_folders_list();
-        int  run_watch_folder_cmd();
-        int  is_ready(long& file_id, MediaConchLib::report& report_kind);
+        int  run_policy_reference_file(long file_id, std::string& err);
+        int  run_file_information(std::string& err);
+        int  run_plugins_list(std::string& err);
+        int  run_watch_folders_list(std::string& err);
+        int  run_watch_folder_cmd(std::string& err);
+        int  is_ready(long& file_id, MediaConchLib::report& report_kind, std::string& err);
         void add_files_recursively(const std::string& filename);
         void file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report);
 

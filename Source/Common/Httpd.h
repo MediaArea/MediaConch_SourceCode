@@ -32,9 +32,9 @@ public:
     Httpd(void *mcl);
     virtual ~Httpd();
 
-    virtual int init() = 0;
-    virtual int bind() = 0;
-    virtual int start() = 0;
+    virtual int init(std::string& err) = 0;
+    virtual int bind(std::string& err) = 0;
+    virtual int start(std::string& err) = 0;
     virtual int finish() = 0;
 
     virtual int send_result(int ret_code, const std::string& ret_msg, void *arg) = 0;
@@ -52,7 +52,6 @@ public:
     REQ_FUNC(Checker_File_From_Id);
     REQ_FUNC(Checker_Id_From_Filename);
     REQ_FUNC(Checker_File_Information);
-    REQ_FUNC(Checker_Retry);
 
     REQ_FUNC(Policy_Import);
     REQ_FUNC(Policy_Change_Info);
@@ -115,26 +114,24 @@ public:
     typedef int (*on_mediaconch_remove_watch_folder_command)(const RESTAPI::MediaConch_Remove_Watch_Folder_Req* req,
                                                              RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void* arg);
 
-    typedef int (*on_analyze_command)(const RESTAPI::Checker_Analyze_Req* req,
-                                      RESTAPI::Checker_Analyze_Res& res, void* arg);
-    typedef int (*on_status_command)(const RESTAPI::Checker_Status_Req* req,
-                                     RESTAPI::Checker_Status_Res& res, void* arg);
-    typedef int (*on_report_command)(const RESTAPI::Checker_Report_Req* req,
-                                     RESTAPI::Checker_Report_Res& res, void* arg);
-    typedef int (*on_retry_command)(const RESTAPI::Checker_Retry_Req* req,
-                                    RESTAPI::Checker_Retry_Res& res, void* arg);
-    typedef int (*on_clear_command)(const RESTAPI::Checker_Clear_Req* req,
-                                    RESTAPI::Checker_Clear_Res& res, void* arg);
-    typedef int (*on_list_command)(const RESTAPI::Checker_List_Req* req,
-                                   RESTAPI::Checker_List_Res& res, void* arg);
-    typedef int (*on_validate_command)(const RESTAPI::Checker_Validate_Req* req,
-                                       RESTAPI::Checker_Validate_Res& res, void* arg);
-    typedef int (*on_file_from_id_command)(const RESTAPI::Checker_File_From_Id_Req* req,
-                                           RESTAPI::Checker_File_From_Id_Res& res, void* arg);
-    typedef int (*on_id_from_filename_command)(const RESTAPI::Checker_Id_From_Filename_Req* req,
-                                               RESTAPI::Checker_Id_From_Filename_Res& res, void* arg);
-    typedef int (*on_file_information_command)(const RESTAPI::Checker_File_Information_Req* req,
-                                               RESTAPI::Checker_File_Information_Res& res, void* arg);
+    typedef int (*on_checker_analyze_command)(const RESTAPI::Checker_Analyze_Req* req,
+                                              RESTAPI::Checker_Analyze_Res& res, void* arg);
+    typedef int (*on_checker_status_command)(const RESTAPI::Checker_Status_Req* req,
+                                             RESTAPI::Checker_Status_Res& res, void* arg);
+    typedef int (*on_checker_report_command)(const RESTAPI::Checker_Report_Req* req,
+                                             RESTAPI::Checker_Report_Res& res, void* arg);
+    typedef int (*on_checker_clear_command)(const RESTAPI::Checker_Clear_Req* req,
+                                            RESTAPI::Checker_Clear_Res& res, void* arg);
+    typedef int (*on_checker_list_command)(const RESTAPI::Checker_List_Req* req,
+                                           RESTAPI::Checker_List_Res& res, void* arg);
+    typedef int (*on_checker_validate_command)(const RESTAPI::Checker_Validate_Req* req,
+                                               RESTAPI::Checker_Validate_Res& res, void* arg);
+    typedef int (*on_checker_file_from_id_command)(const RESTAPI::Checker_File_From_Id_Req* req,
+                                                   RESTAPI::Checker_File_From_Id_Res& res, void* arg);
+    typedef int (*on_checker_id_from_filename_command)(const RESTAPI::Checker_Id_From_Filename_Req* req,
+                                                       RESTAPI::Checker_Id_From_Filename_Res& res, void* arg);
+    typedef int (*on_checker_file_information_command)(const RESTAPI::Checker_File_Information_Req* req,
+                                                       RESTAPI::Checker_File_Information_Res& res, void* arg);
     typedef int (*on_default_values_for_type_command)(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void* arg);
 
@@ -192,10 +189,10 @@ public:
         Commands() : mediaconch_get_plugins_cb(NULL), mediaconch_watch_folder_cb(NULL),
                      mediaconch_list_watch_folders_cb(NULL),
                      mediaconch_edit_watch_folder_cb(NULL), mediaconch_remove_watch_folder_cb(NULL),
-                     analyze_cb(NULL), status_cb(NULL), report_cb(NULL),
-                     retry_cb(NULL), clear_cb(NULL), list_cb(NULL),
-                     validate_cb(NULL), file_from_id_cb(NULL),
-                     id_from_filename_cb(NULL), file_information_cb(NULL),
+                     checker_analyze_cb(NULL), checker_status_cb(NULL), checker_report_cb(NULL),
+                     checker_clear_cb(NULL), checker_list_cb(NULL),
+                     checker_validate_cb(NULL), checker_file_from_id_cb(NULL),
+                     checker_id_from_filename_cb(NULL), checker_file_information_cb(NULL),
                      default_values_for_type_cb(NULL),
                      xslt_policy_create_cb(NULL),
                      policy_import_cb(NULL),
@@ -231,16 +228,15 @@ public:
         on_mediaconch_remove_watch_folder_command mediaconch_remove_watch_folder_cb;
 
         //checker
-        on_analyze_command                        analyze_cb;
-        on_status_command                         status_cb;
-        on_report_command                         report_cb;
-        on_retry_command                          retry_cb;
-        on_clear_command                          clear_cb;
-        on_list_command                           list_cb;
-        on_validate_command                       validate_cb;
-        on_file_from_id_command                   file_from_id_cb;
-        on_id_from_filename_command               id_from_filename_cb;
-        on_file_information_command               file_information_cb;
+        on_checker_analyze_command                checker_analyze_cb;
+        on_checker_status_command                 checker_status_cb;
+        on_checker_report_command                 checker_report_cb;
+        on_checker_clear_command                  checker_clear_cb;
+        on_checker_list_command                   checker_list_cb;
+        on_checker_validate_command               checker_validate_cb;
+        on_checker_file_from_id_command           checker_file_from_id_cb;
+        on_checker_id_from_filename_command       checker_id_from_filename_cb;
+        on_checker_file_information_command       checker_file_information_cb;
         on_default_values_for_type_command        default_values_for_type_cb;
 
         // policy

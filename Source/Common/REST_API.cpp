@@ -76,6 +76,16 @@ RESTAPI::Policy_Duplicate_Req::~Policy_Duplicate_Req()
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::MediaConch_Nok::~MediaConch_Nok()
+{
+    if (id)
+    {
+        delete id;
+        id = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::MediaConch_Watch_Folder_Res::~MediaConch_Watch_Folder_Res()
 {
     if (nok)
@@ -154,17 +164,17 @@ RESTAPI::Checker_Status_Res::~Checker_Status_Res()
 //---------------------------------------------------------------------------
 RESTAPI::Checker_Report_Res::~Checker_Report_Res()
 {
-    for (size_t i = 0; i < nok.size(); ++i)
-        delete nok[i];
-    nok.clear();
-}
+    if (ok)
+    {
+        delete ok;
+        ok = NULL;
+    }
 
-//---------------------------------------------------------------------------
-RESTAPI::Checker_Retry_Res::~Checker_Retry_Res()
-{
-    for (size_t i = 0; i < nok.size(); ++i)
-        delete nok[i];
-    nok.clear();
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -178,9 +188,55 @@ RESTAPI::Checker_Clear_Res::~Checker_Clear_Res()
 //---------------------------------------------------------------------------
 RESTAPI::Checker_List_Res::~Checker_List_Res()
 {
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+
     for (size_t i = 0; i < files.size(); ++i)
         delete files[i];
     files.clear();
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_File_From_Id_Res::~Checker_File_From_Id_Res()
+{
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_Id_From_Filename_Res::~Checker_Id_From_Filename_Res()
+{
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_File_Information_Res::~Checker_File_Information_Res()
+{
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Default_Values_For_Type_Res::~Default_Values_For_Type_Res()
+{
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -189,9 +245,12 @@ RESTAPI::Checker_Validate_Res::~Checker_Validate_Res()
     for (size_t i = 0; i < ok.size(); ++i)
         delete ok[i];
     ok.clear();
-    for (size_t i = 0; i < nok.size(); ++i)
-        delete nok[i];
-    nok.clear();
+
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -444,23 +503,6 @@ std::string RESTAPI::Checker_Report_Req::to_str() const
         if (it != options.begin())
             out << ",";
         out << "{\"" << it->first << "\":\"" << it->second << "\"}";
-    }
-    out << "]}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Retry_Req::to_str() const
-{
-    std::stringstream out;
-
-    out << "{\"user\":" << user;
-    out << ",\"ids\":[";
-    for (size_t i = 0; i < ids.size(); ++i)
-    {
-        if (i)
-            out << ",";
-        out << ids[i];
     }
     out << "]}";
     return out.str();
@@ -828,7 +870,10 @@ std::string RESTAPI::MediaConch_Nok::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"error\":\"" << error << "\"}";
+    out << "{\"error\":\"" << error << "\"";
+    if (id)
+        out << "{\"id\":" << *id;
+    out << "}";
     return out.str();
 }
 
@@ -922,20 +967,9 @@ std::string RESTAPI::Checker_Analyze_Ok::to_str() const
 {
     std::stringstream out;
 
-    out << "{inId: " << inId;
-    out << ", outId: " << outId;
-    out << ", create: " << std::boolalpha << create << "}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Analyze_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{id: " << id;
-    RESTAPI api;
-    out << ", reason: " << api.get_Reason_string(error) << "}";
+    out << "{inId:" << inId;
+    out << ",outId:" << outId;
+    out << ",create:" << std::boolalpha << create << "}";
     return out.str();
 }
 
@@ -944,21 +978,21 @@ std::string RESTAPI::Checker_Analyze_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[ok: [";
+    out << "{ok:[";
     for (size_t i = 0; i < ok.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ok[i]->to_str();
     }
-    out << "], nok: [";
+    out << "],nok:[";
     for (size_t i = 0; i < nok.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << nok[i]->to_str();
     }
-    out << "] ]";
+    out << "]}";
     return out.str();
 }
 
@@ -967,40 +1001,29 @@ std::string RESTAPI::Checker_Status_Ok::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\": " << id;
-    out << ", \"finished\": " << std::boolalpha << finished;
-    out << ", \"has_error\": " << std::boolalpha << has_error;
+    out << "{\"id\":" << id;
+    out << ",\"finished\":" << std::boolalpha << finished;
+    out << ",\"has_error\":" << std::boolalpha << has_error;
 
     if (finished && has_error)
-    out << ", \"error_log\": " << error_log;
+    out << ",\"error_log\":" << error_log;
 
     if (!finished && percent)
-        out << ", \"done\": " << *percent;
+        out << ",\"done\":" << *percent;
 
     if (finished && tool)
     {
         RESTAPI api;
-        out << ", \"tool\": " << api.get_Report_string(*tool);
+        out << ",\"tool\":" << api.get_Report_string(*tool);
     }
 
     if (generated_id != -1)
-        out << ", \"generated_id\": " << generated_id;
+        out << ",\"generated_id\":" << generated_id;
 
     if (source_id != -1)
-        out << ", \"source_id\": " << source_id;
+        out << ",\"source_id\":" << source_id;
 
     out << "}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Status_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{id: " << id;
-    RESTAPI api;
-    out << ", reason: " << api.get_Reason_string(error) << "}";
     return out.str();
 }
 
@@ -1009,21 +1032,21 @@ std::string RESTAPI::Checker_Status_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[ok: [";
+    out << "{ok:[";
     for (size_t i = 0; i < ok.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ok[i]->to_str();
     }
-    out << "], nok: [";
+    out << "],nok:[";
     for (size_t i = 0; i < nok.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << nok[i]->to_str();
     }
-    out << "] ]";
+    out << "]}";
     return out.str();
 }
 
@@ -1040,74 +1063,16 @@ std::string RESTAPI::Checker_Report_Ok::to_str() const
 }
 
 //---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Report_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{id: " << id;
-    RESTAPI api;
-    out << ", reason: " << api.get_Reason_string(error) << "}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
 std::string RESTAPI::Checker_Report_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[ok: " << ok.to_str() << ", nok: [";
-    for (size_t i = 0; i < nok.size(); ++i)
-    {
-        if (i)
-            out << ", ";
-        out << nok[i]->to_str();
-    }
-    out << "] ]";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Retry_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{id: " << id;
-    RESTAPI api;
-    out << ", reason: " << api.get_Reason_string(error) << "}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Retry_Res::to_str() const
-{
-    std::stringstream out;
-
-    out << "[ok: [";
-    for (size_t i = 0; i < ok.size(); ++i)
-    {
-        if (i)
-            out << ", ";
-        out << ok[i];
-    }
-    out << "], nok: [";
-    for (size_t i = 0; i < nok.size(); ++i)
-    {
-        if (i)
-            out << ", ";
-        out << nok[i]->to_str();
-    }
-    out << "] ]";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Clear_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{id: " << id;
-    RESTAPI api;
-    out << ", reason: " << api.get_Reason_string(error) << "}";
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else if (ok)
+        out << "\"ok\":" << ok->to_str();
+    out << "}";
     return out.str();
 }
 
@@ -1116,21 +1081,21 @@ std::string RESTAPI::Checker_Clear_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[ok: [";
+    out << "{ok:[";
     for (size_t i = 0; i < ok.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << ok[i];
     }
-    out << "], nok: [";
+    out << "],nok:[";
     for (size_t i = 0; i < nok.size(); ++i)
     {
         if (i)
-            out << ", ";
+            out << ",";
         out << nok[i]->to_str();
     }
-    out << "] ]";
+    out << "]}";
     return out.str();
 }
 
@@ -1139,15 +1104,22 @@ std::string RESTAPI::Checker_List_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[files: [";
-    for (size_t i = 0; i < files.size(); ++i)
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
     {
-        if (i)
-            out << ", ";
-        out << "{file:" << files[i]->file;
-        out << ", id:" << files[i]->id << "}";
+        out << "\"files\":[";
+        for (size_t i = 0; i < files.size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << "{\"file\":" << files[i]->file;
+            out << ",\"id\":" << files[i]->id << "}";
+        }
+        out << "]";
     }
-    out << "] ]";
+    out << "}";
     return out.str();
 }
 
@@ -1156,18 +1128,7 @@ std::string RESTAPI::Checker_Validate_Ok::to_str() const
 {
     std::stringstream out;
 
-    out << "{id: " << id << ", valid: " << std::boolalpha << valid << "}";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::Checker_Validate_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{id: " << id;
-    RESTAPI api;
-    out << ", reason: " << api.get_Reason_string(error) << "}";
+    out << "{\"id\":" << id << ",\"valid\":" << std::boolalpha << valid << "}";
     return out.str();
 }
 
@@ -1176,21 +1137,21 @@ std::string RESTAPI::Checker_Validate_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[ok: [";
-    for (size_t i = 0; i < ok.size(); ++i)
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
     {
-        if (i)
-            out << ", ";
-        out << ok[i]->to_str();
+        out << "\"ok\":[";
+        for (size_t i = 0; i < ok.size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << ok[i]->to_str();
+        }
+        out <<  "]";
     }
-    out <<  "], nok: [";
-    for (size_t i = 0; i < nok.size(); ++i)
-    {
-        if (i)
-            out << ", ";
-        out << nok[i]->to_str();
-    }
-    out << "] ]";
+    out << "}";
     return out.str();
 }
 
@@ -1199,7 +1160,12 @@ std::string RESTAPI::Checker_File_From_Id_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[file: '" << file << "']";
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
+        out << "\"file\":\"" << file << "\"";
+    out << "}";
     return out.str();
 }
 
@@ -1208,7 +1174,12 @@ std::string RESTAPI::Checker_Id_From_Filename_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[id: " << id << "]";
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
+        out << "\"id\":" << id;
+    out << "}";
     return out.str();
 }
 
@@ -1217,24 +1188,30 @@ std::string RESTAPI::Checker_File_Information_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[\"filename\":\"" << filename << "\"";
-    out << ",\"file_last_modification\":\"" << file_last_modification << "\"";
-    out << ",\"generated_id\":" << generated_id;
-    out << ",\"source_id\":" << source_id;
-    out << ",\"generated_time\":" << generated_time;
-    out << ",\"generated_log\":\"" << generated_log << "\"";
-    out << ",\"generated_error_log\":\"" << generated_error_log << "\"";
-    out << ",\"options\":[";
-    for (size_t i = 0; i < options.size(); ++i)
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
     {
-        if (i)
-            out << ",";
-        out << "{\"" << options[i].first << "\":" << "\"" << options[i].second << "\"}";
+        out << "\"filename\":\"" << filename << "\"";
+        out << ",\"file_last_modification\":\"" << file_last_modification << "\"";
+        out << ",\"generated_id\":" << generated_id;
+        out << ",\"source_id\":" << source_id;
+        out << ",\"generated_time\":" << generated_time;
+        out << ",\"generated_log\":\"" << generated_log << "\"";
+        out << ",\"generated_error_log\":\"" << generated_error_log << "\"";
+        out << ",\"options\":[";
+        for (size_t i = 0; i < options.size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << "{\"" << options[i].first << "\":" << "\"" << options[i].second << "\"}";
+        }
+        out << "],\"analyzed\":" << analyzed;
+        out << ",\"has_error\":" << has_error;
+        out << ",\"error_log\":\"" << error_log << "\"";
     }
-    out << "],\"analyzed\":" << analyzed;
-    out << ",\"has_error\":" << has_error;
-    out << ",\"error_log\":\"" << error_log << "\"";
-    out << "]";
+    out << "}";
 
     return out.str();
 }
@@ -1244,37 +1221,25 @@ std::string RESTAPI::Default_Values_For_Type_Res::to_str() const
 {
     std::stringstream out;
 
-    out << "[values: '";
-    for (size_t i = 0; i < values.size(); ++i)
+    out << "{";
+    if (nok)
+        out << "\"nok\":" << nok->to_str();
+    else
     {
-        if (i)
-            out << ",";
-        out << values[i];
+        out << "\"values\":[\"";
+        for (size_t i = 0; i < values.size(); ++i)
+        {
+            if (i)
+                out << "\",\"";
+            out << values[i];
+        }
+        out  << "\"]}";
     }
-    out  << "']";
-    return out.str();
-}
-
-//---------------------------------------------------------------------------
-std::string RESTAPI::XSLT_Policy_Create_From_File_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{id: " << id;
-    RESTAPI api;
-    out << ", reason: " << api.get_Reason_string(error) << "}";
+    out  << "}";
     return out.str();
 }
 
 //  Policy
-//---------------------------------------------------------------------------
-std::string RESTAPI::Policy_Nok::to_str() const
-{
-    std::stringstream out;
-
-    out << "{\"error\":\"" << error << "\"}";
-    return out.str();
-}
 
 //---------------------------------------------------------------------------
 std::string RESTAPI::XSLT_Policy_Create_Res::to_str() const
@@ -1543,10 +1508,12 @@ std::string RESTAPI::XSLT_Policy_Create_From_File_Res::to_str() const
 {
     std::stringstream out;
 
-    if (policy_id < 0)
-        out << "{\"policy\": " << policy_id << "}";
-    else if (nok)
-        out << "{\"nok\": " << nok->to_str() << "}";
+    out << "{";
+    if (nok)
+        out << "\"nok\": " << nok->to_str();
+    else
+        out << "\"policy_id\": " << policy_id;
+    out << "}";
     return out.str();
 }
 
@@ -1555,10 +1522,11 @@ std::string RESTAPI::XSLT_Policy_Rule_Create_Res::to_str() const
 {
     std::stringstream out;
 
+    out << "{";
     if (nok)
-        out << "{\"nok\":" << nok->to_str();
+        out << "\"nok\":" << nok->to_str();
     else
-        out << "{\"id\":" << id;
+        out << "\"id\":" << id;
     out << "}";
     return out.str();
 }
@@ -1633,7 +1601,7 @@ std::string RESTAPI::XSLT_Policy_Rule_Delete_Res::to_str() const
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, std::string& data)
+int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -1644,7 +1612,7 @@ int RESTAPI::serialize_mediaconch_get_plugins_req(MediaConch_Get_Plugins_Req&, s
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string& data)
+int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, folder, folder_reports, plugins, policies, user, recursive, options;
 
@@ -1708,7 +1676,7 @@ int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& 
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -1716,18 +1684,15 @@ int RESTAPI::serialize_mediaconch_watch_folder_req(MediaConch_Watch_Folder_Req& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_list_watch_folders_req(MediaConch_List_Watch_Folders_Req&, std::string& data)
+int RESTAPI::serialize_mediaconch_list_watch_folders_req(MediaConch_List_Watch_Folders_Req&, std::string& data, std::string&)
 {
     //URI
-    std::stringstream ss;
-
-    data = ss.str();
-
+    data = std::string();
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_edit_watch_folder_req(MediaConch_Edit_Watch_Folder_Req& req, std::string& data)
+int RESTAPI::serialize_mediaconch_edit_watch_folder_req(MediaConch_Edit_Watch_Folder_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, folder, folder_reports;
 
@@ -1746,7 +1711,7 @@ int RESTAPI::serialize_mediaconch_edit_watch_folder_req(MediaConch_Edit_Watch_Fo
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -1754,7 +1719,8 @@ int RESTAPI::serialize_mediaconch_edit_watch_folder_req(MediaConch_Edit_Watch_Fo
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_remove_watch_folder_req(MediaConch_Remove_Watch_Folder_Req& req, std::string& data)
+int RESTAPI::serialize_mediaconch_remove_watch_folder_req(MediaConch_Remove_Watch_Folder_Req& req, std::string& data,
+                                                          std::string& err)
 {
     Container::Value v, child, folder;
 
@@ -1769,7 +1735,7 @@ int RESTAPI::serialize_mediaconch_remove_watch_folder_req(MediaConch_Remove_Watc
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -1777,19 +1743,19 @@ int RESTAPI::serialize_mediaconch_remove_watch_folder_req(MediaConch_Remove_Watc
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_analyze_req(Checker_Analyze_Req& req, std::string& data)
+int RESTAPI::serialize_checker_analyze_req(Checker_Analyze_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["args"] = serialize_analyze_args(req.args);
+    child.obj["args"] = serialize_checker_analyze_args(req.args, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_ANALYZE"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -1797,7 +1763,7 @@ int RESTAPI::serialize_analyze_req(Checker_Analyze_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_status_req(Checker_Status_Req& req, std::string& data)
+int RESTAPI::serialize_checker_status_req(Checker_Status_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -1811,27 +1777,27 @@ int RESTAPI::serialize_status_req(Checker_Status_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_report_req(Checker_Report_Req& req, std::string& data)
+int RESTAPI::serialize_checker_report_req(Checker_Report_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ids"] = serialize_ids(req.ids);
-    child.obj["reports"] = serialize_report_reports(req.reports);
+    child.obj["ids"] = serialize_ids(req.ids, err);
+    child.obj["reports"] = serialize_checker_report_reports(req.reports, err);
 
     user.type = Container::Value::CONTAINER_TYPE_INTEGER;
     user.l = req.user;
     child.obj["user"] = user;
 
     if (req.policies_ids.size())
-        child.obj["policies_ids"] = serialize_report_arr_long_u(req.policies_ids);
+        child.obj["policies_ids"] = serialize_checker_report_arr_long_u(req.policies_ids, err);
     if (req.policies_contents.size())
-        child.obj["policies_contents"] = serialize_report_arr_str(req.policies_contents);
+        child.obj["policies_contents"] = serialize_checker_report_arr_str(req.policies_contents, err);
 
     if (req.display_name.length())
-        child.obj["display_name"] = serialize_report_string(req.display_name);
+        child.obj["display_name"] = serialize_checker_report_string(req.display_name, err);
     if (req.display_content.length())
-        child.obj["display_content"] = serialize_report_string(req.display_content);
+        child.obj["display_content"] = serialize_checker_report_string(req.display_content, err);
 
     if (req.options.size())
     {
@@ -1859,7 +1825,7 @@ int RESTAPI::serialize_report_req(Checker_Report_Req& req, std::string& data)
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -1867,32 +1833,7 @@ int RESTAPI::serialize_report_req(Checker_Report_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_retry_req(Checker_Retry_Req& req, std::string& data)
-{
-    Container::Value v, child, user;
-
-    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-
-    user.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    user.l = req.user;
-    child.obj["user"] = user;
-
-    child.obj["ids"] = serialize_ids(req.ids);
-
-    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["CHECKER_RETRY"] = child;
-
-    if (model->serialize(v, data) < 0)
-    {
-        error = model->get_error();
-        return -1;
-    }
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int RESTAPI::serialize_clear_req(Checker_Clear_Req& req, std::string& data)
+int RESTAPI::serialize_checker_clear_req(Checker_Clear_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -1906,23 +1847,24 @@ int RESTAPI::serialize_clear_req(Checker_Clear_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_list_req(Checker_List_Req& req, std::string& data)
+int RESTAPI::serialize_checker_list_req(Checker_List_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
 
     ss << "?user=" << req.user;
     data = ss.str();
+
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data)
+int RESTAPI::serialize_checker_validate_req(Checker_Validate_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, report, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ids"] = serialize_ids(req.ids);
+    child.obj["ids"] = serialize_ids(req.ids, err);
 
     report.type = Container::Value::CONTAINER_TYPE_STRING;
     report.s = get_Report_string(req.report);
@@ -1933,9 +1875,9 @@ int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data
     child.obj["user"] = user;
 
     if (req.policies_ids.size())
-        child.obj["policies_ids"] = serialize_report_arr_long_u(req.policies_ids);
+        child.obj["policies_ids"] = serialize_checker_report_arr_long_u(req.policies_ids, err);
     if (req.policies_contents.size())
-        child.obj["policies_contents"] = serialize_report_arr_str(req.policies_contents);
+        child.obj["policies_contents"] = serialize_checker_report_arr_str(req.policies_contents, err);
 
     if (req.options.size())
     {
@@ -1963,7 +1905,7 @@ int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -1971,7 +1913,7 @@ int RESTAPI::serialize_validate_req(Checker_Validate_Req& req, std::string& data
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::string& data)
+int RESTAPI::serialize_checker_file_from_id_req(Checker_File_From_Id_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, id, user;
 
@@ -1990,7 +1932,7 @@ int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::stri
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -1998,7 +1940,7 @@ int RESTAPI::serialize_file_from_id_req(Checker_File_From_Id_Req& req, std::stri
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string& data)
+int RESTAPI::serialize_checker_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, filename, user, options;
 
@@ -2030,7 +1972,7 @@ int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, s
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2038,7 +1980,7 @@ int RESTAPI::serialize_id_from_filename_req(Checker_Id_From_Filename_Req& req, s
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_file_information_req(Checker_File_Information_Req& req, std::string& data)
+int RESTAPI::serialize_checker_file_information_req(Checker_File_Information_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, id, user;
 
@@ -2057,7 +1999,7 @@ int RESTAPI::serialize_file_information_req(Checker_File_Information_Req& req, s
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2065,7 +2007,7 @@ int RESTAPI::serialize_file_information_req(Checker_File_Information_Req& req, s
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string& data)
+int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, type, field;
 
@@ -2086,7 +2028,7 @@ int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& 
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2094,7 +2036,7 @@ int RESTAPI::serialize_default_values_for_type_req(Default_Values_For_Type_Req& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2108,7 +2050,7 @@ int RESTAPI::serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_import_req(Policy_Import_Req& req, std::string& data)
+int RESTAPI::serialize_policy_import_req(Policy_Import_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, xml, user;
 
@@ -2127,7 +2069,7 @@ int RESTAPI::serialize_policy_import_req(Policy_Import_Req& req, std::string& da
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2135,7 +2077,7 @@ int RESTAPI::serialize_policy_import_req(Policy_Import_Req& req, std::string& da
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_remove_req(Policy_Remove_Req& req, std::string& data)
+int RESTAPI::serialize_policy_remove_req(Policy_Remove_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2148,7 +2090,7 @@ int RESTAPI::serialize_policy_remove_req(Policy_Remove_Req& req, std::string& da
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_dump_req(Policy_Dump_Req& req, std::string& data)
+int RESTAPI::serialize_policy_dump_req(Policy_Dump_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2163,7 +2105,7 @@ int RESTAPI::serialize_policy_dump_req(Policy_Dump_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_save_req(Policy_Save_Req& req, std::string& data)
+int RESTAPI::serialize_policy_save_req(Policy_Save_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2176,7 +2118,7 @@ int RESTAPI::serialize_policy_save_req(Policy_Save_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string& data)
+int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2194,7 +2136,7 @@ int RESTAPI::serialize_policy_duplicate_req(Policy_Duplicate_Req& req, std::stri
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_move_req(Policy_Move_Req& req, std::string& data)
+int RESTAPI::serialize_policy_move_req(Policy_Move_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2208,7 +2150,7 @@ int RESTAPI::serialize_policy_move_req(Policy_Move_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string& data)
+int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, name, description, license, user, id;
 
@@ -2242,7 +2184,7 @@ int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2250,7 +2192,7 @@ int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string& data)
+int RESTAPI::serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, id, type, user;
 
@@ -2273,7 +2215,7 @@ int RESTAPI::serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2281,7 +2223,7 @@ int RESTAPI::serialize_policy_change_type_req(Policy_Change_Type_Req& req, std::
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& req, std::string& data)
+int RESTAPI::serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, id, is_public, user;
 
@@ -2304,7 +2246,7 @@ int RESTAPI::serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& 
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2312,7 +2254,7 @@ int RESTAPI::serialize_policy_change_is_public_req(Policy_Change_Is_Public_Req& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data)
+int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2327,7 +2269,7 @@ int RESTAPI::serialize_policy_get_req(Policy_Get_Req& req, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string& data)
+int RESTAPI::serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2340,7 +2282,7 @@ int RESTAPI::serialize_policy_get_name_req(Policy_Get_Name_Req& req, std::string
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string& data)
+int RESTAPI::serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2352,7 +2294,7 @@ int RESTAPI::serialize_policy_get_policies_count_req(Policy_Get_Policies_Count_R
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req, std::string& data)
+int RESTAPI::serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2364,7 +2306,7 @@ int RESTAPI::serialize_policy_clear_policies_req(Policy_Clear_Policies_Req& req,
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string& data)
+int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2379,16 +2321,14 @@ int RESTAPI::serialize_policy_get_policies_req(Policy_Get_Policies_Req& req, std
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_public_policies_req(Policy_Get_Public_Policies_Req&, std::string&)
+int RESTAPI::serialize_policy_get_public_policies_req(Policy_Get_Public_Policies_Req&, std::string&, std::string&)
 {
     //URI
-    std::stringstream ss;
-
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_names_list_req(Policy_Get_Policies_Names_List_Req& req, std::string& data)
+int RESTAPI::serialize_policy_get_policies_names_list_req(Policy_Get_Policies_Names_List_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2400,7 +2340,7 @@ int RESTAPI::serialize_policy_get_policies_names_list_req(Policy_Get_Policies_Na
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_File_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2414,7 +2354,7 @@ int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_
 
 // XSLT Rule
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, Container::Value& val)
+int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, Container::Value& val, std::string&)
 {
     Container::Value id, name, tracktype, field, scope, occurrence, ope, value;
     val.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2473,7 +2413,7 @@ int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, C
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2486,7 +2426,7 @@ int RESTAPI::serialize_xslt_policy_rule_create_req(XSLT_Policy_Rule_Create_Req& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_get_req(XSLT_Policy_Rule_Get_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_get_req(XSLT_Policy_Rule_Get_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2500,7 +2440,7 @@ int RESTAPI::serialize_xslt_policy_rule_get_req(XSLT_Policy_Rule_Get_Req& req, s
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req, std::string& data, std::string& err)
 {
     Container::Value v, child, policy_id, rule, user;
 
@@ -2514,7 +2454,7 @@ int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req,
     user.l = req.user;
     child.obj["user"] = user;
 
-    serialize_xslt_policy_rule(req.rule, rule);
+    serialize_xslt_policy_rule(req.rule, rule, err);
     child.obj["rule"] = rule;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2522,7 +2462,7 @@ int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req,
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2530,7 +2470,7 @@ int RESTAPI::serialize_xslt_policy_rule_edit_req(XSLT_Policy_Rule_Edit_Req& req,
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2544,7 +2484,7 @@ int RESTAPI::serialize_xslt_policy_rule_duplicate_req(XSLT_Policy_Rule_Duplicate
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_move_req(XSLT_Policy_Rule_Move_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_move_req(XSLT_Policy_Rule_Move_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2558,7 +2498,7 @@ int RESTAPI::serialize_xslt_policy_rule_move_req(XSLT_Policy_Rule_Move_Req& req,
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& req, std::string& data, std::string&)
 {
     //URI
     std::stringstream ss;
@@ -2576,17 +2516,14 @@ int RESTAPI::serialize_xslt_policy_rule_delete_req(XSLT_Policy_Rule_Delete_Req& 
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string& data)
+int RESTAPI::serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, nok, plugins;
+    Container::Value v, child, plugins;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-    {
-        nok = serialize_mediaconch_nok(res.nok);
-        child.obj["nok"] = nok;
-    }
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else
     {
         plugins.type = Container::Value::CONTAINER_TYPE_ARRAY;
@@ -2607,24 +2544,21 @@ int RESTAPI::serialize_mediaconch_get_plugins_res(MediaConch_Get_Plugins_Res& re
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& res, std::string& data)
+int RESTAPI::serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, nok, user;
+    Container::Value v, child, user;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-    {
-        nok = serialize_mediaconch_nok(res.nok);
-        child.obj["nok"] = nok;
-    }
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else
     {
         user.type = Container::Value::CONTAINER_TYPE_INTEGER;
@@ -2637,24 +2571,21 @@ int RESTAPI::serialize_mediaconch_watch_folder_res(MediaConch_Watch_Folder_Res& 
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_list_watch_folders_res(MediaConch_List_Watch_Folders_Res& res, std::string& data)
+int RESTAPI::serialize_mediaconch_list_watch_folders_res(MediaConch_List_Watch_Folders_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, nok, folders;
+    Container::Value v, child, folders;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-    {
-        nok = serialize_mediaconch_nok(res.nok);
-        child.obj["nok"] = nok;
-    }
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else
     {
         folders.type = Container::Value::CONTAINER_TYPE_ARRAY;
@@ -2674,71 +2605,65 @@ int RESTAPI::serialize_mediaconch_list_watch_folders_res(MediaConch_List_Watch_F
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_edit_watch_folder_res(MediaConch_Edit_Watch_Folder_Res& res, std::string& data)
+int RESTAPI::serialize_mediaconch_edit_watch_folder_res(MediaConch_Edit_Watch_Folder_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, nok;
+    Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-    {
-        nok = serialize_mediaconch_nok(res.nok);
-        child.obj["nok"] = nok;
-    }
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["MEDIACONCH_EDIT_WATCH_FOLDER_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_mediaconch_remove_watch_folder_res(MediaConch_Remove_Watch_Folder_Res& res, std::string& data)
+int RESTAPI::serialize_mediaconch_remove_watch_folder_res(MediaConch_Remove_Watch_Folder_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-    {
-        nok = serialize_mediaconch_nok(res.nok);
-        child.obj["nok"] = nok;
-    }
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["MEDIACONCH_REMOVE_WATCH_FOLDER_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_analyze_res(Checker_Analyze_Res& res, std::string& data)
+int RESTAPI::serialize_checker_analyze_res(Checker_Analyze_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
+        nok.array.push_back(serialize_mediaconch_nok(res.nok[i], err));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ok"] = serialize_analyze_oks(res.ok);
+    child.obj["ok"] = serialize_checker_analyze_oks(res.ok, err);
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2746,23 +2671,23 @@ int RESTAPI::serialize_analyze_res(Checker_Analyze_Res& res, std::string& data)
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_status_res(Checker_Status_Res& res, std::string& data)
+int RESTAPI::serialize_checker_status_res(Checker_Status_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
+        nok.array.push_back(serialize_mediaconch_nok(res.nok[i], err));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ok"] = serialize_status_oks(res.ok);
+    child.obj["ok"] = serialize_checker_status_oks(res.ok, err);
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2770,7 +2695,7 @@ int RESTAPI::serialize_status_res(Checker_Status_Res& res, std::string& data)
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2778,24 +2703,26 @@ int RESTAPI::serialize_status_res(Checker_Status_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_report_res(Checker_Report_Res& res, std::string& data)
+int RESTAPI::serialize_checker_report_res(Checker_Report_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, nok;
-
-    nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
-    for (size_t i = 0; i < res.nok.size(); ++i)
-        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
+    Container::Value v, child, ok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ok"] = serialize_report_ok(res.ok);
-    child.obj["nok"] = nok;
+    if (res.ok)
+    {
+        if (serialize_checker_report_ok(res.ok, ok, err))
+            return -1;
+        child.obj["ok"] = ok;
+    }
+    else if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_REPORT_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2803,41 +2730,16 @@ int RESTAPI::serialize_report_res(Checker_Report_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_retry_res(Checker_Retry_Res& res, std::string& data)
+int RESTAPI::serialize_checker_clear_res(Checker_Clear_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < res.nok.size(); ++i)
-        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
+        nok.array.push_back(serialize_mediaconch_nok(res.nok[i], err));
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ok"] = serialize_ids(res.ok);
-    child.obj["nok"] = nok;
-
-    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    v.obj["CHECKER_RETRY_RESULT"] = child;
-
-    if (model->serialize(v, data) < 0)
-    {
-        error = model->get_error();
-        return -1;
-    }
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int RESTAPI::serialize_clear_res(Checker_Clear_Res& res, std::string& data)
-{
-    Container::Value v, child, nok;
-
-    nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
-    for (size_t i = 0; i < res.nok.size(); ++i)
-        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
-
-    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ok"] = serialize_ids(res.ok);
+    child.obj["ok"] = serialize_ids(res.ok, err);
     child.obj["nok"] = nok;
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -2845,7 +2747,7 @@ int RESTAPI::serialize_clear_res(Checker_Clear_Res& res, std::string& data)
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2853,23 +2755,28 @@ int RESTAPI::serialize_clear_res(Checker_Clear_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_list_res(Checker_List_Res& res, std::string& data)
+int RESTAPI::serialize_checker_list_res(Checker_List_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, files;
-
-    files.type = Container::Value::CONTAINER_TYPE_ARRAY;
-    for (size_t i = 0; i < res.files.size(); ++i)
-        files.array.push_back(serialize_list_file(res.files[i]->file, res.files[i]->id));
+    Container::Value v, child, files, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["files"] = files;
+    if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
+    else
+    {
+        files.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < res.files.size(); ++i)
+            files.array.push_back(serialize_checker_list_file(res.files[i]->file, res.files[i]->id, err));
+
+        child.obj["files"] = files;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_LIST_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2877,28 +2784,27 @@ int RESTAPI::serialize_list_res(Checker_List_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_validate_res(Checker_Validate_Res& res, std::string& data)
+int RESTAPI::serialize_checker_validate_res(Checker_Validate_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, ok, nok;
 
-    ok.type = Container::Value::CONTAINER_TYPE_ARRAY;
-    for (size_t i = 0; i < res.ok.size(); ++i)
-        ok.array.push_back(serialize_validate_ok(res.ok[i]));
-
-    nok.type = Container::Value::CONTAINER_TYPE_ARRAY;
-    for (size_t i = 0; i < res.nok.size(); ++i)
-        nok.array.push_back(serialize_generic_nok(res.nok[i]->id, res.nok[i]->error));
-
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["ok"] = ok;
-    child.obj["nok"] = nok;
+    if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
+    else
+    {
+        ok.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < res.ok.size(); ++i)
+            ok.array.push_back(serialize_checker_validate_ok(res.ok[i], err));
+        child.obj["ok"] = ok;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_VALIDATE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2906,22 +2812,28 @@ int RESTAPI::serialize_validate_res(Checker_Validate_Res& res, std::string& data
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_file_from_id_res(Checker_File_From_Id_Res& res, std::string& data)
+int RESTAPI::serialize_checker_file_from_id_res(Checker_File_From_Id_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, file;
-
-    file.type = Container::Value::CONTAINER_TYPE_STRING;
-    file.s = res.file;
+    Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["file"] = file;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
+    else
+    {
+        Container::Value file;
+        file.type = Container::Value::CONTAINER_TYPE_STRING;
+        file.s = res.file;
+        child.obj["file"] = file;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_FILE_FROM_ID_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2929,22 +2841,29 @@ int RESTAPI::serialize_file_from_id_res(Checker_File_From_Id_Res& res, std::stri
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_id_from_filename_res(Checker_Id_From_Filename_Res& res, std::string& data)
+int RESTAPI::serialize_checker_id_from_filename_res(Checker_Id_From_Filename_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, id;
-
-    id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    id.l = res.id;
+    Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["id"] = id;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
+    else
+    {
+        Container::Value id;
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = res.id;
+
+        child.obj["id"] = id;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["CHECKER_ID_FROM_FILENAME_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -2952,66 +2871,72 @@ int RESTAPI::serialize_id_from_filename_res(Checker_Id_From_Filename_Res& res, s
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, std::string& data)
+int RESTAPI::serialize_checker_file_information_res(Checker_File_Information_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, filename, file_last_modification, generated_id, source_id, generated_time,
-        generated_log, generated_error_log, options, analyzed, has_error, error_log;
+    Container::Value v, child, filename;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
-    filename.type = Container::Value::CONTAINER_TYPE_STRING;
-    filename.s = res.filename;
-    child.obj["filename"] = filename;
-
-    file_last_modification.type = Container::Value::CONTAINER_TYPE_STRING;
-    file_last_modification.s = res.file_last_modification;
-    child.obj["file_last_modification"] = file_last_modification;
-
-    generated_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    generated_id.l = res.generated_id;
-    child.obj["generated_id"] = generated_id;
-
-    source_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    source_id.l = res.source_id;
-    child.obj["source_id"] = source_id;
-
-    generated_time.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    generated_time.l = res.generated_time;
-    child.obj["generated_time"] = generated_time;
-
-    generated_log.type = Container::Value::CONTAINER_TYPE_STRING;
-    generated_log.s = res.generated_log;
-    child.obj["generated_log"] = generated_log;
-
-    generated_error_log.type = Container::Value::CONTAINER_TYPE_STRING;
-    generated_error_log.s = res.generated_error_log;
-    child.obj["generated_error_log"] = generated_error_log;
-
-    options.type = Container::Value::CONTAINER_TYPE_ARRAY;
-    for (size_t i = 0; i < res.options.size(); ++i)
+    if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
+    else
     {
-        Container::Value option, val;
-        option.type = Container::Value::CONTAINER_TYPE_OBJECT;
-        val.type = Container::Value::CONTAINER_TYPE_STRING;
-        val.s = res.options[i].second;
-        option.obj[res.options[i].first] = val;
-        options.array.push_back(option);
-    }
-    child.obj["options"] = options;
+        Container::Value filename, file_last_modification, generated_id, source_id, generated_time,
+            generated_log, generated_error_log, options, analyzed, has_error, error_log;
+        filename.type = Container::Value::CONTAINER_TYPE_STRING;
+        filename.s = res.filename;
+        child.obj["filename"] = filename;
 
-    analyzed.type = Container::Value::CONTAINER_TYPE_BOOL;
-    analyzed.b = res.analyzed;
-    child.obj["analyzed"] = analyzed;
+        file_last_modification.type = Container::Value::CONTAINER_TYPE_STRING;
+        file_last_modification.s = res.file_last_modification;
+        child.obj["file_last_modification"] = file_last_modification;
 
-    has_error.type = Container::Value::CONTAINER_TYPE_BOOL;
-    has_error.b = res.has_error;
-    child.obj["has_error"] = has_error;
+        generated_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        generated_id.l = res.generated_id;
+        child.obj["generated_id"] = generated_id;
 
-    if (res.has_error)
-    {
-        error_log.type = Container::Value::CONTAINER_TYPE_STRING;
-        error_log.s = res.error_log;
-        child.obj["error_log"] = error_log;
+        source_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        source_id.l = res.source_id;
+        child.obj["source_id"] = source_id;
+
+        generated_time.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        generated_time.l = res.generated_time;
+        child.obj["generated_time"] = generated_time;
+
+        generated_log.type = Container::Value::CONTAINER_TYPE_STRING;
+        generated_log.s = res.generated_log;
+        child.obj["generated_log"] = generated_log;
+
+        generated_error_log.type = Container::Value::CONTAINER_TYPE_STRING;
+        generated_error_log.s = res.generated_error_log;
+        child.obj["generated_error_log"] = generated_error_log;
+
+        options.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < res.options.size(); ++i)
+        {
+            Container::Value option, val;
+            option.type = Container::Value::CONTAINER_TYPE_OBJECT;
+            val.type = Container::Value::CONTAINER_TYPE_STRING;
+            val.s = res.options[i].second;
+            option.obj[res.options[i].first] = val;
+            options.array.push_back(option);
+        }
+        child.obj["options"] = options;
+
+        analyzed.type = Container::Value::CONTAINER_TYPE_BOOL;
+        analyzed.b = res.analyzed;
+        child.obj["analyzed"] = analyzed;
+
+        has_error.type = Container::Value::CONTAINER_TYPE_BOOL;
+        has_error.b = res.has_error;
+        child.obj["has_error"] = has_error;
+
+        if (res.has_error)
+        {
+            error_log.type = Container::Value::CONTAINER_TYPE_STRING;
+            error_log.s = res.error_log;
+            child.obj["error_log"] = error_log;
+        }
     }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -3019,7 +2944,7 @@ int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, s
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3027,28 +2952,34 @@ int RESTAPI::serialize_file_information_res(Checker_File_Information_Res& res, s
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string& data)
+int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string& data, std::string& err)
 {
-    Container::Value v, child, values;
-
-    values.type = Container::Value::CONTAINER_TYPE_ARRAY;
-    for (size_t i = 0; i < res.values.size(); ++i)
-    {
-        Container::Value value;
-        value.type = Container::Value::CONTAINER_TYPE_STRING;
-        value.s = res.values[i];
-        values.array.push_back(value);
-    }
+    Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    child.obj["values"] = values;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
+    else
+    {
+        Container::Value values;
+        values.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < res.values.size(); ++i)
+        {
+            Container::Value value;
+            value.type = Container::Value::CONTAINER_TYPE_STRING;
+            value.s = res.values[i];
+            values.array.push_back(value);
+        }
+        child.obj["values"] = values;
+    }
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["DEFAULT_VALUES_FOR_TYPE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3056,7 +2987,7 @@ int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
@@ -3070,14 +3001,14 @@ int RESTAPI::serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::
         child.obj["id"] = id;
     }
     else
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_CREATE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3085,7 +3016,7 @@ int RESTAPI::serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_import_res(Policy_Import_Res& res, std::string& data)
+int RESTAPI::serialize_policy_import_res(Policy_Import_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, id, nok;
 
@@ -3098,14 +3029,14 @@ int RESTAPI::serialize_policy_import_res(Policy_Import_Res& res, std::string& da
         child.obj["id"] = id;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_IMPORT_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3113,21 +3044,21 @@ int RESTAPI::serialize_policy_import_res(Policy_Import_Res& res, std::string& da
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_remove_res(Policy_Remove_Res& res, std::string& data)
+int RESTAPI::serialize_policy_remove_res(Policy_Remove_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_REMOVE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3135,7 +3066,7 @@ int RESTAPI::serialize_policy_remove_res(Policy_Remove_Res& res, std::string& da
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_dump_res(Policy_Dump_Res& res, std::string& data)
+int RESTAPI::serialize_policy_dump_res(Policy_Dump_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, xml, nok;
 
@@ -3148,14 +3079,14 @@ int RESTAPI::serialize_policy_dump_res(Policy_Dump_Res& res, std::string& data)
         child.obj["xml"] = xml;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_DUMP_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3163,21 +3094,21 @@ int RESTAPI::serialize_policy_dump_res(Policy_Dump_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_save_res(Policy_Save_Res& res, std::string& data)
+int RESTAPI::serialize_policy_save_res(Policy_Save_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_SAVE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3185,7 +3116,7 @@ int RESTAPI::serialize_policy_save_res(Policy_Save_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string& data)
+int RESTAPI::serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, id, nok;
 
@@ -3198,14 +3129,14 @@ int RESTAPI::serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::stri
         child.obj["id"] = id;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_DUPLICATE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3213,7 +3144,7 @@ int RESTAPI::serialize_policy_duplicate_res(Policy_Duplicate_Res& res, std::stri
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_move_res(Policy_Move_Res& res, std::string& data)
+int RESTAPI::serialize_policy_move_res(Policy_Move_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, id, nok;
 
@@ -3226,14 +3157,14 @@ int RESTAPI::serialize_policy_move_res(Policy_Move_Res& res, std::string& data)
         child.obj["id"] = id;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_MOVE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3241,21 +3172,21 @@ int RESTAPI::serialize_policy_move_res(Policy_Move_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string& data)
+int RESTAPI::serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_CHANGE_INFO_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3263,21 +3194,21 @@ int RESTAPI::serialize_policy_change_info_res(Policy_Change_Info_Res& res, std::
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string& data)
+int RESTAPI::serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_CHANGE_TYPE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3285,21 +3216,21 @@ int RESTAPI::serialize_policy_change_type_res(Policy_Change_Type_Res& res, std::
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_change_is_public_res(Policy_Change_Is_Public_Res& res, std::string& data)
+int RESTAPI::serialize_policy_change_is_public_res(Policy_Change_Is_Public_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_CHANGE_IS_PUBLIC_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3307,17 +3238,17 @@ int RESTAPI::serialize_policy_change_is_public_res(Policy_Change_Is_Public_Res& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data)
+int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, policy, policyTree, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else if (res.policy)
     {
-        serialize_a_policy(res.policy, policy);
+        serialize_a_policy(res.policy, policy, err);
         child.obj["policy"] = policy;
     }
     else if (res.policyTree.size())
@@ -3331,7 +3262,7 @@ int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data)
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3339,7 +3270,7 @@ int RESTAPI::serialize_policy_get_res(Policy_Get_Res& res, std::string& data)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string& data)
+int RESTAPI::serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, name, nok;
 
@@ -3350,14 +3281,14 @@ int RESTAPI::serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string
     child.obj["name"] = name;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_GET_NAME_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3365,7 +3296,7 @@ int RESTAPI::serialize_policy_get_name_res(Policy_Get_Name_Res& res, std::string
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string& data)
+int RESTAPI::serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, size, nok;
 
@@ -3376,14 +3307,14 @@ int RESTAPI::serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_R
     child.obj["size"] = size;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_GET_POLICIES_COUNT_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3391,21 +3322,21 @@ int RESTAPI::serialize_policy_get_policies_count_res(Policy_Get_Policies_Count_R
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res, std::string& data)
+int RESTAPI::serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["POLICY_CLEAR_POLICIES_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3413,18 +3344,18 @@ int RESTAPI::serialize_policy_clear_policies_res(Policy_Clear_Policies_Res& res,
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string& data)
+int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else if (res.policies.size())
     {
         Container::Value policies;
-        serialize_policies_get_policies(res.policies, policies);
+        serialize_policies_get_policies(res.policies, policies, err);
         child.obj["policies"] = policies;
     }
     else if (res.policiesTree.size())
@@ -3438,7 +3369,7 @@ int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3446,18 +3377,18 @@ int RESTAPI::serialize_policy_get_policies_res(Policy_Get_Policies_Res& res, std
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_public_policies_res(Policy_Get_Public_Policies_Res& res, std::string& data)
+int RESTAPI::serialize_policy_get_public_policies_res(Policy_Get_Public_Policies_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else if (res.policies.size())
     {
         Container::Value policies;
-        serialize_policy_public_policy(res.policies, policies);
+        serialize_policy_public_policy(res.policies, policies, err);
         child.obj["policies"] = policies;
     }
 
@@ -3467,7 +3398,7 @@ int RESTAPI::serialize_policy_get_public_policies_res(Policy_Get_Public_Policies
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3475,17 +3406,17 @@ int RESTAPI::serialize_policy_get_public_policies_res(Policy_Get_Public_Policies
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Names_List_Res& res, std::string& data)
+int RESTAPI::serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Names_List_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, policies, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else
     {
-        serialize_policies_get_policies_names(res.policies, policies);
+        serialize_policies_get_policies_names(res.policies, policies, err);
         child.obj["policies"] = policies;
     }
 
@@ -3494,7 +3425,7 @@ int RESTAPI::serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Na
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3502,7 +3433,7 @@ int RESTAPI::serialize_policy_get_policies_names_list_res(Policy_Get_Policies_Na
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_File_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, policy_id, nok;
 
@@ -3515,14 +3446,14 @@ int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_
         child.obj["policy_id"] = policy_id;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_generic_nok(res.nok->id, res.nok->error);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_CREATE_FROM_FILE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3530,7 +3461,7 @@ int RESTAPI::serialize_xslt_policy_create_from_file_res(XSLT_Policy_Create_From_
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, id, nok;
 
@@ -3543,14 +3474,14 @@ int RESTAPI::serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& 
         child.obj["id"] = id;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_RULE_CREATE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3558,17 +3489,17 @@ int RESTAPI::serialize_xslt_policy_rule_create_res(XSLT_Policy_Rule_Create_Res& 
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, rule, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
     else
     {
-        serialize_xslt_policy_rule(res.rule, rule);
+        serialize_xslt_policy_rule(res.rule, rule, err);
         child.obj["rule"] = rule;
     }
 
@@ -3577,7 +3508,7 @@ int RESTAPI::serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, s
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3585,21 +3516,21 @@ int RESTAPI::serialize_xslt_policy_rule_get_res(XSLT_Policy_Rule_Get_Res& res, s
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_RULE_EDIT_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3607,7 +3538,7 @@ int RESTAPI::serialize_xslt_policy_rule_edit_res(XSLT_Policy_Rule_Edit_Res& res,
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, id, nok;
 
@@ -3620,14 +3551,14 @@ int RESTAPI::serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate
         child.obj["id"] = id;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_RULE_DUPLICATE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3635,7 +3566,7 @@ int RESTAPI::serialize_xslt_policy_rule_duplicate_res(XSLT_Policy_Rule_Duplicate
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, id, nok;
 
@@ -3648,14 +3579,14 @@ int RESTAPI::serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res,
         child.obj["id"] = id;
     }
     else if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_RULE_MOVE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3663,21 +3594,21 @@ int RESTAPI::serialize_xslt_policy_rule_move_res(XSLT_Policy_Rule_Move_Res& res,
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string& data)
+int RESTAPI::serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child, nok;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     if (res.nok)
-        child.obj["nok"] = serialize_policy_nok(res.nok);
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
 
     v.type = Container::Value::CONTAINER_TYPE_OBJECT;
     v.obj["XSLT_POLICY_RULE_DELETE_RESULT"] = child;
 
     if (model->serialize(v, data) < 0)
     {
-        error = model->get_error();
+        err = model->get_error();
         return -1;
     }
 
@@ -3689,42 +3620,52 @@ int RESTAPI::serialize_xslt_policy_rule_delete_res(XSLT_Policy_Rule_Delete_Res& 
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_mediaconch_get_plugins_req(const std::string& data)
+RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_mediaconch_get_plugins_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_GET_PLUGINS");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_GET_PLUGINS in the request";
         return NULL;
+    }
+
     MediaConch_Get_Plugins_Req *req = new MediaConch_Get_Plugins_Req;
 
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req(const std::string& data)
+RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_WATCH_FOLDER");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_WATCH_FOLDER in the request";
         return NULL;
+    }
 
     Container::Value *folder = model->get_value_by_key(*child, "folder");
     if (!folder || folder->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing folder field in the request";
         return NULL;
+    }
 
     MediaConch_Watch_Folder_Req *req = new MediaConch_Watch_Folder_Req;
     req->folder = folder->s;
@@ -3781,19 +3722,22 @@ RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_mediaconch_watch_folder_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_List_Watch_Folders_Req *RESTAPI::parse_mediaconch_list_watch_folders_req(const std::string& data)
+RESTAPI::MediaConch_List_Watch_Folders_Req *RESTAPI::parse_mediaconch_list_watch_folders_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_LIST_WATCH_FOLDERS");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_LIST_WATCH_FOLDERS in the request";
         return NULL;
+    }
 
     MediaConch_List_Watch_Folders_Req *req = new MediaConch_List_Watch_Folders_Req;
 
@@ -3801,23 +3745,29 @@ RESTAPI::MediaConch_List_Watch_Folders_Req *RESTAPI::parse_mediaconch_list_watch
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Edit_Watch_Folder_Req *RESTAPI::parse_mediaconch_edit_watch_folder_req(const std::string& data)
+RESTAPI::MediaConch_Edit_Watch_Folder_Req *RESTAPI::parse_mediaconch_edit_watch_folder_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_EDIT_WATCH_FOLDER");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_EDIT_WATCH_FOLDER in the request";
         return NULL;
+    }
 
     Container::Value *folder = model->get_value_by_key(*child, "folder");
     if (!folder || folder->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing folder field in the request";
         return NULL;
+    }
 
     MediaConch_Edit_Watch_Folder_Req *req = new MediaConch_Edit_Watch_Folder_Req;
     req->folder = folder->s;
@@ -3830,23 +3780,29 @@ RESTAPI::MediaConch_Edit_Watch_Folder_Req *RESTAPI::parse_mediaconch_edit_watch_
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Remove_Watch_Folder_Req *RESTAPI::parse_mediaconch_remove_watch_folder_req(const std::string& data)
+RESTAPI::MediaConch_Remove_Watch_Folder_Req *RESTAPI::parse_mediaconch_remove_watch_folder_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_REMOVE_WATCH_FOLDER");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_REMOVE_WATCH_FOLDER in the request";
         return NULL;
+    }
 
     Container::Value *folder = model->get_value_by_key(*child, "folder");
     if (!folder || folder->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing folder field in the request";
         return NULL;
+    }
 
     MediaConch_Remove_Watch_Folder_Req *req = new MediaConch_Remove_Watch_Folder_Req;
     req->folder = folder->s;
@@ -3855,34 +3811,44 @@ RESTAPI::MediaConch_Remove_Watch_Folder_Req *RESTAPI::parse_mediaconch_remove_wa
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Analyze_Req *RESTAPI::parse_analyze_req(const std::string& data)
+RESTAPI::Checker_Analyze_Req *RESTAPI::parse_checker_analyze_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_ANALYZE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_ANALYZE in the request";
         return NULL;
+    }
+
     Checker_Analyze_Req *req = new Checker_Analyze_Req;
 
     Container::Value *args;
     args = model->get_value_by_key(*child, "args");
+    if (!args)
+    {
+        err = "Missing args field in the request";
+        return NULL;
+    }
 
-    if (!args || parse_analyze_arg(args, req->args) < 0)
+    if (parse_checker_analyze_arg(args, req->args, err) < 0)
     {
         delete req;
         return NULL;
     }
+
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Status_Req *RESTAPI::parse_status_req(const std::string& data)
+RESTAPI::Checker_Status_Req *RESTAPI::parse_checker_status_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
@@ -3894,12 +3860,17 @@ RESTAPI::Checker_Status_Req *RESTAPI::parse_status_req(const std::string& data)
 
     child = model->get_value_by_key(v, "CHECKER_STATUS");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_STATUS in the request";
         return NULL;
-
+    }
 
     Container::Value *ids = model->get_value_by_key(*child, "ids");
     if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "Missing ids field in the request";
         return NULL;
+    }
 
     Checker_Status_Req *req = new Checker_Status_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
@@ -3908,6 +3879,7 @@ RESTAPI::Checker_Status_Req *RESTAPI::parse_status_req(const std::string& data)
 
         if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         {
+            err = "id field type is not correct in the request";
             delete req;
             return NULL;
         }
@@ -3922,19 +3894,22 @@ RESTAPI::Checker_Status_Req *RESTAPI::parse_status_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
+RESTAPI::Checker_Report_Req *RESTAPI::parse_checker_report_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_REPORT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_REPORT in the request";
         return NULL;
+    }
 
     Container::Value *ids, *user, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *options;
     ids = model->get_value_by_key(*child, "ids");
@@ -3947,7 +3922,10 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
     options = model->get_value_by_key(*child, "options");
 
     if (!ids || !reports || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "Missing ids field in the request";
         return NULL;
+    }
 
     Checker_Report_Req *req = new Checker_Report_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
@@ -3956,12 +3934,13 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
 
         if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         {
+            err = "Id field type is not correct in the request";
             delete req;
             return NULL;
         }
         req->ids.push_back(id->l);
     }
-    if (parse_report_reports(reports, req->reports))
+    if (parse_checker_report_reports(reports, req->reports, err))
     {
         delete req;
         return NULL;
@@ -4007,66 +3986,31 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_report_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Retry_Req *RESTAPI::parse_retry_req(const std::string& data)
+RESTAPI::Checker_Clear_Req *RESTAPI::parse_checker_clear_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
-        return NULL;
-    }
-
-    child = model->get_value_by_key(v, "CHECKER_RETRY");
-    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
-        return NULL;
-
-    Container::Value *ids;
-    ids = model->get_value_by_key(*child, "ids");
-
-    if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
-        return NULL;
-
-    Checker_Retry_Req *req = new Checker_Retry_Req;
-    for (size_t i = 0; i < ids->array.size(); ++i)
-    {
-        Container::Value *id = &ids->array[i];
-
-        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        {
-            delete req;
-            return NULL;
-        }
-        req->ids.push_back(id->l);
-    }
-
-    Container::Value *user = model->get_value_by_key(*child, "user");
-    if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        req->user = user->l;
-
-    return req;
-}
-
-//---------------------------------------------------------------------------
-RESTAPI::Checker_Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
-{
-    Container::Value v, *child;
-
-    if (model->parse(data, v))
-    {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_CLEAR");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_CLEAR in the request";
         return NULL;
+    }
 
     Container::Value *ids;
     ids = model->get_value_by_key(*child, "ids");
 
     if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "Missing ids field in the request";
         return NULL;
+    }
 
     Checker_Clear_Req *req = new Checker_Clear_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
@@ -4075,6 +4019,7 @@ RESTAPI::Checker_Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
 
         if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         {
+            err = "id field type is not correct in the request";
             delete req;
             return NULL;
         }
@@ -4088,19 +4033,22 @@ RESTAPI::Checker_Clear_Req *RESTAPI::parse_clear_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_List_Req *RESTAPI::parse_list_req(const std::string& data)
+RESTAPI::Checker_List_Req *RESTAPI::parse_checker_list_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_LIST");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_LIST in the request";
         return NULL;
+    }
 
     Checker_List_Req *req = new Checker_List_Req;
 
@@ -4112,19 +4060,22 @@ RESTAPI::Checker_List_Req *RESTAPI::parse_list_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& data)
+RESTAPI::Checker_Validate_Req *RESTAPI::parse_checker_validate_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_VALIDATE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_VALIDATE in the request";
         return NULL;
+    }
 
     Container::Value *ids, *report, *user, *policies_ids, *policies_contents, *options;
     ids = model->get_value_by_key(*child, "ids");
@@ -4134,8 +4085,17 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
     policies_contents = model->get_value_by_key(*child, "policies_contents");
     options = model->get_value_by_key(*child, "options");
 
-    if (!ids || !report || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    if (!ids || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "Missing ids field in the request";
         return NULL;
+    }
+
+    if (!report || report->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing reports field in the request";
+        return NULL;
+    }
 
     Checker_Validate_Req *req = new Checker_Validate_Req;
     for (size_t i = 0; i < ids->array.size(); ++i)
@@ -4144,17 +4104,13 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
 
         if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
         {
+            err = "id field type is not correct in the request";
             delete req;
             return NULL;
         }
         req->ids.push_back(id->l);
     }
 
-    if (report->type != Container::Value::CONTAINER_TYPE_STRING)
-    {
-        delete req;
-        return NULL;
-    }
     req->report = string_to_Report(report->s);
 
     if (policies_ids && policies_ids->type == Container::Value::CONTAINER_TYPE_ARRAY)
@@ -4163,6 +4119,7 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
             if (policies_ids->array[i].type == Container::Value::CONTAINER_TYPE_INTEGER)
                 req->policies_ids.push_back(policies_ids->array[i].l);
     }
+
     if (policies_contents && policies_contents->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
         for (size_t i = 0; i < policies_contents->array.size(); ++i)
@@ -4193,24 +4150,30 @@ RESTAPI::Checker_Validate_Req *RESTAPI::parse_validate_req(const std::string& da
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::string& data)
+RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_checker_file_from_id_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_FILE_FROM_ID");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_FILE_FROM_ID in the request";
         return NULL;
+    }
 
     Container::Value *id;
     id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Checker_File_From_Id_Req *req = new Checker_File_From_Id_Req;
     req->id = id->l;
@@ -4223,23 +4186,29 @@ RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_file_from_id_req(const std::st
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_id_from_filename_req(const std::string& data)
+RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_checker_id_from_filename_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_ID_FROM_FILENAME");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_ID_FROM_FILENAME in the request";
         return NULL;
+    }
 
     Container::Value *filename = model->get_value_by_key(*child, "filename");
     if (!filename || filename->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing filename field in the request";
         return NULL;
+    }
 
     Checker_Id_From_Filename_Req *req = new Checker_Id_From_Filename_Req;
     req->filename = filename->s;
@@ -4267,24 +4236,30 @@ RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_id_from_filename_req(const
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_File_Information_Req *RESTAPI::parse_file_information_req(const std::string& data)
+RESTAPI::Checker_File_Information_Req *RESTAPI::parse_checker_file_information_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_FILE_INFORMATION");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_FILE_INFORMATION in the request";
         return NULL;
+    }
 
     Container::Value *id;
     id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Checker_File_Information_Req *req = new Checker_File_Information_Req;
     req->id = id->l;
@@ -4297,27 +4272,36 @@ RESTAPI::Checker_File_Information_Req *RESTAPI::parse_file_information_req(const
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req(const std::string& data)
+RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "DEFAULT_VALUES_FOR_TYPE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing DEFAULT_VALUES_FOR_TYPE in the request";
         return NULL;
+    }
 
     Container::Value *type = model->get_value_by_key(*child, "type");
     if (!type || type->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing type field in the request";
         return NULL;
+    }
 
     Container::Value *field = model->get_value_by_key(*child, "field");
     if (!field || field->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing field field in the request";
         return NULL;
+    }
 
     Default_Values_For_Type_Req *req = new Default_Values_For_Type_Req;
     req->type = type->s;
@@ -4326,19 +4310,22 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_default_values_for_type_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_xslt_policy_create_req(const std::string& data)
+RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_xslt_policy_create_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_CREATE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_CREATE in the request";
         return NULL;
+    }
 
     XSLT_Policy_Create_Req *req = new XSLT_Policy_Create_Req;
 
@@ -4358,23 +4345,29 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_xslt_policy_create_req(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Import_Req *RESTAPI::parse_policy_import_req(const std::string& data)
+RESTAPI::Policy_Import_Req *RESTAPI::parse_policy_import_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_IMPORT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_IMPORT in the request";
         return NULL;
+    }
 
     Container::Value *xml = model->get_value_by_key(*child, "xml");
     if (!xml || xml->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing xml field in the request";
         return NULL;
+    }
 
     Policy_Import_Req *req = new Policy_Import_Req;
     req->xml = xml->s;
@@ -4382,27 +4375,34 @@ RESTAPI::Policy_Import_Req *RESTAPI::parse_policy_import_req(const std::string& 
     Container::Value *user = model->get_value_by_key(*child, "user");
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
+
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Remove_Req *RESTAPI::parse_policy_remove_req(const std::string& data)
+RESTAPI::Policy_Remove_Req *RESTAPI::parse_policy_remove_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_REMOVE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_REMOVE in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Policy_Remove_Req *req = new Policy_Remove_Req;
     req->id = id->l;
@@ -4415,23 +4415,29 @@ RESTAPI::Policy_Remove_Req *RESTAPI::parse_policy_remove_req(const std::string& 
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Dump_Req *RESTAPI::parse_policy_dump_req(const std::string& data)
+RESTAPI::Policy_Dump_Req *RESTAPI::parse_policy_dump_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_DUMP");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_DUMP in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Policy_Dump_Req *req = new Policy_Dump_Req;
     req->id = id->l;
@@ -4448,23 +4454,29 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_policy_dump_req(const std::string& data
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Save_Req *RESTAPI::parse_policy_save_req(const std::string& data)
+RESTAPI::Policy_Save_Req *RESTAPI::parse_policy_save_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_SAVE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_SAVE in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Policy_Save_Req *req = new Policy_Save_Req;
     req->id = id->l;
@@ -4477,23 +4489,29 @@ RESTAPI::Policy_Save_Req *RESTAPI::parse_policy_save_req(const std::string& data
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::string& data)
+RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_DUPLICATE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_DUPLICATE in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Policy_Duplicate_Req *req = new Policy_Duplicate_Req;
     req->id = id->l;
@@ -4521,23 +4539,29 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_policy_duplicate_req(const std::st
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Move_Req *RESTAPI::parse_policy_move_req(const std::string& data)
+RESTAPI::Policy_Move_Req *RESTAPI::parse_policy_move_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_MOVE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_MOVE in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Policy_Move_Req *req = new Policy_Move_Req;
     req->id = id->l;
@@ -4554,31 +4578,43 @@ RESTAPI::Policy_Move_Req *RESTAPI::parse_policy_move_req(const std::string& data
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std::string& data)
+RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CHANGE_INFO");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CHANGE_INFO in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Container::Value *name = model->get_value_by_key(*child, "name");
     if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing name field in the request";
         return NULL;
+    }
 
     Container::Value *desc = model->get_value_by_key(*child, "description");
     if (!desc || desc->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing description field in the request";
         return NULL;
+    }
 
     Policy_Change_Info_Req *req = new Policy_Change_Info_Req;
     req->id = id->l;
@@ -4597,27 +4633,36 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_policy_change_type_req(const std::string& data)
+RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_policy_change_type_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CHANGE_TYPE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CHANGE_TYPE in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Container::Value *type = model->get_value_by_key(*child, "type");
     if (!type || type->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "Missing type field in the request";
         return NULL;
+    }
 
     Policy_Change_Type_Req *req = new Policy_Change_Type_Req;
     req->id = id->l;
@@ -4631,27 +4676,36 @@ RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_policy_change_type_req(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_policy_change_is_public_req(const std::string& data)
+RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_policy_change_is_public_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CHANGE_IS_PUBLIC");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CHANGE_IS_PUBLIC in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id type in the request";
         return NULL;
+    }
 
     Container::Value *is_public = model->get_value_by_key(*child, "is_public");
     if (!is_public || is_public->type != Container::Value::CONTAINER_TYPE_BOOL)
+    {
+        err = "Missing is_public field in the request";
         return NULL;
+    }
 
     Policy_Change_Is_Public_Req *req = new Policy_Change_Is_Public_Req;
     req->id = id->l;
@@ -4665,23 +4719,29 @@ RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_policy_change_is_public_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
+RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Policy_Get_Req *req = new Policy_Get_Req;
     req->id = id->l;
@@ -4702,24 +4762,30 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_policy_get_req(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_policy_get_name_req(const std::string& data)
+RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_policy_get_name_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_NAME");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_NAME in the request";
         return NULL;
+    }
 
     Container::Value *id;
     id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     Policy_Get_Name_Req *req = new Policy_Get_Name_Req;
     req->id = id->l;
@@ -4732,19 +4798,22 @@ RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_policy_get_name_req(const std::stri
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_policy_get_policies_count_req(const std::string& data)
+RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_policy_get_policies_count_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_POLICIES_COUNT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_POLICIES_COUNT in the request";
         return NULL;
+    }
 
     Policy_Get_Policies_Count_Req *req = new Policy_Get_Policies_Count_Req;
 
@@ -4756,19 +4825,22 @@ RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_policy_get_policies_count
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_policy_clear_policies_req(const std::string& data)
+RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_policy_clear_policies_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CLEAR_POLICIES");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CLEAR_POLICIES in the request";
         return NULL;
+    }
 
     Policy_Clear_Policies_Req *req = new Policy_Clear_Policies_Req;
 
@@ -4780,19 +4852,22 @@ RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_policy_clear_policies_req(con
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const std::string& data)
+RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_POLICIES");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_POLICIES in the request";
         return NULL;
+    }
 
     Policy_Get_Policies_Req *req = new Policy_Get_Policies_Req;
 
@@ -4816,19 +4891,22 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_policy_get_policies_req(const s
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_policy_get_public_policies_req(const std::string& data)
+RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_policy_get_public_policies_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_PUBLIC_POLICIES");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_PUBLIC_POLICIES in the request";
         return NULL;
+    }
 
     Policy_Get_Public_Policies_Req *req = new Policy_Get_Public_Policies_Req;
 
@@ -4836,19 +4914,22 @@ RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_policy_get_public_polici
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_policy_get_policies_names_list_req(const std::string& data)
+RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_policy_get_policies_names_list_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_POLICIES_NAMES_LIST");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_POLICIES_NAMES_LIST in the request";
         return NULL;
+    }
 
     Policy_Get_Policies_Names_List_Req *req = new Policy_Get_Policies_Names_List_Req;
 
@@ -4860,23 +4941,29 @@ RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_policy_get_policies_
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_from_file_req(const std::string& data)
+RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_from_file_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_FROM_FILE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_CREATE_FROM_FILE in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
     req->id = id->l;
@@ -4889,14 +4976,21 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_xslt_policy_create_fro
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_Policy_Rule *rule)
+int RESTAPI::parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_Policy_Rule *rule, std::string& err)
 {
     if (!val || val->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing Rule in the request";
         return -1;
+    }
 
     Container::Value *id = model->get_value_by_key(*val, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id in the Rule";
         return -1;
+    }
+
     rule->id = id->l;
 
     Container::Value *name = model->get_value_by_key(*val, "name");
@@ -4931,23 +5025,29 @@ int RESTAPI::parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_P
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_xslt_policy_rule_create_req(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_xslt_policy_rule_create_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_CREATE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_CREATE in the request";
         return NULL;
+    }
 
     Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing policy_id field in the request";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Create_Req *req = new XSLT_Policy_Rule_Create_Req;
     req->policy_id = policy_id->l;
@@ -4960,27 +5060,36 @@ RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_xslt_policy_rule_create_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Get_Req *RESTAPI::parse_xslt_policy_rule_get_req(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Get_Req *RESTAPI::parse_xslt_policy_rule_get_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_GET");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_GET in the request";
         return NULL;
+    }
 
     Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing policy_id field in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Get_Req *req = new XSLT_Policy_Rule_Get_Req;
     req->policy_id = policy_id->l;
@@ -4990,31 +5099,35 @@ RESTAPI::XSLT_Policy_Rule_Get_Req *RESTAPI::parse_xslt_policy_rule_get_req(const
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_xslt_policy_rule_edit_req(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_xslt_policy_rule_edit_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_EDIT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_EDIT in the request";
         return NULL;
+    }
 
     Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing policy_id field in the request";
         return NULL;
+    }
 
     Container::Value *rule = model->get_value_by_key(*child, "rule");
-    if (!rule || rule->type != Container::Value::CONTAINER_TYPE_OBJECT)
-        return NULL;
 
     XSLT_Policy_Rule_Edit_Req *req = new XSLT_Policy_Rule_Edit_Req;
     req->policy_id = policy_id->l;
-    if (parse_xslt_policy_rule(rule, &req->rule) < 0)
+    if (parse_xslt_policy_rule(rule, &req->rule, err) < 0)
     {
         delete req;
         return NULL;
@@ -5028,27 +5141,36 @@ RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_xslt_policy_rule_edit_req(con
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_xslt_policy_rule_duplicate_req(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_xslt_policy_rule_duplicate_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DUPLICATE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_DUPLICATE in the request";
         return NULL;
+    }
 
     Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing policy_id field in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Duplicate_Req *req = new XSLT_Policy_Rule_Duplicate_Req;
     req->policy_id = policy_id->l;
@@ -5066,27 +5188,36 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_xslt_policy_rule_duplica
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_xslt_policy_rule_move_req(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_xslt_policy_rule_move_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_MOVE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_MOVE in the request";
         return NULL;
+    }
 
     Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing policy_id field in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Move_Req *req = new XSLT_Policy_Rule_Move_Req;
     req->policy_id = policy_id->l;
@@ -5104,27 +5235,36 @@ RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_xslt_policy_rule_move_req(con
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DELETE");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_DELETE in the request";
         return NULL;
+    }
 
     Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing policy_id field in the request";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*child, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing id field in the request";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Delete_Req *req = new XSLT_Policy_Rule_Delete_Req;
     req->policy_id = policy_id->l;
@@ -5142,14 +5282,14 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_xslt_policy_rule_delete_req
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_uri_mediaconch_get_plugins_req(const std::string&)
+RESTAPI::MediaConch_Get_Plugins_Req *RESTAPI::parse_uri_mediaconch_get_plugins_req(const std::string&, std::string&)
 {
     MediaConch_Get_Plugins_Req *req = new MediaConch_Get_Plugins_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_watch_folder_req(const std::string&)
+RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_watch_folder_req(const std::string&, std::string&)
 {
     MediaConch_Watch_Folder_Req *req = new MediaConch_Watch_Folder_Req;
     //TODO
@@ -5157,7 +5297,7 @@ RESTAPI::MediaConch_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_watch_folder
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_List_Watch_Folders_Req *RESTAPI::parse_uri_mediaconch_list_watch_folders_req(const std::string&)
+RESTAPI::MediaConch_List_Watch_Folders_Req *RESTAPI::parse_uri_mediaconch_list_watch_folders_req(const std::string&, std::string&)
 {
     MediaConch_List_Watch_Folders_Req *req = new MediaConch_List_Watch_Folders_Req;
     //TODO
@@ -5165,7 +5305,7 @@ RESTAPI::MediaConch_List_Watch_Folders_Req *RESTAPI::parse_uri_mediaconch_list_w
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Edit_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_edit_watch_folder_req(const std::string&)
+RESTAPI::MediaConch_Edit_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_edit_watch_folder_req(const std::string&, std::string&)
 {
     MediaConch_Edit_Watch_Folder_Req *req = new MediaConch_Edit_Watch_Folder_Req;
     //TODO
@@ -5173,7 +5313,7 @@ RESTAPI::MediaConch_Edit_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_edit_wa
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Remove_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_remove_watch_folder_req(const std::string&)
+RESTAPI::MediaConch_Remove_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_remove_watch_folder_req(const std::string&, std::string&)
 {
     MediaConch_Remove_Watch_Folder_Req *req = new MediaConch_Remove_Watch_Folder_Req;
     //TODO
@@ -5181,7 +5321,7 @@ RESTAPI::MediaConch_Remove_Watch_Folder_Req *RESTAPI::parse_uri_mediaconch_remov
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
+RESTAPI::Checker_Analyze_Req *RESTAPI::parse_uri_checker_analyze_req(const std::string&, std::string&)
 {
     Checker_Analyze_Req *req = new Checker_Analyze_Req;
     //TODO
@@ -5189,7 +5329,7 @@ RESTAPI::Checker_Analyze_Req *RESTAPI::parse_uri_analyze_req(const std::string&)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Status_Req *RESTAPI::parse_uri_status_req(const std::string& uri)
+RESTAPI::Checker_Status_Req *RESTAPI::parse_uri_checker_status_req(const std::string& uri, std::string&)
 {
     Checker_Status_Req *req = new Checker_Status_Req;
 
@@ -5233,7 +5373,7 @@ RESTAPI::Checker_Status_Req *RESTAPI::parse_uri_status_req(const std::string& ur
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Report_Req *RESTAPI::parse_uri_report_req(const std::string&)
+RESTAPI::Checker_Report_Req *RESTAPI::parse_uri_checker_report_req(const std::string&, std::string&)
 {
     Checker_Report_Req *req = new Checker_Report_Req;
     //TODO
@@ -5241,15 +5381,7 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_uri_report_req(const std::string&)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Retry_Req *RESTAPI::parse_uri_retry_req(const std::string&)
-{
-    Checker_Retry_Req *req = new Checker_Retry_Req;
-    //TODO
-    return req;
-}
-
-//---------------------------------------------------------------------------
-RESTAPI::Checker_Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
+RESTAPI::Checker_Clear_Req *RESTAPI::parse_uri_checker_clear_req(const std::string& uri, std::string&)
 {
     Checker_Clear_Req *req = new Checker_Clear_Req;
 
@@ -5293,7 +5425,7 @@ RESTAPI::Checker_Clear_Req *RESTAPI::parse_uri_clear_req(const std::string& uri)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_List_Req *RESTAPI::parse_uri_list_req(const std::string& uri)
+RESTAPI::Checker_List_Req *RESTAPI::parse_uri_checker_list_req(const std::string& uri, std::string&)
 {
     Checker_List_Req *req = new Checker_List_Req;
 
@@ -5329,35 +5461,35 @@ RESTAPI::Checker_List_Req *RESTAPI::parse_uri_list_req(const std::string& uri)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Validate_Req *RESTAPI::parse_uri_validate_req(const std::string&)
+RESTAPI::Checker_Validate_Req *RESTAPI::parse_uri_checker_validate_req(const std::string&, std::string&)
 {
     Checker_Validate_Req *req = new Checker_Validate_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_uri_file_from_id_req(const std::string&)
+RESTAPI::Checker_File_From_Id_Req *RESTAPI::parse_uri_checker_file_from_id_req(const std::string&, std::string&)
 {
     Checker_File_From_Id_Req *req = new Checker_File_From_Id_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_uri_id_from_filename_req(const std::string&)
+RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_uri_checker_id_from_filename_req(const std::string&, std::string&)
 {
     Checker_Id_From_Filename_Req *req = new Checker_Id_From_Filename_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_File_Information_Req *RESTAPI::parse_uri_file_information_req(const std::string&)
+RESTAPI::Checker_File_Information_Req *RESTAPI::parse_uri_checker_file_information_req(const std::string&, std::string&)
 {
     Checker_File_Information_Req *req = new Checker_File_Information_Req;
     return req;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type_req(const std::string& uri)
+RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type_req(const std::string& uri, std::string&)
 {
     Default_Values_For_Type_Req *req = new Default_Values_For_Type_Req;
 
@@ -5401,7 +5533,7 @@ RESTAPI::Default_Values_For_Type_Req *RESTAPI::parse_uri_default_values_for_type
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const std::string& uri, std::string&)
 {
     XSLT_Policy_Create_Req *req = new XSLT_Policy_Create_Req;
 
@@ -5452,7 +5584,7 @@ RESTAPI::XSLT_Policy_Create_Req *RESTAPI::parse_uri_xslt_policy_create_req(const
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Import_Req *RESTAPI::parse_uri_policy_import_req(const std::string&)
+RESTAPI::Policy_Import_Req *RESTAPI::parse_uri_policy_import_req(const std::string&, std::string&)
 {
     Policy_Import_Req *req = new Policy_Import_Req;
     //todo
@@ -5460,7 +5592,7 @@ RESTAPI::Policy_Import_Req *RESTAPI::parse_uri_policy_import_req(const std::stri
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Remove_Req *RESTAPI::parse_uri_policy_remove_req(const std::string& uri)
+RESTAPI::Policy_Remove_Req *RESTAPI::parse_uri_policy_remove_req(const std::string& uri, std::string&)
 {
     Policy_Remove_Req *req = new Policy_Remove_Req;
 
@@ -5504,7 +5636,7 @@ RESTAPI::Policy_Remove_Req *RESTAPI::parse_uri_policy_remove_req(const std::stri
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& uri)
+RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& uri, std::string&)
 {
     Policy_Dump_Req *req = new Policy_Dump_Req;
 
@@ -5556,7 +5688,7 @@ RESTAPI::Policy_Dump_Req *RESTAPI::parse_uri_policy_dump_req(const std::string& 
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& uri)
+RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& uri, std::string&)
 {
     Policy_Save_Req *req = new Policy_Save_Req;
 
@@ -5600,7 +5732,7 @@ RESTAPI::Policy_Save_Req *RESTAPI::parse_uri_policy_save_req(const std::string& 
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std::string& uri)
+RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std::string& uri, std::string&)
 {
     Policy_Duplicate_Req *req = new Policy_Duplicate_Req;
 
@@ -5667,7 +5799,7 @@ RESTAPI::Policy_Duplicate_Req *RESTAPI::parse_uri_policy_duplicate_req(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Move_Req *RESTAPI::parse_uri_policy_move_req(const std::string& uri)
+RESTAPI::Policy_Move_Req *RESTAPI::parse_uri_policy_move_req(const std::string& uri, std::string&)
 {
     Policy_Move_Req *req = new Policy_Move_Req;
 
@@ -5718,7 +5850,7 @@ RESTAPI::Policy_Move_Req *RESTAPI::parse_uri_policy_move_req(const std::string& 
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const std::string& uri)
+RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const std::string& uri, std::string&)
 {
     Policy_Change_Info_Req *req = new Policy_Change_Info_Req;
 
@@ -5783,7 +5915,7 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_uri_policy_change_type_req(const std::string& uri)
+RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_uri_policy_change_type_req(const std::string& uri, std::string&)
 {
     Policy_Change_Type_Req *req = new Policy_Change_Type_Req;
 
@@ -5834,7 +5966,7 @@ RESTAPI::Policy_Change_Type_Req *RESTAPI::parse_uri_policy_change_type_req(const
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_uri_policy_change_is_public_req(const std::string& uri)
+RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_uri_policy_change_is_public_req(const std::string& uri, std::string&)
 {
     Policy_Change_Is_Public_Req *req = new Policy_Change_Is_Public_Req;
 
@@ -5886,7 +6018,7 @@ RESTAPI::Policy_Change_Is_Public_Req *RESTAPI::parse_uri_policy_change_is_public
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& uri)
+RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& uri, std::string&)
 {
     Policy_Get_Req *req = new Policy_Get_Req;
 
@@ -5945,7 +6077,7 @@ RESTAPI::Policy_Get_Req *RESTAPI::parse_uri_policy_get_req(const std::string& ur
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_uri_policy_get_name_req(const std::string& uri)
+RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_uri_policy_get_name_req(const std::string& uri, std::string&)
 {
     Policy_Get_Name_Req *req = new Policy_Get_Name_Req;
 
@@ -5989,7 +6121,7 @@ RESTAPI::Policy_Get_Name_Req *RESTAPI::parse_uri_policy_get_name_req(const std::
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_count_req(const std::string& uri)
+RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_count_req(const std::string& uri, std::string&)
 {
     Policy_Get_Policies_Count_Req *req = new Policy_Get_Policies_Count_Req;
 
@@ -6026,7 +6158,7 @@ RESTAPI::Policy_Get_Policies_Count_Req *RESTAPI::parse_uri_policy_get_policies_c
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req(const std::string& uri)
+RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req(const std::string& uri, std::string&)
 {
     Policy_Clear_Policies_Req *req = new Policy_Clear_Policies_Req;
 
@@ -6063,7 +6195,7 @@ RESTAPI::Policy_Clear_Policies_Req *RESTAPI::parse_uri_policy_clear_policies_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(const std::string& uri)
+RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(const std::string& uri, std::string&)
 {
     Policy_Get_Policies_Req *req = new Policy_Get_Policies_Req;
 
@@ -6114,7 +6246,7 @@ RESTAPI::Policy_Get_Policies_Req *RESTAPI::parse_uri_policy_get_policies_req(con
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_uri_policy_get_public_policies_req(const std::string&)
+RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_uri_policy_get_public_policies_req(const std::string&, std::string&)
 {
     Policy_Get_Public_Policies_Req *req = new Policy_Get_Public_Policies_Req;
 
@@ -6122,7 +6254,7 @@ RESTAPI::Policy_Get_Public_Policies_Req *RESTAPI::parse_uri_policy_get_public_po
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_uri_policy_get_policies_names_list_req(const std::string& uri)
+RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_uri_policy_get_policies_names_list_req(const std::string& uri, std::string&)
 {
     Policy_Get_Policies_Names_List_Req *req = new Policy_Get_Policies_Names_List_Req;
 
@@ -6159,7 +6291,7 @@ RESTAPI::Policy_Get_Policies_Names_List_Req *RESTAPI::parse_uri_policy_get_polic
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create_from_file_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create_from_file_req(const std::string& uri, std::string&)
 {
     XSLT_Policy_Create_From_File_Req *req = new XSLT_Policy_Create_From_File_Req;
 
@@ -6203,7 +6335,7 @@ RESTAPI::XSLT_Policy_Create_From_File_Req *RESTAPI::parse_uri_xslt_policy_create
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create_req(const std::string& uri, std::string&)
 {
     XSLT_Policy_Rule_Create_Req *req = new XSLT_Policy_Rule_Create_Req;
 
@@ -6247,7 +6379,7 @@ RESTAPI::XSLT_Policy_Rule_Create_Req *RESTAPI::parse_uri_xslt_policy_rule_create
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Get_Req *RESTAPI::parse_uri_xslt_policy_rule_get_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Rule_Get_Req *RESTAPI::parse_uri_xslt_policy_rule_get_req(const std::string& uri, std::string&)
 {
     XSLT_Policy_Rule_Get_Req *req = new XSLT_Policy_Rule_Get_Req;
 
@@ -6298,7 +6430,7 @@ RESTAPI::XSLT_Policy_Rule_Get_Req *RESTAPI::parse_uri_xslt_policy_rule_get_req(c
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_uri_xslt_policy_rule_edit_req(const std::string&)
+RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_uri_xslt_policy_rule_edit_req(const std::string&, std::string&)
 {
     XSLT_Policy_Rule_Edit_Req *req = new XSLT_Policy_Rule_Edit_Req;
     //TODO
@@ -6307,7 +6439,7 @@ RESTAPI::XSLT_Policy_Rule_Edit_Req *RESTAPI::parse_uri_xslt_policy_rule_edit_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_duplicate_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_duplicate_req(const std::string& uri, std::string&)
 {
     XSLT_Policy_Rule_Duplicate_Req *req = new XSLT_Policy_Rule_Duplicate_Req;
 
@@ -6365,7 +6497,7 @@ RESTAPI::XSLT_Policy_Rule_Duplicate_Req *RESTAPI::parse_uri_xslt_policy_rule_dup
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_uri_xslt_policy_rule_move_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_uri_xslt_policy_rule_move_req(const std::string& uri, std::string&)
 {
     XSLT_Policy_Rule_Move_Req *req = new XSLT_Policy_Rule_Move_Req;
 
@@ -6423,7 +6555,7 @@ RESTAPI::XSLT_Policy_Rule_Move_Req *RESTAPI::parse_uri_xslt_policy_rule_move_req
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete_req(const std::string& uri)
+RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete_req(const std::string& uri, std::string&)
 {
     XSLT_Policy_Rule_Delete_Req *req = new XSLT_Policy_Rule_Delete_Req;
 
@@ -6478,19 +6610,22 @@ RESTAPI::XSLT_Policy_Rule_Delete_Req *RESTAPI::parse_uri_xslt_policy_rule_delete
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Get_Plugins_Res *RESTAPI::parse_mediaconch_get_plugins_res(const std::string& data)
+RESTAPI::MediaConch_Get_Plugins_Res *RESTAPI::parse_mediaconch_get_plugins_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_GET_PLUGINS_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_GET_PLUGINS_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *plugins = model->get_value_by_key(*child, "plugins");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
@@ -6501,11 +6636,16 @@ RESTAPI::MediaConch_Get_Plugins_Res *RESTAPI::parse_mediaconch_get_plugins_res(c
     {
         if (nok->type != Container::Value::CONTAINER_TYPE_OBJECT)
         {
+            err = "nok field has not the correct type";
             delete res;
             return NULL;
         }
 
-        parse_mediaconch_nok(nok, &res->nok);
+        if (parse_mediaconch_nok(nok, &res->nok, err))
+        {
+            delete res;
+            return NULL;
+        }
     }
     else if (plugins && plugins->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
@@ -6513,6 +6653,7 @@ RESTAPI::MediaConch_Get_Plugins_Res *RESTAPI::parse_mediaconch_get_plugins_res(c
         {
             if (plugins->array[i].type != Container::Value::CONTAINER_TYPE_STRING)
             {
+                err = "plugins field has not the correct type";
                 delete res;
                 return NULL;
             }
@@ -6530,19 +6671,22 @@ RESTAPI::MediaConch_Get_Plugins_Res *RESTAPI::parse_mediaconch_get_plugins_res(c
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Watch_Folder_Res *RESTAPI::parse_mediaconch_watch_folder_res(const std::string& data)
+RESTAPI::MediaConch_Watch_Folder_Res *RESTAPI::parse_mediaconch_watch_folder_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_WATCH_FOLDER_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_WATCH_FOLDER_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *user = model->get_value_by_key(*child, "user");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
@@ -6553,16 +6697,22 @@ RESTAPI::MediaConch_Watch_Folder_Res *RESTAPI::parse_mediaconch_watch_folder_res
     {
         if (nok->type != Container::Value::CONTAINER_TYPE_OBJECT)
         {
+            err = "nok field has not the correct type";
             delete res;
             return NULL;
         }
 
-        parse_mediaconch_nok(nok, &res->nok);
+        if (parse_mediaconch_nok(nok, &res->nok, err))
+        {
+            delete res;
+            return NULL;
+        }
     }
     else if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         res->user = user->l;
     else
     {
+        err = "Missing user field in the result";
         delete res;
         return NULL;
     }
@@ -6571,19 +6721,22 @@ RESTAPI::MediaConch_Watch_Folder_Res *RESTAPI::parse_mediaconch_watch_folder_res
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_List_Watch_Folders_Res *RESTAPI::parse_mediaconch_list_watch_folders_res(const std::string& data)
+RESTAPI::MediaConch_List_Watch_Folders_Res *RESTAPI::parse_mediaconch_list_watch_folders_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_LIST_WATCH_FOLDERS_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_LIST_WATCH_FOLDERS_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *folders = model->get_value_by_key(*child, "folders");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
@@ -6594,11 +6747,16 @@ RESTAPI::MediaConch_List_Watch_Folders_Res *RESTAPI::parse_mediaconch_list_watch
     {
         if (nok->type != Container::Value::CONTAINER_TYPE_OBJECT)
         {
+            err = "nok field has not the correct type";
             delete res;
             return NULL;
         }
 
-        parse_mediaconch_nok(nok, &res->nok);
+        if (parse_mediaconch_nok(nok, &res->nok, err))
+        {
+            delete res;
+            return NULL;
+        }
     }
     else if (folders && folders->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
@@ -6618,19 +6776,22 @@ RESTAPI::MediaConch_List_Watch_Folders_Res *RESTAPI::parse_mediaconch_list_watch
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Edit_Watch_Folder_Res *RESTAPI::parse_mediaconch_edit_watch_folder_res(const std::string& data)
+RESTAPI::MediaConch_Edit_Watch_Folder_Res *RESTAPI::parse_mediaconch_edit_watch_folder_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_EDIT_WATCH_FOLDER_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_EDIT_WATCH_FOLDER_RESULT in the result";
         return NULL;
+    }
 
     MediaConch_Edit_Watch_Folder_Res *res = new MediaConch_Edit_Watch_Folder_Res;
 
@@ -6639,29 +6800,38 @@ RESTAPI::MediaConch_Edit_Watch_Folder_Res *RESTAPI::parse_mediaconch_edit_watch_
     {
         if (nok->type != Container::Value::CONTAINER_TYPE_OBJECT)
         {
+            err = "nok field has not the correct type";
             delete res;
             return NULL;
         }
 
-        parse_mediaconch_nok(nok, &res->nok);
+        if (parse_mediaconch_nok(nok, &res->nok, err))
+        {
+            delete res;
+            return NULL;
+        }
     }
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::MediaConch_Remove_Watch_Folder_Res *RESTAPI::parse_mediaconch_remove_watch_folder_res(const std::string& data)
+RESTAPI::MediaConch_Remove_Watch_Folder_Res *RESTAPI::parse_mediaconch_remove_watch_folder_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "MEDIACONCH_REMOVE_WATCH_FOLDER_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing MEDIACONCH_REMOVE_WATCH_FOLDER_RESULT in the result";
+        return NULL;
+    }
         return NULL;
 
     MediaConch_Remove_Watch_Folder_Res *res = new MediaConch_Remove_Watch_Folder_Res;
@@ -6671,30 +6841,38 @@ RESTAPI::MediaConch_Remove_Watch_Folder_Res *RESTAPI::parse_mediaconch_remove_wa
     {
         if (nok->type != Container::Value::CONTAINER_TYPE_OBJECT)
         {
+            err = "nok field has not the correct type";
             delete res;
             return NULL;
         }
 
-        parse_mediaconch_nok(nok, &res->nok);
+        if (parse_mediaconch_nok(nok, &res->nok, err))
+        {
+            delete res;
+            return NULL;
+        }
     }
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data)
+RESTAPI::Checker_Analyze_Res *RESTAPI::parse_checker_analyze_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_ANALYZE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_ANALYZE_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *ok, *nok;
     ok = model->get_value_by_key(*child, "ok");
@@ -6702,7 +6880,7 @@ RESTAPI::Checker_Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data
 
     Checker_Analyze_Res *res = new Checker_Analyze_Res;
 
-    if (ok && parse_analyze_ok(ok, res->ok))
+    if (ok && parse_checker_analyze_ok(ok, res->ok, err))
     {
         delete res;
         return NULL;
@@ -6713,15 +6891,16 @@ RESTAPI::Checker_Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data
 
     if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
     {
+        err = "nok field has not the correct type";
         delete res;
         return NULL;
     }
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Checker_Analyze_Nok *tmp = new Checker_Analyze_Nok;
+        MediaConch_Nok *tmp = NULL;
 
-        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
+        if (parse_mediaconch_nok(&nok->array[i], &tmp, err))
         {
             delete res;
             return NULL;
@@ -6732,29 +6911,35 @@ RESTAPI::Checker_Analyze_Res *RESTAPI::parse_analyze_res(const std::string& data
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Status_Res *RESTAPI::parse_status_res(const std::string& data)
+RESTAPI::Checker_Status_Res *RESTAPI::parse_checker_status_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_STATUS_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_STATUS_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *ok, *nok;
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
     Checker_Status_Res *res = new Checker_Status_Res;
-    if (ok && parse_status_ok(ok, res->ok))
+    if (ok)
     {
-        delete res;
-        return NULL;
+        if (parse_checker_status_ok(ok, res->ok, err))
+        {
+            delete res;
+            return NULL;
+        }
     }
 
     if (!nok)
@@ -6762,15 +6947,16 @@ RESTAPI::Checker_Status_Res *RESTAPI::parse_status_res(const std::string& data)
 
     if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
     {
+        err = "nok field has not the correct type";
         delete res;
         return NULL;
     }
 
     for (size_t i = 0; i < nok->array.size(); ++i)
     {
-        Checker_Status_Nok *tmp = new Checker_Status_Nok;
+        MediaConch_Nok *tmp = NULL;
 
-        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
+        if (parse_mediaconch_nok(&nok->array[i], &tmp, err))
         {
             delete res;
             return NULL;
@@ -6781,131 +6967,65 @@ RESTAPI::Checker_Status_Res *RESTAPI::parse_status_res(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Report_Res *RESTAPI::parse_report_res(const std::string& data)
+RESTAPI::Checker_Report_Res *RESTAPI::parse_checker_report_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_REPORT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_REPORT_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *ok, *nok;
     ok = model->get_value_by_key(*child, "ok");
     nok = model->get_value_by_key(*child, "nok");
 
     Checker_Report_Res *res = new Checker_Report_Res;
-    if (ok && parse_report_ok(ok, res->ok))
-    {
-        delete res;
-        return NULL;
-    }
-
-    if (!nok)
-        return res;
-
-    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
-    {
-        delete res;
-        return NULL;
-    }
-
-    for (size_t i = 0; i < nok->array.size(); ++i)
-    {
-        Checker_Report_Nok *tmp = new Checker_Report_Nok;
-
-        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
-        {
-            delete res;
-            return NULL;
-        }
-        res->nok.push_back(tmp);
-    }
-    return res;
-}
-
-//---------------------------------------------------------------------------
-RESTAPI::Checker_Retry_Res *RESTAPI::parse_retry_res(const std::string& data)
-{
-    Container::Value v, *child;
-
-    if (model->parse(data, v))
-    {
-        error = model->get_error();
-        return NULL;
-    }
-
-    child = model->get_value_by_key(v, "CHECKER_RETRY_RESULT");
-    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
-        return NULL;
-
-    Container::Value *ok, *nok;
-    ok = model->get_value_by_key(*child, "ok");
-    nok = model->get_value_by_key(*child, "nok");
-
-    Checker_Retry_Res *res = new Checker_Retry_Res;
     if (ok)
     {
-        if (ok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        if (parse_checker_report_ok(ok, &res->ok, err) < 0)
         {
             delete res;
             return NULL;
         }
-        for (size_t i = 0; i < ok->array.size(); ++i)
-        {
-            Container::Value *tmp = &ok->array[i];
-
-            if (tmp->type != Container::Value::CONTAINER_TYPE_INTEGER)
-            {
-                delete res;
-                return NULL;
-            }
-            res->ok.push_back(tmp->l);
-        }
     }
 
-    if (!nok)
-        return res;
-
-    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    if (nok)
     {
-        delete res;
-        return NULL;
-    }
-
-    for (size_t i = 0; i < nok->array.size(); ++i)
-    {
-        Checker_Retry_Nok *tmp = new Checker_Retry_Nok;
-
-        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
+        if (parse_mediaconch_nok(nok, &res->nok, err))
         {
             delete res;
             return NULL;
         }
-        res->nok.push_back(tmp);
     }
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
+RESTAPI::Checker_Clear_Res *RESTAPI::parse_checker_clear_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_CLEAR_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_CLEAR_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *ok, *nok;
     ok = model->get_value_by_key(*child, "ok");
@@ -6916,6 +7036,7 @@ RESTAPI::Checker_Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
     {
         if (ok->type != Container::Value::CONTAINER_TYPE_ARRAY)
         {
+            err = "oks field has not the correct type";
             delete res;
             return NULL;
         }
@@ -6925,6 +7046,7 @@ RESTAPI::Checker_Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
 
             if (tmp->type != Container::Value::CONTAINER_TYPE_INTEGER)
             {
+                err = "ok field has not the correct type";
                 delete res;
                 return NULL;
             }
@@ -6932,308 +7054,426 @@ RESTAPI::Checker_Clear_Res *RESTAPI::parse_clear_res(const std::string& data)
         }
     }
 
-    if (!nok)
-        return res;
-
-    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    if (nok)
     {
-        delete res;
-        return NULL;
-    }
-
-    for (size_t i = 0; i < nok->array.size(); ++i)
-    {
-        Checker_Clear_Nok *tmp = new Checker_Clear_Nok;
-
-        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
+        if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
         {
+            err = "nok field has not the correct type";
             delete res;
             return NULL;
         }
-        res->nok.push_back(tmp);
+
+        for (size_t i = 0; i < nok->array.size(); ++i)
+        {
+            MediaConch_Nok *tmp = NULL;
+            if (parse_mediaconch_nok(&nok->array[i], &tmp, err) < 0)
+            {
+                delete res;
+                return NULL;
+            }
+            res->nok.push_back(tmp);
+        }
     }
+
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_List_Res *RESTAPI::parse_list_res(const std::string& data)
+RESTAPI::Checker_List_Res *RESTAPI::parse_checker_list_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_LIST_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
-        return NULL;
-
-    Container::Value *files;
-    files = model->get_value_by_key(*child, "files");
-
-    Checker_List_Res *res = new Checker_List_Res;
-    if (files->type != Container::Value::CONTAINER_TYPE_ARRAY)
     {
-        delete res;
+        err = "Missing CHECKER_LIST_RESULT in the result";
         return NULL;
     }
 
-    for (size_t i = 0; i < files->array.size(); ++i)
-    {
-        Checker_List_File *tmp = new Checker_List_File;
+    Container::Value *files = model->get_value_by_key(*child, "files");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
 
-        if (parse_list_file(&files->array[i], tmp->file, tmp->id))
+    Checker_List_Res *res = new Checker_List_Res;
+    if (nok)
+    {
+        if (parse_mediaconch_nok(nok, &res->nok, err) < 0)
         {
             delete res;
             return NULL;
         }
-        res->files.push_back(tmp);
     }
+    else if (files && files->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < files->array.size(); ++i)
+        {
+            Checker_List_File *tmp = new Checker_List_File;
+
+            if (parse_checker_list_file(&files->array[i], tmp->file, tmp->id, err))
+            {
+                delete res;
+                return NULL;
+            }
+            res->files.push_back(tmp);
+        }
+    }
+    else
+    {
+        err = "checker list result is not correct";
+        delete res;
+        return NULL;
+    }
+
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Validate_Res *RESTAPI::parse_validate_res(const std::string& data)
+RESTAPI::Checker_Validate_Res *RESTAPI::parse_checker_validate_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_VALIDATE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_VALIDATE_RESULT in the result";
         return NULL;
+    }
 
-    Container::Value *ok, *nok;
-    ok = model->get_value_by_key(*child, "ok");
-    nok = model->get_value_by_key(*child, "nok");
+    Container::Value *ok = model->get_value_by_key(*child, "ok");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
 
     Checker_Validate_Res *res = new Checker_Validate_Res;
-    if (ok && parse_validate_ok(ok, res->ok))
+    if (ok)
     {
-        delete res;
-        return NULL;
-    }
-
-    if (!nok)
-        return res;
-
-    if (nok->type != Container::Value::CONTAINER_TYPE_ARRAY)
-    {
-        delete res;
-        return NULL;
-    }
-
-    for (size_t i = 0; i < nok->array.size(); ++i)
-    {
-        Checker_Validate_Nok *tmp = new Checker_Validate_Nok;
-
-        if (parse_generic_nok(&nok->array[i], tmp->id, tmp->error))
+        if (parse_checker_validate_ok(ok, res->ok, err) < 0)
         {
             delete res;
             return NULL;
         }
-        res->nok.push_back(tmp);
     }
+    else if (nok)
+    {
+        if (parse_mediaconch_nok(nok, &res->nok, err))
+        {
+            delete res;
+            return NULL;
+        }
+    }
+    else
+    {
+        err = "Malformed checker validate result.";
+        delete res;
+        return NULL;
+    }
+
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_File_From_Id_Res *RESTAPI::parse_file_from_id_res(const std::string& data)
+RESTAPI::Checker_File_From_Id_Res *RESTAPI::parse_checker_file_from_id_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_FILE_FROM_ID_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_FILE_FROM_ID_RESULT in the result";
         return NULL;
-
-    Container::Value *file;
-    file = model->get_value_by_key(*child, "file");
-
-    if (!file || file->type != Container::Value::CONTAINER_TYPE_STRING)
-        return NULL;
+    }
 
     Checker_File_From_Id_Res *res = new Checker_File_From_Id_Res;
-    res->file = file->s;
+    Container::Value *file = model->get_value_by_key(*child, "file");
+    Container::Value *nok = model->get_value_by_key(*child, "file");
+
+    if (nok)
+    {
+        if (parse_mediaconch_nok(nok, &res->nok, err) < 0)
+        {
+            delete res;
+            return NULL;
+        }
+    }
+    else if (file)
+    {
+        if (file->type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            err = "file field has not the correct type in the result.";
+            delete res;
+            return NULL;
+        }
+        res->file = file->s;
+    }
+    else
+    {
+        err = "Missing file field in the result";
+        delete res;
+        return NULL;
+    }
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_Id_From_Filename_Res *RESTAPI::parse_id_from_filename_res(const std::string& data)
+RESTAPI::Checker_Id_From_Filename_Res *RESTAPI::parse_checker_id_from_filename_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_ID_FROM_FILENAME_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_ID_FROM_FILENAME_RESULT in the result";
         return NULL;
-
-    Container::Value *id;
-    id = model->get_value_by_key(*child, "id");
-
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
+    }
 
     Checker_Id_From_Filename_Res *res = new Checker_Id_From_Filename_Res;
-    res->id = id->l;
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+
+    if (nok)
+    {
+        if (parse_mediaconch_nok(nok, &res->nok, err))
+        {
+            delete res;
+            return NULL;
+        }
+    }
+    else if (id)
+    {
+        if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            delete res;
+            err = "id field has not the correct type in the result.";
+            return NULL;
+        }
+        res->id = id->l;
+    }
+    else
+    {
+        delete res;
+        err = "Missing id field in the result";
+        return NULL;
+    }
+
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Checker_File_Information_Res *RESTAPI::parse_file_information_res(const std::string& data)
+RESTAPI::Checker_File_Information_Res *RESTAPI::parse_checker_file_information_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "CHECKER_FILE_INFORMATION_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
-        return NULL;
-
-    Container::Value *filename = model->get_value_by_key(*child, "filename");
-    if (!filename || filename->type != Container::Value::CONTAINER_TYPE_STRING)
-        return NULL;
-
-    Checker_File_Information_Res *res = new Checker_File_Information_Res;
-    res->filename = filename->s;
-
-    Container::Value *file_last_modification = model->get_value_by_key(*child, "file_last_modification");
-    if (file_last_modification && file_last_modification->type == Container::Value::CONTAINER_TYPE_STRING)
-        res->file_last_modification = file_last_modification->s;
-
-    Container::Value *generated_id = model->get_value_by_key(*child, "generated_id");
-    if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        res->generated_id = generated_id->l;
-
-    Container::Value *source_id = model->get_value_by_key(*child, "source_id");
-    if (source_id && source_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        res->source_id = source_id->l;
-
-    Container::Value *generated_time = model->get_value_by_key(*child, "generated_time");
-    if (generated_time && generated_time->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        res->generated_time = generated_time->l;
-
-    Container::Value *generated_log = model->get_value_by_key(*child, "generated_log");
-    if (generated_log && generated_log->type == Container::Value::CONTAINER_TYPE_STRING)
-        res->generated_log = generated_log->s;
-
-    Container::Value *generated_error_log = model->get_value_by_key(*child, "generated_error_log");
-    if (generated_error_log && generated_error_log->type == Container::Value::CONTAINER_TYPE_STRING)
-        res->generated_error_log = generated_error_log->s;
-
-    Container::Value *options = model->get_value_by_key(*child, "options");
-    if (options && options->type == Container::Value::CONTAINER_TYPE_ARRAY)
     {
-        for (size_t i = 0; i < options->array.size(); ++i)
-        {
-            if (options->array[i].type == Container::Value::CONTAINER_TYPE_OBJECT)
-            {
-                std::map<std::string, Container::Value>::iterator it = options->array[i].obj.begin();
-                for (; it != options->array[i].obj.end(); ++it)
-                    if (it->second.type == Container::Value::CONTAINER_TYPE_STRING)
-                        res->options.push_back(std::make_pair(it->first, it->second.s));
-            }
-        }
+        err = "Missing CHECKER_FILE_INFORMATION_RESULT in the result";
+        return NULL;
     }
 
-    Container::Value *analyzed = model->get_value_by_key(*child, "analyzed");
-    if (analyzed && analyzed->type == Container::Value::CONTAINER_TYPE_BOOL)
-        res->analyzed = analyzed->b;
+    Checker_File_Information_Res *res = new Checker_File_Information_Res;
 
-    Container::Value *has_error = model->get_value_by_key(*child, "has_error");
-    if (has_error && has_error->type == Container::Value::CONTAINER_TYPE_BOOL)
-        res->has_error = has_error->b;
-
-    if (res->has_error)
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    Container::Value *filename = model->get_value_by_key(*child, "filename");
+    if (nok)
     {
-        Container::Value *error_log = model->get_value_by_key(*child, "error_log");
-        if (error_log && error_log->type == Container::Value::CONTAINER_TYPE_STRING)
-            res->error_log = error_log->s;
+        if (parse_mediaconch_nok(nok, &res->nok, err) < 0)
+        {
+            delete res;
+            return NULL;
+        }
+    }
+    else if (filename)
+    {
+        if (filename->type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            err = "filename field type is not correct in the result.";
+            delete res;
+            return NULL;
+        }
+        res->filename = filename->s;
+
+        Container::Value *file_last_modification = model->get_value_by_key(*child, "file_last_modification");
+        if (file_last_modification && file_last_modification->type == Container::Value::CONTAINER_TYPE_STRING)
+            res->file_last_modification = file_last_modification->s;
+
+        Container::Value *generated_id = model->get_value_by_key(*child, "generated_id");
+        if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            res->generated_id = generated_id->l;
+
+        Container::Value *source_id = model->get_value_by_key(*child, "source_id");
+        if (source_id && source_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            res->source_id = source_id->l;
+
+        Container::Value *generated_time = model->get_value_by_key(*child, "generated_time");
+        if (generated_time && generated_time->type == Container::Value::CONTAINER_TYPE_INTEGER)
+            res->generated_time = generated_time->l;
+
+        Container::Value *generated_log = model->get_value_by_key(*child, "generated_log");
+        if (generated_log && generated_log->type == Container::Value::CONTAINER_TYPE_STRING)
+            res->generated_log = generated_log->s;
+
+        Container::Value *generated_error_log = model->get_value_by_key(*child, "generated_error_log");
+        if (generated_error_log && generated_error_log->type == Container::Value::CONTAINER_TYPE_STRING)
+            res->generated_error_log = generated_error_log->s;
+
+        Container::Value *options = model->get_value_by_key(*child, "options");
+        if (options && options->type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t i = 0; i < options->array.size(); ++i)
+            {
+                if (options->array[i].type == Container::Value::CONTAINER_TYPE_OBJECT)
+                {
+                    std::map<std::string, Container::Value>::iterator it = options->array[i].obj.begin();
+                    for (; it != options->array[i].obj.end(); ++it)
+                        if (it->second.type == Container::Value::CONTAINER_TYPE_STRING)
+                            res->options.push_back(std::make_pair(it->first, it->second.s));
+                }
+            }
+        }
+
+        Container::Value *analyzed = model->get_value_by_key(*child, "analyzed");
+        if (analyzed && analyzed->type == Container::Value::CONTAINER_TYPE_BOOL)
+            res->analyzed = analyzed->b;
+
+        Container::Value *has_error = model->get_value_by_key(*child, "has_error");
+        if (has_error && has_error->type == Container::Value::CONTAINER_TYPE_BOOL)
+            res->has_error = has_error->b;
+
+        if (res->has_error)
+        {
+            Container::Value *error_log = model->get_value_by_key(*child, "error_log");
+            if (error_log && error_log->type == Container::Value::CONTAINER_TYPE_STRING)
+                res->error_log = error_log->s;
+        }
+    }
+    else
+    {
+        err = "Missing filename field in the result.";
+        delete res;
+        return NULL;
     }
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Default_Values_For_Type_Res *RESTAPI::parse_default_values_for_type_res(const std::string& data)
+RESTAPI::Default_Values_For_Type_Res *RESTAPI::parse_default_values_for_type_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "DEFAULT_VALUES_FOR_TYPE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing DEFAULT_VALUES_FOR_TYPE_RESULT in the result";
         return NULL;
-
-    Container::Value *values;
-    values = model->get_value_by_key(*child, "values");
-
-    if (!values || values->type != Container::Value::CONTAINER_TYPE_ARRAY)
-        return NULL;
+    }
 
     Default_Values_For_Type_Res *res = new Default_Values_For_Type_Res;
-    for (size_t i = 0; i < values->array.size(); ++i)
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    Container::Value *values = model->get_value_by_key(*child, "values");
+    if (nok)
     {
-        if (values->array[i].type != Container::Value::CONTAINER_TYPE_STRING)
-            continue;
-
-        res->values.push_back(values->array[i].s);
+        if (parse_mediaconch_nok(nok, &res->nok, err) < 0)
+        {
+            delete res;
+            return NULL;
+        }
     }
+    else if (values)
+    {
+        if (values->type != Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            err = "values field type is not correct in the result";
+            delete res;
+            return NULL;
+        }
+
+        for (size_t i = 0; i < values->array.size(); ++i)
+        {
+            if (values->array[i].type != Container::Value::CONTAINER_TYPE_STRING)
+                continue;
+
+            res->values.push_back(values->array[i].s);
+        }
+    }
+    else
+    {
+        err = "Missing values field in the result";
+        delete res;
+        return NULL;
+    }
+
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Create_Res *RESTAPI::parse_xslt_policy_create_res(const std::string& data)
+RESTAPI::XSLT_Policy_Create_Res *RESTAPI::parse_xslt_policy_create_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_CREATE_RESULT in the result";
         return NULL;
-
-    Container::Value *id = model->get_value_by_key(*child, "id");
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
+    }
 
     XSLT_Policy_Create_Res *res = new XSLT_Policy_Create_Res;
-    res->id = id->l;
 
+    Container::Value *id = model->get_value_by_key(*child, "id");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
+        delete res;
+        return NULL;
+    }
+    else if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->id = id->l;
+    else
+    {
+        err = "Missing id field in the result";
         delete res;
         return NULL;
     }
@@ -7242,30 +7482,37 @@ RESTAPI::XSLT_Policy_Create_Res *RESTAPI::parse_xslt_policy_create_res(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Import_Res *RESTAPI::parse_policy_import_res(const std::string& data)
+RESTAPI::Policy_Import_Res *RESTAPI::parse_policy_import_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_IMPORT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_IMPORT_RESULT in the result";
         return NULL;
-
-    Container::Value *id = model->get_value_by_key(*child, "id");
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
+    }
 
     Policy_Import_Res *res = new Policy_Import_Res;
-    res->id = id->l;
 
+    Container::Value *id = model->get_value_by_key(*child, "id");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
+        delete res;
+        return NULL;
+    }
+    else if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->id = id->l;
+    else
+    {
+        err = "Missing id field in the result";
         delete res;
         return NULL;
     }
@@ -7274,24 +7521,27 @@ RESTAPI::Policy_Import_Res *RESTAPI::parse_policy_import_res(const std::string& 
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Remove_Res *RESTAPI::parse_policy_remove_res(const std::string& data)
+RESTAPI::Policy_Remove_Res *RESTAPI::parse_policy_remove_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_REMOVE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_REMOVE_RESULT in the result";
         return NULL;
+    }
 
     Policy_Remove_Res *res = new Policy_Remove_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
@@ -7301,30 +7551,37 @@ RESTAPI::Policy_Remove_Res *RESTAPI::parse_policy_remove_res(const std::string& 
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Dump_Res *RESTAPI::parse_policy_dump_res(const std::string& data)
+RESTAPI::Policy_Dump_Res *RESTAPI::parse_policy_dump_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_DUMP_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_DUMP_RESULT in the result";
         return NULL;
-
-    Container::Value *xml = model->get_value_by_key(*child, "xml");
-    if (!xml || xml->type != Container::Value::CONTAINER_TYPE_STRING)
-        return NULL;
+    }
 
     Policy_Dump_Res *res = new Policy_Dump_Res;
-    res->xml = xml->s;
 
+    Container::Value *xml = model->get_value_by_key(*child, "xml");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
+        delete res;
+        return NULL;
+    }
+    else if (xml && xml->type == Container::Value::CONTAINER_TYPE_STRING)
+        res->xml = xml->s;
+    else
+    {
+        err = "Missing xml field in the result";
         delete res;
         return NULL;
     }
@@ -7333,24 +7590,27 @@ RESTAPI::Policy_Dump_Res *RESTAPI::parse_policy_dump_res(const std::string& data
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Save_Res *RESTAPI::parse_policy_save_res(const std::string& data)
+RESTAPI::Policy_Save_Res *RESTAPI::parse_policy_save_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_SAVE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_SAVE_RESULT in the result";
         return NULL;
+    }
 
     Policy_Save_Res *res = new Policy_Save_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
@@ -7360,30 +7620,37 @@ RESTAPI::Policy_Save_Res *RESTAPI::parse_policy_save_res(const std::string& data
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::string& data)
+RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_DUPLICATE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_DUPLICATE_RESULT in the result";
         return NULL;
-
-    Container::Value *id = model->get_value_by_key(*child, "id");
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
+    }
 
     Policy_Duplicate_Res *res = new Policy_Duplicate_Res;
-    res->id = id->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    Container::Value *id = model->get_value_by_key(*child, "id");
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
+        delete res;
+        return NULL;
+    }
+    else if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->id = id->l;
+    else
+    {
+        err = "Missing id field in the result";
         delete res;
         return NULL;
     }
@@ -7392,30 +7659,37 @@ RESTAPI::Policy_Duplicate_Res *RESTAPI::parse_policy_duplicate_res(const std::st
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Move_Res *RESTAPI::parse_policy_move_res(const std::string& data)
+RESTAPI::Policy_Move_Res *RESTAPI::parse_policy_move_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_MOVE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_MOVE_RESULT in the result";
         return NULL;
-
-    Container::Value *id = model->get_value_by_key(*child, "id");
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
+    }
 
     Policy_Move_Res *res = new Policy_Move_Res;
-    res->id = id->l;
 
+    Container::Value *id = model->get_value_by_key(*child, "id");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
+        delete res;
+        return NULL;
+    }
+    if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->id = id->l;
+    else
+    {
+        err = "Missing id field in the result";
         delete res;
         return NULL;
     }
@@ -7424,24 +7698,27 @@ RESTAPI::Policy_Move_Res *RESTAPI::parse_policy_move_res(const std::string& data
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Info_Res *RESTAPI::parse_policy_change_info_res(const std::string& data)
+RESTAPI::Policy_Change_Info_Res *RESTAPI::parse_policy_change_info_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CHANGE_INFO_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CHANGE_INFO_RESULT in the result";
         return NULL;
+    }
 
     Policy_Change_Info_Res *res = new Policy_Change_Info_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
@@ -7451,24 +7728,27 @@ RESTAPI::Policy_Change_Info_Res *RESTAPI::parse_policy_change_info_res(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Type_Res *RESTAPI::parse_policy_change_type_res(const std::string& data)
+RESTAPI::Policy_Change_Type_Res *RESTAPI::parse_policy_change_type_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CHANGE_TYPE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CHANGE_TYPE_RESULT in the result";
         return NULL;
+    }
 
     Policy_Change_Type_Res *res = new Policy_Change_Type_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
@@ -7478,24 +7758,27 @@ RESTAPI::Policy_Change_Type_Res *RESTAPI::parse_policy_change_type_res(const std
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Change_Is_Public_Res *RESTAPI::parse_policy_change_is_public_res(const std::string& data)
+RESTAPI::Policy_Change_Is_Public_Res *RESTAPI::parse_policy_change_is_public_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CHANGE_IS_PUBLIC_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CHANGE_IS_PUBLIC_RESULT in the result";
         return NULL;
+    }
 
     Policy_Change_Is_Public_Res *res = new Policy_Change_Is_Public_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
@@ -7505,19 +7788,22 @@ RESTAPI::Policy_Change_Is_Public_Res *RESTAPI::parse_policy_change_is_public_res
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
+RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_RESULT");
     if (!child)
+    {
+        err = "Missing POLICY_GET_RESULT in the result";
         return NULL;
+    }
 
     Policy_Get_Res *res = NULL;
 
@@ -7528,18 +7814,19 @@ RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
 
         res = new Policy_Get_Res;
 
-        if (nok && parse_policy_nok(nok, &res->nok) < 0)
+        if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
         {
             delete res;
             return NULL;
         }
-        else if (policy && (res->policy = parse_a_policy(policy)) == NULL)
+        else if (policy && (res->policy = parse_a_policy(policy, err)) == NULL)
         {
             delete res;
             return NULL;
         }
         else
         {
+            err = "Policy get result is not correct";
             delete res;
             return NULL;
         }
@@ -7549,36 +7836,47 @@ RESTAPI::Policy_Get_Res *RESTAPI::parse_policy_get_res(const std::string& data)
         res = new Policy_Get_Res;
         res->policyTree = child->s;
     }
+    else
+    {
+        err = "Policy get result is not correct";
+        return NULL;
+    }
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Name_Res *RESTAPI::parse_policy_get_name_res(const std::string& data)
+RESTAPI::Policy_Get_Name_Res *RESTAPI::parse_policy_get_name_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_NAME_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_NAME_RESULT in the result";
         return NULL;
-
-    Container::Value *name = model->get_value_by_key(*child, "name");
-    if (!name || name->type != Container::Value::CONTAINER_TYPE_STRING)
-        return NULL;
+    }
 
     Policy_Get_Name_Res *res = new Policy_Get_Name_Res;
-    res->name = name->s;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    Container::Value *name = model->get_value_by_key(*child, "name");
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
+        return NULL;
+    }
+    else if (name && name->type == Container::Value::CONTAINER_TYPE_STRING)
+        res->name = name->s;
+    else
+    {
+        err = "Missing name field in the result";
         return NULL;
     }
 
@@ -7586,30 +7884,37 @@ RESTAPI::Policy_Get_Name_Res *RESTAPI::parse_policy_get_name_res(const std::stri
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Count_Res *RESTAPI::parse_policy_get_policies_count_res(const std::string& data)
+RESTAPI::Policy_Get_Policies_Count_Res *RESTAPI::parse_policy_get_policies_count_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_POLICIES_COUNT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_POLICIES_COUNT_RESULT in the result";
         return NULL;
-
-    Container::Value *size = model->get_value_by_key(*child, "size");
-    if (!size || size->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
+    }
 
     Policy_Get_Policies_Count_Res *res = new Policy_Get_Policies_Count_Res;
-    res->size = size->l;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    Container::Value *size = model->get_value_by_key(*child, "size");
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
+        delete res;
+        return NULL;
+    }
+    else if (size && size->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->size = size->l;
+    else
+    {
+        err = "Missing size field in the result";
         delete res;
         return NULL;
     }
@@ -7618,24 +7923,27 @@ RESTAPI::Policy_Get_Policies_Count_Res *RESTAPI::parse_policy_get_policies_count
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Clear_Policies_Res *RESTAPI::parse_policy_clear_policies_res(const std::string& data)
+RESTAPI::Policy_Clear_Policies_Res *RESTAPI::parse_policy_clear_policies_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_CLEAR_POLICIES_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_CLEAR_POLICIES_RESULT in the result";
         return NULL;
+    }
 
     Policy_Clear_Policies_Res *res = new Policy_Clear_Policies_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
@@ -7645,19 +7953,22 @@ RESTAPI::Policy_Clear_Policies_Res *RESTAPI::parse_policy_clear_policies_res(con
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const std::string& data)
+RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_POLICIES_RESULT");
     if (!child)
+    {
+        err = "Missing POLICY_GET_POLICIES_RESULT in the result";
         return NULL;
+    }
 
     Policy_Get_Policies_Res *res = NULL;
     if (child->type == Container::Value::CONTAINER_TYPE_OBJECT)
@@ -7666,14 +7977,14 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
         Container::Value *nok = model->get_value_by_key(*child, "nok");
 
         res = new Policy_Get_Policies_Res;
-        if (nok && parse_policy_nok(nok, &res->nok) < 0)
+        if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
         {
             delete res;
             return NULL;
         }
         else if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
         {
-            if (parse_policies_get_policies(policies, res->policies) < 0)
+            if (parse_policies_get_policies(policies, res->policies, err) < 0)
             {
                 delete res;
                 return NULL;
@@ -7681,6 +7992,7 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
         }
         else
         {
+            err = "policy get policies result is not correct";
             delete res;
             return NULL;
         }
@@ -7690,85 +8002,99 @@ RESTAPI::Policy_Get_Policies_Res *RESTAPI::parse_policy_get_policies_res(const s
         res = new Policy_Get_Policies_Res;
         res->policiesTree = child->s;
     }
+    else
+    {
+        err = "policy get policies result is not correct";
+        return NULL;
+    }
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Public_Policies_Res *RESTAPI::parse_policy_get_public_policies_res(const std::string& data)
+RESTAPI::Policy_Get_Public_Policies_Res *RESTAPI::parse_policy_get_public_policies_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_PUBLIC_POLICIES_RESULT");
-    if (!child)
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing POLICY_GET_PUBLIC_POLICIES_RESULT in the result";
         return NULL;
+    }
 
     Policy_Get_Public_Policies_Res *res = NULL;
-    if (child->type == Container::Value::CONTAINER_TYPE_OBJECT)
-    {
-        Container::Value *policies = model->get_value_by_key(*child, "policies");
-        Container::Value *nok = model->get_value_by_key(*child, "nok");
+    Container::Value *policies = model->get_value_by_key(*child, "policies");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
 
-        res = new Policy_Get_Public_Policies_Res;
-        if (nok && parse_policy_nok(nok, &res->nok) < 0)
+    res = new Policy_Get_Public_Policies_Res;
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
+    {
+        delete res;
+        return NULL;
+    }
+    else if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        if (parse_policy_public_policy(policies, res->policies, err) < 0)
         {
             delete res;
             return NULL;
         }
-        else if (policies && policies->type == Container::Value::CONTAINER_TYPE_ARRAY)
-        {
-            if (parse_policy_public_policy(policies, res->policies) < 0)
-            {
-                delete res;
-                return NULL;
-            }
-        }
-        else
-        {
-            delete res;
-            return NULL;
-        }
+    }
+    else
+    {
+        err = "policy get public policies result is not correct";
+        delete res;
+        return NULL;
     }
 
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::Policy_Get_Policies_Names_List_Res *RESTAPI::parse_policy_get_policies_names_list_res(const std::string& data)
+RESTAPI::Policy_Get_Policies_Names_List_Res *RESTAPI::parse_policy_get_policies_names_list_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "POLICY_GET_POLICIES_NAMES_LIST_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
-        return NULL;
-
-    Container::Value *policies = model->get_value_by_key(*child, "policies");
-    if (!policies || policies->type != Container::Value::CONTAINER_TYPE_ARRAY)
-        return NULL;
-
-    Policy_Get_Policies_Names_List_Res *res = new Policy_Get_Policies_Names_List_Res;
-    if (parse_policies_get_policies_names(policies, res->policies) < 0)
     {
-        delete res;
-        return NULL;;
+        err = "Missing POLICY_GET_POLICIES_NAMES_LIST_RESULT in the result";
+        return NULL;
     }
 
+    Policy_Get_Policies_Names_List_Res *res = new Policy_Get_Policies_Names_List_Res;
+
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    Container::Value *policies = model->get_value_by_key(*child, "policies");
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
+        return NULL;
+    }
+    else if (policies && policies->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        if (parse_policies_get_policies_names(policies, res->policies, err) < 0)
+        {
+            delete res;
+            return NULL;
+        }
+    }
+    else
+    {
+        err = "Missing policies field in the result";
         return NULL;
     }
 
@@ -7776,24 +8102,29 @@ RESTAPI::Policy_Get_Policies_Names_List_Res *RESTAPI::parse_policy_get_policies_
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_from_file_res(const std::string& data)
+RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_from_file_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_CREATE_FROM_FILE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_CREATE_FROM_FILE_RESULT in the result";
         return NULL;
+    }
 
     Container::Value *policy_id = model->get_value_by_key(*child, "policy_id");
-
     if (!policy_id || policy_id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "Missing policy_id field in the result";
         return NULL;
+    }
 
     XSLT_Policy_Create_From_File_Res *res = new XSLT_Policy_Create_From_File_Res;
     res->policy_id = policy_id->l;
@@ -7802,57 +8133,67 @@ RESTAPI::XSLT_Policy_Create_From_File_Res *RESTAPI::parse_xslt_policy_create_fro
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Create_Res *RESTAPI::parse_xslt_policy_rule_create_res(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Create_Res *RESTAPI::parse_xslt_policy_rule_create_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_CREATE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_CREATE_RESULT in the result";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Create_Res *res = new XSLT_Policy_Rule_Create_Res;
 
+    Container::Value *id = model->get_value_by_key(*child, "id");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
     }
-
-    if (!nok)
-    {
-        Container::Value *id = model->get_value_by_key(*child, "id");
-        if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+    else if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
             res->id = id->l;
+    else
+    {
+        err = "XSLT policy rule create policies result is not correct";
+        delete res;
+        return NULL;
     }
+
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Get_Res *RESTAPI::parse_xslt_policy_rule_get_res(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Get_Res *RESTAPI::parse_xslt_policy_rule_get_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_GET_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_GET_RESULT in the result";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Get_Res *res = new XSLT_Policy_Rule_Get_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
@@ -7860,13 +8201,7 @@ RESTAPI::XSLT_Policy_Rule_Get_Res *RESTAPI::parse_xslt_policy_rule_get_res(const
     else
     {
         Container::Value *rule = model->get_value_by_key(*child, "rule");
-        if (!rule)
-        {
-            delete res;
-            return NULL;
-        }
-
-        if (parse_xslt_policy_rule(rule, &res->rule) < 0)
+        if (parse_xslt_policy_rule(rule, &res->rule, err) < 0)
         {
             delete res;
             return NULL;
@@ -7877,118 +8212,141 @@ RESTAPI::XSLT_Policy_Rule_Get_Res *RESTAPI::parse_xslt_policy_rule_get_res(const
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Edit_Res *RESTAPI::parse_xslt_policy_rule_edit_res(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Edit_Res *RESTAPI::parse_xslt_policy_rule_edit_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_EDIT_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_EDIT_RESULT in the result";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Edit_Res *res = new XSLT_Policy_Rule_Edit_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
     }
+
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Duplicate_Res *RESTAPI::parse_xslt_policy_rule_duplicate_res(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Duplicate_Res *RESTAPI::parse_xslt_policy_rule_duplicate_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DUPLICATE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_DUPLICATE_RESULT in the result";
         return NULL;
-
-    Container::Value *id = model->get_value_by_key(*child, "id");
-
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
-
-    XSLT_Policy_Rule_Duplicate_Res *res = new XSLT_Policy_Rule_Duplicate_Res;
-    res->id = id->l;
+    }
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    Container::Value *id = model->get_value_by_key(*child, "id");
+
+    XSLT_Policy_Rule_Duplicate_Res *res = new XSLT_Policy_Rule_Duplicate_Res;
+
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
     }
+    else if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->id = id->l;
+    else
+    {
+        err = "Missing id field in the result";
+        delete res;
+        return NULL;
+    }
+
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Move_Res *RESTAPI::parse_xslt_policy_rule_move_res(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Move_Res *RESTAPI::parse_xslt_policy_rule_move_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_MOVE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_MOVE_RESULT in the result";
         return NULL;
-
-    Container::Value *id = model->get_value_by_key(*child, "id");
-
-    if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
-        return NULL;
+    }
 
     XSLT_Policy_Rule_Move_Res *res = new XSLT_Policy_Rule_Move_Res;
-    res->id = id->l;
 
+    Container::Value *id = model->get_value_by_key(*child, "id");
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
     }
+    else if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+        res->id = id->l;
+    else
+    {
+        err = "Missing id in the result";
+        delete res;
+        return NULL;
+    }
+
     return res;
 }
 
 //---------------------------------------------------------------------------
-RESTAPI::XSLT_Policy_Rule_Delete_Res *RESTAPI::parse_xslt_policy_rule_delete_res(const std::string& data)
+RESTAPI::XSLT_Policy_Rule_Delete_Res *RESTAPI::parse_xslt_policy_rule_delete_res(const std::string& data, std::string& err)
 {
     Container::Value v, *child;
 
     if (model->parse(data, v))
     {
-        error = model->get_error();
+        err = model->get_error();
         return NULL;
     }
 
     child = model->get_value_by_key(v, "XSLT_POLICY_RULE_DELETE_RESULT");
     if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing XSLT_POLICY_RULE_DELETE_RESULT in the result";
         return NULL;
+    }
 
     XSLT_Policy_Rule_Delete_Res *res = new XSLT_Policy_Rule_Delete_Res;
 
     Container::Value *nok = model->get_value_by_key(*child, "nok");
-    if (parse_policy_nok(nok, &res->nok) < 0)
+    if (nok && parse_mediaconch_nok(nok, &res->nok, err) < 0)
     {
         delete res;
         return NULL;
     }
+
     return res;
 }
 
@@ -7997,7 +8355,7 @@ RESTAPI::XSLT_Policy_Rule_Delete_Res *RESTAPI::parse_xslt_policy_rule_delete_res
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_mediaconch_nok(MediaConch_Nok* nok)
+Container::Value RESTAPI::serialize_mediaconch_nok(MediaConch_Nok* nok, std::string&)
 {
     Container::Value nok_v, error_v;
 
@@ -8007,11 +8365,19 @@ Container::Value RESTAPI::serialize_mediaconch_nok(MediaConch_Nok* nok)
     error_v.s = nok->error;
     nok_v.obj["error"] = error_v;
 
+    if (nok->id)
+    {
+        Container::Value id;
+        id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+        id.l = *nok->id;
+        nok_v.obj["id"] = id;
+    }
+
     return nok_v;
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg>& args)
+Container::Value RESTAPI::serialize_checker_analyze_args(std::vector<Checker_Analyze_Arg>& args, std::string&)
 {
     Container::Value args_val;
 
@@ -8079,7 +8445,7 @@ Container::Value RESTAPI::serialize_analyze_args(std::vector<Checker_Analyze_Arg
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_ids(std::vector<int>& ids)
+Container::Value RESTAPI::serialize_ids(std::vector<long>& ids, std::string&)
 {
     Container::Value array;
 
@@ -8097,7 +8463,7 @@ Container::Value RESTAPI::serialize_ids(std::vector<int>& ids)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_reports(std::vector<Report>& reports)
+Container::Value RESTAPI::serialize_checker_report_reports(std::vector<Report>& reports, std::string&)
 {
     Container::Value reports_val;
 
@@ -8117,7 +8483,7 @@ Container::Value RESTAPI::serialize_report_reports(std::vector<Report>& reports)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_string(const std::string& reports)
+Container::Value RESTAPI::serialize_checker_report_string(const std::string& reports, std::string&)
 {
     Container::Value str_val;
 
@@ -8128,7 +8494,7 @@ Container::Value RESTAPI::serialize_report_string(const std::string& reports)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_int(int val)
+Container::Value RESTAPI::serialize_checker_report_int(int val, std::string&)
 {
     Container::Value int_val;
 
@@ -8139,7 +8505,7 @@ Container::Value RESTAPI::serialize_report_int(int val)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_arr_str(const std::vector<std::string>& reports)
+Container::Value RESTAPI::serialize_checker_report_arr_str(const std::vector<std::string>& reports, std::string&)
 {
     Container::Value arr_val;
 
@@ -8157,7 +8523,7 @@ Container::Value RESTAPI::serialize_report_arr_str(const std::vector<std::string
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_arr_long_u(const std::vector<size_t>& reports)
+Container::Value RESTAPI::serialize_checker_report_arr_long_u(const std::vector<size_t>& reports, std::string&)
 {
     Container::Value arr_val;
 
@@ -8175,24 +8541,7 @@ Container::Value RESTAPI::serialize_report_arr_long_u(const std::vector<size_t>&
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_generic_nok(int id, Reason error)
-{
-    Container::Value nok, id_v, error_v;
-
-    nok.type = Container::Value::CONTAINER_TYPE_OBJECT;
-
-    id_v.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    id_v.l = id;
-    nok.obj["id"] = id_v;
-
-    error_v.type = Container::Value::CONTAINER_TYPE_STRING;
-    error_v.s = get_Reason_string(error);
-    nok.obj["error"] = error_v;
-    return nok;
-}
-
-//---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_analyze_oks(std::vector<Checker_Analyze_Ok*>& array)
+Container::Value RESTAPI::serialize_checker_analyze_oks(std::vector<Checker_Analyze_Ok*>& array, std::string&)
 {
     Container::Value ok;
 
@@ -8226,7 +8575,7 @@ Container::Value RESTAPI::serialize_analyze_oks(std::vector<Checker_Analyze_Ok*>
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_status_oks(std::vector<Checker_Status_Ok*>& array)
+Container::Value RESTAPI::serialize_checker_status_oks(std::vector<Checker_Status_Ok*>& array, std::string&)
 {
     Container::Value ok;
 
@@ -8295,31 +8644,36 @@ Container::Value RESTAPI::serialize_status_oks(std::vector<Checker_Status_Ok*>& 
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_report_ok(Checker_Report_Ok& obj)
+int RESTAPI::serialize_checker_report_ok(Checker_Report_Ok* obj, Container::Value& ok, std::string& err)
 {
-    Container::Value ok;
+    if (!obj)
+    {
+        err = "report Ok is empty";
+        return -1;
+    }
 
     ok.type = Container::Value::CONTAINER_TYPE_OBJECT;
     Container::Value report, valid;
 
-    if (obj.report.length() > 0)
+    if (obj->report.length() > 0)
     {
         report.type = Container::Value::CONTAINER_TYPE_STRING;
-        report.s = obj.report;
+        report.s = obj->report;
         ok.obj["report"] = report;
     }
 
-    if (obj.has_valid)
+    if (obj->has_valid)
     {
         valid.type = Container::Value::CONTAINER_TYPE_BOOL;
-        valid.b = obj.valid;
+        valid.b = obj->valid;
         ok.obj["valid"] = valid;
     }
-    return ok;
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_list_file(const std::string& filename, int id)
+Container::Value RESTAPI::serialize_checker_list_file(const std::string& filename, int id, std::string&)
 {
     Container::Value file, id_v, filename_v;
 
@@ -8336,7 +8690,7 @@ Container::Value RESTAPI::serialize_list_file(const std::string& filename, int i
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_validate_ok(Checker_Validate_Ok* obj)
+Container::Value RESTAPI::serialize_checker_validate_ok(Checker_Validate_Ok* obj, std::string&)
 {
     Container::Value ok;
     ok.type = Container::Value::CONTAINER_TYPE_OBJECT;
@@ -8358,20 +8712,7 @@ Container::Value RESTAPI::serialize_validate_ok(Checker_Validate_Ok* obj)
 }
 
 //---------------------------------------------------------------------------
-Container::Value RESTAPI::serialize_policy_nok(Policy_Nok* nok)
-{
-    Container::Value nok_v, error_v;
-
-    nok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
-
-    error_v.type = Container::Value::CONTAINER_TYPE_STRING;
-    error_v.s = nok->error;
-    nok_v.obj["error"] = error_v;
-    return nok_v;
-}
-
-//---------------------------------------------------------------------------
-void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v)
+void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v, std::string& err)
 {
     Container::Value id, parent_id, is_system, is_public, kind, type, name, description, license, children;
 
@@ -8421,9 +8762,9 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
     {
         Container::Value v;
         if (policy->children[i].first == 0)
-            serialize_a_policy(policy->children[i].second.policy, v);
+            serialize_a_policy(policy->children[i].second.policy, v, err);
         else if (policy->children[i].first == 1)
-            serialize_a_xslt_policy_rule(policy->children[i].second.rule, v);
+            serialize_a_xslt_policy_rule(policy->children[i].second.rule, v, err);
 
         children.array.push_back(v);
     }
@@ -8431,7 +8772,7 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
 }
 
 //---------------------------------------------------------------------------
-void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v)
+void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v, std::string&)
 {
     Container::Value id, name, tracktype, field, scope, occurrence, ope, value;
 
@@ -8489,7 +8830,8 @@ void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule
 }
 
 //---------------------------------------------------------------------------
-void RESTAPI::serialize_policies_get_policies(const std::vector<MediaConchLib::Policy_Policy *>& policies, Container::Value &p)
+void RESTAPI::serialize_policies_get_policies(const std::vector<MediaConchLib::Policy_Policy *>& policies, Container::Value &p,
+                                              std::string& err)
 {
     p.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < policies.size(); ++i)
@@ -8499,13 +8841,13 @@ void RESTAPI::serialize_policies_get_policies(const std::vector<MediaConchLib::P
         if (!policies[i])
             continue;
 
-        serialize_a_policy(policies[i], ok_v);
+        serialize_a_policy(policies[i], ok_v, err);
         p.array.push_back(ok_v);
     }
 }
 
 //---------------------------------------------------------------------------
-void RESTAPI::serialize_policy_public_policy(const std::vector<Policy_Public_Policy*>& policies, Container::Value &p)
+void RESTAPI::serialize_policy_public_policy(const std::vector<Policy_Public_Policy*>& policies, Container::Value &p, std::string&)
 {
     p.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < policies.size(); ++i)
@@ -8545,7 +8887,7 @@ void RESTAPI::serialize_policy_public_policy(const std::vector<Policy_Public_Pol
 }
 
 //---------------------------------------------------------------------------
-void RESTAPI::serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p)
+void RESTAPI::serialize_policies_get_policies_names(const std::vector<std::pair<int, std::string> >& policies, Container::Value &p, std::string&)
 {
     p.type = Container::Value::CONTAINER_TYPE_ARRAY;
     for (size_t i = 0; i < policies.size(); ++i)
@@ -8567,7 +8909,7 @@ void RESTAPI::serialize_policies_get_policies_names(const std::vector<std::pair<
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_mediaconch_nok(Container::Value *nok_v, RESTAPI::MediaConch_Nok **nok)
+int RESTAPI::parse_mediaconch_nok(Container::Value *nok_v, RESTAPI::MediaConch_Nok **nok, std::string& err)
 {
     if (!nok_v)
     {
@@ -8578,6 +8920,7 @@ int RESTAPI::parse_mediaconch_nok(Container::Value *nok_v, RESTAPI::MediaConch_N
     *nok = new MediaConch_Nok;
     if (nok_v->type != Container::Value::CONTAINER_TYPE_OBJECT)
     {
+        err = "nok has not the correct type ";
         delete *nok;
         *nok = NULL;
         return -1;
@@ -8586,6 +8929,7 @@ int RESTAPI::parse_mediaconch_nok(Container::Value *nok_v, RESTAPI::MediaConch_N
     Container::Value *error = model->get_value_by_key(*nok_v, "error");
     if (!error || error->type != Container::Value::CONTAINER_TYPE_STRING)
     {
+        err = "Missing error field in nok";
         delete *nok;
         *nok = NULL;
         return -1;
@@ -8593,21 +8937,34 @@ int RESTAPI::parse_mediaconch_nok(Container::Value *nok_v, RESTAPI::MediaConch_N
 
     (*nok)->error = error->s;
 
+    Container::Value *id = model->get_value_by_key(*nok_v, "id");
+    if (id && id->type == Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        (*nok)->id = new long;
+        *(*nok)->id = id->l;
+    }
+
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args)
+int RESTAPI::parse_checker_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_Arg>& args, std::string& err)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "checker analyzer args has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < v->array.size(); ++i)
     {
         Container::Value *obj = &v->array[i];
 
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        {
+            err = "checker analyzer arg has not the correct type.";
             return -1;
+        }
 
         Container::Value *file = model->get_value_by_key(*obj, "file");
         Container::Value *user = model->get_value_by_key(*obj, "user");
@@ -8619,7 +8976,10 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
 
         if (!file || !id || file->type != Container::Value::CONTAINER_TYPE_STRING ||
             id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            err = "checker analyzer arg fields are not correct.";
             return -1;
+        }
 
         Checker_Analyze_Arg arg;
         arg.file = file->s;
@@ -8667,17 +9027,23 @@ int RESTAPI::parse_analyze_arg(Container::Value *v, std::vector<Checker_Analyze_
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_report_reports(Container::Value *v, std::vector<Report>& reports)
+int RESTAPI::parse_checker_report_reports(Container::Value *v, std::vector<Report>& reports, std::string& err)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "checker report reports has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < v->array.size(); ++i)
     {
         Container::Value *obj = &v->array[i];
 
         if (obj->type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            err = "checker report report has not the correct type.";
             return -1;
+        }
 
         reports.push_back(string_to_Report(obj->s));
     }
@@ -8686,37 +9052,23 @@ int RESTAPI::parse_report_reports(Container::Value *v, std::vector<Report>& repo
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_generic_nok(Container::Value *v, int& id, Reason& error)
-{
-    if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
-        return -1;
-
-    Container::Value *id_v, *error_v;
-
-    id_v = model->get_value_by_key(*v, "id");
-    error_v = model->get_value_by_key(*v, "error");
-
-    if (!id_v || id_v->type != Container::Value::CONTAINER_TYPE_INTEGER ||
-        !error_v || error_v->type != Container::Value::CONTAINER_TYPE_STRING)
-        return -1;
-
-    id = id_v->l;
-    error = string_to_Reason(error_v->s);
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Checker_Analyze_Ok*>& oks)
+int RESTAPI::parse_checker_analyze_ok(Container::Value *v, std::vector<Checker_Analyze_Ok*>& oks, std::string& err)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "checker analyze oks has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < v->array.size(); ++i)
     {
         Container::Value *obj = &v->array[i];
 
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        {
+            err = "checker analyze ok has not the correct type.";
             return -1;
+        }
 
         Container::Value *inId, *outId, *create;
 
@@ -8726,7 +9078,10 @@ int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Checker_Analyze_O
 
         if (!inId || inId->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !outId || outId->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            err = "checker analyze ok fields are not correct.";
             return -1;
+        }
 
         Checker_Analyze_Ok *ok = new Checker_Analyze_Ok;
         ok->inId = inId->l;
@@ -8741,17 +9096,23 @@ int RESTAPI::parse_analyze_ok(Container::Value *v, std::vector<Checker_Analyze_O
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*>& oks)
+int RESTAPI::parse_checker_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*>& oks, std::string& err)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "checker status oks has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < v->array.size(); ++i)
     {
         Container::Value *obj = &v->array[i];
 
         if (obj->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        {
+            err = "checker status ok has not the correct type.";
             return -1;
+        }
 
         Container::Value *id, *finished, *has_error, *error_log, *done, *tool, *generated_id, *source_id;
 
@@ -8766,7 +9127,10 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*
 
         if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !finished || finished->type != Container::Value::CONTAINER_TYPE_BOOL)
+        {
+            err = "checker status oks fields are not correct.";
             return -1;
+        }
 
         Checker_Status_Ok *ok = new Checker_Status_Ok;
         ok->id = id->l;
@@ -8814,39 +9178,57 @@ int RESTAPI::parse_status_ok(Container::Value *v, std::vector<Checker_Status_Ok*
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_report_ok(Container::Value *v, Checker_Report_Ok& ok)
+int RESTAPI::parse_checker_report_ok(Container::Value *v, Checker_Report_Ok** ok, std::string& err)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "checker report ok has not the correct type.";
         return -1;
+    }
 
     Container::Value *report, *valid;
 
     report = model->get_value_by_key(*v, "report");
     valid = model->get_value_by_key(*v, "valid");
 
+    *ok = new Checker_Report_Ok;
+
     if (report)
     {
         if (report->type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            err = "checker report ok report has not the correct type.";
+            delete *ok;
+            *ok = NULL;
             return -1;
-        ok.report = report->s;
+        }
+        (*ok)->report = report->s;
     }
 
     if (valid)
     {
         if (valid->type != Container::Value::CONTAINER_TYPE_BOOL)
+        {
+            err = "checker report ok valid has not the correct type.";
+            delete *ok;
+            *ok = NULL;
             return -1;
-        ok.has_valid = true;
-        ok.valid = valid->b;
+        }
+        (*ok)->has_valid = true;
+        (*ok)->valid = valid->b;
     }
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_list_file(Container::Value *v, std::string& file, int& id)
+int RESTAPI::parse_checker_list_file(Container::Value *v, std::string& file, long& id, std::string& err)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "checker list has not the correct type.";
         return -1;
+    }
 
     Container::Value *id_v, *file_v;
 
@@ -8855,7 +9237,10 @@ int RESTAPI::parse_list_file(Container::Value *v, std::string& file, int& id)
 
     if (!id_v || id_v->type != Container::Value::CONTAINER_TYPE_INTEGER ||
         !file_v || file_v->type != Container::Value::CONTAINER_TYPE_STRING)
+    {
+        err = "checker list fields are not correct.";
         return -1;
+    }
 
     id = id_v->l;
     file = file_v->s;
@@ -8863,10 +9248,13 @@ int RESTAPI::parse_list_file(Container::Value *v, std::string& file, int& id)
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks)
+int RESTAPI::parse_checker_validate_ok(Container::Value *v, std::vector<Checker_Validate_Ok*>& oks, std::string& err)
 {
     if (v->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "checker validate has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < v->array.size(); ++i)
     {
@@ -8878,14 +9266,20 @@ int RESTAPI::parse_validate_ok(Container::Value *v, std::vector<Checker_Validate
         if (id)
         {
             if (id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+            {
+                err = "checker validate id has not the correct type.";
                 return -1;
+            }
             ok->id = id->l;
         }
 
         if (valid)
         {
             if (valid->type != Container::Value::CONTAINER_TYPE_BOOL)
+            {
+                err = "checker validate valid has not the correct type.";
                 return -1;
+            }
             ok->valid = valid->b;
         }
         oks.push_back(ok);
@@ -8895,41 +9289,17 @@ int RESTAPI::parse_validate_ok(Container::Value *v, std::vector<Checker_Validate
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_policy_nok(Container::Value *nok_v, RESTAPI::Policy_Nok **nok)
-{
-    if (!nok_v)
-        return 0;
-
-    *nok = new Policy_Nok;
-    if (nok_v->type != Container::Value::CONTAINER_TYPE_OBJECT)
-    {
-        delete *nok;
-        *nok = NULL;
-        return -1;
-    }
-
-    Container::Value *error = model->get_value_by_key(*nok_v, "error");
-    if (!error || error->type != Container::Value::CONTAINER_TYPE_STRING)
-    {
-        delete *nok;
-        *nok = NULL;
-        return -1;
-    }
-
-    (*nok)->error = error->s;
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaConchLib::Policy_Policy *>& policies)
+int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaConchLib::Policy_Policy *>& policies, std::string& err)
 {
     if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "policy get policies has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < p->array.size(); ++i)
     {
-        MediaConchLib::Policy_Policy *ok = parse_a_policy(&p->array[i]);
+        MediaConchLib::Policy_Policy *ok = parse_a_policy(&p->array[i], err);
 
         if (ok)
             policies.push_back(ok);
@@ -8938,10 +9308,13 @@ int RESTAPI::parse_policies_get_policies(Container::Value *p, std::vector<MediaC
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_policy_public_policy(Container::Value *p, std::vector<Policy_Public_Policy*>& policies)
+int RESTAPI::parse_policy_public_policy(Container::Value *p, std::vector<Policy_Public_Policy*>& policies, std::string& err)
 {
     if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "policy get public policies has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < p->array.size(); ++i)
     {
@@ -8957,7 +9330,10 @@ int RESTAPI::parse_policy_public_policy(Container::Value *p, std::vector<Policy_
             !user || user->type != Container::Value::CONTAINER_TYPE_INTEGER ||
             !name || name->type != Container::Value::CONTAINER_TYPE_STRING ||
             !description || description->type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            err = "policy get public policies fields are not correct.";
             return -1;
+        }
 
         Policy_Public_Policy *policy = new Policy_Public_Policy;
         policy->id = id->l;
@@ -8973,20 +9349,29 @@ int RESTAPI::parse_policy_public_policy(Container::Value *p, std::vector<Policy_
 }
 
 //---------------------------------------------------------------------------
-int RESTAPI::parse_policies_get_policies_names(Container::Value *p, std::vector<std::pair<int, std::string> >& policies)
+int RESTAPI::parse_policies_get_policies_names(Container::Value *p, std::vector<std::pair<int, std::string> >& policies, std::string& err)
 {
     if (p->type != Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        err = "policy get policies names has not the correct type.";
         return -1;
+    }
 
     for (size_t i = 0; i < p->array.size(); ++i)
     {
         Container::Value *policy = &p->array[i];
         if (policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
+        {
+            err = "policy get policies names policy has not the correct type.";
             return -1;
+        }
 
         Container::Value *id = model->get_value_by_key(*policy, "id");
         if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+        {
+            err = "policy get policies names id has not the correct type.";
             return -1;
+        }
 
         std::string n;
         Container::Value *name = model->get_value_by_key(*policy, "name");
@@ -8999,14 +9384,20 @@ int RESTAPI::parse_policies_get_policies_names(Container::Value *p, std::vector<
 }
 
 //---------------------------------------------------------------------------
-MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
+MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy, std::string& err)
 {
     if (!policy || policy->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "policy has not the correct type.";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*policy, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "policy id has not the correct type.";
         return NULL;
+    }
 
     MediaConchLib::Policy_Policy *ok = new MediaConchLib::Policy_Policy;
     ok->id = id->l;
@@ -9057,7 +9448,7 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
             Container::Value *child_kind = model->get_value_by_key(children->array[i], "kind");
             if (child_kind)
             {
-                MediaConchLib::Policy_Policy* p = parse_a_policy(&children->array[i]);
+                MediaConchLib::Policy_Policy* p = parse_a_policy(&children->array[i], err);
                 if (!p)
                     continue;
 
@@ -9067,7 +9458,7 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
             }
             else
             {
-                MediaConchLib::XSLT_Policy_Rule* r = parse_a_xslt_policy_rule(&children->array[i]);
+                MediaConchLib::XSLT_Policy_Rule* r = parse_a_xslt_policy_rule(&children->array[i], err);
                 if (!r)
                     continue;
 
@@ -9082,14 +9473,20 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy)
 }
 
 //---------------------------------------------------------------------------
-MediaConchLib::XSLT_Policy_Rule* RESTAPI::parse_a_xslt_policy_rule(Container::Value *rule)
+MediaConchLib::XSLT_Policy_Rule* RESTAPI::parse_a_xslt_policy_rule(Container::Value *rule, std::string& err)
 {
     if (!rule || rule->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "XSLT policy rule has not the correct type.";
         return NULL;
+    }
 
     Container::Value *id = model->get_value_by_key(*rule, "id");
     if (!id || id->type != Container::Value::CONTAINER_TYPE_INTEGER)
+    {
+        err = "XSLT policy rule id has not the correct type.";
         return NULL;
+    }
 
     MediaConchLib::XSLT_Policy_Rule *ok = new MediaConchLib::XSLT_Policy_Rule;
     ok->id = id->l;

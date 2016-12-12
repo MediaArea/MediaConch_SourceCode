@@ -149,7 +149,9 @@ void SettingsWindow::fill_html(QString& html)
 void SettingsWindow::create_policy_options(QString& policies)
 {
     MediaConchLib::Get_Policies p;
-    parent->get_policies("JSON", p);
+    QString err;
+
+    parent->get_policies("JSON", p, err);
 
     QString system_policy;
     QString user_policy;

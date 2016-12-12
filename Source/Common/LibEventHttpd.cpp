@@ -54,19 +54,19 @@ LibEventHttpd::~LibEventHttpd()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttpd::init()
+int LibEventHttpd::init(std::string& err)
 {
     base = event_base_new();
     if (!base)
     {
-        error = std::string("cannot create an event-base");
+        err = "cannot create an event-base";
         return -1;
     }
 
     http = evhttp_new(base);
     if (!http)
     {
-        error = std::string("cannot create event-http");
+        err = "cannot create event-http";
         return -1;
     }
 
@@ -75,23 +75,26 @@ int LibEventHttpd::init()
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttpd::bind()
+int LibEventHttpd::bind(std::string& err)
 {
     handle = evhttp_bind_socket_with_handle(http, address.c_str(), port);
     if (!handle)
     {
         std::stringstream ss;
         ss << "couldn't bind to address " << address << " and port " << port;
-        error = ss.str();
+        err = ss.str();
         return -1;
     }
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int LibEventHttpd::start()
+int LibEventHttpd::start(std::string& err)
 {
-    return event_base_dispatch(base);
+    int ret = event_base_dispatch(base);
+    if (ret < 0)
+        err = "HTTP (LibEvent) cannot be dispatached";
+    return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -156,7 +159,7 @@ int LibEventHttpd::send_result(int ret_code, const std::string& ret_msg, void *a
 }
 
 //---------------------------------------------------------------------------
-void LibEventHttpd::request_get_coming(struct evhttp_request *req)
+void LibEventHttpd::request_get_coming(struct evhttp_request *req, std::string& err)
 {
     int code = HTTP_OK;
     std::string ret_msg("OK");
@@ -186,7 +189,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_mediaconch_get_plugins_res(res, result) < 0)
+        if (rest.serialize_mediaconch_get_plugins_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -214,7 +217,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_mediaconch_list_watch_folders_res(res, result) < 0)
+        if (rest.serialize_mediaconch_list_watch_folders_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -225,7 +228,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         get_uri_request(query, &r);
 
         RESTAPI::Checker_Status_Res res;
-        if (commands.status_cb && commands.status_cb(r, res, parent) < 0)
+        if (commands.checker_status_cb && commands.checker_status_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -234,7 +237,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_status_res(res, result) < 0)
+        if (rest.serialize_checker_status_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -247,7 +250,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         get_uri_request(query, &r);
 
         RESTAPI::Checker_List_Res res;
-        if (commands.list_cb && commands.list_cb(r, res, parent) < 0)
+        if (commands.checker_list_cb && commands.checker_list_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -256,7 +259,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_list_res(res, result) < 0)
+        if (rest.serialize_checker_list_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -276,7 +279,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_default_values_for_type_res(res, result) < 0)
+        if (rest.serialize_default_values_for_type_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -299,7 +302,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_create_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_create_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -319,7 +322,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_remove_res(res, result) < 0)
+        if (rest.serialize_policy_remove_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -339,7 +342,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_dump_res(res, result) < 0)
+        if (rest.serialize_policy_dump_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -359,7 +362,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_save_res(res, result) < 0)
+        if (rest.serialize_policy_save_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -379,7 +382,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_duplicate_res(res, result) < 0)
+        if (rest.serialize_policy_duplicate_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -399,7 +402,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_move_res(res, result) < 0)
+        if (rest.serialize_policy_move_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -419,7 +422,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_get_res(res, result) < 0)
+        if (rest.serialize_policy_get_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -439,7 +442,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_get_name_res(res, result) < 0)
+        if (rest.serialize_policy_get_name_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -462,7 +465,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_get_policies_count_res(res, result) < 0)
+        if (rest.serialize_policy_get_policies_count_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -485,7 +488,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_clear_policies_res(res, result) < 0)
+        if (rest.serialize_policy_clear_policies_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -508,7 +511,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_get_policies_res(res, result) < 0)
+        if (rest.serialize_policy_get_policies_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -531,7 +534,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_get_public_policies_res(res, result) < 0)
+        if (rest.serialize_policy_get_public_policies_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -554,7 +557,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_get_policies_names_list_res(res, result) < 0)
+        if (rest.serialize_policy_get_policies_names_list_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -574,7 +577,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_create_from_file_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_create_from_file_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -594,7 +597,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_rule_create_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_rule_create_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -614,7 +617,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_rule_get_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_rule_get_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -634,7 +637,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_rule_duplicate_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_rule_duplicate_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -654,7 +657,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_rule_move_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_rule_move_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -674,7 +677,7 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_rule_delete_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_rule_delete_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -689,7 +692,7 @@ send:
 }
 
 //---------------------------------------------------------------------------
-void LibEventHttpd::request_post_coming(struct evhttp_request *req)
+void LibEventHttpd::request_post_coming(struct evhttp_request *req, std::string& err)
 {
     std::string json;
     int code = HTTP_OK;
@@ -728,7 +731,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
             delete r;
-        if (rest.serialize_mediaconch_watch_folder_res(res, result) < 0)
+        if (rest.serialize_mediaconch_watch_folder_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -753,7 +756,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
             delete r;
-        if (rest.serialize_mediaconch_edit_watch_folder_res(res, result) < 0)
+        if (rest.serialize_mediaconch_edit_watch_folder_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -778,7 +781,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
             delete r;
-        if (rest.serialize_mediaconch_remove_watch_folder_res(res, result) < 0)
+        if (rest.serialize_mediaconch_remove_watch_folder_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -794,7 +797,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         RESTAPI::Checker_Analyze_Res res;
-        if (commands.analyze_cb && commands.analyze_cb(r, res, parent) < 0)
+        if (commands.checker_analyze_cb && commands.checker_analyze_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -803,7 +806,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
             delete r;
-        if (rest.serialize_analyze_res(res, result) < 0)
+        if (rest.serialize_checker_analyze_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -819,7 +822,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         RESTAPI::Checker_Report_Res res;
-        if (commands.report_cb && commands.report_cb(r, res, parent) < 0)
+        if (commands.checker_report_cb && commands.checker_report_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -828,7 +831,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_report_res(res, result) < 0)
+        if (rest.serialize_checker_report_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -844,7 +847,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         RESTAPI::Checker_Validate_Res res;
-        if (commands.validate_cb && commands.validate_cb(r, res, parent) < 0)
+        if (commands.checker_validate_cb && commands.checker_validate_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -853,7 +856,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_validate_res(res, result) < 0)
+        if (rest.serialize_checker_validate_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -869,7 +872,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         RESTAPI::Checker_File_From_Id_Res res;
-        if (commands.file_from_id_cb && commands.file_from_id_cb(r, res, parent) < 0)
+        if (commands.checker_file_from_id_cb && commands.checker_file_from_id_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -878,7 +881,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_file_from_id_res(res, result) < 0)
+        if (rest.serialize_checker_file_from_id_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -894,7 +897,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         RESTAPI::Checker_Id_From_Filename_Res res;
-        if (commands.id_from_filename_cb && commands.id_from_filename_cb(r, res, parent) < 0)
+        if (commands.checker_id_from_filename_cb && commands.checker_id_from_filename_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -903,7 +906,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_id_from_filename_res(res, result) < 0)
+        if (rest.serialize_checker_id_from_filename_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -919,7 +922,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         RESTAPI::Checker_File_Information_Res res;
-        if (commands.file_information_cb && commands.file_information_cb(r, res, parent) < 0)
+        if (commands.checker_file_information_cb && commands.checker_file_information_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -928,7 +931,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_file_information_res(res, result) < 0)
+        if (rest.serialize_checker_file_information_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -953,7 +956,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_import_res(res, result) < 0)
+        if (rest.serialize_policy_import_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -978,7 +981,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_change_info_res(res, result) < 0)
+        if (rest.serialize_policy_change_info_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -1003,7 +1006,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_change_type_res(res, result) < 0)
+        if (rest.serialize_policy_change_type_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -1028,7 +1031,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_policy_change_is_public_res(res, result) < 0)
+        if (rest.serialize_policy_change_is_public_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -1053,7 +1056,7 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_xslt_policy_rule_edit_res(res, result) < 0)
+        if (rest.serialize_xslt_policy_rule_edit_res(res, result, err) < 0)
             error = rest.get_error();
     }
 
@@ -1068,7 +1071,7 @@ send:
 }
 
 //---------------------------------------------------------------------------
-void LibEventHttpd::request_put_coming(struct evhttp_request *req)
+void LibEventHttpd::request_put_coming(struct evhttp_request *req, std::string&)
 {
     std::string json;
     int code = HTTP_OK;
@@ -1085,42 +1088,21 @@ void LibEventHttpd::request_put_coming(struct evhttp_request *req)
 
     if (uri_api_version_is_valid(uri_path, req) < 0)
         return;
-    if (!std::string("/checker_retry").compare(uri_path))
+    if (0)
     {
-        RESTAPI::Checker_Retry_Req *r = NULL;
-        get_request(json, &r);
-        if (!r)
-        {
-            ret_msg = "NOVALIDCONTENT";
-            code = HTTP_BADREQUEST;
-            goto send;
-        }
-
-        RESTAPI::Checker_Retry_Res res;
-        if (commands.retry_cb && commands.retry_cb(r, res, parent) < 0)
-        {
-            delete r;
-            ret_msg = "NOVALIDCONTENT";
-            code = HTTP_BADREQUEST;
-            goto send;
-        }
-
-        delete r;
-        if (rest.serialize_retry_res(res, result) < 0)
-            error = rest.get_error();
     }
+
     else
     {
         code = HTTP_NOTFOUND;
         ret_msg = std::string("NOTFOUND");
         error = std::string("invalid URI");
     }
-send:
     send_result(code, ret_msg, req);
 }
 
 //---------------------------------------------------------------------------
-void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
+void LibEventHttpd::request_delete_coming(struct evhttp_request *req, std::string& err)
 {
     int code = HTTP_OK;
     std::string ret_msg("OK");
@@ -1139,7 +1121,7 @@ void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
         get_uri_request(query, &r);
 
         RESTAPI::Checker_Clear_Res res;
-        if (commands.clear_cb && commands.clear_cb(r, res, parent) < 0)
+        if (commands.checker_clear_cb && commands.checker_clear_cb(r, res, parent) < 0)
         {
             delete r;
             ret_msg = "NOVALIDCONTENT";
@@ -1148,7 +1130,7 @@ void LibEventHttpd::request_delete_coming(struct evhttp_request *req)
         }
 
         delete r;
-        if (rest.serialize_clear_res(res, result) < 0)
+        if (rest.serialize_checker_clear_res(res, result, err) < 0)
             error = rest.get_error();
     }
     else
@@ -1173,7 +1155,7 @@ void LibEventHttpd::request_coming(struct evhttp_request *req, void *arg)
     struct evkeyvalq *kv = evhttp_request_get_input_headers(req);
     if (evHttp->get_mediaconch_instance(kv) < 0)
     {
-        evHttp->error = std::string("HTTP header X-App-MediaConch-Instance-ID not corresponding");
+        evHttp->error = "HTTP header X-App-MediaConch-Instance-ID not corresponding";
         evHttp->send_result(410, "X-App-MediaConch-Instance-ID-INVALID", req);
         return;
     }
@@ -1181,19 +1163,19 @@ void LibEventHttpd::request_coming(struct evhttp_request *req, void *arg)
     switch (evhttp_request_get_command(req))
     {
         case EVHTTP_REQ_GET:
-            evHttp->request_get_coming(req);
+            evHttp->request_get_coming(req, evHttp->error);
             break;
         case EVHTTP_REQ_POST:
-            evHttp->request_post_coming(req);
+            evHttp->request_post_coming(req, evHttp->error);
             break;
         case EVHTTP_REQ_PUT:
-            evHttp->request_put_coming(req);
+            evHttp->request_put_coming(req, evHttp->error);
             break;
         case EVHTTP_REQ_DELETE:
-            evHttp->request_delete_coming(req);
+            evHttp->request_delete_coming(req, evHttp->error);
             break;
         default:
-            evHttp->error = std::string("HTTP Request command not supported");
+            evHttp->error = "HTTP Request command not supported";
             evHttp->send_result(HTTP_BADREQUEST, ret_msg, req);
             return;
     }

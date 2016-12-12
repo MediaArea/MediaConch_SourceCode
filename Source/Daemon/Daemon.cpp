@@ -66,9 +66,10 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::init()
+    int Daemon::init(std::string& err)
     {
-        MCL->init();
+        if (MCL->init(err) < 0)
+            return -1;
 
         // If no Implementation Schema registered, use one by default
         if (!MCL->get_implementation_schema_file().length())
@@ -86,9 +87,9 @@ namespace MediaConch
             httpd->set_address(address);
         if (port != -1)
             httpd->set_port(port);
-        if (httpd->init() < 0)
+        if (httpd->init(err) < 0)
         {
-            std::clog << httpd->get_error() << std::endl;
+            std::clog << err << std::endl;
             return -1;
         }
 
@@ -98,16 +99,15 @@ namespace MediaConch
         httpd->commands.mediaconch_edit_watch_folder_cb = on_mediaconch_edit_watch_folder_command;
         httpd->commands.mediaconch_remove_watch_folder_cb = on_mediaconch_remove_watch_folder_command;
 
-        httpd->commands.analyze_cb = on_analyze_command;
-        httpd->commands.status_cb = on_status_command;
-        httpd->commands.report_cb = on_report_command;
-        httpd->commands.retry_cb = on_retry_command;
-        httpd->commands.clear_cb = on_clear_command;
-        httpd->commands.list_cb = on_list_command;
-        httpd->commands.validate_cb = on_validate_command;
-        httpd->commands.file_from_id_cb = on_file_from_id_command;
-        httpd->commands.id_from_filename_cb = on_id_from_filename_command;
-        httpd->commands.file_information_cb = on_file_information_command;
+        httpd->commands.checker_analyze_cb = on_checker_analyze_command;
+        httpd->commands.checker_status_cb = on_checker_status_command;
+        httpd->commands.checker_report_cb = on_checker_report_command;
+        httpd->commands.checker_clear_cb = on_checker_clear_command;
+        httpd->commands.checker_list_cb = on_checker_list_command;
+        httpd->commands.checker_validate_cb = on_checker_validate_command;
+        httpd->commands.checker_file_from_id_cb = on_checker_file_from_id_command;
+        httpd->commands.checker_id_from_filename_cb = on_checker_id_from_filename_command;
+        httpd->commands.checker_file_information_cb = on_checker_file_information_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
 
         httpd->commands.xslt_policy_create_cb = on_xslt_policy_create_command;
@@ -161,12 +161,12 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::run()
+    int Daemon::run(std::string& err)
     {
         switch (mode)
         {
             case DAEMON_MODE_PLUGINS_LIST:
-                return run_plugins_list();
+                return run_plugins_list(err);
             case DAEMON_MODE_DAEMON:
                 //default, continue
                 break;
@@ -177,7 +177,6 @@ namespace MediaConch
 
         if (MCL && watch_folder.size())
         {
-            std::string err;
             long user_id = -1;
             int ret = MCL->mediaconch_watch_folder(watch_folder, watch_folder_reports, plugins, policies,
                                                    watch_folder_user, watch_folder_recursive, options, user_id, err);
@@ -186,32 +185,36 @@ namespace MediaConch
             else
                 std::clog << "Watching folder:" << watch_folder << ", user:" << user_id << std::endl;
         }
-        if (!httpd)
-            return -1;
 
-        if (httpd->bind() < 0)
+        if (!httpd)
+        {
+            err = "HTTP library not initialized.";
+            return -1;
+        }
+
+        if (httpd->bind(err) < 0)
         {
             std::clog << httpd->get_error() << std::endl;
             return -1;
         }
 
         std::clog << get_date() << "Daemon is running on " << httpd->get_address() << ":" << httpd->get_port() << std::endl;
-        if (httpd->start() < 0)
+        if (httpd->start(err) < 0)
         {
-            std::clog << httpd->get_error() << std::endl;
+            std::clog << err << std::endl;
             return -1;
         }
+
         return 0;
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::run_plugins_list()
+    int Daemon::run_plugins_list(std::string& err)
     {
         std::stringstream out;
         std::vector<std::string> list;
-        std::string error;
-        if (MCL->mediaconch_get_plugins(list, error) < 0)
-            return MediaConchLib::errorHttp_INTERNAL;
+        if (MCL->mediaconch_get_plugins(list, err) < 0)
+            return DAEMON_RETURN_ERROR;
 
         out << "plugins:[";
 
@@ -650,138 +653,127 @@ namespace MediaConch
     }
 #endif
 
+#define FUN_CMD_PROTO(NAME, STRUCT)                                            \
+    int Daemon::on_##NAME##_command(const RESTAPI::STRUCT##_Req* req,          \
+                                    RESTAPI::STRUCT##_Res& res, void *arg)
+
+
+#define FUN_CMD_START(CMD)                                              \
+    Daemon *d = (Daemon*)arg;                                           \
+    if (!d || !req)                                                     \
+        return -1;                                                      \
+                                                                        \
+    std::clog << d->get_date() << "Daemon received "#CMD" command:";    \
+    std::clog << req->to_str() << std::endl;
+
+#define FUN_CMD_NOK(OBJ, ERR, ID)                                       \
+    {                                                                   \
+        OBJ.nok = new RESTAPI::MediaConch_Nok;                          \
+        if ((long)ID != -1)                                             \
+        {                                                               \
+            OBJ.nok->id = new long;                                     \
+            *OBJ.nok->id = ID;                                          \
+        }                                                               \
+        OBJ.nok->error = ERR;                                           \
+    }
+
+#define FUN_CMD_NOK_ARR(OBJ, ERR, ID)                                   \
+    {                                                                   \
+        RESTAPI::MediaConch_Nok *nok = new RESTAPI::MediaConch_Nok;     \
+        if ((long)ID != -1)                                             \
+        {                                                               \
+            nok->id = new long;                                         \
+            *nok->id = ID;                                              \
+        }                                                               \
+        nok->error = ERR;                                               \
+        OBJ.nok.push_back(nok);                                         \
+        continue;                                                       \
+    }
+
+#define FUN_CMD_END(CMD)                                                                      \
+    std::clog << d->get_date() << "Daemon send "#CMD" result: " << res.to_str() << std::endl; \
+    return 0;
+
     //--------------------------------------------------------------------------
-    int Daemon::on_mediaconch_get_plugins_command(const RESTAPI::MediaConch_Get_Plugins_Req* req, RESTAPI::MediaConch_Get_Plugins_Res& res, void *arg)
+    FUN_CMD_PROTO(mediaconch_get_plugins, MediaConch_Get_Plugins)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(MediaConch_Get_Plugins)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a mediaconch get plugins command" << std::endl;
         std::vector<std::string> vec;
-        std::string error;
-        if (d->MCL->mediaconch_get_plugins(vec, error) < 0)
-        {
-            res.nok = new RESTAPI::MediaConch_Nok;
-            res.nok->error = error;
-        }
+        std::string err;
+        if (d->MCL->mediaconch_get_plugins(vec, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
         else
         {
             for (size_t i = 0; i < vec.size(); ++i)
                 res.plugins.push_back(vec[i]);
         }
 
-        std::clog << d->get_date() << "Daemon send get mediaconch plugins result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(MediaConch_Get_Plugins)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_mediaconch_watch_folder_command(const RESTAPI::MediaConch_Watch_Folder_Req* req,
-                                                   RESTAPI::MediaConch_Watch_Folder_Res& res, void *arg)
+    FUN_CMD_PROTO(mediaconch_watch_folder, MediaConch_Watch_Folder)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(MediaConch_Watch_Folder)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a mediaconch watch folder command: ";
-        std::clog << req->to_str() << std::endl;
-        std::string error;
+        std::string err;
         long user_id = -1;
         if (d->MCL->mediaconch_watch_folder(req->folder, req->folder_reports,
                                             req->plugins, req->policies,
-                                            req->user, req->recursive, req->options, user_id, error) < 0)
-        {
-            res.nok = new RESTAPI::MediaConch_Nok;
-            res.nok->error = error;
-        }
+                                            req->user, req->recursive, req->options, user_id, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
         else
             res.user = user_id;
 
-        std::clog << d->get_date() << "Daemon send mediaconch watch folder result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(MediaConch_Watch_Folder)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_mediaconch_list_watch_folders_command(const RESTAPI::MediaConch_List_Watch_Folders_Req* req,
-                                                         RESTAPI::MediaConch_List_Watch_Folders_Res& res, void *arg)
+    FUN_CMD_PROTO(mediaconch_list_watch_folders, MediaConch_List_Watch_Folders)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(MediaConch_List_Watch_Folders)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a mediaconch list watch folders command" << std::endl;
-        std::string error;
+        std::string err;
         std::vector<std::string> list;
-        if (d->MCL->mediaconch_list_watch_folders(list, error) < 0)
-        {
-            res.nok = new RESTAPI::MediaConch_Nok;
-            res.nok->error = error;
-        }
+        if (d->MCL->mediaconch_list_watch_folders(list, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
         else
             for (size_t i = 0; i < list.size(); ++i)
                 res.folders.push_back(list[i]);
 
-        std::clog << d->get_date() << "Daemon send mediaconch list watch folders result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(MediaConch_List_Watch_Folders)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_mediaconch_edit_watch_folder_command(const RESTAPI::MediaConch_Edit_Watch_Folder_Req* req,
-                                                        RESTAPI::MediaConch_Edit_Watch_Folder_Res& res, void *arg)
+    FUN_CMD_PROTO(mediaconch_edit_watch_folder, MediaConch_Edit_Watch_Folder)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(MediaConch_Edit_Watch_Folder)
 
-        if (!d || !req)
-            return -1;
+        std::string err;
+        if (d->MCL->mediaconch_edit_watch_folder(req->folder, req->folder_reports, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon received a mediaconch edit watch folder command: ";
-        std::clog << req->to_str() << std::endl;
-        std::string error;
-        if (d->MCL->mediaconch_edit_watch_folder(req->folder, req->folder_reports, error) < 0)
-        {
-            res.nok = new RESTAPI::MediaConch_Nok;
-            res.nok->error = error;
-        }
-
-        std::clog << d->get_date() << "Daemon send mediaconch edit watch folder result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(MediaConch_Edit_Watch_Folder)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_mediaconch_remove_watch_folder_command(const RESTAPI::MediaConch_Remove_Watch_Folder_Req* req,
-                                                          RESTAPI::MediaConch_Remove_Watch_Folder_Res& res, void *arg)
+    FUN_CMD_PROTO(mediaconch_remove_watch_folder, MediaConch_Remove_Watch_Folder)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(MediaConch_Remove_Watch_Folder)
 
-        if (!d || !req)
-            return -1;
+        std::string err;
+        if (d->MCL->mediaconch_remove_watch_folder(req->folder, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon received a mediaconch remove watch folder command: ";
-        std::clog << req->to_str() << std::endl;
-        std::string error;
-        if (d->MCL->mediaconch_remove_watch_folder(req->folder, error) < 0)
-        {
-            res.nok = new RESTAPI::MediaConch_Nok;
-            res.nok->error = error;
-        }
-
-        std::clog << d->get_date() << "Daemon send mediaconch remove watch folder result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(MediaConch_Remove_Watch_Folder)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_analyze_command(const RESTAPI::Checker_Analyze_Req* req, RESTAPI::Checker_Analyze_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_analyze, Checker_Analyze)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_Analyze)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker_analyze command: ";
-        std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->args.size(); ++i)
         {
             bool force = false;
@@ -797,15 +789,11 @@ namespace MediaConch
 
             bool registered = false;
             long out_id = -1;
-            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, options, registered, out_id, force, req->args[i].mil_analyze);
+            std::string err;
+            int ret = d->MCL->checker_analyze(req->args[i].user, req->args[i].file, plugins, options, registered, out_id,
+                                              err, force, req->args[i].mil_analyze);
             if (ret < 0)
-            {
-                RESTAPI::Checker_Analyze_Nok *nok = new RESTAPI::Checker_Analyze_Nok;
-                nok->id = req->args[i].id;
-                nok->error = RESTAPI::FILE_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
-            }
+                FUN_CMD_NOK_ARR(res, err, req->args[i].id)
 
             RESTAPI::Checker_Analyze_Ok *ok = new RESTAPI::Checker_Analyze_Ok;
             ok->inId = req->args[i].id;
@@ -815,43 +803,26 @@ namespace MediaConch
             res.ok.push_back(ok);
         }
 
-        std::clog << d->get_date() << "Daemon send checker analyze result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Checker_Analyze)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_status_command(const RESTAPI::Checker_Status_Req* req, RESTAPI::Checker_Status_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_status, Checker_Status)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_Status)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker_status command: ";
-        std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             long id = req->ids[i];
             if (id < 0)
-            {
-                RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::ID_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
-            }
+                FUN_CMD_NOK_ARR(res, "ID not existing", id)
 
             MediaConchLib::Checker_StatusRes st_res;
-            int ret = d->MCL->checker_status(req->user, id, st_res);
-
+            std::string err;
+            int ret = d->MCL->checker_status(req->user, id, st_res, err);
             if (ret < 0)
-            {
-                RESTAPI::Checker_Status_Nok *nok = new RESTAPI::Checker_Status_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::NO_REASON;
-                res.nok.push_back(nok);
-                continue;
-            }
+                FUN_CMD_NOK_ARR(res, err, id)
+
             RESTAPI::Checker_Status_Ok *ok = new RESTAPI::Checker_Status_Ok;
 
             ok->id = id;
@@ -888,20 +859,15 @@ namespace MediaConch
 
             res.ok.push_back(ok);
         }
-        std::clog << d->get_date() << "Daemon send checker status result: " << res.to_str() << std::endl;
-        return 0;
+
+        FUN_CMD_END(Checker_Status)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_report_command(const RESTAPI::Checker_Report_Req* req, RESTAPI::Checker_Report_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_report, Checker_Report)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_Report)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker_report command: ";
-        std::clog << req->to_str() << std::endl;
         MediaConchLib::format format = MediaConchLib::format_Xml;
         if (req->display_name == MediaConchLib::display_text_name)
             format = MediaConchLib::format_Text;
@@ -918,7 +884,6 @@ namespace MediaConch
             display_name = NULL;
 
         std::bitset<MediaConchLib::report_Max> report_set;
-        bool has_policy = false;
         for (size_t j = 0; j < req->reports.size(); ++j)
         {
             if (req->reports[j] == RESTAPI::MEDIAINFO)
@@ -927,41 +892,37 @@ namespace MediaConch
                 report_set.set(MediaConchLib::report_MediaTrace);
             if (req->reports[j] == RESTAPI::IMPLEMENTATION)
                 report_set.set(MediaConchLib::report_MediaConch);
-            if (req->reports[j] == RESTAPI::POLICY)
-                has_policy = true;
             if (req->reports[j] == RESTAPI::VERAPDF)
                 report_set.set(MediaConchLib::report_MediaVeraPdf);
             if (req->reports[j] == RESTAPI::DPFMANAGER)
                 report_set.set(MediaConchLib::report_MediaDpfManager);
         }
 
-        if (!report_set.count() && !has_policy)
-            return -1;
+        if (!report_set.count() && !req->policies_ids.size() && !req->policies_contents.size())
+            report_set.set(MediaConchLib::report_MediaConch);
 
-        bool has_valid = false;
-        bool valid = true;
         std::vector<long> files;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             long id = req->ids[i];
             if (id < 0)
             {
-                RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::ID_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
+                FUN_CMD_NOK(res, "ID not existing", -1)
+                FUN_CMD_END(Checker_Report)
             }
 
             MediaConchLib::Checker_StatusRes cs_res;
-            int is_done = d->MCL->checker_status(req->user, id, cs_res);
-            if (is_done < 0 || !cs_res.finished)
+            std::string err;
+            if (d->MCL->checker_status(req->user, id, cs_res, err) < 0)
             {
-                RESTAPI::Checker_Report_Nok *nok = new RESTAPI::Checker_Report_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::NOT_READY;
-                res.nok.push_back(nok);
-                continue;
+                FUN_CMD_NOK(res, err, -1)
+                FUN_CMD_END(Checker_Report)
+            }
+
+            if (!cs_res.finished)
+            {
+                FUN_CMD_NOK(res, "Some files are still analyzing", id)
+                FUN_CMD_END(Checker_Report)
             }
 
             files.push_back(id);
@@ -979,145 +940,74 @@ namespace MediaConch
 
         // Output
         MediaConchLib::Checker_ReportRes result;
-        d->MCL->checker_get_report(req->user, report_set, format, files,
-                                   req->policies_ids, req->policies_contents,
-                                   options, &result, display_name, display_content);
-        res.ok.report = result.report;
-        if (result.has_valid)
+        std::string err;
+        if (d->MCL->checker_get_report(req->user, report_set, format, files,
+                                       req->policies_ids, req->policies_contents,
+                                       options, &result, err, display_name, display_content) < 0)
+            FUN_CMD_NOK(res, err, -1)
+        else
         {
-            has_valid = true;
-            if (!result.valid)
-                valid = false;
+            res.ok = new RESTAPI::Checker_Report_Ok;
+            res.ok->report = result.report;
+            res.ok->has_valid = result.has_valid;
+            res.ok->valid = result.valid;
         }
-        res.ok.has_valid = has_valid;
-        res.ok.valid = valid;
-        std::clog << d->get_date() << "Daemon send checker report result: " << res.to_str() << std::endl;
-        return 0;
+
+        FUN_CMD_END(Checker_Report)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_retry_command(const RESTAPI::Checker_Retry_Req* req, RESTAPI::Checker_Retry_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_clear, Checker_Clear)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_Clear)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker retry command: ";
-        std::clog << req->to_str() << std::endl;
-        for (size_t i = 0; i < req->ids.size(); ++i)
-        {
-            long id = req->ids[i];
-            if (id < 0)
-            {
-                RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::ID_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
-            }
-
-            std::string filename;
-            d->MCL->checker_file_from_id(req->user, id, filename);
-            if (!filename.size())
-            {
-                RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::ID_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
-            }
-
-            std::vector<long> files;
-            files.push_back(id);
-            d->MCL->remove_report(req->user, files);
-
-            bool registered = false;
-            long new_id = -1;
-            std::vector<std::string> plugins;
-            int ret = d->MCL->checker_analyze(req->user, filename, plugins, d->options, registered, new_id);
-            if (ret < 0)
-            {
-                RESTAPI::Checker_Retry_Nok *nok = new RESTAPI::Checker_Retry_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::FILE_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
-            }
-            res.ok.push_back(new_id);
-        }
-        std::clog << d->get_date() << "Daemon send checker retry result: " << res.to_str() << std::endl;
-        return 0;
-    }
-
-    //--------------------------------------------------------------------------
-    int Daemon::on_clear_command(const RESTAPI::Checker_Clear_Req* req, RESTAPI::Checker_Clear_Res& res, void *arg)
-    {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker clear command: ";
-        std::clog << req->to_str() << std::endl;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             int id = req->ids[i];
             if (id < 0)
-            {
-                RESTAPI::Checker_Clear_Nok *nok = new RESTAPI::Checker_Clear_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::ID_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
-            }
+                FUN_CMD_NOK_ARR(res, "ID not existing", id)
 
             std::vector<long> files;
             files.push_back(id);
-            d->MCL->remove_report(req->user, files);
+
+            std::string err;
+            if (d->MCL->remove_report(req->user, files, err) < 0)
+                FUN_CMD_NOK_ARR(res, err, id)
+
             res.ok.push_back(id);
         }
 
-        std::clog << d->get_date() << "Daemon send checker clear result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Checker_Clear)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_list_command(const RESTAPI::Checker_List_Req* req, RESTAPI::Checker_List_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_list, Checker_List)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_List)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker list command: ";
-        std::clog << req->to_str() << std::endl;
         std::vector<long> vec;
-        d->MCL->checker_list(req->user, vec);
+        std::string err;
+        if (d->MCL->checker_list(req->user, vec, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
+
         for (size_t i = 0; i < vec.size(); ++i)
         {
             RESTAPI::Checker_List_File *file = new RESTAPI::Checker_List_File;
             file->id = vec[i];
 
-            d->MCL->checker_file_from_id(req->user, vec[i], file->file);
+            d->MCL->checker_file_from_id(req->user, vec[i], file->file, err);
             res.files.push_back(file);
         }
-        std::clog << d->get_date() << "Daemon send checker list result: " << res.to_str() << std::endl;
-        return 0;
+
+        FUN_CMD_END(Checker_List)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_validate_command(const RESTAPI::Checker_Validate_Req* req, RESTAPI::Checker_Validate_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_validate, Checker_Validate)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_Validate)
 
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker validate command: ";
-        std::clog << req->to_str() << std::endl;
-
-        MediaConchLib::report report;
+            MediaConchLib::report report;
         if (req->report == RESTAPI::IMPLEMENTATION)
             report = MediaConchLib::report_MediaConch;
         else if (req->report == RESTAPI::VERAPDF)
@@ -1135,22 +1025,21 @@ namespace MediaConch
             int id = req->ids[i];
             if (id < 0)
             {
-                RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::ID_NOT_EXISTING;
-                res.nok.push_back(nok);
-                continue;
+                FUN_CMD_NOK(res, "ID not existing", id)
+                FUN_CMD_END(Checker_Validate)
             }
 
             MediaConchLib::Checker_StatusRes st_res;
-            int is_done = d->MCL->checker_status(req->user, id, st_res);
-            if (is_done < 0 || !st_res.finished)
+            std::string err;
+            if (d->MCL->checker_status(req->user, id, st_res, err) < 0)
             {
-                RESTAPI::Checker_Validate_Nok *nok = new RESTAPI::Checker_Validate_Nok;
-                nok->id = id;
-                nok->error = RESTAPI::NOT_READY;
-                res.nok.push_back(nok);
-                continue;
+                FUN_CMD_NOK(res, err, id)
+                FUN_CMD_END(Checker_Validate)
+            }
+            if (!st_res.finished)
+            {
+                FUN_CMD_NOK(res, "File still analyzing", id)
+                FUN_CMD_END(Checker_Validate)
             }
 
             // Output
@@ -1168,10 +1057,14 @@ namespace MediaConch
         }
 
         std::vector<MediaConchLib::Checker_ValidateRes*> result;
+        std::string err;
         if (d->MCL->checker_validate(req->user, report, files,
                                      req->policies_ids, req->policies_contents,
-                                     options, result))
-            return -1;
+                                     options, result, err) < 0)
+        {
+            FUN_CMD_NOK(res, err, -1)
+            FUN_CMD_END(Checker_Validate)
+        }
 
         for (size_t i = 0; i < result.size(); ++i)
         {
@@ -1180,436 +1073,267 @@ namespace MediaConch
             ok->valid = result[i]->valid;
             res.ok.push_back(ok);
         }
-        std::clog << d->get_date() << "Daemon send checker validate result: " << res.to_str() << std::endl;
-        return 0;
+
+        FUN_CMD_END(Checker_Validate)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_file_from_id_command(const RESTAPI::Checker_File_From_Id_Req* req, RESTAPI::Checker_File_From_Id_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_file_from_id, Checker_File_From_Id)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_File_From_Id)
 
-        if (!d || !req)
-            return -1;
+        std::string err;
+        if (d->MCL->checker_file_from_id(req->user, req->id, res.file, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon received a checker_file_from_id command:";
-        std::clog << req->to_str() << std::endl;
-
-        d->MCL->checker_file_from_id(req->user, req->id, res.file);
-
-        std::clog << d->get_date() << "Daemon send checker_file_from_id result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Checker_File_From_Id)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_id_from_filename_command(const RESTAPI::Checker_Id_From_Filename_Req* req, RESTAPI::Checker_Id_From_Filename_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_id_from_filename, Checker_Id_From_Filename)
     {
-        Daemon *d = (Daemon*)arg;
+        FUN_CMD_START(Checker_Id_From_Filename)
 
-        if (!d || !req)
-            return -1;
+        std::string err;
+        if ((res.id = d->MCL->checker_id_from_filename(req->user, req->filename, req->options, err)) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon received a checker_id_from_filename command:";
-        std::clog << req->to_str() << std::endl;
-
-        res.id = d->MCL->checker_id_from_filename(req->user, req->filename, req->options);
-
-        std::clog << d->get_date() << "Daemon send checker_id_from_filename result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Checker_Id_From_Filename)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_file_information_command(const RESTAPI::Checker_File_Information_Req* req, RESTAPI::Checker_File_Information_Res& res, void *arg)
+    FUN_CMD_PROTO(checker_file_information, Checker_File_Information)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a checker_file_information command" << std::endl;
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Checker_File_Information)
 
         MediaConchLib::Checker_FileInfo info;
-        d->MCL->checker_file_information(req->user, req->id, info);
+        std::string err;
+        if (d->MCL->checker_file_information(req->user, req->id, info, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
+        else
+        {
+            res.filename = info.filename;
+            res.file_last_modification = info.file_last_modification;
+            res.analyzed = info.analyzed;
+            res.generated_id = info.generated_id;
+            res.source_id = info.source_id;
+            res.generated_time = info.generated_time;
+            res.generated_log = info.generated_log;
+            res.generated_error_log = info.generated_error_log;
+            for (size_t i = 0; i < info.options.size(); ++i)
+                res.options.push_back(std::make_pair(info.options[i].first, info.options[i].second));
+            res.has_error = info.has_error;
+            res.error_log = info.error_log;
+        }
 
-        res.filename = info.filename;
-        res.file_last_modification = info.file_last_modification;
-        res.analyzed = info.analyzed;
-        res.generated_id = info.generated_id;
-        res.source_id = info.source_id;
-        res.generated_time = info.generated_time;
-        res.generated_log = info.generated_log;
-        res.generated_error_log = info.generated_error_log;
-        for (size_t i = 0; i < info.options.size(); ++i)
-            res.options.push_back(std::make_pair(info.options[i].first, info.options[i].second));
-        res.has_error = info.has_error;
-        res.error_log = info.error_log;
-
-        std::clog << d->get_date() << "Daemon send checker_file_information result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Checker_File_Information)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_default_values_for_type_command(const RESTAPI::Default_Values_For_Type_Req* req, RESTAPI::Default_Values_For_Type_Res& res, void *arg)
+    FUN_CMD_PROTO(default_values_for_type, Default_Values_For_Type)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a default_values_for_type command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Default_Values_For_Type)
 
         std::vector<std::string> values;
-        if (d->MCL->policy_get_values_for_type_field(req->type, req->field, values) >= 0)
+        std::string err;
+        if (d->MCL->policy_get_values_for_type_field(req->type, req->field, values, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
+        else
+        {
             for (size_t i = 0; i < values.size(); ++i)
                 res.values.push_back(values[i]);
+        }
 
-        std::clog << d->get_date() << "Daemon send default_values_for_type result: " << res.to_str() << std::endl;
-
-        return 0;
+        FUN_CMD_END(Default_Values_For_Type)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_create_command(const RESTAPI::XSLT_Policy_Create_Req* req,
-                                              RESTAPI::XSLT_Policy_Create_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_create, XSLT_Policy_Create)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_create command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Create)
 
         std::string err;
         res.id = d->MCL->xslt_policy_create(req->user, err, req->type, req->parent_id);
         if (res.id == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_create result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Create)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_import_command(const RESTAPI::Policy_Import_Req* req,
-                                         RESTAPI::Policy_Import_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_import, Policy_Import)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_import command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Import)
 
         std::string err;
         res.id = d->MCL->policy_import(req->user, req->xml, err);
         if (res.id == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_import result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Import)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_remove_command(const RESTAPI::Policy_Remove_Req* req,
-                                         RESTAPI::Policy_Remove_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_remove, Policy_Remove)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_remove command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Remove)
 
         std::string err;
-        if (d->MCL->policy_remove(req->user, req->id, err) == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+        if (d->MCL->policy_remove(req->user, req->id, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_remove result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Remove)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_dump_command(const RESTAPI::Policy_Dump_Req* req,
-                                       RESTAPI::Policy_Dump_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_dump, Policy_Dump)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_dump command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Dump)
 
         std::string err;
-        if (d->MCL->policy_dump(req->user, req->id, req->must_be_public, res.xml, err) == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+        if (d->MCL->policy_dump(req->user, req->id, req->must_be_public, res.xml, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_dump result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Dump)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_save_command(const RESTAPI::Policy_Save_Req* req,
-                                       RESTAPI::Policy_Save_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_save, Policy_Save)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_save command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Save)
 
         std::string err;
-        if (d->MCL->policy_save(req->user, req->id, err) == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+        if (d->MCL->policy_save(req->user, req->id, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_save result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Save)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_duplicate_command(const RESTAPI::Policy_Duplicate_Req* req,
-                                            RESTAPI::Policy_Duplicate_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_duplicate, Policy_Duplicate)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_duplicate command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Duplicate)
 
         std::string err;
         res.id = d->MCL->policy_duplicate(req->user, req->id, req->dst_policy_id, req->dst_user, req->must_be_public, err);
         if (res.id == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_duplicate result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Duplicate)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_move_command(const RESTAPI::Policy_Move_Req* req,
-                                       RESTAPI::Policy_Move_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_move, Policy_Move)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_move command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Move)
 
         std::string err;
         res.id = d->MCL->policy_move(req->user, req->id, req->dst_policy_id, err);
         if (res.id == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_move result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Move)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_change_info_command(const RESTAPI::Policy_Change_Info_Req* req,
-                                              RESTAPI::Policy_Change_Info_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_change_info, Policy_Change_Info)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_change_info command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Change_Info)
 
         std::string err;
         if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, req->license, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_change_info result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Change_Info)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_change_type_command(const RESTAPI::Policy_Change_Type_Req* req,
-                                              RESTAPI::Policy_Change_Type_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_change_type, Policy_Change_Type)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_change_type command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Change_Type)
 
         std::string err;
         if (d->MCL->policy_change_type(req->user, req->id, req->type, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_change_type result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Change_Type)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_change_is_public_command(const RESTAPI::Policy_Change_Is_Public_Req* req,
-                                                   RESTAPI::Policy_Change_Is_Public_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_change_is_public, Policy_Change_Is_Public)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_change_is_public command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Change_Is_Public)
 
         std::string err;
         if (d->MCL->policy_change_is_public(req->user, req->id, req->is_public, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_change_is_public result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Change_Is_Public)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_get_command(const RESTAPI::Policy_Get_Req* req,
-                                      RESTAPI::Policy_Get_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_get, Policy_Get)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_get command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Get)
 
         std::string err;
         MediaConchLib::Get_Policy p;
         if (d->MCL->policy_get(req->user, req->id, req->format, req->must_be_public, p, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
         else if (p.format == "JSTREE" && p.jstree)
             res.policyTree = *p.jstree;
         else if (p.policy)
             res.policy = new MediaConchLib::Policy_Policy(p.policy);
 
-        std::clog << d->get_date() << "Daemon send policy_get result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Get)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_get_name_command(const RESTAPI::Policy_Get_Name_Req* req,
-                                           RESTAPI::Policy_Get_Name_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_get_name, Policy_Get_Name)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_get_name command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Get_Name)
 
         std::string err;
         if (d->MCL->policy_get_name(req->user, req->id, res.name, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_get_name result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Get_Name)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_get_policies_count_command(const RESTAPI::Policy_Get_Policies_Count_Req* req,
-                                                     RESTAPI::Policy_Get_Policies_Count_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_get_policies_count, Policy_Get_Policies_Count)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_get_policies_count command" << std::endl;
+        FUN_CMD_START(Policy_Get_Policies_Count)
 
         std::string err;
-        res.size = d->MCL->policy_get_policies_count(req->user);
+        if ((int)(res.size = d->MCL->policy_get_policies_count(req->user, err)) < 0)
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_get_policies_count result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Get_Policies_Count)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_clear_policies_command(const RESTAPI::Policy_Clear_Policies_Req* req,
-                                                 RESTAPI::Policy_Clear_Policies_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_clear_policies, Policy_Clear_Policies)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_clear_policies command" << std::endl;
+        FUN_CMD_START(Policy_Clear_Policies)
 
         std::string err;
         if (d->MCL->policy_clear_policies(req->user, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send policy_clear_policies result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Clear_Policies)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_get_policies_command(const RESTAPI::Policy_Get_Policies_Req* req,
-                                               RESTAPI::Policy_Get_Policies_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_get_policies, Policy_Get_Policies)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_get_policies command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Get_Policies)
 
         MediaConchLib::Get_Policies policies;
-        d->MCL->policy_get_policies(req->user, req->ids, req->format, policies);
-        if (req->format == "JSTREE" && policies.jstree)
+        std::string err;
+        if (d->MCL->policy_get_policies(req->user, req->ids, req->format, policies, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
+        else if (req->format == "JSTREE" && policies.jstree)
             res.policiesTree = *policies.jstree;
         else if (policies.policies)
         {
@@ -1620,28 +1344,18 @@ namespace MediaConch
             }
         }
 
-        std::clog << d->get_date() << "Daemon send policy_get_policies result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Get_Policies)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_get_public_policies_command(const RESTAPI::Policy_Get_Public_Policies_Req* req,
-                                                      RESTAPI::Policy_Get_Public_Policies_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_get_public_policies, Policy_Get_Public_Policies)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_get_public_policies command" << std::endl;
+        FUN_CMD_START(Policy_Get_Public_Policies)
 
         std::vector<MediaConchLib::Policy_Public_Policy*> policies;
         std::string err;
         if (d->MCL->policy_get_public_policies(policies, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
         else
         {
             for (size_t i = 0; i < policies.size(); ++i)
@@ -1659,112 +1373,66 @@ namespace MediaConch
             }
         }
 
-        std::clog << d->get_date() << "Daemon send policy_get_public_policies result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Get_Public_Policies)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_policy_get_policies_names_list_command(const RESTAPI::Policy_Get_Policies_Names_List_Req* req,
-                                                          RESTAPI::Policy_Get_Policies_Names_List_Res& res, void *arg)
+    FUN_CMD_PROTO(policy_get_policies_names_list, Policy_Get_Policies_Names_List)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a policy_get_policies_names_list command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(Policy_Get_Policies_Names_List)
 
         std::vector<std::pair<int, std::string> > policies;
-        d->MCL->policy_get_policies_names_list(req->user, policies);
-        res.policies = policies;
+        std::string err;
+        if (d->MCL->policy_get_policies_names_list(req->user, policies, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
+        else
+            res.policies = policies;
 
-        std::clog << d->get_date() << "Daemon send policy_get_policies_names_list result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(Policy_Get_Policies_Names_List)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_create_from_file_command(const RESTAPI::XSLT_Policy_Create_From_File_Req* req, RESTAPI::XSLT_Policy_Create_From_File_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_create_from_file, XSLT_Policy_Create_From_File)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_create_from_file command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Create_From_File)
 
         if (req->id < 0)
-        {
-            RESTAPI::XSLT_Policy_Create_From_File_Nok *nok = new RESTAPI::XSLT_Policy_Create_From_File_Nok;
-            nok->id = req->id;
-            nok->error = RESTAPI::ID_NOT_EXISTING;
-            res.nok = nok;
-        }
+            FUN_CMD_NOK(res, "ID not existing", -1)
         else
         {
             std::string err;
-            int pos = d->MCL->xslt_policy_create_from_file(req->user, req->id, err);
+            res.policy_id = d->MCL->xslt_policy_create_from_file(req->user, req->id, err);
 
-            if (pos == -1)
-            {
-                RESTAPI::XSLT_Policy_Create_From_File_Nok *nok = new RESTAPI::XSLT_Policy_Create_From_File_Nok;
-                nok->id = req->id;
-                nok->error = RESTAPI::NO_REASON;
-                res.nok = nok;
-            }
-            else
-                res.policy_id = pos;
+            if (res.policy_id < 0)
+                FUN_CMD_NOK(res, err, req->id)
         }
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_create_from_file result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Create_From_File)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_rule_create_command(const RESTAPI::XSLT_Policy_Rule_Create_Req* req,
-                                                   RESTAPI::XSLT_Policy_Rule_Create_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_rule_create, XSLT_Policy_Rule_Create)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_create command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Rule_Create)
 
         std::string err;
         res.id = d->MCL->xslt_policy_rule_create(req->user, req->policy_id, err);
         if (res.id == -1)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_rule_create result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Rule_Create)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_rule_get_command(const RESTAPI::XSLT_Policy_Rule_Get_Req* req,
-                                                RESTAPI::XSLT_Policy_Rule_Get_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_rule_get, XSLT_Policy_Rule_Get)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_get command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Rule_Get)
 
         std::string err;
         XsltPolicyRule *rule = d->MCL->xslt_policy_rule_get(req->user, req->policy_id, req->id, err);
 
         if (!rule)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
         else
         {
             res.rule.id = rule->id;
@@ -1777,21 +1445,13 @@ namespace MediaConch
             res.rule.value = rule->value;
         }
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_rule_get result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Rule_Get)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_rule_edit_command(const RESTAPI::XSLT_Policy_Rule_Edit_Req* req,
-                                                 RESTAPI::XSLT_Policy_Rule_Edit_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_rule_edit, XSLT_Policy_Rule_Edit)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_edit command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Rule_Edit)
 
         std::string err;
         XsltPolicyRule rule;
@@ -1806,84 +1466,52 @@ namespace MediaConch
         rule.value = req->rule.value;
 
         if (d->MCL->xslt_policy_rule_edit(req->user, req->policy_id, req->rule.id, &rule, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_rule_edit result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Rule_Edit)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_rule_duplicate_command(const RESTAPI::XSLT_Policy_Rule_Duplicate_Req* req,
-                                                      RESTAPI::XSLT_Policy_Rule_Duplicate_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_rule_duplicate, XSLT_Policy_Rule_Duplicate)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_duplicate command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Rule_Duplicate)
 
         std::string err;
         if ((res.id = d->MCL->xslt_policy_rule_duplicate(req->user, req->policy_id, req->id, req->dst_policy_id, err)) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_rule_duplicate result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Rule_Duplicate)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_rule_move_command(const RESTAPI::XSLT_Policy_Rule_Move_Req* req,
-                                                 RESTAPI::XSLT_Policy_Rule_Move_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_rule_move, XSLT_Policy_Rule_Move)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_move command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Rule_Move)
 
         std::string err;
         if ((res.id = d->MCL->xslt_policy_rule_move(req->user, req->policy_id, req->id, req->dst_policy_id, err)) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_rule_move result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Rule_Move)
     }
 
     //--------------------------------------------------------------------------
-    int Daemon::on_xslt_policy_rule_delete_command(const RESTAPI::XSLT_Policy_Rule_Delete_Req* req,
-                                                   RESTAPI::XSLT_Policy_Rule_Delete_Res& res, void *arg)
+    FUN_CMD_PROTO(xslt_policy_rule_delete, XSLT_Policy_Rule_Delete)
     {
-        Daemon *d = (Daemon*)arg;
-
-        if (!d || !req)
-            return -1;
-
-        std::clog << d->get_date() << "Daemon received a xslt_policy_rule_delete command: ";
-        std::clog << req->to_str() << std::endl;
+        FUN_CMD_START(XSLT_Policy_Rule_Delete)
 
         std::string err;
         if (d->MCL->xslt_policy_rule_delete(req->user, req->policy_id, req->id, err) < 0)
-        {
-            res.nok = new RESTAPI::Policy_Nok;
-            res.nok->error = err;
-        }
+            FUN_CMD_NOK(res, err, -1)
 
-        std::clog << d->get_date() << "Daemon send xslt_policy_rule_delete result: " << res.to_str() << std::endl;
-        return 0;
+        FUN_CMD_END(XSLT_Policy_Rule_Delete)
     }
 
+#undef FUN_CMD_PROTO
+#undef FUN_CMD_START
+#undef FUN_CMD_END
+#undef FUN_CMD_NOK
+#undef FUN_CMD_NOK_ARR
     //--------------------------------------------------------------------------
     std::string Daemon::get_date() const
     {

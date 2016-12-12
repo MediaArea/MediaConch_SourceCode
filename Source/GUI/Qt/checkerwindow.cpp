@@ -214,7 +214,8 @@ void CheckerWindow::hide()
 void CheckerWindow::create_policy_options(QString& policies)
 {
     MediaConchLib::Get_Policies list;
-    mainwindow->get_policies("JSON", list);
+    QString err;
+    mainwindow->get_policies("JSON", list, err);
 
     QString system_policy;
     QString user_policy;
