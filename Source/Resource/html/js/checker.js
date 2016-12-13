@@ -3,7 +3,7 @@ $(document).ready(function() {
         'order': [],
         'autoWidth': false,
         'fixedHeader': {
-            headerOffset: $('#mco-navbar').outerHeight(true)
+            headerOffset: 70
         },
         'columnDefs': [
             { 'orderable': true, targets: 0 },
@@ -19,6 +19,9 @@ $(document).ready(function() {
 
     // Avoid call to checker status if it's already running
     checkerStatusInProgress = false;
+
+    //init error
+    mcoMessage.init('#checkerInfo div');
 
     // Upload form
     $('#file form').on('submit', function (e) {
