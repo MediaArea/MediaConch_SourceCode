@@ -163,7 +163,7 @@ long NoDatabaseReport::get_file_id(int user, const std::string& file, const std:
 //---------------------------------------------------------------------------
 int NoDatabaseReport::get_file_name_from_id(int user, long id, std::string& file, std::string& err)
 {
-    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+    if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
     {
         file = files_saved[id]->filename;
@@ -182,7 +182,7 @@ int NoDatabaseReport::get_file_information_from_id(int user, long id, std::strin
                                                     std::string& options, bool& analyzed,
                                                     bool& has_error, std::string& error_log, std::string& err)
 {
-    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+    if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
     {
         filename = files_saved[id]->filename;
@@ -237,7 +237,7 @@ bool NoDatabaseReport::file_is_analyzed(int user, long id, std::string& err)
 //---------------------------------------------------------------------------
 int NoDatabaseReport::update_file_generated_id(int user, long source_id, long generated_id, std::string& err)
 {
-    if (source_id > 0 && source_id < (long)files_saved.size() && files_saved[source_id] &&
+    if (source_id >= 0 && source_id < (long)files_saved.size() && files_saved[source_id] &&
         files_saved[source_id]->user == user)
     {
         files_saved[source_id]->generated_id = generated_id;
@@ -251,7 +251,7 @@ int NoDatabaseReport::update_file_generated_id(int user, long source_id, long ge
 //---------------------------------------------------------------------------
 int NoDatabaseReport::update_file_analyzed(int user, long id, std::string& err, bool analyzed)
 {
-    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+    if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
     {
         files_saved[id]->analyzed = analyzed;
@@ -265,7 +265,7 @@ int NoDatabaseReport::update_file_analyzed(int user, long id, std::string& err, 
 //---------------------------------------------------------------------------
 int NoDatabaseReport::update_file_error(int user, long id, std::string& err, bool has_error, const std::string& error_log)
 {
-    if (id > 0 && id < (long)files_saved.size() && files_saved[id] &&
+    if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
     {
         files_saved[id]->has_error = has_error;

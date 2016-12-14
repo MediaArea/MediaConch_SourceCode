@@ -29,6 +29,11 @@ UiSettings::~UiSettings()
 //---------------------------------------------------------------------------
 int UiSettings::init()
 {
+    default_policy = "last";
+    default_display = "last";
+    default_verbosity = 5;
+    last_verbosity = 5;
+
     if (!database)
         return -1;
     if (database->ui_settings_get_default_policy(default_policy))
