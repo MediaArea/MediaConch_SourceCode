@@ -191,7 +191,6 @@ namespace MediaConch
     QString WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
                                                 const QString& verbosity, bool fixer)
     {
-        int ret = 0;
         QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
         if (!files.size())

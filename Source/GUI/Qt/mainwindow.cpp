@@ -66,6 +66,7 @@ const std::string MainWindow::version = "16.10";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    db(NULL),
     workerfiles(this)
 {
     ui->setupUi(this);
