@@ -559,7 +559,15 @@ void WorkerFiles::add_registered_files_to_db(const std::vector<FileRegistered*>&
     if (!db)
         return;
 
-    db->ui_add_files(files);
+    for (size_t i = 0; i < files.size();)
+    {
+        std::vector<FileRegistered*> tmp;
+        size_t j = 0;
+        for (; j < 50 && i + j < files.size(); ++j)
+            tmp.push_back(files[i + j]);
+        db->ui_add_files(tmp);
+        i += j;
+    }
 }
 
 //---------------------------------------------------------------------------

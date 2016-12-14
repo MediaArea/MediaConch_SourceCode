@@ -123,8 +123,10 @@ int SQLLiteUi::init_ui()
         return -1;
     if (get_db_version(ui_version) < 0)
         return -1;
-    ui_settings_create_table();
-    ui_create_table();
+    if (ui_settings_create_table() < 0)
+        return -1;
+    if (ui_create_table() < 0)
+        return -1;
     set_db_version(ui_current_version);
     return 0;
 }
@@ -198,12 +200,13 @@ int SQLLiteUi::ui_add_files(const std::vector<FileRegistered*>& files)
     create << ";";
     query = create.str();
 
-    const char* end = NULL;
-    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
-    if (ret != SQLITE_OK || !stmt || (end && *end))
+    std::string err;
+
+    if (prepare_v2(query, err) < 0)
         return -1;
 
     int nb_column = 8;
+    int ret = SQLITE_OK;
     for (size_t i = 0; i < files.size(); ++i)
     {
         FileRegistered* file = files[i];
