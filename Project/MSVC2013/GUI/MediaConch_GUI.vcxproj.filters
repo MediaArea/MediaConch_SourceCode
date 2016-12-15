@@ -89,16 +89,10 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\GUI\Qt\menumainwindow.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\settingswindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_checkerwindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_menumainwindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_settingswindow.cpp">
