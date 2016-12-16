@@ -26,8 +26,10 @@
 
 #if defined(_WIN32) || defined(WIN32)
 #include <Winbase.h>
+#include <windows.h>
 #else
 #include <sys/time.h>
+#include <unistd.h>
 #endif
 
 //---------------------------------------------------------------------------
@@ -112,6 +114,9 @@ namespace MediaConch {
         }
 
         if (another_work_to_do(el, MI) <= 0)
+            return;
+
+        if (attachement_to_add(el, MI) < 0)
             return;
 
         CS.Enter();
@@ -203,6 +208,73 @@ namespace MediaConch {
         if (file_id == -1)
             err = "File not in scheduler.";
         return file_id;
+    }
+
+    int Scheduler::attachement_to_add(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
+    {
+        // Before registering, check if attachements in it
+        String tmp = MI->Get(Stream_General, 0, __T("Attachments_Data"));
+        if (!tmp.size())
+            return 0;
+        std::string attachments_str = ZenLib::Ztring(tmp).To_UTF8().c_str();
+        std::vector<std::string> attachments;
+        size_t start = 0;
+        size_t pos = 0;
+        while (pos != std::string::npos)
+        {
+            pos = attachments_str.find(" / ", start);
+            if (pos != std::string::npos)
+            {
+                attachments.push_back(attachments_str.substr(start, pos - start));
+                start = pos + 3;
+            }
+            else
+                attachments.push_back(attachments_str.substr(start));
+        }
+
+        std::string err;
+        for (size_t i = 0; i < attachments.size(); ++i)
+        {
+            std::stringstream ss;
+            ss << "/tmp/attachment" << i << ".pdf";
+            std::ofstream ofs(ss.str().c_str(), std::ofstream::out);
+            ofs.write(attachments[i].c_str(), attachments[i].size());
+            ofs.close();
+
+            std::vector<std::pair<std::string,std::string> > options;
+            for (size_t i = 0; i < el->options.size(); ++i)
+                options.push_back(std::make_pair(el->options[i].first, el->options[i].second));
+
+            std::vector<std::string> plugins;
+            for (size_t i = 0; i < el->plugins.size(); ++i)
+                plugins.push_back(el->plugins[i]);
+
+            std::string log;
+            long id;
+            if ((id = core->checker_analyze(el->user, ss.str(), el->file_id, 0, log, log,
+                                            options, plugins, err, el->mil_analyze)) >= 0)
+            {
+                core->file_add_generated_file(el->user, el->file_id, id, err);
+
+                while (1)
+                {
+                    MediaConchLib::Checker_StatusRes res;
+                    if (core->checker_status(el->user, id, res, err) < 0)
+                        break;
+
+                    if (res.finished)
+                        break;
+
+#ifdef WINDOWS
+                    ::Sleep((DWORD)50);
+#else
+                    usleep(50000);
+#endif
+                }
+            }
+        }
+
+        return 0;
     }
 
     int Scheduler::another_work_to_do(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
