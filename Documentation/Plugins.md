@@ -36,11 +36,26 @@ It should be a struct named *Plugins* which contains an array of plugin.
 * **params**: CLI parameters to be given to DPF Manager CLI
 * **isos**:   TIFF standarts to check
 
+##### PreHook
+
+* **id**:            Id of the plugin
+* **name**:          Has to be *PreHook*
+* **bin**:           Full path to the Command Line Interface of the command
+* **formatting**:    Command line formatting (following the pattern "$VAR[ $VARXXX]*", $VAR can be $BIN, $INPUTPARAMS, $INPUTFILE, $OUTPUTPARAMS, $OUTPUTFILE, $PARAMS; default is "$BIN $INPUTPARAMS $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE $PARAMS")
+* **createFile**:    Need to be set to true, tell the plugin manager to create an output file
+* **analyzeSource**: Analyze the generated file and the source file
+* **outputDir**:     Directory where the created file will be put
+* **outputExt**:     Extension of the File created
+* **inputParams**:   CLI parameters to be given before the input file
+* **outputParams**:  CLI parameters to be given before the output file
+* **params**:        CLI parameters added after the command
+
 ##### FFmpeg
 
 * **id**:            Id of the plugin
 * **name**:          Has to be *FFmpeg*
 * **bin**:           Full path to the Command Line Interface of ffmpeg
+* **formatting**:    Command line formatting (following the pattern "$VAR[ $VARXXX]*", $VAR can be $BIN, $INPUTPARAMS, $INPUTFILE, $OUTPUTPARAMS, $OUTPUTFILE, $PARAMS; default is "$BIN $INPUTPARAMS $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE $PARAMS")
 * **createFile**:    Need to be set to true, tell the plugin manager to create an output file
 * **analyzeSource**: Analyze the generated file and the source file
 * **outputDir**:     File created by ffmpeg and used to be analyzed will be creted in this directory
@@ -78,6 +93,18 @@ It should be a struct named *Plugins* which contains an array of plugin.
             },
             {
                 "id": "plugin3",
+                "name": "PreHook",
+                "bin": "$PATH_TO_CMD",
+                "analyzeSource": false,
+                "createFile": true,
+                "outputDir": "/tmp",
+                "outputExt": "mkv",
+                "inputParams": ["--input"],
+                "outputParams": [],
+                "params": []
+            },
+            {
+                "id": "plugin4",
                 "name": "FFmpeg",
                 "bin": "$PATH_TO_FFMPEG",
                 "analyzeSource": false,
@@ -85,11 +112,11 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "outputDir": "/tmp",
                 "outputExt": "mkv",
                 "inputParams": ["-y"],
-                "outputParams": ["-vcodec", "ffv1"]
+                "outputParams": ["-vcodec", "ffv1"],
                 "params": []
             },
             {
-                "id": "plugin4",
+                "id": "plugin5",
                 "name": "LogFile",
                 "file": "/tmp/mediaconch.log",
                 "level": "error"

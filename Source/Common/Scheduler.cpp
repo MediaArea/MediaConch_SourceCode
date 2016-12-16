@@ -21,6 +21,7 @@
 #include "DpfManager.h"
 #include "PluginLog.h"
 #include "PluginFileLog.h"
+#include "PluginPreHook.h"
 #include "FFmpeg.h"
 #include <ZenLib/Ztring.h>
 
@@ -269,7 +270,9 @@ namespace MediaConch {
                 continue;
 
             Plugin *p = NULL;
-            if (plugins[i]->get_name() == "FFmpeg")
+            if (plugins[i]->get_name() == "PreHook")
+                p = new PluginPreHook(*(PluginPreHook*)plugins[i]);
+            else if (plugins[i]->get_name() == "FFmpeg")
                 p = new FFmpeg(*(FFmpeg*)plugins[i]);
             else if (plugins[i]->get_name() == "FileLog")
                 p = new PluginFileLog(*(PluginFileLog*)plugins[i]);

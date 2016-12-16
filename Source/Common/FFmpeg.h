@@ -39,15 +39,6 @@ public:
 
 private:
     FFmpeg&    operator=(const FFmpeg&);
-
-    std::string               bin;
-    std::string               outputDir;
-    std::string               outputExt;
-    std::vector<std::string>  inputParams;
-    std::vector<std::string>  outputParams;
-    std::vector<std::string>  params;
-
-    void create_output_file_name();
 };
 
 }
