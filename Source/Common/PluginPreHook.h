@@ -28,15 +28,12 @@ namespace MediaConch {
 class PluginPreHook : public Plugin
 {
 public:
-    PluginPreHook() : create_file(false), analyze_source(true) {}
-    virtual      ~PluginPreHook() {}
-    PluginPreHook(const PluginPreHook& p) : Plugin(p)
-    {
-        input_file = p.input_file;
-        output_file = p.output_file;
-        create_file = p.create_file;
-        analyze_source = p.analyze_source;
-    }
+    PluginPreHook();
+    virtual      ~PluginPreHook();
+    PluginPreHook(const PluginPreHook& p);
+
+    virtual int   load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error);
+    virtual int   run(std::string& error);
 
     void          set_input_file(const std::string& file) { input_file = file; }
 
@@ -46,10 +43,19 @@ public:
     bool          analyzing_source() { return analyze_source; }
 
 protected:
-    std::string   input_file;
-    std::string   output_file;
-    bool          create_file;
-    bool          analyze_source;
+    std::string               input_file;
+    std::string               output_file;
+    std::string               bin;
+    std::string               formatting;
+    std::string               outputDir;
+    std::string               outputExt;
+    std::vector<std::string>  inputParams;
+    std::vector<std::string>  outputParams;
+    std::vector<std::string>  params;
+    bool                      create_file;
+    bool                      analyze_source;
+
+    void create_output_file_name();
 
 private:
     PluginPreHook &operator=(const PluginPreHook&);

@@ -1151,7 +1151,7 @@ int SQLLiteReport::get_element_report_kind(int user, long file_id, MediaConchLib
     }
 
     if (!reports.size())
-        return -1;
+        return 0;
 
     for (size_t i = 0; i < reports.size(); ++i)
     {

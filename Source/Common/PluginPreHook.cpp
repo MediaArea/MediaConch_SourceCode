@@ -14,7 +14,7 @@
 #include <ZenLib/File.h>
 #include <ZenLib/Dir.h>
 #include <ZenLib/FileName.h>
-#include "FFmpeg.h"
+#include "PluginPreHook.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -24,33 +24,39 @@ namespace MediaConch {
     //***************************************************************************
 
     //---------------------------------------------------------------------------
-    FFmpeg::FFmpeg() : PluginPreHook()
+    PluginPreHook::PluginPreHook() : create_file(false), analyze_source(true)
     {
         type = MediaConchLib::PLUGIN_PRE_HOOK;
     }
 
     //---------------------------------------------------------------------------
-    FFmpeg::~FFmpeg()
+    PluginPreHook::~PluginPreHook()
     {
     }
 
     //---------------------------------------------------------------------------
-    FFmpeg::FFmpeg(const FFmpeg& f) : PluginPreHook(f)
+    PluginPreHook::PluginPreHook(const PluginPreHook& p) : Plugin(p)
     {
-        bin = f.bin;
-        outputDir = f.outputDir;
-        outputExt = f.outputExt;
+        type = MediaConchLib::PLUGIN_PRE_HOOK;
+        input_file = p.input_file;
+        output_file = p.output_file;
+        create_file = p.create_file;
+        analyze_source = p.analyze_source;
+        bin = p.bin;
+        formatting = p.formatting;
+        outputDir = p.outputDir;
+        outputExt = p.outputExt;
 
-        for (size_t i = 0; i < f.inputParams.size(); ++i)
-            inputParams.push_back(f.inputParams[i]);
-        for (size_t i = 0; i < f.outputParams.size(); ++i)
-            outputParams.push_back(f.outputParams[i]);
-        for (size_t i = 0; i < f.params.size(); ++i)
-            params.push_back(f.params[i]);
+        for (size_t i = 0; i < p.inputParams.size(); ++i)
+            inputParams.push_back(p.inputParams[i]);
+        for (size_t i = 0; i < p.outputParams.size(); ++i)
+            outputParams.push_back(p.outputParams[i]);
+        for (size_t i = 0; i < p.params.size(); ++i)
+            params.push_back(p.params[i]);
     }
 
     //---------------------------------------------------------------------------
-    int FFmpeg::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
+    int PluginPreHook::load_plugin(const std::map<std::string, Container::Value>& obj, std::string& error)
     {
         if (obj.find("bin") == obj.end() || obj.at("bin").type != Container::Value::CONTAINER_TYPE_STRING)
         {
@@ -94,6 +100,11 @@ namespace MediaConch {
         }
         outputExt = obj.at("outputExt").s;
 
+        if (obj.find("formatting") != obj.end() && obj.at("formatting").type == Container::Value::CONTAINER_TYPE_STRING)
+            formatting = obj.at("formatting").s;
+        else
+            formatting = "$BIN $INPUTPARAMS $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE $PARAMS";
+
         if (obj.find("inputParams") != obj.end() && obj.at("inputParams").type == Container::Value::CONTAINER_TYPE_ARRAY)
         {
             for (size_t i = 0; i < obj.at("inputParams").array.size(); ++i)
@@ -128,7 +139,7 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int FFmpeg::run(std::string& error)
+    int PluginPreHook::run(std::string& error)
     {
         output_file.clear();
 
@@ -142,26 +153,67 @@ namespace MediaConch {
 
         std::vector<std::string> exec_params;
 
-        exec_params.push_back(bin);
-        for (size_t i = 0; i < inputParams.size(); ++i)
-            exec_params.push_back(inputParams[i]);
+        size_t pos = 0;
+        size_t start = 0;
+        while (pos != std::string::npos && pos < formatting.size())
+        {
+            start = pos;
+            while (formatting[start] == ' ')
+                ++start;
 
-        exec_params.push_back("-i");
-        exec_params.push_back(input_file);
+            pos = formatting.find(" ", start);
+            std::string var;
+            if (pos != std::string::npos)
+            {
+                var = formatting.substr(start, pos - start);
+                pos += 1;
+            }
+            else
+                var = formatting.substr(start);
 
-        for (size_t i = 0; i < outputParams.size(); ++i)
-            exec_params.push_back(outputParams[i]);
+            if (!var.size())
+                continue;
 
-        exec_params.push_back(output_file);
+            else if (var == "$BIN")
+                exec_params.push_back(bin);
 
-        for (size_t i = 0; i < params.size(); ++i)
-            exec_params.push_back(params[i]);
+            else if (var == "$INPUTPARAMS")
+            {
+                for (size_t i = 0; i < inputParams.size(); ++i)
+                    exec_params.push_back(inputParams[i]);
+            }
+
+            else if (var == "$INPUTFILE")
+            {
+                exec_params.push_back(input_file);
+            }
+
+            else if (var == "$OUTPUTPARAMS")
+            {
+                for (size_t i = 0; i < outputParams.size(); ++i)
+                    exec_params.push_back(outputParams[i]);
+            }
+
+            else if (var == "$OUTPUTFILE")
+            {
+                exec_params.push_back(output_file);
+            }
+
+            else if (var == "$PARAMS")
+            {
+                for (size_t i = 0; i < params.size(); ++i)
+                    exec_params.push_back(params[i]);
+            }
+
+            else
+                exec_params.push_back(var);
+        }
 
         return exec_bin(exec_params, error);
     }
 
     //---------------------------------------------------------------------------
-    void FFmpeg::create_output_file_name()
+    void PluginPreHook::create_output_file_name()
     {
         ZenLib::Ztring z_in = ZenLib::Ztring().From_UTF8(input_file);
         ZenLib::FileName file(z_in);
