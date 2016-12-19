@@ -155,16 +155,11 @@ namespace MediaConch {
 
         size_t pos = 0;
         size_t start = 0;
-        while (pos != std::string::npos)
+        while (pos != std::string::npos && pos < formatting.size())
         {
             start = pos;
-            if (formatting[start] != '$' || start + 1 == formatting.size())
-            {
-                error = "Formatting variable is not correct.";
-                return -1;
-            }
-
-            start += 1;
+            while (formatting[start] == ' ')
+                ++start;
 
             pos = formatting.find(" ", start);
             std::string var;
@@ -176,42 +171,42 @@ namespace MediaConch {
             else
                 var = formatting.substr(start);
 
-            if (var == "BIN")
+            if (!var.size())
+                continue;
+
+            else if (var == "$BIN")
                 exec_params.push_back(bin);
 
-            else if (var == "INPUTPARAMS")
+            else if (var == "$INPUTPARAMS")
             {
                 for (size_t i = 0; i < inputParams.size(); ++i)
                     exec_params.push_back(inputParams[i]);
             }
 
-            else if (var == "INPUTFILE")
+            else if (var == "$INPUTFILE")
             {
                 exec_params.push_back(input_file);
             }
 
-            else if (var == "OUTPUTPARAMS")
+            else if (var == "$OUTPUTPARAMS")
             {
                 for (size_t i = 0; i < outputParams.size(); ++i)
                     exec_params.push_back(outputParams[i]);
             }
 
-            else if (var == "OUTPUTFILE")
+            else if (var == "$OUTPUTFILE")
             {
                 exec_params.push_back(output_file);
             }
 
-            else if (var == "PARAMS")
+            else if (var == "$PARAMS")
             {
                 for (size_t i = 0; i < params.size(); ++i)
                     exec_params.push_back(params[i]);
             }
 
             else
-            {
-                error = "Formatting variable name unknown.";
-                return -1;
-            }
+                exec_params.push_back(var);
         }
 
         return exec_bin(exec_params, error);

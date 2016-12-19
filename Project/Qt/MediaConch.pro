@@ -79,7 +79,6 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/VeraPDF.cpp \
                     ../../Source/Common/DpfManager.cpp \
                     ../../Source/Common/PluginPreHook.cpp \
-                    ../../Source/Common/FFmpeg.cpp \
                     ../../Source/Common/PluginFileLog.cpp \
                     ../../Source/Common/WatchFoldersManager.cpp \
                     ../../Source/Common/WatchFolder.cpp \
@@ -142,7 +141,6 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/VeraPDF.h \
                     ../../Source/Common/DpfManager.h \
                     ../../Source/Common/PluginPreHook.h \
-                    ../../Source/Common/FFmpeg.h \
                     ../../Source/Common/PluginLog.h \
                     ../../Source/Common/PluginFileLog.h \
                     ../../Source/Common/WatchFoldersManager.h \

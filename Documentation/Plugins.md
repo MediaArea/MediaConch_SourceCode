@@ -50,20 +50,6 @@ It should be a struct named *Plugins* which contains an array of plugin.
 * **outputParams**:  CLI parameters to be given before the output file
 * **params**:        CLI parameters added after the command
 
-##### FFmpeg
-
-* **id**:            Id of the plugin
-* **name**:          Has to be *FFmpeg*
-* **bin**:           Full path to the Command Line Interface of ffmpeg
-* **formatting**:    Command line formatting (following the pattern "$VAR[ $VARXXX]*", $VAR can be $BIN, $INPUTPARAMS, $INPUTFILE, $OUTPUTPARAMS, $OUTPUTFILE, $PARAMS; default is "$BIN $INPUTPARAMS $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE $PARAMS")
-* **createFile**:    Need to be set to true, tell the plugin manager to create an output file
-* **analyzeSource**: Analyze the generated file and the source file
-* **outputDir**:     File created by ffmpeg and used to be analyzed will be creted in this directory
-* **outputExt**:     Extension of the File created by ffmpeg
-* **inputParams**:   CLI parameters to be given to ffmpeg for the input file, the -i will be added by the program
-* **outputParams**:  CLI parameters to be given to ffmpeg for the output file
-* **params**:        CLI parameters added after the ffmpeg command
-
 ##### LogFile
 
 * **id**:    Id of the plugin
@@ -95,6 +81,7 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "id": "plugin3",
                 "name": "PreHook",
                 "bin": "$PATH_TO_CMD",
+                "formatting": "$BIN $INPUTPARAMS $OUTPUTPARAMS $OUTPUTFILE $INPUTFILE",
                 "analyzeSource": false,
                 "createFile": true,
                 "outputDir": "/tmp",
@@ -104,13 +91,14 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "params": []
             },
             {
-                "id": "plugin4",
-                "name": "FFmpeg",
+                "id": "ffmpeg_example",
+                "name": "PreHook",
                 "bin": "$PATH_TO_FFMPEG",
                 "analyzeSource": false,
                 "createFile": true,
                 "outputDir": "/tmp",
                 "outputExt": "mkv",
+                "formatting": "$BIN $INPUTPARAMS -i $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE",
                 "inputParams": ["-y"],
                 "outputParams": ["-vcodec", "ffv1"],
                 "params": []
