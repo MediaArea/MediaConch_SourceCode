@@ -2,7 +2,7 @@ Format: 3.0 (native)
 Source: mediaconch
 Binary: mediaconch, mediaconch-dbg, mediaconch-server, mediaconch-server-dbg, mediaconch-gui, mediaconch-gui-dbg
 Architecture: any
-Version: 16.11
+Version: 16.12
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Homepage: http://MediaArea.net/MediaConch
 Standards-Version: 3.9.6
@@ -14,8 +14,8 @@ Package-List:
  mediaconch-server deb utils optional arch=any
  mediaconch-gui deb utils optional arch=any
 Checksums-Sha1:
- 0000000000000000000000000000000000000000 000000 mediaconch_16.11.tar.xz
+ 0000000000000000000000000000000000000000 000000 mediaconch_16.12.tar.xz
 Checksums-Sha256:
- 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_16.11.tar.xz
+ 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_16.12.tar.xz
 Files:
- 00000000000000000000000000000000 000000 mediaconch_16.11.tar.xz
+ 00000000000000000000000000000000 000000 mediaconch_16.12.tar.xz

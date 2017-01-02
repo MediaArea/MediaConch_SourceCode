@@ -5,7 +5,7 @@ RequestExecutionLevel admin
 ; Some defines
 !define PRODUCT_NAME "MediaConch"
 !define PRODUCT_PUBLISHER "MediaArea.net"
-!define PRODUCT_VERSION "16.11"
+!define PRODUCT_VERSION "16.12"
 !define PRODUCT_VERSION4 "${PRODUCT_VERSION}.0.0"
 !define PRODUCT_WEB_SITE "http://MediaArea.net/MediaConch"
 !define COMPANY_REGISTRY "Software\MediaArea.net"

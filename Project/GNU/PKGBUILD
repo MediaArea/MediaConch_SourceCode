@@ -3,7 +3,7 @@
 # This PKGBUILD is for OBS
 
 pkgname=('mediaconch' 'mediaconch-server' 'mediaconch-gui')
-pkgver=16.11
+pkgver=16.12
 pkgrel=1
 pkgdesc="Implementation checker and policy checker for video and audio files"
 url="http://MediaArea.net/MediaConch"

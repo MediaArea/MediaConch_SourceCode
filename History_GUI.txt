@@ -7,6 +7,15 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 16.12, 2016-12-31
+-------------
+Push policies to MCO (public or private)
+Import policies from MCO
+UI improvements
+Better handling of errors
+Fix adding 100+ files for analyze
+Fixes
+
 Version 16.11, 2016-11-30
 -------------
 Publish a policy to MediaConchOnline public policies

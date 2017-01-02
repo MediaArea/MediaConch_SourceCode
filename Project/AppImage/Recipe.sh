@@ -54,7 +54,7 @@ if ! grep "CentOS release 6\..*" /etc/centos-release ; then
 fi
 
 # Setup evironment
-VERSION=16.11
+VERSION=16.12
 
 if [ "$(arch)" == "i386" ] ; then
     ARCH="i686"
