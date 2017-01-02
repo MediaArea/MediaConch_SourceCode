@@ -7,6 +7,11 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 16.12, 2016-12-31
+-------------
+Better handling of errors
+Fixes
+
 Version 16.11, 2016-11-30
 -------------
 MediaTrace optimization for Matroska
