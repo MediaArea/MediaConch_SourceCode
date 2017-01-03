@@ -851,8 +851,8 @@ namespace MediaConch
                 *ok->percent = *st_res.percent;
             }
 
-            if (st_res.generated_id >= 0)
-                ok->generated_id = st_res.generated_id;
+            for (size_t j = 0; j < st_res.generated_id.size(); ++j)
+                ok->generated_id.push_back(st_res.generated_id[j]);
 
             if (st_res.source_id >= 0)
                 ok->source_id = st_res.source_id;
@@ -1115,7 +1115,8 @@ namespace MediaConch
             res.filename = info.filename;
             res.file_last_modification = info.file_last_modification;
             res.analyzed = info.analyzed;
-            res.generated_id = info.generated_id;
+            for (size_t j = 0; j < info.generated_id.size(); ++j)
+                res.generated_id.push_back(info.generated_id[j]);
             res.source_id = info.source_id;
             res.generated_time = info.generated_time;
             res.generated_log = info.generated_log;

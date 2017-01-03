@@ -312,7 +312,7 @@ namespace MediaConch {
                 long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log,
                                                 generated_error_log, options, plugins, err, el->mil_analyze);
                 if (id >= 0)
-                    core->file_update_generated_file(el->user, old_id, id, err);
+                    core->file_add_generated_file(el->user, old_id, id, err);
                 old_id = id;
             }
             else if (ret)

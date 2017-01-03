@@ -408,8 +408,9 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
     if (id < 0)
     {
         std::string file_last_modification = get_last_modification_file(file);
+        std::vector<long> generated_id;
         db_mutex.Enter();
-        id = get_db()->add_file(user, file, file_last_modification, options_str, err);
+        id = get_db()->add_file(user, file, file_last_modification, options_str, err, generated_id);
         db_mutex.Leave();
         if (id < 0)
             return -1;
@@ -438,12 +439,13 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
     if (force_analyze)
         analyzed = false;
 
+    std::vector<long> generated_id;
     std::string file_last_modification = get_last_modification_file(filename);
     if (id < 0)
     {
         db_mutex.Enter();
         id = get_db()->add_file(user, filename, file_last_modification, options_str, err,
-                                -1, src_id, generated_time,
+                                generated_id, src_id, generated_time,
                                 generated_log, generated_error_log);
         db_mutex.Leave();
         if (id < 0)
@@ -453,7 +455,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
     {
         db_mutex.Enter();
         id = get_db()->update_file(user, id, file_last_modification, options_str, err,
-                                   -1, src_id, generated_time,
+                                   generated_id, src_id, generated_time,
                                    generated_log, generated_error_log);
         db_mutex.Leave();
         if (id < 0)
@@ -467,10 +469,10 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
 }
 
 //---------------------------------------------------------------------------
-int Core::file_update_generated_file(int user, long src_id, long generated_id, std::string& err)
+int Core::file_add_generated_file(int user, long src_id, long generated_id, std::string& err)
 {
     db_mutex.Enter();
-    int ret = get_db()->update_file_generated_id(user, src_id, generated_id, err);
+    int ret = get_db()->add_file_generated_id(user, src_id, generated_id, err);
     db_mutex.Leave();
 
     return ret;

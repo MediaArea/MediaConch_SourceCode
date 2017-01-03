@@ -292,18 +292,18 @@ public:
 
     struct Checker_Status_Ok
     {
-        Checker_Status_Ok() : finished(false), has_error(false), percent(NULL), tool(NULL), generated_id(-1), source_id(-1) {}
+        Checker_Status_Ok() : finished(false), has_error(false), percent(NULL), tool(NULL), source_id(-1) {}
         ~Checker_Status_Ok();
 
-        long                    id;
-        bool                    finished;
-        bool                    has_error;
-        std::string             error_log;
+        long                     id;
+        bool                     finished;
+        bool                     has_error;
+        std::string              error_log;
         double                  *percent;
         Report                  *tool;
-        long                    generated_id;
-        long                    source_id;
-        std::string             to_str() const;
+        std::vector<long>        generated_id;
+        long                     source_id;
+        std::string              to_str() const;
     };
 
     struct Checker_Status_Res
@@ -476,7 +476,7 @@ public:
 
     struct Checker_File_Information_Res
     {
-        Checker_File_Information_Res() : generated_id(-1), source_id(-1), generated_time((size_t)-1),
+        Checker_File_Information_Res() : source_id(-1), generated_time((size_t)-1),
                                          analyzed(false), has_error(false), nok(NULL) {}
         ~Checker_File_Information_Res();
 
@@ -486,7 +486,7 @@ public:
         std::string                                       generated_error_log;
         std::vector<std::pair<std::string,std::string> >  options;
         std::string                                       error_log;
-        long                                              generated_id;
+        std::vector<long>                                 generated_id;
         long                                              source_id;
         size_t                                            generated_time;
         bool                                              analyzed;

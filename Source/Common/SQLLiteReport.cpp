@@ -27,7 +27,7 @@ namespace MediaConch {
 // SQLLiteReport
 //***************************************************************************
 
-int SQLLiteReport::current_report_version = 5;
+int SQLLiteReport::current_report_version = 6;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -118,6 +118,7 @@ int SQLLiteReport::update_report_table()
     UPDATE_REPORT_TABLE_FOR_VERSION(2);
     UPDATE_REPORT_TABLE_FOR_VERSION(3);
     UPDATE_REPORT_TABLE_FOR_VERSION(4);
+    UPDATE_REPORT_TABLE_FOR_VERSION(5);
 
 #undef UPDATE_REPORT_TABLE_FOR_VERSION
 
@@ -148,7 +149,7 @@ void SQLLiteReport::get_users_id(std::vector<long>& ids, std::string& err)
 
 long SQLLiteReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
                              const std::string& options, std::string& err,
-                             long generated_id,
+                             const std::vector<long>& generated_id,
                              long source_id, size_t generated_time,
                              const std::string& generated_log, const std::string& generated_error_log)
 {
@@ -194,7 +195,9 @@ long SQLLiteReport::add_file(int user, const std::string& filename, const std::s
         return -1;
     }
 
-    ret = sqlite3_bind_int(stmt, 4, generated_id);
+    std::string g_id;
+    longs_to_string(generated_id, g_id);
+    ret = sqlite3_bind_blob(stmt, 4, g_id.c_str(), g_id.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -248,7 +251,7 @@ long SQLLiteReport::add_file(int user, const std::string& filename, const std::s
 
 long SQLLiteReport::update_file(int user, long file_id, const std::string& file_last_modification,
                                 const std::string& options, std::string& err,
-                                long generated_id, long source_id, size_t generated_time,
+                                const std::vector<long>& generated_id, long source_id, size_t generated_time,
                                 const std::string& generated_log, const std::string& generated_error_log)
 {
     std::stringstream create;
@@ -271,7 +274,9 @@ long SQLLiteReport::update_file(int user, long file_id, const std::string& file_
         return -1;
     }
 
-    ret = sqlite3_bind_int(stmt, 2, generated_id);
+    std::string g_id;
+    longs_to_string(generated_id, g_id);
+    ret = sqlite3_bind_blob(stmt, 2, g_id.c_str(), g_id.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -444,10 +449,10 @@ int SQLLiteReport::get_file_name_from_id(int user, long id, std::string& file, s
 }
 
 int SQLLiteReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
-                                                 long& generated_id, long& source_id, size_t& generated_time,
-                                                 std::string& generated_log, std::string& generated_error_log,
-                                                 std::string& options, bool& analyzed,
-                                                 bool& has_error, std::string& error_log, std::string& err)
+                                                std::vector<long>& generated_id, long& source_id, size_t& generated_time,
+                                                std::string& generated_log, std::string& generated_error_log,
+                                                std::string& options, bool& analyzed,
+                                                bool& has_error, std::string& error_log, std::string& err)
 {
     std::stringstream create;
     std::string name("FILENAME");
@@ -514,7 +519,10 @@ int SQLLiteReport::get_file_information_from_id(int user, long id, std::string& 
         analyzed = (bool)std_string_to_int(reports[0][analyz]);
 
     if (reports[0].find(gen_id) != reports[0].end())
-        generated_id = std_string_to_int(reports[0][gen_id]);
+    {
+        std::string g_id;
+        string_to_longs(reports[0][gen_id], generated_id);
+    }
 
     if (reports[0].find(src_id) != reports[0].end())
         source_id = std_string_to_int(reports[0][src_id]);
@@ -540,8 +548,59 @@ int SQLLiteReport::get_file_information_from_id(int user, long id, std::string& 
     return 0;
 }
 
-int SQLLiteReport::update_file_generated_id(int user, long source_id, long generated_id, std::string& err)
+int SQLLiteReport::get_generated_id(int user, long id, std::vector<long>& generated_id, std::string& err)
 {
+    std::stringstream create;
+    std::string gen_id("GENERATED_ID");
+
+    reports.clear();
+    create << "SELECT " << gen_id;
+    create << " FROM MEDIACONCH_FILE";
+    create << " WHERE ID = ? AND USER = ?;";
+    query = create.str();
+
+    if (prepare_v2(query, err) < 0)
+        return -1;
+
+    int ret = sqlite3_bind_int(stmt, 1, id);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    ret = sqlite3_bind_int(stmt, 2, user);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    if (execute())
+    {
+        err = error;
+        return -1;
+    }
+
+    if (reports.size() != 1)
+        return 0;
+
+    if (reports[0].find(gen_id) != reports[0].end())
+    {
+        std::string g_id;
+        string_to_longs(reports[0][gen_id], generated_id);
+    }
+
+    return 0;
+}
+
+int SQLLiteReport::add_file_generated_id(int user, long source_id, long generated_id, std::string& err)
+{
+    std::vector<long> ids;
+    if (get_generated_id(user, source_id, ids, err))
+        return -1;
+    ids.push_back(generated_id);
+
     std::stringstream create;
 
     reports.clear();
@@ -553,7 +612,9 @@ int SQLLiteReport::update_file_generated_id(int user, long source_id, long gener
     if (prepare_v2(query, err) < 0)
         return -1;
 
-    int ret = sqlite3_bind_int(stmt, 1, generated_id);
+    std::string g_id;
+    longs_to_string(ids, g_id);
+    int ret = sqlite3_bind_blob(stmt, 1, g_id.c_str(), g_id.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
