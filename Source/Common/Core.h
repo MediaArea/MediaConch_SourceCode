@@ -137,7 +137,7 @@ public:
     //***************************************************************************
     // Checker Helper
     //***************************************************************************
-    int         file_update_generated_file(int user, long src_id, long generated_id, std::string& err);
+    int         file_add_generated_file(int user, long src_id, long generated_id, std::string& err);
     int         update_file_error(int user, long id, bool has_error, const std::string& error_log, std::string& err);
     int         get_reports_output_JStree(int user, const std::vector<long>& file,
                                           const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);

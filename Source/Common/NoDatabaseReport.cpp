@@ -99,7 +99,7 @@ void NoDatabaseReport::get_users_id(std::vector<long>& ids, std::string&)
 
 //---------------------------------------------------------------------------
 long NoDatabaseReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
-                                const std::string& options, std::string&, long generated_id,
+                                const std::string& options, std::string&, const std::vector<long>& generated_id,
                                 long source_id, size_t generated_time,
                                 const std::string& generated_log, const std::string& generated_error_log)
 {
@@ -110,7 +110,8 @@ long NoDatabaseReport::add_file(int user, const std::string& filename, const std
     f->user = user;
 
     f->source_id = source_id;
-    f->generated_id = generated_id;
+    for (size_t i = 0; i < generated_id.size(); ++i)
+        f->generated_id.push_back(generated_id[i]);
 
     f->generated_time = generated_time;
     f->generated_log = generated_log;
@@ -123,7 +124,7 @@ long NoDatabaseReport::add_file(int user, const std::string& filename, const std
 
 //---------------------------------------------------------------------------
 long NoDatabaseReport::update_file(int user, long file_id, const std::string& file_last_modification,
-                                   const std::string& options, std::string&, long generated_id,
+                                   const std::string& options, std::string&, const std::vector<long>& generated_id,
                                    long source_id, size_t generated_time,
                                    const std::string& generated_log, const std::string& generated_error_log)
 {
@@ -137,7 +138,8 @@ long NoDatabaseReport::update_file(int user, long file_id, const std::string& fi
     f->analyzed = false;
 
     f->source_id = source_id;
-    f->generated_id = generated_id;
+    for (size_t i = 0; i < generated_id.size(); ++i)
+        f->generated_id.push_back(generated_id[i]);
 
     f->generated_time = generated_time;
     f->generated_log = generated_log;
@@ -177,17 +179,18 @@ int NoDatabaseReport::get_file_name_from_id(int user, long id, std::string& file
 
 //---------------------------------------------------------------------------
 int NoDatabaseReport::get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
-                                                    long& generated_id, long& source_id, size_t& generated_time,
-                                                    std::string& generated_log, std::string& generated_error_log,
-                                                    std::string& options, bool& analyzed,
-                                                    bool& has_error, std::string& error_log, std::string& err)
+                                                   std::vector<long>& generated_id, long& source_id, size_t& generated_time,
+                                                   std::string& generated_log, std::string& generated_error_log,
+                                                   std::string& options, bool& analyzed,
+                                                   bool& has_error, std::string& error_log, std::string& err)
 {
     if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
         files_saved[id]->user == user)
     {
         filename = files_saved[id]->filename;
         file_last_modification = files_saved[id]->file_last_modification;
-        generated_id = files_saved[id]->generated_id;
+        for (size_t i = 0; i < files_saved[id]->generated_id.size(); ++i)
+            generated_id.push_back(files_saved[id]->generated_id[i]);
         source_id = files_saved[id]->source_id;
         generated_time = files_saved[id]->generated_time;
         generated_log = files_saved[id]->generated_log;
@@ -201,7 +204,7 @@ int NoDatabaseReport::get_file_information_from_id(int user, long id, std::strin
     {
         filename = std::string();
         file_last_modification = std::string();
-        generated_id = -1;
+        generated_id.clear();
         source_id = -1;
         generated_time = (size_t)-1;
         generated_log = std::string();
@@ -235,12 +238,12 @@ bool NoDatabaseReport::file_is_analyzed(int user, long id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int NoDatabaseReport::update_file_generated_id(int user, long source_id, long generated_id, std::string& err)
+int NoDatabaseReport::add_file_generated_id(int user, long source_id, long generated_id, std::string& err)
 {
     if (source_id >= 0 && source_id < (long)files_saved.size() && files_saved[source_id] &&
         files_saved[source_id]->user == user)
     {
-        files_saved[source_id]->generated_id = generated_id;
+        files_saved[source_id]->generated_id.push_back(generated_id);
         return 0;
     }
 

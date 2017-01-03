@@ -605,10 +605,14 @@ namespace MediaConch
             if (res.tool)
                 report_kind = (MediaConchLib::report)*res.tool;
 
-            if (res.generated_id >= 0)
+            for (size_t i = 0; i < res.generated_id.size(); ++i)
             {
-                file_id = res.generated_id;
-                return is_ready(file_id, report_kind, err);
+                if (res.generated_id[i] == -1)
+                    continue;
+
+                file_id = res.generated_id[i];
+                if ((ret = is_ready(file_id, report_kind, err)) <= 0)
+                    return ret;
             }
         }
 
@@ -681,11 +685,21 @@ namespace MediaConch
         if (info->has_error)
             ss << "error_log:          " << std::boolalpha << info->error_log << "\n";
 
-        if (info->generated_id >= 0)
+        if (info->generated_id.size())
         {
-            std::string file;
-            MCL.checker_file_from_id(use_as_user, info->generated_id, file, error);
-            ss << "generated file:         " << file << "\n";
+            ss << "generated file:         [";
+            for (size_t i = 0; i < info->generated_id.size(); ++i)
+            {
+                if (i)
+                    ss << ",";
+
+                std::string file;
+                if (MCL.checker_file_from_id(use_as_user, info->generated_id[i], file, error) >= 0)
+                    ss << file;
+                else
+                    ss << i;
+            }
+            ss << "]\n";
         }
 
         if (info->source_id >= 0)

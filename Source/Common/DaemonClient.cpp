@@ -361,7 +361,8 @@ int DaemonClient::checker_file_information(int user, long id, MediaConchLib::Che
     {
         info.filename = res->filename;
         info.file_last_modification = res->file_last_modification;
-        info.generated_id = res->generated_id;
+        for (size_t i = 0; i < res->generated_id.size(); ++i)
+            info.generated_id.push_back(res->generated_id[i]);
         info.source_id = res->source_id;
         info.generated_time = res->generated_time;
         info.generated_log = res->generated_log;
@@ -510,8 +511,11 @@ int DaemonClient::checker_status(int user, long file_id, MediaConchLib::Checker_
             *st_res.tool = (int)MediaConchLib::report_MediaConch;
     }
 
-    if (ok->generated_id >= 0)
-        st_res.generated_id = ok->generated_id;
+    if (ok->generated_id.size())
+    {
+        for (size_t i = 0; i < ok->generated_id.size(); ++i)
+            st_res.generated_id.push_back(ok->generated_id[i]);
+    }
 
     if (ok->source_id >= 0)
         st_res.source_id = ok->source_id;

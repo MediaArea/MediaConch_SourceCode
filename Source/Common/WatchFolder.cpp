@@ -176,18 +176,21 @@ void WatchFolder::Entry()
             {
                 wffile->state = WatchFolderFile::WFFS_DONE;
 
-                if (status.generated_id != -1)
+                if (status.generated_id.size())
                 {
-                    WatchFolderFile *new_wffile = new WatchFolderFile;
-                    std::string filename;
-                    std::string err;
-                    core->checker_file_from_id(user, status.generated_id, filename, err);
-                    new_wffile->file_id = status.generated_id;
-                    new_wffile->name = filename;
-                    new_wffile->time = ZenLib::File::Modified_Get(ZenLib::Ztring().From_UTF8(filename)).To_UTF8();
-                    new_wffile->report_file = wffile->report_file;
-                    new_wffile->state = WatchFolderFile::WFFS_ANALYZING;
-                    files[filename] = new_wffile;
+                    for (size_t j = 0; j < status.generated_id.size(); ++j)
+                    {
+                        WatchFolderFile *new_wffile = new WatchFolderFile;
+                        std::string filename;
+                        std::string err;
+                        core->checker_file_from_id(user, status.generated_id[j], filename, err);
+                        new_wffile->file_id = status.generated_id[j];
+                        new_wffile->name = filename;
+                        new_wffile->time = ZenLib::File::Modified_Get(ZenLib::Ztring().From_UTF8(filename)).To_UTF8();
+                        new_wffile->report_file = wffile->report_file;
+                        new_wffile->state = WatchFolderFile::WFFS_ANALYZING;
+                        files[filename] = new_wffile;
+                    }
                 }
                 else if (folder_reports.size())
                     ask_report(wffile);

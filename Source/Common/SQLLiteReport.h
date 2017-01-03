@@ -45,23 +45,23 @@ public:
     // File
     virtual long add_file(int user, const std::string& filename, const std::string& file_last_modification,
                           const std::string& options, std::string& err,
-                          long generated_id=-1, long source_id=-1, size_t generated_time=(size_t)-1,
+                          const std::vector<long>& generated_id, long source_id=-1, size_t generated_time=(size_t)-1,
                           const std::string& generated_log="", const std::string& generated_error_log="");
     virtual long update_file(int user, long file_id, const std::string& file_last_modification,
                              const std::string& options, std::string& err,
-                             long generated_id=-1, long source_id=-1, size_t generated_time=(size_t)-1,
+                             const std::vector<long>& generated_id, long source_id=-1, size_t generated_time=(size_t)-1,
                              const std::string& generated_log="", const std::string& generated_error_log="");
     virtual long get_file_id(int user, const std::string& file, const std::string& file_last_modification,
                              const std::string& options, std::string& err);
     virtual int  get_file_name_from_id(int user, long id, std::string& file, std::string& err);
     virtual int  get_file_information_from_id(int user, long id, std::string& filename, std::string& file_last_modification,
-                                              long& generated_id, long& source_id, size_t& generated_time,
+                                              std::vector<long>& generated_id, long& source_id, size_t& generated_time,
                                               std::string& generated_log, std::string& generated_error_log,
                                               std::string& options,
                                               bool& analyzed, bool& has_error, std::string& error_log,
                                               std::string& err);
     virtual bool file_is_analyzed(int user, long id, std::string& err);
-    virtual int  update_file_generated_id(int user, long source_id, long generated_id, std::string& err);
+    virtual int  add_file_generated_id(int user, long source_id, long generated_id, std::string& err);
     virtual int  update_file_analyzed(int user, long id, std::string& err, bool analyzed=true);
     virtual int  update_file_error(int user, long id, std::string& err, bool has_error=true, const std::string& error_log="");
 
@@ -91,6 +91,7 @@ private:
     static int    current_report_version;
 
     bool          file_id_match_user(int user, long file_id, std::string& err);
+    int           get_generated_id(int user, long id, std::vector<long>& generated_id, std::string& err);
 
     SQLLiteReport (const SQLLiteReport&);
     SQLLiteReport& operator=(const SQLLiteReport&);

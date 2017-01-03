@@ -1017,8 +1017,17 @@ std::string RESTAPI::Checker_Status_Ok::to_str() const
         out << ",\"tool\":" << api.get_Report_string(*tool);
     }
 
-    if (generated_id != -1)
-        out << ",\"generated_id\":" << generated_id;
+    if (generated_id.size())
+    {
+        out << ",\"generated_id\":[";
+        for (size_t i = 0; i < generated_id.size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << generated_id[i];
+        }
+        out << "]";
+    }
 
     if (source_id != -1)
         out << ",\"source_id\":" << source_id;
@@ -1195,7 +1204,14 @@ std::string RESTAPI::Checker_File_Information_Res::to_str() const
     {
         out << "\"filename\":\"" << filename << "\"";
         out << ",\"file_last_modification\":\"" << file_last_modification << "\"";
-        out << ",\"generated_id\":" << generated_id;
+        out << ",\"generated_id\":[";
+        for (size_t i = 0; i < generated_id.size(); ++i)
+        {
+            if (i)
+                out << ",";
+            out << generated_id[i];
+        }
+        out << "]";
         out << ",\"source_id\":" << source_id;
         out << ",\"generated_time\":" << generated_time;
         out << ",\"generated_log\":\"" << generated_log << "\"";
@@ -2891,8 +2907,14 @@ int RESTAPI::serialize_checker_file_information_res(Checker_File_Information_Res
         file_last_modification.s = res.file_last_modification;
         child.obj["file_last_modification"] = file_last_modification;
 
-        generated_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-        generated_id.l = res.generated_id;
+        generated_id.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < res.generated_id.size(); ++i)
+        {
+            Container::Value g_id;
+            g_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+            g_id.l = res.generated_id[i];
+            generated_id.array.push_back(g_id);
+        }
         child.obj["generated_id"] = generated_id;
 
         source_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
@@ -7200,7 +7222,7 @@ RESTAPI::Checker_File_From_Id_Res *RESTAPI::parse_checker_file_from_id_res(const
 
     Checker_File_From_Id_Res *res = new Checker_File_From_Id_Res;
     Container::Value *file = model->get_value_by_key(*child, "file");
-    Container::Value *nok = model->get_value_by_key(*child, "file");
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
 
     if (nok)
     {
@@ -7326,8 +7348,14 @@ RESTAPI::Checker_File_Information_Res *RESTAPI::parse_checker_file_information_r
             res->file_last_modification = file_last_modification->s;
 
         Container::Value *generated_id = model->get_value_by_key(*child, "generated_id");
-        if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
-            res->generated_id = generated_id->l;
+        if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t j = 0; j < generated_id->array.size(); ++j)
+            {
+                if (generated_id->array[j].type == Container::Value::CONTAINER_TYPE_INTEGER)
+                    res->generated_id.push_back(generated_id->array[j].l);
+            }
+        }
 
         Container::Value *source_id = model->get_value_by_key(*child, "source_id");
         if (source_id && source_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
@@ -8623,10 +8651,17 @@ Container::Value RESTAPI::serialize_checker_status_oks(std::vector<Checker_Statu
             v.obj["tool"] = tool;
         }
 
-        if (array[i]->generated_id != -1)
+
+        if (array[i]->generated_id.size())
         {
-            generated_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
-            generated_id.l = array[i]->generated_id;
+            generated_id.type = Container::Value::CONTAINER_TYPE_ARRAY;
+            for (size_t j = 0; j < array[i]->generated_id.size(); ++j)
+            {
+                Container::Value g_id;
+                g_id.type = Container::Value::CONTAINER_TYPE_INTEGER;
+                g_id.l = array[i]->generated_id[j];
+                generated_id.array.push_back(g_id);
+            }
             v.obj["generated_id"] = generated_id;
         }
 
@@ -9165,8 +9200,14 @@ int RESTAPI::parse_checker_status_ok(Container::Value *v, std::vector<Checker_St
                 ok->error_log = error_log->s;
         }
 
-        if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
-            ok->generated_id = generated_id->l;
+        if (generated_id && generated_id->type == Container::Value::CONTAINER_TYPE_ARRAY)
+        {
+            for (size_t j = 0; j < generated_id->array.size(); ++j)
+            {
+                if (generated_id->array[j].type == Container::Value::CONTAINER_TYPE_INTEGER)
+                    ok->generated_id.push_back(generated_id->array[j].l);
+            }
+        }
 
         if (source_id && source_id->type == Container::Value::CONTAINER_TYPE_INTEGER)
             ok->source_id = source_id->l;
