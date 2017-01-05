@@ -15,6 +15,7 @@
 #include "MediaConchLib.h"
 #include "Core.h"
 #include "PluginLog.h"
+#include "PluginPreHook.h"
 
 #include <ZenLib/Ztring.h>
 #include <ZenLib/ZtringList.h>
@@ -150,7 +151,23 @@ void WatchFolder::Entry()
 
             bool registered = false;
             std::string err;
-            wffile->file_id = core->checker_analyze(user, filename, registered, options, plugins, err, false);
+            bool need_analyze = true;
+            for (size_t j = 0; need_analyze && j < plugins.size(); ++j)
+            {
+                const std::vector<Plugin*>& ps = core->get_pre_hook_plugins();
+                for (size_t ps_i = 0; ps_i < ps.size(); ++ps_i)
+                    if (ps[ps_i] && plugins[i] == ps[ps_i]->get_id() &&
+                        ps[ps_i]->get_type() == MediaConchLib::PLUGIN_PRE_HOOK)
+                    {
+                        if (((PluginPreHook*)ps[ps_i])->is_creating_files())
+                        {
+                            need_analyze = false;
+                            break;
+                        }
+                    }
+            }
+
+            wffile->file_id = core->checker_analyze(user, filename, registered, options, plugins, err, need_analyze);
             if (wffile->file_id == -1)
             {
                 std::stringstream out;
