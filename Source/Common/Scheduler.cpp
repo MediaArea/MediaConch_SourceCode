@@ -309,6 +309,7 @@ namespace MediaConch {
                 std::vector<PluginPreHook::Output*> new_files;
                 ((PluginPreHook*)p)->get_outputs(new_files);
 
+                long gen_id = -1;
                 for (size_t j = 0; j < new_files.size(); ++j)
                 {
                     if (!new_files[j])
@@ -323,9 +324,13 @@ namespace MediaConch {
                                                     generated_error_log, options, plugins, err,
                                                     new_files[j]->analyze);
                     if (id >= 0)
+                    {
                         core->file_add_generated_file(el->user, old_id, id, err);
-                    old_id = id;
+                        gen_id = id;
+                    }
                 }
+
+                old_id = gen_id;
             }
             else if (ret)
             {
