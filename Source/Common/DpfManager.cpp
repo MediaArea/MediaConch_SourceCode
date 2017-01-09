@@ -31,6 +31,8 @@
 //---------------------------------------------------------------------------
 namespace MediaConch {
 
+
+    const char* DPFManager::conf_version = "3";
     //***************************************************************************
     // Constructor/Destructor
     //***************************************************************************
@@ -53,9 +55,9 @@ namespace MediaConch {
         bin = d.bin;
 
         for (size_t i = 0; i < d.isos.size(); ++i)
-            isos.push_back(isos[i]);
+            isos.push_back(d.isos[i]);
         for (size_t i = 0; i < d.params.size(); ++i)
-            params.push_back(params[i]);
+            params.push_back(d.params[i]);
     }
 
     //---------------------------------------------------------------------------
@@ -116,7 +118,7 @@ namespace MediaConch {
         if (create_configuration_file(report_dir, config_file) < 0)
             return -1;
 
-        exec_params.push_back("-configuration");
+        exec_params.push_back("--configuration");
         exec_params.push_back(config_file);
 
         std::string file(filename);
@@ -176,7 +178,7 @@ namespace MediaConch {
 
         //Version
         xmlNodePtr version_node = xmlNewNode(NULL, (const xmlChar*)"version");
-        xmlNodeSetContent(version_node, (const xmlChar*)"1");
+        xmlNodeSetContent(version_node, (const xmlChar*)conf_version);
         xmlAddChild(root_node, version_node);
 
         //Isos
@@ -195,6 +197,10 @@ namespace MediaConch {
         xmlNodeSetContent(format_node, (const xmlChar*)"XML");
         xmlAddChild(formats_node, format_node);
         xmlAddChild(root_node, formats_node);
+
+        //Modified-isos
+        xmlNodePtr mod_isos_node = xmlNewNode(NULL, (const xmlChar*)"modified-isos");
+        xmlAddChild(root_node, mod_isos_node);
 
         //Rules
         xmlNodePtr rules_node = xmlNewNode(NULL, (const xmlChar*)"rules");

@@ -32,9 +32,9 @@ It should be a struct named *Plugins* which contains an array of plugin.
 * **id**:     Id of the plugin
 * **name**:   Has to be *DPFManager*
 * **format**: Format given by MediaInfoLib to be used by the plugin. Here, it should be *TIFF*
-* **bin**:    Full path to the Command Line Interface
-* **params**: CLI parameters to be given to DPF Manager CLI
-* **isos**:   TIFF standarts to check
+* **bin**:    Full path to the Command Line Interface (version 3.1)
+* **params**: CLI parameters to be given to DPF Manager CLI (need at least: ["check", "-s", "-f", "xml"])
+* **isos**:   TIFF standarts to check (could be: "TIAProfileChecker", "TiffITP1ProfileChecker", "TiffITP2ProfileChecker", "TiffITProfileChecker", "TIFF_Baseline_Core_6_0", "TIFF_Baseline_Extended_6_0", "TIFF_EP")
 
 ##### PreHook
 
@@ -74,8 +74,8 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "name": "DPFManager",
                 "format": "TIFF",
                 "bin": "$PATH_TO_DPF_MANAGER",
-                "params": ["-s"]
-                "isos": ["Baseline","Tiff/EP","Tiff/IT"]
+                "isos": ["TiffITProfileChecker", "TIFF_Baseline_Core_6_0", "TIFF_EP"],
+                "params": ["check", "-s", "-f", "xml"]
             },
             {
                 "id": "plugin3",
