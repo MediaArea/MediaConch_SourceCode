@@ -62,7 +62,7 @@ var policyTreeAjax = (function() {
         res = webpage.policy_get_jstree(policyId);
         data = JSON.parse(res);
         if (!data.error) {
-            policyTree.policyCreateFromFile(data.policy);
+            policyTree.policyCreateFromFile(data.policyTree);
             createPolicyFromFile.removeSpinner();
         }
         else {

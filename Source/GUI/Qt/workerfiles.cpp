@@ -146,7 +146,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
 //---------------------------------------------------------------------------
 int WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
                                   int policy, int display, int verbosity, bool fixer,
-                                  std::string& err)
+                                  bool create_policy, std::string& err)
 {
     std::string full_file(path);
     if (path.length())
@@ -160,7 +160,8 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
     {
         exists = true;
         // nothing to do
-        if (!fixer && policy == working_files[full_file]->policy && display == working_files[full_file]->display
+        if (!fixer && !create_policy &&
+            policy == working_files[full_file]->policy && display == working_files[full_file]->display
             && verbosity == working_files[full_file]->verbosity)
         {
             working_files_mutex.unlock();
@@ -187,6 +188,7 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
     fr->policy = policy;
     fr->display = display;
     fr->verbosity = verbosity;
+    fr->create_policy = create_policy;
 
     working_files_mutex.lock();
 
@@ -365,7 +367,14 @@ void WorkerFiles::update_update_files_registered()
     {
         std::map<std::string, FileRegistered*>::iterator it = to_update_files.begin();
         for (; it != to_update_files.end(); ++it)
+        {
+            if (!it->second)
+                continue;
+
             vec.push_back(it->second);
+            if (it->second->create_policy)
+                mainwindow->create_policy_from_file(it->second);
+        }
         to_update_files.clear();
     }
     to_update_files_mutex.unlock();

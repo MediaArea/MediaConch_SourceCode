@@ -60,7 +60,7 @@ public:
     // Functions
     int                         add_file_to_list(const QString& file, const QString& path, const QString& policy,
                                                  const QString& display,
-                                                 const QString& verbosity, bool fixer, std::string& err);
+                                                 const QString& verbosity, bool fixer, bool, std::string& err);
     void                        remove_file_to_list(const QString& file);
     void                        update_policy_of_file_in_list(long file_id, const QString& policy);
     void                        clear_file_list();
@@ -168,6 +168,8 @@ public:
     std::string                 get_filename_from_registered_file_id(long file_id);
     void                        remove_file_registered_from_file(const std::string& file);
 
+    void                        create_policy_from_file(const FileRegistered* file);
+
     int                         get_ui_database_path(std::string& path);
     void                        get_version(std::string& version);
 
@@ -228,9 +230,13 @@ private:
 protected:
     void closeEvent(QCloseEvent *event);
 
+//***************************************************************************
+// SIGNAL
+//***************************************************************************
 Q_SIGNALS:
     void status_bar_clear_message();
     void status_bar_show_message(const QString& message, int timeout);
+    void execute_javascript(const QString& script);
 
 private Q_SLOTS:
     void on_actionOpen_triggered();

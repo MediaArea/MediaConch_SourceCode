@@ -189,7 +189,7 @@ namespace MediaConch
     }
 
     QString WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
-                                                const QString& verbosity, bool fixer)
+                                                   const QString& verbosity, bool fixer)
     {
         QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
@@ -201,7 +201,7 @@ namespace MediaConch
             QFileInfo f = QFileInfo(files[i]);
             std::string error;
             if (mainwindow->add_file_to_list(f.fileName(), f.absolutePath(), policy,
-                                             display, verbosity, fixer, error) < 0)
+                                             display, verbosity, fixer, false, error) < 0)
                 return QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         }
         file_selector.clear();
@@ -220,7 +220,7 @@ namespace MediaConch
             return ret;
 
         std::string error;
-        if (mainwindow->add_file_to_list(url, "", policy, display, verbosity, fixer, error) < 0)
+        if (mainwindow->add_file_to_list(url, "", policy, display, verbosity, fixer, false, error) < 0)
             ret += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         file_selector.clear();
         clean_forms();
@@ -245,7 +245,7 @@ namespace MediaConch
         {
             std::string error;
             if (mainwindow->add_file_to_list(list[i].fileName(), list[i].absolutePath(), policy,
-                                             display, verbosity, fixer, error))
+                                             display, verbosity, fixer, false, error))
                 ret += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         }
         file_selector.clear();
@@ -972,20 +972,20 @@ namespace MediaConch
         if (list.size())
             file = list.last().toUtf8().data();
 
-        if (!file.length())
+        if (!file.size())
             return QString("{\"error\":\"No file selected\"}");
 
         file_selector.clear();
 
-        return policy_from_file(file);
-    }
+        std::string error;
+        QFileInfo f = QFileInfo(file);
+        if (mainwindow->add_file_to_list(f.fileName(), f.absolutePath(),
+                                         QString().setNum(mainwindow->select_correct_policy()),
+                                         QString().setNum(mainwindow->select_correct_display()),
+                                         QString().setNum(mainwindow->select_correct_verbosity()), false, true, error) < 0)
+            return QString("{\"error\":\"%1\"").arg(QString().fromUtf8(error.c_str(), error.size()));
 
-    QString WebCommonPage::policy_from_file(const QString& file)
-    {
-        QString json;
-
-        json = "{\"success\":\"Ok\"}";
-        return json;
+        return QString("{}");
     }
 
     QString WebCommonPage::policy_import_data(const QString& data)

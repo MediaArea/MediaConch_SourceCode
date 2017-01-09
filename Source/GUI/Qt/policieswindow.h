@@ -61,6 +61,9 @@ private:
 //***************************************************************************
 // SLOTS
 //***************************************************************************
+public Q_SLOTS:
+    void use_javascript(const QString& script);
+
 private Q_SLOTS:
     void create_web_view_finished(bool ok);
 };

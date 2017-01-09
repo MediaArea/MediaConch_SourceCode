@@ -117,7 +117,6 @@ public Q_SLOTS:
     QString      import_policy(const QString& file);
     int          import_policy(const QStringList& files);
     QString      policy_from_file();
-    QString      policy_from_file(const QString& file);
     QString      policy_import_data(const QString& data);
     QString      xslt_policy_create(int parent_id);
     QString      policy_duplicate(int id, int dst_policy_id);
