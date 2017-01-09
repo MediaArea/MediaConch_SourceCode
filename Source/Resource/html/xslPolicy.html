@@ -36,9 +36,25 @@
         <button class="btn btn-default userPolicies">List your policies</button>
       </div>
 
+      <hr>
       <div>
-        <h2>Create a policy</h2>
+        <h2>Create a new policy</h2>
         <button class="policyCreate btn btn-warning">Add a new policy</button>
+      </div>
+      <hr>
+      <div>
+          <h2>Policy from a file</h2>
+          <form name="xslPolicyCreateFromFile" method="post" action="" enctype="multipart/form-data">
+              <div id="xslPolicyCreateFromFile">
+                  <div class="form-group">
+                      <label class="control-label required" for="xslPolicyCreateFromFile_file">File</label>
+                      <input type="file" id="xslPolicyCreateFromFile_file" name="xslPolicyCreateFromFile[file]" required="required" onclick="webpage.on_input_changed(this.name);" />
+                  </div>
+                  <div class="form-group">
+                      <button type="submit" id="xslPolicyCreateFromFile_CreatePolicyFromFile" name="xslPolicyCreateFromFile[CreatePolicyFromFile]" class="btn-warning btn">Create policy from file</button>
+                  </div>
+              </div>
+          </form>
       </div>
     </div>
 

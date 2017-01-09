@@ -458,6 +458,13 @@ var policyTree = (function() {
         mcoMessage.success('Policy imported successfuly');
     }
 
+    var policyCreateFromFile = function(policy) {
+        var policyNodeId = instance.create_node('u_p', policy);
+        instance.deselect_node(instance.get_selected(), true);
+        instance.select_node(policyNodeId);
+        mcoMessage.success('Policy created successfuly');
+    }
+
     var policyCreate = function(policy, selectedPolicy) {
         // Force CC-BY-SA-4.0+ license by default
         policy.data.license = 'CC-BY-SA-4.0+';
@@ -573,6 +580,7 @@ var policyTree = (function() {
         getParentPolicyId: getParentPolicyId,
         setData: setData,
         policyImport: policyImport,
+        policyCreateFromFile: policyCreateFromFile,
         policyCreate: policyCreate,
         policyEdit: policyEdit,
         policyDelete: policyDelete,

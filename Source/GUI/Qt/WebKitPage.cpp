@@ -79,6 +79,8 @@ namespace MediaConch
             return choose_file_settings();
         else if (select_file_name.startsWith("xslPolicyImport"))
             return choose_file_import_policy();
+        else if (select_file_name.startsWith("xslPolicyCreateFromFile"))
+            return choose_file_policy_from_file();
 
         QString value_input;
         std::string suggested_str;

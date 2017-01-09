@@ -56,6 +56,7 @@ protected:
     void         charge_local_dir(const QString& directory, QStringList& tmp);
     QString      choose_file_settings();
     QString      choose_file_import_policy();
+    QString      choose_file_policy_from_file();
     void         string_to_json(QString& str);
 
 private Q_SLOTS:
@@ -115,6 +116,8 @@ public Q_SLOTS:
     QString      import_policy();
     QString      import_policy(const QString& file);
     int          import_policy(const QStringList& files);
+    QString      policy_from_file();
+    QString      policy_from_file(const QString& file);
     QString      policy_import_data(const QString& data);
     QString      xslt_policy_create(int parent_id);
     QString      policy_duplicate(int id, int dst_policy_id);

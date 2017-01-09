@@ -495,6 +495,27 @@ namespace MediaConch
         return value_input;
     }
 
+    QString WebCommonPage::choose_file_policy_from_file()
+    {
+        std::string suggested_str;
+
+        suggested_str = mainwindow->select_correct_load_files_path();
+
+        QString suggested = QString().fromUtf8(suggested_str.c_str(), suggested_str.length());
+        QString value_input = QFileDialog::getOpenFileName(mainwindow, "Open file", suggested);
+
+        QMap<QString, QStringList>::iterator it = file_selector.find(select_file_name);
+        if (it != file_selector.end())
+            file_selector.erase(it);
+
+        if (!value_input.length())
+            return QString();
+
+        file_selector.insert(select_file_name, QStringList(value_input));
+
+        return value_input;
+    }
+
     void WebCommonPage::charge_local_dir(const QString& path, QStringList& tmp)
     {
         QFileInfo info(path);
@@ -941,6 +962,29 @@ namespace MediaConch
         }
 
         json = QString().fromUtf8(p.jstree->c_str(), p.jstree->length());
+        return json;
+    }
+
+    QString WebCommonPage::policy_from_file()
+    {
+        QString file;
+        QStringList list = file_selector["xslPolicyCreateFromFile[file]"];
+        if (list.size())
+            file = list.last().toUtf8().data();
+
+        if (!file.length())
+            return QString("{\"error\":\"No file selected\"}");
+
+        file_selector.clear();
+
+        return policy_from_file(file);
+    }
+
+    QString WebCommonPage::policy_from_file(const QString& file)
+    {
+        QString json;
+
+        json = "{\"success\":\"Ok\"}";
         return json;
     }
 
