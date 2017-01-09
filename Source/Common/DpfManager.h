@@ -46,6 +46,8 @@ private:
     std::string               bin;
     std::vector<std::string>  params;
     std::vector<std::string>  isos;
+
+    static const char        *conf_version;
 };
 
 }
