@@ -684,7 +684,7 @@ int Policies::erase_xslt_policy_node(std::map<size_t, Policy *>& user_policies, 
     std::map<size_t, Policy *>::iterator it = user_policies.find(id);
     if (it == user_policies.end())
     {
-        err = "Policy is not exisiting";
+        err = "Policy is not existing";
         return -1;
     }
 
@@ -711,7 +711,7 @@ int Policies::erase_policy(int user, int id, std::string& err)
     std::map<int, std::map<size_t, Policy *> >::iterator it = policies.find(user);
     if (it == policies.end())
     {
-        err = "User policies are not exisiting";
+        err = "User policies are not existing";
         return -1;
     }
 
