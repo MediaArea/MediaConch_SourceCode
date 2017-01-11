@@ -4,10 +4,10 @@
  *
  * To rebuild or modify this file with the latest versions of the included
  * software please visit:
- *   https://datatables.net/download/#bs/dt-1.10.12,fh-3.1.2
+ *   https://datatables.net/download/#bs/dt-1.10.13/fh-3.1.2
  *
  * Included libraries:
- *   DataTables 1.10.12, FixedHeader 3.1.2
+ *   DataTables 1.10.13, FixedHeader 3.1.2
  */
 
 table.dataTable {
@@ -20,7 +20,6 @@ table.dataTable {
 table.dataTable td,
 table.dataTable th {
   -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 table.dataTable td.dataTables_empty,
