@@ -27,7 +27,7 @@ class FileRegistered
 {
 public:
     FileRegistered() : file_id(-1), policy(-1), display(-1), verbosity(-1), analyze_percent(0), analyzed(false),
-        implementation_valid(false), policy_valid(false), report_kind(0), need_update(true)
+        implementation_valid(false), policy_valid(false), create_policy(false), report_kind(0), need_update(true)
     {
     }
 
@@ -46,6 +46,7 @@ public:
         this->analyzed = f.analyzed;
         this->implementation_valid = f.implementation_valid;
         this->policy_valid = f.policy_valid;
+        this->create_policy = f.create_policy;
         this->index = f.index;
         this->report_kind = f.report_kind;
         this->need_update = f.need_update;
@@ -62,6 +63,7 @@ public:
     bool         analyzed;
     bool         implementation_valid;
     bool         policy_valid;
+    bool         create_policy;
 
     int          report_kind;
 

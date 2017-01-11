@@ -41,6 +41,36 @@ var policyTreeAjax = (function() {
             mcoMessage.error(data.error);
     }
 
+    var policyCreateFromFile = function(form) {
+        createPolicyFromFile.addSpinner();
+        /**
+         * Create a policy from a file (the file is provided as POST data from a form)
+         *
+         * @return json
+         * {"policy":POLICY_JSTREE_JSON}
+         */
+         res = webpage.policy_from_file();
+         data = JSON.parse(res);
+         $("#xslPolicyCreateFromFile_file").val("");
+         if (data.error) {
+             mcoMessage.error(data.error);
+             createPolicyFromFile.removeSpinner();
+         }
+    }
+
+    var policyCreateFromFileCallback = function(policyId) {
+        res = webpage.policy_get_jstree(policyId);
+        data = JSON.parse(res);
+        if (!data.error) {
+            policyTree.policyCreateFromFile(data.policyTree);
+            createPolicyFromFile.removeSpinner();
+        }
+        else {
+            mcoMessage.error(data.error);
+            createPolicyFromFile.removeSpinner();
+        }
+    }
+
     var policyCreate = function(policyNode, parentId) {
         /**
          * Create a policy
@@ -347,6 +377,8 @@ var policyTreeAjax = (function() {
         getData: getData,
         policyImport: policyImport,
         policyDropped: policyDropped,
+        policyCreateFromFile: policyCreateFromFile,
+        policyCreateFromFileCallback: policyCreateFromFileCallback,
         policyCreate: policyCreate,
         policyEdit: policyEdit,
         policyDelete: policyDelete,

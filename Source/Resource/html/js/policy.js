@@ -65,6 +65,13 @@ function formBindings() {
         policyTreeAjax.policyImport($(this));
     });
 
+    // Create policy from file form
+    $('form[name="xslPolicyCreateFromFile"]').on('submit', function (e) {
+        e.preventDefault();
+
+        policyTreeAjax.policyCreateFromFile($(this));
+    });
+
     // Policy edit form
     $('form[name="xslPolicyInfo"]').on('submit', function (e) {
         e.preventDefault();
@@ -345,6 +352,21 @@ function policyRuleHelp() {
     // Validator
     addHelp('validator', 'Applies the appropriate operator to the rule.', 'Validator');
 }
+
+var createPolicyFromFile = (function() {
+    var addSpinner = function() {
+        $('#xslPolicyCreateFromFile_CreatePolicyFromFile').after('<span class="spinner-policy"></span>');
+    }
+
+    var removeSpinner = function() {
+        $('.spinner-policy').remove();
+    }
+
+    return {
+        addSpinner: addSpinner,
+        removeSpinner: removeSpinner,
+    }
+})();
 
 $(document).ready(function () {
     (function loop_init(time) {

@@ -54,6 +54,13 @@ namespace MediaConch
                 return QStringList();
             return QStringList(file);
         }
+        else if (select_file_name.startsWith("xslPolicyCreateFromFile"))
+        {
+            QString file = choose_file_policy_from_file();
+            if (!file.size())
+                return QStringList();
+            return QStringList(file);
+        }
 
         QStringList list;
         std::string suggested_str;

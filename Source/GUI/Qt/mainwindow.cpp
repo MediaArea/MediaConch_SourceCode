@@ -166,8 +166,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 //---------------------------------------------------------------------------
 int MainWindow::add_file_to_list(const QString& file, const QString& path,
-                                  const QString& policy, const QString& display,
-                                  const QString& v, bool fixer, std::string& err)
+                                 const QString& policy, const QString& display,
+                                 const QString& v, bool fixer, bool create_policy, std::string& err)
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
@@ -185,9 +185,11 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
         full_path += "/";
     full_path += filename;
 
-    if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, err) < 0)
+    if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, create_policy, err) < 0)
         return -1;
-    checkerView->add_file_to_result_table(full_path);
+
+    if (checkerView)
+        checkerView->add_file_to_result_table(full_path);
     return 0;
 }
 
@@ -314,6 +316,24 @@ long MainWindow::xslt_policy_create_from_file(long file_id, QString& err)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::create_policy_from_file(const FileRegistered* file)
+{
+    if (!file)
+        return;
+
+    long id = -1;
+    std::string error;
+    if ((id = MCL.xslt_policy_create_from_file(-1, file->file_id, error)) < 0)
+        set_str_msg_to_status_bar(error);
+
+    if (policiesView)
+    {
+        QString script = QString("policyTreeAjax.policyCreateFromFileCallback(%1);").arg(id);
+        Q_EMIT execute_javascript(script);
+    }
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::add_default_displays()
 {
     QDir displays_dir(":/displays");
@@ -339,13 +359,15 @@ void MainWindow::add_default_displays()
 //---------------------------------------------------------------------------
 void MainWindow::add_xslt_display(const QString& display_xslt)
 {
-    checkerView->set_display_xslt(display_xslt);
+    if (checkerView)
+        checkerView->set_display_xslt(display_xslt);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::remove_xslt_display()
 {
-    checkerView->reset_display_xslt();
+    if (checkerView)
+        checkerView->reset_display_xslt();
 }
 
 //---------------------------------------------------------------------------
@@ -433,6 +455,7 @@ void MainWindow::on_actionOpen_triggered()
 
     if (!checkerView)
         return;
+
     checkerView->change_local_files(list);
 }
 
@@ -605,6 +628,8 @@ void MainWindow::createPoliciesView()
 
     MCL.reset_daemon_client();
     policiesView = new PoliciesWindow(this);
+    connect(this, SIGNAL(execute_javascript(const QString&)),
+            policiesView, SLOT(use_javascript(const QString&)));
     policiesView->display_policies();
 }
 
