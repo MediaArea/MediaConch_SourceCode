@@ -26,7 +26,7 @@
     <policy type="and" name="Format is MPEG2 (XDCam 50 or IMX 50)?">
       <description>to do: make test more specific to IMX or XDCam</description>
       <rule name="Format is MPEG?" value="Format" tracktype="Video" occurrence="*" operator="=">MPEG Video</rule>
-      <rule name="Format verison is 2 (MPEG2)?" value="Format_Version" tracktype="Video" occurrence="*" operator="=">2</rule>
+      <rule name="Format version is 2 (MPEG2)?" value="Format_Version" tracktype="Video" occurrence="*" operator="=">2</rule>
       <policy type="or" name="BitRate is 50Mb">
         <rule name="BitRate is 50Mb?" value="BitRate" tracktype="Video" occurrence="*" operator="=">50000000</rule>
         <rule name="Max BitRate is 50Mb?" value="BitRate_Maximum" tracktype="Video" occurrence="*" operator="=">50000000</rule>
