@@ -112,7 +112,7 @@ namespace MediaConch {
             exec_params.push_back(params[i]);
 
         std::string report_dir;
-        if (create_report_dir("DPFTemp/", "DPFReportDir", report_dir) < 0)
+        if (create_report_dir("DPFTemp", "DPFReportDir", report_dir) < 0)
             return -1;
 
         std::string config_file;

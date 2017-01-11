@@ -23,6 +23,7 @@
 #include "PluginFileLog.h"
 #include "PluginPreHook.h"
 #include <ZenLib/Ztring.h>
+#include <ZenLib/File.h>
 
 #if defined(_WIN32) || defined(WIN32)
 #include <Winbase.h>
@@ -67,11 +68,12 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int Scheduler::add_element_to_queue(int user, const std::string& filename, long file_id,
                                         const std::vector<std::pair<std::string,std::string> >& options,
-                                        const std::vector<std::string>& plugins, bool mil_analyze)
+                                        const std::vector<std::string>& plugins, bool mil_analyze,
+                                        const std::string& alias)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins, mil_analyze);
+        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins, mil_analyze, alias);
         run_element();
         return index - 1;
     }
@@ -216,6 +218,7 @@ namespace MediaConch {
         String tmp = MI->Get(Stream_General, 0, __T("Attachments_Data"));
         if (!tmp.size())
             return 0;
+
         std::string attachments_str = ZenLib::Ztring(tmp).To_UTF8().c_str();
         std::vector<std::string> attachments;
         size_t start = 0;
@@ -235,9 +238,12 @@ namespace MediaConch {
         std::string err;
         for (size_t i = 0; i < attachments.size(); ++i)
         {
-            std::stringstream ss;
-            ss << "/tmp/attachment" << i << ".pdf";
-            std::ofstream ofs(ss.str().c_str(), std::ofstream::out);
+            std::string path;
+
+            if (Core::create_local_unique_data_filename("MediaconchTemp", "attachment", "", path) < 0)
+                continue;
+
+            std::ofstream ofs(path.c_str(), std::ofstream::out);
             ofs.write(attachments[i].c_str(), attachments[i].size());
             ofs.close();
 
@@ -249,29 +255,17 @@ namespace MediaConch {
             for (size_t i = 0; i < el->plugins.size(); ++i)
                 plugins.push_back(el->plugins[i]);
 
+            std::stringstream alias;
+            alias << "attachement";
+            if (i)
+                alias << i;
+            alias << ":" << el->filename;
+
             std::string log;
             long id;
-            if ((id = core->checker_analyze(el->user, ss.str(), el->file_id, 0, log, log,
-                                            options, plugins, err, el->mil_analyze)) >= 0)
-            {
+            if ((id = core->checker_analyze(el->user, path, el->file_id, 0, log, log,
+                                            options, plugins, err, el->mil_analyze, alias.str())) >= 0)
                 core->file_add_generated_file(el->user, el->file_id, id, err);
-
-                while (1)
-                {
-                    MediaConchLib::Checker_StatusRes res;
-                    if (core->checker_status(el->user, id, res, err) < 0)
-                        break;
-
-                    if (res.finished)
-                        break;
-
-#ifdef WINDOWS
-                    ::Sleep((DWORD)50);
-#else
-                    usleep(50000);
-#endif
-                }
-            }
         }
 
         return 0;

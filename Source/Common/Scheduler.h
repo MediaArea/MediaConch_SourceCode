@@ -53,7 +53,8 @@ public:
 
     int  add_element_to_queue(int user, const std::string& filename, long file_id,
                               const std::vector<std::pair<std::string,std::string> >& options,
-                              const std::vector<std::string>& plugins, bool mil_analyze);
+                              const std::vector<std::string>& plugins, bool mil_analyze,
+                              const std::string& alias="");
     void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     bool is_finished();
     long element_exists(int user, const std::string& filename,

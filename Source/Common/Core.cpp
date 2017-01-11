@@ -422,14 +422,16 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 long Core::checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                            const std::string generated_log, const std::string generated_error_log,
                            const std::vector<std::pair<std::string,std::string> >& options,
-                           const std::vector<std::string>& plugins, std::string& err, bool mil_analyze)
+                           const std::vector<std::string>& plugins, std::string& err, bool mil_analyze,
+                           const std::string& alias)
 {
     long id = -1;
     bool analyzed = false;
     bool force_analyze = true;
     std::string options_str = serialize_string_from_options_vec(options);
 
-    id = file_is_registered_and_analyzed(user, filename, analyzed, options_str, err);
+    std::string tocheck = alias.size() ? alias : filename;
+    id = file_is_registered_and_analyzed(user, tocheck, analyzed, options_str, err);
     if (force_analyze)
         analyzed = false;
 
@@ -438,7 +440,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
     if (id < 0)
     {
         db_mutex.Enter();
-        id = get_db()->add_file(user, filename, file_last_modification, options_str, err,
+        id = get_db()->add_file(user, tocheck, file_last_modification, options_str, err,
                                 generated_id, src_id, generated_time,
                                 generated_log, generated_error_log);
         db_mutex.Leave();
@@ -456,7 +458,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
             return -1;
     }
 
-    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, plugins, mil_analyze) < 0)
+    if (!analyzed && scheduler->add_element_to_queue(user, filename, id, options, plugins, mil_analyze, alias) < 0)
         return -1;
 
     return id;
@@ -1068,6 +1070,33 @@ std::vector<std::pair<std::string,std::string> > Core::parse_options_vec_from_st
     return toreturn;
 }
 
+#if defined(WINDOWS)
+
+//---------------------------------------------------------------------------
+char Core::get_path_separator(const std::string& path)
+{
+    if (path.size() < 3)
+        return '\\';
+
+    if (path[2] == '\\' || path[2] == '/')
+        return path[2];
+
+    if (path.size() > 3 && (path[3] == '\\' || path[3] == '/'))
+        return path[3];
+
+    return '\\';
+}
+
+#else
+
+//---------------------------------------------------------------------------
+char Core::get_path_separator(const std::string&)
+{
+    return '/';
+}
+
+#endif
+
 //---------------------------------------------------------------------------
 std::string Core::serialize_string_from_options_map(const std::map<std::string,std::string>& options)
 {
@@ -1126,44 +1155,46 @@ std::string Core::get_local_config_path()
     if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path) == S_OK)
     {
         local_path = Ztring(path).To_UTF8();
-        local_path += "/MediaConch/";
+        char separator = get_path_separator(local_path);
+        if (local_path.size() > 0 && local_path[local_path.size() - 1] != separator)
+            local_path.append(1, separator);
+        local_path += "MediaConch";
         CoTaskMemFree(path);
-
-        for (;;)
-        {
-            size_t pos = 0;
-            pos = local_path.find('\\');
-            if (pos == std::string::npos)
-                break;
-
-            local_path[pos] = '/';
-        }
     }
 #elif defined(UNIX)
     const char* home = NULL;
+    char separator = get_path_separator(local_path);
 
     if ((home = getenv("HOME")) == NULL)
     {
         struct passwd *pw = getpwuid(getuid());
         if (pw)
             home = pw->pw_dir;
-        else
+
+        if (!home)
             home = ".";
     }
-    local_path = std::string(home) + std::string("/.config/");
+
+    local_path = std::string(home) + separator + ".config";
 #elif defined(MACOS) || defined(MACOSX)
     const char* home = NULL;
+    char separator = get_path_separator(local_path);
 
     if ((home = getenv("HOME")) == NULL)
     {
         struct passwd *pw = getpwuid(getuid());
         if (pw)
             home = pw->pw_dir;
-        else
+
+        if (!home)
             home = ".";
     }
-    local_path = std::string(home) + std::string("/Library/Preferences/");
+    local_path = std::string(home) + separator + "Library" + separator + "Preferences";
 #endif
+
+    char sep = get_path_separator(local_path);
+    if (local_path.size() > 0 && local_path[local_path.size() - 1] != sep)
+        local_path += sep;
 
     Ztring z_path = ZenLib::Ztring().From_UTF8(local_path);
     if (!ZenLib::Dir::Exists(z_path))
@@ -1182,44 +1213,42 @@ std::string Core::get_local_data_path()
     if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path) == S_OK)
     {
         local_path = Ztring(path).To_UTF8();
-        local_path += "/MediaConch/";
-	CoTaskMemFree(path);
-
-	for (;;)
-	{
-	    size_t pos = 0;
-	    pos = local_path.find('\\');
-	    if (pos == std::string::npos)
-	      break;
-
-	    local_path[pos] = '/';
-	}
+	    CoTaskMemFree(path);
     }
 #elif defined(UNIX)
     const char* home;
+    char separator = get_path_separator(local_path);
 
     if ((home = getenv("HOME")) == NULL)
     {
         struct passwd *pw = getpwuid(getuid());
         if (pw)
             home = pw->pw_dir;
-        else
+        if (!home)
             home = ".";
     }
-    local_path = std::string(home) + std::string("/.local/share/MediaConch/");
+    local_path = std::string(home) + separator + ".local" + separator + "share";
 #elif defined(MACOS) || defined(MACOSX)
     const char* home;
+    char separator = get_path_separator(local_path);
 
     if ((home = getenv("HOME")) == NULL)
     {
         struct passwd *pw = getpwuid(getuid());
         if (pw)
             home = pw->pw_dir;
-        else
+
+        if (!home)
             home = ".";
     }
-    local_path = std::string(home) + std::string("/Library/Application Support/MediaConch/");
+    local_path = std::string(home) + separator + "Library" + separator + "Application Support";
 #endif
+
+    char sep = get_path_separator(local_path);
+    if (local_path.size() > 0 && local_path[local_path.size() - 1] != sep)
+        local_path.append(1, sep);
+
+    local_path += std::string("MediaConch").append(1, sep);
 
     Ztring z_path = ZenLib::Ztring().From_UTF8(local_path);
     if (!ZenLib::Dir::Exists(z_path))
@@ -1229,13 +1258,106 @@ std::string Core::get_local_data_path()
 }
 
 //---------------------------------------------------------------------------
+int Core::create_local_data_directory(const std::string& base_dir, std::string& report_dir)
+{
+    std::string local_data = Core::get_local_data_path();
+    local_data += base_dir;
+
+    char sep = get_path_separator(local_data);
+    if (local_data.size() > 0 && local_data[local_data.size() - 1] != sep)
+        local_data.append(1, sep);
+
+    Ztring z_local = ZenLib::Ztring().From_UTF8(local_data);
+    if (!ZenLib::Dir::Exists(z_local))
+        ZenLib::Dir::Create(z_local);
+
+    if (!ZenLib::Dir::Exists(z_local))
+        return -1;
+
+    report_dir = local_data;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Core::create_local_unique_data_directory(const std::string& base_dir, const std::string& template_dir, std::string& report_dir)
+{
+    std::string local_data;
+    if (create_local_data_directory(base_dir, local_data) < 0)
+        return -1;
+
+    char sep = get_path_separator(local_data);
+    if (local_data.size() > 0 && local_data[local_data.size() - 1] != sep)
+        local_data.append(1, sep);
+
+    std::stringstream path;
+    for (size_t i = 0; ; ++i)
+    {
+        path.str("");
+        path << local_data << template_dir;
+        if (i)
+            path << i;
+
+        if (path.str().size() > 0 && path.str().at(path.str().size() - 1) != sep)
+            path << sep;
+
+        Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
+        if (ZenLib::Dir::Exists(z_path))
+            continue;
+
+        report_dir = path.str();
+        break;
+    }
+
+    Ztring z_path = ZenLib::Ztring().From_UTF8(report_dir);
+    ZenLib::Dir::Create(z_path);
+    if (!ZenLib::Dir::Exists(z_path))
+        return -1;
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Core::create_local_unique_data_filename(const std::string& base_dir, const std::string& template_file,
+                                            const std::string& template_ext, std::string& filename)
+{
+    std::string local_data;
+    if (create_local_data_directory(base_dir, local_data) < 0)
+        return -1;
+
+    char sep = get_path_separator(local_data);
+    if (local_data.size() > 0 && local_data[local_data.size() - 1] != sep)
+        local_data.append(1, sep);
+
+    filename = local_data + template_file;
+    for (size_t i = 0; ; ++i)
+    {
+        std::stringstream path;
+        path << filename;
+        if (i)
+            path << i;
+        if (template_ext.size())
+            path << "." << template_ext;
+
+        Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
+        if (ZenLib::File::Exists(z_path))
+            continue;
+
+        filename = path.str();
+        break;
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 std::string Core::get_database_path()
 {
     std::string database_path = get_local_data_path();
 
     Ztring z_path = ZenLib::Ztring().From_UTF8(database_path);
+    char sep = get_path_separator(database_path);
     if (!ZenLib::Dir::Exists(z_path))
-        database_path = std::string(".") + Path_Separator;
+        database_path = std::string(".").append(1, sep);
     return database_path;
 }
 
@@ -1249,8 +1371,9 @@ std::string Core::get_config_file()
 
     config_file += configName;
     std::ifstream ifile(config_file.c_str());
+    char sep = get_path_separator(config_file);
     if (!ifile)
-        config_file = std::string(".") + Path_Separator + configName;
+        config_file = std::string(".").append(1, sep) + configName;
     return config_file;
 }
 

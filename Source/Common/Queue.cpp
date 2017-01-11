@@ -12,6 +12,7 @@
 
 //---------------------------------------------------------------------------
 #include "ZenLib/Ztring.h"
+#include "ZenLib/File.h"
 #include "Queue.h"
 #include "Scheduler.h"
 #include "PluginLog.h"
@@ -53,14 +54,14 @@ void QueueElement::stop()
 //---------------------------------------------------------------------------
 void QueueElement::Entry()
 {
-    std::string file = filename;
+    std::string file = real_filename;
     std::string err;
 
     //Pre hook plugins
     int ret = 0;
 
     std::stringstream log;
-    log << "start analyze:" << filename;
+    log << "start analyze:" << file;
     scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
 
     ret = scheduler->execute_pre_hook_plugins(this, err);
@@ -68,7 +69,7 @@ void QueueElement::Entry()
     if (ret || !mil_analyze)
     {
         log.str("");
-        log << "end analyze:" << filename;
+        log << "end analyze:" << file;
         scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
         scheduler->work_finished(this, NULL);
         return;
@@ -105,8 +106,16 @@ void QueueElement::Entry()
     delete MI;
     MI = NULL;
     log.str("");
-    log << "end analyze:" << filename;
+    log << "end analyze:" << file;
     scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
+
+    // Delete a generated file
+    if (real_filename != filename)
+    {
+        Ztring z_path = ZenLib::Ztring().From_UTF8(real_filename);
+        ZenLib::File::Delete(z_path);
+    }
+
 }
 
 //---------------------------------------------------------------------------
@@ -131,13 +140,14 @@ Queue::~Queue()
 
 int Queue::add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
                        const std::vector<std::pair<std::string,std::string> >& options,
-                       const std::vector<std::string>& plugins, bool mil_analyze)
+                       const std::vector<std::string>& plugins, bool mil_analyze, const std::string& alias)
 {
     QueueElement *el = new QueueElement(scheduler);
 
     el->id = id;
     el->user = user;
-    el->filename = filename;
+    el->filename = alias.size() ? alias : filename;
+    el->real_filename = filename;
     el->file_id = file_id;
     el->mil_analyze = mil_analyze;
 
