@@ -498,7 +498,7 @@ int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRe
     if (is_finished)
     {
         res.tool = new int;
-        *res.tool = (int)MediaConchLib::report_MediaConch;;
+        *res.tool = (int)MediaConchLib::report_MediaConch;
 
         std::string filename;
         std::string file_time;

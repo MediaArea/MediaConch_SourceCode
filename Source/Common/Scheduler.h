@@ -65,7 +65,7 @@ public:
     int  get_elements(int user, std::vector<long>& vec, std::string& err);
     int  another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     int  execute_pre_hook_plugins(QueueElement *el, std::string& err);
-    int  attachement_to_add(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI);
+    int  attachments_to_add(QueueElement *el);
     void write_log_timestamp(int level, std::string log);
 
 private:

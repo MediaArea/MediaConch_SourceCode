@@ -26,8 +26,10 @@
     #include "MediaInfo/MediaInfo.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
+#include "ZenLib/Ztring.h"
 #include "ZenLib/Thread.h"
 #include "ZenLib/CriticalSection.h"
+#include <MediaInfo/MediaInfo_Events.h>
 //---------------------------------------------------------------------------
 #include <map>
 #include <list>
@@ -42,6 +44,12 @@ namespace MediaConch
     class Queue;
     class Scheduler;
 
+    struct Attachment
+    {
+        std::string filename;
+        std::string realname;
+    };
+
     class QueueElement : public ZenLib::Thread
     {
     public:
@@ -54,12 +62,14 @@ namespace MediaConch
         std::string                        options_str;
         std::vector<std::pair<std::string, std::string> > options;
         std::vector<std::string>           plugins;
+        std::vector<Attachment*>           attachments;
         long                               file_id;
         bool                               mil_analyze;
 
         void                               Entry();
         void                               stop();
         double                             percent_done();
+        int                                attachment_cb(struct MediaInfo_Event_Global_AttachedFile_0 *Event);
 
     private:
         Scheduler*                         scheduler;

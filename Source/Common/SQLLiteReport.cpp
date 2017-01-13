@@ -1257,7 +1257,7 @@ int SQLLiteReport::get_element_report_kind(int user, long file_id, MediaConchLib
         {
             MediaConchLib::report tool_i = (MediaConchLib::report)std_string_to_int(reports[i]["TOOL"]);
 
-            if (tool_i == MediaConchLib::report_MediaInfo || tool_i == MediaConchLib::report_MediaTrace || tool_i == MediaConchLib::report_MicroMediaTrace)
+            if (tool_i == MediaConchLib::report_MediaConch || tool_i == MediaConchLib::report_MediaInfo || tool_i == MediaConchLib::report_MediaTrace || tool_i == MediaConchLib::report_MicroMediaTrace)
                 continue;
             report_kind = tool_i;
         }

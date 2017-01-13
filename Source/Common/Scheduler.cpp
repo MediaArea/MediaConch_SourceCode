@@ -118,7 +118,7 @@ namespace MediaConch {
         if (another_work_to_do(el, MI) <= 0)
             return;
 
-        if (attachement_to_add(el, MI) < 0)
+        if (attachments_to_add(el) < 0)
             return;
 
         CS.Enter();
@@ -212,40 +212,13 @@ namespace MediaConch {
         return file_id;
     }
 
-    int Scheduler::attachement_to_add(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
+    int Scheduler::attachments_to_add(QueueElement *el)
     {
-        // Before registering, check if attachements in it
-        String tmp = MI->Get(Stream_General, 0, __T("Attachments_Data"));
-        if (!tmp.size())
-            return 0;
-
-        std::string attachments_str = ZenLib::Ztring(tmp).To_UTF8().c_str();
-        std::vector<std::string> attachments;
-        size_t start = 0;
-        size_t pos = 0;
-        while (pos != std::string::npos)
-        {
-            pos = attachments_str.find(" / ", start);
-            if (pos != std::string::npos)
-            {
-                attachments.push_back(attachments_str.substr(start, pos - start));
-                start = pos + 3;
-            }
-            else
-                attachments.push_back(attachments_str.substr(start));
-        }
-
         std::string err;
-        for (size_t i = 0; i < attachments.size(); ++i)
+        for (size_t i = 0; i < el->attachments.size(); ++i)
         {
-            std::string path;
-
-            if (Core::create_local_unique_data_filename("MediaconchTemp", "attachment", "", path) < 0)
+            if (!el->attachments[i])
                 continue;
-
-            std::ofstream ofs(path.c_str(), std::ofstream::out);
-            ofs.write(attachments[i].c_str(), attachments[i].size());
-            ofs.close();
 
             std::vector<std::pair<std::string,std::string> > options;
             for (size_t i = 0; i < el->options.size(); ++i)
@@ -256,14 +229,15 @@ namespace MediaConch {
                 plugins.push_back(el->plugins[i]);
 
             std::stringstream alias;
-            alias << "attachement";
+            alias << "attachment";
             if (i)
                 alias << i;
-            alias << ":" << el->filename;
+            alias << ":" << el->filename << ":" << el->attachments[i]->realname;
 
             std::string log;
             long id;
-            if ((id = core->checker_analyze(el->user, path, el->file_id, 0, log, log,
+            if ((id = core->checker_analyze(el->user, el->attachments[i]->filename,
+                                            el->file_id, 0, log, log,
                                             options, plugins, err, el->mil_analyze, alias.str())) >= 0)
                 core->file_add_generated_file(el->user, el->file_id, id, err);
         }
@@ -290,7 +264,7 @@ namespace MediaConch {
         else
             return 1;
 
-        ((PluginFormat*)p)->set_file(el->filename);
+        ((PluginFormat*)p)->set_file(el->real_filename);
         if (p->run(error) < 0)
             core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, error);
         const std::string& report = p->get_report();

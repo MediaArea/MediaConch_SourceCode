@@ -11,12 +11,13 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "ZenLib/Ztring.h"
-#include "ZenLib/File.h"
+#include <ZenLib/File.h>
+
 #include "Queue.h"
 #include "Scheduler.h"
 #include "PluginLog.h"
 #include "Core.h"
+#include <fstream>
 
 #if !defined(WINDOWS)
 #include <unistd.h>
@@ -51,6 +52,26 @@ void QueueElement::stop()
     }
 }
 
+
+static void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t, void* UserHandle_Void)
+{
+    QueueElement *queue = (QueueElement*)UserHandle_Void;
+    struct MediaInfo_Event_Generic* Event_Generic = (struct MediaInfo_Event_Generic*)Data_Content;
+    // unsigned char ParserID = (unsigned char)((Event_Generic->EventCode & 0xFF000000) >> 24);
+    unsigned short EventID = (unsigned short)((Event_Generic->EventCode & 0x00FFFF00) >> 8);
+    unsigned char EventVersion = (unsigned char)(Event_Generic->EventCode & 0x000000FF);
+
+    switch (EventID)
+    {
+        case MediaInfo_Event_Global_AttachedFile:
+            if (EventVersion == 0)
+                queue->attachment_cb((struct MediaInfo_Event_Global_AttachedFile_0 *)Data_Content);
+            break;
+        default:
+            break;
+    }
+}
+
 //---------------------------------------------------------------------------
 void QueueElement::Entry()
 {
@@ -76,6 +97,7 @@ void QueueElement::Entry()
     }
 
     MI = new MediaInfoNameSpace::MediaInfo;
+
     // Currently avoiding to have a big trace
     bool found = false;
     for (size_t i = 0; i < options.size(); ++i)
@@ -91,6 +113,11 @@ void QueueElement::Entry()
             found = true;
     if (found == false)
         MI->Option(__T("Details"), __T("1"));
+
+    // Attachment
+    std::stringstream ss;
+    ss << "CallBack=memory://" << (int64u)Event_CallBackFunction << ";UserHandler=memory://" << (int64u)this;
+    MI->Option(__T("File_Event_CallBackFunction"), ZenLib::Ztring().From_UTF8(ss.str()));
 
     // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
     MI->Option(__T("ReadByHuman"), __T("1"));
@@ -115,7 +142,6 @@ void QueueElement::Entry()
         Ztring z_path = ZenLib::Ztring().From_UTF8(real_filename);
         ZenLib::File::Delete(z_path);
     }
-
 }
 
 //---------------------------------------------------------------------------
@@ -126,6 +152,33 @@ double QueueElement::percent_done()
 
     size_t state = MI->State_Get();
     return (double)state / 100;
+}
+
+//---------------------------------------------------------------------------
+int QueueElement::attachment_cb(struct MediaInfo_Event_Global_AttachedFile_0 *Event)
+{
+    std::string attachment((const char*)Event->Content, Event->Content_Size);
+
+    std::string realname = "Unknown";
+    if (Event->Name && Event->Name[0])
+        realname = std::string(Event->Name);
+
+    std::string path;
+
+    if (Core::create_local_unique_data_filename("MediaconchTemp", "attachment", "", path) < 0)
+        return 0;
+
+    std::ofstream ofs(path.c_str(), std::ofstream::out);
+    ofs.write(attachment.c_str(), attachment.size());
+    ofs.close();
+
+    Attachment *attach = new Attachment;
+    attach->filename = path;
+    attach->realname = realname;
+
+    attachments.push_back(attach);
+
+    return 0;
 }
 
 //***************************************************************************
