@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" extension-element-prefixes="xsi">
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
-  <xsl:template match="globalreport">
+  <xsl:template match="report">
     <MediaConch>
       <xsl:attribute name="version">
         <xsl:text>0.2</xsl:text>
       </xsl:attribute>
-      <xsl:for-each select="individualreports/report">
         <media>
           <xsl:attribute name="ref">
             <xsl:value-of select="file_info/fullpath"/>
@@ -48,6 +47,10 @@
                     <xsl:value-of select="ruleId"/>
                   </context>
                   <context>
+                    <xsl:attribute name="name">ruleValue</xsl:attribute>
+                    <xsl:value-of select="ruleValue"/>
+                  </context>
+                  <context>
                     <xsl:attribute name="name">iso_reference</xsl:attribute>
                     <xsl:value-of select="iso_reference"/>
                   </context>
@@ -74,7 +77,6 @@
             </implementationChecks>
           </xsl:for-each>
         </media>
-      </xsl:for-each>
     </MediaConch>
   </xsl:template>
 </xsl:stylesheet>
