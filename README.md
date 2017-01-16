@@ -36,6 +36,7 @@ All open source digital assets for the software developed by MediaArea during th
 # How to build MediaConch
 
 [![Build Status](https://travis-ci.org/MediaArea/MediaConch_SourceCode.svg?branch=master)](https://travis-ci.org/MediaArea/MediaConch_SourceCode)
+[![Build status](https://ci.appveyor.com/api/projects/status/xnoysoqp5i0075fk/branch/master?svg=true)](https://ci.appveyor.com/project/MediaArea/mediaconch-sourcecode/branch/master)
 
 ## Build under Unix (Mac and Linux)
 
