@@ -181,8 +181,13 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
     uisettings.change_last_verbosity(verbosity_i);
 
     std::string full_path = filepath;
+#ifdef WINDOWS
+    if (full_path.length() && full_path[full_path.size() - 1] != '/' && full_path[full_path.size() - 1] != '\\')
+        full_path += "/";
+#else
     if (full_path.length())
         full_path += "/";
+#endif
     full_path += filename;
 
     if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, create_policy, err) < 0)
