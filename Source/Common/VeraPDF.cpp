@@ -82,13 +82,13 @@ namespace MediaConch {
         for (size_t i = 0; i < params.size(); ++i)
             exec_params.push_back(params[i]);
 
-        std::string report_dir;
-        if (create_report_dir("VeraTemp/", "VeraReportDir", report_dir) < 0)
-            return -1;
+        // std::string report_dir;
+        // if (create_report_dir("VeraTemp/", "VeraReportDir", report_dir) < 0)
+        //     return -1;
 
-        std::string report_file = report_dir + "summary.xml";
-        exec_params.push_back("--reportfile");
-        exec_params.push_back(report_file);
+        // std::string report_file = report_dir + "summary.xml";
+        // exec_params.push_back("--reportfile");
+        // exec_params.push_back(report_file);
 
         std::string file(filename);
 #if !defined(_WIN32)
@@ -104,11 +104,11 @@ namespace MediaConch {
         report.clear();
         int ret = exec_bin(exec_params, error);
 
-        if (ret >= 0)
-        {
-            report.clear();
-            read_report(report_file, report);
-        }
+        // if (ret >= 0)
+        // {
+        //     report.clear();
+        //     read_report(report_file, report);
+        // }
 
         return ret;
     }
