@@ -237,7 +237,7 @@ int Policies::save_policy(int user, int id, std::string& err)
     if (policy->type == POLICY_XSLT && ((XsltPolicy*)policy)->parent_id != (size_t)-1)
         return save_policy(user, ((XsltPolicy*)policy)->parent_id, err);
 
-    return export_policy(user, NULL, id, err);
+    return export_policy(user, NULL, id, err, true);
 }
 
 int Policies::duplicate_policy(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err, bool copy_name)
@@ -313,7 +313,7 @@ int Policies::duplicate_policy(int user, int id, int dst_policy_id, int *dst_use
 
     find_save_name(destination_user, NULL, p->filename, p->name.c_str());
     if (p->type == POLICY_UNKNOWN)
-        export_policy(destination_user, p->filename.c_str(), old->id, err);
+        export_policy(destination_user, p->filename.c_str(), old->id, err, false);
 
     return (int)p->id;
 }
@@ -334,7 +334,7 @@ int Policies::move_policy(int user, int id, int dst_policy_id, std::string& err)
     return new_id;
 }
 
-int Policies::export_policy(int user, const char* filename, int id, std::string& err)
+int Policies::export_policy(int user, const char* filename, int id, std::string& err, bool is_save)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
@@ -347,6 +347,8 @@ int Policies::export_policy(int user, const char* filename, int id, std::string&
 
         filename = p->filename.c_str();
     }
+
+    p->set_keep_public(is_save);
 
     return p->export_schema(filename, err);
 }
@@ -362,6 +364,8 @@ int Policies::dump_policy_to_memory(int user, int id, bool must_be_public, std::
         err = "This policy is not a public policy";
         return -1;
     }
+
+    p->set_keep_public(false);
 
     if (p->dump_schema(memory) < 0)
     {
@@ -863,6 +867,7 @@ xmlDocPtr Policies::create_doc(int user, int id)
     if (!p)
         return NULL;
 
+    p->set_keep_public(true);
     return p->create_doc();
 }
 

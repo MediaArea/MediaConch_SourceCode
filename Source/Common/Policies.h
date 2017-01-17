@@ -68,7 +68,7 @@ public:
     int         create_xslt_policy_from_file(int user, long file, std::string& err);
 
     int         save_policy(int user, int id, std::string& err);
-    int         export_policy(int user, const char* filename, int id, std::string& err);
+    int         export_policy(int user, const char* filename, int id, std::string& err, bool is_save=false);
     int         dump_policy_to_memory(int user, int pos, bool must_be_public, std::string& memory, std::string& err);
 
     int         policy_change_info(int user, int id, const std::string& name, const std::string& description,

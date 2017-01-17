@@ -507,7 +507,7 @@ int XsltPolicy::create_node_policy_child(xmlNodePtr& node, XsltPolicy *current)
     }
 
     //isPublic
-    if (current->is_public)
+    if (current->keep_public && current->is_public)
         xmlNewProp(node, (const xmlChar *)"isPublic", (const xmlChar *)"true");
 
     //license
