@@ -11,7 +11,7 @@
 %endif
 
 # CentOS also set rhel macro
-%if ! 0%{?suse_version} && ! 0%{?rhel} || 0%{?suse_version} >= 1200 || 0%{?centos_version} >= 700
+%if ! 0%{?suse_version} && ! 0%{?rhel} || 0%{?suse_version} >= 1200 || 0%{?rhel_version} >= 700
 %define build_server 1
 %else
 %define build_server 0
@@ -52,7 +52,7 @@ BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  sqlite-devel
 
-%if ! 0%{?rhel} || 0%{?centos_version} >= 700
+%if ! 0%{?rhel} || 0%{?rhel_version} >= 700
 BuildRequires:  libevent-devel
 %endif
 
@@ -224,7 +224,11 @@ pushd Project/GNU/Server
     %if 0%{?suse_version} && ! 0%{?is_opensuse}
         %configure --without-jansson
     %else
-        %configure
+        %if 0%{?rhel} && ! 0%{?centos}
+            %configure --without-jansson
+        %else
+           %configure
+        %endif
     %endif
     make %{?_smp_mflags}
 popd
