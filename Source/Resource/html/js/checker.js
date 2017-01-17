@@ -83,6 +83,13 @@ $(document).ready(function() {
         resetSelectList('applyAllPolicy');
     });
 
+    // Scroll to the top of the results when page is changed
+    $('#result-table').on('page.dt', function() {
+        $('html, body').animate({
+            scrollTop: $('#checkerResults').offset().top
+        }, 200);
+    });
+
     // Keep popover open while hover on the popover content
     var popoverManualBinding = function(elem) {
         elem.on('mouseenter', function () {
