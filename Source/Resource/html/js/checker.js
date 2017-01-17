@@ -133,6 +133,20 @@ function getDataFromForm(form) {
     return formValues;
 }
 
+// Based on https://stackoverflow.com/a/41629420
+function jumpToPageContainingResultId(id) {
+    result.draw(false);
+    var node = result.row('#result-' + id).node();
+    var page = Math.floor(
+        result.rows({
+            page: 'all',
+            order: 'current',
+            search: 'applied'
+        }).nodes().indexOf( node ) / result.page.info().length
+    );
+    result.page(page).draw(false);
+}
+
 function updateFileOrAddFile(sourceName, fileName, fileId, values) {
     var formValues = JSON.parse(values);
     if (!result.$('tr.fileId-' + fileId).length) {
@@ -213,7 +227,7 @@ function addFile(sourceName, fileName, fileId, formValues) {
 };
 
 function startWaitingLoop() {
-    result.draw();
+    result.draw(false);
     stopWaitingLoop();
     waitingLoop(100, 1000);
 }
