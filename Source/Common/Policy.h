@@ -53,6 +53,7 @@ public:
     int                  dump_schema(std::string& data);
     std::string          get_error() const { return error; }
     virtual xmlDocPtr    create_doc() = 0;
+    void                 set_keep_public(bool b) { keep_public = b;}
 
     std::string          filename;
     std::string          name;
@@ -63,6 +64,7 @@ public:
     bool                 is_system;
     bool                 no_https;
     bool                 is_public;
+    bool                 keep_public;
 
 protected:
     Policies            *policies;
