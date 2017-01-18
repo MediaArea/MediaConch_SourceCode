@@ -149,8 +149,13 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
                                   bool create_policy, std::string& err)
 {
     std::string full_file(path);
-    if (path.length())
+#ifdef WINDOWS
+    if (full_file.size() && full_file[full_file.size() - 1] != '/' && full_file[full_file.size() - 1] != '\\')
         full_file += "/";
+#else
+    if (full_file.length())
+        full_file += "/";
+#endif
     full_file += file;
 
     bool exists = false;
@@ -651,8 +656,13 @@ void WorkerFiles::fill_registered_files_from_db()
         FileRegistered *fr = vec[i];
 
         std::string full_file(fr->filepath);
+#ifdef WINDOWS
+        if (full_file.size() && full_file[full_file.size() - 1] != '/' && full_file[full_file.size() - 1] != '\\')
+            full_file += "/";
+#else
         if (full_file.length())
             full_file += "/";
+#endif
         full_file += fr->filename;
 
         //check if policy still exists
