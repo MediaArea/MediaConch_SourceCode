@@ -83,6 +83,13 @@ $(document).ready(function() {
         resetSelectList('applyAllPolicy');
     });
 
+    // Scroll to the top of the results when page is changed
+    $('#result-table').on('page.dt', function() {
+        $('html, body').animate({
+            scrollTop: $('#checkerResults').offset().top
+        }, 200);
+    });
+
     // Keep popover open while hover on the popover content
     var popoverManualBinding = function(elem) {
         elem.on('mouseenter', function () {
@@ -131,6 +138,20 @@ function getDataFromForm(form) {
                  };
 
     return formValues;
+}
+
+// Based on https://stackoverflow.com/a/41629420
+function jumpToPageContainingResultId(id) {
+    result.draw(false);
+    var node = result.row('#result-' + id).node();
+    var page = Math.floor(
+        result.rows({
+            page: 'all',
+            order: 'current',
+            search: 'applied'
+        }).nodes().indexOf( node ) / result.page.info().length
+    );
+    result.page(page).draw(false);
 }
 
 function updateFileOrAddFile(sourceName, fileName, fileId, values) {
@@ -213,7 +234,7 @@ function addFile(sourceName, fileName, fileId, formValues) {
 };
 
 function startWaitingLoop() {
-    result.draw();
+    result.draw(false);
     stopWaitingLoop();
     waitingLoop(100, 1000);
 }

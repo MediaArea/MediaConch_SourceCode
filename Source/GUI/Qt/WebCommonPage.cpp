@@ -206,6 +206,12 @@ namespace MediaConch
         }
         file_selector.clear();
         clean_forms();
+
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(files[0].toUtf8().data());
+        if (fr && fr->file_id != 1)
+            use_javascript(QString("jumpToPageContainingResultId('%1')")
+                           .arg(fr->file_id));
+
         use_javascript(QString("startWaitingLoop()"));
 
         return QString();
@@ -224,8 +230,15 @@ namespace MediaConch
             ret += QString("%1\n").arg(QString().fromUtf8(error.c_str(), error.size()));
         file_selector.clear();
         clean_forms();
+
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(url.toUtf8().data());
+        if (fr && fr->file_id != 1)
+            use_javascript(QString("jumpToPageContainingResultId('%1')")
+                           .arg(fr->file_id));
+
         use_javascript(QString("startWaitingLoop()"));
-        return ret;    }
+        return ret;
+    }
 
     QString WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
                                                     const QString& verbosity, bool fixer)
@@ -250,6 +263,21 @@ namespace MediaConch
         }
         file_selector.clear();
         clean_forms();
+
+        std::string full_file(list[0].absolutePath().toUtf8().data());
+#ifdef WINDOWS
+        if (full_file.length() && full_file[full_file.size() - 1] != '/' && full_file[full_file.size() - 1] != '\\')
+            full_file += "/";
+#else
+        if (full_file.length())
+            full_file += "/";
+#endif
+        full_file += list[0].fileName().toUtf8().data();
+        FileRegistered* fr = mainwindow->get_file_registered_from_file(full_file);
+        if (fr && fr->file_id != 1)
+            use_javascript(QString("jumpToPageContainingResultId('%1')")
+                           .arg(fr->file_id));
+
         use_javascript(QString("startWaitingLoop()"));
 
         return ret;
