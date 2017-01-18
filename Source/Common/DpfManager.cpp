@@ -17,6 +17,7 @@
 #include <ZenLib/Dir.h>
 #include <sstream>
 #include <fstream>
+#include <string.h>
 #include <libxml/tree.h>
 
 #if defined(WINDOWS)
@@ -138,7 +139,12 @@ namespace MediaConch {
         if (ret >= 0)
         {
             report.clear();
-            std::string report_file = report_dir + "summary.xml";
+            std::string report_summary_file = report_dir + "summary.xml";
+            read_report(report_summary_file, report);
+            std::string report_file;
+            if (read_summary_report_for_new_report_file(report, report_file, error) < 0)
+                return -1;
+            report.clear();
             read_report(report_file, report);
         }
 
@@ -236,6 +242,86 @@ namespace MediaConch {
 
         ZenLib::File::Delete(z_path);
         return 0;
+    }
+
+    //---------------------------------------------------------------------------
+    int DPFManager::read_summary_report_for_new_report_file(const std::string& summary, std::string& file, std::string& err)
+    {
+        xmlSetGenericErrorFunc(this, manage_xml_error);
+
+        xmlDocPtr doc = xmlParseMemory(summary.c_str(), summary.length());
+        xmlSetGenericErrorFunc(NULL, NULL);
+
+        if (!doc)
+        {
+            err = "The MediaInfo report given cannot be parsed";
+            return -1;
+        }
+
+        xmlNodePtr root = xmlDocGetRootElement(doc);
+        if (!root || !root->name || std::string((const char*)root->name).compare("globalreport"))
+        {
+            err = "xml summary is not correct";
+            xmlFreeDoc(doc);
+            return -1;
+        }
+
+        err.clear();
+        xmlNodePtr child = NULL;
+        for (child = root->children; child; child = child->next)
+        {
+            std::string def("individualreports");
+            if (child->type == XML_TEXT_NODE || !child->name || def.compare((const char*)child->name))
+                continue;
+
+            xmlNodePtr i_child = NULL;
+            for (i_child = child->children; i_child; i_child = i_child->next)
+            {
+                def = "report";
+                if (i_child->type == XML_TEXT_NODE || !i_child->name || def.compare((const char*)i_child->name))
+                    continue;
+
+                xmlChar *content = xmlNodeGetContent(i_child);
+                if (content)
+                    file = (const char*)content;
+                break;
+            }
+
+            if (i_child)
+                break;
+            err = "report tag not found in summary.xml";
+        }
+
+        if (!child)
+        {
+            if (!err.size())
+                err = "individualreports tag not found in summary.xml";
+            xmlFreeDoc(doc);
+            return -1;
+        }
+
+        xmlFreeDoc(doc);
+        return 0;
+    }
+
+    //---------------------------------------------------------------------------
+    void DPFManager::manage_xml_error(void *userData, const char* msg, ...)
+    {
+        DPFManager *obj = (DPFManager *)userData;
+        va_list args;
+        char buf[4096] = {0};
+
+        va_start(args, msg);
+#ifdef _MSC_VER
+        int ret = vsnprintf_s(buf, sizeof(buf), _TRUNCATE, msg, args);
+#else //_MSC_VER
+        int ret = vsnprintf(buf, sizeof(buf), msg, args);
+        if (ret < 0)
+            ret = 0;
+        buf[ret] = '\0';
+#endif //_MSC_VER
+        obj->xml_error = std::string(buf);
+        va_end(args);
     }
 
 }

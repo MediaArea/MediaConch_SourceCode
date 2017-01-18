@@ -2290,18 +2290,28 @@ bool Core::policy_is_valid(const std::string& report)
 //---------------------------------------------------------------------------
 bool Core::verapdf_report_is_valid(const std::string& report)
 {
-    size_t pos = report.find(" compliant=\"false\"");
-    if (pos != std::string::npos)
+    size_t pos = report.find("<summary");
+    if (pos == std::string::npos)
+        return true;
+
+    std::string invalid("inValid=\"");
+    pos = report.find(invalid, pos);
+    if (pos == std::string::npos)
+        return true;
+
+    if (report.size() > pos + invalid.size() && report[pos + invalid.size()] != '0')
         return false;
+
     return true;
 }
 
 //---------------------------------------------------------------------------
 bool Core::dpfmanager_report_is_valid(const std::string& report)
 {
-    size_t pos = report.find("<invalid_files>1</invalid_files>");
+    size_t pos = report.find("<level>error</level>");
     if (pos != std::string::npos)
         return false;
+
     return true;
 }
 
