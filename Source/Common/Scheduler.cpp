@@ -248,7 +248,7 @@ namespace MediaConch {
             working.erase(it);
     }
 
-    int Scheduler::execute_pre_hook_plugins(QueueElement *el, std::string& err, bool& analyze_file)
+    int Scheduler::execute_pre_hook_plugins(QueueElement *el, std::string& err)
     {
         // Before registering, check the format
         std::vector<Plugin*> plugins = core->get_pre_hook_plugins();
@@ -271,8 +271,6 @@ namespace MediaConch {
             Plugin *p = NULL;
             if (plugins[i]->get_name() == "PreHook")
                 p = new PluginPreHook(*(PluginPreHook*)plugins[i]);
-            else if (plugins[i]->get_name() == "FileLog")
-                p = new PluginFileLog(*(PluginFileLog*)plugins[i]);
             else
                 continue;
 
@@ -297,23 +295,42 @@ namespace MediaConch {
             size_t time_passed = (time_after.tv_sec - time_before.tv_sec) * 1000 + (time_after.tv_usec - time_before.tv_usec) / 1000;
 #endif
 
-            if (ret == 0 && ((PluginPreHook*)p)->is_creating_file())
+            if (ret == 0 && ((PluginPreHook*)p)->is_creating_files())
             {
                 std::string generated_log = ((PluginPreHook*)p)->get_report();
                 std::string generated_error_log = ((PluginPreHook*)p)->get_report_err();
-                new_file = ((PluginPreHook*)p)->get_output_file();
 
-                std::vector<std::pair<std::string,std::string> > options;
-                for (size_t i = 0; i < el->options.size(); ++i)
-                    options.push_back(std::make_pair(el->options[i].first, el->options[i].second));
+                std::vector<std::pair<std::string, std::string> > options;
+                for (size_t j = 0; j < el->options.size(); ++j)
+                    options.push_back(std::make_pair(el->options[j].first, el->options[j].second));
 
-                std::vector<std::string> plugins;
                 std::string err;
-                long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log,
-                                                generated_error_log, options, plugins, err, el->mil_analyze);
-                if (id >= 0)
-                    core->file_add_generated_file(el->user, old_id, id, err);
-                old_id = id;
+                std::vector<std::string> plugins;
+                std::vector<PluginPreHook::Output*> new_files;
+                ((PluginPreHook*)p)->get_outputs(new_files);
+
+                long gen_id = -1;
+                for (size_t j = 0; j < new_files.size(); ++j)
+                {
+                    if (!new_files[j])
+                        continue;
+
+                    if (!new_files[j]->create_file)
+                        continue;
+
+                    new_file = new_files[j]->output_file;
+
+                    long id = core->checker_analyze(el->user, new_file, old_id, time_passed, generated_log,
+                                                    generated_error_log, options, plugins, err,
+                                                    new_files[j]->analyze);
+                    if (id >= 0)
+                    {
+                        core->file_add_generated_file(el->user, old_id, id, err);
+                        gen_id = id;
+                    }
+                }
+
+                old_id = gen_id;
             }
             else if (ret)
             {
@@ -323,13 +340,8 @@ namespace MediaConch {
                 return ret;
             }
 
-            if (!((PluginPreHook*)p)->analyzing_source())
-                analyze_file = false;
             delete p;
         }
-
-        if (!analyze_file)
-            remove_element(el);
 
         return ret;
     }

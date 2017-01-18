@@ -38,17 +38,24 @@ It should be a struct named *Plugins* which contains an array of plugin.
 
 ##### PreHook
 
-* **id**:            Id of the plugin
-* **name**:          Has to be *PreHook*
-* **bin**:           Full path to the Command Line Interface of the command
-* **formatting**:    Command line formatting (following the pattern "$VAR[ $VARXXX]*", $VAR can be $BIN, $INPUTPARAMS, $INPUTFILE, $OUTPUTPARAMS, $OUTPUTFILE, $PARAMS; default is "$BIN $INPUTPARAMS $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE $PARAMS")
-* **createFile**:    Need to be set to true, tell the plugin manager to create an output file
-* **analyzeSource**: Analyze the generated file and the source file
+###### PreHookOutputs
+
+* **name**:          Name of the output, used in the formatting
+* **createFile**:    If set to true, make the plugin manager to create an output file
+* **analyze**:       Analyze the generated file, default set to true
 * **outputDir**:     Directory where the created file will be put
 * **outputExt**:     Extension of the File created
+* **outputParams**:  CLI parameters to be given for the output file
+
+###### Parameters
+
+* **id**:            Id of the plugin (mandatory to be set)
+* **name**:          Must be *PreHook*
+* **bin**:           Full path to the Command Line Interface of the command
+* **formatting**:    Command line formatting (following the pattern "$VAR[ $VARXXX]*", $VAR can be $BIN, $INPUTPARAMS, $INPUTFILE, $OUTPUTPARAMS, $OUTPUTFILE, $PARAMS; default is "$BIN $INPUTPARAMS $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE $PARAMS"). In case of multiple outputs, $OUTPUTPARAMS and $OUTPUTFILE must be identified using ":$OUTPUTNAME" ($OUTPUTNAME is the name of the output)
 * **inputParams**:   CLI parameters to be given before the input file
-* **outputParams**:  CLI parameters to be given before the output file
 * **params**:        CLI parameters added after the command
+* **outputs**:       List of PreHookOutputs
 
 ##### LogFile
 
@@ -81,27 +88,33 @@ It should be a struct named *Plugins* which contains an array of plugin.
                 "id": "plugin3",
                 "name": "PreHook",
                 "bin": "$PATH_TO_CMD",
-                "formatting": "$BIN $INPUTPARAMS $OUTPUTPARAMS $OUTPUTFILE $INPUTFILE",
-                "analyzeSource": false,
-                "createFile": true,
-                "outputDir": "/tmp",
-                "outputExt": "mkv",
+                "formatting": "$BIN $INPUTPARAMS $OUTPUTPARAMS:demo $OUTPUTFILE:demo $INPUTFILE",
                 "inputParams": ["--input"],
-                "outputParams": [],
-                "params": []
+                "params": [],
+                "outputs": [
+                    "name": "demo",
+                    "createFile": true,
+                    "analyze": true,
+                    "outputDir": "/tmp",
+                    "outputExt": "mkv",
+                    "outputParams": []
+                ]
             },
             {
                 "id": "ffmpeg_example",
                 "name": "PreHook",
                 "bin": "$PATH_TO_FFMPEG",
-                "analyzeSource": false,
-                "createFile": true,
-                "outputDir": "/tmp",
-                "outputExt": "mkv",
-                "formatting": "$BIN $INPUTPARAMS -i $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE",
+                "formatting": "$BIN $INPUTPARAMS -i $INPUTFILE $OUTPUTPARAMS $OUTPUTFILE", #only one outputs, no need of the name
                 "inputParams": ["-y"],
-                "outputParams": ["-vcodec", "ffv1"],
-                "params": []
+                "params": [],
+                "outputs": [
+                    "name": "demo",
+                    "createFile": true,
+                    "analyze": true,
+                    "outputDir": "/tmp",
+                    "outputExt": "mkv",
+                    "outputParams": ["-vcodec", "ffv1"]
+                ]
             },
             {
                 "id": "plugin5",

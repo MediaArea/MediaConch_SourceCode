@@ -58,24 +58,14 @@ void QueueElement::Entry()
 
     //Pre hook plugins
     int ret = 0;
-    bool analyze_file = true;
 
     std::stringstream log;
     log << "start analyze:" << filename;
     scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
 
-    ret = scheduler->execute_pre_hook_plugins(this, err, analyze_file);
+    ret = scheduler->execute_pre_hook_plugins(this, err);
 
-    if (!analyze_file || ret)
-    {
-        log.str("");
-        log << "end analyze:" << filename;
-        scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
-        scheduler->work_finished(this, NULL);
-        return;
-    }
-
-    if (!mil_analyze)
+    if (ret || !mil_analyze)
     {
         log.str("");
         log << "end analyze:" << filename;
