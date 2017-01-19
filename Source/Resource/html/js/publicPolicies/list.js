@@ -58,7 +58,7 @@ var publicPoliciesList = (function() {
 
             // Start wrapper line
             if (0 == index % 2) {
-                $('#publicPoliciesList').append('<div class="col-xs-12 policiesLineWrapper">');
+                $('#publicPoliciesList').append('<div class="clearfix">');
             }
 
             // Add to my policies or unpublish button
