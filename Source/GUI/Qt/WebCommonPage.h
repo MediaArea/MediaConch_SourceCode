@@ -87,6 +87,7 @@ public Q_SLOTS:
     QString      on_fill_mediatrace_report(long file_id);
     void         on_save_mediatrace_report(long file_id);
     QString      on_create_policy_from_file(long file_id);
+    QString      checker_force_analyze(long id);
 
     void         close_all();
     void         close_element(const QString& file);

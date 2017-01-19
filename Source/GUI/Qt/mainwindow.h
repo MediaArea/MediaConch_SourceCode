@@ -63,6 +63,7 @@ public:
                                                  const QString& verbosity, bool fixer, bool, std::string& err);
     void                        remove_file_to_list(const QString& file);
     void                        update_policy_of_file_in_list(long file_id, const QString& policy);
+    int                         analyze_force_file_to_list(long id, std::string& err);
     void                        clear_file_list();
 
     // UI
@@ -77,8 +78,8 @@ public:
     void                        remove_widget_from_layout(QWidget* w);
     int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
     int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
-    int                         analyze(const std::vector<std::string>& files, bool with_fixer, std::vector<long>& files_id,
-                                        std::string& err);
+    int                         analyze(const std::vector<std::string>& files, bool with_fixer, bool force,
+                                        std::vector<long>& files_id, std::string& err);
     int                         is_analyze_finished(const std::vector<std::string>& files,
                                                     std::vector<MediaConchLib::Checker_StatusRes>& res,std::string& err);
     int                         is_analyze_finished(const std::string& file, MediaConchLib::Checker_StatusRes& res, std::string& err);
@@ -113,6 +114,7 @@ public:
     void                        get_implementation_report(long file_id, QString& report, std::string& err,
                                                           int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(long file_id, QString& report, std::string& err, int policy=-1, int *display=NULL);
+    int                         checker_file_from_id(long id, std::string& file, std::string& err);
 
     void                        add_policy_to_list(const QString& policy);
     void                        clear_policy_list();
