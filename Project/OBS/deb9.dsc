@@ -2,7 +2,7 @@ Format: 3.0 (quilt)
 Source: mediaconch
 Binary: mediaconch, mediaconch-dbg, mediaconch-server, mediaconch-server-dbg, mediaconch-gui, mediaconch-gui-dbg
 Architecture: any
-Version: 16.12-1
+Version: 16.12-1deb9
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Homepage: http://MediaArea.net/MediaConch
 Standards-Version: 3.9.6
@@ -18,10 +18,10 @@ Package-List:
  mediaconch-gui-dbg deb debug extra arch=any
 Checksums-Sha1:
  0000000000000000000000000000000000000000 000000 mediaconch_16.12.orig.tar.xz
- 0000000000000000000000000000000000000000 000000 mediaconch_16.12-1.debian.tar.xz
+ 0000000000000000000000000000000000000000 000000 mediaconch_16.12-1deb9.debian.tar.xz
 Checksums-Sha256:
  0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_16.12.orig.tar.xz
- 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_16.12-1.debian.tar.xz
+ 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_16.12-1deb9.debian.tar.xz
 Files:
  00000000000000000000000000000000 000000 mediaconch_16.12.orig.tar.xz
- 00000000000000000000000000000000 000000 mediaconch_16.12-1.debian.tar.xz
+ 00000000000000000000000000000000 000000 mediaconch_16.12-1deb9.debian.tar.xz
