@@ -190,7 +190,8 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
 #endif
     full_path += filename;
 
-    if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, create_policy, err) < 0)
+    bool force = fixer;
+    if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, force, create_policy, err) < 0)
         return -1;
 
     if (checkerView)
@@ -210,6 +211,26 @@ void MainWindow::update_policy_of_file_in_list(long file_id, const QString& poli
 {
     int policy_i = policy.toInt();
     workerfiles.update_policy_of_file_registered_from_file(file_id, policy_i);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::analyze_force_file_to_list(long id, std::string& err)
+{
+    std::string full_path;
+    if (checker_file_from_id(id, full_path, err) < 0)
+        return -1;
+
+    FileRegistered *fr = get_file_registered_from_file(full_path);
+    if (!fr)
+    {
+        err = "File ID not registered";
+        return -1;
+    }
+
+    if (workerfiles.add_file_to_list(fr->filename, fr->filepath, fr->policy, fr->display, fr->verbosity, false, true, false, err) < 0)
+        return -1;
+
+    return 0;
 }
 
 //***************************************************************************
@@ -1189,10 +1210,9 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer,
+int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, bool force,
                         std::vector<long>& files_id, std::string& err)
 {
-    bool force = false;
     std::vector<std::string> plugins;
     std::vector<std::pair<std::string, std::string> > options;
     if (with_fixer)
@@ -1284,6 +1304,12 @@ int MainWindow::validate_policy(long file_id, size_t policy_id,
 
     return MCL.checker_validate(-1, MediaConchLib::report_Max, files_id, policies_ids,
                                 policies_contents, options, result, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::checker_file_from_id(long id, std::string& file, std::string& err)
+{
+    return MCL.checker_file_from_id(-1, id, file, err);
 }
 
 //---------------------------------------------------------------------------

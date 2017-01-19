@@ -188,6 +188,20 @@ namespace MediaConch
         return script;
     }
 
+    QString WebCommonPage::checker_force_analyze(long id)
+    {
+        std::string err;
+
+        if (mainwindow->analyze_force_file_to_list(id, err) < 0)
+        {
+            QString err_str = QString().fromUtf8(err.c_str(), err.size());
+            string_to_json(err_str);
+            return QString("{\"error\": \"%1\"}").arg(err_str);
+        }
+
+        return QString("{}");
+    }
+
     QString WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
                                                    const QString& verbosity, bool fixer)
     {

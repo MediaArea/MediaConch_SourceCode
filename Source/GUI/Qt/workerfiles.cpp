@@ -146,7 +146,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
 //---------------------------------------------------------------------------
 int WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
                                   int policy, int display, int verbosity, bool fixer,
-                                  bool create_policy, std::string& err)
+                                  bool force, bool create_policy, std::string& err)
 {
     std::string full_file(path);
 #ifdef WINDOWS
@@ -165,7 +165,7 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
     {
         exists = true;
         // nothing to do
-        if (!fixer && !create_policy &&
+        if (!force && !create_policy &&
             policy == working_files[full_file]->policy && display == working_files[full_file]->display
             && verbosity == working_files[full_file]->verbosity)
         {
@@ -206,7 +206,7 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
     unfinished_files.push_back(full_file);
     unfinished_files_mutex.unlock();
 
-    if (!fixer && exists)
+    if (!force && exists)
     {
         to_update_files_mutex.lock();
         to_update_files[full_file] = new FileRegistered(*fr);
@@ -219,7 +219,7 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
 
     int ret;
     std::vector<long> files_id;
-    if ((ret = mainwindow->analyze(vec, fixer, files_id, err)) < 0)
+    if ((ret = mainwindow->analyze(vec, fixer, force, files_id, err)) < 0)
     {
         mainwindow->set_str_msg_to_status_bar(err);
         return -1;
@@ -685,7 +685,7 @@ void WorkerFiles::fill_registered_files_from_db()
 
         int ret;
         std::vector<long> files_id;
-        if ((ret = mainwindow->analyze(tmp, false, files_id, err2)) < 0)
+        if ((ret = mainwindow->analyze(tmp, false, false, files_id, err2)) < 0)
             mainwindow->set_str_msg_to_status_bar(err2);
         else if (!files_id.size())
             mainwindow->set_str_msg_to_status_bar("Internal error: Analyze result is not correct.");
