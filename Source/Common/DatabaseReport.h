@@ -70,13 +70,16 @@ public:
 
     // Report
     virtual int save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+                            const std::string& options,
                             const std::string& report, MediaConchLib::compression,
                             int mil_version, std::string& err) = 0;
     virtual int remove_report(int user, long file_id, std::string& err) = 0;
     virtual void get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+                            const std::string& options,
                             std::string& report, MediaConchLib::compression&, std::string& err) = 0;
     virtual bool report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
-                                      MediaConchLib::format format, std::string& err) = 0;
+                                      MediaConchLib::format format, const std::string& options,
+                                      std::string& err) = 0;
     virtual int  version_registered(int user, long file_id, std::string& err) = 0;
     virtual int  get_elements(int user, std::vector<std::string>& vec, std::string& err) = 0;
     virtual int  get_elements(int user, std::vector<long>& vec, std::string& err) = 0;
@@ -93,6 +96,7 @@ protected:
     void        get_sql_query_for_update_report_table_v3(std::string& q);
     void        get_sql_query_for_update_report_table_v4(std::string& q);
     void        get_sql_query_for_update_report_table_v5(std::string& q);
+    void        get_sql_query_for_update_report_table_v6(std::string& q);
 
     // Helpers
     void        longs_to_string(const std::vector<long>&, std::string&);

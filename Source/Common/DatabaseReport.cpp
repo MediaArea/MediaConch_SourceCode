@@ -169,6 +169,16 @@ void DatabaseReport::get_sql_query_for_update_report_table_v5(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseReport::get_sql_query_for_update_report_table_v6(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE MEDIACONCH_REPORT";
+    create << " ADD OPTIONS TEXT DEFAULT \"\";";
+
+    q = create.str();
+}
+
 void DatabaseReport::longs_to_string(const std::vector<long>& arr, std::string& str)
 {
     std::stringstream ss;

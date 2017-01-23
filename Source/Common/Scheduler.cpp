@@ -231,7 +231,7 @@ namespace MediaConch {
         MediaConchLib::report report_kind = ((PluginFormat*)p)->get_report_kind();
 
         CS.Enter();
-        core->register_reports_to_database(el->user, el->file_id, report, report_kind, MI);
+        core->register_reports_to_database(el->user, el->file_id, report, report_kind, "", MI);
         remove_element(el);
         CS.Leave();
         run_element();

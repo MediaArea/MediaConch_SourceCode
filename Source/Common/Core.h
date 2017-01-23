@@ -191,7 +191,8 @@ public:
     //***************************************************************************
     void set_file_analyzed_to_database(int user, long id);
     void register_reports_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* MI);
-    void register_reports_to_database(int user, long file, const std::string& report, MediaConchLib::report report_kind,
+    void register_reports_to_database(int user, long file, const std::string& report,
+                                      MediaConchLib::report report_kind, const std::string& options,
                                       MediaInfoNameSpace::MediaInfo* curMI);
     void create_report_mi_xml(int user, const std::vector<long>& filename, std::string& report);
     void create_report_mt_xml(int user, const std::vector<long>& filename, std::string& report);
@@ -267,7 +268,7 @@ private:
     void compress_report_copy(std::string& report, const char* src, size_t src_len, MediaConchLib::compression& compress);
     int  uncompress_report(std::string& report, MediaConchLib::compression compress);
     void get_report_saved(int user, const std::vector<long>& file, MediaConchLib::report reportKind,
-                          MediaConchLib::format f, std::string& report);
+                          MediaConchLib::format f, const std::string& options, std::string& report);
     void get_reports_output(int user, const std::vector<long>& files,
                             const std::map<std::string, std::string>& options,
                             MediaConchLib::format f,
@@ -280,7 +281,7 @@ private:
 
     void register_reports_to_database(int user, long file);
     void register_report_xml_to_database(int user, long file, const std::string& report,
-                                         MediaConchLib::report report_kind);
+                                         MediaConchLib::report report_kind, const std::string& options);
     void register_report_mediainfo_text_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* MI);
     void register_report_mediainfo_xml_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* MI);
     void register_report_micromediatrace_xml_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* MI);
