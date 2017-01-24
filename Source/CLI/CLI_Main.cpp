@@ -131,7 +131,7 @@ int main(int argc, char* argv_ansi[])
         return 0;
 
     std::string err;
-    if (cli.init(err) < 0)
+    if (cli.init(err) == CLI_RETURN_ERROR)
     {
         STRINGOUT(ZenLib::Ztring().From_UTF8(err));
         return 1;

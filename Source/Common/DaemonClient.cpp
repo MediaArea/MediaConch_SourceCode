@@ -600,6 +600,10 @@ int DaemonClient::checker_get_report(int user, const std::bitset<MediaConchLib::
         req.display_name = MediaConchLib::display_html_name;
     else if (f == MediaConchLib::format_JsTree)
         req.display_name = MediaConchLib::display_jstree_name;
+    else if (f == MediaConchLib::format_Simple)
+        req.display_name = MediaConchLib::display_simple_name;
+    else if (f == MediaConchLib::format_CSV)
+        req.display_name = MediaConchLib::display_csv_name;
 
     if (display_content)
         req.display_content = *display_content;

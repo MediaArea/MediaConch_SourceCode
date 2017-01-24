@@ -53,6 +53,12 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::init(std::string& err)
     {
+        if (format == MediaConchLib::format_CSV && !policies.size())
+        {
+            err = "CLI can use format CSV only with Policy";
+            return CLI_RETURN_ERROR;
+        }
+
         if (!no_needs_files_mode)
         {
             // If no filenames (and no options)
@@ -72,7 +78,7 @@ namespace MediaConch
             {
                 if (err == "MicroMediaTrace requires an XML output.")
                     err += " Add -fx.";
-                return -1;
+                return CLI_RETURN_ERROR;
             }
         }
 
@@ -80,10 +86,10 @@ namespace MediaConch
         MCL.set_plugins_configuration_file(plugins_configuration_file);
 
         if (MCL.init(err) < 0)
-            return -1;
+            return CLI_RETURN_ERROR;
 
         use_daemon = MCL.get_use_daemon();
-        return 0;
+        return CLI_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -364,6 +370,10 @@ namespace MediaConch
             return set_format(MediaConchLib::format_JsTree);
         if (f == "HTML" || f == "html")
             return set_format(MediaConchLib::format_Html);
+        if (f == "SIMPLE" || f == "simple")
+            return set_format(MediaConchLib::format_Simple);
+        if (f == "CSV" || f == "csv")
+            return set_format(MediaConchLib::format_CSV);
 
         return -1;
     }

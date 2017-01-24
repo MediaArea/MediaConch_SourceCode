@@ -493,8 +493,8 @@ std::string RESTAPI::Checker_Report_Req::to_str() const
     }
     out << "],\"policies_ids_size\":" << policies_ids.size();
     out << ",\"policies_contents_size\":" << policies_contents.size();
-    out << ",\"display_name\":" << display_name;
-    out << ",\"display_content_length\":" << display_content.size();
+    out << ",\"display_name\":\"" << display_name;
+    out << "\",\"display_content_length\":" << display_content.size();
     out << ",\"options\":[";
 
     std::map<std::string, std::string>::const_iterator it = options.begin();

@@ -877,6 +877,10 @@ namespace MediaConch
             format = MediaConchLib::format_Html;
         else if (req->display_name == MediaConchLib::display_jstree_name)
             format = MediaConchLib::format_JsTree;
+        else if (req->display_name == MediaConchLib::display_simple_name)
+            format = MediaConchLib::format_Simple;
+        else if (req->display_name == MediaConchLib::display_csv_name)
+            format = MediaConchLib::format_CSV;
 
         const std::string* display_name = req->display_name.length() ? &req->display_name : NULL;
         const std::string* display_content = req->display_content.length() ? &req->display_content : NULL;

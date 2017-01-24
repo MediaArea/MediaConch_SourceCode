@@ -354,7 +354,7 @@ Parameters:
 - policies_contents: Array of policies contents (Strings)
 - policies_ids:      Array of policies ids (Integer)
 - display_content:   String:  display content
-- display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE)
+- display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE, SIMPLE, CSV)
 - options:           Object of strings given to the XSL transformations: Verbosity should be defined here.
                      Example: "options":{"verbosity": "5", "key":"value", ...}
 
