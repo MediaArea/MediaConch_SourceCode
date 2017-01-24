@@ -145,6 +145,8 @@ public:
                                         const std::bitset<MediaConchLib::report_Max>& report_set, std::string& report);
     static std::string serialize_string_from_options_vec(const std::vector<std::pair<std::string,std::string> >& options);
     static std::vector<std::pair<std::string,std::string> > parse_options_vec_from_string(const std::string& options);
+    static std::string serialize_string_from_options_map(const std::map<std::string, std::string>& options);
+    static std::map<std::string, std::string> parse_options_map_from_string(const std::string& options);
 
     //***************************************************************************
     // Display
@@ -274,8 +276,11 @@ private:
                             MediaConchLib::format f,
                             std::bitset<MediaConchLib::report_Max> report_set,
                             MediaConchLib::Checker_ReportRes* result);
-    bool get_implementation_report(int user, const std::vector<long>& file, const std::map<std::string, std::string>& options,
-                                   std::string& report);
+    int  get_implementation_report(int user, long file, const std::map<std::string, std::string>& options,
+                                   std::string& report, bool& valid, std::string& err);
+    int  get_implementation_reports(int user, const std::vector<long>& file,
+                                    const std::map<std::string, std::string>& options,
+                                    std::string& report, bool& valid, std::string& err);
     bool get_verapdf_report(int user, long file, std::string& report);
     bool get_dpfmanager_report(int user, long file, std::string& report);
 

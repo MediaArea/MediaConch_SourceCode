@@ -793,7 +793,7 @@ bool SQLLiteReport::file_is_analyzed(int user, long id, std::string& err)
     return true;
 }
 
-int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report report_kind, MediaConchLib::format format,
                                const std::string& options,
                                const std::string& report, MediaConchLib::compression compress,
                                int mil_version, std::string& err)
@@ -806,8 +806,8 @@ int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report rep
         return -1;
     }
 
-    if (report_is_registered(user, file_id, reportKind, format, options, err))
-        return update_report(user, file_id, reportKind, format, options, report, compress, mil_version, err);
+    if (report_is_registered(user, file_id, report_kind, format, options, err))
+        return update_report(user, file_id, report_kind, format, options, report, compress, mil_version, err);
 
     reports.clear();
     create << "INSERT INTO MEDIACONCH_REPORT";
@@ -825,7 +825,7 @@ int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report rep
         return -1;
     }
 
-    ret = sqlite3_bind_int(stmt, 2, (int)reportKind);
+    ret = sqlite3_bind_int(stmt, 2, (int)report_kind);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -1043,7 +1043,7 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
     }
 }
 
-bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
+bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::report report_kind,
                                          MediaConchLib::format format, const std::string& options,
                                          std::string& err)
 {
@@ -1074,7 +1074,7 @@ bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::
         return false;
     }
 
-    ret = sqlite3_bind_int(stmt, 2, (int)reportKind);
+    ret = sqlite3_bind_int(stmt, 2, (int)report_kind);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -1088,7 +1088,7 @@ bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::
         return false;
     }
 
-    ret = sqlite3_bind_blob(stmt, 3, options.c_str(), options.size(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);

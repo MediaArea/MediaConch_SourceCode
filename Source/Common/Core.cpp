@@ -696,7 +696,8 @@ int Core::checker_validate(int user, MediaConchLib::report report, const std::ve
         {
             //XXX
             std::string report;
-            res->valid = get_implementation_report(user, file_tmp, options, report);
+            if (get_implementation_report(user, files[i], options, report, res->valid, err) < 0)
+                return -1;
         }
         else if (report == MediaConchLib::report_MediaVeraPdf)
         {
@@ -1593,13 +1594,14 @@ void Core::create_report_ma_xml(int user, const std::vector<long>& files,
         if (reports[MediaConchLib::report_MediaConch])
         {
             std::string implem;
-            if (get_implementation_report(user, vec, options, implem))
-                get_content_of_media_in_xml(implem);
-            else
+            bool valid;
+            if (get_implementation_report(user, files[i], options, implem, valid, err) < 0)
                 implem = std::string();
+            else
+                get_content_of_media_in_xml(implem);
 
-            report += "<MediaConch xmlns=\"http" + (AcceptsHttps ? "s" : string()) + "://mediaarea.net/mediaconch\" version=\"0.2\">\n"
-                + implem + "</MediaConch>\n";
+            report += "<MediaConch xmlns=\"http" + (AcceptsHttps ? "s" : string()) +
+                "://mediaarea.net/mediaconch\" version=\"0.2\">\n" + implem + "</MediaConch>\n";
         }
         report += std::string("</media>\n");
     }
@@ -1720,7 +1722,10 @@ void Core::get_reports_output(int user, const std::vector<long>& files,
         if (report_set[MediaConchLib::report_MediaConch])
         {
             std::string tmp;
-            bool is_valid = get_implementation_report(user, files, options, tmp);
+            std::string err;
+            bool is_valid = false;
+            if (get_implementation_reports(user, files, options, tmp, is_valid, err) < 0)
+                tmp = std::string();
 
             if (f == MediaConchLib::format_Html)
                 transform_with_xslt_html_memory(tmp, tmp);
@@ -1827,17 +1832,75 @@ void Core::get_reports_output(int user, const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Core::get_implementation_report(int user, const std::vector<long>& files,
+int Core::get_implementation_reports(int user, const std::vector<long>& files,
                                      const std::map<std::string, std::string>& options,
-                                     std::string& report)
+                                     std::string& report, bool& valid, std::string& err)
 {
-    std::string memory(implementation_report_xsl);
+    bool AcceptsHttps = accepts_https();
+    valid = true;
+
+    std::stringstream verbo;
+    std::map<std::string, std::string>::const_iterator it = options.find("verbosity");
+    if (it != options.end() && it->second.size())
+        verbo << it->second;
+    else
+        verbo << "5";
+
+    report = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    report += "<MediaConch xmlns=\"http" + (AcceptsHttps ? "s" : string()) +
+        "://mediaarea.net/mediaconch\" version=\"0.2\" verbosity=\"" + verbo.str() + "\">\n";
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+        std::string file;
+        checker_file_from_id(user, files[i], file, err);
+        xml_escape_attributes(file);
+
+        report += "  <media ref=\"" + file + "\">";
+        std::string implem;
+        bool v = false;
+        if (get_implementation_report(user, files[i], options, implem, v, err) < 0)
+            implem = std::string();
+        else
+            get_content_of_media_in_xml(implem);
+
+        report += implem + "</media>\n";
+
+        if (!v)
+            valid = false;
+    }
+
+    report += "</MediaConch>\n";
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Core::get_implementation_report(int user, long file, const std::map<std::string, std::string>& options,
+                                    std::string& report, bool& valid, std::string& err)
+{
+    std::string options_str = serialize_string_from_options_map(options);
+    valid = true;
     std::string tmp_report;
-    bool valid = validate_xslt_from_memory(user, files, options, memory, tmp_report, true);
+
+    if (!get_db()->report_is_registered(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml, options_str, err))
+    {
+        std::string memory(implementation_report_xsl);
+        std::vector<long> tocheck;
+        tocheck.push_back(file);
+        valid = validate_xslt_from_memory(user, tocheck, options, memory, tmp_report, true);
+        get_db()->save_report(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
+                              options_str, tmp_report, MediaConchLib::compression_None, 0, err);
+        tmp_report = std::string();
+    }
+
+    MediaConchLib::compression compress = MediaConchLib::compression_None;
+    get_db()->get_report(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
+                         options_str, tmp_report, compress, err);
     if (valid)
         valid = implementation_is_valid(tmp_report);
     report += tmp_report;
-    return valid;
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -1992,6 +2055,54 @@ std::vector<std::pair<std::string,std::string> > Core::parse_options_vec_from_st
         toreturn.push_back(std::make_pair(opt[i], opt[i + 1]));
         i += 2;
     }
+
+    return toreturn;
+}
+
+//---------------------------------------------------------------------------
+std::string Core::serialize_string_from_options_map(const std::map<std::string,std::string>& options)
+{
+    std::stringstream toreturn;
+
+    std::map<std::string,std::string>::const_iterator it = options.begin();
+    for (; it != options.end(); ++it)
+        toreturn << it->first.size() << "," << it->first << it->second.size() << "," << it->second;
+
+    return toreturn.str();
+}
+
+//---------------------------------------------------------------------------
+std::map<std::string, std::string> Core::parse_options_map_from_string(const std::string& options)
+{
+    std::map<std::string, std::string> toreturn;
+
+    size_t pos = 0;
+    size_t start;
+
+    std::vector<std::string> opt;
+    while (pos != std::string::npos)
+    {
+        start = pos;
+        pos = options.find(",", start);
+        if (pos == std::string::npos)
+            continue;
+
+        std::string size = options.substr(start, pos - start);
+        pos += 1;
+        char *end = NULL;
+        long len = strtol(size.c_str(), &end, 10);
+        if (len < 0 || pos + len > options.size())
+        {
+            pos = std::string::npos;
+            continue;
+        }
+
+        opt.push_back(options.substr(pos, len));
+        pos += len;
+    }
+
+    for (size_t i = 0; i + 1 < opt.size(); i += 2)
+        toreturn[opt[i]] = opt[i + 1];
 
     return toreturn;
 }
