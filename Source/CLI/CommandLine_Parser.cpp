@@ -161,6 +161,10 @@ static void change_short_options_to_long(std::string& argument)
         argument = "--format=JSTREE";
     if (argument=="-fh")
         argument = "--format=HTML";
+    if (argument=="-fc")
+        argument = "--format=CSV";
+    if (argument=="-fs")
+        argument = "--format=SIMPLE";
 
     // Compression short options
     if (argument=="-cz")

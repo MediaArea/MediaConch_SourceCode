@@ -253,6 +253,8 @@ private:
 
     int transform_with_xslt_text_memory(const std::string& report, std::string& result);
     int transform_with_xslt_html_memory(const std::string& report, std::string& result);
+    int transform_with_xslt_simple_memory(const std::string& report, std::string& result);
+    int transform_with_xslt_csv_memory(const std::string& report, std::string& result);
 
     long   file_is_registered_and_analyzed(int user, const std::string& file, bool& analyzed,
                                            const std::string& options, std::string& err);

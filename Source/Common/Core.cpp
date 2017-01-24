@@ -34,6 +34,8 @@
 #include "Common/generated/ImplementationReportDisplayTextUnicodeXsl.h"
 #endif //defined(_WIN32) || defined(WIN32)
 #include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/generated/ImplementationReportDisplaySimpleXsl.h"
+#include "Common/generated/ImplementationReportDisplayCSVXsl.h"
 #include "Common/generated/ImplementationReportMatroskaSchema.h"
 #include "Common/generated/MediaTraceDisplayTextXsl.h"
 #include "Common/generated/MediaTraceDisplayHtmlXsl.h"
@@ -619,6 +621,10 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
             transform_with_xslt_text_memory(result->report, result->report);
         else if (f == MediaConchLib::format_Html)
             transform_with_xslt_html_memory(result->report, result->report);
+        else if (f == MediaConchLib::format_Simple)
+            transform_with_xslt_simple_memory(result->report, result->report);
+        else if (f == MediaConchLib::format_CSV)
+            transform_with_xslt_csv_memory(result->report, result->report);
     }
     else
     {
@@ -636,6 +642,8 @@ int Core::checker_get_report(int user, const std::bitset<MediaConchLib::report_M
             case MediaConchLib::format_MaXml:
             case MediaConchLib::format_Html:
             case MediaConchLib::format_OrigXml:
+            case MediaConchLib::format_Simple:
+            case MediaConchLib::format_CSV:
                 get_reports_output(user, files, options, f, report_set, result);
                 break;
             case MediaConchLib::format_JsTree:
@@ -893,6 +901,22 @@ int Core::transform_with_xslt_text_memory(const std::string& report, std::string
 #else //defined(_WIN32) || defined(WIN32)
     std::string memory(implementation_report_display_textunicode_xsl);
 #endif //defined(_WIN32) || defined(WIN32)
+    return transform_with_xslt_memory(report, memory, opts, result);
+}
+
+//---------------------------------------------------------------------------
+int Core::transform_with_xslt_simple_memory(const std::string& report, std::string& result)
+{
+    std::map<std::string, std::string> opts;
+    std::string memory(implementation_report_display_simple_xsl);
+    return transform_with_xslt_memory(report, memory, opts, result);
+}
+
+//---------------------------------------------------------------------------
+int Core::transform_with_xslt_csv_memory(const std::string& report, std::string& result)
+{
+    std::map<std::string, std::string> opts;
+    std::string memory(implementation_report_display_csv_xsl);
     return transform_with_xslt_memory(report, memory, opts, result);
 }
 
@@ -1702,6 +1726,10 @@ void Core::get_reports_output(int user, const std::vector<long>& files,
             {
                 // No transformation for XML
             }
+            else if (f == MediaConchLib::format_Simple)
+                transform_with_xslt_simple_memory(tmp, tmp);
+            else if (f == MediaConchLib::format_CSV)
+                transform_with_xslt_csv_memory(tmp, tmp);
             else
                 transform_with_xslt_text_memory(tmp, tmp);
 
@@ -1742,6 +1770,10 @@ void Core::get_reports_output(int user, const std::vector<long>& files,
             {
                 if (f == MediaConchLib::format_Html)
                     transform_with_xslt_html_memory(transformed, transformed);
+                else if (f == MediaConchLib::format_Simple)
+                    transform_with_xslt_simple_memory(transformed, transformed);
+                else if (f == MediaConchLib::format_CSV)
+                    transform_with_xslt_csv_memory(transformed, transformed);
                 else
                     transform_with_xslt_text_memory(transformed, transformed);
 
@@ -1778,6 +1810,10 @@ void Core::get_reports_output(int user, const std::vector<long>& files,
             {
                 if (f == MediaConchLib::format_Html)
                     transform_with_xslt_html_memory(transformed, transformed);
+                if (f == MediaConchLib::format_Simple)
+                    transform_with_xslt_simple_memory(transformed, transformed);
+                else if (f == MediaConchLib::format_CSV)
+                    transform_with_xslt_csv_memory(transformed, transformed);
                 else
                     transform_with_xslt_text_memory(transformed, transformed);
 
