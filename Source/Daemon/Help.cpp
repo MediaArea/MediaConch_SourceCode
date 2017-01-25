@@ -45,7 +45,7 @@ int Help()
     TEXTOUT("");
 
     TEXTOUT("Implementation Checker:");
-    TEXTOUT("--ImplementationSchema=File");
+    TEXTOUT("--ImplementationSchema=File, -i File");
     TEXTOUT("                    Use the specified File for implementation validation");
     TEXTOUT("--ImplementationVerbosity=V, -iv V");
     TEXTOUT("                    Select verbosity (V) of the implementation check, default 5");
@@ -61,15 +61,11 @@ int Help()
     TEXTOUT("");
 
     TEXTOUT("Daemon Debug:");
-    TEXTOUT("--OutputLog=File");
+    TEXTOUT("--OutputLog=File, -o File");
     TEXTOUT("                    Log debug information to File");
-    TEXTOUT("-o File");
-    TEXTOUT("                    Same as --OutFile=File");
     TEXTOUT("");
 
     TEXTOUT("Watch folder:");
-    TEXTOUT("--WatchFolders-List");
-    TEXTOUT("                    List the folder watched");
     TEXTOUT("--WatchFolder=folder -wf folder");
     TEXTOUT("                    Send to the server a folder to watch");
     TEXTOUT("--WatchFolder-Reports=folder -wfr folder");
@@ -82,7 +78,7 @@ int Help()
     TEXTOUT("                    Plugin ID can be get using the --pluginslist.");
     TEXTOUT("--PluginsList");
     TEXTOUT("                    Output the plugins information ID");
-    TEXTOUT("--Policy=PolicyFile");
+    TEXTOUT("--Policy=PolicyFile, -p PolicyFile");
     TEXTOUT("                    Policy used by the watch folder manager.");
     TEXTOUT("");
 
