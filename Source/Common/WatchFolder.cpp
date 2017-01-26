@@ -260,12 +260,12 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
 
     //Implementation report HTML
     report_set.set(MediaConchLib::report_MediaConch);
-    int ret = core->checker_get_report(user, report_set, format,
-                                       files, policies_ids, policies_contents, options,
-                                       &result, err, &display_name, &display_content);
+    int ret = core->reports.checker_get_report(user, report_set, format,
+                                               files, policies_ids, policies_contents, options,
+                                               &result, err, &display_name, &display_content);
     report_set.reset();
 
-    if (ret || (result.has_valid && !result.valid))
+    if (ret < 0 || (result.has_valid && !result.valid))
     {
         std::stringstream out;
 
@@ -283,9 +283,9 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     result.has_valid = false;
     result.report = std::string();
     report_set.set(MediaConchLib::report_MediaConch);
-    ret = core->checker_get_report(user, report_set, format,
-                                   files, policies_ids, policies_contents, options,
-                                   &result, err, &display_name, &display_content);
+    ret = core->reports.checker_get_report(user, report_set, format,
+                                           files, policies_ids, policies_contents, options,
+                                           &result, err, &display_name, &display_content);
     report_set.reset();
 
     filename = wffile->report_file + ".ImplementationReport.xml";
@@ -297,9 +297,9 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     result.has_valid = false;
     result.report = std::string();
     report_set.set(MediaConchLib::report_MediaInfo);
-    ret = core->checker_get_report(user, report_set, format,
-                                   files, policies_ids, policies_contents, options,
-                                   &result, err, &display_name, &display_content);
+    ret = core->reports.checker_get_report(user, report_set, format,
+                                           files, policies_ids, policies_contents, options,
+                                           &result, err, &display_name, &display_content);
     report_set.reset();
 
     filename = wffile->report_file + ".MediaInfo.xml";
@@ -311,9 +311,9 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     result.has_valid = false;
     result.report = std::string();
     report_set.set(MediaConchLib::report_MediaTrace);
-    ret = core->checker_get_report(user, report_set, format,
-                                   files, policies_ids, policies_contents, options,
-                                   &result, err, &display_name, &display_content);
+    ret = core->reports.checker_get_report(user, report_set, format,
+                                           files, policies_ids, policies_contents, options,
+                                           &result, err, &display_name, &display_content);
     report_set.reset();
 
     filename = wffile->report_file + ".MediaTrace.xml";
@@ -326,10 +326,10 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     {
         result.has_valid = false;
         result.report = std::string();
-        ret = core->checker_get_report(user, report_set, format,
-                                       files, policies_ids, policies, options,
-                                       &result, err, &display_name, &display_content);
-        if (ret || (result.has_valid && !result.valid))
+        ret = core->reports.checker_get_report(user, report_set, format,
+                                               files, policies_ids, policies, options,
+                                               &result, err, &display_name, &display_content);
+        if (ret < 0 || (result.has_valid && !result.valid))
         {
             std::stringstream out;
 

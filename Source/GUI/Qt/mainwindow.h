@@ -7,14 +7,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QMainWindow>
+#include <QFileInfo>
+#include <QString>
+#include <map>
+#include <list>
+
 #include "Common/Core.h"
 #include "workerfiles.h"
 #include "uisettings.h"
 #include "DatabaseUi.h"
 
-#include <QMainWindow>
-#include <QFileInfo>
-#include <QString>
 
 namespace Ui {
     class MainWindow;
@@ -77,8 +80,6 @@ public:
     // Helpers
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
-    int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
-    int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
     int                         analyze(const std::vector<std::string>& files, bool with_fixer, bool force,
                                         std::vector<long>& files_id, std::string& err);
     int                         is_analyze_finished(const std::vector<std::string>& files,

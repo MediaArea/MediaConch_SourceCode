@@ -357,12 +357,6 @@ public:
     void               set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
 
-    // Xsl Transformation
-    int  transform_with_xslt_file(const std::string& report, const std::string& file,
-                                  const std::map<std::string, std::string>& opts, std::string& result);
-    int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
-                                    const std::map<std::string, std::string>& opts, std::string& result);
-
     // Configuration
     void               load_configuration();
     void               set_configuration_file(const std::string& file);

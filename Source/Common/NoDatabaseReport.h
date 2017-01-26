@@ -70,12 +70,12 @@ public:
                              const std::string& options,
                              const std::string& report, MediaConchLib::compression, int, std::string&);
     virtual int  remove_report(int user, long file_id, std::string& err);
-    virtual void get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+    virtual int  get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& options,
                             std::string& report, MediaConchLib::compression&, std::string&);
-    virtual bool report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
+    virtual int  report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
                                       MediaConchLib::format format, const std::string& options,
-                                      std::string&);
+                                      bool& registered, std::string& err);
     virtual int  version_registered(int user, long file_id, std::string&);
     virtual int  get_elements(int user, std::vector<std::string>& vec, std::string& err);
     virtual int  get_elements(int user, std::vector<long>& vec, std::string& err);

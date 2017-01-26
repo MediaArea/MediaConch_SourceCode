@@ -904,10 +904,11 @@ int Policies::create_xslt_policy_from_file(int user, long file_id, std::string& 
     report_set.set(MediaConchLib::report_MediaInfo);
     files.push_back(file_id);
 
-    core->checker_get_report(user, report_set, MediaConchLib::format_Xml, files,
-                             policies_ids, policies_contents,
-                             options, &result, err,
-                             NULL, NULL);
+    if (core->reports.checker_get_report(user, report_set, MediaConchLib::format_Xml, files,
+                                         policies_ids, policies_contents,
+                                         options, &result, err,
+                                         NULL, NULL) < 0)
+        return -1;
     if (!result.valid || !result.report.length())
     {
         err = "Implementation report not found";
@@ -1443,7 +1444,7 @@ int Policies::transform_with_xslt_memory(const std::string& report, const std::s
                                          const std::map<std::string, std::string>& opts,
                                          std::string& result)
 {
-    return core->transform_with_xslt_memory(report, memory, opts, result);
+    return core->reports.transform_with_xslt_memory(report, memory, opts, result);
 }
 
 //---------------------------------------------------------------------------

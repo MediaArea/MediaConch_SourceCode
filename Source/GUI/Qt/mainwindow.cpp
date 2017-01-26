@@ -269,20 +269,6 @@ void MainWindow::Run()
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result)
-{
-    std::map<std::string, std::string> opts;
-    return MCL.transform_with_xslt_file(report, file, opts, result);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result)
-{
-    std::map<std::string, std::string> opts;
-    return MCL.transform_with_xslt_memory(report, memory, opts, result);
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::get_registered_files(std::map<std::string, FileRegistered>& files)
 {
     workerfiles.get_registered_files(files);
