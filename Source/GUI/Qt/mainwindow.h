@@ -189,9 +189,9 @@ public:
 
     UiSettings&                 get_settings();
 
-    const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
-    const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
-    const list<string>* providePolicyExistingXsltOperator() const { return &Policies::existing_xsltOperator; }
+    const std::map<std::string, std::list<std::string> >* providePolicyExistingType() const { return &Policies::existing_type; }
+    const std::list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
+    const std::list<std::string>* providePolicyExistingXsltOperator() const { return &Policies::existing_xsltOperator; }
 
 private:
     Ui::MainWindow *ui;

@@ -36,8 +36,6 @@
 #include "Configuration.h"
 #include "Scheduler.h"
 
-using namespace MediaInfoNameSpace;
-using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaConch {
@@ -200,7 +198,7 @@ public:
     void create_report_mt_xml(int user, const std::vector<long>& filename, std::string& report);
     void create_report_mmt_xml(int user, const std::vector<long>& filename, std::string& report);
     void create_report_ma_xml(int user, const std::vector<long>& files, const std::map<std::string, std::string>& options,
-                              std::string& report, bitset<MediaConchLib::report_Max> reports);
+                              std::string& report, std::bitset<MediaConchLib::report_Max> reports);
     void create_report_verapdf_xml(int user, const std::vector<long>& files, std::string& report);
     void create_report_dpfmanager_xml(int user, const std::vector<long>& files, std::string& report);
 
@@ -292,8 +290,8 @@ private:
     void register_report_micromediatrace_xml_to_database(int user, long file, MediaInfoNameSpace::MediaInfo* MI);
     void get_content_of_media_in_xml(std::string& report);
     //No idea how to do it better way
-    bitset<MediaConchLib::report_Max> get_bitset_with_mi_mt();
-    bitset<MediaConchLib::report_Max> get_bitset_with_mi_mmt();
+    std::bitset<MediaConchLib::report_Max> get_bitset_with_mi_mt();
+    std::bitset<MediaConchLib::report_Max> get_bitset_with_mi_mmt();
 
     std::string get_config_file();
     std::string get_database_path();
