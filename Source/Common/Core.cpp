@@ -1637,8 +1637,8 @@ void Core::get_report_saved(int user, const std::vector<long>& files,
 {
     if (f == MediaConchLib::format_MaXml)
     {
-        std::map<std::string, std::string> options;
-        create_report_ma_xml(user, files, options, report, get_bitset_with_mi_mt());
+        std::map<std::string, std::string> map_options;
+        create_report_ma_xml(user, files, map_options, report, get_bitset_with_mi_mt());
         return;
     }
 

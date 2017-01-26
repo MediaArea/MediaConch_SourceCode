@@ -154,11 +154,7 @@ long SQLLiteReport::add_file(int user, const std::string& filename, const std::s
                              long source_id, size_t generated_time,
                              const std::string& generated_log, const std::string& generated_error_log)
 {
-    std::string opt = options;
-    if (!opt.size())
-        opt = "";
-
-    long id = get_file_id(user, filename, file_last_modification, opt, err);
+    long id = get_file_id(user, filename, file_last_modification, options, err);
     if (id >= 0)
         return id;
 
@@ -233,7 +229,7 @@ long SQLLiteReport::add_file(int user, const std::string& filename, const std::s
         return -1;
     }
 
-    ret = sqlite3_bind_blob(stmt, 9, opt.c_str(), opt.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_text(stmt, 9, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -246,7 +242,7 @@ long SQLLiteReport::add_file(int user, const std::string& filename, const std::s
         return -1;
     }
 
-    id = get_file_id(user, filename, file_last_modification, opt, err);
+    id = get_file_id(user, filename, file_last_modification, options, err);
     return id;
 }
 
@@ -326,7 +322,7 @@ long SQLLiteReport::update_file(int user, long file_id, const std::string& file_
         return -1;
     }
 
-    ret = sqlite3_bind_blob(stmt, 9, options.c_str(), options.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_text(stmt, 9, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -375,11 +371,7 @@ long SQLLiteReport::get_file_id(int user, const std::string& filename, const std
         return -1;
     }
 
-    std::string opt = options;
-    if (!opt.size())
-        opt = "";
-
-    ret = sqlite3_bind_blob(stmt, 3, opt.c_str(), opt.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_text(stmt, 3, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -839,7 +831,7 @@ int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report rep
         return -1;
     }
 
-    ret = sqlite3_bind_blob(stmt, 4, options.c_str(), options.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_text(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -929,7 +921,7 @@ int SQLLiteReport::update_report(int, long file_id, MediaConchLib::report report
         return -1;
     }
 
-    ret = sqlite3_bind_blob(stmt, 7, options.c_str(), options.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_text(stmt, 7, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -965,7 +957,7 @@ int SQLLiteReport::remove_report(int user, long file_id, std::string& err)
     return execute();
 }
 
-void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report reportKind,
+void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report report_kind,
                                MediaConchLib::format format, const std::string& options,
                                std::string& report, MediaConchLib::compression& compress, std::string& err)
 {
@@ -995,7 +987,7 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
         return;
     }
 
-    ret = sqlite3_bind_int(stmt, 2, (int)reportKind);
+    ret = sqlite3_bind_int(stmt, 2, (int)report_kind);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -1009,7 +1001,7 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
         return;
     }
 
-    ret = sqlite3_bind_blob(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
+    ret = sqlite3_bind_text(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -1088,7 +1080,7 @@ bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::
         return false;
     }
 
-    ret = sqlite3_bind_blob(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
+    ret = sqlite3_bind_text(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
