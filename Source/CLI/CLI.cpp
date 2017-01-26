@@ -42,7 +42,7 @@ namespace MediaConch
                  watch_folder_recursive(true), create_policy_mode(false), file_information(false),
                  plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
     {
-        format = MediaConchLib::format_Text;
+        format = MediaConchLib::format_Simple;
     }
 
     //--------------------------------------------------------------------------
@@ -362,17 +362,17 @@ namespace MediaConch
     {
         if (f == "Text" || f == "text")
             return set_format(MediaConchLib::format_Text);
-        if (f == "XML" || f == "xml")
+        else if (f == "XML" || f == "xml")
             return set_format(MediaConchLib::format_Xml);
-        if (f == "MAXML" || f == "maxml")
+        else if (f == "MAXML" || f == "maxml")
             return set_format(MediaConchLib::format_MaXml);
-        if (f == "JSTREE" || f == "jstree")
+        else if (f == "JSTREE" || f == "jstree")
             return set_format(MediaConchLib::format_JsTree);
-        if (f == "HTML" || f == "html")
+        else if (f == "HTML" || f == "html")
             return set_format(MediaConchLib::format_Html);
-        if (f == "SIMPLE" || f == "simple")
+        else if (f == "SIMPLE" || f == "simple")
             return set_format(MediaConchLib::format_Simple);
-        if (f == "CSV" || f == "csv")
+        else if (f == "CSV" || f == "csv")
             return set_format(MediaConchLib::format_CSV);
 
         return -1;

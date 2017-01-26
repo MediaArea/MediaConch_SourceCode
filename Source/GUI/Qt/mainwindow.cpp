@@ -438,9 +438,13 @@ void MainWindow::display_delete_id(const QString& name)
 //---------------------------------------------------------------------------
 int MainWindow::get_display_index_by_filename(const std::string& filename)
 {
+    std::string tmp(filename);
+    if (!tmp.size())
+        tmp = ":/displays/MediaConchHtml.xsl";
+
     for (size_t i = 0; i < displays_list.size(); ++i)
     {
-        if (filename == displays_list[i].toUtf8().data())
+        if (tmp == displays_list[i].toUtf8().data())
             return i;
     }
 
