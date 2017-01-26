@@ -42,7 +42,7 @@ fi
 
 if [ -f "${comparefile}" ] ; then
   compare_tmp=$(_maketemp)
-  mediaconch -mi -mt -fx --force "${comparefile}" > "${compare_tmp}"
+  mediaconch -mi -mmt -fx --force "${comparefile}" > "${compare_tmp}"
 else
   if [ "${comparefile}" ] ; then
     echo "Error: ${comparefile} is not a file."
@@ -53,7 +53,7 @@ while [ "${*}" != "" ] ; do
   INPUT="${1}"
   shift
   mc_tmp=$(_maketemp)
-  mediaconch -mi -mt -fx --ParseSpeed=0.5 --force "${INPUT}" > "${mc_tmp}"
+  mediaconch -mi -mmt -fx --ParseSpeed=0.5 --force "${INPUT}" > "${mc_tmp}"
   if [ -f "${displayfile}" ] ; then
     xsltproc ../policyset2policytransform2policyresult.xsl "${policyfile}" | sed 's/aliasxsl/xsl/g' | sed 's|xmlns:xsl="my:namespace"|xmlns:xsl="http://www.w3.org/1999/XSL/Transform"|g' | xsltproc - "${mc_tmp}" | xsltproc "${displayfile}" -
   elif [ -f "${compare_tmp}" ] ; then
