@@ -118,6 +118,7 @@ private:
         MediaConchLib::format      format;
         MediaConchLib::compression compression;
         std::string                report;
+        std::string                options;
         int                        mil_version;
     };
 

@@ -299,6 +299,7 @@ int NoDatabaseReport::save_report(int user, long file_id, MediaConchLib::report 
     r->report = report;
     r->compression = c;
     r->mil_version = mil_version;
+    r->options = options;
 
     std::map<long, std::vector<MC_Report*> >::iterator it = reports_saved.find(file_id);
     if (it != reports_saved.end())
@@ -306,7 +307,7 @@ int NoDatabaseReport::save_report(int user, long file_id, MediaConchLib::report 
         for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
         {
             MC_Report *r = reports_saved[file_id][i];
-            if (r && r->format == format && r->reportKind == reportKind)
+            if (r && r->format == format && r->reportKind == reportKind && r->options == options)
             {
                 delete r;
                 reports_saved[file_id].erase(reports_saved[file_id].begin() + i);
@@ -333,7 +334,7 @@ void NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
     {
         MC_Report* r = reports_saved[file_id][i];
-        if (!r || r->format != format || r->reportKind != reportKind)
+        if (!r || r->format != format || r->reportKind != reportKind || r->options != options)
             continue;
 
         report = r->report;
@@ -381,7 +382,7 @@ bool NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLi
     {
         MC_Report* r = reports_saved[file_id][i];
 
-        if (r && r->format == format && r->reportKind == reportKind)
+        if (r && r->format == format && r->reportKind == reportKind && r->options == options)
             return true;
     }
 
