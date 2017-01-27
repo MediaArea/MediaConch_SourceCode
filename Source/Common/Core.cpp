@@ -1653,7 +1653,7 @@ void Core::get_report_saved(int user, const std::vector<long>& files,
     for (size_t i = 0; i < files.size(); ++i)
     {
         std::string raw;
-        MediaConchLib::compression compress;
+        MediaConchLib::compression compress = MediaConchLib::compression_None;
         std::string err;
         db_mutex.Enter();
         get_db()->get_report(user, files[i], reportKind, f, options, raw, compress, err);
@@ -1882,7 +1882,10 @@ int Core::get_implementation_report(int user, long file, const std::map<std::str
     valid = true;
     std::string tmp_report;
 
-    if (!get_db()->report_is_registered(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml, options_str, err))
+    db_mutex.Enter();
+    bool registered = get_db()->report_is_registered(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml, options_str, err);
+    db_mutex.Leave();
+    if (!registered)
     {
         std::string memory(implementation_report_xsl);
         std::vector<long> tocheck;
@@ -1892,14 +1895,19 @@ int Core::get_implementation_report(int user, long file, const std::map<std::str
         MediaConchLib::compression mode = compression_mode;
         compress_report(tmp_report, mode);
 
+        db_mutex.Enter();
         get_db()->save_report(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
                               options_str, tmp_report, mode, 0, err);
+        db_mutex.Leave();
         tmp_report = std::string();
     }
 
     MediaConchLib::compression compress = MediaConchLib::compression_None;
+    db_mutex.Enter();
     get_db()->get_report(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
                          options_str, tmp_report, compress, err);
+    db_mutex.Leave();
+
     uncompress_report(tmp_report, compress);
     if (valid)
         valid = implementation_is_valid(tmp_report);
