@@ -100,7 +100,7 @@ if test -e libxslt/configure; then
     cd libxslt
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --with-libxml-src="$PWD"/../libxml2 --without-python --without-modules --without-crypto --enable-static --disable-shared $*
+    ./configure --without-python --without-modules --without-iconv --without-ftp --without-http --without-c14n --without-catalog --with-xpath --without-xptr --without-xinclude --without-iconv --without-icu --without-iso8859x --without-zlib --without-lzma --without-mem_debug --without-run_debug --without-regexps --with-tree --without-writer --with-pattern --with-push --without-valid --with-sax1 --without-legacy --with-output --without-schemas --with-schematron --enable-static --disable-shared $*
     if test ! -e Makefile; then
         echo Problem while configuring libxslt
         exit
@@ -238,38 +238,6 @@ fi
 cd $Home
 
 ##################################################################
-# Configure MediaConch
-
-if test -e MediaConch/Project/Qt/prepare; then
-    cd MediaConch/Project/Qt/
-    test -e Makefile && rm Makefile
-    chmod +x prepare
-    ./prepare STATIC_LIBS=1
-    if test ! -e Makefile; then
-        echo "Problem while configuring MediaConch (GUI)"
-        exit
-    fi
-else
-    echo MediaConch directory is not found
-    exit
-fi
-cd $Home
-
-##################################################################
-# Compile MediaInfoLib
-
-cd MediaInfoLib/Project/GNU/Library
-make clean
-Parallel_Make
-if test -e libmediainfo.la; then
-    echo MediaInfoLib compiled
-else
-    echo Problem while compiling MediaInfoLib
-    exit
-fi
-cd $Home
-
-##################################################################
 # Compile libxml2
 
 cd libxml2
@@ -335,6 +303,38 @@ if test -e .libs/libsqlite3.la; then
     echo sqlite compiled
 else
     echo Problem while compiling sqlite
+    exit
+fi
+cd $Home
+
+##################################################################
+# Compile MediaInfoLib
+
+cd MediaInfoLib/Project/GNU/Library
+make clean
+Parallel_Make
+if test -e libmediainfo.la; then
+    echo MediaInfoLib compiled
+else
+    echo Problem while compiling MediaInfoLib
+    exit
+fi
+cd $Home
+
+##################################################################
+# Configure MediaConch
+
+if test -e MediaConch/Project/Qt/prepare; then
+    cd MediaConch/Project/Qt/
+    test -e Makefile && rm Makefile
+    chmod +x prepare
+    ./prepare STATIC_LIBS=1
+    if test ! -e Makefile; then
+        echo "Problem while configuring MediaConch (GUI)"
+        exit
+    fi
+else
+    echo MediaConch directory is not found
     exit
 fi
 cd $Home
