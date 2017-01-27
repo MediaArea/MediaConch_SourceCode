@@ -362,3 +362,24 @@ p.registration {
 .popover-content {
     word-wrap: break-word;
 }
+
+.modal-body .jstree-default .jstree-anchor {
+    line-height: 20px;
+    height: 20px;
+}
+
+.modal-body .jstree-default .jstree-icon:empty {
+    height: 20px;
+    line-height: 20px;
+    width: 20px;
+}
+
+.modal-body .jstree-default .jstree-node {
+    min-height: 20px;
+    line-height: 20px;
+}
+
+.jstree-grid-cell-regular.jstree-animated {
+    line-height: 20px;
+    height: 20px;
+}
