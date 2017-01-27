@@ -193,8 +193,8 @@ function updateFile(fileId, formValues) {
 function addFile(sourceName, fileName, fileId, formValues) {
     node = result.row.add( [ '<span title="' + sourceName + '">' + truncateString(fileName, 28) + '</span>',
                              '', '', '', '',
-                             '<span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button> \
-                              <button type="button" class="btn btn-link result-reload hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>' ] ).node();
+                             '<div><span class="status-text">In queue</span><button type="button" class="btn btn-link result-close" title="Close result"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button> \
+                              <button type="button" class="btn btn-link result-reload hidden" title="Reload result"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button></div>' ] ).node();
 
     // Add id
     resultId = 'result-' + fileId;
@@ -481,7 +481,7 @@ function implementationCell(data, resultId, fileId) {
         implemResultText = '<span class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span> Not valid';
     }
 
-    result.cell(nodeCell, 1).data(implemResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalConformance' + resultId + '" title="View implementation report"><span class="glyphicon glyphicon-eye-open implem-view" aria-hidden="true"></span></a><a href="#" class="implem-dld" data-target="#modalConformance' + resultId + '" title="Download implementation report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>');
+    result.cell(nodeCell, 1).data('<div>' + implemResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalConformance' + resultId + '" title="View implementation report"><span class="glyphicon glyphicon-eye-open implem-view" aria-hidden="true"></span></a><a href="#" class="implem-dld" data-target="#modalConformance' + resultId + '" title="Download implementation report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p></div>');
 
     nodeImplem.find('.implem-view').on('click', function(e) {
         e.preventDefault();
@@ -609,7 +609,7 @@ function policyCell(data, resultId, fileId)
     policyResultText += '<span title="' + nodeCell.data('policyName') + '">' + truncateString(nodeCell.data('policyName'), 20) + '</span>';
     policyResultText += '</span>';
 
-    result.cell(nodeCell, 2).data(policyResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalPolicy' + resultId + '" title="View policy report"><span class="glyphicon glyphicon-eye-open policy-view" aria-hidden="true"></span></a><a href="#" class="policy-dld" data-target="#modalPolicy' + resultId + '" title="Download policy report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p>');
+    result.cell(nodeCell, 2).data('<div>' + policyResultText + '<p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalPolicy' + resultId + '" title="View policy report"><span class="glyphicon glyphicon-eye-open policy-view" aria-hidden="true"></span></a><a href="#" class="policy-dld" data-target="#modalPolicy' + resultId + '" title="Download policy report"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></p></div>');
 
     policyModal(resultId, fileId);
 }
@@ -618,7 +618,7 @@ function policyCellEmptyWithModal(resultId, fileId)
 {
     nodePolicy = $(result.cell('#' + resultId, 2).node());
     nodePolicy.removeClass().addClass('info');
-    result.cell('#' + resultId, 2).data('<span class="policyResult">N/A</span><p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalPolicy' + resultId + '" title="View policy report"><span class="glyphicon glyphicon-eye-open policy-view" aria-hidden="true"></span></a></p>');
+    result.cell('#' + resultId, 2).data('<div><span class="policyResult">N/A</span><p class="pull-right"><a href="#" data-toggle="modal" data-target="#modalPolicy' + resultId + '" title="View policy report"><span class="glyphicon glyphicon-eye-open policy-view" aria-hidden="true"></span></a></p></div>');
 
     policyModal(resultId, fileId);
 }
