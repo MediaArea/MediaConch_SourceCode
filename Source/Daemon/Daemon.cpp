@@ -261,9 +261,9 @@ namespace MediaConch
 
         if (argument=="-h")
             argument="--help";
-        if (argument=="-v")
+        else if (argument=="-v")
             argument="--version";
-        if (argument=="-n")
+        else if (argument=="-n")
             argument="--fork=No";
 
         if (argument=="-c")
@@ -271,24 +271,39 @@ namespace MediaConch
             last_argument="--configuration=";
             return DAEMON_RETURN_NONE;
         }
-        if (argument=="-pc")
+        else if (argument=="-pc")
         {
             last_argument="--pluginsconfiguration=";
             return DAEMON_RETURN_NONE;
         }
-        if (argument=="-i")
+        else if (argument=="-i")
         {
             last_argument = "--implementationschema=";
             return DAEMON_RETURN_NONE;
         }
-        if (argument=="-iv")
+        else if (argument=="-iv")
         {
             last_argument = "--implementationverbosity=";
             return DAEMON_RETURN_NONE;
         }
-        if (argument=="-o")
+        else if (argument=="-o")
         {
             last_argument = "--outputlog=";
+            return DAEMON_RETURN_NONE;
+        }
+        else if (argument=="-wf")
+        {
+            last_argument = "--watchfolder=";
+            return DAEMON_RETURN_NONE;
+        }
+        else if (argument=="-wfr")
+        {
+            last_argument = "--watchfolder-reports=";
+            return DAEMON_RETURN_NONE;
+        }
+        else if (argument=="-p")
+        {
+            last_argument = "--policy=";
             return DAEMON_RETURN_NONE;
         }
 

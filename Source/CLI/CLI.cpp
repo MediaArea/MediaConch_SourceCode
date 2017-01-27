@@ -55,7 +55,7 @@ namespace MediaConch
     {
         if (format == MediaConchLib::format_CSV && !policies.size())
         {
-            err = "CLI can use format CSV only with Policy";
+            err = "CLI can use CSV format only with policies.";
             return CLI_RETURN_ERROR;
         }
 

@@ -68,14 +68,14 @@ int Help()
 
     TEXTOUT("Output Formats:");
     TEXTOUT("--Format=text -ft");
-    TEXTOUT("                    Output in Text format (default)");
+    TEXTOUT("                    Output MediaConch reports in Text format");
     TEXTOUT("--Format=xml -fx");
     TEXTOUT("                    Output MediaConch reports in XML format");
     TEXTOUT("                    (changed to -fa if there are more than 1 tool or more than 1 file)");
     TEXTOUT("--Format=html -fh");
     TEXTOUT("                    Output MediaConch reports in HTML format");
     TEXTOUT("--Format=simple -fs");
-    TEXTOUT("                    Output MediaConch reports in a shorten form (>1 line only if there are errors)");
+    TEXTOUT("                    Output MediaConch reports in a shorten form (>1 line only if there are errors), default format");
     TEXTOUT("--Format=csv -fc");
     TEXTOUT("                    Output MediaConch reports in CSV format (only for policies)");
     TEXTOUT("--Format=maxml -fa");
