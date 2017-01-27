@@ -1888,14 +1888,19 @@ int Core::get_implementation_report(int user, long file, const std::map<std::str
         std::vector<long> tocheck;
         tocheck.push_back(file);
         valid = validate_xslt_from_memory(user, tocheck, options, memory, tmp_report, true);
+
+        MediaConchLib::compression mode = compression_mode;
+        compress_report(tmp_report, mode);
+
         get_db()->save_report(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
-                              options_str, tmp_report, MediaConchLib::compression_None, 0, err);
+                              options_str, tmp_report, mode, 0, err);
         tmp_report = std::string();
     }
 
     MediaConchLib::compression compress = MediaConchLib::compression_None;
     get_db()->get_report(user, file, MediaConchLib::report_MediaConch, MediaConchLib::format_Xml,
                          options_str, tmp_report, compress, err);
+    uncompress_report(tmp_report, compress);
     if (valid)
         valid = implementation_is_valid(tmp_report);
     report += tmp_report;
