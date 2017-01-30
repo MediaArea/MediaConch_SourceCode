@@ -4,7 +4,7 @@ Section: utils
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Build-Depends: debhelper (>= 9),
                dh-autoreconf,
-               libmediainfo-dev (>= 0.7.91),
+               libmediainfo-dev (>= 0.7.92),
                libzen-dev (>= 0.4.34),
                libqt4-dev,
                libxml2-dev,
@@ -23,7 +23,7 @@ Vcs-Browser: https://github.com/MediaArea/MediaConch_SourceCode
 
 Package: mediaconch
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 0.7.91), libzen0 (>= 0.4.34)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 0.7.92), libzen0 (>= 0.4.34)
 Description: implementation and policy checker, reporter and fixer for media files (command-line utility)
  MediaConch is an extensible, open source software project consisting of an
  implementation checker, policy checker, reporter, and fixer that targets
@@ -39,7 +39,7 @@ Description: implementation and policy checker, reporter and fixer for media fil
 
 Package: mediaconch-server
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 0.7.91), libzen0 (>= 0.4.34)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 0.7.92), libzen0 (>= 0.4.34)
 Description: implementation and policy checker, reporter and fixer for media files (server daemon)
  MediaConch is an extensible, open source software project consisting of an
  implementation checker, policy checker, reporter, and fixer that targets
@@ -55,7 +55,7 @@ Description: implementation and policy checker, reporter and fixer for media fil
 
 Package: mediaconch-gui
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 0.7.91), libzen0 (>= 0.4.34)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 0.7.92), libzen0 (>= 0.4.34)
 Description: implementation and policy checker, reporter and fixer for media files (GUI application)
  MediaConch is an extensible, open source software project consisting of an
  implementation checker, policy checker, reporter, and fixer that targets
