@@ -7,6 +7,20 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.01, 2017-01-31
+-------------
+Less verbose output by default (use " -ft" for old behavior)
+New display templates "Simple" and "CSV"
+Support of newest version of DPFManager (TIFF plugin) and VeraPDF (PDF plugin)
+Store implementation report in database (no need to run it again at relaunch)
+Policy editor: option for creating policy from a file
+Policy editor: split between Profile and Level
+Checker page: jump to the page containing the file to analyze
+Checker page: scroll to the top of the results when page is changed
+Checker page: add reload analyze button (force analyze)
+Checker page: reduce font size of jstree MediaInfo and MediaTrace
+Several small bug fixes
+
 Version 16.12, 2016-12-31
 -------------
 Push policies to MCO (public or private)

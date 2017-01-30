@@ -7,6 +7,14 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.01, 2017-01-31
+-------------
+Less verbose output by default (use " -ft" for old behavior)
+New display templates "Simple" and "CSV"
+Support of newest version of DPFManager (TIFF plugin) and VeraPDF (PDF plugin)
+Store implementation report in database (no need to run it again at relaunch)
+Several small bug fixes
+
 Version 16.12, 2016-12-31
 -------------
 Better handling of errors
