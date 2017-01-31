@@ -326,19 +326,19 @@ cd MediaConch_SourceCode/Project/Qt
 Run:
 
 ```sh
-./prepare NO_LIBCURL=1
+./prepare
 make
 ```
 
 Under Mac, or if you also build ZenLib and MediaInfoLib, run:
 ```sh
-./prepare STATIC_LIBS=1 NO_LIBCURL=1
+./prepare STATIC_LIBS=1
 make
 ```
 
 With shared ZenLib and MediaInfoLib:
 ```sh
-./prepare NO_LIBCURL=1
+./prepare
 make
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DIR/ZenLib/Project/GNU/Library/.libs:$BUILD_DIR/MediaInfoLib/Project/GNU/Library/.libs
 ```
@@ -348,19 +348,19 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DIR/ZenLib/Project/GNU/Library/.l
 You must install the online checker dependencies. Then run:
 
 ```sh
-./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+./prepare
 make
 ```
 
 Under Mac, or if you also build ZenLib and MediaInfoLib, run:
 ```sh
-./prepare STATIC_LIBS=1 "DEFINES+=MEDIAINFO_LIBCURL_YES"
+./prepare STATIC_LIBS=1
 make
 ```
 
 With shared ZenLib and MediaInfoLib:
 ```sh
-./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+./prepare
 make
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DIR/ZenLib/Project/GNU/Library/.libs:$BUILD_DIR/MediaInfoLib/Project/GNU/Library/.libs
 ```

@@ -110,8 +110,8 @@
             "sources": [
                 { "type": "git", "url": "https://github.com/MediaArea/MediaConch_SourceCode.git" },
                 {
-                     "type": "script", 
-                     "commands": [ "qmake USE_WEBKIT=1 \"DEFINES+=MEDIAINFO_LIBCURL_YES\" -after target.path=/app/bin" ], 
+                     "type": "script",
+                     "commands": [ "qmake USE_WEBKIT=1 -after target.path=/app/bin" ],
                      "dest-filename": "Project/Qt/configure"
                 }
             ],
