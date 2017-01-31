@@ -258,7 +258,8 @@ public:
     void reset_daemon_client();
 
     //Options
-    int test_mil_option(const std::string& key, std::string& value, std::string& report);
+    int  test_mil_option(const std::string& key, std::string& value, std::string& report);
+    bool mil_has_curl_enabled();
 
     // MediaConch
     int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);

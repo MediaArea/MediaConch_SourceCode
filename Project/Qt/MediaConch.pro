@@ -301,13 +301,6 @@ contains(NO_LIBEVENT, yes|1) {
     }
 }
 
-contains(NO_LIBCURL, yes|1) {
-    message("use libcurl : no")
-} else {
-    message("use libcurl : yes (from libmediainfo)")
-    DEFINES += MEDIAINFO_LIBCURL_YES
-}
-
 macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
