@@ -15,6 +15,7 @@
 #include <ZenLib/ZtringList.h>
 #include "MediaConchLib.h"
 #include "Core.h"
+#include "Reports.h"
 #include "DaemonClient.h"
 #include "Policy.h"
 #include "Http.h"
@@ -363,27 +364,17 @@ int MediaConchLib::checker_file_information(int user, long id, MediaConchLib::Ch
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int MediaConchLib::checker_get_report(int user, const std::bitset<report_Max>& report_set, format f,
-                                      const std::vector<long>& files,
-                                      const std::vector<size_t>& policies_ids,
-                                      const std::vector<std::string>& policies_contents,
-                                      const std::map<std::string, std::string>& options,
-                                      Checker_ReportRes* result, std::string& error,
-                                      const std::string* display_name,
-                                      const std::string* display_content)
+int MediaConchLib::checker_get_report(CheckerReport& c_report, Checker_ReportRes* result, std::string& error)
 {
-    if (!files.size())
-        return errorHttp_INVALID_DATA;
+    if (!c_report.files.size())
+    {
+        error = "No file given for report.";
+        return -1;
+    }
 
     if (use_daemon)
-        return daemon_client->checker_get_report(user, report_set, f, files,
-                                                 policies_ids, policies_contents,
-                                                 options, result, error,
-                                                 display_name, display_content);
-    return core->reports.checker_get_report(user, report_set, f, files,
-                                            policies_ids, policies_contents,
-                                            options, result, error,
-                                            display_name, display_content);
+        return daemon_client->checker_get_report(c_report, result, error);
+    return core->reports.checker_get_report(c_report, result, error);
 }
 
 //---------------------------------------------------------------------------

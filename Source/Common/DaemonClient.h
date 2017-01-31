@@ -25,6 +25,7 @@ namespace MediaConch
 {
 
 class Http;
+class CheckerReport;
 
 //***************************************************************************
 // Class DaemonClient
@@ -82,14 +83,7 @@ public:
     int checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res, std::string& error);
 
     // Report
-    int checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
-                           const std::vector<long>& files,
-                           const std::vector<size_t>& policies_names,
-                           const std::vector<std::string>& policies_contents,
-                           const std::map<std::string, std::string>& options,
-                           MediaConchLib::Checker_ReportRes* result, std::string& error,
-                           const std::string* display_name = NULL,
-                           const std::string* display_content = NULL);
+    int checker_get_report(CheckerReport& c_report, MediaConchLib::Checker_ReportRes* result, std::string& error);
     int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,

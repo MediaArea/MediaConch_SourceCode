@@ -207,6 +207,8 @@ private:
     UiSettings                    uisettings;
     Run_View                      current_view;
 
+    long                          user;
+
     // Visual elements
     QVBoxLayout*                Layout;
     CheckerWindow*              checkerView;
@@ -227,7 +229,7 @@ private:
 
     void                        fill_display_used(int *policy_i,
                                                   std::string& display_name, std::string& display_content,
-                                                  const std::string*& dname, const std::string*& dcontent,
+                                                  std::string*& dname, std::string*& dcontent,
                                                   FileRegistered* fr);
     void                        fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p);
 

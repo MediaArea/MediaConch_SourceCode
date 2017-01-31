@@ -53,40 +53,33 @@ Reports::~Reports()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int Reports::checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
-                             const std::vector<long>& files,
-                             const std::vector<size_t>& policies_ids,
-                             const std::vector<std::string>& policies_contents,
-                             const std::map<std::string, std::string>& options,
-                             MediaConchLib::Checker_ReportRes* result, std::string& err,
-                             const std::string* display_name,
-                             const std::string* display_content)
+int Reports::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_ReportRes* result, std::string& err)
 {
-    if (!policies_ids.empty() || !policies_contents.empty())
+    if (!cr.policies_ids.empty() || !cr.policies_contents.empty())
     {
-        if (check_policies(user, files, options, result, err,
-                           policies_ids.size() ? &policies_ids : NULL,
-                           policies_contents.size() ? &policies_contents : NULL) < 0)
+        if (check_policies(cr.user, cr.files, cr.options, result, err,
+                           cr.policies_ids.size() ? &cr.policies_ids : NULL,
+                           cr.policies_contents.size() ? &cr.policies_contents : NULL) < 0)
             return -1;
-        if (f == MediaConchLib::format_Text)
+        if (cr.format == MediaConchLib::format_Text)
             transform_with_xslt_text_memory(result->report, result->report);
-        else if (f == MediaConchLib::format_Html)
+        else if (cr.format == MediaConchLib::format_Html)
             transform_with_xslt_html_memory(result->report, result->report);
-        else if (f == MediaConchLib::format_Simple)
+        else if (cr.format == MediaConchLib::format_Simple)
             transform_with_xslt_simple_memory(result->report, result->report);
-        else if (f == MediaConchLib::format_CSV)
+        else if (cr.format == MediaConchLib::format_CSV)
             transform_with_xslt_csv_memory(result->report, result->report);
     }
     else
     {
         // For VeraPDF and DPFManager, to get the original XML
-        if ((report_set[MediaConchLib::report_MediaVeraPdf] || report_set[MediaConchLib::report_MediaDpfManager]) &&
-            f == MediaConchLib::format_Xml &&
-            (!display_content || !display_content->size()) &&
-            (!display_name || !display_name->size()))
-            f = MediaConchLib::format_OrigXml;
+        if ((cr.report_set[MediaConchLib::report_MediaVeraPdf] || cr.report_set[MediaConchLib::report_MediaDpfManager]) &&
+            cr.format == MediaConchLib::format_Xml &&
+            (!cr.display_content || !cr.display_content->size()) &&
+            (!cr.display_name || !cr.display_name->size()))
+            cr.format = MediaConchLib::format_OrigXml;
 
-        switch (f)
+        switch (cr.format)
         {
             case MediaConchLib::format_Text:
             case MediaConchLib::format_Xml:
@@ -95,11 +88,11 @@ int Reports::checker_get_report(int user, const std::bitset<MediaConchLib::repor
             case MediaConchLib::format_OrigXml:
             case MediaConchLib::format_Simple:
             case MediaConchLib::format_CSV:
-                if (get_reports_output(user, files, options, f, report_set, result, err) < 0)
+                if (get_reports_output(cr.user, cr.files, cr.options, cr.format, cr.report_set, result, err) < 0)
                     return -1;
                 break;
             case MediaConchLib::format_JsTree:
-                if (get_reports_output_JStree(user, files, report_set, result->report, err) < 0)
+                if (get_reports_output_JStree(cr.user, cr.files, cr.report_set, result->report, err) < 0)
                     return -1;
                 break;
             default:
@@ -107,10 +100,10 @@ int Reports::checker_get_report(int user, const std::bitset<MediaConchLib::repor
         }
     }
 
-    if (display_name)
-        transform_with_xslt_file(result->report, *display_name, options, result->report);
-    else if (display_content)
-        transform_with_xslt_memory(result->report, *display_content, options, result->report);
+    if (cr.display_name)
+        transform_with_xslt_file(result->report, *cr.display_name, cr.options, result->report);
+    else if (cr.display_content)
+        transform_with_xslt_memory(result->report, *cr.display_content, cr.options, result->report);
 
     if (result->has_valid && !result->valid)
         core->plugin_add_log(PluginLog::LOG_LEVEL_DEBUG, "Implementation report is not valid");
@@ -952,7 +945,7 @@ int Reports::check_policies(int user, const std::vector<long>& files,
 
     std::stringstream Out;
     result->has_valid = true;
-    if (!check_policies_xslts(user, files, options, policies, Out, result->valid, err))
+    if (check_policies_xslts(user, files, options, policies, Out, result->valid, err) < 0)
         return -1;
 
     result->report = Out.str();
@@ -960,7 +953,7 @@ int Reports::check_policies(int user, const std::vector<long>& files,
 }
 
 //---------------------------------------------------------------------------
-bool Reports::check_policies_xslts(int user, const std::vector<long>& files,
+int Reports::check_policies_xslts(int user, const std::vector<long>& files,
                                    const std::map<std::string, std::string>& options,
                                    const std::vector<std::string>& policies,
                                    std::stringstream& Out, bool& valid, std::string& err)
@@ -969,8 +962,8 @@ bool Reports::check_policies_xslts(int user, const std::vector<long>& files,
     for (size_t i = 0; i < policies.size(); ++i)
     {
         std::string tmp;
-        if (!validate_xslt_from_memory(user, files, options, policies[i], false,
-                                       tmp, valid, err))
+        if (validate_xslt_from_memory(user, files, options, policies[i], false,
+                                       tmp, valid, err) < 0)
         {
             valid = false;
             Out << tmp;
@@ -982,7 +975,7 @@ bool Reports::check_policies_xslts(int user, const std::vector<long>& files,
                 valid = false;
         }
     }
-    return valid;
+    return 0;
 }
 
 //***************************************************************************

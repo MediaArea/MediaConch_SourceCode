@@ -58,14 +58,7 @@ public:
     ~Reports();
 
     // Reports
-    int   checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set, MediaConchLib::format f,
-                             const std::vector<long>& files,
-                             const std::vector<size_t>& policies_ids,
-                             const std::vector<std::string>& policies_contents,
-                             const std::map<std::string, std::string>& options,
-                             MediaConchLib::Checker_ReportRes* result, std::string& err,
-                             const std::string* display_name,
-                             const std::string* display_content);
+    int   checker_get_report(CheckerReport& c_report, MediaConchLib::Checker_ReportRes* result, std::string& err);
     int   checker_validate(int user, MediaConchLib::report report,
                            const std::vector<long>& file,
                            const std::vector<size_t>& policies_ids,
@@ -111,7 +104,7 @@ public:
                          MediaConchLib::Checker_ReportRes *result, std::string& error,
                          const std::vector<size_t>* policies_ids = NULL,
                          const std::vector<std::string>* policies_contents = NULL);
-    bool  check_policies_xslts(int user, const std::vector<long>& files,
+    int   check_policies_xslts(int user, const std::vector<long>& files,
                                const std::map<std::string, std::string>& options,
                                const std::vector<std::string>& policies,
                                std::stringstream& Out, bool& valid, std::string& err);

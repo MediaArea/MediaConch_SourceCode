@@ -14,6 +14,7 @@
 #include "CLI.h"
 #include "CommandLine_Parser.h"
 #include "Help.h"
+#include "Common/Reports.h"
 #include <ZenLib/ZtringList.h>
 #include <ZenLib/File.h>
 #include <ZenLib/Dir.h>
@@ -122,7 +123,7 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     int CLI::run(std::string& err)
     {
-        std::vector<long> id_to_report;
+        CheckerReport cr;
         MediaConchLib::report report_kind;
 
         //Return plugins list
@@ -171,14 +172,13 @@ namespace MediaConch
                 set_report_reset();
                 report_set.set(report_kind);
             }
-            id_to_report.push_back(file_id);
+            cr.files.push_back(file_id);
         }
 
         //Ensure to analyze before creating library
         if (create_policy_mode)
-            return run_create_policy(id_to_report);
+            return run_create_policy(cr.files);
 
-        std::map<std::string, std::string> options;
         // if compare two files
         if (policy_reference_file.size())
         {
@@ -194,15 +194,21 @@ namespace MediaConch
 
             std::stringstream ss;
             ss << file_id;
-            options["policy_reference_id"] = ss.str();
+            cr.options["policy_reference_id"] = ss.str();
         }
 
         //Output
         MediaConchLib::Checker_ReportRes result;
-        std::vector<size_t> policies_ids;
-        options["verbosity"] = MCL.get_implementation_verbosity();
-        MCL.checker_get_report(use_as_user, report_set, format, id_to_report, policies_ids,
-                               policies, options, &result, error, &display_file, NULL);
+        cr.user = use_as_user;
+        cr.report_set = report_set;
+        cr.format = format;
+        cr.options["verbosity"] = MCL.get_implementation_verbosity();
+
+        for (size_t i = 0; i < policies.size(); ++i)
+            cr.policies_contents.push_back(policies[i]);
+
+        cr.display_name = &display_file;
+        MCL.checker_get_report(cr, &result, error);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
         STRINGOUT(report_mi);
