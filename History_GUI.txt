@@ -7,6 +7,10 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.01.1, 2017-02-02
+--------------
+Fix a performance regression in the matroska parser
+
 Version 17.01, 2017-01-31
 -------------
 Less verbose output by default (use " -ft" for old behavior)
