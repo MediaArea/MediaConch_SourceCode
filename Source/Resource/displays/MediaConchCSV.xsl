@@ -3,6 +3,8 @@
   <xsl:output encoding="UTF-8" method="text" version="1.0" indent="yes"/>
   <xsl:template match="/mc:MediaConch">
     <xsl:text>filename</xsl:text>
+    <xsl:text>,</xsl:text>
+    <xsl:text>overall</xsl:text>
     <xsl:for-each select="mc:media[1]/mc:policy/mc:policy|mc:media[1]/mc:policy/mc:rule|mc:media[1]/mc:rule|mc:media[1]/mc:implementationChecks/mc:check">
       <xsl:text>,</xsl:text>
       <xsl:choose>
@@ -21,6 +23,8 @@
       <xsl:call-template name="escapecommas">
         <xsl:with-param name="text" select="@ref"/>
       </xsl:call-template>
+      <xsl:text>,</xsl:text>
+      <xsl:value-of select="mc:policy/@outcome|mc:rule/@outcome"/>
       <xsl:for-each select="mc:policy/mc:policy|mc:policy/mc:rule|mc:rule">
         <xsl:text>,</xsl:text>
         <xsl:value-of select="@outcome"/>
