@@ -7,7 +7,7 @@
   <rule name="SeekHead is present?" scope="mmt" value="Segment/SeekHead/"/>
   <policy type="or" name="Video Scan Type is clarified?">
     <policy type="and" name="Interlaced video is clarified?">
-      <rule name="Video is interlaced?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FlagInterlaceed/Data" operator="=">1</rule>
+      <rule name="Video is interlaced?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FlagInterlaced/Data" operator="=">1</rule>
       <policy type="or" name="FieldOrder is clarified?">
         <rule name="Video is Top Field displayed and stored first?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FieldOrder/Data" operator="=">1</rule>
         <rule name="Video is Bottom Field displayed and stored first?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FieldOrder/Data" operator="=">6</rule>
