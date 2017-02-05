@@ -461,6 +461,23 @@
                   </xsl:when>
                 </xsl:choose>
               </xsl:when>
+              <xsl:when test="substring($list, string-length($list)) = '/'">
+                <xsl:choose>
+                  <xsl:when test="@scope='mmt'">
+                    <xsl:text>/mmt:b[@n='</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@scope='mmt'">
+                    <xsl:text>/mt:block[@name='</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>/mi:</xsl:otherwise>
+                </xsl:choose>
+                <xsl:value-of select="$first"/>
+                <xsl:choose>
+                  <xsl:when test="@scope='mmt' or @scope='mt'">
+                    <xsl:text>']</xsl:text>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:when>
               <xsl:otherwise>
                 <xsl:choose>
                   <xsl:when test="@scope='mmt'">
