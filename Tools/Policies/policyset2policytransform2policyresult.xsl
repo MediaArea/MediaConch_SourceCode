@@ -357,13 +357,26 @@
   <xsl:template name="tokenize">
     <xsl:param name="list"/>
     <xsl:param name="delimiter"/>
-    <xsl:variable name="newlist">
+    <xsl:variable name="removeprefix">
       <xsl:choose>
-        <xsl:when test="contains($list, $delimiter)">
-          <xsl:value-of select="normalize-space($list)"/>
+        <xsl:when test="substring($list, 1 , 7)='offset:'">
+          <xsl:value-of select="substring-after($list,'offset:')"/>
+        </xsl:when>
+        <xsl:when test="substring($list, 1 , 5)='size:'">
+          <xsl:value-of select="substring-after($list,'size:')"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="concat(normalize-space($list), $delimiter)"/>
+          <xsl:value-of select="$list"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="newlist">
+      <xsl:choose>
+        <xsl:when test="contains($removeprefix, $delimiter)">
+          <xsl:value-of select="normalize-space($removeprefix)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat(normalize-space($removeprefix), $delimiter)"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -467,6 +480,22 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="substring-before($list, ':') = 'offset'">
+        <xsl:choose>
+          <xsl:when test="@scope='mmt'">
+            <xsl:text>/@o</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="substring-before($list, ':') = 'size'">
+        <xsl:choose>
+          <xsl:when test="@scope='mmt'">
+            <xsl:text>/@s</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>
