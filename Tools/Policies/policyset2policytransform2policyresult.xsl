@@ -430,7 +430,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="@first='data'">
+          <xsl:when test="$first='Data'">
             <xsl:choose>
               <xsl:when test="@scope='mmt'">
                 <xsl:text>/mmt:d</xsl:text>
