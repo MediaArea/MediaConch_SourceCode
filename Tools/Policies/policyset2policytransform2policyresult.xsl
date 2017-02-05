@@ -388,18 +388,18 @@
       <xsl:when test="$remaining">
         <xsl:choose>
           <xsl:when test="substring($first,1,2)='m:'">
-          <xsl:choose>
-            <xsl:when test="@scope='mmt'">
-              <xsl:text>/mmt:b[mmt:b[@n='Header']/mmt:d[@n='Name']='</xsl:text>
-            </xsl:when>
-            <xsl:when test="@scope='mt'">
-              <xsl:text>/mt:block[mt:block[@name='Header']/mt:data[@name='Name']='</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>/mi:</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:value-of select="substring($first,3)"/>
+            <xsl:choose>
+              <xsl:when test="@scope='mmt'">
+                <xsl:text>/mmt:b[mmt:b[@n='Header']/mmt:d[@n='Name']='</xsl:text>
+              </xsl:when>
+              <xsl:when test="@scope='mt'">
+                <xsl:text>/mt:block[mt:block[@name='Header']/mt:data[@name='Name']='</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>/mi:</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="substring($first,3)"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
