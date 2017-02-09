@@ -1334,7 +1334,7 @@ void Core::create_report_mi_xml(int user, const std::vector<long>& files, std::s
     start << "<MediaInfo\n";
     start << "xmlns=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediainfo\"\n";
     start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-    start << "xsi:schemaLocation=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediaarea http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediainfo/mediainfo_2_0.xsd\"\n";
+    start << "xsi:schemaLocation=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediainfo http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediainfo/mediainfo_2_0.xsd\"\n";
     start << "version=\"2.0beta1\">\n";
     start << "<!-- Work in progress, not for production -->\n";
     start << "<creatingLibrary version=\"";
@@ -1377,7 +1377,7 @@ void Core::create_report_mt_xml(int user, const std::vector<long>& files, std::s
     start << "<MediaTrace\n";
     start << "xmlns=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediatrace\"\n";
     start << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-    start << "xsi:schemaLocation=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediaarea http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediatrace/mediatrace_0_1.xsd\"\n";
+    start << "xsi:schemaLocation=\"http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediatrace http" << (AcceptsHttps ? "s" : string()) << "://mediaarea.net/mediatrace/mediatrace_0_1.xsd\"\n";
     start << "version=\"0.1\">\n";
     start << "<creatingLibrary version=\"";
     start << version;
