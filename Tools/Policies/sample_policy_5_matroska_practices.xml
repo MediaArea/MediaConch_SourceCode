@@ -3,11 +3,11 @@
   <description>Example of a digitization specification of analog SD video to FFV1 and Matroska.</description>
   <rule name="Is it Matroska?" value="Format" tracktype="General" occurrence="*" operator="=">Matroska</rule>
   <rule name="Matroska version 4 or greater?" value="Format_Version" tracktype="General" occurrence="*" operator="&gt;=">4</rule>
-  <rule name="SegmentUID is present?" scope="mmt" value="Segment/Info/SegmentUID/Data"/>
-  <rule name="SeekHead is present?" scope="mmt" value="Segment/SeekHead"/>
+  <rule name="SegmentUID is present?" scope="mmt" value="Segment/Info/SegmentUID/"/>
+  <rule name="SeekHead is present?" scope="mmt" value="Segment/SeekHead/"/>
   <policy type="or" name="Video Scan Type is clarified?">
     <policy type="and" name="Interlaced video is clarified?">
-      <rule name="Video is interlaced?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FlagInterlaceed/Data" operator="=">1</rule>
+      <rule name="Video is interlaced?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FlagInterlaced/Data" operator="=">1</rule>
       <policy type="or" name="FieldOrder is clarified?">
         <rule name="Video is Top Field displayed and stored first?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FieldOrder/Data" operator="=">1</rule>
         <rule name="Video is Bottom Field displayed and stored first?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FieldOrder/Data" operator="=">6</rule>
@@ -18,12 +18,19 @@
     <rule name="Video is progressive?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/FlagInterlaceed/Data" operator="=">2</rule>
   </policy>
   <policy type="or" name="Video Sample Range is clarified?">
-    <rule name="Video is in Broadcast Range?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/Data" operator="=">1</rule>
-    <rule name="Video is in Full Range?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/Data" operator="=">2</rule>
-    <rule name="Video is defined by MatrixCoefficients/TransferCharacteristics?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/Data" operator="=">3</rule>
+    <rule name="Range data is stored?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/"/>
+    <rule name="Range data is not Unspecified?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/Data" operator="!=">o2</rule>
   </policy>
   <policy type="or" name="Video Colour Primary is clarified?">
-    <rule name="Colour Primary data is stored?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Primaries"/>
+    <rule name="Colour Primary data is stored?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Primaries/"/>
     <rule name="Colour Primary data is not Unspecified?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Primaries/Data" operator="!=">2</rule>
+  </policy>
+  <policy type="or" name="Transfer Characteristics is clarified?">
+    <rule name="TransferCharacteristics data is stored?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/TransferCharacteristics/"/>
+    <rule name="TransferCharacteristics data is not Unspecified?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/TransferCharacteristics/Data" operator="!=">2</rule>
+  </policy>
+  <policy type="or" name="MatrixCoefficients is clarified?">
+    <rule name="MatrixCoefficients data is stored?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/MatrixCoefficients/"/>
+    <rule name="MatrixCoefficients data is not Unspecified?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/MatrixCoefficients/Data" operator="!=">2</rule>
   </policy>
 </policy>
