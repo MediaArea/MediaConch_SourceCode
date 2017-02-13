@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<policy type="and" name="TN2162 compliant?">
+  <description>Test compliance with Apple's Technical Note 2162 (dated December 14, 1999) on Uncompressed Y'CbCr Video in QuickTime Files. This policy covers QuickTime's ImageDescription version 2 as documented by TN2162 and not version 0 or 1 as documented by its Backwards Compatibility section.</description>
+  <policy type="or" name="Using a TN2162 video fourcc?">
+    <description>Test that video fourcc is in table 1.</description>
+    <rule name="Is 2vuy?" value="CodecID" tracktype="Video" occurrence="1" operator="=">2vuy</rule>
+    <rule name="Is yuv2?" value="CodecID" tracktype="Video" occurrence="1" operator="=">yuv2</rule>
+    <rule name="Is v308?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v308</rule>
+    <rule name="Is v408?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v408</rule>
+    <rule name="Is v216?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v216</rule>
+    <rule name="Is v410?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v410</rule>
+    <rule name="Is v210?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v210</rule>
+  </policy>
+  <policy type="or" name="Compression type follow requirements?">
+    <policy type="and" name="Valid 2vuy?">
+      <rule name="Is 2vuy?" value="CodecID" tracktype="Video" occurrence="1" operator="=">2vuy</rule>
+      <rule name="bitDepth is 24?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Depth" operator="=">24</rule>
+    </policy>
+    <policy type="and" name="Valid yuv2?">
+      <rule name="Is yuv2?" value="CodecID" tracktype="Video" occurrence="1" operator="=">yuv2</rule>
+      <rule name="bitDepth is 24?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Depth" operator="=">24</rule>
+    </policy>
+    <policy type="and" name="Valid v308?">
+      <rule name="Is v308?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v308</rule>
+      <rule name="bitDepth is 24?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Depth" operator="=">24</rule>
+    </policy>
+    <policy type="and" name="Valid v408?">
+      <rule name="Is v408?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v408</rule>
+      <rule name="bitDepth is 32?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Depth" operator="=">32</rule>
+    </policy>
+    <policy type="and" name="Valid v216?">
+      <rule name="Is v216?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v216</rule>
+      <rule name="bitDepth is 24?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Depth" operator="=">24</rule>
+      <!-- could add a test for the sgbt extension -->
+    </policy>
+    <policy type="and" name="Valid v410?">
+      <rule name="Is v410?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v410</rule>
+      <rule name="bitDepth is 24?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Depth" operator="=">24</rule>
+    </policy>
+    <policy type="and" name="Valid v210?">
+      <rule name="Is v210?" value="CodecID" tracktype="Video" occurrence="1" operator="=">v210</rule>
+      <rule name="bitDepth is 24?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Depth" operator="=">24</rule>
+    </policy>
+  </policy>
+  <policy type="and" name="Contains required descriptive atoms?">
+    <rule name="moov atom is used?" scope="mmt" value="m:moov" operator="exists"/>
+    <rule name="fiel atom is used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel" operator="exists"/>
+    <rule name="colr atom is used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr" operator="exists"/>
+    <rule name="clap atom is used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:clap" operator="exists"/>
+    <rule name="gama atom is not used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:gama" operator="must not exist"/>
+  </policy>
+  <policy type="and" name="Follows TN2162 ImageDescription requirements?">
+    <rule name="ImageDescription version is 2?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Version" operator="=">2</rule>
+    <rule name="ImageDescription revisionLevel is 0?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Revision level" operator="=">0</rule>
+    <rule name="ImageDescription temporalQuality is 0?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Temporal quality" operator="=">0</rule>
+    <rule name="ImageDescription frameCount is 1?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Frame count" operator="=">1</rule>
+    <rule name="ImageDescription dataSize is 0?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/Data size" operator="=">0</rule>
+  </policy>
+  <policy type="or" name="Follows color parameter requirements?">
+    <rule name="Color parameter type is nclc?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Color parameter type" operator="=">nclc</rule>
+    <policy type="or" name="Primaries index is valid?">
+      <rule name="Primary is ITU-R BT.709-2?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Primaries index" operator="=">1</rule>
+      <rule name="Primary is unknown?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Primaries index" operator="=">2</rule>
+      <rule name="Primary is EBU Tech. 3213?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Primaries index" operator="=">5</rule>
+      <rule name="Primary is SMPTE RP 145-1993?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Primaries index" operator="=">6</rule>
+    </policy>
+    <policy type="or" name="Transfer function index is valid?">
+      <rule name="Transfer function is ITU-R BT.709-2?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Transfer function index" operator="=">1</rule>
+      <rule name="Transfer function is unknown?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Transfer function index" operator="=">2</rule>
+      <rule name="Transfer function is SMPTE 240M-1995?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Transfer function index" operator="=">7</rule>
+    </policy>
+    <policy type="or" name="Matrix index is valid?">
+      <rule name="Transfer function is ITU-R BT.709-2?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Matrix index" operator="=">1</rule>
+      <rule name="Transfer function is unknown?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Matrix index" operator="=">2</rule>
+      <rule name="Transfer function is ITU-R BT.601-4?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Matrix index" operator="=">6</rule>
+      <rule name="Transfer function is SMPTE 240M-1995?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:colr/Matrix index" operator="=">7</rule>
+    </policy>
+  </policy>
+  <policy type="or" name="Follows field/frame description requirements?">
+    <policy type="and" name="Follows progressive requirements?">
+      <rule name="fields is progressive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel/fields" operator="=">1</rule>
+      <rule name="interlaced detail is set to 0?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel/detail" operator="=">0</rule>
+    </policy>
+    <policy type="and" name="Follows interlaced requirements?">
+      <rule name="fields is interlaced?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel/fields" operator="=">2</rule>
+      <policy type="or" name="Valid interlacement detail?">
+        <rule name="fields are tff?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel/detail" operator="=">1</rule>
+        <rule name="fields are bff?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel/detail" operator="=">6</rule>
+        <rule name="fields are bottom displayed first, top coded first?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel/detail" operator="=">9</rule>
+        <rule name="fields are top displayed first, bottom coded first?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:fiel/detail" operator="=">14</rule>
+      </policy>
+    </policy>
+  </policy>
+  <policy type="or" name="Follow pixel aspect ratio requirements or is not used?">
+    <rule name="pasp atom is used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp" operator="must not exist"/>
+    <policy type="and" name="Follow pixel aspect ratio requirements?">
+      <rule name="hSpacing is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp/hSpacing" operator="&gt;">0</rule>
+      <rule name="vSpacing is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp/vSpacing" operator="&gt;">0</rule>
+    </policy>
+  </policy>
+  <policy type="or" name="Follows clean aperture requirements?">
+    <rule name="horizOff_D is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:clap/horizOff_D" operator="&gt;">0</rule>
+    <rule name="vertOff_D is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:clap/vertOff_D" operator="&gt;">0</rule>
+    <rule name="apertureWidth_N is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:clap/apertureWidth_N" operator="&gt;">0</rule>
+    <rule name="apertureWidth_D is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:clap/apertureWidth_D" operator="&gt;">0</rule>
+    <rule name="apertureHeight_N is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:clap/apertureHeight_N" operator="&gt;">0</rule>
+    <rule name="apertureHeight_D is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:clap/apertureHeight_D" operator="&gt;">0</rule>
+  </policy>
+</policy>
