@@ -22,7 +22,7 @@ auto_build_cmd =				\
 override_dh_auto_configure:
 	dh_auto_configure -DProject/GNU/CLI
 	dh_auto_configure -DProject/GNU/Server
-	dh_auto_configure -DProject/Qt -- USE_WEBKIT=1 DEFINES+=MEDIAINFO_LIBCURL_YES
+	dh_auto_configure -DProject/Qt -- USE_WEBKIT=1
 
 override_dh_auto_build:
 	$(call auto_build_cmd,dh_auto_build)

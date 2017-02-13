@@ -406,17 +406,22 @@ void CheckerWindow::load_form_in_template(QString& html)
     QRegExp reg("\\{\\{[\\s]+form\\((\\w+)\\)[\\s]\\}\\}");
     int pos = 0;
 
+    bool has_libcurl = mainwindow->mil_has_curl_enabled();
     while ((pos = reg.indexIn(html, pos)) != -1)
     {
         QString value = reg.cap(1);
         if (value == "formUpload")
             html.replace(pos, reg.matchedLength(), create_form_upload());
         else if (value == "formOnline")
-#if defined(MEDIAINFO_LIBCURL_YES)
-            html.replace(pos, reg.matchedLength(), create_form_online());
-#else
-        remove_form_online(pos, html);
-#endif
+        {
+            if (has_libcurl)
+                html.replace(pos, reg.matchedLength(), create_form_online());
+            else
+            {
+                remove_form_online(pos, html);
+                remove_li_online(pos, html);
+            }
+        }
         else if (value == "formRepository")
             html.replace(pos, reg.matchedLength(), create_form_repository());
         else
@@ -480,23 +485,41 @@ QString CheckerWindow::create_form_online()
 void CheckerWindow::remove_form_online(int pos, QString& html)
 {
     int start_div_pos = pos;
-    QRegExp reg("<div class=\"panel panel-default\">");
+    QRegExp reg("<div role=\"tabpanel\" class=\"tab-pane panel col-md-12\" id=\"url\">");
     reg.setMinimal(true);
     start_div_pos = reg.lastIndexIn(html, start_div_pos);
 
     reg = QRegExp("</div>");
     reg.setMinimal(true);
     int end_div_pos = pos;
-    int nb_turn = 0;
-    while ((end_div_pos = reg.indexIn(html, end_div_pos)) != -1)
-    {
-        ++nb_turn;
+    if ((end_div_pos = reg.indexIn(html, end_div_pos)) != -1)
         end_div_pos += reg.matchedLength();
-        if (nb_turn == 2)
-            break;
-    }
+
     if (end_div_pos != -1 && start_div_pos != -1)
         html.remove(start_div_pos, end_div_pos - start_div_pos);
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::remove_li_online(int& pos, QString& html)
+{
+    QRegExp reg("<li role=\"presentation\" class=\"\"><a href=\"#url\"");
+    reg.setMinimal(true);
+    int start = reg.lastIndexIn(html);
+    if (start == -1)
+        return;
+
+    reg = QRegExp("</li>");
+    reg.setMinimal(true);
+    int end_pos = -1;
+    if ((end_pos = reg.indexIn(html, start)) != -1)
+        end_pos += reg.matchedLength();
+
+    if (end_pos != -1 && start != -1)
+    {
+        int len = end_pos - start;
+        html.remove(start, len);
+        pos -= len;
+    }
 }
 
 //---------------------------------------------------------------------------

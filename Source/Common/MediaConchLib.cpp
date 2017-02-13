@@ -133,6 +133,19 @@ int MediaConchLib::test_mil_option(const std::string& key, std::string& value, s
 }
 
 //---------------------------------------------------------------------------
+bool MediaConchLib::mil_has_curl_enabled()
+{
+    String Result = core->Menu_Option_Preferences_Option(__T("info_canhandleurls"), __T(""));
+    if (Result.empty())
+        return false;
+
+    if (Result == __T("1"))
+        return true;
+
+    return false;
+}
+
+//---------------------------------------------------------------------------
 bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::string>&,
                                                        const std::bitset<MediaConchLib::report_Max>& reports,
                                                        const std::string& display, MediaConchLib::format& Format,

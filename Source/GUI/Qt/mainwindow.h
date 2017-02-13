@@ -72,6 +72,7 @@ public:
     void                        set_str_msg_to_status_bar(const std::string& message);
     void                        clear_msg_in_status_bar();
     void                        drag_and_drop_files_action(const QStringList& files);
+    bool                        mil_has_curl_enabled();
 
     // Helpers
     void                        set_widget_to_layout(QWidget* w);

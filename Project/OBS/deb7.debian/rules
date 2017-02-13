@@ -21,7 +21,7 @@ configure-stamp:
 	cd Project/GNU/Server && ./configure --prefix=/usr
 
 	cd Project/Qt && chmod +x prepare
-	cd Project/Qt && ./prepare "DEFINES+=MEDIAINFO_LIBCURL_YES"
+	cd Project/Qt && ./prepare
 
 	touch $@
 
