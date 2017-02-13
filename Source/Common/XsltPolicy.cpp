@@ -270,8 +270,13 @@ int XsltPolicy::run_over_siblings_nodes(xmlNodePtr node, bool is_root, XsltPolic
     int ret = 0;
     for (; node; node = node->next)
     {
-        if (node->type == XML_TEXT_NODE)
-            continue;
+        switch (node->type)
+        {
+            case XML_TEXT_NODE: 
+            case XML_COMMENT_NODE:
+                continue;
+            default:;
+        }
 
         int tmp = find_policy_node(node, is_root, current);
         if (tmp < 0)
