@@ -209,9 +209,13 @@ void PublicPoliciesWindow::create_html()
     QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
     QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
 
-    QUrl url = QUrl("qrc:/html");
+    QUrl url;
+
+#if QT_VERSION < 0x050700
+    url = QUrl("qrc:/html");
     if (!url.isValid())
         return;
+#endif
 
 #if defined(WEB_MACHINE_ENGINE)
     QWebChannel *channel = new QWebChannel(page);
