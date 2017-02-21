@@ -38,7 +38,7 @@ SettingsWindow::~SettingsWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void SettingsWindow::create_settings_finished(bool ok)
+void SettingsWindow::create_web_view_finished(bool ok)
 {
     if (!web_view || !ok)
         return;
@@ -85,7 +85,7 @@ void SettingsWindow::display_settings()
     web_view->setPage(page);
 
     QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_settings_finished(bool)));
+    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
 
 #if defined(WEB_MACHINE_ENGINE)
     QWebChannel *channel = new QWebChannel(page);

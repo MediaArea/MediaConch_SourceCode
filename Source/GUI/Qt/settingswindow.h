@@ -58,7 +58,7 @@ private:
     void add_load_display_path_to_js_input(WebPage *page);
 
 private Q_SLOTS:
-    void create_settings_finished(bool ok);
+    void create_web_view_finished(bool ok);
 };
 
 }
