@@ -35,11 +35,9 @@ protected:
     MainWindow*                 main_window;
     WebView*                    web_view;
 
-private:
-    ProgressBar*                progress_bar;
-
 private Q_SLOTS:
     void                        on_loadFinished(bool ok);
+    void                        on_loadProgress(int progress);
 };
 
 }

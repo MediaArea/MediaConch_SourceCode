@@ -24,7 +24,7 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-CommonWebWindow::CommonWebWindow(MainWindow *p) : main_window(p), web_view(NULL), progress_bar(NULL)
+CommonWebWindow::CommonWebWindow(MainWindow *p) : main_window(p), web_view(NULL)
 {
 }
 
@@ -42,11 +42,6 @@ void CommonWebWindow::display_html()
 {
     clear_visual_elements();
 
-    progress_bar = new ProgressBar(main_window);
-    main_window->set_widget_to_layout(progress_bar);
-    progress_bar->get_progress_bar()->setValue(0);
-    progress_bar->show();
-
     QFile template_html(":/base.html");
     template_html.open(QIODevice::ReadOnly | QIODevice::Text);
     QString html(template_html.readAll());
@@ -59,7 +54,7 @@ void CommonWebWindow::display_html()
     WebPage* page = new WebPage(main_window, web_view);
     web_view->setPage(page);
 
-    QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
+    QObject::connect(web_view, SIGNAL(loadProgress(int)), this, SLOT(on_loadProgress(int)));
     QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
 
 #if defined(WEB_MACHINE_ENGINE)
@@ -85,13 +80,6 @@ void CommonWebWindow::clear_visual_elements()
         delete web_view;
         web_view = NULL;
     }
-
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
 }
 
 //***************************************************************************
@@ -109,16 +97,18 @@ void CommonWebWindow::on_loadFinished(bool ok)
 
     create_web_view_finished(ok);
 
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
     web_view->show();
     web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     main_window->set_widget_to_layout(web_view);
+}
+
+//---------------------------------------------------------------------------
+void CommonWebWindow::on_loadProgress(int progress)
+{
+    if (progress==100)
+        main_window->status_bar_clear_message();
+    else
+        main_window->set_msg_to_status_bar(QString::number(progress)+"%");
 }
 
 }
