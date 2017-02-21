@@ -76,11 +76,6 @@ void SettingsWindow::create_html_settings(QString& settings)
 //---------------------------------------------------------------------------
 void SettingsWindow::create_html_base(QString& base, const QString& settings)
 {
-    QFile template_html(":/base.html");
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    base = QString(template_html.readAll());
-    template_html.close();
-
     set_webmachine_script_in_template(base);
     change_qt_scripts_in_template(base);
     change_checker_in_template(base, settings);

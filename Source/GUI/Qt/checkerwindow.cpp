@@ -535,13 +535,6 @@ void CheckerWindow::set_webmachine_script_in_template(QString& html)
 //---------------------------------------------------------------------------
 void CheckerWindow::create_html_base(const QString& checker, const QString& result, QString& base)
 {
-    QFile template_html(":/base.html");
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = template_html.readAll();
-    template_html.close();
-
-    base = QString(html);
-
     set_webmachine_script_in_template(base);
     change_body_script_in_template(base);
     change_checker_in_template(checker, base);

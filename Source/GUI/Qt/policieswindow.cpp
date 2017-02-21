@@ -141,13 +141,6 @@ void PoliciesWindow::create_html_policy(QString& policy)
 //---------------------------------------------------------------------------
 void PoliciesWindow::create_html_base(const QString& policy, QString& base)
 {
-    QFile template_html(":/base.html");
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = template_html.readAll();
-    template_html.close();
-
-    base = QString(html);
-
     set_webmachine_script_in_template(base);
     change_qt_scripts_in_template(base);
     change_checker_in_template(policy, base);

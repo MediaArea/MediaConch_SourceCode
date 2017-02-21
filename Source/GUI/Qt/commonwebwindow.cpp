@@ -47,7 +47,10 @@ void CommonWebWindow::display_html()
     progress_bar->get_progress_bar()->setValue(0);
     progress_bar->show();
 
-    QString html;
+    QFile template_html(":/base.html");
+    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString html(template_html.readAll());
+    template_html.close();
     create_html(html);
 
     web_view = new WebView(main_window);
