@@ -18,10 +18,26 @@
 
 int main(int argc, char *argv[])
 {
+#if QT_VERSION >= 0x050700
+    char disable_security[] = "--disable-web-security"; //Fonts are not loaded if this is not set
+
+    char **old_argv = argv;
+    argv = new char*[argc + 2]; 
+    memcpy(argv, old_argv, argc * sizeof(char*));
+    argv[argc] = disable_security;
+    argc++;
+    argv[argc] = NULL;
+#endif
+
     QApplication a(argc, argv);
     a.setApplicationName("MediaConch");
     MediaConch::MainWindow w;
     w.show();
+    int ret = a.exec();
 
-    return a.exec();
+#if QT_VERSION >= 0x050700
+    delete [] argv;
+#endif
+
+    return ret;
 }
