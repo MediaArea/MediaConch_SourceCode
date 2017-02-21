@@ -29,9 +29,6 @@ public:
 
 private:
     // Visual elements
-    MainWindow   *main_window;
-    WebView      *web_view;
-    ProgressBar  *progress_bar;
     bool          is_finished;
 
     void create_html(QString& html);

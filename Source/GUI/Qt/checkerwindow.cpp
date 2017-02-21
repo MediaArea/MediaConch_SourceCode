@@ -107,45 +107,9 @@ void CheckerWindow::create_web_view_finished(bool ok)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::set_web_view_content(QString& html)
-{
-    if (!web_view)
-        web_view = new WebView(main_window);
-    web_view->hide();
-
-    WebPage* page = new WebPage(main_window, web_view);
-    web_view->setPage(page);
-
-    QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
-
-    QUrl url = QUrl("qrc:/html");
-    if (!url.isValid())
-        return;
-
-#if defined(WEB_MACHINE_ENGINE)
-    QWebChannel *channel = new QWebChannel(page);
-    page->setWebChannel(channel);
-    channel->registerObject("webpage", page);
-    web_view->setHtml(html.toUtf8(), url);
-#endif
-#if defined(WEB_MACHINE_KIT)
-    web_view->setContent(html.toUtf8(), "text/html", url);
-#endif
-}
-
-//---------------------------------------------------------------------------
 void CheckerWindow::create_web_view()
 {
-    clear_visual_elements();
-
-    progress_bar = new ProgressBar(main_window);
-    main_window->set_widget_to_layout(progress_bar);
-    progress_bar->get_progress_bar()->setValue(0);
-    progress_bar->show();
-
-    QString html = create_html();
-    set_web_view_content(html);
+    display_html();
 }
 
 //---------------------------------------------------------------------------
@@ -617,15 +581,13 @@ void CheckerWindow::create_html_base(const QString& checker, const QString& resu
 }
 
 //---------------------------------------------------------------------------
-QString CheckerWindow::create_html()
+void CheckerWindow::create_html(QString &html)
 {
     QString checker;
     create_html_checker(checker);
     QString result;
     create_html_result(result);
-    QString base;
-    create_html_base(checker, result, base);
-    return base;
+    create_html_base(checker, result, html);
 }
 
 //---------------------------------------------------------------------------

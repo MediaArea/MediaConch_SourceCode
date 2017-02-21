@@ -43,7 +43,7 @@ private:
     void change_checker_in_template(const QString& policy, QString& html);
     void create_html_base(const QString& policy, QString& base);
     void create_html_policy(QString& policy);
-    void create_html();
+    void create_html(QString &html);
 
 //***************************************************************************
 // SLOTS

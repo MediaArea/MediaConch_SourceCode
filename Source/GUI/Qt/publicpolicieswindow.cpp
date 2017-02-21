@@ -41,7 +41,7 @@ PublicPoliciesWindow::~PublicPoliciesWindow()
 //---------------------------------------------------------------------------
 void PublicPoliciesWindow::display_public_policies()
 {
-    create_html();
+    display_html();
 }
 
 //***************************************************************************
@@ -53,7 +53,6 @@ void PublicPoliciesWindow::create_web_view_finished(bool ok)
 {
     if (!web_view || !ok)
     {
-        create_html();
         main_window->set_msg_to_status_bar("Problem to load the policy page");
         return;
     }
@@ -163,41 +162,11 @@ void PublicPoliciesWindow::create_html_base(const QString& policy, QString& base
 }
 
 //---------------------------------------------------------------------------
-void PublicPoliciesWindow::create_html()
+void PublicPoliciesWindow::create_html(QString &html)
 {
-    clear_visual_elements();
     QString policy;
     create_html_policy(policy);
-    QString html;
     create_html_base(policy, html);
-
-    progress_bar = new ProgressBar(main_window);
-    main_window->set_widget_to_layout(progress_bar);
-    progress_bar->get_progress_bar()->setValue(0);
-    progress_bar->show();
-
-    web_view = new WebView(main_window);
-    web_view->hide();
-
-    WebPage* page = new WebPage(main_window, web_view);
-    web_view->setPage(page);
-
-    QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
-
-    QUrl url = QUrl("qrc:/html");
-    if (!url.isValid())
-        return;
-
-#if defined(WEB_MACHINE_ENGINE)
-    QWebChannel *channel = new QWebChannel(page);
-    page->setWebChannel(channel);
-    channel->registerObject("webpage", page);
-    web_view->setHtml(html.toUtf8(), url);
-#endif
-#if defined(WEB_MACHINE_KIT)
-    web_view->setContent(html.toUtf8(), "text/html", url);
-#endif
 }
 
 //***************************************************************************

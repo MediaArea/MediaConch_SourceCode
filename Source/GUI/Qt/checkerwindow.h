@@ -45,8 +45,6 @@ private:
     bool                        is_finished;
     std::vector<std::string>    files;
 
-    void                        set_web_view_content(QString& html);
-
 //***************************************************************************
 // HELPER
 //***************************************************************************
@@ -61,7 +59,7 @@ private:
     void load_include_in_template(QString& html);
     void remove_element_in_template(QString& html);
     void load_form_in_template(QString& html);
-    QString create_html();
+    void create_html(QString &html);
     void create_html_base(const QString& checker, const QString& result, QString& base);
     void create_html_checker(QString&);
     void create_html_result(QString&);

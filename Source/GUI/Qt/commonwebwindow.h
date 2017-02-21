@@ -26,8 +26,10 @@ public:
     ~CommonWebWindow();
 
 protected:
+    void                        display_html();
     void                        clear_visual_elements();
 
+    virtual void                create_html(QString &html) = 0;
     virtual void                create_web_view_finished(bool ok) = 0;
 
     MainWindow*                 main_window;

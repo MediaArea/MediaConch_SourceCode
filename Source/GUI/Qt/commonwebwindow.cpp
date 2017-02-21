@@ -38,6 +38,43 @@ CommonWebWindow::~CommonWebWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void CommonWebWindow::display_html()
+{
+    clear_visual_elements();
+
+    progress_bar = new ProgressBar(main_window);
+    main_window->set_widget_to_layout(progress_bar);
+    progress_bar->get_progress_bar()->setValue(0);
+    progress_bar->show();
+
+    QString html;
+    create_html(html);
+
+    web_view = new WebView(main_window);
+    web_view->hide();
+
+    WebPage* page = new WebPage(main_window, web_view);
+    web_view->setPage(page);
+
+    QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
+    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
+
+    QUrl url = QUrl("");
+    //if (!url.isValid())
+    //    return;
+
+#if defined(WEB_MACHINE_ENGINE)
+    QWebChannel *channel = new QWebChannel(page);
+    page->setWebChannel(channel);
+    channel->registerObject("webpage", page);
+    web_view->setHtml(html.toUtf8(), url);
+#endif
+#if defined(WEB_MACHINE_KIT)
+    web_view->setContent(html.toUtf8(), "text/html", url);
+#endif
+}
+
+//---------------------------------------------------------------------------
 void CommonWebWindow::clear_visual_elements()
 {
     if (web_view)
