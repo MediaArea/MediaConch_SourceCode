@@ -45,7 +45,7 @@ void PoliciesWindow::display_policies()
 
 int PoliciesWindow::add_new_policies(const QStringList& files)
 {
-    WebPage* page = (WebPage*)web_view->page();
+    WebPage* page = (WebPage*)main_window->web_view->page();
     if (!page)
         return -1;
 

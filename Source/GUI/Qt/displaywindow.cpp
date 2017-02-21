@@ -41,7 +41,7 @@ void DisplayWindow::display_display()
 }
 
 //---------------------------------------------------------------------------
-void DisplayWindow::create_web_view_finished(bool ok)
+void DisplayWindow::create_web_view_finished()
 {
     fill_table();
 }
@@ -62,7 +62,7 @@ void DisplayWindow::fill_table()
 
         script += QString("('%2');")
             .arg(file.completeBaseName());
-        ((WebPage*)web_view->page())->use_javascript(script);
+        ((WebPage*)main_window->web_view->page())->use_javascript(script);
     }
 }
 
@@ -151,7 +151,7 @@ int DisplayWindow::add_new_files(const QStringList& files)
             displays.push_back(str);
 
             QString script = QString("addUserDisplay('%2');").arg(file_info.completeBaseName());
-            ((WebPage*)web_view->page())->use_javascript(script);
+            ((WebPage*)main_window->web_view->page())->use_javascript(script);
             break;
         }
 

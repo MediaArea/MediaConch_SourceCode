@@ -20,6 +20,7 @@ public:
     ~SettingsWindow();
 
     void display_settings();
+    void create_web_view_finished();
 
 private:
     void create_html(QString& html);
@@ -45,8 +46,6 @@ private:
     void add_load_policy_path_to_js_input(WebPage *page);
     void add_save_display_path_to_js_input(WebPage *page);
     void add_load_display_path_to_js_input(WebPage *page);
-
-    void create_web_view_finished(bool ok);
 };
 
 }

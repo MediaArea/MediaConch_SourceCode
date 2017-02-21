@@ -62,9 +62,9 @@ CheckerWindow::~CheckerWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void CheckerWindow::create_web_view_finished(bool ok)
+void CheckerWindow::create_web_view_finished()
 {
-    result_table = new ResultTable(main_window, (WebPage*)web_view->page());
+    result_table = new ResultTable(main_window, (WebPage*)main_window->web_view->page());
     if (files.size())
     {
         for (size_t i = 0; i < files.size(); ++i)
@@ -83,17 +83,11 @@ void CheckerWindow::create_web_view()
 //---------------------------------------------------------------------------
 void CheckerWindow::change_local_files(const QStringList& files)
 {
-    if (!web_view || !web_view->page())
+    if (!main_window->web_view || !main_window->web_view->page())
         return;
 
-    WebPage* p = (WebPage*)web_view->page();
+    WebPage* p = (WebPage*)main_window->web_view->page();
     p->change_local_files(files);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::hide()
-{
-    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -565,10 +559,10 @@ void CheckerWindow::add_file_to_result_table(const std::string& full_path)
 
 void CheckerWindow::page_start_waiting_loop()
 {
-    if (!web_view || !result_table)
+    if (!main_window->web_view || !result_table)
         return;
 
-    WebPage* page = (WebPage*)web_view->page();
+    WebPage* page = (WebPage*)main_window->web_view->page();
     if (!page)
         return;
 

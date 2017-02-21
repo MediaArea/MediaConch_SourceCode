@@ -25,19 +25,14 @@ public:
     explicit CommonWebWindow(MainWindow* parent);
     ~CommonWebWindow();
 
+    virtual void                create_web_view_finished() {};
+
 protected:
     void                        display_html();
-    void                        clear_visual_elements();
 
     virtual void                create_html(QString &html) = 0;
-    virtual void                create_web_view_finished(bool ok) {};
 
     MainWindow*                 main_window;
-    WebView*                    web_view;
-
-private Q_SLOTS:
-    void                        on_loadFinished(bool ok);
-    void                        on_loadProgress(int progress);
 };
 
 }

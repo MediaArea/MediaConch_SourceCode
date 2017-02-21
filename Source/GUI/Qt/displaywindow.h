@@ -21,6 +21,7 @@ public:
     ~DisplayWindow();
 
     void display_display();
+    void create_web_view_finished();
 
     int  add_new_file(const QString& name, const QString& filename);
     int  add_new_files(const QStringList& files);
@@ -39,8 +40,6 @@ private:
     void remove_result_in_template(QString& base);
 
     void fill_table();
-
-    void create_web_view_finished(bool ok);
 };
 
 }

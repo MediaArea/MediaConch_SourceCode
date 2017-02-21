@@ -37,14 +37,14 @@ SettingsWindow::~SettingsWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void SettingsWindow::create_web_view_finished(bool ok)
+void SettingsWindow::create_web_view_finished()
 {
-    add_save_report_path_to_js_input((WebPage *)web_view->page());
-    add_load_files_path_to_js_input((WebPage *)web_view->page());
-    add_save_policy_path_to_js_input((WebPage *)web_view->page());
-    add_load_policy_path_to_js_input((WebPage *)web_view->page());
-    add_save_display_path_to_js_input((WebPage *)web_view->page());
-    add_load_display_path_to_js_input((WebPage *)web_view->page());
+    add_save_report_path_to_js_input((WebPage *)main_window->web_view->page());
+    add_load_files_path_to_js_input((WebPage *)main_window->web_view->page());
+    add_save_policy_path_to_js_input((WebPage *)main_window->web_view->page());
+    add_load_policy_path_to_js_input((WebPage *)main_window->web_view->page());
+    add_save_display_path_to_js_input((WebPage *)main_window->web_view->page());
+    add_load_display_path_to_js_input((WebPage *)main_window->web_view->page());
 }
 
 //---------------------------------------------------------------------------

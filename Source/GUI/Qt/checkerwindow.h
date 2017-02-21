@@ -30,10 +30,10 @@ public:
 
     // Functions
     void                        create_web_view();
+    void                        create_web_view_finished();
     void                        set_display_xslt(const QString& d) { display_xslt = d; }
     void                        reset_display_xslt() { display_xslt.clear(); }
     void                        change_local_files(const QStringList& files);
-    void                        hide();
     void                        add_file_to_result_table(const std::string& full_path);
     void                        page_start_waiting_loop();
 
@@ -71,8 +71,6 @@ private:
     void change_result_in_template(const QString& result, QString& html);
     void change_body_script_in_template(QString& html);
     void set_webmachine_script_in_template(QString& html);
-
-    void create_web_view_finished(bool ok);
 };
 
 }

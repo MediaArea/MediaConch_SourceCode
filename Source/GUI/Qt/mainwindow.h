@@ -37,6 +37,7 @@ class VerbositySpinbox;
 class PolicyCombobox;
 class DisplayCombobox;
 class FileRegistered;
+class WebView;
 
 class MainWindow : public QMainWindow
 {
@@ -193,6 +194,8 @@ public:
     const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
     const list<string>* providePolicyExistingXsltOperator() const { return &Policies::existing_xsltOperator; }
 
+    WebView*                      web_view;
+
 private:
     Ui::MainWindow *ui;
 
@@ -252,6 +255,8 @@ public Q_SLOTS:
     void on_actionPublicPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
+    void on_loadFinished(bool ok);
+    void on_loadProgress(int progress);
 
     //Help
     void on_actionAbout_triggered();

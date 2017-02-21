@@ -12,6 +12,8 @@
 #include "publicpolicieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
+#include "webview.h"
+#include "webpage.h"
 #include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
@@ -50,6 +52,14 @@
 #endif
 #include <sstream>
 
+#if defined(WEB_MACHINE_ENGINE)
+#include <QWebEnginePage>
+#include <QWebChannel>
+#endif
+#if defined(WEB_MACHINE_KIT)
+#include <QWebFrame>
+#endif
+
 namespace MediaConch {
 
 //***************************************************************************
@@ -67,6 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     db(NULL),
+    web_view(NULL),
     workerfiles(this)
 {
     ui->setupUi(this);
@@ -134,6 +145,20 @@ MainWindow::MainWindow(QWidget *parent) :
     workerfiles.fill_registered_files_from_db();
     workerfiles.start();
 
+    // WebView
+    web_view = new WebView(this);
+    WebPage* page = new WebPage(this, web_view);
+    web_view->setPage(page);
+#if defined(WEB_MACHINE_ENGINE)
+    QWebChannel *channel = new QWebChannel(page);
+    page->setWebChannel(channel);
+    channel->registerObject("webpage", page);
+#endif
+    connect(web_view, SIGNAL(loadProgress(int)), this, SLOT(on_loadProgress(int)));
+    connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
+    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    set_widget_to_layout(web_view);
+
     // Default
     add_default_displays();
     on_actionChecker_triggered();
@@ -145,6 +170,19 @@ MainWindow::~MainWindow()
     workerfiles.wait();
     delete ui;
     clearVisualElements();
+
+    if (web_view)
+    {
+        remove_widget_from_layout(web_view);
+#if defined(WEB_MACHINE_ENGINE)
+        WebPage* page = (WebPage*)web_view->page();
+        QWebChannel *channel = page ? page->webChannel() : NULL;
+        if (channel)
+            channel->deregisterObject(page);
+#endif
+        delete web_view;
+        web_view = NULL;
+    }
 }
 
 //***************************************************************************
@@ -566,6 +604,36 @@ void MainWindow::on_actionChooseSchema_triggered()
         ui->actionPolicies->setChecked(true);
     current_view = RUN_POLICIES_VIEW;
     Run();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_loadFinished(bool ok)
+{
+    if (!ok)
+    {
+        set_msg_to_status_bar("Problem to load the checker page");
+        return;
+    }
+
+    if (checkerView)
+        checkerView->create_web_view_finished();
+    if (policiesView)
+        policiesView->create_web_view_finished();
+    if (publicPoliciesView)
+        publicPoliciesView->create_web_view_finished();
+    if (displayView)
+        displayView->create_web_view_finished();
+    if (settingsView)
+        settingsView->create_web_view_finished();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::on_loadProgress(int progress)
+{
+    if (progress == 100)
+        status_bar_clear_message();
+    else
+        set_msg_to_status_bar(QString::number(progress) + "%");
 }
 
 //***************************************************************************
