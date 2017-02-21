@@ -76,7 +76,6 @@ private:
     QString create_form_upload();
     QString create_form_online();
     QString create_form_repository();
-    void add_script_js_tree(std::string& file);
     void remove_form_online(int pos, QString& html);
     void remove_li_online(int& pos, QString& html);
     void change_collapse_form(QString& html);
@@ -84,12 +83,6 @@ private:
     void change_result_in_template(const QString& result, QString& html);
     void change_body_script_in_template(QString& html);
     void set_webmachine_script_in_template(QString& html);
-#if defined(WEB_MACHINE_ENGINE)
-    void add_file_detail_to_html(std::string& file, int policy);
-#endif
-#if defined(WEB_MACHINE_KIT)
-    void add_file_detail_to_html(std::string& file, int policy, QString& html);
-#endif
 
 private Q_SLOTS:
     void create_web_view_finished(bool ok);

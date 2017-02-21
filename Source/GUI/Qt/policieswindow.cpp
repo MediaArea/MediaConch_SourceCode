@@ -77,17 +77,6 @@ int PoliciesWindow::add_new_policies(const QStringList& files)
     return page->import_policy(files);
 }
 
-//---------------------------------------------------------------------------
-void PoliciesWindow::use_javascript(const QString& script)
-{
-    if (web_view)
-    {
-        WebPage* page = (WebPage*)web_view->page();
-        if (page)
-            page->use_javascript(script);
-    }
-}
-
 //***************************************************************************
 // WEB
 //***************************************************************************
