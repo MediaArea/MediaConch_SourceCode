@@ -62,19 +62,12 @@ void CommonWebWindow::display_html()
     QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
     QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
 
-    QUrl url = QUrl("");
-    //if (!url.isValid())
-    //    return;
-
 #if defined(WEB_MACHINE_ENGINE)
     QWebChannel *channel = new QWebChannel(page);
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
-    web_view->setHtml(html.toUtf8(), url);
 #endif
-#if defined(WEB_MACHINE_KIT)
-    web_view->setContent(html.toUtf8(), "text/html", url);
-#endif
+    web_view->setHtml(html.toUtf8());
 }
 
 //---------------------------------------------------------------------------
