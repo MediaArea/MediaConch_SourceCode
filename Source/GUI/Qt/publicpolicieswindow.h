@@ -38,7 +38,7 @@ public:
     void                        display_public_policies();
 
 private:
-    MainWindow   *mainwindow;
+    MainWindow   *main_window;
     WebView      *web_view;
     ProgressBar  *progress_bar;
 

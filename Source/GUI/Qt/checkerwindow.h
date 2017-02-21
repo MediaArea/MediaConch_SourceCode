@@ -43,8 +43,8 @@ public:
 
 private:
     // Visual elements
-    MainWindow*                 mainwindow;
-    WebView*                    main_view;
+    MainWindow*                 main_window;
+    WebView*                    web_view;
     ProgressBar*                progress_bar;
     QString                     display_xslt;
     unsigned int                result_index;

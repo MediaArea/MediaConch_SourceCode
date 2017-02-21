@@ -27,7 +27,7 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-DisplayWindow::DisplayWindow(MainWindow* m) : mainwindow(m), web_view(NULL), progress_bar(NULL), is_finished(false)
+DisplayWindow::DisplayWindow(MainWindow* m) : main_window(m), web_view(NULL), progress_bar(NULL), is_finished(false)
 {
 }
 
@@ -40,18 +40,18 @@ void DisplayWindow::display_display()
 {
     clear_display();
 
-    progress_bar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progress_bar);
+    progress_bar = new ProgressBar(main_window);
+    main_window->set_widget_to_layout(progress_bar);
     progress_bar->get_progress_bar()->setValue(0);
     progress_bar->show();
 
     QString html;
     create_html(html);
 
-    web_view = new WebView(mainwindow);
+    web_view = new WebView(main_window);
     web_view->hide();
 
-    WebPage* page = new WebPage(mainwindow, web_view);
+    WebPage* page = new WebPage(main_window, web_view);
     web_view->setPage(page);
 
     QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
@@ -76,14 +76,14 @@ void DisplayWindow::clear_display()
 {
     if (progress_bar)
     {
-        mainwindow->remove_widget_from_layout(progress_bar);
+        main_window->remove_widget_from_layout(progress_bar);
         delete progress_bar;
         progress_bar = NULL;
     }
 
     if (web_view)
     {
-        mainwindow->remove_widget_from_layout(web_view);
+        main_window->remove_widget_from_layout(web_view);
 #if defined(WEB_MACHINE_ENGINE)
         WebPage* page = (WebPage*)web_view->page();
         QWebChannel *channel = page ? page->webChannel() : NULL;
@@ -100,14 +100,14 @@ void DisplayWindow::create_web_view_finished(bool ok)
 {
     if (!web_view || !ok)
     {
-        mainwindow->set_msg_to_status_bar("Problem to load the checker page");
+        main_window->set_msg_to_status_bar("Problem to load the checker page");
         return;
     }
     is_finished = true;
 
     if (progress_bar)
     {
-        mainwindow->remove_widget_from_layout(progress_bar);
+        main_window->remove_widget_from_layout(progress_bar);
         delete progress_bar;
         progress_bar = NULL;
     }
@@ -115,7 +115,7 @@ void DisplayWindow::create_web_view_finished(bool ok)
     web_view->show();
     fill_table();
     web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainwindow->set_widget_to_layout(web_view);
+    main_window->set_widget_to_layout(web_view);
 }
 
 void DisplayWindow::fill_table()
@@ -123,7 +123,7 @@ void DisplayWindow::fill_table()
     if (!web_view || !is_finished)
         return;
 
-    std::vector<QString>& displays = mainwindow->get_displays();
+    std::vector<QString>& displays = main_window->get_displays();
     for (size_t i = 0; i < displays.size(); ++i)
     {
         QFileInfo file(displays[i]);
@@ -166,7 +166,7 @@ int DisplayWindow::add_new_file(const QString& name, const QString& filename)
         display_name = file_info.completeBaseName();
     }
 
-    std::vector<QString>& displays = mainwindow->get_displays();
+    std::vector<QString>& displays = main_window->get_displays();
     int pos = (int)displays.size();
     for (int j = 0; 1; ++j)
     {
@@ -205,7 +205,7 @@ int DisplayWindow::add_new_files(const QStringList& files)
         if (!dir.mkpath(dir.absolutePath()))
             return -1;
 
-    std::vector<QString>& displays = mainwindow->get_displays();
+    std::vector<QString>& displays = main_window->get_displays();
     int pos = (int)displays.size();
     for (int i = 0; i < files.size(); ++i)
     {
@@ -231,7 +231,7 @@ int DisplayWindow::add_new_files(const QStringList& files)
         }
 
         if (i + 1 == files.size())
-            mainwindow->set_last_load_display_path(file_info.absolutePath().toUtf8().data());
+            main_window->set_last_load_display_path(file_info.absolutePath().toUtf8().data());
     }
 
     return pos;
@@ -239,7 +239,7 @@ int DisplayWindow::add_new_files(const QStringList& files)
 
 void DisplayWindow::export_file(const QString& name)
 {
-    std::vector<QString>& displays = mainwindow->get_displays();
+    std::vector<QString>& displays = main_window->get_displays();
 
     size_t i = 0;
     for (; i < displays.size(); ++i)
@@ -251,8 +251,8 @@ void DisplayWindow::export_file(const QString& name)
     if (i == displays.size())
         return;
 
-    QString suggested = QString().fromUtf8(mainwindow->select_correct_save_display_path().c_str());
-    QString file = QFileDialog::getSaveFileName(mainwindow, tr("Save display file"), suggested, tr("Display file (*.xsl)"));
+    QString suggested = QString().fromUtf8(main_window->select_correct_save_display_path().c_str());
+    QString file = QFileDialog::getSaveFileName(main_window, tr("Save display file"), suggested, tr("Display file (*.xsl)"));
     if (!file.length())
         return;
 
@@ -262,12 +262,12 @@ void DisplayWindow::export_file(const QString& name)
     f.copy(file);
 
     QDir info(QFileInfo(file).absoluteDir());
-    mainwindow->set_last_save_display_path(info.absolutePath().toUtf8().data());
+    main_window->set_last_save_display_path(info.absolutePath().toUtf8().data());
 }
 
 void DisplayWindow::delete_file(const QString& name)
 {
-    std::vector<QString>& displays = mainwindow->get_displays();
+    std::vector<QString>& displays = main_window->get_displays();
 
     size_t i = 0;
     for (; i < displays.size(); ++i)
@@ -284,7 +284,7 @@ void DisplayWindow::delete_file(const QString& name)
 
     QFile file(displays[i]);
     file.remove();
-    mainwindow->get_displays().erase(mainwindow->get_displays().begin() + i);
+    main_window->get_displays().erase(main_window->get_displays().begin() + i);
 }
 
 //---------------------------------------------------------------------------

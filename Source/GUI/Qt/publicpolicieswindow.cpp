@@ -25,7 +25,7 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-PublicPoliciesWindow::PublicPoliciesWindow(MainWindow *parent) : mainwindow(parent), web_view(NULL), progress_bar(NULL)
+PublicPoliciesWindow::PublicPoliciesWindow(MainWindow *parent) : main_window(parent), web_view(NULL), progress_bar(NULL)
 {
 }
 
@@ -49,7 +49,7 @@ void PublicPoliciesWindow::clear_visual_elements()
 {
     if (progress_bar)
     {
-        mainwindow->remove_widget_from_layout(progress_bar);
+        main_window->remove_widget_from_layout(progress_bar);
         delete progress_bar;
         progress_bar = NULL;
     }
@@ -62,7 +62,7 @@ void PublicPoliciesWindow::clear_visual_elements()
         if (channel)
             channel->deregisterObject(page);
 #endif
-        mainwindow->remove_widget_from_layout(web_view);
+        main_window->remove_widget_from_layout(web_view);
         delete web_view;
         web_view = NULL;
     }
@@ -78,20 +78,20 @@ void PublicPoliciesWindow::create_web_view_finished(bool ok)
     if (!web_view || !ok)
     {
         create_html();
-        mainwindow->set_msg_to_status_bar("Problem to load the policy page");
+        main_window->set_msg_to_status_bar("Problem to load the policy page");
         return;
     }
 
     if (progress_bar)
     {
-        mainwindow->remove_widget_from_layout(progress_bar);
+        main_window->remove_widget_from_layout(progress_bar);
         delete progress_bar;
         progress_bar = NULL;
     }
 
     web_view->show();
     web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainwindow->set_widget_to_layout(web_view);
+    main_window->set_widget_to_layout(web_view);
 }
 
 //---------------------------------------------------------------------------
@@ -195,15 +195,15 @@ void PublicPoliciesWindow::create_html()
     QString html;
     create_html_base(policy, html);
 
-    progress_bar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progress_bar);
+    progress_bar = new ProgressBar(main_window);
+    main_window->set_widget_to_layout(progress_bar);
     progress_bar->get_progress_bar()->setValue(0);
     progress_bar->show();
 
-    web_view = new WebView(mainwindow);
+    web_view = new WebView(main_window);
     web_view->hide();
 
-    WebPage* page = new WebPage(mainwindow, web_view);
+    WebPage* page = new WebPage(main_window, web_view);
     web_view->setPage(page);
 
     QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));

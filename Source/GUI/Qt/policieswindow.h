@@ -38,7 +38,7 @@ public:
     int                         add_new_policies(const QStringList& files);
 
 private:
-    MainWindow   *mainwindow;
+    MainWindow   *main_window;
     WebView      *web_view;
     ProgressBar  *progress_bar;
 

@@ -29,8 +29,8 @@ public:
     void clear_visual_elements();
 
 private:
-    MainWindow*   parent;
-    WebView*      settings_view;
+    MainWindow*   main_window;
+    WebView*      web_view;
     ProgressBar*  progress_bar;
 
     void create_html(QString& html);
