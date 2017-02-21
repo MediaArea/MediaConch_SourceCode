@@ -31,7 +31,6 @@ PoliciesWindow::PoliciesWindow(MainWindow *parent) : CommonWebWindow(parent)
 
 PoliciesWindow::~PoliciesWindow()
 {
-    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -162,9 +161,5 @@ void PoliciesWindow::create_html(QString &html)
     create_html_policy(policy);
     create_html_base(policy, html);
 }
-
-//***************************************************************************
-// HELPER
-//***************************************************************************
 
 }

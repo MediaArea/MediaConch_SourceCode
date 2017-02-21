@@ -30,7 +30,6 @@ SettingsWindow::SettingsWindow(MainWindow *p) : CommonWebWindow(p)
 
 SettingsWindow::~SettingsWindow()
 {
-    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -54,17 +53,12 @@ void SettingsWindow::display_settings()
     display_html();
 }
 
-
 //---------------------------------------------------------------------------
 void SettingsWindow::create_html(QString& html)
 {
     QString settings;
     create_html_settings(settings);
-
-    QString base;
-    create_html_base(base, settings);
-
-    html = QString(base);
+    create_html_base(html, settings);
 }
 
 //---------------------------------------------------------------------------

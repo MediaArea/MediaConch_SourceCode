@@ -40,9 +40,7 @@ public:
 private:
     // Visual elements
     QString                     display_xslt;
-    unsigned int                result_index;
     ResultTable                *result_table;
-    bool                        is_finished;
     std::vector<std::string>    files;
 
 //***************************************************************************

@@ -217,11 +217,7 @@ void DisplayWindow::create_html(QString& html)
 {
     QString display;
     create_html_display(display);
-
-    QString base;
-    create_html_base(base, display);
-
-    html = QString(base);
+    create_html_base(html, display);
 }
 
 //---------------------------------------------------------------------------

@@ -31,7 +31,6 @@ PublicPoliciesWindow::PublicPoliciesWindow(MainWindow *parent) : CommonWebWindow
 
 PublicPoliciesWindow::~PublicPoliciesWindow()
 {
-    clear_visual_elements();
 }
 
 //***************************************************************************

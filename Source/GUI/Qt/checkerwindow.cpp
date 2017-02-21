@@ -50,18 +50,11 @@ namespace MediaConch {
 
 CheckerWindow::CheckerWindow(MainWindow *parent) : CommonWebWindow(parent), result_table(NULL)
 {
-    // Visual elements
-    result_index = 0;
-    is_finished = false;
 }
 
 CheckerWindow::~CheckerWindow()
 {
-    if (result_table)
-    {
-        delete result_table;
-        result_table = NULL;
-    }
+    delete result_table;
 }
 
 //***************************************************************************
@@ -71,13 +64,6 @@ CheckerWindow::~CheckerWindow()
 //---------------------------------------------------------------------------
 void CheckerWindow::create_web_view_finished(bool ok)
 {
-    if (result_table)
-    {
-        delete result_table;
-        result_table = NULL;
-    }
-    is_finished = true;
-
     result_table = new ResultTable(main_window, (WebPage*)web_view->page());
     if (files.size())
     {
@@ -575,7 +561,7 @@ void CheckerWindow::create_html(QString &html)
 //---------------------------------------------------------------------------
 void CheckerWindow::add_file_to_result_table(const std::string& full_path)
 {
-    if (!result_table || !is_finished)
+    if (!result_table)
     {
         files.push_back(full_path);
         return;
@@ -586,7 +572,7 @@ void CheckerWindow::add_file_to_result_table(const std::string& full_path)
 
 void CheckerWindow::page_start_waiting_loop()
 {
-    if (!web_view || !is_finished)
+    if (!web_view || !result_table)
         return;
 
     WebPage* page = (WebPage*)web_view->page();
