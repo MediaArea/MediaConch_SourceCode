@@ -33,12 +33,11 @@ DisplayWindow::DisplayWindow(MainWindow* m) : CommonWebWindow(m), is_finished(fa
 
 DisplayWindow::~DisplayWindow()
 {
-    clear_display();
 }
 
 void DisplayWindow::display_display()
 {
-    clear_display();
+    clear_visual_elements();
 
     progress_bar = new ProgressBar(main_window);
     main_window->set_widget_to_layout(progress_bar);
@@ -70,29 +69,6 @@ void DisplayWindow::display_display()
 #if defined(WEB_MACHINE_KIT)
     web_view->setContent(html.toUtf8(), "text/html", url);
 #endif
-}
-
-void DisplayWindow::clear_display()
-{
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    if (web_view)
-    {
-        main_window->remove_widget_from_layout(web_view);
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)web_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        delete web_view;
-        web_view = NULL;
-    }
 }
 
 //---------------------------------------------------------------------------

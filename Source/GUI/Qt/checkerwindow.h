@@ -45,7 +45,6 @@ private:
     bool                        is_finished;
     std::vector<std::string>    files;
 
-    void                        clear_visual_elements();
     void                        set_web_view_content(QString& html);
 
 //***************************************************************************

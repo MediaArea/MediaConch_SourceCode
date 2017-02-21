@@ -62,38 +62,11 @@ CheckerWindow::~CheckerWindow()
         delete result_table;
         result_table = NULL;
     }
-    if (web_view)
-    {
-        main_window->remove_widget_from_layout(web_view);
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)web_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        delete web_view;
-        web_view = NULL;
-    }
-    clear_visual_elements();
 }
 
 //***************************************************************************
 // Visual elements
 //***************************************************************************
-
-//---------------------------------------------------------------------------
-void CheckerWindow::clear_visual_elements()
-{
-    if (web_view)
-        web_view->hide();
-
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-}
 
 //---------------------------------------------------------------------------
 void CheckerWindow::create_web_view_finished(bool ok)
@@ -164,19 +137,6 @@ void CheckerWindow::set_web_view_content(QString& html)
 //---------------------------------------------------------------------------
 void CheckerWindow::create_web_view()
 {
-    if (web_view)
-    {
-        main_window->remove_widget_from_layout(web_view);
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)web_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        delete web_view;
-        web_view = NULL;
-    }
-
     clear_visual_elements();
 
     progress_bar = new ProgressBar(main_window);

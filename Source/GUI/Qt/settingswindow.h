@@ -20,7 +20,6 @@ public:
     ~SettingsWindow();
 
     void display_settings();
-    void clear_visual_elements();
 
 private:
     void create_html(QString& html);

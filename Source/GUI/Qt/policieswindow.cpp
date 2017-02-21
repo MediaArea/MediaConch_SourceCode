@@ -44,30 +44,6 @@ void PoliciesWindow::display_policies()
     create_html();
 }
 
-//---------------------------------------------------------------------------
-void PoliciesWindow::clear_visual_elements()
-{
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    if (web_view)
-    {
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)web_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        main_window->remove_widget_from_layout(web_view);
-        delete web_view;
-        web_view = NULL;
-    }
-}
-
 int PoliciesWindow::add_new_policies(const QStringList& files)
 {
     WebPage* page = (WebPage*)web_view->page();

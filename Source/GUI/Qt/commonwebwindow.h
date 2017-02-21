@@ -26,6 +26,8 @@ public:
     ~CommonWebWindow();
 
 protected:
+    void                        clear_visual_elements();
+
     virtual void                create_web_view_finished(bool ok) = 0;
 
     MainWindow*                 main_window;

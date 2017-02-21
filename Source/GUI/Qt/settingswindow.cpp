@@ -137,30 +137,6 @@ void SettingsWindow::create_html_base(QString& base, const QString& settings)
     remove_result_in_template(base);
 }
 
-//---------------------------------------------------------------------------
-void SettingsWindow::clear_visual_elements()
-{
-    if (web_view)
-    {
-        main_window->remove_widget_from_layout(web_view);
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)web_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        delete web_view;
-        web_view = NULL;
-    }
-
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-}
-
 //***************************************************************************
 // HELPER
 //***************************************************************************
