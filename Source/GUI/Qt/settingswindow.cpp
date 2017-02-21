@@ -40,25 +40,12 @@ SettingsWindow::~SettingsWindow()
 //---------------------------------------------------------------------------
 void SettingsWindow::create_web_view_finished(bool ok)
 {
-    if (!web_view || !ok)
-        return;
-
     add_save_report_path_to_js_input((WebPage *)web_view->page());
     add_load_files_path_to_js_input((WebPage *)web_view->page());
     add_save_policy_path_to_js_input((WebPage *)web_view->page());
     add_load_policy_path_to_js_input((WebPage *)web_view->page());
     add_save_display_path_to_js_input((WebPage *)web_view->page());
     add_load_display_path_to_js_input((WebPage *)web_view->page());
-
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    web_view->show();
-    main_window->set_widget_to_layout(web_view);
 }
 
 //---------------------------------------------------------------------------

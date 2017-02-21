@@ -27,7 +27,7 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-DisplayWindow::DisplayWindow(MainWindow* m) : CommonWebWindow(m), is_finished(false)
+DisplayWindow::DisplayWindow(MainWindow* m) : CommonWebWindow(m)
 {
 }
 
@@ -43,31 +43,11 @@ void DisplayWindow::display_display()
 //---------------------------------------------------------------------------
 void DisplayWindow::create_web_view_finished(bool ok)
 {
-    if (!web_view || !ok)
-    {
-        main_window->set_msg_to_status_bar("Problem to load the checker page");
-        return;
-    }
-    is_finished = true;
-
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    web_view->show();
     fill_table();
-    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    main_window->set_widget_to_layout(web_view);
 }
 
 void DisplayWindow::fill_table()
 {
-    if (!web_view || !is_finished)
-        return;
-
     std::vector<QString>& displays = main_window->get_displays();
     for (size_t i = 0; i < displays.size(); ++i)
     {

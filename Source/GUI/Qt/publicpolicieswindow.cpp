@@ -44,31 +44,6 @@ void PublicPoliciesWindow::display_public_policies()
     display_html();
 }
 
-//***************************************************************************
-// WEB
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void PublicPoliciesWindow::create_web_view_finished(bool ok)
-{
-    if (!web_view || !ok)
-    {
-        main_window->set_msg_to_status_bar("Problem to load the policy page");
-        return;
-    }
-
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    web_view->show();
-    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    main_window->set_widget_to_layout(web_view);
-}
-
 //---------------------------------------------------------------------------
 void PublicPoliciesWindow::change_qt_scripts_in_template(QString& html)
 {

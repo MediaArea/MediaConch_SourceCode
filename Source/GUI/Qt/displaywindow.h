@@ -28,9 +28,6 @@ public:
     void delete_file(const QString& name);
 
 private:
-    // Visual elements
-    bool          is_finished;
-
     void create_html(QString& html);
 
     void create_html_display(QString& display);

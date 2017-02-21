@@ -44,12 +44,6 @@ private:
     void create_html_base(const QString& policy, QString& base);
     void create_html_policy(QString& policy);
     void create_html(QString &html);
-
-//***************************************************************************
-// SLOTS
-//***************************************************************************
-
-    void create_web_view_finished(bool ok);
 };
 
 }

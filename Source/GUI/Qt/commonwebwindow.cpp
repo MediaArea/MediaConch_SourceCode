@@ -105,7 +105,24 @@ void CommonWebWindow::clear_visual_elements()
 //---------------------------------------------------------------------------
 void CommonWebWindow::on_loadFinished(bool ok)
 {
+    if (!web_view || !ok)
+    {
+        main_window->set_msg_to_status_bar("Problem to load the checker page");
+        return;
+    }
+
     create_web_view_finished(ok);
+
+    if (progress_bar)
+    {
+        main_window->remove_widget_from_layout(progress_bar);
+        delete progress_bar;
+        progress_bar = NULL;
+    }
+
+    web_view->show();
+    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    main_window->set_widget_to_layout(web_view);
 }
 
 }

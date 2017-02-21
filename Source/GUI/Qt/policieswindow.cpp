@@ -58,27 +58,6 @@ int PoliciesWindow::add_new_policies(const QStringList& files)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void PoliciesWindow::create_web_view_finished(bool ok)
-{
-    if (!web_view || !ok)
-    {
-        main_window->set_msg_to_status_bar("Problem to load the policy page");
-        return;
-    }
-
-    if (progress_bar)
-    {
-        main_window->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    web_view->show();
-    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    main_window->set_widget_to_layout(web_view);
-}
-
-//---------------------------------------------------------------------------
 void PoliciesWindow::change_qt_scripts_in_template(QString& html)
 {
     QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
