@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include <QString>
 #include "WebChoose.h"
+#include "commonwebwindow.h"
 
 class QVBoxLayout;
 class QLabel;
@@ -20,14 +21,8 @@ class QFrame;
 
 namespace MediaConch {
 
-class MainWindow;
-class WebView;
-class ProgressBar;
-
-class PublicPoliciesWindow : public QObject
+class PublicPoliciesWindow : public CommonWebWindow
 {
-    Q_OBJECT
-
 public:
     explicit PublicPoliciesWindow(MainWindow *parent = 0);
     virtual ~PublicPoliciesWindow();
@@ -38,9 +33,6 @@ public:
     void                        display_public_policies();
 
 private:
-    MainWindow   *main_window;
-    WebView      *web_view;
-    ProgressBar  *progress_bar;
 
 //***************************************************************************
 // VISUAL
@@ -61,7 +53,7 @@ private:
 //***************************************************************************
 // SLOTS
 //***************************************************************************
-private Q_SLOTS:
+
     void create_web_view_finished(bool ok);
 };
 

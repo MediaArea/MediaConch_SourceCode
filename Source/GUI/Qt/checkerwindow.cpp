@@ -48,11 +48,9 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-CheckerWindow::CheckerWindow(MainWindow *parent) : main_window(parent), result_table(NULL)
+CheckerWindow::CheckerWindow(MainWindow *parent) : CommonWebWindow(parent), result_table(NULL)
 {
     // Visual elements
-    progress_bar = NULL;
-    web_view = NULL;
     result_index = 0;
     is_finished = false;
 }
@@ -146,7 +144,7 @@ void CheckerWindow::set_web_view_content(QString& html)
     web_view->setPage(page);
 
     QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
+    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
 
     QUrl url = QUrl("qrc:/html");
     if (!url.isValid())

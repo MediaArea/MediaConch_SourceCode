@@ -9,6 +9,7 @@
 
 #include <QFileInfo>
 #include <QString>
+#include "commonwebwindow.h"
 
 class QVBoxLayout;
 class QLabel;
@@ -19,14 +20,8 @@ class QFrame;
 
 namespace MediaConch {
 
-class MainWindow;
-class WebView;
-class ProgressBar;
-
-class PoliciesWindow : public QObject
+class PoliciesWindow : public CommonWebWindow
 {
-    Q_OBJECT
-
 public:
     explicit PoliciesWindow(MainWindow *parent = 0);
     ~PoliciesWindow();
@@ -38,9 +33,6 @@ public:
     int                         add_new_policies(const QStringList& files);
 
 private:
-    MainWindow   *main_window;
-    WebView      *web_view;
-    ProgressBar  *progress_bar;
 
 //***************************************************************************
 // VISUAL
@@ -61,7 +53,7 @@ private:
 //***************************************************************************
 // SLOTS
 //***************************************************************************
-private Q_SLOTS:
+
     void create_web_view_finished(bool ok);
 };
 

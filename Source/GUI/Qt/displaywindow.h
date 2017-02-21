@@ -10,17 +10,12 @@
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
+#include "commonwebwindow.h"
 
 namespace MediaConch {
 
-class MainWindow;
-class WebView;
-class ProgressBar;
-
-class DisplayWindow : public QObject
+class DisplayWindow : public CommonWebWindow
 {
-    Q_OBJECT
-
 public:
     explicit DisplayWindow(MainWindow* m);
     ~DisplayWindow();
@@ -34,9 +29,6 @@ public:
 
 private:
     // Visual elements
-    MainWindow   *main_window;
-    WebView      *web_view;
-    ProgressBar  *progress_bar;
     bool          is_finished;
 
     void clear_display();
@@ -52,7 +44,6 @@ private:
 
     void fill_table();
 
-private Q_SLOTS:
     void create_web_view_finished(bool ok);
 };
 

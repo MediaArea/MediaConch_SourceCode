@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QString>
 #include "WebChoose.h"
+#include "commonwebwindow.h"
 
 class QFrame;
 class QFile;
@@ -19,15 +20,10 @@ class QWebView;
 
 namespace MediaConch {
 
-class MainWindow;
-class WebView;
-class ProgressBar;
 class ResultTable;
 
-class CheckerWindow : public QObject
+class CheckerWindow : public CommonWebWindow
 {
-    Q_OBJECT
-
 public:
     explicit CheckerWindow(MainWindow *parent = 0);
     ~CheckerWindow();
@@ -43,9 +39,6 @@ public:
 
 private:
     // Visual elements
-    MainWindow*                 main_window;
-    WebView*                    web_view;
-    ProgressBar*                progress_bar;
     QString                     display_xslt;
     unsigned int                result_index;
     ResultTable                *result_table;
@@ -84,7 +77,6 @@ private:
     void change_body_script_in_template(QString& html);
     void set_webmachine_script_in_template(QString& html);
 
-private Q_SLOTS:
     void create_web_view_finished(bool ok);
 };
 

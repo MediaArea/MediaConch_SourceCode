@@ -24,7 +24,7 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-SettingsWindow::SettingsWindow(MainWindow *p) : main_window(p), web_view(NULL), progress_bar(NULL)
+SettingsWindow::SettingsWindow(MainWindow *p) : CommonWebWindow(p)
 {
 }
 
@@ -85,7 +85,7 @@ void SettingsWindow::display_settings()
     web_view->setPage(page);
 
     QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
+    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
 
 #if defined(WEB_MACHINE_ENGINE)
     QWebChannel *channel = new QWebChannel(page);

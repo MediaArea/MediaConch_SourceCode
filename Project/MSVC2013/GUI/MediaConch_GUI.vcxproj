@@ -203,6 +203,7 @@
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
+    <ClCompile Include="..\..\..\Source\GUI\Qt\commonwebwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp" />
@@ -223,13 +224,9 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\workerfiles.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
-    <ClCompile Include="_Automated\moc_checkerwindow.cpp" />
-    <ClCompile Include="_Automated\moc_displaywindow.cpp" />
+    <ClCompile Include="_Automated\moc_commonwebwindow.cpp" />
     <ClCompile Include="_Automated\moc_helpwindow.cpp" />
     <ClCompile Include="_Automated\moc_mainwindow.cpp" />
-    <ClCompile Include="_Automated\moc_publicpolicieswindow.cpp" />
-    <ClCompile Include="_Automated\moc_settingswindow.cpp" />
-    <ClCompile Include="_Automated\moc_policieswindow.cpp" />
     <ClCompile Include="_Automated\moc_progressbar.cpp" />
     <ClCompile Include="_Automated\moc_WebCommonPage.cpp" />
     <ClCompile Include="_Automated\moc_WebKitPage.cpp" />
@@ -306,6 +303,7 @@
     <ClInclude Include="..\..\..\Source\Common\Xslt.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
+    <ClInclude Include="..\..\..\Source\GUI\Qt\commonwebwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\DatabaseUi.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h" />
