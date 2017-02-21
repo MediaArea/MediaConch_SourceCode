@@ -127,6 +127,8 @@ MainWindow::MainWindow(QWidget *parent) :
     clear_msg_in_status_bar();
     connect(this, SIGNAL(status_bar_show_message(const QString&, int)),
             statusBar(), SLOT(showMessage(const QString&, int)));
+    connect(this, SIGNAL(status_bar_clear_message()),
+            statusBar(), SLOT(clearMessage()));
 
     // worker load existing files
     workerfiles.fill_registered_files_from_db();
@@ -702,14 +704,16 @@ void MainWindow::createSettingsView()
 //---------------------------------------------------------------------------
 void MainWindow::set_msg_to_status_bar(const QString& message)
 {
-    Q_EMIT status_bar_show_message(message, 5000);
+    if (message.isEmpty())
+        clear_msg_in_status_bar();
+    else
+        Q_EMIT status_bar_show_message(message, 5000);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::set_str_msg_to_status_bar(const std::string& message)
 {
-    QString str = QString().fromUtf8(message.c_str(), message.size());
-    Q_EMIT status_bar_show_message(str, 5000);
+    set_msg_to_status_bar(QString::fromStdString(message));
 }
 
 //---------------------------------------------------------------------------
