@@ -34,6 +34,8 @@ protected:
 
     MainWindow*                 main_window;
     WebView*                    web_view;
+
+private:
     ProgressBar*                progress_bar;
 
 private Q_SLOTS:
