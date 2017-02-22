@@ -32,6 +32,13 @@ protected:
     virtual void                create_html(QString &html) = 0;
 
     MainWindow*                 main_window;
+
+//***************************************************************************
+// SLOTS
+//***************************************************************************
+
+public Q_SLOTS:
+    void use_javascript(const QString& script);
 };
 
 }

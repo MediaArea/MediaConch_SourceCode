@@ -56,4 +56,15 @@ void CommonWebWindow::display_html()
 #endif
 }
 
+//---------------------------------------------------------------------------
+void CommonWebWindow::use_javascript(const QString& script)
+{
+    if (main_window->web_view)
+    {
+        WebPage* page = (WebPage*)main_window->web_view->page();
+        if (page)
+            page->use_javascript(script);
+    }
+}
+
 }
