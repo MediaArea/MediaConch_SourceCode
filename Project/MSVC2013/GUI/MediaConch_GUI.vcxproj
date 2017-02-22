@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -191,6 +191,7 @@
     <ClCompile Include="..\..\..\Source\Common\Policies.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Policy.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Queue.cpp" />
+    <ClCompile Include="..\..\..\Source\Common\Reports.cpp" />
     <ClCompile Include="..\..\..\Source\Common\REST_API.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Scheduler.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Schema.cpp" />
@@ -291,6 +292,7 @@
     <ClInclude Include="..\..\..\Source\Common\Policies.h" />
     <ClInclude Include="..\..\..\Source\Common\Policy.h" />
     <ClInclude Include="..\..\..\Source\Common\Queue.h" />
+    <ClInclude Include="..\..\..\Source\Common\Reports.h" />
     <ClInclude Include="..\..\..\Source\Common\REST_API.h" />
     <ClInclude Include="..\..\..\Source\Common\Scheduler.h" />
     <ClInclude Include="..\..\..\Source\Common\Schema.h" />

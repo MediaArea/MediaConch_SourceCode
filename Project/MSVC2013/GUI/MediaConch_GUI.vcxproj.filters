@@ -248,6 +248,21 @@
     <ClCompile Include="_Automated\moc_commonwebwindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Reports.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -507,6 +522,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\commonwebwindow.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Reports.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
