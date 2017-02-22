@@ -51,6 +51,7 @@ DEFINES          +=  _UNICODE
 
 SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/Core.cpp \
+                    ../../Source/Common/Reports.cpp \
                     ../../Source/Common/Schema.cpp \
                     ../../Source/Common/Xslt.cpp \
                     ../../Source/Common/Policies.cpp \
@@ -102,6 +103,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
 
 HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/Core.h \
+                    ../../Source/Common/Reports.h \
                     ../../Source/Common/Schema.h \
                     ../../Source/Common/Xslt.h \
                     ../../Source/Common/JS_Tree.h \

@@ -7,14 +7,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QMainWindow>
+#include <QFileInfo>
+#include <QString>
+#include <map>
+#include <list>
+
 #include "Common/Core.h"
 #include "workerfiles.h"
 #include "uisettings.h"
 #include "DatabaseUi.h"
 
-#include <QMainWindow>
-#include <QFileInfo>
-#include <QString>
 
 namespace Ui {
     class MainWindow;
@@ -78,8 +81,6 @@ public:
     // Helpers
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
-    int                         transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result);
-    int                         transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result);
     int                         analyze(const std::vector<std::string>& files, bool with_fixer, bool force,
                                         std::vector<long>& files_id, std::string& err);
     int                         is_analyze_finished(const std::vector<std::string>& files,
@@ -190,9 +191,9 @@ public:
 
     UiSettings&                 get_settings();
 
-    const map<string, list<string> >* providePolicyExistingType() const { return &Policies::existing_type; }
-    const list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
-    const list<string>* providePolicyExistingXsltOperator() const { return &Policies::existing_xsltOperator; }
+    const std::map<std::string, std::list<std::string> >* providePolicyExistingType() const { return &Policies::existing_type; }
+    const std::list<Policies::validatorType>* providePolicyExistingValidator() const { return &Policies::existing_validator; }
+    const std::list<std::string>* providePolicyExistingXsltOperator() const { return &Policies::existing_xsltOperator; }
 
     WebView*                      web_view;
 
@@ -208,6 +209,8 @@ private:
     WorkerFiles                   workerfiles;
     UiSettings                    uisettings;
     Run_View                      current_view;
+
+    long                          user;
 
     // Visual elements
     QVBoxLayout*                Layout;
@@ -229,7 +232,7 @@ private:
 
     void                        fill_display_used(int *policy_i,
                                                   std::string& display_name, std::string& display_content,
-                                                  const std::string*& dname, const std::string*& dcontent,
+                                                  std::string*& dname, std::string*& dcontent,
                                                   FileRegistered* fr);
     void                        fill_options_for_report(std::map<std::string, std::string>& opts, int *verbosity_p);
 

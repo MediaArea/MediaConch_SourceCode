@@ -798,7 +798,11 @@ int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report rep
         return -1;
     }
 
-    if (report_is_registered(user, file_id, report_kind, format, options, err))
+    bool registered = false;
+    if (report_is_registered(user, file_id, report_kind, format, options, registered, err) < 0)
+        return -1;
+
+    if (registered)
         return update_report(user, file_id, report_kind, format, options, report, compress, mil_version, err);
 
     reports.clear();
@@ -957,14 +961,14 @@ int SQLLiteReport::remove_report(int user, long file_id, std::string& err)
     return execute();
 }
 
-void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report report_kind,
-                               MediaConchLib::format format, const std::string& options,
-                               std::string& report, MediaConchLib::compression& compress, std::string& err)
+int SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report report_kind,
+                              MediaConchLib::format format, const std::string& options,
+                              std::string& report, MediaConchLib::compression& compress, std::string& err)
 {
     if (!file_id_match_user(user, file_id, err))
     {
         err = "File ID is not matching the user.";
-        return;
+        return -1;
     }
 
     std::stringstream create;
@@ -978,40 +982,40 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
     query = create.str();
 
     if (prepare_v2(query, err) < 0)
-        return;
+        return -1;
 
     int ret = sqlite3_bind_int(stmt, 1, file_id);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return;
+        return -1;
     }
 
     ret = sqlite3_bind_int(stmt, 2, (int)report_kind);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return;
+        return -1;
     }
 
     ret = sqlite3_bind_int(stmt, 3, (int)format);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return;
+        return -1;
     }
 
     ret = sqlite3_bind_text(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return;
+        return -1;
     }
 
     if (execute() < 0 || !reports.size())
     {
         err = error;
-        return;
+        return -1;
     }
 
     std::map<std::string, std::string> r = reports[0];
@@ -1019,7 +1023,7 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
     if (r.find("REPORT") == r.end())
     {
         err = "No report found";
-        return;
+        return -1;
     }
     report += r["REPORT"];
 
@@ -1033,16 +1037,20 @@ void SQLLiteReport::get_report(int user, long file_id, MediaConchLib::report rep
         else
             compress = MediaConchLib::compression_None;
     }
+
+    return 0;
 }
 
-bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::report report_kind,
-                                         MediaConchLib::format format, const std::string& options,
-                                         std::string& err)
+int SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::report report_kind,
+                                        MediaConchLib::format format, const std::string& options,
+                                        bool& registered, std::string& err)
 {
+    registered = false;
+
     if (!file_id_match_user(user, file_id, err))
     {
         err = "File ID is not matching the user.";
-        return false;
+        return -1;
     }
 
     std::stringstream create;
@@ -1057,49 +1065,50 @@ bool SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::
     query = create.str();
 
     if (prepare_v2(query, err) < 0)
-        return false;
+        return -1;
 
     int ret = sqlite3_bind_int(stmt, 1, file_id);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return false;
+        return -1;
     }
 
     ret = sqlite3_bind_int(stmt, 2, (int)report_kind);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return false;
+        return -1;
     }
 
     ret = sqlite3_bind_int(stmt, 3, (int)format);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return false;
+        return -1;
     }
 
     ret = sqlite3_bind_text(stmt, 4, options.c_str(), options.size(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
-        return false;
+        return -1;
     }
 
     if (execute())
     {
         err = error;
-        return false;
+        return -1;
     }
 
     if (!reports.size() || reports[0].find(key) == reports[0].end())
-        return false;
+        return 0;
 
     if (reports[0][key] == "0")
-        return false;
+        return 0;
 
-    return true;
+    registered = true;
+    return 0;
 }
 
 int SQLLiteReport::version_registered(int user, long file_id, std::string& err)

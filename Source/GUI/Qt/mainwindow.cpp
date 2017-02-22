@@ -14,6 +14,7 @@
 #include "helpwindow.h"
 #include "webview.h"
 #include "webpage.h"
+#include "Common/Reports.h"
 #include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
 #include "DatabaseUi.h"
@@ -78,7 +79,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     db(NULL),
     web_view(NULL),
-    workerfiles(this)
+    workerfiles(this),
+    user(-1)
 {
     ui->setupUi(this);
 
@@ -309,20 +311,6 @@ void MainWindow::Run()
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::transform_with_xslt_file(const std::string& report, const std::string& file, std::string& result)
-{
-    std::map<std::string, std::string> opts;
-    return MCL.transform_with_xslt_file(report, file, opts, result);
-}
-
-//---------------------------------------------------------------------------
-int MainWindow::transform_with_xslt_memory(const std::string& report, const std::string& memory, std::string& result)
-{
-    std::map<std::string, std::string> opts;
-    return MCL.transform_with_xslt_memory(report, memory, opts, result);
-}
-
-//---------------------------------------------------------------------------
 void MainWindow::get_registered_files(std::map<std::string, FileRegistered>& files)
 {
     workerfiles.get_registered_files(files);
@@ -363,7 +351,7 @@ long MainWindow::xslt_policy_create_from_file(long file_id, QString& err)
 
     std::string error;
     if (file_id >= 0)
-        if ((pos = MCL.xslt_policy_create_from_file(-1, file_id, error)) < 0)
+        if ((pos = MCL.xslt_policy_create_from_file(user, file_id, error)) < 0)
             err = QString().fromUtf8(error.c_str(), error.size());
 
     QMessageBox::Icon icon;
@@ -394,7 +382,7 @@ void MainWindow::create_policy_from_file(const FileRegistered* file)
 
     long id = -1;
     std::string error;
-    if ((id = MCL.xslt_policy_create_from_file(-1, file->file_id, error)) < 0)
+    if ((id = MCL.xslt_policy_create_from_file(user, file->file_id, error)) < 0)
         set_str_msg_to_status_bar(error);
 
     if (policiesView)
@@ -866,7 +854,7 @@ int MainWindow::get_policies(const std::string& format, MediaConchLib::Get_Polic
 {
     std::vector<int> ids;
     std::string error;
-    int ret = MCL.policy_get_policies(-1, ids, format, policies, error);
+    int ret = MCL.policy_get_policies(user, ids, format, policies, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -889,7 +877,7 @@ int MainWindow::policy_import(const QString& filename, QString& err)
     std::string memory(schema.constData(), schema.length());
     std::string error;
 
-    int ret = MCL.policy_import(-1, memory, error);
+    int ret = MCL.policy_import(user, memory, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -899,7 +887,7 @@ int MainWindow::policy_import(const QString& filename, QString& err)
 int MainWindow::policy_import_data(const QString& data, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_import(-1, data.toUtf8().data(), error);
+    int ret = MCL.policy_import(user, data.toUtf8().data(), error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -909,7 +897,7 @@ int MainWindow::policy_import_data(const QString& data, QString& err)
 int MainWindow::xslt_policy_create(int parent_id, QString& err)
 {
     std::string error;
-    int ret = MCL.xslt_policy_create(-1, error, "and", parent_id);
+    int ret = MCL.xslt_policy_create(user, error, "and", parent_id);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -919,7 +907,7 @@ int MainWindow::xslt_policy_create(int parent_id, QString& err)
 int MainWindow::policy_duplicate(int id, int dst_policy_id, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_duplicate(-1, id, dst_policy_id, NULL, false, error);
+    int ret = MCL.policy_duplicate(user, id, dst_policy_id, NULL, false, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -929,7 +917,7 @@ int MainWindow::policy_duplicate(int id, int dst_policy_id, QString& err)
 int MainWindow::policy_move(int id, int dst_policy_id, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_move(-1, id, dst_policy_id, error);
+    int ret = MCL.policy_move(user, id, dst_policy_id, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -940,7 +928,7 @@ int MainWindow::policy_change_info(int id, const std::string& name, const std::s
                                    const std::string& license, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_change_info(-1, id, name, description, license, error);
+    int ret = MCL.policy_change_info(user, id, name, description, license, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -950,7 +938,7 @@ int MainWindow::policy_change_info(int id, const std::string& name, const std::s
 int MainWindow::policy_change_type(int id, const std::string& type, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_change_type(-1, id, type, error);
+    int ret = MCL.policy_change_type(user, id, type, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -960,7 +948,7 @@ int MainWindow::policy_change_type(int id, const std::string& type, QString& err
 int MainWindow::policy_change_is_public(int id, bool is_public, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_change_is_public(-1, id, is_public, error);
+    int ret = MCL.policy_change_is_public(user, id, is_public, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -970,7 +958,7 @@ int MainWindow::policy_change_is_public(int id, bool is_public, QString& err)
 int MainWindow::xslt_policy_rule_create(int policy_id, QString& err)
 {
     std::string error;
-    int ret = MCL.xslt_policy_rule_create(-1, policy_id, error);
+    int ret = MCL.xslt_policy_rule_create(user, policy_id, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -980,7 +968,7 @@ int MainWindow::xslt_policy_rule_create(int policy_id, QString& err)
 XsltPolicyRule *MainWindow::xslt_policy_rule_get(int policy_id, int rule_id, QString& err)
 {
     std::string error;
-    XsltPolicyRule *ret = MCL.xslt_policy_rule_get(-1, policy_id, rule_id, error);
+    XsltPolicyRule *ret = MCL.xslt_policy_rule_get(user, policy_id, rule_id, error);
     if (!ret)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -990,7 +978,7 @@ XsltPolicyRule *MainWindow::xslt_policy_rule_get(int policy_id, int rule_id, QSt
 int MainWindow::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPolicyRule *rule, QString& err)
 {
     std::string error;
-    int ret = MCL.xslt_policy_rule_edit(-1, policy_id, rule_id, rule, error);
+    int ret = MCL.xslt_policy_rule_edit(user, policy_id, rule_id, rule, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1000,7 +988,7 @@ int MainWindow::xslt_policy_rule_edit(int policy_id, int rule_id, const XsltPoli
 int MainWindow::xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_policy_id, QString& err)
 {
     std::string error;
-    int ret = MCL.xslt_policy_rule_duplicate(-1, policy_id, rule_id, dst_policy_id, error);
+    int ret = MCL.xslt_policy_rule_duplicate(user, policy_id, rule_id, dst_policy_id, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1010,7 +998,7 @@ int MainWindow::xslt_policy_rule_duplicate(int policy_id, int rule_id, int dst_p
 int MainWindow::xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy_id, QString& err)
 {
     std::string error;
-    int ret = MCL.xslt_policy_rule_move(-1, policy_id, rule_id, dst_policy_id, error);
+    int ret = MCL.xslt_policy_rule_move(user, policy_id, rule_id, dst_policy_id, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1020,7 +1008,7 @@ int MainWindow::xslt_policy_rule_move(int policy_id, int rule_id, int dst_policy
 int MainWindow::xslt_policy_rule_delete(int policy_id, int rule_id, QString& err)
 {
     std::string error;
-    int ret = MCL.xslt_policy_rule_delete(-1, policy_id, rule_id, error);
+    int ret = MCL.xslt_policy_rule_delete(user, policy_id, rule_id, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1031,7 +1019,7 @@ int MainWindow::policy_get(int pos, const std::string& format, MediaConchLib::Ge
                            QString& err)
 {
     std::string error;
-    int ret = MCL.policy_get(-1, pos, format, false, p, error);
+    int ret = MCL.policy_get(user, pos, format, false, p, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1041,7 +1029,7 @@ int MainWindow::policy_get(int pos, const std::string& format, MediaConchLib::Ge
 int MainWindow::policy_remove(int id, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_remove(-1, id, error);
+    int ret = MCL.policy_remove(user, id, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1051,7 +1039,7 @@ int MainWindow::policy_remove(int id, QString& err)
 int MainWindow::policy_save(int pos, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_save(-1, pos, error);
+    int ret = MCL.policy_save(user, pos, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1061,7 +1049,7 @@ int MainWindow::policy_save(int pos, QString& err)
 int MainWindow::policy_dump(int pos, std::string& memory, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_dump(-1, pos, false, memory, error);
+    int ret = MCL.policy_dump(user, pos, false, memory, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1071,7 +1059,7 @@ int MainWindow::policy_dump(int pos, std::string& memory, QString& err)
 int MainWindow::policy_get_name(int pos, std::string& name, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_get_name(-1, pos, name, error);
+    int ret = MCL.policy_get_name(user, pos, name, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1082,14 +1070,14 @@ int MainWindow::policy_export(int pos, QString& err)
 {
     std::string error;
     std::string policy;
-    if (MCL.policy_dump(-1, pos, false, policy, error) < 0)
+    if (MCL.policy_dump(user, pos, false, policy, error) < 0)
     {
         err = QString().fromUtf8(error.c_str(), error.size());
         return -1;
     }
 
     std::string p_name;
-    if (MCL.policy_get_name(-1, pos, p_name, error) < 0)
+    if (MCL.policy_get_name(user, pos, p_name, error) < 0)
     {
         err = QString().fromUtf8(error.c_str(), error.size());
         return -1;
@@ -1138,7 +1126,7 @@ int MainWindow::policy_export_data(const QString& policy, const QString& p_name,
 int MainWindow::clear_policies(QString& err)
 {
     std::string error;
-    int ret = MCL.policy_clear_policies(-1, error);
+    int ret = MCL.policy_clear_policies(user, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1148,7 +1136,7 @@ int MainWindow::clear_policies(QString& err)
 size_t MainWindow::get_policies_count(QString& err) const
 {
     std::string error;
-    int ret = MCL.policy_get_policies_count(-1, error);
+    int ret = MCL.policy_get_policies_count(user, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;
@@ -1302,7 +1290,7 @@ int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, 
         force = true;
     }
 
-    return MCL.checker_analyze(-1, files, plugins, options, files_id, err, force);
+    return MCL.checker_analyze(user, files, plugins, options, files_id, err, force);
 }
 
 //---------------------------------------------------------------------------
@@ -1319,7 +1307,7 @@ int MainWindow::is_analyze_finished(const std::vector<std::string>& files,
         files_id.push_back(id);
     }
 
-    return MCL.checker_status(-1, files_id, res, err);
+    return MCL.checker_status(user, files_id, res, err);
 }
 
 //---------------------------------------------------------------------------
@@ -1330,7 +1318,7 @@ int MainWindow::is_analyze_finished(const std::string& file, MediaConchLib::Chec
     if (id < 0)
         return -1;
 
-    return MCL.checker_status(-1, id, res, err);
+    return MCL.checker_status(user, id, res, err);
 }
 
 //---------------------------------------------------------------------------
@@ -1350,7 +1338,7 @@ int MainWindow::validate(MediaConchLib::report report, const std::vector<std::st
         files_id.push_back(id);
     }
 
-    return MCL.checker_validate(-1, report, files_id, policies_ids, policies_contents, options, result, err);
+    return MCL.checker_validate(user, report, files_id, policies_ids, policies_contents, options, result, err);
 }
 
 //---------------------------------------------------------------------------
@@ -1367,7 +1355,7 @@ int MainWindow::validate(MediaConchLib::report report, const std::string& file,
 
     files_id.push_back(id);
 
-    return MCL.checker_validate(-1, report, files_id, policies_ids, policies_contents, options, result, err);
+    return MCL.checker_validate(user, report, files_id, policies_ids, policies_contents, options, result, err);
 }
 
 //---------------------------------------------------------------------------
@@ -1383,14 +1371,14 @@ int MainWindow::validate_policy(long file_id, size_t policy_id,
     std::vector<std::string> policies_contents;
     std::map<std::string, std::string> options;
 
-    return MCL.checker_validate(-1, MediaConchLib::report_Max, files_id, policies_ids,
+    return MCL.checker_validate(user, MediaConchLib::report_Max, files_id, policies_ids,
                                 policies_contents, options, result, err);
 }
 
 //---------------------------------------------------------------------------
 int MainWindow::checker_file_from_id(long id, std::string& file, std::string& err)
 {
-    return MCL.checker_file_from_id(-1, id, file, err);
+    return MCL.checker_file_from_id(user, id, file, err);
 }
 
 //---------------------------------------------------------------------------
@@ -1399,22 +1387,21 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(long file_id,
                                                      const std::string& display_content,
                                                      std::string& err)
 {
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaInfo);
-    report_set.set(MediaConchLib::report_MediaTrace);
-    std::string report;
-
-    std::vector<long> files;
-    files.push_back(file_id);
-
+    CheckerReport cr;
     MediaConchLib::Checker_ReportRes result;
-    std::vector<size_t> ids;
-    std::vector<std::string> vec;
-    std::map<std::string, std::string> options;
-    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
-                   ids, vec,
-                   options,
-                           &result, err, &display_name, &display_content);
+
+    cr.user = user;
+    cr.files.push_back(file_id);
+    cr.format = MediaConchLib::format_Xml;
+    cr.report_set.set(MediaConchLib::report_MediaInfo);
+    cr.report_set.set(MediaConchLib::report_MediaTrace);
+
+    std::string d_name = display_name;
+    std::string d_content = display_content;
+    cr.display_name = d_name.size() ? &d_name : NULL;
+    cr.display_content = d_content.size() ? &d_content : NULL;
+
+    MCL.checker_get_report(cr, &result, err);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
@@ -1424,40 +1411,35 @@ QString MainWindow::get_mediainfo_xml(long file_id,
                                       const std::string& display_content,
                                       std::string& err)
 {
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaInfo);
-    std::string report;
-
-    std::vector<long> files;
-    files.push_back(file_id);
-
+    CheckerReport cr;
     MediaConchLib::Checker_ReportRes result;
-    std::vector<size_t> ids;
-    std::vector<std::string> vec;
-    std::map<std::string, std::string> options;
-    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
-                           ids, vec,
-                           options,
-                           &result, err, &display_name, &display_content);
+
+    cr.user = user;
+    cr.files.push_back(file_id);
+    cr.format = MediaConchLib::format_Xml;
+    cr.report_set.set(MediaConchLib::report_MediaInfo);
+
+    std::string d_name = display_name;
+    std::string d_content = display_content;
+    cr.display_name = d_name.size() ? &d_name : NULL;
+    cr.display_content = d_content.size() ? &d_content : NULL;
+
+    MCL.checker_get_report(cr, &result, err);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_jstree(long file_id, std::string& err)
 {
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaInfo);
-    std::string report;
-
-    std::vector<long> files;
-    files.push_back(file_id);
-
+    CheckerReport cr;
     MediaConchLib::Checker_ReportRes result;
-    std::vector<size_t> ids;
-    std::vector<std::string> vec;
-    std::map<std::string, std::string> options;
-    MCL.checker_get_report(-1, report_set, MediaConchLib::format_JsTree, files,
-                           ids, vec, options, &result, err);
+
+    cr.user = user;
+    cr.files.push_back(file_id);
+    cr.format = MediaConchLib::format_JsTree;
+    cr.report_set.set(MediaConchLib::report_MediaInfo);
+
+    MCL.checker_get_report(cr, &result, err);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
@@ -1467,42 +1449,35 @@ QString MainWindow::get_mediatrace_xml(long file_id,
                                        const std::string& display_content,
                                        std::string& err)
 {
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaTrace);
-    std::string report;
-
-    std::vector<long> files;
-    files.push_back(file_id);
-
+    CheckerReport cr;
     MediaConchLib::Checker_ReportRes result;
-    std::vector<size_t> ids;
-    std::vector<std::string> vec;
-    std::map<std::string, std::string> options;
-    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
-                           ids, vec,
-                           options,
-                           &result, err, &display_name, &display_content);
+
+    cr.user = user;
+    cr.files.push_back(file_id);
+    cr.format = MediaConchLib::format_Xml;
+    cr.report_set.set(MediaConchLib::report_MediaTrace);
+
+    std::string d_name = display_name;
+    std::string d_content = display_content;
+    cr.display_name = d_name.size() ? &d_name : NULL;
+    cr.display_content = d_content.size() ? &d_content : NULL;
+
+    MCL.checker_get_report(cr, &result, err);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
 //---------------------------------------------------------------------------
 QString MainWindow::get_mediatrace_jstree(long file_id, std::string& err)
 {
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(MediaConchLib::report_MediaTrace);
-    std::string report;
-
-    std::vector<long> files;
-    files.push_back(file_id);
-
+    CheckerReport cr;
     MediaConchLib::Checker_ReportRes result;
-    std::vector<size_t> ids;
-    std::vector<std::string> vec;
-    std::map<std::string, std::string> options;
-    MCL.checker_get_report(-1, report_set, MediaConchLib::format_JsTree, files,
-                           ids, vec,
-                           options,
-                           &result, err);
+
+    cr.user = user;
+    cr.files.push_back(file_id);
+    cr.format = MediaConchLib::format_JsTree;
+    cr.report_set.set(MediaConchLib::report_MediaTrace);
+
+    MCL.checker_get_report(cr, &result, err);
     return QString().fromUtf8(result.report.c_str(), result.report.length());
 }
 
@@ -1520,28 +1495,21 @@ void MainWindow::get_implementation_report(long file_id, QString& report, std::s
         return;
     }
 
+    CheckerReport cr;
+    MediaConchLib::Checker_ReportRes result;
+
+    cr.user = user;
+    cr.files.push_back(file_id);
+    cr.format = MediaConchLib::format_Xml;
+    cr.report_set.set(fr->report_kind);
+
     std::string display_content;
     std::string display_name;
-    const std::string* dname = NULL;
-    const std::string* dcontent = NULL;
-    fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
+    fill_display_used(display_p, display_name, display_content, cr.display_name, cr.display_content, fr);
 
-    std::bitset<MediaConchLib::report_Max> report_set;
-    report_set.set(fr->report_kind);
+    fill_options_for_report(cr.options, verbosity);
 
-    std::vector<long> files;
-    files.push_back(file_id);
-
-    MediaConchLib::Checker_ReportRes result;
-    std::vector<size_t> ids;
-    std::vector<std::string> vec;
-    std::map<std::string, std::string> options;
-    fill_options_for_report(options, verbosity);
-
-    MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
-                           ids, vec,
-                           options,
-                           &result, err, dname, dcontent);
+    MCL.checker_get_report(cr, &result, err);
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
     delete fr;
@@ -1570,28 +1538,23 @@ int MainWindow::validate_policy(long file_id, QString& report, std::string& err,
         policy = fr->policy;
     }
 
+    CheckerReport cr;
+    MediaConchLib::Checker_ReportRes result;
+
+    cr.user = user;
+    cr.files.push_back(file_id);
+    cr.format = MediaConchLib::format_Xml;
+
     std::string display_content;
     std::string display_name;
-    const std::string* dname = NULL;
-    const std::string* dcontent = NULL;
-    fill_display_used(display_p, display_name, display_content, dname, dcontent, fr);
-    std::vector<long> files;
-    files.push_back(fr->file_id);
+    fill_display_used(display_p, display_name, display_content, cr.display_name, cr.display_content, fr);
     delete fr;
 
-    MediaConchLib::Checker_ReportRes result;
-    std::bitset<MediaConchLib::report_Max> report_set;
-    std::vector<std::string> policies_contents;
-    std::vector<size_t> policies_ids;
-    std::map<std::string, std::string> options;
+    cr.policies_ids.push_back(policy);
 
-    policies_ids.push_back(policy);
-
-    if (MCL.checker_get_report(-1, report_set, MediaConchLib::format_Xml, files,
-                               policies_ids, policies_contents,
-                               options,
-                               &result, err, dname, dcontent) < 0)
+    if (MCL.checker_get_report(cr, &result, err) < 0)
         return 0;
+
 
     report = QString().fromUtf8(result.report.c_str(), result.report.length());
 
@@ -1628,7 +1591,7 @@ void MainWindow::remove_file_registered_from_file(const std::string& file)
 
 //---------------------------------------------------------------------------
 void MainWindow::fill_display_used(int *display_p, std::string&, std::string& display_content,
-                                   const std::string*& dname, const std::string*& dcontent,
+                                   std::string*& dname, std::string*& dcontent,
                                    FileRegistered* fr)
 {
     if (display_p)

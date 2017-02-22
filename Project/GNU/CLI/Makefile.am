@@ -8,6 +8,7 @@ mediaconch_SOURCES = \
     ../../../Source/CLI/Help.cpp \
     ../../../Source/Common/MediaConchLib.cpp \
     ../../../Source/Common/Core.cpp \
+    ../../../Source/Common/Reports.cpp \
     ../../../Source/Common/DaemonClient.cpp \
     ../../../Source/Common/Schema.cpp \
     ../../../Source/Common/Xslt.cpp \

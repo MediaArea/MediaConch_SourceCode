@@ -320,7 +320,7 @@ int NoDatabaseReport::save_report(int user, long file_id, MediaConchLib::report 
 }
 
 //---------------------------------------------------------------------------
-void NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+int NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                   const std::string& options,
                                   std::string& report, MediaConchLib::compression& c, std::string& err)
 {
@@ -328,7 +328,7 @@ void NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report 
         files_saved[file_id]->user != user)
     {
         err = "File not found";
-        return;
+        return -1;
     }
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
@@ -339,10 +339,11 @@ void NoDatabaseReport::get_report(int user, long file_id, MediaConchLib::report 
 
         report = r->report;
         c = r->compression;
-        return;
+        return 0;
     }
 
     err = "Report not found";
+    return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -368,14 +369,15 @@ int NoDatabaseReport::remove_report(int user, long file_id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-bool NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
-                                            const std::string& options, std::string& err)
+int NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+                                           const std::string& options, bool& registered, std::string& err)
 {
+    registered = false;
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
     {
         err = "File not found";
-        return false;
+        return -1;
     }
 
     for (size_t i = 0; i < reports_saved[file_id].size(); ++i)
@@ -383,11 +385,13 @@ bool NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLi
         MC_Report* r = reports_saved[file_id][i];
 
         if (r && r->format == format && r->reportKind == reportKind && r->options == options)
-            return true;
+        {
+            registered = true;
+            break;
+        }
     }
 
-    err = "Report not found";
-    return false;
+    return 0;
 }
 
 int NoDatabaseReport::version_registered(int user, long file_id, std::string& err)

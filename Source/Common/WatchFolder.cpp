@@ -14,6 +14,7 @@
 #include "WatchFolder.h"
 #include "MediaConchLib.h"
 #include "Core.h"
+#include "Reports.h"
 #include "PluginLog.h"
 #include "PluginPreHook.h"
 
@@ -241,31 +242,19 @@ void WatchFolder::stop()
 //---------------------------------------------------------------------------
 int WatchFolder::ask_report(WatchFolderFile *wffile)
 {
-    std::vector<long> files;
-    files.push_back(wffile->file_id);
-
-    MediaConchLib::format format = MediaConchLib::format_Html;
-
-
-    std::bitset<MediaConchLib::report_Max> report_set;
-
-    std::vector<size_t> policies_ids;
-    std::vector<std::string> policies_contents;
-
-    std::map<std::string, std::string> options;
-
     MediaConchLib::Checker_ReportRes result;
 
-    std::string err, display_name, display_content;
+    std::string err;
 
+    CheckerReport cr;
+    cr.user = user;
+    cr.files.push_back(wffile->file_id);
     //Implementation report HTML
-    report_set.set(MediaConchLib::report_MediaConch);
-    int ret = core->checker_get_report(user, report_set, format,
-                                       files, policies_ids, policies_contents, options,
-                                       &result, err, &display_name, &display_content);
-    report_set.reset();
+    cr.report_set.set(MediaConchLib::report_MediaConch);
+    cr.format = MediaConchLib::format_Html;
+    int ret = core->reports.checker_get_report(cr, &result, err);
 
-    if (ret || (result.has_valid && !result.valid))
+    if (ret < 0 || (result.has_valid && !result.valid))
     {
         std::stringstream out;
 
@@ -279,42 +268,36 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     out.close();
 
     //Implementation report XML
-    format = MediaConchLib::format_Xml;
+    cr.format = MediaConchLib::format_Xml;
     result.has_valid = false;
     result.report = std::string();
-    report_set.set(MediaConchLib::report_MediaConch);
-    ret = core->checker_get_report(user, report_set, format,
-                                   files, policies_ids, policies_contents, options,
-                                   &result, err, &display_name, &display_content);
-    report_set.reset();
+    cr.report_set.reset();
+    cr.report_set.set(MediaConchLib::report_MediaConch);
+    ret = core->reports.checker_get_report(cr, &result, err);
 
     filename = wffile->report_file + ".ImplementationReport.xml";
     std::ofstream out_xml(filename.c_str(), std::ofstream::out);
     out_xml << result.report;
     out_xml.close();
 
-    //MediaInfo
+    //MediaInfo XML
     result.has_valid = false;
     result.report = std::string();
-    report_set.set(MediaConchLib::report_MediaInfo);
-    ret = core->checker_get_report(user, report_set, format,
-                                   files, policies_ids, policies_contents, options,
-                                   &result, err, &display_name, &display_content);
-    report_set.reset();
+    cr.report_set.reset();
+    cr.report_set.set(MediaConchLib::report_MediaInfo);
+    ret = core->reports.checker_get_report(cr, &result, err);
 
     filename = wffile->report_file + ".MediaInfo.xml";
     std::ofstream out_mi(filename.c_str(), std::ofstream::out);
     out_mi << result.report;
     out_mi.close();
 
-    //MediaTrace
+    //MediaTrace XML
     result.has_valid = false;
     result.report = std::string();
-    report_set.set(MediaConchLib::report_MediaTrace);
-    ret = core->checker_get_report(user, report_set, format,
-                                   files, policies_ids, policies_contents, options,
-                                   &result, err, &display_name, &display_content);
-    report_set.reset();
+    cr.report_set.reset();
+    cr.report_set.set(MediaConchLib::report_MediaTrace);
+    ret = core->reports.checker_get_report(cr, &result, err);
 
     filename = wffile->report_file + ".MediaTrace.xml";
     std::ofstream out_mt(filename.c_str(), std::ofstream::out);
@@ -326,17 +309,19 @@ int WatchFolder::ask_report(WatchFolderFile *wffile)
     {
         result.has_valid = false;
         result.report = std::string();
-        ret = core->checker_get_report(user, report_set, format,
-                                       files, policies_ids, policies, options,
-                                       &result, err, &display_name, &display_content);
-        if (ret || (result.has_valid && !result.valid))
+        cr.report_set.reset();
+
+        for (size_t i = 0; i < policies.size(); ++i)
+            cr.policies_contents.push_back(policies[i]);
+        ret = core->reports.checker_get_report(cr, &result, err);
+        if (ret < 0 || (result.has_valid && !result.valid))
         {
             std::stringstream out;
 
             out << wffile->name << ": policy is not valid";
             core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, out.str());
         }
-        report_set.reset();
+        cr.report_set.reset();
 
         std::ofstream out_pr(std::string(wffile->report_file + ".PoliciesReport.xml").c_str(), std::ofstream::out);
         out_pr << result.report;
