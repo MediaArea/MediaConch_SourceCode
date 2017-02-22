@@ -68,9 +68,9 @@ const std::string MainWindow::version = "16.10";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    web_view(NULL),
     ui(new Ui::MainWindow),
     db(NULL),
-    web_view(NULL),
     workerfiles(this),
     user(-1)
 {
@@ -148,8 +148,8 @@ MainWindow::MainWindow(QWidget *parent) :
     page->setWebChannel(channel);
     channel->registerObject("webpage", page);
 #endif
-    connect(web_view, SIGNAL(loadProgress(int)), this, SLOT(on_loadProgress(int)));
-    connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(on_loadFinished(bool)));
+    connect(web_view, SIGNAL(loadProgress(int)), this, SLOT(loadProgress_Custom(int)));
+    connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished_Custom(bool)));
     web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     set_widget_to_layout(web_view);
 
@@ -587,7 +587,7 @@ void MainWindow::on_actionChooseSchema_triggered()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_loadFinished(bool ok)
+void MainWindow::loadFinished_Custom(bool ok)
 {
     if (!ok)
     {
@@ -608,7 +608,7 @@ void MainWindow::on_loadFinished(bool ok)
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::on_loadProgress(int progress)
+void MainWindow::loadProgress_Custom(int progress)
 {
     if (progress == 100)
         status_bar_clear_message();

@@ -258,8 +258,6 @@ public Q_SLOTS:
     void on_actionPublicPolicies_triggered();
     void on_actionDisplay_triggered();
     void on_actionSettings_triggered();
-    void on_loadFinished(bool ok);
-    void on_loadProgress(int progress);
 
     //Help
     void on_actionAbout_triggered();
@@ -268,6 +266,8 @@ public Q_SLOTS:
     void on_actionDataFormat_triggered();
 
     bool close();
+    void loadFinished_Custom(bool ok);
+    void loadProgress_Custom(int progress);
 };
 
 }
