@@ -74,9 +74,12 @@ void SettingsWindow::display_settings()
     QString html;
     create_html(html);
 
-    QUrl url = QUrl("qrc:/html");
+    QUrl url;
+#if QT_VERSION < 0x050700
+    url = QUrl("qrc:/html");
     if (!url.isValid())
         return;
+#endif
 
     settings_view = new WebView(parent);
     settings_view->hide();
