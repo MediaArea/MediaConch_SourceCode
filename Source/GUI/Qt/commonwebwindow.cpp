@@ -45,6 +45,13 @@ void CommonWebWindow::display_html()
     template_html.close();
     create_html(html);
 
+    QUrl url;
+#if QT_VERSION < 0x050700
+    url = QUrl("qrc:/html"); //Without it, it works sometimes, depending of engine and version, so let it as before for Qt<5.7 as it is always working for Qt<5.7 and never for Qt>=5.7
+    if (!url.isValid())
+        return;
+#endif
+
     main_window->web_view->setHtml(html.toUtf8());
 }
 
