@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 #include "DaemonClient.h"
 #include "MediaConchLib.h"
+#include "Reports.h"
 #include "XsltPolicy.h"
 #include "Http.h"
 #include "LibEventHttp.h"
@@ -540,76 +541,69 @@ int DaemonClient::checker_status(int user, long file_id, MediaConchLib::Checker_
 }
 
 //---------------------------------------------------------------------------
-int DaemonClient::checker_get_report(int user, const std::bitset<MediaConchLib::report_Max>& report_set,
-                                     MediaConchLib::format f, const std::vector<long>& files,
-                                     const std::vector<size_t>& policies_ids,
-                                     const std::vector<std::string>& policies_contents,
-                                     const std::map<std::string, std::string>& options,
-                                     MediaConchLib::Checker_ReportRes* result, std::string& err,
-                                     const std::string* display_name,
-                                     const std::string* display_content)
+int DaemonClient::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_ReportRes* result, std::string& err)
 {
     // FILE
     RESTAPI::Checker_Report_Req  req;
     RESTAPI::Checker_Report_Res *res = NULL;
 
-    req.user = user;
+    req.user = cr.user;
 
-    for (size_t i = 0; i < files.size(); ++i)
-        req.ids.push_back(files[i]);
+    for (size_t i = 0; i < cr.files.size(); ++i)
+        req.ids.push_back(cr.files[i]);
 
     // REPORT KIND
-    if (report_set[MediaConchLib::report_MediaConch])
+    if (cr.report_set[MediaConchLib::report_MediaConch])
         req.reports.push_back(RESTAPI::IMPLEMENTATION);
-    if (report_set[MediaConchLib::report_MediaInfo])
+    if (cr.report_set[MediaConchLib::report_MediaInfo])
         req.reports.push_back(RESTAPI::MEDIAINFO);
-    if (report_set[MediaConchLib::report_MediaTrace])
+    if (cr.report_set[MediaConchLib::report_MediaTrace])
         req.reports.push_back(RESTAPI::MEDIATRACE);
-    if (report_set[MediaConchLib::report_MediaVeraPdf])
+    if (cr.report_set[MediaConchLib::report_MediaVeraPdf])
         req.reports.push_back(RESTAPI::VERAPDF);
-    if (report_set[MediaConchLib::report_MediaDpfManager])
+    if (cr.report_set[MediaConchLib::report_MediaDpfManager])
         req.reports.push_back(RESTAPI::DPFMANAGER);
 
     // POLICY
-    if (policies_ids.size())
+    if (cr.policies_ids.size())
     {
         req.reports.push_back(RESTAPI::POLICY);
-        for (size_t i = 0; i < policies_ids.size(); ++i)
-            req.policies_ids.push_back(policies_ids[i]);
+        for (size_t i = 0; i < cr.policies_ids.size(); ++i)
+            req.policies_ids.push_back(cr.policies_ids[i]);
     }
-    if (policies_contents.size())
+    if (cr.policies_contents.size())
     {
         req.reports.push_back(RESTAPI::POLICY);
-        for (size_t i = 0; i < policies_contents.size(); ++i)
-            req.policies_contents.push_back(policies_contents[i]);
+        for (size_t i = 0; i < cr.policies_contents.size(); ++i)
+            req.policies_contents.push_back(cr.policies_contents[i]);
     }
 
     // FORMAT
-    if (f == MediaConchLib::format_Xml)
+    if (cr.format == MediaConchLib::format_Xml)
     {
-        if (display_name)
-            req.display_name = *display_name;
-        else if (!display_content)
+        if (cr.display_name)
+            req.display_name = *cr.display_name;
+        else if (!cr.display_content)
             req.display_name = MediaConchLib::display_xml_name;
     }
-    else if (f == MediaConchLib::format_MaXml)
+    else if (cr.format == MediaConchLib::format_MaXml)
         req.display_name = MediaConchLib::display_maxml_name;
-    else if (f == MediaConchLib::format_Text)
+    else if (cr.format == MediaConchLib::format_Text)
         req.display_name = MediaConchLib::display_text_name;
-    else if (f == MediaConchLib::format_Html)
+    else if (cr.format == MediaConchLib::format_Html)
         req.display_name = MediaConchLib::display_html_name;
-    else if (f == MediaConchLib::format_JsTree)
+    else if (cr.format == MediaConchLib::format_JsTree)
         req.display_name = MediaConchLib::display_jstree_name;
-    else if (f == MediaConchLib::format_Simple)
+    else if (cr.format == MediaConchLib::format_Simple)
         req.display_name = MediaConchLib::display_simple_name;
-    else if (f == MediaConchLib::format_CSV)
+    else if (cr.format == MediaConchLib::format_CSV)
         req.display_name = MediaConchLib::display_csv_name;
 
-    if (display_content)
-        req.display_content = *display_content;
+    if (cr.display_content)
+        req.display_content = *cr.display_content;
 
-    std::map<std::string, std::string>::const_iterator it = options.begin();
-    for (; it != options.end(); ++it)
+    std::map<std::string, std::string>::const_iterator it = cr.options.begin();
+    for (; it != cr.options.end(); ++it)
     {
         if (!it->first.size())
             continue;

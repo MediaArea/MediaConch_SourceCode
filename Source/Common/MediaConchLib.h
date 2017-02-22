@@ -23,6 +23,7 @@
 namespace MediaConch {
 
 class Core;
+class CheckerReport;
 class DaemonClient;
 class Policy;
 class XsltPolicyRule;
@@ -296,14 +297,7 @@ public:
     int  checker_file_information(int user, long id, Checker_FileInfo& info, std::string& error);
 
     // Output
-    int  checker_get_report(int user, const std::bitset<report_Max>& Report, format f,
-                            const std::vector<long>& files,
-                            const std::vector<size_t>& policies_ids,
-                            const std::vector<std::string>& policies_contents,
-                            const std::map<std::string, std::string>& options,
-                            Checker_ReportRes* result, std::string& error,
-                            const std::string* display_name = NULL,
-                            const std::string* display_content = NULL);
+    int  checker_get_report(CheckerReport& c_report, Checker_ReportRes* result, std::string& error);
     int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
                          const std::vector<size_t>& policies_ids,
                          const std::vector<std::string>& policies_contents,
@@ -356,12 +350,6 @@ public:
     void               create_default_implementation_schema();
     void               set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
-
-    // Xsl Transformation
-    int  transform_with_xslt_file(const std::string& report, const std::string& file,
-                                  const std::map<std::string, std::string>& opts, std::string& result);
-    int  transform_with_xslt_memory(const std::string& report, const std::string& memory,
-                                    const std::map<std::string, std::string>& opts, std::string& result);
 
     // Configuration
     void               load_configuration();

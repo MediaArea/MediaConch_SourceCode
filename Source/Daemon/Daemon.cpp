@@ -883,44 +883,46 @@ namespace MediaConch
     {
         FUN_CMD_START(Checker_Report)
 
-        MediaConchLib::format format = MediaConchLib::format_Xml;
+        CheckerReport cr;
+        cr.user = req->user;
+        cr.format = MediaConchLib::format_Xml;
         if (req->display_name == MediaConchLib::display_text_name)
-            format = MediaConchLib::format_Text;
+            cr.format = MediaConchLib::format_Text;
         else if (req->display_name == MediaConchLib::display_maxml_name)
-            format = MediaConchLib::format_MaXml;
+            cr.format = MediaConchLib::format_MaXml;
         else if (req->display_name == MediaConchLib::display_html_name)
-            format = MediaConchLib::format_Html;
+            cr.format = MediaConchLib::format_Html;
         else if (req->display_name == MediaConchLib::display_jstree_name)
-            format = MediaConchLib::format_JsTree;
+            cr.format = MediaConchLib::format_JsTree;
         else if (req->display_name == MediaConchLib::display_simple_name)
-            format = MediaConchLib::format_Simple;
+            cr.format = MediaConchLib::format_Simple;
         else if (req->display_name == MediaConchLib::display_csv_name)
-            format = MediaConchLib::format_CSV;
+            cr.format = MediaConchLib::format_CSV;
 
-        const std::string* display_name = req->display_name.length() ? &req->display_name : NULL;
-        const std::string* display_content = req->display_content.length() ? &req->display_content : NULL;
-        if (format != MediaConchLib::format_Xml)
-            display_name = NULL;
+        std::string d_name = req->display_name;
+        std::string d_content = req->display_content;
+        cr.display_name = d_name.size() ? &d_name : NULL;
+        cr.display_content = d_content.size() ? &d_content : NULL;
+        if (cr.format != MediaConchLib::format_Xml)
+            cr.display_name = NULL;
 
-        std::bitset<MediaConchLib::report_Max> report_set;
         for (size_t j = 0; j < req->reports.size(); ++j)
         {
             if (req->reports[j] == RESTAPI::MEDIAINFO)
-                report_set.set(MediaConchLib::report_MediaInfo);
+                cr.report_set.set(MediaConchLib::report_MediaInfo);
             if (req->reports[j] == RESTAPI::MEDIATRACE)
-                report_set.set(MediaConchLib::report_MediaTrace);
+                cr.report_set.set(MediaConchLib::report_MediaTrace);
             if (req->reports[j] == RESTAPI::IMPLEMENTATION)
-                report_set.set(MediaConchLib::report_MediaConch);
+                cr.report_set.set(MediaConchLib::report_MediaConch);
             if (req->reports[j] == RESTAPI::VERAPDF)
-                report_set.set(MediaConchLib::report_MediaVeraPdf);
+                cr.report_set.set(MediaConchLib::report_MediaVeraPdf);
             if (req->reports[j] == RESTAPI::DPFMANAGER)
-                report_set.set(MediaConchLib::report_MediaDpfManager);
+                cr.report_set.set(MediaConchLib::report_MediaDpfManager);
         }
 
-        if (!report_set.count() && !req->policies_ids.size() && !req->policies_contents.size())
-            report_set.set(MediaConchLib::report_MediaConch);
+        if (!cr.report_set.count() && !req->policies_ids.size() && !req->policies_contents.size())
+            cr.report_set.set(MediaConchLib::report_MediaConch);
 
-        std::vector<long> files;
         for (size_t i = 0; i < req->ids.size(); ++i)
         {
             long id = req->ids[i];
@@ -944,25 +946,28 @@ namespace MediaConch
                 FUN_CMD_END(Checker_Report)
             }
 
-            files.push_back(id);
+            cr.files.push_back(id);
         }
 
-        std::map<std::string, std::string> options;
+        for (size_t i = 0; i < req->policies_ids.size(); ++i)
+            cr.policies_ids.push_back(req->policies_ids[i]);
+
+        for (size_t i = 0; i < req->policies_contents.size(); ++i)
+            cr.policies_contents.push_back(req->policies_contents[i]);
+
         std::map<std::string, std::string>::const_iterator it = req->options.begin();
         for (; it != req->options.end(); ++it)
         {
             if (!it->first.size())
                 continue;
 
-            options[it->first.c_str()] = it->second;
+            cr.options[it->first.c_str()] = it->second;
         }
 
         // Output
         MediaConchLib::Checker_ReportRes result;
         std::string err;
-        if (d->MCL->checker_get_report(req->user, report_set, format, files,
-                                       req->policies_ids, req->policies_contents,
-                                       options, &result, err, display_name, display_content) < 0)
+        if (d->MCL->checker_get_report(cr, &result, err) < 0)
             FUN_CMD_NOK(res, err, -1)
         else
         {

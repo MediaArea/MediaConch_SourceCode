@@ -66,21 +66,21 @@ public:
     virtual int  update_file_error(int user, long id, std::string& err, bool has_error=true, const std::string& error_log="");
 
     // Report
-    virtual int save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
-                            const std::string& options,
-                            const std::string& report, MediaConchLib::compression,
-                            int mil_version, std::string& err);
-    virtual int update_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
-                              const std::string& options,
-                              const std::string& report, MediaConchLib::compression,
-                              int mil_version, std::string& err);
-    virtual int remove_report(int user, long filename, std::string& err);
-    virtual void get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+    virtual int  save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+                             const std::string& options,
+                             const std::string& report, MediaConchLib::compression,
+                             int mil_version, std::string& err);
+    virtual int  update_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
+                               const std::string& options,
+                               const std::string& report, MediaConchLib::compression,
+                               int mil_version, std::string& err);
+    virtual int  remove_report(int user, long filename, std::string& err);
+    virtual int  get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& options,
                             std::string& report, MediaConchLib::compression&, std::string& err);
-    virtual bool report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
+    virtual int  report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
                                       MediaConchLib::format format, const std::string& options,
-                                      std::string& err);
+                                      bool& registered, std::string& err);
     virtual int  version_registered(int user, long file_id, std::string& err);
     virtual int  get_elements(int user, std::vector<std::string>& vec, std::string& err);
     virtual int  get_elements(int user, std::vector<long>& vec, std::string& err);

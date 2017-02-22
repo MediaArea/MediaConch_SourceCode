@@ -257,6 +257,9 @@
     <ClCompile Include="..\..\..\Source\Common\PluginPreHook.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\Reports.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -513,6 +516,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Reports.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
