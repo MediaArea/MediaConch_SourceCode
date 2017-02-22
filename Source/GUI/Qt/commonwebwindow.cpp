@@ -47,6 +47,13 @@ void CommonWebWindow::display_html()
 #endif
 
     main_window->web_view->setHtml(html.toUtf8());
+
+#if defined(WEB_MACHINE_ENGINE)
+    main_window->web_view->setHtml(html.toUtf8(), url);
+#endif
+#if defined(WEB_MACHINE_KIT)
+    main_window->web_view->setContent(html.toUtf8(), "text/html", url); //If we use setHtml(), HTML is parsed with local codepage instead of UTF-8
+#endif
 }
 
 }
