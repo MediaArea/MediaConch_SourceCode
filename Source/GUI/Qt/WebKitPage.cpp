@@ -8,7 +8,6 @@
 
 #if defined(WEB_MACHINE_KIT)
 
-#include <QWebPage>
 #include <QWebFrame>
 #include <QWebElement>
 #include <QWebElementCollection>

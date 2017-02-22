@@ -29,13 +29,6 @@
     #include <QFontDatabase>
 #endif
 
-#if defined(WEB_MACHINE_ENGINE)
-#include <QWebChannel>
-#endif
-#if defined(WEB_MACHINE_KIT)
-#include <QWebFrame>
-#endif
-
 #if defined(WINDOWS)
     #include <windows.h>
 #else

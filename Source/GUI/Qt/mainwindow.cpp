@@ -12,8 +12,8 @@
 #include "publicpolicieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
-#include "webview.h"
-#include "webpage.h"
+#include "WebView.h"
+#include "WebPage.h"
 #include "Common/Reports.h"
 #include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
@@ -52,14 +52,6 @@
     #include <QFontDatabase>
 #endif
 #include <sstream>
-
-#if defined(WEB_MACHINE_ENGINE)
-#include <QWebEnginePage>
-#include <QWebChannel>
-#endif
-#if defined(WEB_MACHINE_KIT)
-#include <QWebFrame>
-#endif
 
 namespace MediaConch {
 

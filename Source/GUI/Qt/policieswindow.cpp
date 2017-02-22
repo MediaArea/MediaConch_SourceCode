@@ -11,14 +11,6 @@
 #include "WebView.h"
 #include "progressbar.h"
 
-#if defined(WEB_MACHINE_ENGINE)
-#include <QWebChannel>
-#endif
-#if defined(WEB_MACHINE_KIT)
-#include <QWebFrame>
-#endif
-#include <QProgressBar>
-
 namespace MediaConch {
 
 //***************************************************************************

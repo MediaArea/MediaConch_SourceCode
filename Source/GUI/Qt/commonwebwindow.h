@@ -8,7 +8,6 @@
 #define COMMONWEBWINDOW_H
 
 #include <QWidget>
-#include "WebView.h"
 
 namespace MediaConch
 {

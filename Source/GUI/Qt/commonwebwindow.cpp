@@ -6,15 +6,9 @@
 
 #include "commonwebwindow.h"
 #include "mainwindow.h"
+#include "WebView.h"
 #include "WebPage.h"
 #include "progressbar.h"
-#if defined(WEB_MACHINE_ENGINE)
-#include <QWebEnginePage>
-#include <QWebChannel>
-#endif
-#if defined(WEB_MACHINE_KIT)
-#include <QWebFrame>
-#endif
 #include <QFile>
 #include <QProgressBar>
 
