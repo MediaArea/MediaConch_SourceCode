@@ -29,13 +29,6 @@
     #include <QFontDatabase>
 #endif
 
-#if defined(WEB_MACHINE_ENGINE)
-#include <QWebChannel>
-#endif
-#if defined(WEB_MACHINE_KIT)
-#include <QWebFrame>
-#endif
-
 #if defined(WINDOWS)
     #include <windows.h>
 #else
@@ -48,35 +41,13 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-CheckerWindow::CheckerWindow(MainWindow *parent) : mainwindow(parent), result_table(NULL)
+CheckerWindow::CheckerWindow(MainWindow *parent) : CommonWebWindow(parent), result_table(NULL)
 {
-    // Visual elements
-    progress_bar = NULL;
-    main_view = NULL;
-    result_index = 0;
-    is_finished = false;
 }
 
 CheckerWindow::~CheckerWindow()
 {
-    if (result_table)
-    {
-        delete result_table;
-        result_table = NULL;
-    }
-    if (main_view)
-    {
-        mainwindow->remove_widget_from_layout(main_view);
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)main_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        delete main_view;
-        main_view = NULL;
-    }
-    clear_visual_elements();
+    delete result_table;
 }
 
 //***************************************************************************
@@ -84,37 +55,9 @@ CheckerWindow::~CheckerWindow()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void CheckerWindow::clear_visual_elements()
+void CheckerWindow::create_web_view_finished()
 {
-    if (main_view)
-        main_view->hide();
-
-    if (progress_bar)
-    {
-        mainwindow->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::create_web_view_finished(bool ok)
-{
-    if (!main_view || !ok)
-    {
-        create_web_view();
-        mainwindow->set_msg_to_status_bar("Problem to load the checker page");
-        return;
-    }
-
-    if (result_table)
-    {
-        delete result_table;
-        result_table = NULL;
-    }
-    is_finished = true;
-
-    result_table = new ResultTable(mainwindow, (WebPage*)main_view->page());
+    result_table = new ResultTable(main_window, (WebPage*)main_window->web_view->page());
     if (files.size())
     {
         for (size_t i = 0; i < files.size(); ++i)
@@ -122,88 +65,22 @@ void CheckerWindow::create_web_view_finished(bool ok)
         files.clear();
         page_start_waiting_loop();
     }
-
-    if (progress_bar)
-    {
-        mainwindow->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    main_view->show();
-    main_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainwindow->set_widget_to_layout(main_view);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::set_web_view_content(QString& html)
-{
-    if (!main_view)
-        main_view = new WebView(mainwindow);
-    main_view->hide();
-
-    WebPage* page = new WebPage(mainwindow, main_view);
-    main_view->setPage(page);
-
-    QObject::connect(main_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(main_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
-
-    QUrl url = QUrl("qrc:/html");
-    if (!url.isValid())
-        return;
-
-#if defined(WEB_MACHINE_ENGINE)
-    QWebChannel *channel = new QWebChannel(page);
-    page->setWebChannel(channel);
-    channel->registerObject("webpage", page);
-    main_view->setHtml(html.toUtf8(), url);
-#endif
-#if defined(WEB_MACHINE_KIT)
-    main_view->setContent(html.toUtf8(), "text/html", url);
-#endif
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::create_web_view()
 {
-    if (main_view)
-    {
-        mainwindow->remove_widget_from_layout(main_view);
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)main_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        delete main_view;
-        main_view = NULL;
-    }
-
-    clear_visual_elements();
-
-    progress_bar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progress_bar);
-    progress_bar->get_progress_bar()->setValue(0);
-    progress_bar->show();
-
-    QString html = create_html();
-    set_web_view_content(html);
+    display_html();
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::change_local_files(const QStringList& files)
 {
-    if (!main_view || !main_view->page())
+    if (!main_window->web_view || !main_window->web_view->page())
         return;
 
-    WebPage* p = (WebPage*)main_view->page();
+    WebPage* p = (WebPage*)main_window->web_view->page();
     p->change_local_files(files);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::hide()
-{
-    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -215,11 +92,11 @@ void CheckerWindow::create_policy_options(QString& policies)
 {
     MediaConchLib::Get_Policies list;
     QString err;
-    mainwindow->get_policies("JSON", list, err);
+    main_window->get_policies("JSON", list, err);
 
     QString system_policy;
     QString user_policy;
-    int selected_policy = mainwindow->select_correct_policy();
+    int selected_policy = main_window->select_correct_policy();
     for (size_t i = 0; list.policies && i < list.policies->size(); ++i)
     {
         if (!list.policies->at(i))
@@ -262,8 +139,8 @@ void CheckerWindow::create_displays_options(QString& displays)
 {
     QString system_display;
     QString user_display;
-    int selected_display = mainwindow->select_correct_display();
-    const std::vector<QString>& displays_list = mainwindow->get_displays();
+    int selected_display = main_window->select_correct_display();
+    const std::vector<QString>& displays_list = main_window->get_displays();
     for (size_t i = 0; i < displays_list.size(); ++i)
     {
         QFileInfo file(displays_list[i]);
@@ -297,7 +174,7 @@ void CheckerWindow::create_displays_options(QString& displays)
 //---------------------------------------------------------------------------
 void CheckerWindow::create_verbosity_options(QString& verbosity)
 {
-    int selected_verbosity = mainwindow->select_correct_verbosity();
+    int selected_verbosity = main_window->select_correct_verbosity();
     for (int i = 0; i < 6; ++i)
     {
         verbosity += QString("<option ");
@@ -406,7 +283,7 @@ void CheckerWindow::load_form_in_template(QString& html)
     QRegExp reg("\\{\\{[\\s]+form\\((\\w+)\\)[\\s]\\}\\}");
     int pos = 0;
 
-    bool has_libcurl = mainwindow->mil_has_curl_enabled();
+    bool has_libcurl = main_window->mil_has_curl_enabled();
     while ((pos = reg.indexIn(html, pos)) != -1)
     {
         QString value = reg.cap(1);
@@ -645,13 +522,6 @@ void CheckerWindow::set_webmachine_script_in_template(QString& html)
 //---------------------------------------------------------------------------
 void CheckerWindow::create_html_base(const QString& checker, const QString& result, QString& base)
 {
-    QFile template_html(":/base.html");
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = template_html.readAll();
-    template_html.close();
-
-    base = QString(html);
-
     set_webmachine_script_in_template(base);
     change_body_script_in_template(base);
     change_checker_in_template(checker, base);
@@ -659,21 +529,19 @@ void CheckerWindow::create_html_base(const QString& checker, const QString& resu
 }
 
 //---------------------------------------------------------------------------
-QString CheckerWindow::create_html()
+void CheckerWindow::create_html(QString &html)
 {
     QString checker;
     create_html_checker(checker);
     QString result;
     create_html_result(result);
-    QString base;
-    create_html_base(checker, result, base);
-    return base;
+    create_html_base(checker, result, html);
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::add_file_to_result_table(const std::string& full_path)
 {
-    if (!result_table || !is_finished)
+    if (!result_table)
     {
         files.push_back(full_path);
         return;
@@ -684,10 +552,10 @@ void CheckerWindow::add_file_to_result_table(const std::string& full_path)
 
 void CheckerWindow::page_start_waiting_loop()
 {
-    if (!main_view || !is_finished)
+    if (!main_window->web_view || !result_table)
         return;
 
-    WebPage* page = (WebPage*)main_view->page();
+    WebPage* page = (WebPage*)main_window->web_view->page();
     if (!page)
         return;
 

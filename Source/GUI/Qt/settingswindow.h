@@ -8,31 +8,21 @@
 #define SETTINGSWINDOW_H
 
 #include <QWidget>
-#include "WebView.h"
+#include "commonwebwindow.h"
 
 namespace MediaConch
 {
 
-class MainWindow;
-class WebPage;
-class ProgressBar;
-
-class SettingsWindow : QObject
+class SettingsWindow : public CommonWebWindow
 {
-    Q_OBJECT
-
 public:
     explicit SettingsWindow(MainWindow* parent);
     ~SettingsWindow();
 
     void display_settings();
-    void clear_visual_elements();
+    void create_web_view_finished();
 
 private:
-    MainWindow*   parent;
-    WebView*      settings_view;
-    ProgressBar*  progress_bar;
-
     void create_html(QString& html);
 
     void create_html_settings(QString& settings);
@@ -56,9 +46,6 @@ private:
     void add_load_policy_path_to_js_input(WebPage *page);
     void add_save_display_path_to_js_input(WebPage *page);
     void add_load_display_path_to_js_input(WebPage *page);
-
-private Q_SLOTS:
-    void create_settings_finished(bool ok);
 };
 
 }

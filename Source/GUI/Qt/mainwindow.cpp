@@ -12,6 +12,8 @@
 #include "publicpolicieswindow.h"
 #include "displaywindow.h"
 #include "helpwindow.h"
+#include "WebView.h"
+#include "WebPage.h"
 #include "Common/Reports.h"
 #include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
@@ -66,6 +68,7 @@ const std::string MainWindow::version = "16.10";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    web_view(NULL),
     ui(new Ui::MainWindow),
     db(NULL),
     workerfiles(this),
@@ -129,10 +132,26 @@ MainWindow::MainWindow(QWidget *parent) :
     clear_msg_in_status_bar();
     connect(this, SIGNAL(status_bar_show_message(const QString&, int)),
             statusBar(), SLOT(showMessage(const QString&, int)));
+    connect(this, SIGNAL(status_bar_clear_message()),
+            statusBar(), SLOT(clearMessage()));
 
     // worker load existing files
     workerfiles.fill_registered_files_from_db();
     workerfiles.start();
+
+    // WebView
+    web_view = new WebView(this);
+    WebPage* page = new WebPage(this, web_view);
+    web_view->setPage(page);
+#if defined(WEB_MACHINE_ENGINE)
+    QWebChannel *channel = new QWebChannel(page);
+    page->setWebChannel(channel);
+    channel->registerObject("webpage", page);
+#endif
+    connect(web_view, SIGNAL(loadProgress(int)), this, SLOT(loadProgress_Custom(int)));
+    connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished_Custom(bool)));
+    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    set_widget_to_layout(web_view);
 
     // Default
     add_default_displays();
@@ -145,6 +164,19 @@ MainWindow::~MainWindow()
     workerfiles.wait();
     delete ui;
     clearVisualElements();
+
+    if (web_view)
+    {
+        remove_widget_from_layout(web_view);
+#if defined(WEB_MACHINE_ENGINE)
+        WebPage* page = (WebPage*)web_view->page();
+        QWebChannel *channel = page ? page->webChannel() : NULL;
+        if (channel)
+            channel->deregisterObject(page);
+#endif
+        delete web_view;
+        web_view = NULL;
+    }
 }
 
 //***************************************************************************
@@ -554,6 +586,36 @@ void MainWindow::on_actionChooseSchema_triggered()
     Run();
 }
 
+//---------------------------------------------------------------------------
+void MainWindow::loadFinished_Custom(bool ok)
+{
+    if (!ok)
+    {
+        set_msg_to_status_bar("Problem to load the checker page");
+        return;
+    }
+
+    if (checkerView)
+        checkerView->create_web_view_finished();
+    if (policiesView)
+        policiesView->create_web_view_finished();
+    if (publicPoliciesView)
+        publicPoliciesView->create_web_view_finished();
+    if (displayView)
+        displayView->create_web_view_finished();
+    if (settingsView)
+        settingsView->create_web_view_finished();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::loadProgress_Custom(int progress)
+{
+    if (progress == 100)
+        status_bar_clear_message();
+    else
+        set_msg_to_status_bar(QString::number(progress) + "%");
+}
+
 //***************************************************************************
 // Help
 //***************************************************************************
@@ -690,14 +752,16 @@ void MainWindow::createSettingsView()
 //---------------------------------------------------------------------------
 void MainWindow::set_msg_to_status_bar(const QString& message)
 {
-    Q_EMIT status_bar_show_message(message, 5000);
+    if (message.isEmpty())
+        clear_msg_in_status_bar();
+    else
+        Q_EMIT status_bar_show_message(message, 5000);
 }
 
 //---------------------------------------------------------------------------
 void MainWindow::set_str_msg_to_status_bar(const std::string& message)
 {
-    QString str = QString().fromUtf8(message.c_str(), message.size());
-    Q_EMIT status_bar_show_message(str, 5000);
+    set_msg_to_status_bar(QString::fromStdString(message));
 }
 
 //---------------------------------------------------------------------------

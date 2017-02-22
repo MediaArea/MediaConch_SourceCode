@@ -10,13 +10,6 @@
 #include "WebPage.h"
 #include "WebView.h"
 #include "progressbar.h"
-
-#if defined(WEB_MACHINE_ENGINE)
-#include <QWebChannel>
-#endif
-#if defined(WEB_MACHINE_KIT)
-#include <QWebFrame>
-#endif
 #include <QProgressBar>
 
 namespace MediaConch {
@@ -25,13 +18,12 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-PublicPoliciesWindow::PublicPoliciesWindow(MainWindow *parent) : mainwindow(parent), web_view(NULL), progress_bar(NULL)
+PublicPoliciesWindow::PublicPoliciesWindow(MainWindow *parent) : CommonWebWindow(parent)
 {
 }
 
 PublicPoliciesWindow::~PublicPoliciesWindow()
 {
-    clear_visual_elements();
 }
 
 //***************************************************************************
@@ -41,57 +33,7 @@ PublicPoliciesWindow::~PublicPoliciesWindow()
 //---------------------------------------------------------------------------
 void PublicPoliciesWindow::display_public_policies()
 {
-    create_html();
-}
-
-//---------------------------------------------------------------------------
-void PublicPoliciesWindow::clear_visual_elements()
-{
-    if (progress_bar)
-    {
-        mainwindow->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    if (web_view)
-    {
-#if defined(WEB_MACHINE_ENGINE)
-        WebPage* page = (WebPage*)web_view->page();
-        QWebChannel *channel = page ? page->webChannel() : NULL;
-        if (channel)
-            channel->deregisterObject(page);
-#endif
-        mainwindow->remove_widget_from_layout(web_view);
-        delete web_view;
-        web_view = NULL;
-    }
-}
-
-//***************************************************************************
-// WEB
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void PublicPoliciesWindow::create_web_view_finished(bool ok)
-{
-    if (!web_view || !ok)
-    {
-        create_html();
-        mainwindow->set_msg_to_status_bar("Problem to load the policy page");
-        return;
-    }
-
-    if (progress_bar)
-    {
-        mainwindow->remove_widget_from_layout(progress_bar);
-        delete progress_bar;
-        progress_bar = NULL;
-    }
-
-    web_view->show();
-    web_view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainwindow->set_widget_to_layout(web_view);
+    display_html();
 }
 
 //---------------------------------------------------------------------------
@@ -173,13 +115,6 @@ void PublicPoliciesWindow::create_html_policy(QString& policy)
 //---------------------------------------------------------------------------
 void PublicPoliciesWindow::create_html_base(const QString& policy, QString& base)
 {
-    QFile template_html(":/base.html");
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = template_html.readAll();
-    template_html.close();
-
-    base = QString(html);
-
     set_webmachine_script_in_template(base);
     change_qt_scripts_in_template(base);
     change_checker_in_template(policy, base);
@@ -187,41 +122,11 @@ void PublicPoliciesWindow::create_html_base(const QString& policy, QString& base
 }
 
 //---------------------------------------------------------------------------
-void PublicPoliciesWindow::create_html()
+void PublicPoliciesWindow::create_html(QString &html)
 {
-    clear_visual_elements();
     QString policy;
     create_html_policy(policy);
-    QString html;
     create_html_base(policy, html);
-
-    progress_bar = new ProgressBar(mainwindow);
-    mainwindow->set_widget_to_layout(progress_bar);
-    progress_bar->get_progress_bar()->setValue(0);
-    progress_bar->show();
-
-    web_view = new WebView(mainwindow);
-    web_view->hide();
-
-    WebPage* page = new WebPage(mainwindow, web_view);
-    web_view->setPage(page);
-
-    QObject::connect(web_view, SIGNAL(loadProgress(int)), progress_bar->get_progress_bar(), SLOT(setValue(int)));
-    QObject::connect(web_view, SIGNAL(loadFinished(bool)), this, SLOT(create_web_view_finished(bool)));
-
-    QUrl url = QUrl("qrc:/html");
-    if (!url.isValid())
-        return;
-
-#if defined(WEB_MACHINE_ENGINE)
-    QWebChannel *channel = new QWebChannel(page);
-    page->setWebChannel(channel);
-    channel->registerObject("webpage", page);
-    web_view->setHtml(html.toUtf8(), url);
-#endif
-#if defined(WEB_MACHINE_KIT)
-    web_view->setContent(html.toUtf8(), "text/html", url);
-#endif
 }
 
 //***************************************************************************

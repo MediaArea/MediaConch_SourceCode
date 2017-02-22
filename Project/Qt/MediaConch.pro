@@ -84,6 +84,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/WatchFoldersManager.cpp \
                     ../../Source/Common/WatchFolder.cpp \
                     ../../Source/GUI/Qt/main.cpp \
+                    ../../Source/GUI/Qt/commonwebwindow.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
                     ../../Source/GUI/Qt/mainwindow.cpp \
                     ../../Source/GUI/Qt/settingswindow.cpp \
@@ -146,6 +147,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/PluginLog.h \
                     ../../Source/Common/PluginFileLog.h \
                     ../../Source/Common/WatchFoldersManager.h \
+                    ../../Source/GUI/Qt/commonwebwindow.h \
                     ../../Source/GUI/Qt/helpwindow.h \
                     ../../Source/GUI/Qt/WebPage.h \
                     ../../Source/GUI/Qt/WebCommonPage.h \

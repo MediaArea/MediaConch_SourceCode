@@ -15,13 +15,6 @@
 #include "WebView.h"
 #include "WebPage.h"
 
-#if defined(WEB_MACHINE_ENGINE)
-#include <QWebChannel>
-#endif
-#if defined(WEB_MACHINE_KIT)
-#include <QWebFrame>
-#include <QWebElement>
-#endif
 
 #include "progressbar.h"
 

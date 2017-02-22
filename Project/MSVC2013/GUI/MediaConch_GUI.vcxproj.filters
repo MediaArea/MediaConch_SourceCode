@@ -92,22 +92,10 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\settingswindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_checkerwindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_settingswindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_policieswindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
     <ClCompile Include="_Automated\moc_helpwindow.cpp">
-      <Filter>Source Files\_Automated</Filter>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_displaywindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp">
@@ -239,7 +227,25 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="_Automated\moc_publicpolicieswindow.cpp">
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_WebKitView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Common\PluginPreHook.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\commonwebwindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="_Automated\moc_commonwebwindow.cpp">
       <Filter>Source Files\_Automated</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp">
@@ -254,7 +260,7 @@
     <ClCompile Include="_Automated\moc_WebKitView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Common\PluginPreHook.cpp">
+    <ClCompile Include="..\..\..\Source\Common\Reports.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -513,6 +519,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebKitView.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\commonwebwindow.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Common\Reports.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
