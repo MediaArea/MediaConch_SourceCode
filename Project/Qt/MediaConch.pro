@@ -38,6 +38,13 @@ isEmpty(WEB_MACHINE) {
     }
 }
 
+!defined(packagesExist, test) {
+    defineTest(packagesExist) {
+        system(pkg-config $$ARGS): return(true)
+        return(false)
+    }
+}
+
 !macx:TARGET = mediaconch-gui
 macx:TARGET = MediaConch
 TEMPLATE = app
