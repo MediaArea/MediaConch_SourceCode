@@ -793,7 +793,7 @@ namespace MediaConch
         QFileInfoList tmp = dir.entryInfoList(QDir::Files);
         list << tmp;
 
-        tmp = dir.entryInfoList(QDir::Dirs | QDir::NoDot | QDir::NoDotDot);
+        tmp = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (int i = 0; i < tmp.size(); ++i)
         {
             QDir tmp_dir(tmp[i].absoluteFilePath());
