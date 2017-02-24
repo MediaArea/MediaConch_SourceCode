@@ -35,7 +35,6 @@ public:
     void                        reset_display_xslt() { display_xslt.clear(); }
     void                        change_local_files(const QStringList& files);
     void                        add_file_to_result_table(const std::string& full_path);
-    void                        page_start_waiting_loop();
 
 private:
     // Visual elements
@@ -58,9 +57,8 @@ private:
     void remove_element_in_template(QString& html);
     void load_form_in_template(QString& html);
     void create_html(QString &html);
-    void create_html_base(const QString& checker, const QString& result, QString& base);
+    void create_html_base(const QString& checker, QString& base);
     void create_html_checker(QString&);
-    void create_html_result(QString&);
     QString create_form_upload();
     QString create_form_online();
     QString create_form_repository();
@@ -68,7 +66,6 @@ private:
     void remove_li_online(int& pos, QString& html);
     void change_collapse_form(QString& html);
     void change_checker_in_template(const QString& checker, QString& html);
-    void change_result_in_template(const QString& result, QString& html);
     void change_body_script_in_template(QString& html);
     void set_webmachine_script_in_template(QString& html);
 };

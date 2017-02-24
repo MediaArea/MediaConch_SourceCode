@@ -129,7 +129,7 @@ std::string WorkerFiles::get_filename_from_registered_file_id(long file_id)
 }
 
 //---------------------------------------------------------------------------
-void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& files)
+void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered*>& files)
 {
     working_files_mutex.lock();
     std::map<std::string, FileRegistered*>::iterator it = working_files.begin();
@@ -138,7 +138,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered>& fi
         if (!it->second)
             continue;
 
-        files[it->first] = FileRegistered(*it->second);
+        files[it->first] = new FileRegistered(*it->second);
     }
     working_files_mutex.unlock();
 }
@@ -174,6 +174,8 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
         }
         else
             fr = new FileRegistered;
+        if (!force)
+            fr->analyzed = working_files[full_file]->analyzed;
     }
     else
         fr = new FileRegistered;
@@ -537,21 +539,30 @@ void WorkerFiles::update_unfinished_files()
 }
 
 //---------------------------------------------------------------------------
-void WorkerFiles::remove_file_registered_from_file(const std::string& file)
+void WorkerFiles::remove_file_registered_from_id(long file_id)
 {
+    std::string file;
+    FileRegistered *fr = NULL;
     working_files_mutex.lock();
-    std::map<std::string, FileRegistered*>::iterator it = working_files.find(file);
-    if (it == working_files.end() || !working_files[file])
+    std::map<std::string, FileRegistered*>::iterator it = working_files.begin();
+    for (; it != working_files.end(); ++it)
     {
-        working_files_mutex.unlock();
-        return;
+        if (!it->second)
+            continue;
+
+        if (it->second->file_id == file_id)
+        {
+            fr = it->second;
+            file = it->first;
+            it->second = NULL;
+            working_files.erase(it);
+            break;
+        }
     }
-
-    FileRegistered* fr = working_files[file];
-
-    working_files[file] = NULL;
-    working_files.erase(it);
     working_files_mutex.unlock();
+
+    if (!fr)
+        return;
 
     to_delete_files_mutex.lock();
     to_delete_files[file] = fr;

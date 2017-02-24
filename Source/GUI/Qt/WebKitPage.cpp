@@ -155,6 +155,7 @@ namespace MediaConch
     {
         mainFrame()->evaluateJavaScript(js);
     }
+
 }
 
 #endif

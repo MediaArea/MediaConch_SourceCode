@@ -24,13 +24,13 @@ public:
     virtual void use_javascript(const QString& js);
 
 protected:
-    virtual bool acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request, QWebPage::NavigationType type);
-    QString chooseFile(QWebFrame *frame, const QString& suggested);
-    bool    extension(Extension extension, const ExtensionOption * option = 0, ExtensionReturn *output = 0);
-    bool    supportsExtension(Extension extension) const;
+    virtual bool   acceptNavigationRequest(QWebFrame *frame, const QNetworkRequest& request, QWebPage::NavigationType type);
+    QString        chooseFile(QWebFrame *frame, const QString& suggested);
+    bool           extension(Extension extension, const ExtensionOption * option = 0, ExtensionReturn *output = 0);
+    bool           supportsExtension(Extension extension) const;
 
 public Q_SLOTS:
-    void    on_load_finished(bool ok);
+    void           on_load_finished(bool ok);
 
 private:
     QWebInspector *inspector;

@@ -232,17 +232,13 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
     bool force = fixer;
     if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, force, create_policy, err) < 0)
         return -1;
-
-    if (checkerView)
-        checkerView->add_file_to_result_table(full_path);
     return 0;
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::remove_file_to_list(const QString& file)
+void MainWindow::remove_file_to_list(long file_id)
 {
-    std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
-    workerfiles.remove_file_registered_from_file(filename);
+    workerfiles.remove_file_registered_from_id(file_id);
 }
 
 //---------------------------------------------------------------------------
@@ -303,7 +299,7 @@ void MainWindow::Run()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::get_registered_files(std::map<std::string, FileRegistered>& files)
+void MainWindow::get_registered_files(std::map<std::string, FileRegistered*>& files)
 {
     workerfiles.get_registered_files(files);
 }
@@ -696,13 +692,6 @@ void MainWindow::createCheckerView()
 
     checkerView = new CheckerWindow(this);
     checkerView->create_web_view();
-    std::map<std::string, FileRegistered> files;
-    workerfiles.get_registered_files(files);
-
-    std::map<std::string, FileRegistered>::iterator it = files.begin();
-    for (; it != files.end(); ++it)
-        checkerView->add_file_to_result_table(it->first);
-    checkerView->page_start_waiting_loop();
 }
 
 //---------------------------------------------------------------------------
@@ -1573,12 +1562,6 @@ FileRegistered* MainWindow::get_file_registered_from_id(long id)
 std::string MainWindow::get_filename_from_registered_file_id(long file_id)
 {
     return workerfiles.get_filename_from_registered_file_id(file_id);
-}
-
-//---------------------------------------------------------------------------
-void MainWindow::remove_file_registered_from_file(const std::string& file)
-{
-    workerfiles.remove_file_registered_from_file(file);
 }
 
 //---------------------------------------------------------------------------

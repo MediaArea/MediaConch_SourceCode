@@ -12,6 +12,9 @@
 #include <QWebEnginePage>
 #include <QWebChannel>
 #include <QMap>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonObject>
 
 namespace MediaConch {
 
