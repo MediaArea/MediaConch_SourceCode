@@ -7,6 +7,14 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.02, 2017-02-28
+--------------
+New policy example (TN2162)
+Fix incorrect namespaces in schemaLocation (Thanks to kimec)
+Report refactoring
+Several minor FFV1 related bug fixed
+Support of V_FFV1 codec identifier in Matroska
+
 Version 17.01.1, 2017-02-02
 --------------
 Fix a performance regression in the matroska parser
