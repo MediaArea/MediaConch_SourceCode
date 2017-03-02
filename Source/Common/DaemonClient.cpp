@@ -579,7 +579,7 @@ int DaemonClient::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_R
     }
 
     // FORMAT
-    if (cr.format == MediaConchLib::format_Xml)
+    if (cr.format == MediaConchLib::format_Max)
     {
         if (cr.display_name)
             req.display_name = *cr.display_name;
