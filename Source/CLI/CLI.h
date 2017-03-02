@@ -80,7 +80,7 @@ namespace MediaConch
         std::vector<std::string> plugins;
         std::vector<std::pair<std::string,std::string> > options;
         std::string              error;
-        std::string              display_file;
+        std::string              display_content;
         std::string              configuration_file;
         std::string              plugins_configuration_file;
         std::string              policy_reference_file;

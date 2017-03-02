@@ -158,13 +158,9 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
         return false;
     }
 
-    // Forcing some formats
-    if (Format == MediaConchLib::format_Text && !display.empty())
-        Format = format_Xml; //Forcing Text (default) to XML
-
-    if (Format != MediaConchLib::format_Xml && !display.empty())
+    if (Format != MediaConchLib::format_Max && !display.empty())
     {
-        reason = "If a display is used, no other output format can be used";
+        reason = "If a display is used, no other output format can be used.";
         return false;
     }
 

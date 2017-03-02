@@ -43,7 +43,7 @@ namespace MediaConch
                  watch_folder_recursive(true), create_policy_mode(false), file_information(false),
                  plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
     {
-        format = MediaConchLib::format_Simple;
+        format = MediaConchLib::format_Max;
     }
 
     //--------------------------------------------------------------------------
@@ -74,13 +74,18 @@ namespace MediaConch
             if (!MCL.get_implementation_schema_file().length())
                 MCL.create_default_implementation_schema();
 
-            if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_file,
+            if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_content,
                                                         format, err))
             {
                 if (err == "MicroMediaTrace requires an XML output.")
                     err += " Add -fx.";
                 return CLI_RETURN_ERROR;
             }
+
+            if (format == MediaConchLib::format_Max && display_content.empty())
+                format = MediaConchLib::format_Simple;
+            else if (format == MediaConchLib::format_Max && !display_content.empty())
+                format = MediaConchLib::format_Xml;
         }
 
         MCL.set_configuration_file(configuration_file);
@@ -207,7 +212,7 @@ namespace MediaConch
         for (size_t i = 0; i < policies.size(); ++i)
             cr.policies_contents.push_back(policies[i]);
 
-        cr.display_name = &display_file;
+        cr.display_content = &display_content;
         MCL.checker_get_report(cr, &result, error);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
@@ -416,7 +421,25 @@ namespace MediaConch
     //--------------------------------------------------------------------------
     void CLI::set_display_file(const std::string& file)
     {
-        display_file = file;
+        std::ifstream file_handler(file.c_str(), std::ios_base::ate);
+        if (!file_handler.is_open())
+        {
+            display_content = std::string();
+            return;
+        }
+
+        int size = file_handler.tellg();
+        if (size < 0)
+        {
+            display_content = std::string();
+            return;
+        }
+
+        file_handler.seekg(0, file_handler.beg);
+        display_content.reserve(size);
+        display_content.assign(std::istreambuf_iterator<char>(file_handler),
+                               std::istreambuf_iterator<char>());
+        file_handler.close();
     }
 
     //--------------------------------------------------------------------------
