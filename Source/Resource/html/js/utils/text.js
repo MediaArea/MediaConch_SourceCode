@@ -19,8 +19,13 @@ var textUtils = (function() {
         return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
     }
 
+    var truncate = function(str, length) {
+        return str.length > length ? str.substring(0, length) + '&hellip;' : str
+    }
+
     return {
         sanitizeHtml: sanitizeHtml,
         nl2br: nl2br,
+        truncate: truncate,
     };
 })();

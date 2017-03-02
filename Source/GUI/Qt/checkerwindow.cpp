@@ -41,13 +41,12 @@ namespace MediaConch {
 // Constructor / Desructor
 //***************************************************************************
 
-CheckerWindow::CheckerWindow(MainWindow *parent) : CommonWebWindow(parent), result_table(NULL)
+CheckerWindow::CheckerWindow(MainWindow *parent) : CommonWebWindow(parent)
 {
 }
 
 CheckerWindow::~CheckerWindow()
 {
-    delete result_table;
 }
 
 //***************************************************************************
@@ -57,14 +56,6 @@ CheckerWindow::~CheckerWindow()
 //---------------------------------------------------------------------------
 void CheckerWindow::create_web_view_finished()
 {
-    result_table = new ResultTable(main_window, (WebPage*)main_window->web_view->page());
-    if (files.size())
-    {
-        for (size_t i = 0; i < files.size(); ++i)
-            result_table->add_file_to_result_table(files[i]);
-        files.clear();
-        page_start_waiting_loop();
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -446,19 +437,6 @@ void CheckerWindow::create_html_checker(QString& checker)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::create_html_result(QString& result)
-{
-    QFile template_html(":/result.html");
-
-    template_html.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray html = template_html.readAll();
-    template_html.close();
-
-    result = QString(html);
-    remove_template_tags(result);
-}
-
-//---------------------------------------------------------------------------
 void CheckerWindow::change_checker_in_template(const QString& checker, QString& html)
 {
     QRegExp reg("\\{% block checker %\\}\\{% endblock %\\}");
@@ -470,17 +448,6 @@ void CheckerWindow::change_checker_in_template(const QString& checker, QString& 
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::change_result_in_template(const QString& result, QString& html)
-{
-    QRegExp reg("\\{% block result %\\}\\{% endblock %\\}");
-    int pos = 0;
-
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), result);
-}
-
-//---------------------------------------------------------------------------
 void CheckerWindow::change_body_script_in_template(QString& html)
 {
     QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
@@ -488,15 +455,25 @@ void CheckerWindow::change_body_script_in_template(QString& html)
     int     pos = 0;
 
     reg.setMinimal(true);
+
 #if defined(WEB_MACHINE_KIT)
-    script = "        <script type=\"text/javascript\" src=\"qrc:/checker.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/checker/webkit.js\"></script>\n";
 #elif defined(WEB_MACHINE_ENGINE)
-    script = "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
-             "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
-             "        <script type=\"text/javascript\" src=\"qrc:/checker.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/qtwebchannel/qwebchannel.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/webengine.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/checker/webengine.js\"></script>\n";
 #endif
-    script += "       <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n";
-    script += "       <script type=\"text/javascript\" src=\"qrc:/menu.js\"></script>\n";
+    script += "        <script type=\"text/javascript\" src=\"qrc:/checker/base.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/checker/cellImplementation.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/checker/cellMediaInfo.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/checker/cellMediaTrace.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/checker/cellPolicy.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/checker/cellStatus.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/checker/table.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/utils/size.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/utils/text.js\"></script>\n"
+              "        <script type=\"text/javascript\" src=\"qrc:/menu.js\"></script>\n";
 
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), script);
@@ -520,12 +497,11 @@ void CheckerWindow::set_webmachine_script_in_template(QString& html)
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::create_html_base(const QString& checker, const QString& result, QString& base)
+void CheckerWindow::create_html_base(const QString& checker, QString& base)
 {
     set_webmachine_script_in_template(base);
     change_body_script_in_template(base);
     change_checker_in_template(checker, base);
-    change_result_in_template(result, base);
 }
 
 //---------------------------------------------------------------------------
@@ -533,33 +509,7 @@ void CheckerWindow::create_html(QString &html)
 {
     QString checker;
     create_html_checker(checker);
-    QString result;
-    create_html_result(result);
-    create_html_base(checker, result, html);
-}
-
-//---------------------------------------------------------------------------
-void CheckerWindow::add_file_to_result_table(const std::string& full_path)
-{
-    if (!result_table)
-    {
-        files.push_back(full_path);
-        return;
-    }
-
-    result_table->add_file_to_result_table(full_path);
-}
-
-void CheckerWindow::page_start_waiting_loop()
-{
-    if (!main_window->web_view || !result_table)
-        return;
-
-    WebPage* page = (WebPage*)main_window->web_view->page();
-    if (!page)
-        return;
-
-    page->use_javascript("startWaitingLoop()");
+    create_html_base(checker, html);
 }
 
 }

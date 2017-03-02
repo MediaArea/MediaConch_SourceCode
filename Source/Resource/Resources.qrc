@@ -9,8 +9,6 @@
         <file alias="webengine.js">html/js/webengine.js</file>
         <file alias="settings.html">html/settings.html</file>
         <file alias="checker.html">html/checker.html</file>
-        <file alias="result.html">html/result.html</file>
-        <file alias="resultTableRow.html">html/resultTableRow.html</file>
         <file alias="formUpload.html">html/formUpload.html</file>
         <file alias="formOnline.html">html/formOnline.html</file>
         <file alias="formRepository.html">html/formRepository.html</file>
@@ -26,8 +24,17 @@
         <file alias="utils/text.js">html/js/utils/text.js</file>
         <file alias="utils/functions.js">html/js/utils/functions.js</file>
         <file alias="utils/url.js">html/js/utils/url.js</file>
-        <file alias="checker.js">html/js/checker.js</file>
+        <file alias="utils/size.js">html/js/utils/size.js</file>
         <file alias="menu.js">html/js/menu.js</file>
+        <file alias="checker/base.js">html/js/checker/base.js</file>
+        <file alias="checker/cellImplementation.js">html/js/checker/cellImplementation.js</file>
+        <file alias="checker/cellMediaInfo.js">html/js/checker/cellMediaInfo.js</file>
+        <file alias="checker/cellMediaTrace.js">html/js/checker/cellMediaTrace.js</file>
+        <file alias="checker/cellPolicy.js">html/js/checker/cellPolicy.js</file>
+        <file alias="checker/cellStatus.js">html/js/checker/cellStatus.js</file>
+        <file alias="checker/table.js">html/js/checker/table.js</file>
+        <file alias="checker/webengine.js">html/js/checker/webengine.js</file>
+        <file alias="checker/webkit.js">html/js/checker/webkit.js</file>
         <file alias="policy.js">html/js/policy.js</file>
         <file alias="policyTree.js">html/js/policyTree.js</file>
         <file alias="policyTreePolicies.js">html/js/policyTreePolicies.js</file>

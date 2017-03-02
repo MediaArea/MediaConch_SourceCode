@@ -63,12 +63,19 @@ private Q_SLOTS:
     void         timer_menu_link();
 
 public Q_SLOTS:
+    void         on_file_selected(const QString& filename, const QString& path,
+                                  const QString& policy, const QString& display, const QString& verbosity,
+                                  bool fixer, QString& ret, std::string& err_str);
+    void         on_file_selected_end(const std::string& err_str, QString& ret);
+    void         on_file_selected_formValues(const FileRegistered* fr, QString& formValues);
     QString      on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity,
                                          bool fixer);
     QString      on_file_online_selected(const QString& url, const QString& policy, const QString& display,
                                          const QString& verbosity, bool fixer);
     QString      on_file_repository_selected(const QString& policy, const QString& display,
                                              const QString& verbosity, bool fixer);
+    QString      on_file_from_db_selected();
+    QString      status_reports_multi(const QStringList& ids, const QStringList& policy_ids);
     void         on_save_settings_selected(const QString& policy, const QString& display, const QString& verbosity,
                                            const QString& save_report, const QString& load_files,
                                            const QString& save_policy, const QString& load_policy,
@@ -90,7 +97,7 @@ public Q_SLOTS:
     QString      checker_force_analyze(long id);
 
     void         close_all();
-    void         close_element(const QString& file);
+    void         close_element(long file_id);
 
     bool         report_is_html(const QString& report);
     bool         report_is_xml(const QString& report);
@@ -104,7 +111,6 @@ public Q_SLOTS:
     QString      implementation_and_policy_is_valid(long file_id);
     QString      file_is_analyzed(const QStringList& ids);
     void         change_policy_for_file(long file_id, const QString& policy);
-
 
     QString      display_add_file(const QString& name);
     void         display_export_id(const QString& name);
