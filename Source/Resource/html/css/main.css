@@ -148,14 +148,28 @@ footer .navbar {
 }
 
 .checker-results .btn {
-    font-size: inherit;
-    padding: 0 0 0 10px;
-    float: right;
+    font-size: 14px;
+    line-height: 16px;
     border: 0px;
+    padding: 0;
+}
+
+.checker-results .btn.result-close {
+    padding: 0 0 0 10px;
 }
 
 #result-table td p {
     margin: 0;
+}
+
+@media (max-width: 1199px) {
+    .status-text {
+        display: none;
+    }
+}
+
+.statusButton {
+    display: inline-block;
 }
 
 .tab-pane {
