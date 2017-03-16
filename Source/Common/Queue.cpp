@@ -52,9 +52,12 @@ void QueueElement::stop()
     }
 }
 
-
-static void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t, void* UserHandle_Void)
+static void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_Size, void* UserHandle_Void)
 {
+    //*integrity tests
+    if (Data_Size<4)
+        return; //There is a problem
+
     QueueElement *queue = (QueueElement*)UserHandle_Void;
     struct MediaInfo_Event_Generic* Event_Generic = (struct MediaInfo_Event_Generic*)Data_Content;
     // unsigned char ParserID = (unsigned char)((Event_Generic->EventCode & 0xFF000000) >> 24);
@@ -66,6 +69,10 @@ static void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t
         case MediaInfo_Event_Global_AttachedFile:
             if (EventVersion == 0)
                 queue->attachment_cb((struct MediaInfo_Event_Global_AttachedFile_0 *)Data_Content);
+            break;
+        case MediaInfo_Event_Log:
+            if (EventVersion == 0 && Data_Size >= sizeof(struct MediaInfo_Event_Log_0))
+                queue->log_cb((struct MediaInfo_Event_Log_0*)Data_Content);
             break;
         default:
             break;
@@ -178,6 +185,14 @@ int QueueElement::attachment_cb(struct MediaInfo_Event_Global_AttachedFile_0 *Ev
 
     attachments.push_back(attach);
 
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int QueueElement::log_cb(struct MediaInfo_Event_Log_0 *event)
+{
+    if (scheduler)
+        scheduler->log_cb(event);
     return 0;
 }
 

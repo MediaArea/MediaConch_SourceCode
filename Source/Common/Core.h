@@ -16,16 +16,6 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#ifdef MEDIAINFO_DLL_RUNTIME
-    #include "MediaInfoDLL/MediaInfoDLL.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#elif defined MEDIAINFO_DLL_STATIC
-    #include "MediaInfoDLL/MediaInfoDLL_Static.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#else
-    #include "MediaInfo/MediaInfo.h"
-    #define MediaInfoNameSpace MediaInfoLib
-#endif
 #include <ZenLib/CriticalSection.h>
 #include <map>
 #include <bitset>
@@ -206,6 +196,16 @@ public:
     static void compress_report(std::string& report, MediaConchLib::compression& compress);
     static void compress_report_copy(std::string& report, const char* src, size_t src_len, MediaConchLib::compression& compress);
     static int  uncompress_report(std::string& report, MediaConchLib::compression compress);
+
+
+    //***************************************************************************
+    // Event Callback
+    //***************************************************************************
+    struct EventCallBack
+    {
+        void (*log)(struct MediaInfo_Event_Log_0* Event);
+    };
+    EventCallBack ecb;
 
 private:
     Core (const Core&);

@@ -15,6 +15,7 @@
 #include "CommandLine_Parser.h"
 #include "Help.h"
 #include "Common/Reports.h"
+#include <Common/MediaConchLib.h>
 #include <ZenLib/ZtringList.h>
 #include <ZenLib/File.h>
 #include <ZenLib/Dir.h>
@@ -32,6 +33,47 @@ extern ZenLib::Ztring LogFile_FileName;
 //---------------------------------------------------------------------------
 namespace MediaConch
 {
+
+//****************************************************************************
+// Event to manage
+//****************************************************************************
+
+//--------------------------------------------------------------------------
+void Log_0(struct MediaInfo_Event_Log_0* Event)
+{
+    MediaInfoLib::String MessageString;
+
+    if (Event->Type >= 0xC0)
+        MessageString += __T("E: ");
+
+#if defined(UNICODE) || defined (_UNICODE)
+    MessageString+=Event->MessageStringU;
+#else //defined(UNICODE) || defined (_UNICODE)
+    MessageString+=Event->MessageStringA;
+#endif //defined(UNICODE) || defined (_UNICODE)
+
+    //Special cases
+    switch (Event->MessageCode)
+    {
+    case 0xF1010101:
+        MessageString+=__T(" If you want to use such protocols, compile libcurl with SSL/SSH support");
+        break;
+    case 0xF1010102:
+    case 0xF1010103:
+        MessageString += __T(" If you are in a secure environment, do \"ssh %YourServerName%\" in order to add the fingerprint to the known_hosts file. If you want to ignore security issues, use --Ssh_IgnoreSecurity option");
+        break;
+    case 0xF1010104:
+        MessageString += __T(" If you want to ignore security issues, use --Ssl_IgnoreSecurity option.");
+        break;
+    default:
+        break;
+    }
+
+    if (Event->Type >= 0x80)
+        STRINGERR(MessageString);
+    else
+        STRINGOUT(MessageString);
+}
 
     //**************************************************************************
     // CLI
@@ -95,6 +137,8 @@ namespace MediaConch
             return CLI_RETURN_ERROR;
 
         use_daemon = MCL.get_use_daemon();
+
+        MCL.register_log_callback(&Log_0);
         return CLI_RETURN_NONE;
     }
 

@@ -391,4 +391,10 @@ namespace MediaConch {
         core->plugin_add_log_timestamp(level, log);
     }
 
+    void Scheduler::log_cb(struct MediaInfo_Event_Log_0 *event)
+    {
+        if (core->ecb.log)
+            core->ecb.log(event);
+    }
+
 }

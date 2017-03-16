@@ -18,6 +18,17 @@
 #include <vector>
 #include <map>
 #include <bitset>
+#ifdef MEDIAINFO_DLL_RUNTIME
+    #include "MediaInfoDLL/MediaInfoDLL.h"
+    #define MediaInfoNameSpace MediaInfoDLL
+#elif defined MEDIAINFO_DLL_STATIC
+    #include "MediaInfoDLL/MediaInfoDLL_Static.h"
+    #define MediaInfoNameSpace MediaInfoDLL
+#else
+    #include "MediaInfo/MediaInfo.h"
+    #define MediaInfoNameSpace MediaInfoLib
+#endif
+#include <MediaInfo/MediaInfo_Events.h>
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -376,6 +387,9 @@ public:
     int close_http_client();
     int load_system_policy();
     int load_existing_policy();
+
+    // Register Event callback
+    void register_log_callback(void (*log)(struct MediaInfo_Event_Log_0* Event));
 
 private:
     MediaConchLib (const MediaConchLib&);

@@ -70,6 +70,7 @@ namespace MediaConch
         void                               stop();
         double                             percent_done();
         int                                attachment_cb(struct MediaInfo_Event_Global_AttachedFile_0 *Event);
+        int                                log_cb(struct MediaInfo_Event_Log_0 *Event);
 
     private:
         Scheduler*                         scheduler;
