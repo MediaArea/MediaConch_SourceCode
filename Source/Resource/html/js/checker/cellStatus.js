@@ -32,7 +32,8 @@ var statusCell = (function() {
     var reset = function(fileId) {
         var nodeStatus = $(result.cell('#result-' + fileId, 5).node());
         nodeStatus.removeClass().addClass('statusCell info');
-        nodeStatus.find('.statusResult').html('In queue');
+        nodeStatus.find('.statusButton').addClass('hidden').parent().removeClass('text-center');
+        nodeStatus.find('.statusResult').removeClass('hidden').html('In queue');
         nodeStatus.find('.result-reload').addClass('hidden');
     };
 
