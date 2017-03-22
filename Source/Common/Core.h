@@ -16,16 +16,6 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#ifdef MEDIAINFO_DLL_RUNTIME
-    #include "MediaInfoDLL/MediaInfoDLL.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#elif defined MEDIAINFO_DLL_STATIC
-    #include "MediaInfoDLL/MediaInfoDLL_Static.h"
-    #define MediaInfoNameSpace MediaInfoDLL
-#else
-    #include "MediaInfo/MediaInfo.h"
-    #define MediaInfoNameSpace MediaInfoLib
-#endif
 #include <ZenLib/CriticalSection.h>
 #include <map>
 #include <bitset>
@@ -65,8 +55,14 @@ public:
     //***************************************************************************
     // Local path
     //***************************************************************************
+    static char        get_path_separator(const std::string& path);
     static std::string get_local_data_path();
     static std::string get_local_config_path();
+    static int         create_local_data_directory(const std::string& base_dir, std::string& report_dir);
+    static int         create_local_unique_data_directory(const std::string& base_dir, const std::string& template_dir,
+                                                          std::string& report_dir);
+    static int         create_local_unique_data_filename(const std::string& base_dir, const std::string& template_file,
+                                                         const std::string& template_ext, std::string& filename);
 
     //***************************************************************************
     // MediaConch General
@@ -102,7 +98,8 @@ public:
     long        checker_analyze(int user, const std::string& filename, long src_id, size_t generated_time,
                                 const std::string generated_log, const std::string generated_error_log,
                                 const std::vector<std::pair<std::string,std::string> >& options,
-                                const std::vector<std::string>& plugins, std::string& error, bool mil_analyze=true);
+                                const std::vector<std::string>& plugins, std::string& error, bool mil_analyze=true,
+                                const std::string& alias="");
 
     int         checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res, std::string& error);
     int         remove_report(int user, const std::vector<long>& files, std::string& error);
@@ -199,6 +196,16 @@ public:
     static void compress_report(std::string& report, MediaConchLib::compression& compress);
     static void compress_report_copy(std::string& report, const char* src, size_t src_len, MediaConchLib::compression& compress);
     static int  uncompress_report(std::string& report, MediaConchLib::compression compress);
+
+
+    //***************************************************************************
+    // Event Callback
+    //***************************************************************************
+    struct EventCallBack
+    {
+        void (*log)(struct MediaInfo_Event_Log_0* Event);
+    };
+    EventCallBack ecb;
 
 private:
     Core (const Core&);

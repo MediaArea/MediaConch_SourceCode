@@ -289,38 +289,7 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int Plugin::create_report_dir(const std::string& base_dir, const std::string& template_dir, std::string& report_dir)
     {
-        std::string local_data = Core::get_local_data_path();
-        local_data += base_dir;
-
-        Ztring z_local = ZenLib::Ztring().From_UTF8(local_data);
-        if (!ZenLib::Dir::Exists(z_local))
-            ZenLib::Dir::Create(z_local);
-
-        if (!ZenLib::Dir::Exists(z_local))
-            return -1;
-
-        std::stringstream path;
-        for (size_t i = 0; ; ++i)
-        {
-            path.str("");
-            path << local_data << template_dir;
-            if (i)
-                path << i;
-            path << "/";
-
-            Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
-            if (!ZenLib::Dir::Exists(z_path))
-                break;
-        }
-
-        Ztring z_path = ZenLib::Ztring().From_UTF8(path.str());
-        ZenLib::Dir::Create(z_path);
-
-        if (!ZenLib::Dir::Exists(z_path))
-            return -1;
-
-        report_dir = path.str();
-        return 0;
+        return Core::create_local_unique_data_directory(base_dir, template_dir, report_dir);
     }
 
     //---------------------------------------------------------------------------

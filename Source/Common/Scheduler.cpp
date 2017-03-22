@@ -23,11 +23,14 @@
 #include "PluginFileLog.h"
 #include "PluginPreHook.h"
 #include <ZenLib/Ztring.h>
+#include <ZenLib/File.h>
 
 #if defined(_WIN32) || defined(WIN32)
 #include <Winbase.h>
+#include <windows.h>
 #else
 #include <sys/time.h>
+#include <unistd.h>
 #endif
 
 //---------------------------------------------------------------------------
@@ -65,11 +68,12 @@ namespace MediaConch {
     //---------------------------------------------------------------------------
     int Scheduler::add_element_to_queue(int user, const std::string& filename, long file_id,
                                         const std::vector<std::pair<std::string,std::string> >& options,
-                                        const std::vector<std::string>& plugins, bool mil_analyze)
+                                        const std::vector<std::string>& plugins, bool mil_analyze,
+                                        const std::string& alias)
     {
         static int index = 0;
 
-        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins, mil_analyze);
+        queue->add_element(PRIORITY_NONE, index++, user, filename, file_id, options, plugins, mil_analyze, alias);
         run_element();
         return index - 1;
     }
@@ -112,6 +116,9 @@ namespace MediaConch {
         }
 
         if (another_work_to_do(el, MI) <= 0)
+            return;
+
+        if (attachments_to_add(el) < 0)
             return;
 
         CS.Enter();
@@ -205,6 +212,39 @@ namespace MediaConch {
         return file_id;
     }
 
+    int Scheduler::attachments_to_add(QueueElement *el)
+    {
+        std::string err;
+        for (size_t i = 0; i < el->attachments.size(); ++i)
+        {
+            if (!el->attachments[i])
+                continue;
+
+            std::vector<std::pair<std::string,std::string> > options;
+            for (size_t i = 0; i < el->options.size(); ++i)
+                options.push_back(std::make_pair(el->options[i].first, el->options[i].second));
+
+            std::vector<std::string> plugins;
+            for (size_t i = 0; i < el->plugins.size(); ++i)
+                plugins.push_back(el->plugins[i]);
+
+            std::stringstream alias;
+            alias << "attachment";
+            if (i)
+                alias << i;
+            alias << ":" << el->filename << ":" << el->attachments[i]->realname;
+
+            std::string log;
+            long id;
+            if ((id = core->checker_analyze(el->user, el->attachments[i]->filename,
+                                            el->file_id, 0, log, log,
+                                            options, plugins, err, el->mil_analyze, alias.str())) >= 0)
+                core->file_add_generated_file(el->user, el->file_id, id, err);
+        }
+
+        return 0;
+    }
+
     int Scheduler::another_work_to_do(QueueElement *el, MediaInfoNameSpace::MediaInfo* MI)
     {
         // Before registering, check the format
@@ -224,7 +264,7 @@ namespace MediaConch {
         else
             return 1;
 
-        ((PluginFormat*)p)->set_file(el->filename);
+        ((PluginFormat*)p)->set_file(el->real_filename);
         if (p->run(error) < 0)
             core->plugin_add_log(PluginLog::LOG_LEVEL_ERROR, error);
         const std::string& report = p->get_report();
@@ -349,6 +389,12 @@ namespace MediaConch {
     void Scheduler::write_log_timestamp(int level, std::string log)
     {
         core->plugin_add_log_timestamp(level, log);
+    }
+
+    void Scheduler::log_cb(struct MediaInfo_Event_Log_0 *event)
+    {
+        if (core->ecb.log)
+            core->ecb.log(event);
     }
 
 }

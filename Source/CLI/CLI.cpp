@@ -15,6 +15,7 @@
 #include "CommandLine_Parser.h"
 #include "Help.h"
 #include "Common/Reports.h"
+#include <Common/MediaConchLib.h>
 #include <ZenLib/ZtringList.h>
 #include <ZenLib/File.h>
 #include <ZenLib/Dir.h>
@@ -32,6 +33,47 @@ extern ZenLib::Ztring LogFile_FileName;
 //---------------------------------------------------------------------------
 namespace MediaConch
 {
+
+//****************************************************************************
+// Event to manage
+//****************************************************************************
+
+//--------------------------------------------------------------------------
+void Log_0(struct MediaInfo_Event_Log_0* Event)
+{
+    MediaInfoLib::String MessageString;
+
+    if (Event->Type >= 0xC0)
+        MessageString += __T("E: ");
+
+#if defined(UNICODE) || defined (_UNICODE)
+    MessageString+=Event->MessageStringU;
+#else //defined(UNICODE) || defined (_UNICODE)
+    MessageString+=Event->MessageStringA;
+#endif //defined(UNICODE) || defined (_UNICODE)
+
+    //Special cases
+    switch (Event->MessageCode)
+    {
+    case 0xF1010101:
+        MessageString+=__T(" If you want to use such protocols, compile libcurl with SSL/SSH support");
+        break;
+    case 0xF1010102:
+    case 0xF1010103:
+        MessageString += __T(" If you are in a secure environment, do \"ssh %YourServerName%\" in order to add the fingerprint to the known_hosts file. If you want to ignore security issues, use --Ssh_IgnoreSecurity option");
+        break;
+    case 0xF1010104:
+        MessageString += __T(" If you want to ignore security issues, use --Ssl_IgnoreSecurity option.");
+        break;
+    default:
+        break;
+    }
+
+    if (Event->Type >= 0x80)
+        STRINGERR(MessageString);
+    else
+        STRINGOUT(MessageString);
+}
 
     //**************************************************************************
     // CLI
@@ -95,6 +137,8 @@ namespace MediaConch
             return CLI_RETURN_ERROR;
 
         use_daemon = MCL.get_use_daemon();
+
+        MCL.register_log_callback(&Log_0);
         return CLI_RETURN_NONE;
     }
 
@@ -129,7 +173,7 @@ namespace MediaConch
     int CLI::run(std::string& err)
     {
         CheckerReport cr;
-        MediaConchLib::report report_kind;
+        MediaConchLib::report report_kind = MediaConchLib::report_Max;
 
         //Return plugins list
         if (plugins_list_mode)
@@ -149,6 +193,7 @@ namespace MediaConch
         {
             bool registered = false;
             long file_id = -1;
+            std::vector<long> file_ids;
             int ret = MCL.checker_analyze(use_as_user, files[i], plugins, options, registered,
                                           file_id, err, force_analyze, mil_analyze);
             if (ret < 0)
@@ -163,12 +208,15 @@ namespace MediaConch
                 STRINGOUT(ZenLib::Ztring().From_UTF8(str.str()));
             }
 
-            int ready = is_ready(file_id, report_kind, err);
+            int ready = is_ready(file_id, file_ids, report_kind, err);
             if (ready == MediaConchLib::errorHttp_NONE)
                 continue;
             else if (ready < 0)
                 //TODO: PROBLEM
                 return -1;
+
+            if (report_kind == MediaConchLib::report_Max)
+                report_kind = MediaConchLib::report_MediaConch;
 
             if (report_set[MediaConchLib::report_MediaConch] &&
                 report_kind > MediaConchLib::report_MediaTrace && report_kind < MediaConchLib::report_Max &&
@@ -177,7 +225,9 @@ namespace MediaConch
                 set_report_reset();
                 report_set.set(report_kind);
             }
-            cr.files.push_back(file_id);
+
+            for (size_t j = 0; j < file_ids.size(); ++j)
+                cr.files.push_back(file_ids[j]);
         }
 
         //Ensure to analyze before creating library
@@ -585,14 +635,12 @@ namespace MediaConch
     }
 
     //--------------------------------------------------------------------------
-    int CLI::is_ready(long& file_id, MediaConchLib::report& report_kind, std::string& err)
+    int CLI::is_ready(long file_id, std::vector<long>& file_ids, MediaConchLib::report& report_kind, std::string& err)
     {
         MediaConchLib::Checker_StatusRes res;
         int ret = MCL.checker_status(use_as_user, file_id, res, err);
         if (ret < 0)
             return -1;
-
-        report_kind = MediaConchLib::report_MediaConch;
 
         if (use_daemon && asynchronous)
         {
@@ -609,21 +657,21 @@ namespace MediaConch
                 return 1;
             }
 
-            if (res.tool)
+            if (res.tool && report_kind == MediaConchLib::report_Max)
                 report_kind = (MediaConchLib::report)*res.tool;
 
+            file_ids.push_back(file_id);
             return ret;
         }
         else
         {
             while (!res.finished)
             {
-
-                #ifdef WINDOWS
+#ifdef WINDOWS
                 ::Sleep((DWORD)5);
-                #else
+#else
                 usleep(500000);
-                #endif
+#endif
                 if (MCL.checker_status(use_as_user, file_id, res, err) < 0)
                     return -1;
             }
@@ -641,7 +689,9 @@ namespace MediaConch
                 return -1;
             }
 
-            if (res.tool)
+            file_ids.push_back(file_id);
+
+            if (res.tool && report_kind == MediaConchLib::report_Max)
                 report_kind = (MediaConchLib::report)*res.tool;
 
             for (size_t i = 0; i < res.generated_id.size(); ++i)
@@ -650,7 +700,7 @@ namespace MediaConch
                     continue;
 
                 file_id = res.generated_id[i];
-                if ((ret = is_ready(file_id, report_kind, err)) <= 0)
+                if ((ret = is_ready(file_id, file_ids, report_kind, err)) <= 0)
                     return ret;
             }
         }
@@ -709,8 +759,9 @@ namespace MediaConch
 
     int CLI::run_policy_reference_file(long id, std::string& err)
     {
-        MediaConchLib::report report_kind;
-        return is_ready(id, report_kind, err);
+        MediaConchLib::report report_kind = MediaConchLib::report_Max;
+        std::vector<long> file_ids;
+        return is_ready(id, file_ids, report_kind, err);
     }
 
     void CLI::file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report)

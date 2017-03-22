@@ -11,11 +11,13 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "ZenLib/Ztring.h"
+#include <ZenLib/File.h>
+
 #include "Queue.h"
 #include "Scheduler.h"
 #include "PluginLog.h"
 #include "Core.h"
+#include <fstream>
 
 #if !defined(WINDOWS)
 #include <unistd.h>
@@ -50,17 +52,44 @@ void QueueElement::stop()
     }
 }
 
+static void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_Size, void* UserHandle_Void)
+{
+    //*integrity tests
+    if (Data_Size<4)
+        return; //There is a problem
+
+    QueueElement *queue = (QueueElement*)UserHandle_Void;
+    struct MediaInfo_Event_Generic* Event_Generic = (struct MediaInfo_Event_Generic*)Data_Content;
+    // unsigned char ParserID = (unsigned char)((Event_Generic->EventCode & 0xFF000000) >> 24);
+    unsigned short EventID = (unsigned short)((Event_Generic->EventCode & 0x00FFFF00) >> 8);
+    unsigned char EventVersion = (unsigned char)(Event_Generic->EventCode & 0x000000FF);
+
+    switch (EventID)
+    {
+        case MediaInfo_Event_Global_AttachedFile:
+            if (EventVersion == 0)
+                queue->attachment_cb((struct MediaInfo_Event_Global_AttachedFile_0 *)Data_Content);
+            break;
+        case MediaInfo_Event_Log:
+            if (EventVersion == 0 && Data_Size >= sizeof(struct MediaInfo_Event_Log_0))
+                queue->log_cb((struct MediaInfo_Event_Log_0*)Data_Content);
+            break;
+        default:
+            break;
+    }
+}
+
 //---------------------------------------------------------------------------
 void QueueElement::Entry()
 {
-    std::string file = filename;
+    std::string file = real_filename;
     std::string err;
 
     //Pre hook plugins
     int ret = 0;
 
     std::stringstream log;
-    log << "start analyze:" << filename;
+    log << "start analyze:" << file;
     scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
 
     ret = scheduler->execute_pre_hook_plugins(this, err);
@@ -68,13 +97,14 @@ void QueueElement::Entry()
     if (ret || !mil_analyze)
     {
         log.str("");
-        log << "end analyze:" << filename;
+        log << "end analyze:" << file;
         scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
         scheduler->work_finished(this, NULL);
         return;
     }
 
     MI = new MediaInfoNameSpace::MediaInfo;
+
     // Currently avoiding to have a big trace
     bool found = false;
     for (size_t i = 0; i < options.size(); ++i)
@@ -91,6 +121,11 @@ void QueueElement::Entry()
     if (found == false)
         MI->Option(__T("Details"), __T("1"));
 
+    // Attachment
+    std::stringstream ss;
+    ss << "CallBack=memory://" << (int64u)Event_CallBackFunction << ";UserHandler=memory://" << (int64u)this;
+    MI->Option(__T("File_Event_CallBackFunction"), ZenLib::Ztring().From_UTF8(ss.str()));
+
     // Partial configuration of the output (note: this options should be removed after libmediainfo has a support of these options after Open() )
     MI->Option(__T("ReadByHuman"), __T("1"));
     MI->Option(__T("Language"), __T("raw"));
@@ -105,8 +140,15 @@ void QueueElement::Entry()
     delete MI;
     MI = NULL;
     log.str("");
-    log << "end analyze:" << filename;
+    log << "end analyze:" << file;
     scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());
+
+    // Delete a generated file
+    if (real_filename != filename)
+    {
+        Ztring z_path = ZenLib::Ztring().From_UTF8(real_filename);
+        ZenLib::File::Delete(z_path);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -117,6 +159,41 @@ double QueueElement::percent_done()
 
     size_t state = MI->State_Get();
     return (double)state / 100;
+}
+
+//---------------------------------------------------------------------------
+int QueueElement::attachment_cb(struct MediaInfo_Event_Global_AttachedFile_0 *Event)
+{
+    std::string attachment((const char*)Event->Content, Event->Content_Size);
+
+    std::string realname = "Unknown";
+    if (Event->Name && Event->Name[0])
+        realname = std::string(Event->Name);
+
+    std::string path;
+
+    if (Core::create_local_unique_data_filename("MediaconchTemp", "attachment", "", path) < 0)
+        return 0;
+
+    std::ofstream ofs(path.c_str(), std::ofstream::out);
+    ofs.write(attachment.c_str(), attachment.size());
+    ofs.close();
+
+    Attachment *attach = new Attachment;
+    attach->filename = path;
+    attach->realname = realname;
+
+    attachments.push_back(attach);
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int QueueElement::log_cb(struct MediaInfo_Event_Log_0 *event)
+{
+    if (scheduler)
+        scheduler->log_cb(event);
+    return 0;
 }
 
 //***************************************************************************
@@ -131,13 +208,14 @@ Queue::~Queue()
 
 int Queue::add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
                        const std::vector<std::pair<std::string,std::string> >& options,
-                       const std::vector<std::string>& plugins, bool mil_analyze)
+                       const std::vector<std::string>& plugins, bool mil_analyze, const std::string& alias)
 {
     QueueElement *el = new QueueElement(scheduler);
 
     el->id = id;
     el->user = user;
-    el->filename = filename;
+    el->filename = alias.size() ? alias : filename;
+    el->real_filename = filename;
     el->file_id = file_id;
     el->mil_analyze = mil_analyze;
 

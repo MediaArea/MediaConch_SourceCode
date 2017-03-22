@@ -26,8 +26,10 @@
     #include "MediaInfo/MediaInfo.h"
     #define MediaInfoNameSpace MediaInfoLib
 #endif
+#include "ZenLib/Ztring.h"
 #include "ZenLib/Thread.h"
 #include "ZenLib/CriticalSection.h"
+#include <MediaInfo/MediaInfo_Events.h>
 //---------------------------------------------------------------------------
 #include <map>
 #include <list>
@@ -42,6 +44,12 @@ namespace MediaConch
     class Queue;
     class Scheduler;
 
+    struct Attachment
+    {
+        std::string filename;
+        std::string realname;
+    };
+
     class QueueElement : public ZenLib::Thread
     {
     public:
@@ -50,15 +58,19 @@ namespace MediaConch
         int                                user;
         int                                id;
         std::string                        filename;
+        std::string                        real_filename;
         std::string                        options_str;
         std::vector<std::pair<std::string, std::string> > options;
         std::vector<std::string>           plugins;
+        std::vector<Attachment*>           attachments;
         long                               file_id;
         bool                               mil_analyze;
 
         void                               Entry();
         void                               stop();
         double                             percent_done();
+        int                                attachment_cb(struct MediaInfo_Event_Global_AttachedFile_0 *Event);
+        int                                log_cb(struct MediaInfo_Event_Log_0 *Event);
 
     private:
         Scheduler*                         scheduler;
@@ -89,7 +101,8 @@ namespace MediaConch
 
         int add_element(QueuePriority priority, int id, int user, const std::string& filename, long file_id,
                         const std::vector<std::pair<std::string,std::string> >& options,
-                        const std::vector<std::string>& plugins, bool mil_analyze);
+                        const std::vector<std::string>& plugins, bool mil_analyze,
+                        const std::string& alias="");
         long has_element(int user, const std::string& filename);
         int  has_id(int user, long file_id);
         int remove_element(int id);

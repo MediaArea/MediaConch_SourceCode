@@ -53,7 +53,8 @@ public:
 
     int  add_element_to_queue(int user, const std::string& filename, long file_id,
                               const std::vector<std::pair<std::string,std::string> >& options,
-                              const std::vector<std::string>& plugins, bool mil_analyze);
+                              const std::vector<std::string>& plugins, bool mil_analyze,
+                              const std::string& alias="");
     void work_finished(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     bool is_finished();
     long element_exists(int user, const std::string& filename,
@@ -64,7 +65,9 @@ public:
     int  get_elements(int user, std::vector<long>& vec, std::string& err);
     int  another_work_to_do(QueueElement* el, MediaInfoNameSpace::MediaInfo* MI);
     int  execute_pre_hook_plugins(QueueElement *el, std::string& err);
+    int  attachments_to_add(QueueElement *el);
     void write_log_timestamp(int level, std::string log);
+    void log_cb(struct MediaInfo_Event_Log_0 *Event);
 
 private:
     Scheduler(const Scheduler&);

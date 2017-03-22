@@ -70,7 +70,7 @@ namespace MediaConch
         int  run_plugins_list(std::string& err);
         int  run_watch_folders_list(std::string& err);
         int  run_watch_folder_cmd(std::string& err);
-        int  is_ready(long& file_id, MediaConchLib::report& report_kind, std::string& err);
+        int  is_ready(long file_id, std::vector<long>& file_ids, MediaConchLib::report& report_kind, std::string& err);
         void add_files_recursively(const std::string& filename);
         void file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report);
 

@@ -875,4 +875,10 @@ int MediaConchLib::load_existing_policy()
     return 0;
 }
 
+//---------------------------------------------------------------------------
+void MediaConchLib::register_log_callback(void (*log)(struct MediaInfo_Event_Log_0* Event))
+{
+    core->ecb.log = log;
+}
+
 }
