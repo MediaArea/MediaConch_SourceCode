@@ -913,12 +913,51 @@ namespace MediaConch
             if ((report_kind >= 0 && report_kind <= 2) || report_kind == 5) //MC/MI/MT/MMT
                 report_kind = 2;
 
-            QString analyzed = QString("\"%1\": {\"finish\":%2,\"tool\":%3,\"percent\":%4}")
-                .arg(fr->file_id)                     // id
-                .arg(fr->analyzed ? "true" : "false") // finish
-                .arg(report_kind)                     // tool
-                .arg(fr->analyze_percent);            // percent
+            QString analyzed = QString("\"%1\":{\"finish\":%2,")
+                .arg(fr->file_id)                      // id
+                .arg(fr->analyzed ? "true" : "false"); // finish
+
+            if (fr->analyzed)
+            {
+                analyzed += QString("\"tool\":%1")
+                    .arg(report_kind);                 // tool
+            }
+            else
+            {
+                analyzed += QString("\"percent\":%1")
+                    .arg(fr->analyze_percent);         // percent
+            }
+
+            if (fr->generated_id.size())
+            {
+                analyzed += QString(",\"associatedFiles\":{"); // associated files
+
+                for (size_t x = 0; x < fr->generated_id.size(); ++x)
+                {
+                    if (x)
+                        analyzed += ",";
+
+                    std::string filename, err;
+                    if (mainwindow->checker_file_from_id(fr->generated_id[x], filename, err) < 0)
+                    {
+                        mainwindow->set_str_msg_to_status_bar(err);
+                        filename = "";
+                    }
+
+                    if (mainwindow->add_attachment_to_list(QString().fromUtf8(filename.c_str(), filename.size()),
+                                                           fr->policy, fr->display, fr->verbosity, err) < 0)
+                    {
+                        mainwindow->set_str_msg_to_status_bar(err);
+                    }
+
+                    analyzed += QString("\"%1\":\"%2\"").arg(QString().number(fr->generated_id[x]))
+                        .arg(QString().fromUtf8(filename.c_str(), filename.size()));
+                }
+                analyzed += QString("}");
+            }
+
             delete fr;
+            analyzed += "}";
 
             if (one_added)
                 json += ",";
@@ -1631,6 +1670,7 @@ namespace MediaConch
     {
         str.replace("\"", "\\\"");
         str.replace("\n", "\\n");
+        str.replace("\t", " ");
     }
 
     void WebCommonPage::call_tooltip(const QString& link)

@@ -247,6 +247,92 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
 }
 
 //---------------------------------------------------------------------------
+int WorkerFiles::add_attachment_to_list(const std::string& file, int policy, int display,
+                                        int verbosity, std::string& err)
+{
+    bool exists = false;
+    FileRegistered *fr = NULL;
+    working_files_mutex.lock();
+    if (working_files.find(file) != working_files.end() && working_files[file])
+    {
+        exists = true;
+        // nothing to do
+        if (policy == working_files[file]->policy && display == working_files[file]->display
+            && verbosity == working_files[file]->verbosity)
+        {
+            working_files_mutex.unlock();
+            return 0;
+        }
+        else
+            fr = new FileRegistered;
+        fr->analyzed = working_files[file]->analyzed;
+    }
+    else
+        fr = new FileRegistered;
+    working_files_mutex.unlock();
+
+    // Keep the old index for the same file
+    if (exists)
+    {
+        fr->index = working_files[file]->index;
+        fr->file_id = working_files[file]->file_id;
+    }
+    else
+        fr->index = file_index++;
+
+    fr->filename = file;
+    fr->filepath = "";
+    fr->policy = policy;
+    fr->display = display;
+    fr->verbosity = verbosity;
+    fr->create_policy = false;
+
+    working_files_mutex.lock();
+
+    if (exists)
+        delete working_files[file];
+    working_files[file] = fr;
+    working_files_mutex.unlock();
+
+    unfinished_files_mutex.lock();
+    unfinished_files.push_back(file);
+    unfinished_files_mutex.unlock();
+
+    if (exists)
+    {
+        to_update_files_mutex.lock();
+        to_update_files[file] = new FileRegistered(*fr);
+        to_update_files_mutex.unlock();
+        return 0;
+    }
+
+    std::vector<std::string> vec;
+    vec.push_back(file);
+
+    int ret;
+    std::vector<long> files_id;
+    if ((ret = mainwindow->analyze(vec, false, false, files_id, err)) < 0)
+    {
+        mainwindow->set_str_msg_to_status_bar(err);
+        return -1;
+    }
+
+    if (files_id.size() != 1)
+    {
+        err = "Internal error: analyze result is not correct, no id returned.";
+        return -1;
+    }
+
+    fr->file_id = files_id[0];
+
+    working_files_mutex.lock();
+    working_files[file]->file_id = files_id[0];
+    working_files_mutex.unlock();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int policy)
 {
     std::string file;
@@ -452,6 +538,9 @@ void WorkerFiles::update_unfinished_files()
             fr->report_kind = MediaConchLib::report_MediaConch;
             if (st_res.tool)
                 fr->report_kind = *st_res.tool;
+
+            for (size_t x = 0; x < st_res.generated_id.size(); ++x)
+                fr->generated_id.push_back(st_res.generated_id[x]);
 
             std::vector<size_t> policies_ids;
             std::vector<std::string> policies_contents;

@@ -65,6 +65,8 @@ public:
     int                         add_file_to_list(const QString& file, const QString& path, const QString& policy,
                                                  const QString& display,
                                                  const QString& verbosity, bool fixer, bool, std::string& err);
+    int                         add_attachment_to_list(const QString& file, int policy, int display,
+                                                       int verbosity, std::string& err);
     void                        remove_file_to_list(long file_id);
     void                        update_policy_of_file_in_list(long file_id, const QString& policy);
     int                         analyze_force_file_to_list(long id, std::string& err);
