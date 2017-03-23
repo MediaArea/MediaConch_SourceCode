@@ -9,7 +9,7 @@ var checkerTable = (function() {
 
     var init = function() {
         result = $('#result-table').DataTable({
-            order: [],
+            order: [0, 'asc'],
             autoWidth: false,
             fixedHeader: {
                 headerOffset: $('#mco-navbar').outerHeight(true)
@@ -92,7 +92,12 @@ var checkerTable = (function() {
     };
 
     var addFile = function(fileName, fileId, formValues) {
-        var node = result.row.add( [ '<span title="' + fileName + '">' + textUtils.truncate(fileName.split('/').pop(), 28) + '</span>',
+        var fileNameSplitted = fileName.split('/');
+        if (fileNameSplitted !== undefined)
+            fileNameSplitted = fileNameSplitted.pop();
+        else
+            fileNameSplitted = "";
+        var node = result.row.add( [ '<span title="' + fileName + '">' + textUtils.truncate(fileNameSplitted, 28) + '</span>',
             '', '', '', '',
             '<span class="statusResult">In queue</span><div class="statusButton hidden"> \
             <button type="button" class="btn btn-link result-reload hidden" title="Reload result (force analyze)"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button> \
@@ -265,6 +270,14 @@ var checkerTable = (function() {
 
                 // MediaTrace
                 mediaTraceCell.success(statusFileId);
+
+                // Handle associated files (attachments)
+                if (undefined !== status.associatedFiles) {
+                    $.each(status.associatedFiles, function(associatedFileId, associatedFileName) {
+                        addFile(associatedFileName, associatedFileId, checker.getDataFromForm($('.tab-content .active form')));
+                    });
+                    draw();
+                }
             }
             else if (status.percent > 0) {
                 statusCell.inProgress(statusFileId, status);

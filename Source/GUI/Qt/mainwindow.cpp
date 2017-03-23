@@ -236,6 +236,16 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::add_attachment_to_list(const QString& file, int policy, int display,
+                                       int verbosity, std::string& err)
+{
+    std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
+    if (workerfiles.add_attachment_to_list(filename, policy, display, verbosity, err) < 0)
+        return -1;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::remove_file_to_list(long file_id)
 {
     workerfiles.remove_file_registered_from_id(file_id);

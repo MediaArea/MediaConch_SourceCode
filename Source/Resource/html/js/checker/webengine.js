@@ -108,7 +108,7 @@ var checkerAjax = (function() {
          * @param array ids List of files ID
          *
          * @return json
-         * {"status":{"fileId":{"finish":true,"tool":2},"fileId":{"finish":false,"percent":42}}}
+         * {"status":{"fileId":{"finish":true,"tool":2,"associatedFiles":{"fileId":"fileName"}},"fileId":{"finish":false,"percent":42}}}
          */
         webpage.file_is_analyzed(ids, function(res) {
             data = JSON.parse(res);
