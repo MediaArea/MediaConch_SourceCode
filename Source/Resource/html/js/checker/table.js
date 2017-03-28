@@ -285,7 +285,7 @@ var checkerTable = (function() {
                 if (undefined !== status.associatedFiles) {
                     $.each(status.associatedFiles, function(associatedFileId, associatedFileName) {
                         var nodeFile = addFile(associatedFileName, associatedFileId, checker.getDataFromForm($('.tab-content .active form')));
-                        $(nodeFile).data('parent-id', statusFileId);
+                        $(nodeFile).data('parent-id', statusFileId).find('.result-reload').remove();
                     });
                     draw();
                 }
