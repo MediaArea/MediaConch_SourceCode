@@ -92,8 +92,9 @@
     </policy>
   </policy>
   <policy type="or" name="Follow pixel aspect ratio requirements or is not used?">
-    <rule name="pasp atom is used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp" operator="must not exist"/>
+    <rule name="pasp atom is not used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp" operator="must not exist"/>
     <policy type="and" name="Follow pixel aspect ratio requirements?">
+      <rule name="pasp atom is used?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp" operator="exists"/>
       <rule name="hSpacing is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp/hSpacing" operator="&gt;">0</rule>
       <rule name="vSpacing is positive?" scope="mmt" value="m:moov/m:trak/m:mdia/m:minf/m:stbl/m:stsd/Video/m:pasp/vSpacing" operator="&gt;">0</rule>
     </policy>
