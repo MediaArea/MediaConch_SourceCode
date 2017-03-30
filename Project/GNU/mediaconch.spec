@@ -1,6 +1,6 @@
-%define mediaconch_version          17.02
-%define libmediainfo_version        0.7.93
-%define libzen_version              0.4.34
+%define mediaconch_version          17.03
+%define libmediainfo_version        0.7.94
+%define libzen_version              0.4.35
 
 %if 0%{?fedora} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
 %define libmediainfo_name libmediainfo
