@@ -41,7 +41,7 @@ namespace MediaConch
     //**************************************************************************
     // Daemon
     //**************************************************************************
-    std::string Daemon::version = "17.02.0";
+    std::string Daemon::version = "17.03.0";
 
     //--------------------------------------------------------------------------
     Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), watch_folder_user(NULL),

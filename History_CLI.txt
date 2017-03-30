@@ -7,6 +7,13 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.03, 2017-03-31
+--------------
+Analyze attachments in Matroska files
+Reduce size of Matroska trace
+Few small FFV1 parsing improvements
+Several small bug fixes
+
 Version 17.02, 2017-02-28
 --------------
 New policy example (TN2162)
