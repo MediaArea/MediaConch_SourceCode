@@ -221,12 +221,12 @@ namespace MediaConch {
                 continue;
 
             std::vector<std::pair<std::string,std::string> > options;
-            for (size_t i = 0; i < el->options.size(); ++i)
-                options.push_back(std::make_pair(el->options[i].first, el->options[i].second));
+            for (size_t j = 0; j < el->options.size(); ++j)
+                options.push_back(std::make_pair(el->options[j].first, el->options[j].second));
 
             std::vector<std::string> plugins;
-            for (size_t i = 0; i < el->plugins.size(); ++i)
-                plugins.push_back(el->plugins[i]);
+            for (size_t j = 0; j < el->plugins.size(); ++j)
+                plugins.push_back(el->plugins[j]);
 
             std::stringstream alias;
             alias << "attachment";
