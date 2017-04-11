@@ -60,6 +60,7 @@ AC_ARG_WITH(libevent,           AC_HELP_STRING([--with-libevent],           [Ena
 dnl -------------------------------------------------------------------------
 dnl External options
 dnl
+AC_CHECK_FUNCS(glob)
 
 dnl #########################################################################
 dnl ### Options from elsewhere

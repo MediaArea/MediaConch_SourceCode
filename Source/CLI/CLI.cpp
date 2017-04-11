@@ -24,6 +24,14 @@
     #include <unistd.h>
 #endif //!defined(WINDOWS)
 
+#ifdef HAVE_GLOB
+    #include <glob.h>
+#endif
+
+#ifndef GLOB_TILDE
+#define GLOB_TILDE 0
+#endif
+
 //****************************************************************************
 // Extern
 //****************************************************************************
@@ -139,6 +147,7 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
         use_daemon = MCL.get_use_daemon();
 
         MCL.register_log_callback(&Log_0);
+
         return CLI_RETURN_NONE;
     }
 
@@ -440,31 +449,51 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
     }
 
     //--------------------------------------------------------------------------
-    int CLI::add_policy(const std::string& filename)
+    int CLI::add_policy(const std::string& pattern)
     {
-        ZenLib::Ztring z_filename = ZenLib::Ztring().From_UTF8(filename);
-        if (!ZenLib::File::Exists(z_filename))
-            return -1;
+        std::vector<std::string> filenames;
+#ifdef HAVE_GLOB
+        // Policy filenames pattern matching
+        glob_t gl;
+        if (glob(pattern.c_str(), GLOB_TILDE, NULL, &gl) == 0)
+        {
+            for (size_t j = 0; j < gl.gl_pathc; ++j)
+                filenames.push_back(gl.gl_pathv[j]);
+            globfree(&gl);
+        }
+        else
+            filenames.push_back(pattern);
+#else
+        filenames.push_back(pattern);
+#endif
 
-        ZenLib::File file(z_filename);
+        for (size_t i = 0; i < filenames.size() ; ++i)
+        {
+            std::string& filename = filenames[i];
+            ZenLib::Ztring z_filename = ZenLib::Ztring().From_UTF8(filename);
+            if (!ZenLib::File::Exists(z_filename))
+                return -1;
 
-        ZenLib::int64u size = file.Size_Get();
-        if (size == (ZenLib::int64u)-1)
-            return -1;
+            ZenLib::File file(z_filename);
 
-        ZenLib::int8u* Buffer = new ZenLib::int8u[size + 1];
+            ZenLib::int64u size = file.Size_Get();
+            if (size == (ZenLib::int64u)-1)
+                return -1;
 
-        size_t len = file.Read(Buffer, size);
-        Buffer[len] = '\0';
+            ZenLib::int8u* Buffer = new ZenLib::int8u[size + 1];
 
-        ZenLib::Ztring FromFile;
-        FromFile.From_UTF8((char*)Buffer);
-        if (FromFile.empty())
-            FromFile.From_Local((char*)Buffer);
+            size_t len = file.Read(Buffer, size);
+            Buffer[len] = '\0';
 
-        file.Close();
-        policies.push_back(FromFile.To_UTF8());
-        delete [] Buffer;
+            ZenLib::Ztring FromFile;
+            FromFile.From_UTF8((char*)Buffer);
+            if (FromFile.empty())
+                FromFile.From_Local((char*)Buffer);
+
+            file.Close();
+            policies.push_back(FromFile.To_UTF8());
+            delete [] Buffer;
+        }
         return 0;
     }
 
