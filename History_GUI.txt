@@ -7,6 +7,13 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.04, 2017-05-04
+--------------
+Better support of some broken Matroska files (high EBMLMaxSizeLength, padding before start of EBML)
+Was sometimes displaying "Bit depth: Bit0" when bit depth is unknown in Matroska
+FFV1 PixelAspectRatio was an integer, switched to 3-digit rational
+Several small bug fixes and small performance optimizations
+
 Version 17.03, 2017-03-31
 --------------
 Analyze attachments in Matroska files
