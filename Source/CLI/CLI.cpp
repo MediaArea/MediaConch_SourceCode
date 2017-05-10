@@ -91,7 +91,8 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
     CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false),
                  force_analyze(false), mil_analyze(true),
                  watch_folder_recursive(true), create_policy_mode(false), file_information(false),
-                 plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false)
+                 plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false),
+                 list_mode(false)
     {
         format = MediaConchLib::format_Max;
     }
@@ -190,6 +191,9 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
         //Return watch folders list
         else if (list_watch_folders_mode)
             return run_watch_folders_list(err);
+        //Return list files
+        else if (list_mode)
+            return run_list_files(err);
         // Add a watch folder
         else if (watch_folder.size())
             return run_watch_folder_cmd(err);
@@ -370,6 +374,31 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
         }
 
         out << "]";
+
+        MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
+        STRINGOUT(out_str);
+
+        return 0;
+    }
+
+    //--------------------------------------------------------------------------
+    int CLI::run_list_files(std::string& err)
+    {
+        std::vector<std::string> list;
+        if (MCL.checker_list(use_as_user, list, err) < 0)
+            return -1;
+
+        std::stringstream out;
+        out << "{\"files_analyzed\":[";
+
+        for (size_t i = 0; i < list.size(); ++i)
+        {
+            if (i)
+                out << ", ";
+            out << "\"" << list[i] << "\"";
+        }
+
+        out << "]}";
 
         MediaInfoLib::String out_str = ZenLib::Ztring().From_UTF8(out.str());
         STRINGOUT(out_str);
@@ -641,6 +670,13 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
     void CLI::set_list_watch_folders_mode()
     {
         list_watch_folders_mode = true;
+        no_needs_files_mode = true;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_list_mode()
+    {
+        list_mode = true;
         no_needs_files_mode = true;
     }
 

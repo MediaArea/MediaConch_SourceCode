@@ -1170,7 +1170,7 @@ int SQLLiteReport::get_elements(int user, std::vector<std::string>& vec, std::st
         return -1;
     }
 
-    if (execute() || !reports.size())
+    if (execute())
     {
         err = get_sqlite_error(ret);
         return -1;
@@ -1204,7 +1204,7 @@ int SQLLiteReport::get_elements(int user, std::vector<long>& vec, std::string& e
         return -1;
     }
 
-    if (execute() || !reports.size())
+    if (execute())
     {
         err = get_sqlite_error(ret);
         return -1;

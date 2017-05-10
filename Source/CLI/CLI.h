@@ -59,6 +59,7 @@ namespace MediaConch
         int  set_watch_folder_not_recursive();
         int  set_watch_folder_user(const std::string& user);
         void set_list_watch_folders_mode();
+        void set_list_mode();
 
       private:
         CLI(const CLI&);
@@ -73,6 +74,7 @@ namespace MediaConch
         int  is_ready(long file_id, std::vector<long>& file_ids, MediaConchLib::report& report_kind, std::string& err);
         void add_files_recursively(const std::string& filename);
         void file_info_report(const MediaConchLib::Checker_FileInfo* info, std::string& report);
+        int  run_list_files(std::string& err);
 
         MediaConchLib MCL;
         std::vector<std::string> files;
@@ -101,6 +103,7 @@ namespace MediaConch
         bool                    plugins_list_mode;
         bool                    list_watch_folders_mode;
         bool                    no_needs_files_mode;
+        bool                    list_mode;
     };
 
 }

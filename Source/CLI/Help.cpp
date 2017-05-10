@@ -84,6 +84,10 @@ int Help()
     TEXTOUT("                    Apply the display transformation (XSL)");
     TEXTOUT("");
 
+    TEXTOUT("--List");
+    TEXTOUT("                    List files analyzed.");
+    TEXTOUT("");
+
     TEXTOUT("Watch folder:");
     TEXTOUT("--WatchFolders-List, -wfl");
     TEXTOUT("                    List the folder watched");

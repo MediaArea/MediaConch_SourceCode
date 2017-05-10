@@ -31,6 +31,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument);
 CL_OPTION(Help);
 CL_OPTION(Inform);
 CL_OPTION(User);
+CL_OPTION(List);
 CL_OPTION(Report);
 CL_OPTION(Language);
 CL_OPTION(Format);
