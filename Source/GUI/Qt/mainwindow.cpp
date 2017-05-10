@@ -331,7 +331,7 @@ QString MainWindow::get_local_folder() const
 QString MainWindow::ask_for_schema_file()
 {
     QString suggested = QString().fromUtf8(select_correct_load_policy_path().c_str());
-    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QString file = QFileDialog::getOpenFileName(this, "Open file", suggested, "XSL file (*.xsl);;All (*.*)", 0, QFileDialog::Option(0));
 
     if (file.length())
     {
@@ -507,7 +507,7 @@ int MainWindow::get_fields_for_type(const std::string& type, std::vector<std::st
 //---------------------------------------------------------------------------
 void MainWindow::on_actionOpen_triggered()
 {
-    QStringList list = QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+    QStringList list = QFileDialog::getOpenFileNames(this, "Open file", "", "Video files (*.avi *.mkv *.mov *.mxf *.mp4);;All (*.*)", 0, QFileDialog::Option(0));
     if (list.empty())
         return;
 
