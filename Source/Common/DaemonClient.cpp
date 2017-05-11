@@ -541,6 +541,37 @@ int DaemonClient::checker_status(int user, long file_id, MediaConchLib::Checker_
 }
 
 //---------------------------------------------------------------------------
+int DaemonClient::checker_clear(int user, const std::vector<long>& files, std::string& err)
+{
+    RESTAPI::Checker_Clear_Req  req;
+    RESTAPI::Checker_Clear_Res *res = NULL;
+    req.user = user;
+    for (size_t i = 0; i < files.size(); ++i)
+        req.ids.push_back(files[i]);
+
+    COMMON_HTTP_REQ_RES(checker_clear, -1)
+
+    if (res->nok.size())
+    {
+        if (res->nok[0])
+            err = res->nok[0]->error;
+        else
+            err = "Cannmot clear the ids.";
+        delete res;
+        return -1;
+    }
+    else if (res->ok.size() != files.size())
+    {
+        err = "Internal error.";
+        delete res;
+        return -1;
+    }
+
+    delete res;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_ReportRes* result, std::string& err)
 {
     // FILE

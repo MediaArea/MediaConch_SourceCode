@@ -309,14 +309,14 @@ public:
 
     // Output
     int  checker_get_report(CheckerReport& c_report, Checker_ReportRes* result, std::string& error);
-    int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
-                         const std::vector<size_t>& policies_ids,
-                         const std::vector<std::string>& policies_contents,
-                         const std::map<std::string, std::string>& options,
-                         std::vector<Checker_ValidateRes*>& result, std::string& error);
+    int  checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
+                          const std::vector<size_t>& policies_ids,
+                          const std::vector<std::string>& policies_contents,
+                          const std::map<std::string, std::string>& options,
+                          std::vector<Checker_ValidateRes*>& result, std::string& error);
 
     //Clear
-    int remove_report(int user, const std::vector<long>& files, std::string& error);
+    int  checker_clear(int user, const std::vector<long>& files, std::string& error);
 
     // Policies
     //   Create policy

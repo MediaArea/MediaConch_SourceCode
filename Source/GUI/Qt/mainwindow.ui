@@ -73,6 +73,7 @@
     <addaction name="actionPolicies"/>
     <addaction name="actionPublicPolicies"/>
     <addaction name="actionDisplay"/>
+    <addaction name="actionDatabase"/>
     <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -145,6 +146,14 @@
    </property>
    <property name="text">
     <string>&amp;Display</string>
+   </property>
+  </action>
+  <action name="actionDatabase">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Data&amp;base</string>
    </property>
   </action>
   <action name="actionSettings">

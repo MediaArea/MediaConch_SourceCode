@@ -785,6 +785,31 @@ bool SQLLiteReport::file_is_analyzed(int user, long id, std::string& err)
     return true;
 }
 
+int SQLLiteReport::remove_file(int user, long file_id, std::string& err)
+{
+    reports.clear();
+    query = "DELETE FROM MEDIACONCH_FILE WHERE ID = ? AND USER = ?;";
+
+    if (prepare_v2(query, err) < 0)
+        return -1;
+
+    int ret = sqlite3_bind_int(stmt, 1, file_id);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    ret = sqlite3_bind_int(stmt, 2, user);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    return execute();
+}
+
 int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report report_kind, MediaConchLib::format format,
                                const std::string& options,
                                const std::string& report, MediaConchLib::compression compress,

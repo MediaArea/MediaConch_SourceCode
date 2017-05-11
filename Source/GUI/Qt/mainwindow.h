@@ -36,6 +36,7 @@ class CheckerWindow;
 class PoliciesWindow;
 class PublicPoliciesWindow;
 class DisplayWindow;
+class DatabaseWindow;
 class VerbositySpinbox;
 class PolicyCombobox;
 class DisplayCombobox;
@@ -56,6 +57,7 @@ public:
         RUN_CHECKER_VIEW,
         RUN_POLICIES_VIEW,
         RUN_DISPLAY_VIEW,
+        RUN_DATABASE_VIEW,
         RUN_SETTINGS_VIEW,
         RUN_PUBLIC_POLICIES_VIEW,
     };
@@ -114,12 +116,15 @@ public:
     void                        policies_selected();
     void                        public_policies_selected();
     void                        display_selected();
+    void                        database_selected();
     void                        settings_selected();
     void                        add_default_displays();
     void                        get_implementation_report(long file_id, QString& report, std::string& err,
                                                           int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(long file_id, QString& report, std::string& err, int policy=-1, int *display=NULL);
+    int                         checker_clear(long id, QString& err);
     int                         checker_file_from_id(long id, std::string& file, std::string& err);
+    int                         checker_file_information(long id, MediaConchLib::Checker_FileInfo& file, std::string& err);
 
     void                        add_policy_to_list(const QString& policy);
     void                        clear_policy_list();
@@ -183,6 +188,8 @@ public:
     QString                     get_local_folder() const;
     void                        get_registered_files(std::map<std::string, FileRegistered*>& files);
 
+    void                        checker_list(std::vector<long>& files, QString& error);
+
     // Display related
     std::vector<QString>&       get_displays();
     int                         display_add_file(const QString& name, const QString& filename);
@@ -219,6 +226,7 @@ private:
     PoliciesWindow*             policiesView;
     PublicPoliciesWindow*       publicPoliciesView;
     DisplayWindow*              displayView;
+    DatabaseWindow*             databaseView;
     SettingsWindow*             settingsView;
 
     void                        create_and_configure_ui_database();
@@ -229,6 +237,7 @@ private:
     void                        createPoliciesView();
     void                        createPublicPoliciesView();
     void                        createDisplayView();
+    void                        createDatabaseView();
     void                        createSettingsView();
 
     void                        fill_display_used(int *policy_i,
@@ -258,6 +267,7 @@ public Q_SLOTS:
     void on_actionPolicies_triggered();
     void on_actionPublicPolicies_triggered();
     void on_actionDisplay_triggered();
+    void on_actionDatabase_triggered();
     void on_actionSettings_triggered();
 
     //Help

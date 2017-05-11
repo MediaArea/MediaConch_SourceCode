@@ -238,6 +238,22 @@ bool NoDatabaseReport::file_is_analyzed(int user, long id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int NoDatabaseReport::remove_file(int user, long id, std::string& err)
+{
+    err = std::string();
+    if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
+        files_saved[id]->user == user)
+    {
+        delete files_saved[id];
+        files_saved[id] = NULL;
+        return 0;
+    }
+
+    err = "File not found";
+    return -1;
+}
+
+//---------------------------------------------------------------------------
 int NoDatabaseReport::add_file_generated_id(int user, long source_id, long generated_id, std::string& err)
 {
     if (source_id >= 0 && source_id < (long)files_saved.size() && files_saved[source_id] &&

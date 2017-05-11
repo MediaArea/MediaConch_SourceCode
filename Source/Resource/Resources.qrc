@@ -15,6 +15,7 @@
         <file alias="xsltPolicy.html">html/xslPolicy.html</file>
         <file alias="publicPolicies.html">html/publicPolicies.html</file>
         <file alias="display.html">html/display.html</file>
+        <file alias="database.html">html/database.html</file>
         <file alias="jquery.js">html/js/jquery-1.12.4.min.js</file>
         <file alias="bootstrap.js">html/js/bootstrap.min.js</file>
         <file alias="jstree.js">html/js/jstree.min.js</file>
@@ -53,6 +54,9 @@
         <file alias="users/userWebKit.js">html/js/users/userWebKit.js</file>
         <file alias="message.js">html/js/message.js</file>
         <file alias="display.js">html/js/display.js</file>
+        <file alias="database/database.js">html/js/database/database.js</file>
+        <file alias="database/databaseWebEngine.js">html/js/database/databaseWebEngine.js</file>
+        <file alias="database/databaseWebKit.js">html/js/database/databaseWebKit.js</file>
         <file alias="settings.js">html/js/settings.js</file>
         <file alias="main.css">html/css/main.css</file>
         <file alias="main-gui.css">html/css/main-gui.css</file>

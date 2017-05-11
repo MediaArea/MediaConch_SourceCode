@@ -400,12 +400,12 @@ int MediaConchLib::checker_validate(int user, report report, const std::vector<l
 }
 
 //---------------------------------------------------------------------------
-int MediaConchLib::remove_report(int user, const std::vector<long>& files, std::string& error)
+int MediaConchLib::checker_clear(int user, const std::vector<long>& files, std::string& error)
 {
-    if (!files.size())
-        return errorHttp_INVALID_DATA;
+    // if (use_daemon)
+    //     return daemon_client->checker_clear(user, files, error);
 
-    return core->remove_report(user, files, error);
+    return core->checker_clear(user, files, error);
 }
 
 //***************************************************************************

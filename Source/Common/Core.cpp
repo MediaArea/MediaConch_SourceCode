@@ -596,7 +596,7 @@ int Core::checker_list(int user, std::vector<long>& vec, std::string& err)
 }
 
 //---------------------------------------------------------------------------
-int Core::remove_report(int user, const std::vector<long>& files, std::string& err)
+int Core::checker_clear(int user, const std::vector<long>& files, std::string& err)
 {
     if (!get_db())
     {
@@ -608,7 +608,9 @@ int Core::remove_report(int user, const std::vector<long>& files, std::string& e
     db_mutex.Enter();
     for (size_t i = 0; i < files.size(); ++i)
     {
-        if (db->remove_report(user, files[i], err) < 0)
+        if (get_db()->remove_report(user, files[i], err) < 0)
+            ret = -1;
+        if (get_db()->remove_file(user, files[i], err) < 0)
             ret = -1;
     }
     db_mutex.Leave();

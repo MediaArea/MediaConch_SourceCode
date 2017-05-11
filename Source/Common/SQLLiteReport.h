@@ -61,6 +61,7 @@ public:
                                               bool& analyzed, bool& has_error, std::string& error_log,
                                               std::string& err);
     virtual bool file_is_analyzed(int user, long id, std::string& err);
+    virtual int  remove_file(int user, long filen, std::string& err);
     virtual int  add_file_generated_id(int user, long source_id, long generated_id, std::string& err);
     virtual int  update_file_analyzed(int user, long id, std::string& err, bool analyzed=true);
     virtual int  update_file_error(int user, long id, std::string& err, bool has_error=true, const std::string& error_log="");
