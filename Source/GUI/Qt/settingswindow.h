@@ -40,6 +40,7 @@ private:
     void remove_result_in_template(QString& html);
     void change_checker_in_template(QString& html, const QString& settings);
 
+    void add_logged_to_js_input(WebPage *page);
     void add_save_report_path_to_js_input(WebPage *page);
     void add_load_files_path_to_js_input(WebPage *page);
     void add_save_policy_path_to_js_input(WebPage *page);
