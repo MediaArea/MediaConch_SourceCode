@@ -657,7 +657,7 @@ namespace MediaConch
             return QString();
 
         QString suggested = QString().fromUtf8(suggested_str.c_str(), suggested_str.length());
-        QString value_input = QFileDialog::getOpenFileName(mainwindow, "Open file", suggested, "XML file (*.xml);;XSL file (*.xsl);;All (*.*)", 0, QFileDialog::DontUseNativeDialog);
+        QString value_input = QFileDialog::getOpenFileName(mainwindow, "Open file", suggested, "XML file (*.xml);;XSL file (*.xsl);;All (*.*)", 0, QFileDialog::Option(0));
 
         QMap<QString, QStringList>::iterator it = file_selector.find(select_file_name);
         if (it != file_selector.end())
