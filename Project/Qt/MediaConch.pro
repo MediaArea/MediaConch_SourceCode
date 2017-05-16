@@ -312,7 +312,15 @@ contains(NO_LIBEVENT, yes|1) {
     }
 }
 
-macx:QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+macx:contains(MACSTORE, yes|1) {
+    QMAKE_CFLAGS += -gdwarf-2
+    QMAKE_CXXFLAGS += -gdwarf-2
+    QMAKE_INFO_PLIST = ../Mac/Info.plist
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+} else:macx {
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+}
+
 LIBS             += -lz
 !macx:LIBS       += -ldl -lrt
 
