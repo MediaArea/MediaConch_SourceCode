@@ -605,15 +605,27 @@ int Core::checker_clear(int user, const std::vector<long>& files, std::string& e
     }
 
     int ret = 0;
-    db_mutex.Enter();
-    for (size_t i = 0; i < files.size(); ++i)
+    if (files.size())
     {
-        if (get_db()->remove_report(user, files[i], err) < 0)
-            ret = -1;
-        if (get_db()->remove_file(user, files[i], err) < 0)
-            ret = -1;
+        db_mutex.Enter();
+        for (size_t i = 0; i < files.size(); ++i)
+        {
+            if (get_db()->remove_report(user, files[i], err) < 0)
+                ret = -1;
+            if (get_db()->remove_file(user, files[i], err) < 0)
+                ret = -1;
+        }
+        db_mutex.Leave();
     }
-    db_mutex.Leave();
+    else
+    {
+        db_mutex.Enter();
+        if (get_db()->remove_all_reports(user, err) < 0)
+            ret = -1;
+        if (get_db()->remove_all_files(user, err) < 0)
+            ret = -1;
+        db_mutex.Leave();
+    }
 
     return ret;
 }

@@ -144,6 +144,7 @@ public Q_SLOTS:
 
     QString      checker_list();
     QString      remove_file_from_db(long id);
+    QString      remove_all_files_from_db();
 
     QString      get_version();
     QString      get_mco_token();

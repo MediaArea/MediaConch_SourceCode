@@ -556,7 +556,7 @@ int DaemonClient::checker_clear(int user, const std::vector<long>& files, std::s
         if (res->nok[0])
             err = res->nok[0]->error;
         else
-            err = "Cannmot clear the ids.";
+            err = "Cannot clear the ids.";
         delete res;
         return -1;
     }

@@ -1,13 +1,26 @@
 var database = (function() {
 
-    mcoMessage.init('#databaseInfo div');
-
     var init = function() {
+        mcoMessage.init('#databaseInfo div');
         databaseAjax.init();
     }
 
     var load = function() {
         databaseAjax.loadTree();
+
+        // Show delete all button
+        if (accordionDatabase.childElementCount != 0)
+            $('#databaseCloseAll').removeClass('hidden');
+
+        // Remove all file blocks
+        $('#databaseCloseAll').on('click', function(e) {
+            e.preventDefault();
+            databaseAjax.removeAllFiles();
+            $('#accordionDatabase').remove();
+
+            // Remove close all button
+            $(this).addClass('hidden');
+        });
     }
 
     var addFile = function(file) {
@@ -24,12 +37,16 @@ var database = (function() {
                 </div> \
               </div> \
             </div>');
+        $('#databaseCloseAll').removeClass('hidden');
 
         $('#database_file_remove' + file.id).on('click', function(e) {
             e.preventDefault();
-            webpage.remove_file_from_db(file.id);
+            databaseAjax.removeFile(file.id);
             $('#database_' + file.id).remove();
-        });;
+            // Show delete all button
+            if (accordionDatabase.childElementCount != 0)
+                $('#databaseCloseAll').addClass('hidden');
+        });
 
     }
 

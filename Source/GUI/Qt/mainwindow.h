@@ -70,6 +70,7 @@ public:
     int                         add_attachment_to_list(const QString& file, int policy, int display,
                                                        int verbosity, std::string& err);
     void                        remove_file_to_list(long file_id);
+    void                        remove_all_files_to_list();
     void                        update_policy_of_file_in_list(long file_id, const QString& policy);
     int                         analyze_force_file_to_list(long id, std::string& err);
     void                        clear_file_list();
@@ -123,6 +124,7 @@ public:
                                                           int *display=NULL, int *verbosity=NULL);
     int                         validate_policy(long file_id, QString& report, std::string& err, int policy=-1, int *display=NULL);
     int                         checker_clear(long id, QString& err);
+    int                         checker_clear(QString& err);
     int                         checker_file_from_id(long id, std::string& file, std::string& err);
     int                         checker_file_information(long id, MediaConchLib::Checker_FileInfo& file, std::string& err);
 

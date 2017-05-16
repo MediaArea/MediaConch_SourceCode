@@ -1711,6 +1711,20 @@ namespace MediaConch
         return ret;
     }
 
+    QString WebCommonPage::remove_all_files_from_db()
+    {
+        QString ret("{");
+        QString error;
+        if (mainwindow->checker_clear(error) < 0)
+        {
+            string_to_json(error);
+            ret += QString("\"error\":\"%1\"").arg(error);
+        }
+
+        ret += "}";
+        return ret;
+    }
+
     void WebCommonPage::string_to_json(QString& str)
     {
         str.replace("\"", "\\\"");

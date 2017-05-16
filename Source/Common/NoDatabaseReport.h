@@ -62,6 +62,7 @@ public:
                                               std::string& err);
     virtual bool file_is_analyzed(int user, long id, std::string& err);
     virtual int  remove_file(int user, long filen, std::string& err);
+    virtual int  remove_all_files(int user, std::string& err);
     virtual int  add_file_generated_id(int user, long source_id, long generated_id, std::string& err);
     virtual int  update_file_analyzed(int user, long id, std::string& err, bool analyzed=true);
     virtual int  update_file_error(int user, long id, std::string& err, bool has_error=true, const std::string& error_log="");
@@ -71,6 +72,7 @@ public:
                              const std::string& options,
                              const std::string& report, MediaConchLib::compression, int, std::string&);
     virtual int  remove_report(int user, long file_id, std::string& err);
+    virtual int  remove_all_reports(int user, std::string& err);
     virtual int  get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& options,
                             std::string& report, MediaConchLib::compression&, std::string&);

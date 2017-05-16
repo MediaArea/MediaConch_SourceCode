@@ -255,6 +255,12 @@ void MainWindow::remove_file_to_list(long file_id)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::remove_all_files_to_list()
+{
+    workerfiles.remove_all_files_registered();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::update_policy_of_file_in_list(long file_id, const QString& policy)
 {
     int policy_i = policy.toInt();
@@ -1424,6 +1430,21 @@ int MainWindow::checker_clear(long id, QString& err)
         err = QString().fromUtf8(error.c_str(), error.size());
     else
         remove_file_to_list(id);
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::checker_clear(QString& err)
+{
+    std::string error;
+    std::vector<long> files;
+
+    int ret = MCL.checker_clear(user, files, error);
+    if (ret < 0)
+        err = QString().fromUtf8(error.c_str(), error.size());
+    else
+        remove_all_files_to_list();
 
     return ret;
 }
