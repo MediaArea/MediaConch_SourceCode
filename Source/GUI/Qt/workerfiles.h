@@ -45,6 +45,7 @@ public:
     FileRegistered* get_file_registered_from_file(const std::string& file);
     FileRegistered* get_file_registered_from_id(long id);
     void remove_file_registered_from_id(long file_id);
+    void remove_all_files_registered();
     void get_registered_files(std::map<std::string, FileRegistered*>& files);
     long get_id_from_registered_file(const std::string& file);
     std::string get_filename_from_registered_file_id(long file_id);

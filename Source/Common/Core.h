@@ -102,7 +102,7 @@ public:
                                 const std::string& alias="");
 
     int         checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res, std::string& error);
-    int         remove_report(int user, const std::vector<long>& files, std::string& error);
+    int         checker_clear(int user, const std::vector<long>& files, std::string& error);
 
     int         checker_list(int user, std::vector<std::string>& vec, std::string& error);
     int         checker_list(int user, std::vector<long>& vec, std::string& error);

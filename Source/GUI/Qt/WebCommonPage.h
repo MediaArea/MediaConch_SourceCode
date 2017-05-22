@@ -142,6 +142,10 @@ public Q_SLOTS:
     QString      get_fields_list(const QString& type, const QString& field);
     void         call_tooltip(const QString&);
 
+    QString      checker_list();
+    QString      remove_file_from_db(long id);
+    QString      remove_all_files_from_db();
+
     QString      get_version();
     QString      get_mco_token();
     QString      save_mco_token(const QString& token);

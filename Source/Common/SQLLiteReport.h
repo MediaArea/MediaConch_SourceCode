@@ -41,6 +41,7 @@ public:
 
     //User
     virtual void get_users_id(std::vector<long>& ids, std::string& err);
+    int          get_file_ids(long user, std::vector<long>& ids, std::string& err);
 
     // File
     virtual long add_file(int user, const std::string& filename, const std::string& file_last_modification,
@@ -61,6 +62,8 @@ public:
                                               bool& analyzed, bool& has_error, std::string& error_log,
                                               std::string& err);
     virtual bool file_is_analyzed(int user, long id, std::string& err);
+    virtual int  remove_file(int user, long file, std::string& err);
+    virtual int  remove_all_files(int user, std::string& err);
     virtual int  add_file_generated_id(int user, long source_id, long generated_id, std::string& err);
     virtual int  update_file_analyzed(int user, long id, std::string& err, bool analyzed=true);
     virtual int  update_file_error(int user, long id, std::string& err, bool has_error=true, const std::string& error_log="");
@@ -75,6 +78,7 @@ public:
                                const std::string& report, MediaConchLib::compression,
                                int mil_version, std::string& err);
     virtual int  remove_report(int user, long filename, std::string& err);
+    virtual int  remove_all_reports(int user, std::string& err);
     virtual int  get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                             const std::string& options,
                             std::string& report, MediaConchLib::compression&, std::string& err);

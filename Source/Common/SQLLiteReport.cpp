@@ -148,6 +148,37 @@ void SQLLiteReport::get_users_id(std::vector<long>& ids, std::string& err)
     }
 }
 
+//---------------------------------------------------------------------------
+int SQLLiteReport::get_file_ids(long user, std::vector<long>& ids, std::string& err)
+{
+    reports.clear();
+    query = "SELECT ID FROM MEDIACONCH_FILE WHERE USER = ?;";
+
+    if (prepare_v2(query, err) < 0)
+        return -1;
+
+    int ret = sqlite3_bind_int(stmt, 1, user);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    if (execute() < 0)
+    {
+        err = error;
+        return -1;
+    }
+
+    for (size_t i = 0; i < reports.size(); ++i)
+    {
+        if (reports[i].find("ID") != reports[i].end())
+            ids.push_back(std_string_to_int(reports[i]["ID"]));
+    }
+
+    return 0;
+}
+
 long SQLLiteReport::add_file(int user, const std::string& filename, const std::string& file_last_modification,
                              const std::string& options, std::string& err,
                              const std::vector<long>& generated_id,
@@ -785,6 +816,49 @@ bool SQLLiteReport::file_is_analyzed(int user, long id, std::string& err)
     return true;
 }
 
+int SQLLiteReport::remove_file(int user, long file_id, std::string& err)
+{
+    reports.clear();
+    query = "DELETE FROM MEDIACONCH_FILE WHERE ID = ? AND USER = ?;";
+
+    if (prepare_v2(query, err) < 0)
+        return -1;
+
+    int ret = sqlite3_bind_int(stmt, 1, file_id);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    ret = sqlite3_bind_int(stmt, 2, user);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    return execute();
+}
+
+int SQLLiteReport::remove_all_files(int user, std::string& err)
+{
+    reports.clear();
+    query = "DELETE FROM MEDIACONCH_FILE WHERE USER = ?;";
+
+    if (prepare_v2(query, err) < 0)
+        return -1;
+
+    int ret = sqlite3_bind_int(stmt, 1, user);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    return execute();
+}
+
 int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report report_kind, MediaConchLib::format format,
                                const std::string& options,
                                const std::string& report, MediaConchLib::compression compress,
@@ -956,6 +1030,45 @@ int SQLLiteReport::remove_report(int user, long file_id, std::string& err)
     {
         err = get_sqlite_error(ret);
         return -1;
+    }
+
+    return execute();
+}
+
+int SQLLiteReport::remove_all_reports(int user, std::string& err)
+{
+    std::vector<long> ids;
+    get_file_ids(user, ids, err);
+    if (!ids.size())
+        return 0;
+
+    std::stringstream delete_query;
+
+    reports.clear();
+    delete_query << "DELETE FROM MEDIACONCH_REPORT WHERE";
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        if (i)
+            delete_query << " OR";
+        delete_query << " FILE_ID = ?";
+    }
+    delete_query << ";";
+
+    query = delete_query.str();
+
+    if (prepare_v2(query, err) < 0)
+        return -1;
+
+    int ret = 0;
+
+    for (size_t i = 0; i < ids.size(); ++i)
+    {
+        ret = sqlite3_bind_int(stmt, i + 1, ids[i]);
+        if (ret != SQLITE_OK)
+        {
+            err = get_sqlite_error(ret);
+            return -1;
+        }
     }
 
     return execute();
@@ -1170,7 +1283,7 @@ int SQLLiteReport::get_elements(int user, std::vector<std::string>& vec, std::st
         return -1;
     }
 
-    if (execute() || !reports.size())
+    if (execute())
     {
         err = get_sqlite_error(ret);
         return -1;
@@ -1204,7 +1317,7 @@ int SQLLiteReport::get_elements(int user, std::vector<long>& vec, std::string& e
         return -1;
     }
 
-    if (execute() || !reports.size())
+    if (execute())
     {
         err = get_sqlite_error(ret);
         return -1;

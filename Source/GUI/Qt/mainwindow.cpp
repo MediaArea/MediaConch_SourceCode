@@ -11,6 +11,7 @@
 #include "policieswindow.h"
 #include "publicpolicieswindow.h"
 #include "displaywindow.h"
+#include "databasewindow.h"
 #include "helpwindow.h"
 #include "WebView.h"
 #include "WebPage.h"
@@ -102,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ToolGroup->addAction(ui->actionPolicies);
     ToolGroup->addAction(ui->actionPublicPolicies);
     ToolGroup->addAction(ui->actionDisplay);
+    ToolGroup->addAction(ui->actionDatabase);
     ToolGroup->addAction(ui->actionSettings);
 
     // Visual elements
@@ -112,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent) :
     policiesView = NULL;
     publicPoliciesView = NULL;
     displayView = NULL;
+    databaseView = NULL;
     settingsView = NULL;
 
     // Window
@@ -252,6 +255,12 @@ void MainWindow::remove_file_to_list(long file_id)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::remove_all_files_to_list()
+{
+    workerfiles.remove_all_files_registered();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::update_policy_of_file_in_list(long file_id, const QString& policy)
 {
     int policy_i = policy.toInt();
@@ -298,6 +307,9 @@ void MainWindow::Run()
             break;
         case RUN_DISPLAY_VIEW:
             createDisplayView();
+            break;
+        case RUN_DATABASE_VIEW:
+            createDatabaseView();
             break;
         case RUN_SETTINGS_VIEW:
             createSettingsView();
@@ -565,6 +577,17 @@ void MainWindow::on_actionDisplay_triggered()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::on_actionDatabase_triggered()
+{
+    if (!ui->actionDatabase->isChecked())
+        ui->actionDatabase->setChecked(true);
+    if (clearVisualElements() < 0)
+        return;
+    current_view = RUN_DATABASE_VIEW;
+    Run();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::on_actionSettings_triggered()
 {
     if (!ui->actionSettings->isChecked())
@@ -609,6 +632,8 @@ void MainWindow::loadFinished_Custom(bool ok)
         publicPoliciesView->create_web_view_finished();
     if (displayView)
         displayView->create_web_view_finished();
+    if (databaseView)
+        databaseView->create_web_view_finished();
     if (settingsView)
         settingsView->create_web_view_finished();
 }
@@ -685,6 +710,12 @@ int MainWindow::clearVisualElements()
         displayView = NULL;
     }
 
+    if (databaseView)
+    {
+        delete databaseView;
+        databaseView = NULL;
+    }
+
     if (settingsView)
     {
         delete settingsView;
@@ -739,6 +770,16 @@ void MainWindow::createDisplayView()
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::createDatabaseView()
+{
+    if (clearVisualElements() < 0)
+        return;
+
+    databaseView = new DatabaseWindow(this);
+    databaseView->display_database();
+}
+
+//---------------------------------------------------------------------------
 void MainWindow::createSettingsView()
 {
     if (clearVisualElements() < 0)
@@ -777,6 +818,11 @@ void MainWindow::drag_and_drop_files_action(const QStringList& files)
 
     if (displayView)
         displayView->add_new_files(files);
+
+    if (databaseView)
+    {
+        //nothing to do
+    }
 
     if (settingsView)
     {
@@ -832,6 +878,12 @@ void MainWindow::public_policies_selected()
 void MainWindow::display_selected()
 {
     on_actionDisplay_triggered();
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::database_selected()
+{
+    on_actionDatabase_triggered();
 }
 
 //---------------------------------------------------------------------------
@@ -1367,9 +1419,46 @@ int MainWindow::validate_policy(long file_id, size_t policy_id,
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::checker_clear(long id, QString& err)
+{
+    std::string error;
+    std::vector<long> files;
+    files.push_back(id);
+
+    int ret = MCL.checker_clear(user, files, error);
+    if (ret < 0)
+        err = QString().fromUtf8(error.c_str(), error.size());
+    else
+        remove_file_to_list(id);
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::checker_clear(QString& err)
+{
+    std::string error;
+    std::vector<long> files;
+
+    int ret = MCL.checker_clear(user, files, error);
+    if (ret < 0)
+        err = QString().fromUtf8(error.c_str(), error.size());
+    else
+        remove_all_files_to_list();
+
+    return ret;
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::checker_file_from_id(long id, std::string& file, std::string& err)
 {
     return MCL.checker_file_from_id(user, id, file, err);
+}
+
+//---------------------------------------------------------------------------
+int MainWindow::checker_file_information(long id, MediaConchLib::Checker_FileInfo& file, std::string& err)
+{
+    return MCL.checker_file_information(user, id, file, err);
 }
 
 //---------------------------------------------------------------------------
@@ -1554,6 +1643,20 @@ int MainWindow::validate_policy(long file_id, QString& report, std::string& err,
     if (result.valid)
         return 1;
     return 0;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::checker_list(std::vector<long>& files, QString& error)
+{
+    std::string err;
+    std::vector<long> list;
+    if (MCL.checker_list(user, list, err) < 0)
+        error = QString().fromUtf8(err.c_str(), err.size());
+    else
+    {
+        for (size_t i = 0; i < list.size(); ++i)
+            files.push_back(list[i]);
+    }
 }
 
 //---------------------------------------------------------------------------

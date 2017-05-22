@@ -33,6 +33,8 @@ namespace MediaConch
             Q_EMIT mainwindow->on_actionPublicPolicies_triggered();
         else if (!menu_name.compare("Display"))
             Q_EMIT mainwindow->on_actionDisplay_triggered();
+        else if (!menu_name.compare("Database"))
+            Q_EMIT mainwindow->on_actionDatabase_triggered();
         else if (!menu_name.compare("Settings"))
             Q_EMIT mainwindow->on_actionSettings_triggered();
         else if (!menu_name.compare("Help"))
@@ -1664,6 +1666,63 @@ namespace MediaConch
             json += QString("%1\"%2\"").arg(values.size() > 0 ? "," : "").arg(value);
         json += "]}";
         return json;
+    }
+
+    QString WebCommonPage::checker_list()
+    {
+        std::vector<long> files;
+        QString error;
+        mainwindow->checker_list(files, error);
+        QString ret("{\"files\":[");
+        for (size_t i = 0; i < files.size(); ++i)
+        {
+            MediaConchLib::Checker_FileInfo fi;
+            std::string err;
+            if (mainwindow->checker_file_information(files[i], fi, err) < 0)
+                error = QString().fromUtf8(err.c_str(), err.size());
+
+            if (i)
+                ret += ",";
+
+            QString file = QString().fromUtf8(fi.filename.c_str(), fi.filename.size());
+            string_to_json(file);
+            ret += QString("{\"name\":\"%1\",\"id\":%2}").arg(file).arg(files[i]);
+        }
+        ret += "]";
+
+        if (error.size())
+            ret += QString(",\"error\":\"%1\"").arg(error);
+        ret += "}";
+
+        return ret;
+    }
+
+    QString WebCommonPage::remove_file_from_db(long id)
+    {
+        QString ret("{");
+        QString error;
+        if (mainwindow->checker_clear(id, error) < 0)
+        {
+            string_to_json(error);
+            ret += QString("\"error\":\"%1\"").arg(error);
+        }
+
+        ret += "}";
+        return ret;
+    }
+
+    QString WebCommonPage::remove_all_files_from_db()
+    {
+        QString ret("{");
+        QString error;
+        if (mainwindow->checker_clear(error) < 0)
+        {
+            string_to_json(error);
+            ret += QString("\"error\":\"%1\"").arg(error);
+        }
+
+        ret += "}";
+        return ret;
     }
 
     void WebCommonPage::string_to_json(QString& str)

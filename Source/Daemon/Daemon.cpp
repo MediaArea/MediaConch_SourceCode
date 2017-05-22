@@ -995,7 +995,7 @@ namespace MediaConch
             files.push_back(id);
 
             std::string err;
-            if (d->MCL->remove_report(req->user, files, err) < 0)
+            if (d->MCL->checker_clear(req->user, files, err) < 0)
                 FUN_CMD_NOK_ARR(res, err, id)
 
             res.ok.push_back(id);

@@ -251,6 +251,9 @@
     <ClCompile Include="..\..\..\Source\Common\Reports.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\GUI\Qt\databasewindow.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h">
@@ -513,6 +516,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Common\Reports.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\GUI\Qt\databasewindow.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

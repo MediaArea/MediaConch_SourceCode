@@ -236,6 +236,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--watchfolder-user",                            WatchFolderUser)
     OPTION("--watchfolder",                                 WatchFolder)
     OPTION("--user",                                        User)
+    OPTION("--list",                                        List)
     //Default
     OPTION("--",                                            Default)
     else
@@ -666,6 +667,16 @@ CL_OPTION(User)
     std::string user;
     user.assign(argument, egal_pos + 1 , std::string::npos);
     cli->set_user_to_use(user);
+
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(List)
+{
+    //Form : --list
+    (void)argument;
+    cli->set_list_mode();
 
     return CLI_RETURN_NONE;
 }

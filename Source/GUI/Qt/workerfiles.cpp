@@ -659,6 +659,32 @@ void WorkerFiles::remove_file_registered_from_id(long file_id)
 }
 
 //---------------------------------------------------------------------------
+void WorkerFiles::remove_all_files_registered()
+{
+    std::string file;
+    FileRegistered *fr = NULL;
+
+    working_files_mutex.lock();
+    std::map<std::string, FileRegistered*>::iterator it = working_files.begin();
+    for (; it != working_files.end(); ++it)
+    {
+        if (!it->second)
+            continue;
+
+        fr = it->second;
+        file = it->first;
+        it->second = NULL;
+
+        to_delete_files_mutex.lock();
+        to_delete_files[file] = fr;
+        to_delete_files_mutex.unlock();
+    }
+    working_files.clear();
+    working_files_mutex.unlock();
+
+}
+
+//---------------------------------------------------------------------------
 void WorkerFiles::add_registered_file_to_db(const FileRegistered* file)
 {
     if (!db)

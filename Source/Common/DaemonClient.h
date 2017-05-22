@@ -82,6 +82,9 @@ public:
     // Status
     int checker_status(int user, long file_id, MediaConchLib::Checker_StatusRes& res, std::string& error);
 
+    // Clear
+    int checker_clear(int user, const std::vector<long>& files, std::string& error);
+
     // Report
     int checker_get_report(CheckerReport& c_report, MediaConchLib::Checker_ReportRes* result, std::string& error);
     int checker_validate(int user, MediaConchLib::report report, const std::vector<long>& files,
