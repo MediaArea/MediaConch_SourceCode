@@ -14,6 +14,31 @@ $(document).ready(function() {
     });
 });
 
+function set_logged_status(status)
+{
+    status_str = "";
+
+    if (!status.length)
+    {
+        status_str = 'No';
+        $('#loggedForget').addClass('hidden');
+    }
+    else
+    {
+        status_str = 'Yes ';
+        $('#loggedForget').removeClass();
+
+        $('#loggedForget').click(function() {
+            webpage.save_mco_token("");
+            $(this).addClass('hidden');
+            status_str = 'No';
+            $('#settings_logged_str').text(status_str);
+        });
+    }
+
+    $('#settings_logged_str').text(status_str);
+}
+
 function set_save_report_selected(path)
 {
     if (!path.length)

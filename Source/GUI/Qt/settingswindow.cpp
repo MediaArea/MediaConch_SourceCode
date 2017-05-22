@@ -33,6 +33,7 @@ SettingsWindow::~SettingsWindow()
 //---------------------------------------------------------------------------
 void SettingsWindow::create_web_view_finished()
 {
+    add_logged_to_js_input((WebPage *)main_window->web_view->page());
     add_save_report_path_to_js_input((WebPage *)main_window->web_view->page());
     add_load_files_path_to_js_input((WebPage *)main_window->web_view->page());
     add_save_policy_path_to_js_input((WebPage *)main_window->web_view->page());
@@ -335,6 +336,14 @@ void SettingsWindow::set_webmachine_script_in_template(QString& html)
 #endif
     if ((pos = reg.indexIn(html, pos)) != -1)
         html.replace(pos, reg.matchedLength(), machine);
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_logged_to_js_input(WebPage *page)
+{
+    std::string token_str = main_window->get_settings().get_mco_token();
+    QString token = QString().fromUtf8(token_str.c_str(), token_str.length());
+    page->use_javascript(QString("set_logged_status('%1');").arg(token));
 }
 
 //---------------------------------------------------------------------------
