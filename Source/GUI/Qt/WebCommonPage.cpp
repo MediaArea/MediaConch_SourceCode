@@ -1711,6 +1711,26 @@ namespace MediaConch
         return ret;
     }
 
+    QString WebCommonPage::add_file_to_checker_again(long id)
+    {
+        QString json("{");
+        std::string err;
+        int ret = mainwindow->add_file_to_list(id, err);
+        if (ret < 0)
+        {
+            QString error = QString().fromUtf8(err.c_str(), err.size());
+            string_to_json(error);
+            json += QString("\"error\":\"%1\"").arg(error);
+        }
+        else if (ret > 0)
+            json += QString("\"success\":\"File already in the checker\"");
+        else
+            json += QString("\"success\":\"File added to the checker\"");
+
+        json += "}";
+        return json;
+    }
+
     QString WebCommonPage::remove_all_files_from_db()
     {
         QString ret("{");

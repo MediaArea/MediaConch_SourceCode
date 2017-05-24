@@ -34,6 +34,7 @@ var database = (function() {
               <div id="collapse' + file.id + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading' + file.id +'"> \
                 <div class="panel-body"> \
                   <a id="database_file_remove' + file.id + '" href="#"><button class="btn-warning pull-right">Remove</button></a> \
+                  <a id="database_file_add' + file.id + '" href="#"><button class="btn-warning pull-right">Add to checker</button></a> \
                 </div> \
               </div> \
             </div>');
@@ -46,6 +47,11 @@ var database = (function() {
             // Show delete all button
             if (accordionDatabase.childElementCount != 0)
                 $('#databaseCloseAll').addClass('hidden');
+        });
+
+        $('#database_file_add' + file.id).on('click', function(e) {
+            e.preventDefault();
+            databaseAjax.addFileChecker(file.id);
         });
 
     }

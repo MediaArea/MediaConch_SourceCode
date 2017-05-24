@@ -15,6 +15,16 @@ var databaseAjax = (function() {
             mcoMessage.error(data.error);
     }
 
+    var addFileChecker = function(id) {
+        res = webpage.add_file_to_checker_again(id);
+        data = JSON.parse(res);
+
+        if (data.error && data.error.length)
+            mcoMessage.error(data.error);
+        else if (data.success && data.success.length)
+            mcoMessage.success(data.success);
+    }
+
     var removeFile = function(id) {
         res = webpage.remove_file_from_db(id);
         data = JSON.parse(res);
@@ -34,6 +44,7 @@ var databaseAjax = (function() {
     return {
         init: init,
         loadTree: loadTree,
+        addFileChecker: addFileChecker,
         removeFile: removeFile,
         removeAllFiles: removeAllFiles,
     };

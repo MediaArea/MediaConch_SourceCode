@@ -239,6 +239,17 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::add_file_to_list(long id, std::string& err)
+{
+    std::string full_file;
+    if (checker_file_from_id(id, full_file, err) < 0)
+        return -1;
+
+    QFileInfo info(QString().fromUtf8(full_file.c_str(), full_file.size()));
+    return workerfiles.add_file_to_list(id, full_file, info.absolutePath().toUtf8().data(), info.fileName().toUtf8().data(), err);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::add_attachment_to_list(const QString& file, int policy, int display,
                                        int verbosity, std::string& err)
 {

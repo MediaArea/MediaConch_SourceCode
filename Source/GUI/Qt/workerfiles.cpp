@@ -247,6 +247,46 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
 }
 
 //---------------------------------------------------------------------------
+int WorkerFiles::add_file_to_list(long id, const std::string& full_file, const std::string& filepath, const std::string& filename, std::string&)
+{
+    FileRegistered *fr = NULL;
+    working_files_mutex.lock();
+    if (working_files.find(full_file) != working_files.end() && working_files[full_file])
+    {
+        working_files_mutex.unlock();
+        return 1;
+    }
+    else
+        fr = new FileRegistered;
+    working_files_mutex.unlock();
+
+    // Keep the old index for the same file
+    fr->file_id = id;
+    fr->index = file_index++;
+
+    fr->filename = filename;
+    fr->filepath = filepath;
+    fr->policy = -1;
+    fr->display = -1;
+    fr->verbosity = 5;
+    fr->create_policy = false;
+
+    working_files_mutex.lock();
+    working_files[full_file] = fr;
+    working_files_mutex.unlock();
+
+    unfinished_files_mutex.lock();
+    unfinished_files.push_back(full_file);
+    unfinished_files_mutex.unlock();
+
+    to_add_files_mutex.lock();
+    to_add_files[full_file] = new FileRegistered(*fr);
+    to_add_files_mutex.unlock();
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int WorkerFiles::add_attachment_to_list(const std::string& file, int policy, int display,
                                         int verbosity, std::string& err)
 {
