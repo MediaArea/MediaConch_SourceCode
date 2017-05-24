@@ -16,6 +16,17 @@ var databaseAjax = (function() {
         });
     }
 
+    var addFileChecker = function(id) {
+        webpage.add_file_to_checker_again(id, function (res) {
+            data = JSON.parse(res);
+
+            if (data.error && data.error.length)
+                mcoMessage.error(data.error);
+            else if (data.success && data.success.length)
+                mcoMessage.success(data.success);
+        });
+    }
+
     var removeFile = function(id) {
         webpage.remove_file_from_db(id, function(res) {
             data = JSON.parse(res);
@@ -37,6 +48,7 @@ var databaseAjax = (function() {
     return {
         init: init,
         loadTree: loadTree,
+        addFileChecker: addFileChecker,
         removeFile: removeFile,
         removeAllFiles: removeAllFiles,
     };

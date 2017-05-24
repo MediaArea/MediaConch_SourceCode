@@ -143,6 +143,7 @@ public Q_SLOTS:
     void         call_tooltip(const QString&);
 
     QString      checker_list();
+    QString      add_file_to_checker_again(long id);
     QString      remove_file_from_db(long id);
     QString      remove_all_files_from_db();
 

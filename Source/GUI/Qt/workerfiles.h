@@ -39,6 +39,7 @@ public:
     // functions
     int add_file_to_list(const std::string& file, const std::string& path, int policy, int display,
                          int verbosity, bool fixer, bool force, bool, std::string& err);
+    int add_file_to_list(long id, const std::string& file, const std::string&, const std::string&, std::string& err);
     int add_attachment_to_list(const std::string& file, int policy, int display, int verbosity,
                                std::string& err);
     void clear_files();
