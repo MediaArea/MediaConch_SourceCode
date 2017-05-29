@@ -113,6 +113,11 @@ private:
     int           ui_version;
     static int    ui_current_version;
 
+    //HELPER
+    void options_vec_to_string(const std::vector<std::string>& vec, std::string& str);
+    void options_string_to_vec(const std::string& str, std::vector<std::string>& vec);
+
+
     SQLLiteUi (const SQLLiteUi&);
     SQLLiteUi& operator=(const SQLLiteUi&);
 };

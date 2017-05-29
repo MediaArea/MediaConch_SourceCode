@@ -66,10 +66,12 @@ public:
     // Functions
     int                         add_file_to_list(const QString& file, const QString& path, const QString& policy,
                                                  const QString& display,
-                                                 const QString& verbosity, bool fixer, bool, std::string& err);
+                                                 const QString& verbosity, bool fixer, bool,
+                                                 const QStringList& options, std::string& err);
     int                         add_file_to_list(long id, std::string& err);
     int                         add_attachment_to_list(const QString& file, int policy, int display,
-                                                       int verbosity, std::string& err);
+                                                       int verbosity, const QStringList& options,
+                                                       std::string& err);
     void                        remove_file_to_list(long file_id);
     void                        remove_all_files_to_list();
     int                         update_policy_of_file_in_list(long file_id, long policy, std::string& error);
@@ -88,7 +90,8 @@ public:
     void                        set_widget_to_layout(QWidget* w);
     void                        remove_widget_from_layout(QWidget* w);
     int                         analyze(const std::vector<std::string>& files, bool with_fixer, bool force,
-                                        std::vector<long>& files_id, std::string& err);
+                                        const std::vector<std::string>& options, std::vector<long>& files_id,
+                                        std::string& err);
     int                         is_analyze_finished(const std::vector<std::string>& files,
                                                     std::vector<MediaConchLib::Checker_StatusRes>& res,std::string& err);
     int                         is_analyze_finished(const std::string& file, MediaConchLib::Checker_StatusRes& res, std::string& err);

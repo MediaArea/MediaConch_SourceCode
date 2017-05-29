@@ -146,7 +146,7 @@ void WorkerFiles::get_registered_files(std::map<std::string, FileRegistered*>& f
 //---------------------------------------------------------------------------
 int WorkerFiles::add_file_to_list(const std::string& file, const std::string& path,
                                   int policy, int display, int verbosity, bool fixer,
-                                  bool force, bool create_policy, std::string& err)
+                                  bool force, bool create_policy, const std::vector<std::string>& options, std::string& err)
 {
     std::string full_file(path);
 #ifdef WINDOWS
@@ -161,13 +161,29 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
     bool exists = false;
     FileRegistered *fr = NULL;
     working_files_mutex.lock();
-    if (working_files.find(full_file) != working_files.end() && working_files[full_file])
+    std::map<std::string, FileRegistered*>::iterator it = working_files.find(full_file);
+    if (it != working_files.end() && it->second)
     {
         exists = true;
+        bool same_options = true;
+        for (size_t i = 0; i < it->second->options.size(); ++i)
+        {
+            size_t j = 0;
+            for (; j < options.size(); ++j)
+                if (options[j] == it->second->options[i])
+                    break;
+
+            if (j == options.size())
+            {
+                same_options = false;
+                break;
+            }
+        }
+
         // nothing to do
-        if (!force && !create_policy &&
-            policy == working_files[full_file]->policy && display == working_files[full_file]->display
-            && verbosity == working_files[full_file]->verbosity)
+        if (!force && !create_policy && same_options &&
+            policy == it->second->policy && display == it->second->display
+            && verbosity == it->second->verbosity)
         {
             working_files_mutex.unlock();
             return 0;
@@ -196,6 +212,8 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
     fr->display = display;
     fr->verbosity = verbosity;
     fr->create_policy = create_policy;
+    for (size_t i = 0; i < options.size(); ++i)
+        fr->options.push_back(options[i]);
 
     working_files_mutex.lock();
 
@@ -221,7 +239,7 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
 
     int ret;
     std::vector<long> files_id;
-    if ((ret = mainwindow->analyze(vec, fixer, force, files_id, err)) < 0)
+    if ((ret = mainwindow->analyze(vec, fixer, force, options, files_id, err)) < 0)
     {
         mainwindow->set_str_msg_to_status_bar(err);
         return -1;
@@ -288,24 +306,41 @@ int WorkerFiles::add_file_to_list(long id, const std::string& full_file, const s
 
 //---------------------------------------------------------------------------
 int WorkerFiles::add_attachment_to_list(const std::string& file, int policy, int display,
-                                        int verbosity, std::string& err)
+                                        int verbosity, const std::vector<std::string>& options, std::string& err)
 {
     bool exists = false;
     FileRegistered *fr = NULL;
+
     working_files_mutex.lock();
-    if (working_files.find(file) != working_files.end() && working_files[file])
+    std::map<std::string, FileRegistered*>::iterator it = working_files.find(file);
+    if (it != working_files.end() && it->second)
     {
         exists = true;
+        bool same_options = true;
+        for (size_t i = 0; i < it->second->options.size(); ++i)
+        {
+            size_t j = 0;
+            for (; j < options.size(); ++j)
+                if (options[j] == it->second->options[i])
+                    break;
+
+            if (j == options.size())
+            {
+                same_options = false;
+                break;
+            }
+        }
+
         // nothing to do
-        if (policy == working_files[file]->policy && display == working_files[file]->display
-            && verbosity == working_files[file]->verbosity)
+        if (same_options && policy == it->second->policy &&
+            display == it->second->display && verbosity == it->second->verbosity)
         {
             working_files_mutex.unlock();
             return 0;
         }
         else
             fr = new FileRegistered;
-        fr->analyzed = working_files[file]->analyzed;
+        fr->analyzed = it->second->analyzed;
     }
     else
         fr = new FileRegistered;
@@ -326,6 +361,8 @@ int WorkerFiles::add_attachment_to_list(const std::string& file, int policy, int
     fr->display = display;
     fr->verbosity = verbosity;
     fr->create_policy = false;
+    for (size_t i = 0; i < options.size(); ++i)
+        fr->options.push_back(options[i]);
 
     working_files_mutex.lock();
 
@@ -351,7 +388,7 @@ int WorkerFiles::add_attachment_to_list(const std::string& file, int policy, int
 
     int ret;
     std::vector<long> files_id;
-    if ((ret = mainwindow->analyze(vec, false, false, files_id, err)) < 0)
+    if ((ret = mainwindow->analyze(vec, false, false, options, files_id, err)) < 0)
     {
         mainwindow->set_str_msg_to_status_bar(err);
         return -1;
@@ -863,7 +900,7 @@ void WorkerFiles::fill_registered_files_from_db()
 
         int ret;
         std::vector<long> files_id;
-        if ((ret = mainwindow->analyze(tmp, false, false, files_id, err2)) < 0)
+        if ((ret = mainwindow->analyze(tmp, false, false, fr->options, files_id, err2)) < 0)
             mainwindow->set_str_msg_to_status_bar(err2);
         else if (!files_id.size())
             mainwindow->set_str_msg_to_status_bar("Internal error: Analyze result is not correct.");

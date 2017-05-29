@@ -65,15 +65,16 @@ private Q_SLOTS:
 public Q_SLOTS:
     void         on_file_selected(const QString& filename, const QString& path,
                                   const QString& policy, const QString& display, const QString& verbosity,
-                                  bool fixer, QString& ret, std::string& err_str);
+                                  bool fixer, const QStringList&,
+                                  QString& ret, std::string& err_str);
     void         on_file_selected_end(const std::string& err_str, QString& ret);
     void         on_file_selected_formValues(const FileRegistered* fr, QString& formValues);
     QString      on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity,
-                                         bool fixer);
+                                         bool fixer, const QStringList&);
     QString      on_file_online_selected(const QString& url, const QString& policy, const QString& display,
-                                         const QString& verbosity, bool fixer);
+                                         const QString& verbosity, bool fixer, const QStringList&);
     QString      on_file_repository_selected(const QString& policy, const QString& display,
-                                             const QString& verbosity, bool fixer);
+                                             const QString& verbosity, bool fixer, const QStringList&);
     QString      on_file_from_db_selected();
     QString      status_reports_multi(const QStringList& ids, const QStringList& policy_ids);
     void         on_save_settings_selected(const QString& policy, const QString& display, const QString& verbosity,

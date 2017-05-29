@@ -116,6 +116,7 @@ protected:
     void        get_sql_query_for_update_ui_settings_table_v7(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v8(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v9(std::string& q);
+    void        get_sql_query_for_update_ui_table_v10(std::string& q);
 
 private:
     DatabaseUi (const DatabaseUi&);

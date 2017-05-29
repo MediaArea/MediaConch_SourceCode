@@ -179,4 +179,13 @@ void DatabaseUi::get_sql_query_for_update_ui_settings_table_v9(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_table_v10(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI"; // Table name
+    create << " ADD OPTIONS TEXT DEFAULT NULL;";
+    q = create.str();
+}
+
 }

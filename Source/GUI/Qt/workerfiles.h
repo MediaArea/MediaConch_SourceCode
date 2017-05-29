@@ -38,10 +38,10 @@ public:
 
     // functions
     int add_file_to_list(const std::string& file, const std::string& path, int policy, int display,
-                         int verbosity, bool fixer, bool force, bool, std::string& err);
+                         int verbosity, bool fixer, bool force, bool, const std::vector<std::string>&, std::string& err);
     int add_file_to_list(long id, const std::string& file, const std::string&, const std::string&, std::string& err);
     int add_attachment_to_list(const std::string& file, int policy, int display, int verbosity,
-                               std::string& err);
+                               const std::vector<std::string>& options, std::string& err);
     void clear_files();
     FileRegistered* get_file_registered_from_file(const std::string& file);
     FileRegistered* get_file_registered_from_id(long id);
