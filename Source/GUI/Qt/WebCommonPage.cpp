@@ -1749,6 +1749,7 @@ namespace MediaConch
     {
         str.replace("\"", "\\\"");
         str.replace("\n", "\\n");
+        str.replace("\r", "");
         str.replace("\t", " ");
     }
 
