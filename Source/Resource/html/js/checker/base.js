@@ -6,6 +6,9 @@ var checker = (function() {
         formBindings();
         applyPolicyToAll();
         bindings();
+
+        // help
+        addHelp('.checkerFixer label', 'Try to fix buggy files, technology preview, see <a href="https://mediaarea.net/MediaConch/fixity.html" onclick="urlUtils.openInBrowser(event);">the fixity webpage</a> for how to test it.', 'Fixer', 'checkerFixerHelp');
     }
 
     var formBindings = function() {
@@ -91,9 +94,46 @@ var checker = (function() {
         });
     };
 
+    // Keep popover open while hover on the popover content
+    var popoverManualBinding = function(elem) {
+        elem.on('mouseenter', function () {
+            var _this = this;
+            $(this).popover('show');
+            $(this).siblings('.popover').on('mouseleave', function () {
+                $(_this).popover('hide');
+            });
+        }).on('mouseleave', function () {
+            var _this = this;
+            setTimeout(function () {
+                if (!$('.popover:hover').length) {
+                    $(_this).popover('hide');
+                }
+            }, 300);
+        });
+    };
+
+    // Add help sign and bind popover
+    var addHelp = function(elem, content, title, elemClass) {
+        if (undefined === title) {
+            var title = 'Help';
+        }
+
+        if (undefined === elemClass) {
+            var elemClass = elem + 'Help';
+        }
+        else {
+            var elemClass = elemClass + 'Help';
+        }
+
+        $(elem).append('&nbsp;<span class="glyphicon glyphicon-info-sign ' + elemClass + '" aria-hidden="true"></span>');
+        var popHelp = $('.' + elemClass).popover({title: title, content: content, placement: 'auto top', trigger: 'manual', html: true});
+        popoverManualBinding(popHelp);
+    };
+
     return {
         initPage: initPage,
         getDataFromForm: getDataFromForm,
+        addHelp: addHelp,
     };
 })();
 
