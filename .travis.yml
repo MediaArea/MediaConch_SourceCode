@@ -18,7 +18,6 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libmediainfo0/0.7.93/libmediainfo0_0.7.93-1_amd64.xUbuntu_14.04.deb ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libmediainfo0/0.7.93/libmediainfo-dev_0.7.93-1_amd64.xUbuntu_14.04.deb ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo dpkg -i libzen*.deb ; fi
-  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo dpkg -i libmediainfo*.deb ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then git -C .. clone https://github.com/MediaArea/MediaInfoLib.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then pushd ../MediaInfoLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
 
@@ -26,8 +25,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install libxslt sqlite jansson libevent qt5 ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/ZenLib.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../ZenLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
-  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install media-info ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/MediaInfoLib.git ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../MediaInfoLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
 
-script: export PATH=/usr/local/opt/qt5/bin:$PATH && cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make check && cd ../../Qt && ./prepare INCLUDEPATH+=/usr/local/include && make
+script: export PATH=/usr/local/opt/qt5/bin:$PATH && cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make check && cd ../../Qt && ./prepare INCLUDEPATH+=/usr/local/include CONFIG+=c++11 -after QMAKE_MACOSX_DEPLOYMENT_TARGET=10.9 && make
