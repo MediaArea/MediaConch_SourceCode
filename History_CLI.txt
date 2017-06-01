@@ -7,6 +7,13 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.05, 2017-06-01
+--------------
+add a --list command to the CLI for listing files in the database
+add FFV1-VALID-VERSION, EBML-ELEMENT-VALID-RANGE, NO-JUNK-IN-FIXEDSIZE-MATROSKA, EBML-ELEM-UNKNOWN-SIZE tests
+deprecate MKV-VALID-BOOLEANS test
+fixes to MKV-NUMERICAL-TAG test
+
 Version 17.04, 2017-05-04
 --------------
 Better support of some broken Matroska files (high EBMLMaxSizeLength, padding before start of EBML)
