@@ -11,8 +11,12 @@ matrix:
       compiler: clang
 
 before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo add-apt-repository -y ppa:mc3man/trusty-media ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo apt-get update -qq ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo apt-get install -y libmms0 libxml2-dev libxslt-dev zlib1g-dev libcurl4-gnutls-dev libsqlite3-dev libjansson-dev libevent-dev libqt4-dev libqtwebkit-dev libxml2-utils pkg-config ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo apt-get install -y libmms0 libxml2-dev libxslt-dev zlib1g-dev libcurl4-gnutls-dev libsqlite3-dev libjansson-dev libevent-dev libqt4-dev libqtwebkit-dev libxml2-utils pkg-config ffmpeg xmlstarlet ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo curl -L http://stahlworks.com/dev/sfk/sfk-linux-64.exe -o /usr/local/bin/sfk ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo chmod +x /usr/local/bin/sfk ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo pip install git+https://github.com/vi/mkvparse.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libzen0/0.4.34/libzen0_0.4.34-1_amd64.xUbuntu_14.04.deb ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libzen0/0.4.34/libzen-dev_0.4.34-1_amd64.xUbuntu_14.04.deb ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libmediainfo0/0.7.93/libmediainfo0_0.7.93-1_amd64.xUbuntu_14.04.deb ; fi
@@ -22,10 +26,11 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then pushd ../MediaInfoLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew update ; true ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install libxslt sqlite jansson libevent qt5 ; true ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install libxslt sqlite jansson libevent qt5 ffmpeg sfk xmlstarlet ; true ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pip install --user git+https://github.com/vi/mkvparse.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/ZenLib.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../ZenLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/MediaInfoLib.git ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../MediaInfoLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
 
-script: export PATH=/usr/local/opt/qt5/bin:$PATH && cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make check && cd ../../Qt && ./prepare INCLUDEPATH+=/usr/local/include CONFIG+=c++11 -after QMAKE_MACOSX_DEPLOYMENT_TARGET=10.9 && make
+script: export PATH=/usr/local/opt/qt5/bin:$PATH && cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make clone_checks_files && make check && cd ../../Qt && ./prepare INCLUDEPATH+=/usr/local/include CONFIG+=c++11 -after QMAKE_MACOSX_DEPLOYMENT_TARGET=10.9 && make
