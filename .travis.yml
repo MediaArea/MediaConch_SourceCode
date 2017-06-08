@@ -27,7 +27,7 @@ before_install:
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew update ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install libxslt sqlite jansson libevent qt5 ffmpeg sfk xmlstarlet ; true ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pip install --user git+https://github.com/vi/mkvparse.git ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then sudo pip install git+https://github.com/vi/mkvparse.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/ZenLib.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../ZenLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/MediaInfoLib.git ; true ; fi
