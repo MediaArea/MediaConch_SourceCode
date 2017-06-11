@@ -2,7 +2,7 @@
 %define libmediainfo_version        0.7.96
 %define libzen_version              0.4.35
 
-%if 0%{?fedora} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
+%if 0%{?fedora_version} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
 %define libmediainfo_name libmediainfo
 %define libzen_name libzen
 %else
@@ -62,7 +62,7 @@ BuildRequires:  curl-devel
 BuildRequires:  libcurl-devel
 %endif
 
-%if 0%{?fedora}
+%if 0%{?fedora_version}
 BuildRequires:  pkgconfig(systemd)
 %endif
 
@@ -83,10 +83,13 @@ BuildRequires:  libuuid-devel
 
 # GUI dependencies
 %if 0%{?build_gui}
-%if 0%{?fedora}
+%if 0%{?fedora_version}
 BuildRequires:  pkgconfig(Qt5)
 BuildRequires:  desktop-file-utils
-%if 0%{?fedora} >= 24
+%if 0%{?fedora_version} == 99
+BuildRequires:  gnu-free-sans-fonts
+%endif
+%if 0%{?fedora_version} >= 24
 BuildRequires:  pkgconfig(Qt5WebEngine)
 %else
 BuildRequires:  pkgconfig(Qt5WebKit)
@@ -125,7 +128,7 @@ Summary:    Implementation checker and policy checker for video and audio files 
 Group:      Applications/Multimedia
 Requires:   %{libzen_name}%{?_isa} >= %{libzen_version}
 Requires:   %{libmediainfo_name}%{?_isa} >= %{libmediainfo_version}
-%if 0%{?fedora}
+%if 0%{?fedora_version}
 %{?systemd_requires}
 %endif
 %endif # Server
@@ -204,8 +207,12 @@ pushd Project/GNU/CLI
         %if 0%{?suse_version} && 0%{?suse_version} < 1200
             %configure --without-libevent
         %else
-        	%if ! 0%{?rhel} || 0%{?centos_version} >= 700
-                %configure
+            %if ! 0%{?rhel} || 0%{?centos_version} >= 700
+                %if 0%{?mageia} > 5
+                    %configure --disable-dependency-tracking
+                %else
+                    %configure
+                %endif
             %else
                 %if 0%{?rhel} == 5
                     %configure --without-jansson --without-libevent --without-sqlite
@@ -231,7 +238,11 @@ pushd Project/GNU/Server
         %if 0%{?rhel} && ! 0%{?centos}
             %configure --without-jansson
         %else
-           %configure
+            %if 0%{?mageia} > 5
+                %configure --disable-dependency-tracking
+            %else
+                %configure
+            %endif
         %endif
     %endif
     make %{?_smp_mflags}
@@ -275,7 +286,7 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.desktop %{buildroot}%{_datadir}/ap
 %if 0%{?suse_version}
   %suse_update_desktop_file -n mediaconch-gui AudioVideo AudioVideoEditing
 %endif
-%if 0%{?fedora}
+%if 0%{?fedora_version}
   desktop-file-install --dir="%{buildroot}%{_datadir}/applications" -m 644 Project/GNU/GUI/mediaconch-gui.desktop
 install -dm 755 %{buildroot}%{_unitdir}
 install -m 644 -p Project/GNU/Server/mediaconchd.service  %{buildroot}%{_unitdir}/mediaconchd.service
@@ -296,7 +307,7 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir
 %endif
 %endif #GUI
 
-%if 0%{?fedora}
+%if 0%{?fedora_version}
 %post server
 %systemd_post mediaconchd.service
 
@@ -310,7 +321,7 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir
 %files
 %defattr(-,root,root,-)
 %doc Release/ReadMe_CLI_Linux.txt History_CLI.txt
-%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
+%if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %license License.html License.GPLv3.html License.MPLv2.html
 %else
 %doc License.html License.GPLv3.html License.MPLv2.html
@@ -321,13 +332,13 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir
 %files server
 %defattr(-,root,root,-)
 %doc Documentation/Daemon.md Documentation/Config.md Documentation/REST.md
-%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
+%if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %license License.html License.GPLv3.html License.MPLv2.html
 %else
 %doc License.html License.GPLv3.html License.MPLv2.html
 %endif
 %{_bindir}/mediaconchd
-%if 0%{?fedora}
+%if 0%{?fedora_version}
 %config(noreplace) %{_sysconfdir}/%{name}/MediaConch.rc
 %{_unitdir}/mediaconchd.service
 %endif
@@ -337,7 +348,7 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir
 %files gui
 %defattr(-,root,root,-)
 %doc Release/ReadMe_GUI_Linux.txt History_GUI.txt
-%if 0%{?fedora} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
+%if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
 %license License.html License.GPLv3.html License.MPLv2.html
 %else
 %doc License.html License.GPLv3.html License.MPLv2.html
