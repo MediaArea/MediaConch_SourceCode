@@ -73,6 +73,7 @@
     <addaction name="actionPolicies"/>
     <addaction name="actionPublicPolicies"/>
     <addaction name="actionDisplay"/>
+    <addaction name="actionDatabase"/>
     <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
