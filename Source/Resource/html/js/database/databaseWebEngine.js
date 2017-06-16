@@ -5,20 +5,25 @@ var databaseAjax = (function() {
 
     var loadTree = function() {
         webpage.checker_list(function(res) {
-            data = JSON.parse(res);
+            var data = JSON.parse(res);
 
+            var success = 0;
             $.each(data.files, function(idx, val) {
-                database.addFile(val);
+                success++;
+                databaseTable.addFile(val);
             });
 
-            if (data.error && data.error.length)
+            if (success > 0) {
+                databaseTable.draw();
+            }
+            else if (data.error && data.error.length)
                 mcoMessage.error(data.error);
         });
     }
 
     var addFileChecker = function(id) {
         webpage.add_file_to_checker_again(id, function (res) {
-            data = JSON.parse(res);
+            var data = JSON.parse(res);
 
             if (data.error && data.error.length)
                 mcoMessage.error(data.error);
@@ -29,7 +34,7 @@ var databaseAjax = (function() {
 
     var removeFile = function(id) {
         webpage.remove_file_from_db(id, function(res) {
-            data = JSON.parse(res);
+            var data = JSON.parse(res);
 
             if (data.error && data.error.length)
                 mcoMessage.error(data.error);
@@ -38,7 +43,7 @@ var databaseAjax = (function() {
 
     var removeAllFiles = function() {
         webpage.remove_all_files_from_db(function(res) {
-            data = JSON.parse(res);
+            var data = JSON.parse(res);
 
             if (data.error && data.error.length)
                 mcoMessage.error(data.error);

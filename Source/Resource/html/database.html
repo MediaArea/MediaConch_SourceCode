@@ -1,12 +1,26 @@
-<h1 class="headline">Database</h1>
+<h1>Database</h1>
 
 <div class="col-md-12" id="databaseInfo">
   <div></div>
 </div>
 
-<div class="col-md-12">
-  <h4>Files list:</h4>
-    <button id="databaseCloseAll" type="button" class="delete h2 hidden">&times; Delete all files</button>
-  <div class="panel-group" id="accordionDatabase" role="tablist" aria-multiselectable="true">
+<div class="col-md-12" id="checkerResults">
+  <div id="checkerResultTitle">
+    <h2>Results</h2>
+    <button type="button" class="close h2 hidden">&times; Delete all results from database</button>
   </div>
+  <div id="checkerApplyAll" class="col-md-12 hidden"></div>
+  <div class="table-responsive col-md-12">
+    <table id="result-table" class="table table-hover checker-results display">
+      <thead>
+        <tr>
+          <th>Files</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <div class="result-container"></div>
 </div>

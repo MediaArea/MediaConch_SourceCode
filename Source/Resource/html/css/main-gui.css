@@ -7,3 +7,15 @@
 .policyPushContainer {
     margin-top: 10px;
 }
+
+.containerAutoWidth {
+    position: relative;
+}
+
+.contentAutoWidth {
+    position: absolute;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
