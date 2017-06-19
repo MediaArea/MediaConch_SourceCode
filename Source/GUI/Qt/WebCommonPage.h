@@ -109,7 +109,6 @@ public Q_SLOTS:
     QString      policy_is_valid(long file_id, long policy_id);
     QString      implementation_is_valid(long file_id);
     QString      file_is_analyzed(const QStringList& ids);
-    void         change_policy_for_file(long file_id, const QString& policy);
 
     QString      display_add_file(const QString& name);
     void         display_export_id(const QString& name);

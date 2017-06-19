@@ -272,10 +272,9 @@ void MainWindow::remove_all_files_to_list()
 }
 
 //---------------------------------------------------------------------------
-void MainWindow::update_policy_of_file_in_list(long file_id, const QString& policy)
+int MainWindow::update_policy_of_file_in_list(long file_id, long policy, std::string& error)
 {
-    int policy_i = policy.toInt();
-    workerfiles.update_policy_of_file_registered_from_file(file_id, policy_i);
+    return workerfiles.update_policy_of_file_registered_from_file(file_id, policy, error);
 }
 
 //---------------------------------------------------------------------------

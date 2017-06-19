@@ -50,7 +50,7 @@ public:
     void get_registered_files(std::map<std::string, FileRegistered*>& files);
     long get_id_from_registered_file(const std::string& file);
     std::string get_filename_from_registered_file_id(long file_id);
-    void update_policy_of_file_registered_from_file(long file_id, int policy);
+    int update_policy_of_file_registered_from_file(long file_id, long policy, std::string& error);
 
 private:
     void add_registered_file_to_db(const FileRegistered* file);
