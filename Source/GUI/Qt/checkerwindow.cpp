@@ -118,11 +118,11 @@ void CheckerWindow::create_policy_options(QString& policies)
 
     // Create default policy opt-group
     if (user_policy.length())
-        policies += QString("<optgroup label=\"User policies\">%1</optgroup>").arg(user_policy);
+        policies += QString("<optgroup class=\"userPolicy\" label=\"User policies\">%1</optgroup>").arg(user_policy);
 
     // Create default policy opt-group
     if (system_policy.length())
-        policies += QString("<optgroup label=\"System policies\">%1</optgroup>").arg(system_policy);
+        policies += QString("<optgroup class=\"systemPolicy\" label=\"System policies\">%1</optgroup>").arg(system_policy);
 }
 
 //---------------------------------------------------------------------------
