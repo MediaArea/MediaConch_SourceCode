@@ -271,7 +271,7 @@ namespace MediaConch
 
         QString err;
         if (err_str.size())
-            err = QString("\"error\":%1").arg(QString().fromUtf8(err_str.c_str(), err_str.size()));
+            err = QString("\"error\":\"%1\"").arg(QString().fromUtf8(err_str.c_str(), err_str.size()));
 
         if (err.size())
         {
@@ -426,7 +426,7 @@ namespace MediaConch
                 continue;
             }
 
-            ret += ",\"policyReport\":" + policy_is_valid(file_id);
+            ret += ",\"policyReport\":" + policy_is_valid(file_id, policy_ids[i].toInt());
 
             ret += "}";
         }
@@ -817,7 +817,7 @@ namespace MediaConch
         return QString().setNum(verbosity);
     }
 
-    QString WebCommonPage::policy_is_valid(long file_id)
+    QString WebCommonPage::policy_is_valid(long file_id, long policy_id)
     {
         //{"valid":false,"fileId":"fileId","error":null}
         std::string err;
@@ -840,7 +840,7 @@ namespace MediaConch
 
         bool policy_valid = false;
         std::vector<MediaConchLib::Checker_ValidateRes*> res;
-        if (mainwindow->validate_policy(file_id, fr->policy, res, err) < 0)
+        if (mainwindow->validate_policy(file_id, policy_id, res, err) < 0)
         {
             json += QString("\"valid\":false,\"error\":\"%2\"}")
                 .arg(QString().fromUtf8(err.c_str(), err.size()));
@@ -886,17 +886,6 @@ namespace MediaConch
             .arg(fr->implementation_valid ? "true" : "false").arg("null");
 
         delete fr;
-        return json;
-    }
-
-    QString WebCommonPage::implementation_and_policy_is_valid(long file_id)
-    {
-        //{"implemReport":{"valid":true,"fileId":"fileId","error":null},"statusReport":{"valid":false,"fileId":"fileId","error":null}}
-        QString json = QString("{\"implemReport\":");
-        json += implementation_is_valid(file_id);
-        json += ",\"statusReport\":";
-        json += policy_is_valid(file_id);
-        json += "}";
         return json;
     }
 

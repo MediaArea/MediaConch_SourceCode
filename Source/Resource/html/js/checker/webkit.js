@@ -147,7 +147,7 @@ var checkerAjax = (function() {
     };
 
     var policyStatus = function(fileId, policyId) {
-        res = webpage.policy_is_valid(fileId);
+        res = webpage.policy_is_valid(fileId, policyId);
         data = JSON.parse(res);
         policyCell.success(data, fileId);
     };

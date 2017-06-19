@@ -106,9 +106,8 @@ public Q_SLOTS:
     QString      get_file_policy_id(const QString& file);
     QString      get_file_display_id(const QString& file);
     QString      get_file_verbosity_id(const QString& file);
-    QString      policy_is_valid(long file_id);
+    QString      policy_is_valid(long file_id, long policy_id);
     QString      implementation_is_valid(long file_id);
-    QString      implementation_and_policy_is_valid(long file_id);
     QString      file_is_analyzed(const QStringList& ids);
     void         change_policy_for_file(long file_id, const QString& policy);
 
