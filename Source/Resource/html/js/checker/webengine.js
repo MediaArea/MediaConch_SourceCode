@@ -159,7 +159,7 @@ var checkerAjax = (function() {
     };
 
     var policyStatus = function(fileId, policyId) {
-        webpage.policy_is_valid(fileId, function(res)
+        webpage.policy_is_valid(fileId, policyId, function(res)
         {
             data = JSON.parse(res);
             policyCell.success(data, fileId);
