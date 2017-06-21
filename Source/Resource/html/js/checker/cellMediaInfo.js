@@ -133,6 +133,8 @@ var mediaInfoCell = (function() {
 
             // Add new policy to all select lists
             $('.policyList .userPolicy').each(function() {
+                if ($(this).hasClass('hidden'))
+                    $(this).removeClass('hidden');
                 $(this).append('<option value="' + createPolicy.policyId + '">' + createPolicy.policyName + '</option>');
             });
         }
