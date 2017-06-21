@@ -72,7 +72,7 @@ public:
                                                        int verbosity, std::string& err);
     void                        remove_file_to_list(long file_id);
     void                        remove_all_files_to_list();
-    void                        update_policy_of_file_in_list(long file_id, const QString& policy);
+    int                         update_policy_of_file_in_list(long file_id, long policy, std::string& error);
     int                         analyze_force_file_to_list(long id, std::string& err);
     void                        clear_file_list();
 

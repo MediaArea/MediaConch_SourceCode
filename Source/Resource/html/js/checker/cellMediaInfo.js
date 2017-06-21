@@ -132,7 +132,9 @@ var mediaInfoCell = (function() {
             $('#modalInfo-' + fileId + ' .mi-create-report').fadeOut(200).replaceWith('<div class="alert alert-success alert-modal-create-policy" role="alert"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>Policy successfuly created</div>');
 
             // Add new policy to all select lists
-            $('.policyList').each(function() {
+            $('.policyList .userPolicy').each(function() {
+                if ($(this).hasClass('hidden'))
+                    $(this).removeClass('hidden');
                 $(this).append('<option value="' + createPolicy.policyId + '">' + createPolicy.policyName + '</option>');
             });
         }

@@ -549,8 +549,15 @@ std::string RESTAPI::Checker_Validate_Req::to_str() const
     }
     RESTAPI api;
     out << "],\"report\":" << api.get_Report_string(report);
-    out << ",\"policies_ids_size\":" << policies_ids.size();
-    out << ",\"policies_contents_size\":" << policies_contents.size();
+    out << ",\"policies_ids\":[";
+
+    for (size_t i = 0; i < policies_ids.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << policies_ids[i];
+    }
+    out << "],\"policies_contents_size\":" << policies_contents.size();
     out << ",\"options\":[";
 
     std::map<std::string, std::string>::const_iterator it = options.begin();

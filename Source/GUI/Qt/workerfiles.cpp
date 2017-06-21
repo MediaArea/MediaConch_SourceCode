@@ -373,9 +373,10 @@ int WorkerFiles::add_attachment_to_list(const std::string& file, int policy, int
 }
 
 //---------------------------------------------------------------------------
-void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int policy)
+int WorkerFiles::update_policy_of_file_registered_from_file(long file_id, long policy, std::string& error)
 {
     std::string file;
+    FileRegistered* fr = NULL;
     working_files_mutex.lock();
     std::map<std::string, FileRegistered*>::iterator it = working_files.begin();
     for (; it != working_files.end(); ++it)
@@ -384,24 +385,32 @@ void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int p
             continue;
 
         file = it->first;
+        fr = it->second;
         break;
     }
 
-    if (!file.size())
+    if (!fr)
     {
         // file is not existing
+        error = "File not reachable";
         working_files_mutex.unlock();
-        return;
+        return -1;
     }
 
-    working_files[file]->policy = policy;
+    fr->policy = policy;
 
     bool policy_valid = false;
-    if (working_files[file]->analyzed && policy >= 0)
+    if (!fr->analyzed)
     {
+        error = "File not analyzed";
         working_files_mutex.unlock();
+        return -1;
+    }
 
-        std::string err;
+    working_files_mutex.unlock();
+
+    if (policy >= 0)
+    {
         std::vector<size_t> policies_ids;
         std::vector<std::string> policies_contents;
         std::vector<MediaConchLib::Checker_ValidateRes*> res;
@@ -409,24 +418,27 @@ void WorkerFiles::update_policy_of_file_registered_from_file(long file_id, int p
         policies_ids.push_back(policy);
 
         if (mainwindow->validate(MediaConchLib::report_Max, file,
-                                 policies_ids, policies_contents, options, res, err) == 0 && res.size() == 1)
+                                 policies_ids, policies_contents, options, res, error) < 0)
+            return -1;
+
+        if (res.size() == 1)
         {
             policy_valid = res[0]->valid;
             for (size_t j = 0; j < res.size() ; ++j)
                 delete res[j];
             res.clear();
         }
-
-        working_files_mutex.lock();
     }
 
+    working_files_mutex.lock();
     working_files[file]->policy_valid = policy_valid;
-    FileRegistered fr = *working_files[file];
+    FileRegistered tmp = *working_files[file];
     working_files_mutex.unlock();
 
     to_update_files_mutex.lock();
-    to_update_files[file] = new FileRegistered(fr);
+    to_update_files[file] = new FileRegistered(tmp);
     to_update_files_mutex.unlock();
+    return 0;
 }
 
 //---------------------------------------------------------------------------

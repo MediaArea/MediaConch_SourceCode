@@ -271,7 +271,7 @@ namespace MediaConch
 
         QString err;
         if (err_str.size())
-            err = QString("\"error\":%1").arg(QString().fromUtf8(err_str.c_str(), err_str.size()));
+            err = QString("\"error\":\"%1\"").arg(QString().fromUtf8(err_str.c_str(), err_str.size()));
 
         if (err.size())
         {
@@ -426,7 +426,7 @@ namespace MediaConch
                 continue;
             }
 
-            ret += ",\"policyReport\":" + policy_is_valid(file_id);
+            ret += ",\"policyReport\":" + policy_is_valid(file_id, policy_ids[i].toInt());
 
             ret += "}";
         }
@@ -817,46 +817,27 @@ namespace MediaConch
         return QString().setNum(verbosity);
     }
 
-    QString WebCommonPage::policy_is_valid(long file_id)
+    QString WebCommonPage::policy_is_valid(long file_id, long policy_id)
     {
         //{"valid":false,"fileId":"fileId","error":null}
         std::string err;
         QString json = QString("{\"fileId\":\"%1\",").arg(file_id);
-        FileRegistered* fr = mainwindow->get_file_registered_from_id(file_id);
-        if (!fr)
-        {
-            json += QString("\"valid\":%1,\"error\":\"%2\"}")
-                .arg("false").arg("File not reachable");
-            return json;
-        }
-
-        if (!fr->analyzed)
-        {
-            json += QString("\"valid\":%1,\"error\":\"%2\"}")
-                .arg("false").arg("File not analyzed");
-            delete fr;
-            return json;
-        }
-
         bool policy_valid = false;
-        std::vector<MediaConchLib::Checker_ValidateRes*> res;
-        if (mainwindow->validate_policy(file_id, fr->policy, res, err) < 0)
+        if (mainwindow->update_policy_of_file_in_list(file_id, policy_id, err) < 0)
         {
             json += QString("\"valid\":false,\"error\":\"%2\"}")
                 .arg(QString().fromUtf8(err.c_str(), err.size()));
-            delete fr;
-            return json;
         }
 
-        if (res.size() == 1)
-            policy_valid = res[0]->valid;
-
-        for (size_t j = 0; j < res.size() ; ++j)
-            delete res[j];
-        res.clear();
+        FileRegistered* fr = mainwindow->get_file_registered_from_id(file_id);
+        if (!fr)
+        {
+            json += QString("\"valid\":false,\"error\":\"%2\"}")
+                .arg(QString().fromUtf8("File has been removed."));
+        }
 
         json += QString("\"valid\":%1,\"error\":%2}")
-            .arg(policy_valid ? "true" : "false").arg("null");
+            .arg(fr->policy_valid ? "true" : "false").arg("null");
 
         delete fr;
         return json;
@@ -886,17 +867,6 @@ namespace MediaConch
             .arg(fr->implementation_valid ? "true" : "false").arg("null");
 
         delete fr;
-        return json;
-    }
-
-    QString WebCommonPage::implementation_and_policy_is_valid(long file_id)
-    {
-        //{"implemReport":{"valid":true,"fileId":"fileId","error":null},"statusReport":{"valid":false,"fileId":"fileId","error":null}}
-        QString json = QString("{\"implemReport\":");
-        json += implementation_is_valid(file_id);
-        json += ",\"statusReport\":";
-        json += policy_is_valid(file_id);
-        json += "}";
         return json;
     }
 
@@ -971,11 +941,6 @@ namespace MediaConch
         json += "}}";
 
         return json;
-    }
-
-    void WebCommonPage::change_policy_for_file(long file_id, const QString& policy)
-    {
-        mainwindow->update_policy_of_file_in_list(file_id, policy);
     }
 
     void WebCommonPage::add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list)
