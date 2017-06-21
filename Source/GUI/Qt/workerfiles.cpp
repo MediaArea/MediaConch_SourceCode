@@ -411,8 +411,6 @@ int WorkerFiles::update_policy_of_file_registered_from_file(long file_id, long p
 
     if (policy >= 0)
     {
-        working_files_mutex.unlock();
-
         std::vector<size_t> policies_ids;
         std::vector<std::string> policies_contents;
         std::vector<MediaConchLib::Checker_ValidateRes*> res;
