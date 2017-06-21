@@ -20,6 +20,11 @@ then
     wget https://github.com/MediaArea/MediaAreaXml/raw/master/mediatrace.xsd -O "$UTILS_PATH/mediatrace.xsd"
 fi
 
+if [ ! -f "$UTILS_PATH/micromediatrace.xsd" ]
+then
+    wget https://github.com/MediaArea/MediaAreaXml/raw/master/micromediatrace.xsd -O "$UTILS_PATH/micromediatrace.xsd"
+fi
+
 if [ ! -f "$UTILS_PATH/mediaarea.xsd" ]
 then
     wget https://github.com/MediaArea/MediaAreaXml/raw/master/mediaarea.xsd -O "$UTILS_PATH/mediaarea.xsd"
