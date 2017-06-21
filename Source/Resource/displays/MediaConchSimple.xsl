@@ -35,8 +35,10 @@
         <xsl:value-of select="substring('                            ',1,count(ancestor::*))"/>
         <xsl:text>[</xsl:text>
         <xsl:value-of select="@outcome"/>
-        <xsl:text>:</xsl:text>
-        <xsl:value-of select="@reason"/>
+        <xsl:if test="@reason">
+          <xsl:text>:</xsl:text>
+          <xsl:value-of select="@reason"/>
+        </xsl:if>
         <xsl:text>]</xsl:text>
         <xsl:for-each select="mc:value">
           <xsl:text>&#xa;</xsl:text>
