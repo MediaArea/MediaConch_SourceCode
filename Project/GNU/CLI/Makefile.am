@@ -66,4 +66,4 @@ $(SAMPLES_DIR):
 	git clone https://github.com/MediaArea/MediaConch_SampleFiles test/SampleFiles
 
 $(CHECKS_DIR):
-	git clone https://github.com/preforma/groundtruth test/ImplementationChecks
+	git clone https://github.com/MediaArea/groundtruth test/ImplementationChecks
