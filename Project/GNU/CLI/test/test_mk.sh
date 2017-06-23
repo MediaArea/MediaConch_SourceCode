@@ -31,13 +31,8 @@ for FILE in $(ls -v *.md) ; do
         continue
     fi
 
-    if [ "${TEST}" == "MKV-NUMERICAL-TAGS" ] ; then
-        TEST="MKV-NUMERICAL-TAG"
-    fi
-
     if [ "${TEST}" == "EBML-HEADER-ELEMENTS-WITHIN-MAXIDLENGTH" ] || \
        [ "${TEST}" == "EBML-NO-JUNK-IN-FIXEDSIZE" ] || \
-       [ "${TEST}" == "MKV-ELEMENT-VALID-PARENT" ] || \
        [ "${TEST}" == "EBML-ELEM-START" ] || \
        [ "${TEST}" == "EBML-CRC-FIRST" ] ; then
         continue;
