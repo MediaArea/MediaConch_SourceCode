@@ -26,20 +26,14 @@ for FILE in $(ls -v *.md) ; do
     TEST="$(grep -Eom1 '^# [^[:space:]]+$' ${FILE} | grep -Eom1 '[^[:space:]]+$')"
     SCRIPT="$(perl -0777lne 'print for grep !//,/^```sh\s+(.*?)^```/mgs' ${FILE})"
 
-    # exclude policy tests
-    if [ -z "${SCRIPT}" ] || grep -iq "policy" ${FILE} ; then
-        continue
+    POLICY="$(perl -0777lne 'print for grep !//,/^```xml\s+(.*?)^```/mgs' ${FILE})"
+    if [ -n "${POLICY}" ] ; then
+        echo "${POLICY}" > "${TEST}.xml"
     fi
 
-    if [ "${TEST}" == "MKV-NUMERICAL-TAGS" ] ; then
-        TEST="MKV-NUMERICAL-TAG"
-    fi
-
-    if [ "${TEST}" == "EBML-HEADER-ELEMENTS-WITHIN-MAXIDLENGTH" ] || \
-       [ "${TEST}" == "EBML-NO-JUNK-IN-FIXEDSIZE" ] || \
-       [ "${TEST}" == "MKV-ELEMENT-VALID-PARENT" ] || \
-       [ "${TEST}" == "EBML-ELEM-START" ] || \
-       [ "${TEST}" == "EBML-CRC-FIRST" ] ; then
+    if [ "${TEST}" == "EBML-HEADER-ELEMENTS-WITHIN-MAXSIZELENGTH" ] || \
+       [ "${TEST}" == "EBML-HEADER-ELEMENTS-WITHIN-MAXIDLENGTH" ] || \
+       [ "${TEST}" == "MKV-V4+" ] ; then
         continue;
     fi
 
@@ -55,20 +49,29 @@ for FILE in $(ls -v *.md) ; do
             continue
         fi
 
-        DATA="$(${MC} -fx ${TESTFILE})"
+        DATA="$(${MC}${POLICY/$POLICY/ -p $TEST.xml} -fx ${TESTFILE})"
 
+        # test if the check fail as expected
         if [ "${TEST}" == "Correct" ] ; then
             # skip this test for correct files
             T1="true"
+        elif [ -n "${POLICY}" ] ; then
+            # test against a policy
+            T1=`echo "${DATA}" | xmllint --xpath \
+            "boolean(//*/*[@name and @name=\"${TEST}\" and @fail_count and @fail_count!=\"0\"])" -`
         else
-            # test if the check fail as expected
             T1=`echo "${DATA}" | xmllint --xpath \
             "boolean(//*/*[@icid and @icid=\"${TEST}\" and @fail_count and @fail_count!=\"0\"])" -`
         fi
 
         # test if other check fail
-        T2=`echo "${DATA}" | xmllint --xpath \
-        "boolean(//*/*[@icid and @icid!=\"${TEST}\" and @fail_count and @fail_count!=\"0\"])" -`
+        if [ -n "${POLICY}" ] ; then
+            # skip this test for policies
+            T2="false"
+        else
+            T2=`echo "${DATA}" | xmllint --xpath \
+            "boolean(//*/*[@icid and @icid!=\"${TEST}\" and @fail_count and @fail_count!=\"0\"])" -`
+        fi
 
         if [ "${T1}" != "true" ] || [ "${T2}" != "false" ] ; then
             echo "NOK: ${TESTFILE}" >&9
@@ -80,6 +83,9 @@ for FILE in $(ls -v *.md) ; do
         rm -f "${TESTFILE}"
         echo "OK: ${TESTFILE}" >&9
     done
+
+    rm -f "${TEST}.xml"
+
 done
 
 popd
