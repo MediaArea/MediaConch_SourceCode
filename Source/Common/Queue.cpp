@@ -108,8 +108,13 @@ void QueueElement::Entry()
     // Currently avoiding to have a big trace
     bool found = false;
     for (size_t i = 0; i < options.size(); ++i)
-        if (options[i].first == "parsespeed")
+    {
+        if (options[i].first == "parsespeed" || options[i].first == "file_parsespeed")
+        {
             found = true;
+            break;
+        }
+    }
     if (found == false)
         MI->Option(__T("ParseSpeed"), __T("0"));
 
