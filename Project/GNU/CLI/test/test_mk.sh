@@ -31,12 +31,6 @@ for FILE in $(ls -v *.md) ; do
         echo "${POLICY}" > "${TEST}.xml"
     fi
 
-    if [ "${TEST}" == "EBML-HEADER-ELEMENTS-WITHIN-MAXSIZELENGTH" ] || \
-       [ "${TEST}" == "EBML-HEADER-ELEMENTS-WITHIN-MAXIDLENGTH" ] || \
-       [ "${TEST}" == "MKV-V4+" ] ; then
-        continue;
-    fi
-
     echo "${SCRIPT}" > "${TEST}.sh"
     sh "${TEST}.sh"
     rm "${TEST}.sh"
