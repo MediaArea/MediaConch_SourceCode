@@ -298,6 +298,8 @@ int MainWindow::analyze_force_file_to_list(long id, std::string& err)
         err = "File ID not registered";
         return -1;
     }
+    if (db)
+        db->ui_reset_file_for_reload(fr);
 
     if (workerfiles.add_file_to_list(fr->filename, fr->filepath, fr->policy, fr->display, fr->verbosity, false, true, false, fr->options, err) < 0)
         return -1;

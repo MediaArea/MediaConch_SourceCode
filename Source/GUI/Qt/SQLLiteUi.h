@@ -101,13 +101,16 @@ public:
     virtual int  ui_update_table();
     virtual int  ui_add_file(const FileRegistered* file);
     virtual int  ui_add_files(const std::vector<FileRegistered*>& files);
+    virtual int  ui_create_files(const std::vector<FileRegistered*>& files);
     virtual int  ui_update_file(const FileRegistered* file);
     virtual int  ui_update_files(const std::vector<FileRegistered*>& files);
     virtual int  ui_get_file(FileRegistered* file);
+    virtual bool ui_file_exists(FileRegistered* file);
     virtual int  ui_remove_file(const FileRegistered* file);
     virtual int  ui_remove_files(const std::vector<FileRegistered*>& files);
     virtual int  ui_remove_all_files();
     virtual void ui_get_elements(std::vector<FileRegistered*>& vec);
+    virtual int  ui_reset_file_for_reload(FileRegistered* file);
 
 private:
     int           ui_version;

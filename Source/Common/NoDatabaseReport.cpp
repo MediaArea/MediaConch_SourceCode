@@ -254,6 +254,28 @@ int NoDatabaseReport::remove_file(int user, long id, std::string& err)
 }
 
 //---------------------------------------------------------------------------
+int NoDatabaseReport::reset_file(int user, long id, std::string& err)
+{
+    err = std::string();
+    if (id >= 0 && id < (long)files_saved.size() && files_saved[id] &&
+        files_saved[id]->user == user)
+        files_saved[id]->analyzed = false;
+
+    std::map<long, std::vector<MC_Report*> >::iterator it = reports_saved.find(id);
+    if (it != reports_saved.end())
+    {
+        for (size_t i = 0; i < reports_saved[id].size(); ++i)
+        {
+            if (reports_saved[id][i])
+                delete reports_saved[id][i];
+        }
+        reports_saved[id].clear();
+    }
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int NoDatabaseReport::remove_all_files(int user, std::string& err)
 {
     err = std::string();

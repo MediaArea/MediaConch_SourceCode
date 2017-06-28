@@ -410,7 +410,15 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
             return -1;
     }
     else
+    {
+        if (force_analyze)
+        {
+            db_mutex.Enter();
+            get_db()->reset_file(user, id, err);
+            db_mutex.Leave();
+        }
         registered = true;
+    }
 
     if (!analyzed && scheduler->add_element_to_queue(user, file, id, options, plugins, mil_analyze) < 0)
         return -1;

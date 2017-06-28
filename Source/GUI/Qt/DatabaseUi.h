@@ -52,6 +52,7 @@ public:
     virtual int ui_remove_files(const std::vector<FileRegistered*>& files) = 0;
     virtual int ui_remove_all_files() = 0;
     virtual void ui_get_elements(std::vector<FileRegistered*>& vec) = 0;
+    virtual int ui_reset_file_for_reload(FileRegistered* file) = 0;
 
     // UI Settings
     virtual int ui_settings_save_default_policy(const std::string&, int user_id = -1) = 0;
