@@ -510,9 +510,9 @@ int Core::checker_status(int user, long file_id, MediaConchLib::Checker_StatusRe
         db_mutex.Enter();
         ret = get_db()->get_file_information_from_id(user, file_id, filename, file_time,
                                                res.generated_id, res.source_id, generated_time,
-                                               generated_log, generated_error_log, options, is_finished,
+                                               generated_log, generated_error_log, options, res.finished,
                                                res.has_error, res.error_log, err);
-        if (ret == 0 && is_finished)
+        if (ret == 0 && res.finished)
             ret = get_db()->get_element_report_kind(user, file_id, (MediaConchLib::report&)*res.tool, err);
         db_mutex.Leave();
     }

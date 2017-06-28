@@ -813,7 +813,10 @@ bool SQLLiteReport::file_is_analyzed(int user, long id, std::string& err)
         return false;
     }
 
-    return true;
+    if (reports[0]["ANALYZED"] == "1")
+        return true;
+
+    return false;
 }
 
 int SQLLiteReport::remove_file(int user, long file_id, std::string& err)
