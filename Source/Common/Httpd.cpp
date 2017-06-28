@@ -81,6 +81,7 @@ int Httpd::send_result()
     MAKE_REQ_FUNC(mediaconch_remove_watch_folder, MediaConch_Remove_Watch_Folder)
 
     MAKE_REQ_FUNC(checker_analyze, Checker_Analyze)
+    MAKE_REQ_FUNC(checker_stop, Checker_Stop)
     MAKE_REQ_FUNC(checker_report, Checker_Report)
     MAKE_REQ_FUNC(checker_validate, Checker_Validate)
     MAKE_REQ_FUNC(checker_file_from_id, Checker_File_From_Id)

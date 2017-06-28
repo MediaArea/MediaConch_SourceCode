@@ -631,6 +631,12 @@ int Core::checker_clear(int user, const std::vector<long>& files, std::string& e
 }
 
 //---------------------------------------------------------------------------
+int Core::checker_stop(int user, const std::vector<long>& files, std::string& err)
+{
+    return scheduler->stop_elements(user, files, err);
+}
+
+//---------------------------------------------------------------------------
 void Core::unify_no_https(std::string& str)
 {
     size_t pos;

@@ -103,6 +103,7 @@ public:
 
     int         checker_status(int user, long file, MediaConchLib::Checker_StatusRes& res, std::string& error);
     int         checker_clear(int user, const std::vector<long>& files, std::string& error);
+    int         checker_stop(int user, const std::vector<long>& files, std::string& error);
 
     int         checker_list(int user, std::vector<std::string>& vec, std::string& error);
     int         checker_list(int user, std::vector<long>& vec, std::string& error);

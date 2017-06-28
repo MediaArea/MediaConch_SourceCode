@@ -103,6 +103,7 @@ namespace MediaConch
         httpd->commands.checker_status_cb = on_checker_status_command;
         httpd->commands.checker_report_cb = on_checker_report_command;
         httpd->commands.checker_clear_cb = on_checker_clear_command;
+        httpd->commands.checker_stop_cb = on_checker_stop_command;
         httpd->commands.checker_list_cb = on_checker_list_command;
         httpd->commands.checker_validate_cb = on_checker_validate_command;
         httpd->commands.checker_file_from_id_cb = on_checker_file_from_id_command;
@@ -1002,6 +1003,30 @@ namespace MediaConch
         }
 
         FUN_CMD_END(Checker_Clear)
+    }
+
+    //--------------------------------------------------------------------------
+    FUN_CMD_PROTO(checker_stop, Checker_Stop)
+    {
+        FUN_CMD_START(Checker_Stop)
+
+        for (size_t i = 0; i < req->ids.size(); ++i)
+        {
+            int id = req->ids[i];
+            if (id < 0)
+                FUN_CMD_NOK_ARR(res, "ID not existing", id)
+
+            std::vector<long> files;
+            files.push_back(id);
+
+            std::string err;
+            if (d->MCL->checker_stop(req->user, files, err) < 0)
+                FUN_CMD_NOK_ARR(res, err, id)
+
+            res.ok.push_back(id);
+        }
+
+        FUN_CMD_END(Checker_Stop)
     }
 
     //--------------------------------------------------------------------------

@@ -574,13 +574,18 @@ void WorkerFiles::update_update_files_registered()
 void WorkerFiles::update_delete_files_registered()
 {
     std::vector<FileRegistered*> vec;
+    std::vector<long> ids;
 
     to_delete_files_mutex.lock();
     if (to_delete_files.size())
     {
         std::map<std::string, FileRegistered*>::iterator it = to_delete_files.begin();
         for (; it != to_delete_files.end(); ++it)
+        {
             vec.push_back(it->second);
+            if (it->second)
+                ids.push_back(it->second->file_id);
+        }
         to_delete_files.clear();
     }
     to_delete_files_mutex.unlock();
@@ -589,6 +594,7 @@ void WorkerFiles::update_delete_files_registered()
         return;
 
     remove_registered_files_from_db(vec);
+    mainwindow->checker_stop(ids);
     for (size_t i = 0; i < vec.size(); ++i)
         delete vec[i];
     vec.clear();

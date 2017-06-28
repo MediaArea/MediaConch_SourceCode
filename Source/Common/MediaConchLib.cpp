@@ -408,6 +408,15 @@ int MediaConchLib::checker_clear(int user, const std::vector<long>& files, std::
     return core->checker_clear(user, files, error);
 }
 
+//---------------------------------------------------------------------------
+int MediaConchLib::checker_stop(int user, const std::vector<long>& files, std::string& error)
+{
+    if (use_daemon)
+        return daemon_client->checker_stop(user, files, error);
+
+    return core->checker_stop(user, files, error);
+}
+
 //***************************************************************************
 // Policy
 //***************************************************************************

@@ -810,6 +810,32 @@ void LibEventHttpd::request_post_coming(struct evhttp_request *req, std::string&
             error = rest.get_error();
     }
 
+    else if (!std::string("/checker_stop").compare(uri_path))
+    {
+        RESTAPI::Checker_Stop_Req *r = NULL;
+
+        get_request(json, &r);
+        if (!r)
+        {
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        RESTAPI::Checker_Stop_Res res;
+        if (commands.checker_stop_cb && commands.checker_stop_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_checker_stop_res(res, result, err) < 0)
+            error = rest.get_error();
+    }
+
     else if (!std::string("/checker_report").compare(uri_path))
     {
         RESTAPI::Checker_Report_Req *r = NULL;

@@ -1476,6 +1476,13 @@ int MainWindow::checker_clear(QString& err)
 }
 
 //---------------------------------------------------------------------------
+void MainWindow::checker_stop(const std::vector<long>& ids)
+{
+    std::string error;
+    MCL.checker_stop(user, ids, error);
+}
+
+//---------------------------------------------------------------------------
 int MainWindow::checker_file_from_id(long id, std::string& file, std::string& err)
 {
     return MCL.checker_file_from_id(user, id, file, err);
