@@ -7,6 +7,11 @@ var checker = (function() {
         applyPolicyToAll();
         bindings();
 
+        //
+        $('.checkboxParseSpeed').change(function(){
+            webpage.set_full_parse($(this).is(':checked'));
+        })
+
         // help
         addHelp('.label_fixer', 'Try to fix buggy files, technology preview, see <a href="https://mediaarea.net/MediaConch/fixity.html" onclick="urlUtils.openInBrowser(event);">the fixity webpage</a> for how to test it.', 'Fixer', 'checkerFixerHelp');
         addHelp('.label_parsespeed', 'By default, only few frames are parsed, fast, suitable for policy checker and container implementation checker. Enable this option for checking all frames in the file, slower.', 'Full parsing', 'checkerParseSpeedHelp');

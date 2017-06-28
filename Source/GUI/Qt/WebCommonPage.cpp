@@ -734,6 +734,11 @@ namespace MediaConch
         }
 
         QStringList options;
+        if (checker_full_parse)
+        {
+            options << "file_parsespeed";
+            options << "1";
+        }
         QString res = on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
                                               QString().setNum(mainwindow->select_correct_display()),
                                               QString().setNum(mainwindow->select_correct_verbosity()),
@@ -1748,5 +1753,10 @@ namespace MediaConch
         UiSettings& settings = mainwindow->get_settings();
         settings.change_mco_token(token.toUtf8().data());
         return QString("{}");
+    }
+
+    void WebCommonPage::set_full_parse(bool fp)
+    {
+        checker_full_parse = fp;
     }
 }

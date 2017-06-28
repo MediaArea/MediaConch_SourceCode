@@ -41,9 +41,9 @@ class WebCommonPage : public QWebEnginePage
 	Q_OBJECT
 public:
 #if defined(WEB_MACHINE_KIT)
-    explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebPage(parent), mainwindow(m) {}
+        explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebPage(parent), mainwindow(m), checker_full_parse(false) {}
 #elif defined(WEB_MACHINE_ENGINE)
-    explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebEnginePage(parent), mainwindow(m) {}
+    explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebEnginePage(parent), mainwindow(m), checker_full_parse(false) {}
 #endif
     virtual ~WebCommonPage() {}
 
@@ -96,6 +96,7 @@ public Q_SLOTS:
     void         on_save_mediatrace_report(long file_id);
     QString      on_create_policy_from_file(long file_id);
     QString      checker_force_analyze(long id);
+    void         set_full_parse(bool fp);
 
     void         close_all();
     void         close_element(long file_id);
@@ -155,6 +156,8 @@ protected:
     QMap<QString, QStringList>  file_selector;
     QString                     select_file_name;
     QString                     menu_name;
+
+    bool                        checker_full_parse;
 };
 
 }
