@@ -7,6 +7,13 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.06, 2017-06-30
+--------------
+Ubuntu 17.04 packages
+More Matroska checks
+More detailed FFV1 errors
+See https://github.com/MediaArea/groundtruth/blob/master/matroska/README.md for more information
+
 Version 17.05, 2017-06-01
 --------------
 add a --list command to the CLI for listing files in the database
