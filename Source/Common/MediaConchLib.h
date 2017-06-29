@@ -367,6 +367,7 @@ public:
 
     // Configuration
     void               load_configuration();
+    void               set_default_scheduler_max_threads(size_t nb);
     void               set_configuration_file(const std::string& file);
     const std::string& get_configuration_file() const;
     void               load_plugins_configuration();

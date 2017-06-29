@@ -1406,6 +1406,15 @@ std::string Core::get_config_file()
 }
 
 //---------------------------------------------------------------------------
+void Core::set_default_scheduler_max_threads(size_t nb)
+{
+    if (!scheduler)
+        return;
+        
+    scheduler->set_default_max_threads(nb);
+}
+
+//---------------------------------------------------------------------------
 void Core::set_configuration_file(const std::string& file)
 {
     configuration_file = file;
