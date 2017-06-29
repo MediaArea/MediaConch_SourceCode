@@ -44,6 +44,7 @@
 #include <QCloseEvent>
 #include <QTimer>
 #include <QTextStream>
+#include <QThread>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -89,6 +90,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
         MCL.create_default_implementation_schema();
+    int nb_threads=QThread::idealThreadCount();
+    if (nb_threads!=-1)
+        MCL.set_default_scheduler_max_threads(nb_threads);
 
     // Load policy
     if (!MCL.get_use_daemon())

@@ -740,6 +740,12 @@ void MediaConchLib::load_configuration()
 }
 
 //---------------------------------------------------------------------------
+void MediaConchLib::set_default_scheduler_max_threads(size_t nb)
+{
+    core->set_default_scheduler_max_threads(nb);
+}
+
+//---------------------------------------------------------------------------
 void MediaConchLib::set_configuration_file(const std::string& file)
 {
     core->set_configuration_file(file);
