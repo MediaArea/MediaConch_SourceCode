@@ -118,6 +118,7 @@ SEND_REQUEST_POST(Checker_Analyze_Req, checker_analyze);
 SEND_REQUEST_GET(Checker_Status_Req, checker_status);
 SEND_REQUEST_POST(Checker_Report_Req, checker_report);
 SEND_REQUEST_DELETE(Checker_Clear_Req, checker_clear);
+SEND_REQUEST_POST(Checker_Stop_Req, checker_stop);
 SEND_REQUEST_GET(Checker_List_Req, checker_list);
 SEND_REQUEST_POST(Checker_Validate_Req, checker_validate);
 SEND_REQUEST_POST(Checker_File_From_Id_Req, checker_file_from_id);

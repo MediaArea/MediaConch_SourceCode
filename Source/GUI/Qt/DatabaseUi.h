@@ -52,6 +52,7 @@ public:
     virtual int ui_remove_files(const std::vector<FileRegistered*>& files) = 0;
     virtual int ui_remove_all_files() = 0;
     virtual void ui_get_elements(std::vector<FileRegistered*>& vec) = 0;
+    virtual int ui_reset_file_for_reload(FileRegistered* file) = 0;
 
     // UI Settings
     virtual int ui_settings_save_default_policy(const std::string&, int user_id = -1) = 0;
@@ -116,6 +117,7 @@ protected:
     void        get_sql_query_for_update_ui_settings_table_v7(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v8(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v9(std::string& q);
+    void        get_sql_query_for_update_ui_table_v10(std::string& q);
 
 private:
     DatabaseUi (const DatabaseUi&);

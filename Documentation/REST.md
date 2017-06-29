@@ -8,6 +8,10 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.14
+ * Create new command for the checker
+  * Checker_Stop
+
 #### Version 1.13
  * Update command:
   * Mediaconch_Watch_Folder: add options in request
@@ -128,7 +132,7 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.13
+Current API version: $API_VERSION = 1.14
 
 #### Command
 
@@ -146,6 +150,7 @@ Current API version: $API_VERSION = 1.13
 * Checker_Validate:               HTTP POST
 * Checker_File_From_Id:           HTTP POST
 * Default_Values_For_type:        HTTP GET
+* Checker_Stop:                   HTTP POST
 
 * XSLT_Policy_Create:             HTTP GET
 * Policy_Import:                  HTTP POST
@@ -408,6 +413,27 @@ Parameters:
 Parameters:
 
 * ok:                Array of Integer: ids of the files removed from Database
+
+* nok:               MediaConch_Nok when error occurs
+
+#### Checker_Stop
+
+URI format for the parameters.
+URL: /$API_VERSION/checker_stop
+
+##### Request
+
+Parameters:
+
+- user:              Integer: a unique id for the user
+
+* List of ids:       Array of integers: ids given by the Analyze command
+
+##### Response
+
+Parameters:
+
+* ok:                Array of Integer: ids of the files stoped
 
 * nok:               MediaConch_Nok when error occurs
 

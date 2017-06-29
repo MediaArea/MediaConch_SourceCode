@@ -107,6 +107,8 @@ namespace MediaConch
                                              RESTAPI::Checker_Report_Res& res, void *arg);
         static int on_checker_clear_command(const RESTAPI::Checker_Clear_Req* req,
                                             RESTAPI::Checker_Clear_Res& res, void *arg);
+        static int on_checker_stop_command(const RESTAPI::Checker_Stop_Req* req,
+                                           RESTAPI::Checker_Stop_Res& res, void *arg);
         static int on_checker_list_command(const RESTAPI::Checker_List_Req* req,
                                            RESTAPI::Checker_List_Res& res, void *arg);
         static int on_checker_validate_command(const RESTAPI::Checker_Validate_Req* req,

@@ -813,11 +813,53 @@ bool SQLLiteReport::file_is_analyzed(int user, long id, std::string& err)
         return false;
     }
 
-    return true;
+    if (reports[0]["ANALYZED"] == "1")
+        return true;
+
+    return false;
 }
 
 int SQLLiteReport::remove_file(int user, long file_id, std::string& err)
 {
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE MEDIACONCH_FILE ";
+    create << "SET ANALYZED = ? ";
+    create << "WHERE ID = ? AND USER = ?;";
+    query = create.str();
+
+    if (prepare_v2(query, err) < 0)
+        return -1;
+
+    int ret = sqlite3_bind_int(stmt, 1, false);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    ret = sqlite3_bind_int(stmt, 2, file_id);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    ret = sqlite3_bind_int(stmt, 3, user);
+    if (ret != SQLITE_OK)
+    {
+        err = get_sqlite_error(ret);
+        return -1;
+    }
+
+    return execute();
+}
+
+int SQLLiteReport::reset_file(int user, long file_id, std::string& err)
+{
+    remove_report(user, file_id, err);
+
     reports.clear();
     query = "DELETE FROM MEDIACONCH_FILE WHERE ID = ? AND USER = ?;";
 

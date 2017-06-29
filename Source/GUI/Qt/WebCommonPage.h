@@ -41,9 +41,9 @@ class WebCommonPage : public QWebEnginePage
 	Q_OBJECT
 public:
 #if defined(WEB_MACHINE_KIT)
-    explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebPage(parent), mainwindow(m) {}
+        explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebPage(parent), mainwindow(m), checker_full_parse(false) {}
 #elif defined(WEB_MACHINE_ENGINE)
-    explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebEnginePage(parent), mainwindow(m) {}
+    explicit WebCommonPage(MainWindow *m, QWidget *parent) : QWebEnginePage(parent), mainwindow(m), checker_full_parse(false) {}
 #endif
     virtual ~WebCommonPage() {}
 
@@ -65,15 +65,16 @@ private Q_SLOTS:
 public Q_SLOTS:
     void         on_file_selected(const QString& filename, const QString& path,
                                   const QString& policy, const QString& display, const QString& verbosity,
-                                  bool fixer, QString& ret, std::string& err_str);
+                                  bool fixer, const QStringList&,
+                                  QString& ret, std::string& err_str);
     void         on_file_selected_end(const std::string& err_str, QString& ret);
     void         on_file_selected_formValues(const FileRegistered* fr, QString& formValues);
     QString      on_file_upload_selected(const QString& policy, const QString& display, const QString& verbosity,
-                                         bool fixer);
+                                         bool fixer, const QStringList&);
     QString      on_file_online_selected(const QString& url, const QString& policy, const QString& display,
-                                         const QString& verbosity, bool fixer);
+                                         const QString& verbosity, bool fixer, const QStringList&);
     QString      on_file_repository_selected(const QString& policy, const QString& display,
-                                             const QString& verbosity, bool fixer);
+                                             const QString& verbosity, bool fixer, const QStringList&);
     QString      on_file_from_db_selected();
     QString      status_reports_multi(const QStringList& ids, const QStringList& policy_ids);
     void         on_save_settings_selected(const QString& policy, const QString& display, const QString& verbosity,
@@ -95,6 +96,7 @@ public Q_SLOTS:
     void         on_save_mediatrace_report(long file_id);
     QString      on_create_policy_from_file(long file_id);
     QString      checker_force_analyze(long id);
+    void         set_full_parse(bool fp);
 
     void         close_all();
     void         close_element(long file_id);
@@ -154,6 +156,8 @@ protected:
     QMap<QString, QStringList>  file_selector;
     QString                     select_file_name;
     QString                     menu_name;
+
+    bool                        checker_full_parse;
 };
 
 }

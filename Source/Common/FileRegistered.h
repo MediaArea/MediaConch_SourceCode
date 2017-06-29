@@ -53,26 +53,33 @@ public:
 
         for (size_t x = 0; x < f.generated_id.size(); ++x)
             this->generated_id.push_back(f.generated_id[x]);
+
+        for (size_t x = 0; x < f.options.size(); ++x)
+        {
+            if (f.options[x] != "File_TryToFix")
+                this->options.push_back(f.options[x]);
+        }
     }
 
-    std::string        filename;
-    std::string        filepath;
-    std::vector<long>  generated_id;
+    std::string               filename;
+    std::string               filepath;
+    std::vector<long>         generated_id;
+    std::vector<std::string>  options;
 
-    double             analyze_percent;
-    long               file_id;
-    int                policy;
-    int                display;
-    int                verbosity;
+    double                    analyze_percent;
+    long                      file_id;
+    int                       policy;
+    int                       display;
+    int                       verbosity;
 
-    int                report_kind;
+    int                       report_kind;
 
-    unsigned int       index;
-    bool               analyzed;
-    bool               implementation_valid;
-    bool               policy_valid;
-    bool               create_policy;
-    bool               need_update;
+    unsigned int              index;
+    bool                      analyzed;
+    bool                      implementation_valid;
+    bool                      policy_valid;
+    bool                      create_policy;
+    bool                      need_update;
 };
 
 }

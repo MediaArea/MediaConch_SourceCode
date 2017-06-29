@@ -14,7 +14,7 @@ var statusCell = (function() {
     var inProgress = function(fileId, status) {
         var nodeStatus = $(result.cell('#result-' + fileId, 5).node());
         nodeStatus.addClass('checkInProgress');
-        if (undefined == status.tool || 2 != status.tool || 100 == status.percent) {
+        if ((undefined !== status.tool && 2 != status.tool) || 100 == status.percent) {
             nodeStatus.find('.statusResult').html('<span class="spinner-status"></span>');
         }
         else {

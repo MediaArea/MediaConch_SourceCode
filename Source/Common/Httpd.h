@@ -47,6 +47,7 @@ public:
     REQ_FUNC(MediaConch_Remove_Watch_Folder);
 
     REQ_FUNC(Checker_Analyze);
+    REQ_FUNC(Checker_Stop);
     REQ_FUNC(Checker_Report);
     REQ_FUNC(Checker_Validate);
     REQ_FUNC(Checker_File_From_Id);
@@ -122,6 +123,8 @@ public:
                                              RESTAPI::Checker_Report_Res& res, void* arg);
     typedef int (*on_checker_clear_command)(const RESTAPI::Checker_Clear_Req* req,
                                             RESTAPI::Checker_Clear_Res& res, void* arg);
+    typedef int (*on_checker_stop_command)(const RESTAPI::Checker_Stop_Req* req,
+                                           RESTAPI::Checker_Stop_Res& res, void* arg);
     typedef int (*on_checker_list_command)(const RESTAPI::Checker_List_Req* req,
                                            RESTAPI::Checker_List_Res& res, void* arg);
     typedef int (*on_checker_validate_command)(const RESTAPI::Checker_Validate_Req* req,
@@ -190,7 +193,7 @@ public:
                      mediaconch_list_watch_folders_cb(NULL),
                      mediaconch_edit_watch_folder_cb(NULL), mediaconch_remove_watch_folder_cb(NULL),
                      checker_analyze_cb(NULL), checker_status_cb(NULL), checker_report_cb(NULL),
-                     checker_clear_cb(NULL), checker_list_cb(NULL),
+                     checker_clear_cb(NULL), checker_stop_cb(NULL), checker_list_cb(NULL),
                      checker_validate_cb(NULL), checker_file_from_id_cb(NULL),
                      checker_id_from_filename_cb(NULL), checker_file_information_cb(NULL),
                      default_values_for_type_cb(NULL),
@@ -232,6 +235,7 @@ public:
         on_checker_status_command                 checker_status_cb;
         on_checker_report_command                 checker_report_cb;
         on_checker_clear_command                  checker_clear_cb;
+        on_checker_stop_command                   checker_stop_cb;
         on_checker_list_command                   checker_list_cb;
         on_checker_validate_command               checker_validate_cb;
         on_checker_file_from_id_command           checker_file_from_id_cb;

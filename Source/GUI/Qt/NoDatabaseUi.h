@@ -96,6 +96,7 @@ public:
     virtual int ui_remove_files(const std::vector<FileRegistered*>& files);
     virtual int ui_remove_all_files();
     virtual void ui_get_elements(std::vector<FileRegistered*>& vec);
+    virtual int ui_reset_file_for_reload(FileRegistered* file);
 
 protected:
     virtual int execute();

@@ -209,7 +209,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //---------------------------------------------------------------------------
 int MainWindow::add_file_to_list(const QString& file, const QString& path,
                                  const QString& policy, const QString& display,
-                                 const QString& v, bool fixer, bool create_policy, std::string& err)
+                                 const QString& v, bool fixer, bool create_policy,
+                                 const QStringList& options, std::string& err)
 {
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     std::string filepath = std::string(path.toUtf8().data(), path.toUtf8().length());
@@ -233,7 +234,10 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
     full_path += filename;
 
     bool force = fixer;
-    if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, force, create_policy, err) < 0)
+    std::vector<std::string> opt_vec;
+    for (int i = 0; i < options.size(); ++i)
+        opt_vec.push_back(options[i].toUtf8().data());
+    if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, force, create_policy, opt_vec, err) < 0)
         return -1;
     return 0;
 }
@@ -251,10 +255,14 @@ int MainWindow::add_file_to_list(long id, std::string& err)
 
 //---------------------------------------------------------------------------
 int MainWindow::add_attachment_to_list(const QString& file, int policy, int display,
-                                       int verbosity, std::string& err)
+                                       int verbosity, const QStringList& options, std::string& err)
 {
+    std::vector<std::string> opt_vec;
+    for (int i = 0; i < options.size(); ++i)
+        opt_vec.push_back(options[i].toUtf8().data());
+
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
-    if (workerfiles.add_attachment_to_list(filename, policy, display, verbosity, err) < 0)
+    if (workerfiles.add_attachment_to_list(filename, policy, display, verbosity, opt_vec, err) < 0)
         return -1;
     return 0;
 }
@@ -290,8 +298,10 @@ int MainWindow::analyze_force_file_to_list(long id, std::string& err)
         err = "File ID not registered";
         return -1;
     }
+    if (db)
+        db->ui_reset_file_for_reload(fr);
 
-    if (workerfiles.add_file_to_list(fr->filename, fr->filepath, fr->policy, fr->display, fr->verbosity, false, true, false, err) < 0)
+    if (workerfiles.add_file_to_list(fr->filename, fr->filepath, fr->policy, fr->display, fr->verbosity, false, true, false, fr->options, err) < 0)
         return -1;
 
     return 0;
@@ -1333,7 +1343,8 @@ void MainWindow::set_last_load_display_path(const std::string& path)
 
 //---------------------------------------------------------------------------
 int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, bool force,
-                        std::vector<long>& files_id, std::string& err)
+                        const std::vector<std::string>& opt, std::vector<long>& files_id,
+                        std::string& err)
 {
     std::vector<std::string> plugins;
     std::vector<std::pair<std::string, std::string> > options;
@@ -1341,6 +1352,13 @@ int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, 
     {
         options.push_back(std::make_pair("File_TryToFix", "1"));
         force = true;
+    }
+
+    for (size_t i = 0; i + 1 < opt.size();)
+    {
+        if (opt[i] != "File_TryToFix")
+            options.push_back(std::make_pair(opt[i], opt[i + 1]));
+        i += 2;
     }
 
     return MCL.checker_analyze(user, files, plugins, options, files_id, err, force);
@@ -1457,6 +1475,13 @@ int MainWindow::checker_clear(QString& err)
         remove_all_files_to_list();
 
     return ret;
+}
+
+//---------------------------------------------------------------------------
+void MainWindow::checker_stop(const std::vector<long>& ids)
+{
+    std::string error;
+    MCL.checker_stop(user, ids, error);
 }
 
 //---------------------------------------------------------------------------

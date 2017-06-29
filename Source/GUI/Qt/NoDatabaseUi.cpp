@@ -109,6 +109,12 @@ void NoDatabaseUi::ui_get_elements(std::vector<FileRegistered*>&)
 }
 
 //---------------------------------------------------------------------------
+int NoDatabaseUi::ui_reset_file_for_reload(FileRegistered*)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int NoDatabaseUi::ui_settings_save_default_policy(const std::string&, int)
 {
     return 0;

@@ -220,13 +220,13 @@ namespace MediaConch
 
     void WebCommonPage::on_file_selected(const QString& filename, const QString& path,
                                          const QString& policy, const QString& display,
-                                         const QString& verbosity, bool fixer,
+                                         const QString& verbosity, bool fixer, const QStringList& options,
                                          QString& ret, std::string& err_str)
     {
         std::string error;
         std::string full_file(path.toUtf8().data());
         if (mainwindow->add_file_to_list(filename, path, policy,
-                                         display, verbosity, fixer, false, error) < 0)
+                                         display, verbosity, fixer, false, options, error) < 0)
         {
             if (err_str.size())
                 err_str += "\n";
@@ -316,7 +316,7 @@ namespace MediaConch
     }
 
     QString WebCommonPage::on_file_upload_selected(const QString& policy, const QString& display,
-                                                   const QString& verbosity, bool fixer)
+                                                   const QString& verbosity, bool fixer, const QStringList& options)
     {
         QStringList files = file_selector.value("checkerUpload_file", QStringList());
 
@@ -329,7 +329,7 @@ namespace MediaConch
         {
             QFileInfo f = QFileInfo(files[i]);
             on_file_selected(f.fileName(), f.absolutePath(), policy,
-                             display, verbosity, fixer, ret, err_str);
+                             display, verbosity, fixer, options, ret, err_str);
         }
         on_file_selected_end(err_str, ret);
 
@@ -338,21 +338,22 @@ namespace MediaConch
 
     QString WebCommonPage::on_file_online_selected(const QString& url, const QString& policy,
                                                    const QString& display, const QString& verbosity,
-                                                   bool)
+                                                   bool, const QStringList& options)
     {
         if (!url.length())
             return QString("{\"error\": \"No URL given.\"}");
 
         std::string err_str;
         QString ret;
-        on_file_selected(url, "", policy, display, verbosity, false, ret, err_str);
+        on_file_selected(url, "", policy, display, verbosity, false, options, ret, err_str);
         on_file_selected_end(err_str, ret);
 
         return ret;
     }
 
     QString WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
-                                                       const QString& verbosity, bool fixer)
+                                                       const QString& verbosity, bool fixer,
+                                                       const QStringList& options)
     {
         QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
         if (dirname.empty())
@@ -367,7 +368,7 @@ namespace MediaConch
         std::string err_str;
         QString ret;
         for (int i = 0; i < list.size(); ++i)
-            on_file_selected(list[i].fileName(), list[i].absolutePath(), policy, display, verbosity, fixer, ret, err_str);
+            on_file_selected(list[i].fileName(), list[i].absolutePath(), policy, display, verbosity, fixer, options, ret, err_str);
         on_file_selected_end(err_str, ret);
 
         return ret;
@@ -732,10 +733,16 @@ namespace MediaConch
             mainwindow->set_last_load_files_path(info.absolutePath().toUtf8().data());
         }
 
+        QStringList options;
+        if (checker_full_parse)
+        {
+            options << "file_parsespeed";
+            options << "1";
+        }
         QString res = on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
                                               QString().setNum(mainwindow->select_correct_display()),
                                               QString().setNum(mainwindow->select_correct_verbosity()),
-                                              false);
+                                              false, options);
 
         FileRegistered* fr = mainwindow->get_file_registered_from_file(tmp[0].toUtf8().data());
         if (!fr)
@@ -916,11 +923,13 @@ namespace MediaConch
                         filename = "";
                     }
 
+                    QStringList opt;
+                    for (size_t k = 0; k < fr->options.size(); ++k)
+                        opt << QString().fromUtf8(fr->options[k].c_str(), fr->options[k].size());
                     if (mainwindow->add_attachment_to_list(QString().fromUtf8(filename.c_str(), filename.size()),
-                                                           fr->policy, fr->display, fr->verbosity, err) < 0)
-                    {
+                                                           fr->policy, fr->display, fr->verbosity, opt,
+                                                           err) < 0)
                         mainwindow->set_str_msg_to_status_bar(err);
-                    }
 
                     analyzed += QString("\"%1\":\"%2\"").arg(QString().number(fr->generated_id[x]))
                         .arg(QString().fromUtf8(filename.c_str(), filename.size()));
@@ -1176,10 +1185,12 @@ namespace MediaConch
 
         std::string error;
         QFileInfo f = QFileInfo(file);
+        QStringList options;
         if (mainwindow->add_file_to_list(f.fileName(), f.absolutePath(),
                                          QString().setNum(mainwindow->select_correct_policy()),
                                          QString().setNum(mainwindow->select_correct_display()),
-                                         QString().setNum(mainwindow->select_correct_verbosity()), false, true, error) < 0)
+                                         QString().setNum(mainwindow->select_correct_verbosity()), false, true,
+                                         options, error) < 0)
             return QString("{\"error\":\"%1\"").arg(QString().fromUtf8(error.c_str(), error.size()));
 
         return QString("{}");
@@ -1742,5 +1753,10 @@ namespace MediaConch
         UiSettings& settings = mainwindow->get_settings();
         settings.change_mco_token(token.toUtf8().data());
         return QString("{}");
+    }
+
+    void WebCommonPage::set_full_parse(bool fp)
+    {
+        checker_full_parse = fp;
     }
 }

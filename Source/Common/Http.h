@@ -49,6 +49,7 @@ public:
     int send_request(RESTAPI::Checker_Status_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_Report_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_Clear_Req& req, std::string& err);
+    int send_request(RESTAPI::Checker_Stop_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_List_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_Validate_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_File_From_Id_Req& req, std::string& err);

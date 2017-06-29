@@ -160,6 +160,27 @@ namespace MediaConch {
         return 0;
     }
 
+    int Scheduler::stop_elements(int user, const std::vector<long>& vec, std::string&)
+    {
+        CS.Enter();
+        for (size_t i = 0; i < vec.size(); ++i)
+        {
+            std::map<QueueElement*, QueueElement*>::iterator it = working.begin();
+            for (; it != working.end(); ++it)
+            {
+                if (it->first && it->first->user == user && it->first->file_id == vec[i])
+                {
+                    remove_element(it->first);
+                    break;
+                }
+            }
+        }
+        CS.Leave();
+        run_element();
+
+        return 0;
+    }
+
     bool Scheduler::element_is_finished(int user, long file_id, double& percent_done)
     {
         bool ret = true;

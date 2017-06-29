@@ -318,6 +318,9 @@ public:
     //Clear
     int  checker_clear(int user, const std::vector<long>& files, std::string& error);
 
+    //Stop
+    int  checker_stop(int user, const std::vector<long>& files, std::string& error);
+
     // Policies
     //   Create policy
     int                          policy_duplicate(int user, int id, int dst_policy_id, int *dst_user, bool must_be_public, std::string& err);

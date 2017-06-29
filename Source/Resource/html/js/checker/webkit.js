@@ -2,27 +2,48 @@ var checkerAjax = (function() {
     var formRequest = function(form, formValues, formType) {
         var res = null;
 
+        var options = [];
         if (formType === 'file')
         {
+            if ($('#checkerUpload_parseSpeed').is(':checked'))
+            {
+                options.push("file_parsespeed");
+                options.push("1");
+            }
+
             res = webpage.on_file_upload_selected($('.tab-content .active .policyList').val(),
-                                            $('.tab-content .active .displayList').val(),
-                                            $('.tab-content .active .verbosityList').val(),
-                                            $('#checkerUpload_fixer').is(':checked'));
+                                                  $('.tab-content .active .displayList').val(),
+                                                  $('.tab-content .active .verbosityList').val(),
+                                                  $('#checkerUpload_fixer').is(':checked'),
+                                                 options);
         }
         else if (formType === 'url')
         {
+            if ($('#checkerOnline_parseSpeed').is(':checked'))
+            {
+                options.push("file_parsespeed");
+                options.push("1");
+            }
+
             res = webpage.on_file_online_selected($('#checkerOnline_file').val(),
                                                   $('.tab-content .active .policyList').val(),
                                                   $('.tab-content .active .displayList').val(),
                                                   $('.tab-content .active .verbosityList').val(),
-                                                  false);
+                                                  false, options);
         }
         else if (formType === 'repository')
         {
+            if ($('#checkerRepository_parseSpeed').is(':checked'))
+            {
+                options.push("file_parsespeed");
+                options.push("1");
+            }
+
             res = webpage.on_file_repository_selected($('.tab-content .active .policyList').val(),
                                                       $('.tab-content .active .displayList').val(),
                                                       $('.tab-content .active .verbosityList').val(),
-                                                      $('#checkerRepository_fixer').is(':checked'));
+                                                      $('#checkerRepository_fixer').is(':checked'),
+                                                      options);
         }
 
         formRequestResponse(res, formValues);
