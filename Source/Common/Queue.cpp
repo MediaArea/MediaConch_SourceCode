@@ -36,20 +36,19 @@ QueueElement::QueueElement(Scheduler *s) : Thread(), scheduler(s), MI(NULL)
 //---------------------------------------------------------------------------
 QueueElement::~QueueElement()
 {
+    stop();
 }
 
 //---------------------------------------------------------------------------
 void QueueElement::stop()
 {
     RequestTerminate();
+    MI_CS.Enter();
+    if (MI)
+        MI->Option(__T("File_RequestTerminate"), String());
+    MI_CS.Leave();
     while (!IsExited())
-    {
-#ifdef WINDOWS
-        Sleep(0);
-#else //WINDOWS
-        sleep(0);
-#endif //WINDOWS
-    }
+        Yield();
 }
 
 static void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_Size, void* UserHandle_Void)
@@ -103,7 +102,9 @@ void QueueElement::Entry()
         return;
     }
 
+    MI_CS.Enter();
     MI = new MediaInfoNameSpace::MediaInfo;
+    MI_CS.Leave();
 
     // Currently avoiding to have a big trace
     bool found = false;
@@ -140,10 +141,13 @@ void QueueElement::Entry()
         MI->Option(Ztring().From_UTF8(options[i].first), Ztring().From_UTF8(options[i].second));
 
     MI->Open(ZenLib::Ztring().From_UTF8(file));
-    scheduler->work_finished(this, MI);
+    if (!IsTerminating()) //If terminating was requested, file is partially parsed (and there is some thread lock because the scheduler calls the queue which calls the scheduler) //TODO: reorganize calls
+        scheduler->work_finished(this, MI);
+    MI_CS.Enter();
     MI->Close();
     delete MI;
     MI = NULL;
+    MI_CS.Leave();
     log.str("");
     log << "end analyze:" << file;
     scheduler->write_log_timestamp(PluginLog::LOG_LEVEL_DEBUG, log.str());

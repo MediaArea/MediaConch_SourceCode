@@ -170,6 +170,7 @@ namespace MediaConch {
             {
                 if (it->first && it->first->user == user && it->first->file_id == vec[i])
                 {
+                    it->first->stop(); 
                     remove_element(it->first);
                     break;
                 }
