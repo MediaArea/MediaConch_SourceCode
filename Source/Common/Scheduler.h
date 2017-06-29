@@ -72,7 +72,7 @@ public:
     void write_log_timestamp(int level, std::string log);
     void log_cb(struct MediaInfo_Event_Log_0 *Event);
 
-    void set_default_max_threads(size_t nb) { if (max_threads_modified) return; max_threads = nb; }
+    void set_default_max_threads(size_t nb) {} // { if (max_threads_modified) return; max_threads = nb; } //TODO: check issues with the GUI when there are tons of files
     void set_max_threads(size_t nb) { max_threads_modified = true; max_threads = nb; }
 
 private:
