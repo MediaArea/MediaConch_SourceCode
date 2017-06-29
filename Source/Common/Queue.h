@@ -75,6 +75,7 @@ namespace MediaConch
     private:
         Scheduler*                         scheduler;
         MediaInfoNameSpace::MediaInfo     *MI;
+        ZenLib::CriticalSection            MI_CS;
     };
 
     //***************************************************************************
