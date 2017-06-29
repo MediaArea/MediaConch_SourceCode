@@ -7,6 +7,16 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.06, 2017-06-30
+--------------
+"Full parsing" option
+Internal database viewer
+Policy column in checker was sometimes displaying "fail" even if test was passing
+Ubuntu 17.04 packages
+More Matroska checks
+More detailed FFV1 errors
+See https://github.com/MediaArea/groundtruth/blob/master/matroska/README.md for more information
+
 Version 17.05, 2017-06-01
 --------------
 Add MediaConch to Mac App Store

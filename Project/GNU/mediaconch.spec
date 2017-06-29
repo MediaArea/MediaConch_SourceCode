@@ -1,5 +1,5 @@
-%define mediaconch_version          17.05
-%define libmediainfo_version        0.7.96
+%define mediaconch_version          17.06
+%define libmediainfo_version        0.7.97
 %define libzen_version              0.4.35
 
 %if 0%{?fedora_version} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
