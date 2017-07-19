@@ -4,6 +4,7 @@ PATH_SCRIPT=$(dirname "${0}")
 . "${PATH_SCRIPT}/utils.sh"
 
 FILES_DIRECTORY="${PATH_SCRIPT}/ImplementationChecks/matroska"
+RUN_REPORT="$(date +%Y%m%d)_mediaconch_$(date +%H%M%S).txt"
 
 MC="${PWD}/mediaconch"
 
@@ -67,8 +68,14 @@ for FILE in $(ls -v *.md) ; do
             "boolean(//*/*[@icid and @icid!=\"${TEST}\" and @fail_count and @fail_count!=\"0\"])" -`
         fi
 
+        CLASSID="AVC$(printf "%03d" "${TEST}")"
+        COL2="Q0"
+        DOC_UID="${TESTFILE}"
+
         if [ "${T1}" != "true" ] || [ "${T2}" != "false" ] ; then
             echo "NOK: ${TESTFILE}" >&9
+            CLASS_BELONG="0"
+            echo -e "${CLASSID}\t${COL2}\t${DOC_UID}\t${CLASS_BELONG}" >> "${RUN_REPORT}"
             rm -f "${TESTFILE}"
             RCODE=1
             continue
@@ -76,6 +83,8 @@ for FILE in $(ls -v *.md) ; do
 
         rm -f "${TESTFILE}"
         echo "OK: ${TESTFILE}" >&9
+        CLASS_BELONG="1"
+        echo -e "${CLASSID}\t${COL2}\t${DOC_UID}\t${CLASS_BELONG}" >> "${RUN_REPORT}"
     done
 
     rm -f "${TEST}.xml"
