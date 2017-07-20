@@ -86,6 +86,7 @@ BuildRequires:  libuuid-devel
 %if 0%{?fedora_version}
 BuildRequires:  pkgconfig(Qt5)
 BuildRequires:  desktop-file-utils
+BuildRequires:  libappstream-glib
 %if 0%{?fedora_version} == 99
 BuildRequires:  gnu-free-sans-fonts
 %endif
@@ -128,6 +129,17 @@ Summary:    Implementation checker and policy checker for video and audio files 
 Group:      Applications/Multimedia
 Requires:   %{libzen_name}%{?_isa} >= %{libzen_version}
 Requires:   %{libmediainfo_name}%{?_isa} >= %{libmediainfo_version}
+
+%description server
+MediaConch is an implementation checker, policy checker, reporter,
+and fixer that targets preservation-level audiovisual files
+(specifically Matroska, Linear Pulse Code Modulation (LPCM)
+and FF Video Codec 1 (FFV1)).
+
+This project is maintained by MediaArea and funded by PREFORMA.
+
+This package includes the server.
+
 %if 0%{?fedora_version}
 %{?systemd_requires}
 %endif
@@ -151,18 +163,6 @@ This project is maintained by MediaArea and funded by PREFORMA.
 This package includes the graphical user interface.
 %endif # GUI
 
-%if 0%{?build_server}
-%description server
-MediaConch is an implementation checker, policy checker, reporter,
-and fixer that targets preservation-level audiovisual files
-(specifically Matroska, Linear Pulse Code Modulation (LPCM)
-and FF Video Codec 1 (FFV1)).
-
-This project is maintained by MediaArea and funded by PREFORMA.
-
-This package includes the server.
-%endif # Server
-
 %prep
 %setup -q -n MediaConch
 sed -i 's/.$//' *.txt *.html Release/*.txt
@@ -171,22 +171,26 @@ find Source -type f -exec chmod 644 {} ';'
 chmod 644 *.html *.txt Release/*.txt
 
 pushd Project/GNU/CLI
-    autoreconf -i
+    autoreconf -fiv
 popd
 
 %if 0%{?build_server}
 pushd Project/GNU/Server
-    autoreconf -i
+    autoreconf -fiv
 popd
 %endif # Server
 
 %if 0%{?build_gui}
 pushd Project/Qt
-    chmod u+x prepare
-    %if 0%{?suse_version} && ! 0%{?is_opensuse}
-        ./prepare NO_JANSSON=yes
+    %if 0%{?fedora}
+        %{qmake_qt5}
     %else
-        ./prepare
+        chmod u+x prepare
+        %if 0%{?suse_version} && ! 0%{?is_opensuse}
+            ./prepare NO_JANSSON=yes
+        %else
+            ./prepare
+        %endif
     %endif
 popd
 %endif # GUI
@@ -283,27 +287,25 @@ install -m 644 Source/Resource/Image/MediaConch.png %{buildroot}%{_datadir}/pixm
 # menu-entry
 install -dm 755 %{buildroot}%{_datadir}/applications
 install -m 644 Project/GNU/GUI/mediaconch-gui.desktop %{buildroot}%{_datadir}/applications
-%if 0%{?suse_version}
-  %suse_update_desktop_file -n mediaconch-gui AudioVideo AudioVideoEditing
-%endif
-%if 0%{?fedora_version}
-  desktop-file-install --dir="%{buildroot}%{_datadir}/applications" -m 644 Project/GNU/GUI/mediaconch-gui.desktop
-install -dm 755 %{buildroot}%{_unitdir}
-install -m 644 -p Project/GNU/Server/mediaconchd.service  %{buildroot}%{_unitdir}/mediaconchd.service
-install -dm 755 %{buildroot}%{_sysconfdir}/%{name}
-install -m 644 -p Project/GNU/Server/MediaConch.rc  %{buildroot}%{_sysconfdir}/%{name}/MediaConch.rc
-%endif
 install -dm 755 %{buildroot}%{_datadir}/apps/konqueror/servicemenus
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde3.desktop %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop
-%if 0%{?suse_version}
-  %suse_update_desktop_file -n %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
-%endif
 install -dm 755 %{buildroot}%{_datadir}/kde4/services/ServiceMenus/
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop
 install -dm 755 %{buildroot}%{_datadir}/appdata/
 install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir}/appdata/mediaconch-gui.appdata.xml
 %if 0%{?suse_version}
-  %suse_update_desktop_file -n %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
+%suse_update_desktop_file -n %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
+%suse_update_desktop_file -n %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
+%suse_update_desktop_file -n mediaconch-gui AudioVideo AudioVideoEditing
+%endif
+%if 0%{?fedora_version}
+desktop-file-install --dir="%{buildroot}%{_datadir}/applications" -m 644 Project/GNU/GUI/mediaconch-gui.desktop
+install -dm 755 %{buildroot}%{_unitdir}
+install -m 644 -p Project/GNU/Server/mediaconchd.service  %{buildroot}%{_unitdir}/mediaconchd.service
+install -dm 755 %{buildroot}%{_sysconfdir}/%{name}
+install -m 644 -p Project/GNU/Server/MediaConch.rc  %{buildroot}%{_sysconfdir}/%{name}/MediaConch.rc
+%check
+appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/*.appdata.xml
 %endif
 %endif #GUI
 
@@ -316,6 +318,18 @@ install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir
 
 %postun server
 %systemd_postun_with_restart mediaconchd.service
+
+%post gui
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+
+%postun gui
+if [ $1 -eq 0 ] ; then
+    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+fi
+
+%posttrans gui
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %endif
 
 %files
