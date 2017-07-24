@@ -4,7 +4,11 @@ PATH_SCRIPT=$(dirname "${0}")
 . "${PATH_SCRIPT}/utils.sh"
 
 FILES_DIRECTORY="${PATH_SCRIPT}/ImplementationChecks/matroska"
-RUN_REPORT="$(date +%Y%m%d)_mediaconch_$(date +%H%M%S).txt"
+
+BUILD_NUMBER="${TRAVIS_BUILD_NUMBER:-0}"
+
+RUN_REPORT="$(date +%Y%m%d)_MediaArea_${BUILD_NUMBER:-0}.txt"
+RUN_META="$(date +%Y%m%d)_MediaArea_${BUILD_NUMBER:-0}.meta.txt"
 
 MC="${PWD}/mediaconch"
 
@@ -68,14 +72,15 @@ for FILE in $(ls -v *.md) ; do
             "boolean(//*/*[@icid and @icid!=\"${TEST}\" and @fail_count and @fail_count!=\"0\"])" -`
         fi
 
-        CLASSID="AVC$(printf "%03d" "${TEST}")"
+        CLASSID="AVC$(printf '%03d' ${FILE%.*})"
         COL2="Q0"
         DOC_UID="${TESTFILE}"
+        COL4="0"
 
         if [ "${T1}" != "true" ] || [ "${T2}" != "false" ] ; then
             echo "NOK: ${TESTFILE}" >&9
             CLASS_BELONG="0"
-            echo -e "${CLASSID}\t${COL2}\t${DOC_UID}\t${CLASS_BELONG}" >> "${RUN_REPORT}"
+            echo -e "${CLASSID}\t${COL2}\t${DOC_UID}\t${COL4}\t${CLASS_BELONG}\t${BUILD_NUMBER}" >> "${RUN_REPORT}"
             rm -f "${TESTFILE}"
             RCODE=1
             continue
@@ -84,12 +89,16 @@ for FILE in $(ls -v *.md) ; do
         rm -f "${TESTFILE}"
         echo "OK: ${TESTFILE}" >&9
         CLASS_BELONG="1"
-        echo -e "${CLASSID}\t${COL2}\t${DOC_UID}\t${CLASS_BELONG}" >> "${RUN_REPORT}"
+        echo -e "${CLASSID}\t${COL2}\t${DOC_UID}\t${COL4}\t${CLASS_BELONG}\t${BUILD_NUMBER}" >> "${RUN_REPORT}"
     done
 
     rm -f "${TEST}.xml"
 
 done
+
+if [ -n "${TRAVIS_COMMIT_MESSAGE}" ] ; then
+    echo -e "${TRAVIS_COMMIT_MESSAGE}" >> "${RUN_META}"
+fi
 
 popd
 
