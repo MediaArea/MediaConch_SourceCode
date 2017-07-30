@@ -42,13 +42,13 @@ All open source digital assets for the software developed by MediaArea during th
 
 First, you must create a directory which will receive the MediaConch directory, and some of its dependencies depending on your configuration: ZenLib and MediaInfoLib if you decide to compile them yourself, and under Mac libxml2 and libxslt.
 
-In this document, this directory will be refered as $BUILD_DIR.
+In this document, this directory will be referred as $BUILD_DIR.
 
 ### Dependancies under Mac
 
 #### macport
 
-Some dependencies are availables with macport. To install macport:
+Some dependencies are available with macport. To install macport:
 https://guide.macports.org/#installing
 
 ```sh
@@ -265,7 +265,7 @@ Unzip the corresponding srcXX.zip, and then launch
 
 in order to compile, respectively, the CLI, the server and the GUI.
 
-#### Build manually from github
+#### Build manually from GitHub
 
 When you have done all the prerequisite for you configuration, you can build MediaConch. We start with the CLI.
 
