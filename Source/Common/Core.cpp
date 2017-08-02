@@ -413,9 +413,14 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
     {
         if (force_analyze)
         {
+            std::string file_last_modification = get_last_modification_file(file);
+            std::vector<long> generated_id;
             db_mutex.Enter();
-            get_db()->reset_file(user, id, err);
+            get_db()->remove_report(user, id, err);
+            id = get_db()->update_file(user, id, file_last_modification, options_str, err, generated_id);
             db_mutex.Leave();
+            if (id < 0)
+                return -1;
         }
         registered = true;
     }
