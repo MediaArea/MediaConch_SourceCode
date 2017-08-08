@@ -133,6 +133,11 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
                 return CLI_RETURN_ERROR;
             }
 
+            if (report_set[MediaConchLib::report_MediaInfo]
+                && format == MediaConchLib::format_Max
+                && display_content.empty())
+                format = MediaConchLib::format_Text;
+
             if (format == MediaConchLib::format_Max && display_content.empty())
                 format = MediaConchLib::format_Simple;
             else if (format == MediaConchLib::format_Max && !display_content.empty())
