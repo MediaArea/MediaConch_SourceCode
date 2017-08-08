@@ -164,6 +164,18 @@ bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::st
         return false;
     }
 
+    if (reports[MediaConchLib::report_MediaInfo] && (Format == MediaConchLib::format_Simple))
+    {
+        reason = "Simple output is not currently supported for MediaInfo reports.";
+        return false;
+    }
+
+    if (reports[MediaConchLib::report_MediaInfo] && (Format == MediaConchLib::format_Html))
+    {
+        reason = "HTML output is not currently supported for MediaInfo reports.";
+        return false;
+    }
+
     if (reports.count() > 1 && Format == MediaConchLib::format_Xml)
         Format = MediaConchLib::format_MaXml;
 
