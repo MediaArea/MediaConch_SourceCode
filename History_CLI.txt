@@ -7,6 +7,12 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.07, 2017-08-08
+--------------
+Add EBML-MINVER-COHERANT and EBML-MAXVER-COHERANT tests
+MediaConch is now directly integrated in Fedora repository
+CLI was sometimes not responding with -f option
+
 Version 17.06, 2017-06-30
 --------------
 Ubuntu 17.04 packages
