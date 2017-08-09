@@ -47,7 +47,7 @@ done
 
 find $APPNAME.app/Contents/PlugIns -name "*.dylib" -exec codesign --force --verbose --sign "3rd Party Mac Developer Application: $SIGNATURE" -i $BUNDLEID '{}' \;
 
-plutil -insert com\\.apple\\.security\\.application-groups -xml "<array><string>$TEAMID.net.mediaarea.mc-group</string></array>" $APPNAME.entitlements
+plutil -replace com\\.apple\\.security\\.application-groups -xml "<array><string>$TEAMID.net.mediaarea.mc-group</string></array>" $APPNAME.entitlements
 
 codesign --force --verbose --sign "3rd Party Mac Developer Application: $SIGNATURE"  --entitlements $APPNAME.entitlements $APPNAME.app
 
