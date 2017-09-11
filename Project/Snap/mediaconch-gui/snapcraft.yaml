@@ -1,5 +1,5 @@
 name: mediaconch-gui
-version: 17.07
+version: 17.08
 summary: Implementation checker and policy checker for video and audio files (GUI)
 description: |
   MediaConch is an implementation checker, policy checker, reporter,

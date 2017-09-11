@@ -1,5 +1,5 @@
 name: mediaconch-server
-version: 17.07
+version: 17.08
 summary: Implementation checker and policy checker for video and audio files (Server)
 description: |
   MediaConch is an implementation checker, policy checker, reporter,
