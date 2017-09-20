@@ -1,5 +1,5 @@
 usr/bin/mediaconch-gui
-usr/share/appdata/*
+usr/share/metainfo/*
 usr/share/applications/*
 usr/share/apps/konqueror/servicemenus/*
 usr/share/kde4/services/ServiceMenus/*

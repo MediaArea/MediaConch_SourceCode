@@ -291,8 +291,13 @@ install -dm 755 %{buildroot}%{_datadir}/apps/konqueror/servicemenus
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde3.desktop %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop
 install -dm 755 %{buildroot}%{_datadir}/kde4/services/ServiceMenus/
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop
+%if %{undefined fedora_version} || 0%{?fedora_version} < 26
 install -dm 755 %{buildroot}%{_datadir}/appdata/
-install -m 644 Project/GNU/GUI/mediaconch-gui.appdata.xml %{buildroot}%{_datadir}/appdata/mediaconch-gui.appdata.xml
+install -m 644 Project/GNU/GUI/mediaconch-gui.metainfo.xml %{buildroot}%{_datadir}/appdata/mediaconch-gui.appdata.xml
+%else
+install -dm 755 %{buildroot}%{_datadir}/metainfo/
+install -m 644 Project/GNU/GUI/mediaconch-gui.metainfo.xml %{buildroot}%{_datadir}/metainfo/mediaconch-gui.metainfo.xml
+%endif
 %if 0%{?suse_version}
 %suse_update_desktop_file -n %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %suse_update_desktop_file -n %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
@@ -305,7 +310,11 @@ install -m 644 -p Project/GNU/Server/mediaconchd.service  %{buildroot}%{_unitdir
 install -dm 755 %{buildroot}%{_sysconfdir}/%{name}
 install -m 644 -p Project/GNU/Server/MediaConch.rc  %{buildroot}%{_sysconfdir}/%{name}/MediaConch.rc
 %check
+%if 0%{?fedora_version} >= 26
+appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/metainfo/*.metainfo.xml
+%else
 appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/*.appdata.xml
+%endif
 %endif
 %endif #GUI
 
@@ -382,8 +391,13 @@ fi
 %dir %{_datadir}/kde4/services
 %dir %{_datadir}/kde4/services/ServiceMenus
 %{_datadir}/kde4/services/ServiceMenus/*.desktop
+%if 0%{?fedora_version} && 0%{?fedora_version} >= 26
+%dir %{_datadir}/metainfo
+%{_datadir}/metainfo/*.xml
+%else
 %dir %{_datadir}/appdata
 %{_datadir}/appdata/*.xml
+%endif
 %endif # GUI
 
 %changelog
