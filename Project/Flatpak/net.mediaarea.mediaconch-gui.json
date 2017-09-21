@@ -116,8 +116,8 @@
                 }
             ],
             "post-install": [
-                "install -m 0755 -d /app/share/appdata",
-                "install -m 0644 ../GNU/GUI/mediaconch-gui.appdata.xml /app/share/appdata/mediaconch-gui.appdata.xml",
+                "install -m 0755 -d /app/share/metainfo",
+                "install -m 0644 ../GNU/GUI/mediaconch-gui.metainfo.xml /app/share/metainfo/mediaconch-gui.metainfo.xml",
                 "install -m 0755 -d /app/share/applications",
                 "install -m 0644 ../GNU/GUI/mediaconch-gui.desktop /app/share/applications/mediaconch-gui.desktop",
                 "install -m 0755 -d /app/share/icons/hicolor/256x256/apps",

@@ -98,7 +98,7 @@ package_mediaconch-gui() {
 
     install -D -m 0644 Project/GNU/GUI/mediaconch-gui.kde3.desktop "${pkgdir}"/usr/share/apps/konqueror/servicemenus/mediaconch-gui.desktop
     install -D -m 0644 Project/GNU/GUI/mediaconch-gui.kde4.desktop "${pkgdir}"/usr/share/kde4/services/ServiceMenus/mediaconch-gui.desktop
-    install -D -m 0644 Project/GNU/GUI/mediaconch-gui.appdata.xml "${pkgdir}"/usr/share/appdata/mediaconch-gui.appdata.xml
+    install -D -m 0644 Project/GNU/GUI/mediaconch-gui.metainfo.xml "${pkgdir}"/usr/share/metainfo/mediaconch-gui.metainfo.xml
 
     install -D -m 0644 License.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.html
     install -D -m 0644 License.MPLv2.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.MPLv2.html
