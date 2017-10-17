@@ -83,10 +83,12 @@ BuildRequires:  libuuid-devel
 
 # GUI dependencies
 %if 0%{?build_gui}
-%if 0%{?fedora_version}
+%if 0%{?fedora_version} || 0%{?centos} >= 7
 BuildRequires:  pkgconfig(Qt5)
+%if 0%{?fedora_version}
 BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
+%endif
 %if 0%{?fedora_version} == 99
 BuildRequires:  gnu-free-sans-fonts
 %endif
@@ -96,19 +98,19 @@ BuildRequires:  pkgconfig(Qt5WebEngine)
 BuildRequires:  pkgconfig(Qt5WebKit)
 %endif
 %else
-BuildRequires:  libqt4-devel
-%endif
-
 %if 0%{?suse_version}
 BuildRequires:  libQtWebKit-devel
 BuildRequires:  update-desktop-files
-%endif
-
+%else
 %if 0%{?mageia}
 %ifarch x86_64
 BuildRequires:  lib64qtwebkit2.2-devel
 %else
 BuildRequires:  libqtwebkit2.2-devel
+%endif
+%else
+BuildRequires:  libqt4-devel
+%endif
 %endif
 %endif
 %endif # GUI
@@ -212,7 +214,7 @@ pushd Project/GNU/CLI
             %configure --without-libevent
         %else
             %if ! 0%{?rhel} || 0%{?centos_version} >= 700
-                %if 0%{?mageia} > 5
+                %if 0%{?mageia} >= 6
                     %configure --disable-dependency-tracking
                 %else
                     %configure
@@ -242,7 +244,7 @@ pushd Project/GNU/Server
         %if 0%{?rhel} && ! 0%{?centos}
             %configure --without-jansson
         %else
-            %if 0%{?mageia} > 5
+            %if 0%{?mageia} >= 6
                 %configure --disable-dependency-tracking
             %else
                 %configure
