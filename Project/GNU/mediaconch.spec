@@ -293,6 +293,8 @@ install -dm 755 %{buildroot}%{_datadir}/apps/konqueror/servicemenus
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde3.desktop %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop
 install -dm 755 %{buildroot}%{_datadir}/kde4/services/ServiceMenus/
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop
+install -dm 755 %{buildroot}%{_datadir}/kservices5/ServiceMenus/
+install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}%{_datadir}/kservices5/ServiceMenus/mediaconch-gui.desktop
 %if %{undefined fedora_version} || 0%{?fedora_version} < 26
 install -dm 755 %{buildroot}%{_datadir}/appdata/
 install -m 644 Project/GNU/GUI/mediaconch-gui.metainfo.xml %{buildroot}%{_datadir}/appdata/mediaconch-gui.appdata.xml
@@ -301,6 +303,7 @@ install -dm 755 %{buildroot}%{_datadir}/metainfo/
 install -m 644 Project/GNU/GUI/mediaconch-gui.metainfo.xml %{buildroot}%{_datadir}/metainfo/mediaconch-gui.metainfo.xml
 %endif
 %if 0%{?suse_version}
+%suse_update_desktop_file -n %{buildroot}%{_datadir}/kservices5/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %suse_update_desktop_file -n %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %suse_update_desktop_file -n %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %suse_update_desktop_file -n mediaconch-gui AudioVideo AudioVideoEditing
@@ -393,6 +396,9 @@ fi
 %dir %{_datadir}/kde4/services
 %dir %{_datadir}/kde4/services/ServiceMenus
 %{_datadir}/kde4/services/ServiceMenus/*.desktop
+%dir %{_datadir}/kservices5
+%dir %{_datadir}/kservices5/ServiceMenus
+%{_datadir}/kservices5/ServiceMenus/*.desktop
 %if 0%{?fedora_version} && 0%{?fedora_version} >= 26
 %dir %{_datadir}/metainfo
 %{_datadir}/metainfo/*.xml
