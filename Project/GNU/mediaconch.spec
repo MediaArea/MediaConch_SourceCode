@@ -83,10 +83,12 @@ BuildRequires:  libuuid-devel
 
 # GUI dependencies
 %if 0%{?build_gui}
-%if 0%{?fedora_version}
+%if 0%{?fedora_version} || 0%{?centos} >= 7
 BuildRequires:  pkgconfig(Qt5)
+%if 0%{?fedora_version}
 BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
+%endif
 %if 0%{?fedora_version} == 99
 BuildRequires:  gnu-free-sans-fonts
 %endif
@@ -96,19 +98,19 @@ BuildRequires:  pkgconfig(Qt5WebEngine)
 BuildRequires:  pkgconfig(Qt5WebKit)
 %endif
 %else
-BuildRequires:  libqt4-devel
-%endif
-
 %if 0%{?suse_version}
 BuildRequires:  libQtWebKit-devel
 BuildRequires:  update-desktop-files
-%endif
-
+%else
 %if 0%{?mageia}
 %ifarch x86_64
 BuildRequires:  lib64qtwebkit2.2-devel
 %else
 BuildRequires:  libqtwebkit2.2-devel
+%endif
+%else
+BuildRequires:  libqt4-devel
+%endif
 %endif
 %endif
 %endif # GUI
@@ -212,7 +214,7 @@ pushd Project/GNU/CLI
             %configure --without-libevent
         %else
             %if ! 0%{?rhel} || 0%{?centos_version} >= 700
-                %if 0%{?mageia} > 5
+                %if 0%{?mageia} >= 6
                     %configure --disable-dependency-tracking
                 %else
                     %configure
@@ -242,7 +244,7 @@ pushd Project/GNU/Server
         %if 0%{?rhel} && ! 0%{?centos}
             %configure --without-jansson
         %else
-            %if 0%{?mageia} > 5
+            %if 0%{?mageia} >= 6
                 %configure --disable-dependency-tracking
             %else
                 %configure
@@ -291,6 +293,8 @@ install -dm 755 %{buildroot}%{_datadir}/apps/konqueror/servicemenus
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde3.desktop %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop
 install -dm 755 %{buildroot}%{_datadir}/kde4/services/ServiceMenus/
 install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop
+install -dm 755 %{buildroot}%{_datadir}/kservices5/ServiceMenus/
+install -m 644 Project/GNU/GUI/mediaconch-gui.kde4.desktop %{buildroot}%{_datadir}/kservices5/ServiceMenus/mediaconch-gui.desktop
 %if %{undefined fedora_version} || 0%{?fedora_version} < 26
 install -dm 755 %{buildroot}%{_datadir}/appdata/
 install -m 644 Project/GNU/GUI/mediaconch-gui.metainfo.xml %{buildroot}%{_datadir}/appdata/mediaconch-gui.appdata.xml
@@ -299,6 +303,7 @@ install -dm 755 %{buildroot}%{_datadir}/metainfo/
 install -m 644 Project/GNU/GUI/mediaconch-gui.metainfo.xml %{buildroot}%{_datadir}/metainfo/mediaconch-gui.metainfo.xml
 %endif
 %if 0%{?suse_version}
+%suse_update_desktop_file -n %{buildroot}%{_datadir}/kservices5/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %suse_update_desktop_file -n %{buildroot}%{_datadir}/kde4/services/ServiceMenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %suse_update_desktop_file -n %{buildroot}%{_datadir}/apps/konqueror/servicemenus/mediaconch-gui.desktop AudioVideo AudioVideoEditing
 %suse_update_desktop_file -n mediaconch-gui AudioVideo AudioVideoEditing
@@ -391,6 +396,9 @@ fi
 %dir %{_datadir}/kde4/services
 %dir %{_datadir}/kde4/services/ServiceMenus
 %{_datadir}/kde4/services/ServiceMenus/*.desktop
+%dir %{_datadir}/kservices5
+%dir %{_datadir}/kservices5/ServiceMenus
+%{_datadir}/kservices5/ServiceMenus/*.desktop
 %if 0%{?fedora_version} && 0%{?fedora_version} >= 26
 %dir %{_datadir}/metainfo
 %{_datadir}/metainfo/*.xml

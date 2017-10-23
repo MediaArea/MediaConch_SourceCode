@@ -32,14 +32,17 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then pushd ../MediaInfoLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew update ; true ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install libxslt sqlite jansson libevent qt5 ffmpeg sfk xmlstarlet ; true ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install libxslt sqlite jansson libevent qt ffmpeg sfk xmlstarlet ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then sudo pip install git+https://github.com/vi/mkvparse.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/ZenLib.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../ZenLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/MediaInfoLib.git ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../MediaInfoLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
 
-script: export PATH=/usr/local/opt/qt5/bin:$PATH && cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make clone_checks_files && make check && cd ../../Qt && ./prepare INCLUDEPATH+=/usr/local/include CONFIG+=c++11 -after QMAKE_MACOSX_DEPLOYMENT_TARGET=10.9 && make
+  # get working version of toolchain.prf for qt-5.9.2
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then sudo curl -o /usr/local/opt/qt/mkspecs/features/toolchain.prf http://code.qt.io/cgit/qt/qtbase.git/plain/mkspecs/features/toolchain.prf?id=62013d77721820976102581b4cbd31404c109903 ; fi
+
+script: export PATH=/usr/local/opt/qt/bin:$PATH && cd Project/GNU/CLI/ && ./autogen.sh && ./configure && make && make clone_sample_files && make clone_checks_files && make check && cd ../../Qt && ./prepare INCLUDEPATH+=/usr/local/include CONFIG+=c++11 -after QMAKE_MACOSX_DEPLOYMENT_TARGET=10.9 && make
 
 after_script:
  - cd $TRAVIS_BUILD_DIR/Project/GNU/CLI/test/ImplementationChecks/matroska
