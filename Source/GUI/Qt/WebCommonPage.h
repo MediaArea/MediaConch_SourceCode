@@ -85,13 +85,14 @@ public Q_SLOTS:
     void         menu_link_checker(const QString& name);
     void         on_input_changed(const QString& inputName);
 
+    QString      on_fill_output_list();
     void         on_download_report(const QString& report, long file_id, const QString& report_name);
     QString      on_fill_implementation_report(long file_id, const QString& display, const QString& verbosity);
     void         on_save_implementation_report(long file_id, const QString& display = "-1", const QString& verbosity="");
     QString      on_fill_policy_report(long file_id, const QString& policy, const QString& display);
     void         on_save_policy_report(long file_id, const QString& policy = "-1", const QString& display = "-1");
     QString      on_fill_mediainfo_report(long file_id);
-    void         on_save_mediainfo_report(long file_id);
+    void         on_save_mediainfo_report(long file_id, const QString& output);
     QString      on_fill_mediatrace_report(long file_id);
     void         on_save_mediatrace_report(long file_id);
     QString      on_create_policy_from_file(long file_id);
@@ -103,6 +104,7 @@ public Q_SLOTS:
 
     bool         report_is_html(const QString& report);
     bool         report_is_xml(const QString& report);
+    bool         report_is_json(const QString& report);
 
     QString      get_file_tool(const QString& file);
     QString      get_file_policy_id(const QString& file);

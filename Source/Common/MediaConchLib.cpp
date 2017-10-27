@@ -147,6 +147,15 @@ bool MediaConchLib::mil_has_curl_enabled()
 }
 
 //---------------------------------------------------------------------------
+int MediaConchLib::mil_get_output_list(std::string& output_list, std::string& error)
+{
+    if (use_daemon)
+        return daemon_client->checker_list_mediainfo_outputs(output_list, error);
+
+    return core->checker_list_mediainfo_outputs(output_list, error);
+}
+
+//---------------------------------------------------------------------------
 bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::string>&,
                                                        const std::bitset<MediaConchLib::report_Max>& reports,
                                                        const std::string& display, MediaConchLib::format& Format,

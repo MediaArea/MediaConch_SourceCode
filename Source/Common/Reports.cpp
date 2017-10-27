@@ -79,6 +79,10 @@ int Reports::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_Report
             (!cr.display_name || !cr.display_name->size()))
             cr.format = MediaConchLib::format_OrigXml;
 
+        // For MediaInfo output, get the XML, then transform it
+        if (cr.report_set[MediaConchLib::report_MediaInfo] && cr.mi_inform && *cr.mi_inform != "MIXML" && *cr.mi_inform != "XML")
+            cr.format = MediaConchLib::format_Xml;
+
         switch (cr.format)
         {
             case MediaConchLib::format_Text:
@@ -99,6 +103,9 @@ int Reports::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_Report
                 return -1;
         }
     }
+
+    if (cr.report_set[MediaConchLib::report_MediaInfo] && cr.mi_inform && *cr.mi_inform != "MIXML" && *cr.mi_inform != "XML")
+        core->transform_mixml_report(result->report, *cr.mi_inform, result->report, err);
 
     if (cr.display_name)
         transform_with_xslt_file(result->report, *cr.display_name, cr.options, result->report);

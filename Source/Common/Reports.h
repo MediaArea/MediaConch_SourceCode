@@ -33,7 +33,7 @@ class Schema;
 
 struct CheckerReport
 {
-    CheckerReport() : display_name(NULL), display_content(NULL), user(-1), format(MediaConchLib::format_Xml) {}
+    CheckerReport() : display_name(NULL), display_content(NULL), mi_inform(NULL), user(-1), format(MediaConchLib::format_Xml) {}
 
     std::bitset<MediaConchLib::report_Max>  report_set;
     std::vector<long>                       files;
@@ -42,6 +42,7 @@ struct CheckerReport
     std::vector<std::string>                policies_contents;
     std::string                            *display_name;
     std::string                            *display_content;
+    std::string                            *mi_inform;
     int                                     user;
     MediaConchLib::format                   format;
 };

@@ -109,6 +109,7 @@ namespace MediaConch
         httpd->commands.checker_file_from_id_cb = on_checker_file_from_id_command;
         httpd->commands.checker_id_from_filename_cb = on_checker_id_from_filename_command;
         httpd->commands.checker_file_information_cb = on_checker_file_information_command;
+        httpd->commands.checker_list_mediainfo_outputs_cb = on_checker_list_mediainfo_outputs_command;
         httpd->commands.default_values_for_type_cb = on_default_values_for_type_command;
 
         httpd->commands.xslt_policy_create_cb = on_xslt_policy_create_command;
@@ -902,8 +903,10 @@ namespace MediaConch
 
         std::string d_name = req->display_name;
         std::string d_content = req->display_content;
+        std::string m_inform = req->mi_inform;
         cr.display_name = d_name.size() ? &d_name : NULL;
         cr.display_content = d_content.size() ? &d_content : NULL;
+        cr.mi_inform = m_inform.size() ? &m_inform : NULL;
         if (cr.format != MediaConchLib::format_Xml)
             cr.display_name = NULL;
 
@@ -1177,6 +1180,21 @@ namespace MediaConch
         }
 
         FUN_CMD_END(Checker_File_Information)
+    }
+
+    //--------------------------------------------------------------------------
+    FUN_CMD_PROTO(checker_list_mediainfo_outputs, Checker_List_MediaInfo_Outputs)
+    {
+        FUN_CMD_START(Checker_List_MediaInfo_Outputs)
+
+        std::string outputs;
+        std::string err;
+        if (d->MCL->mil_get_output_list(outputs, err) < 0)
+            FUN_CMD_NOK(res, err, -1)
+        else
+            res.outputs = outputs;
+
+        FUN_CMD_END(Checker_List_MediaInfo_Outputs)
     }
 
     //--------------------------------------------------------------------------

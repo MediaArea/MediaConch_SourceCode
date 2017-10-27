@@ -154,6 +154,11 @@ footer .navbar {
     padding: 0;
 }
 
+.dropdown-menu {
+    width: auto;
+    height: auto;
+}
+
 .checker-results .btn.result-close {
     padding: 0 0 0 10px;
 }
@@ -191,7 +196,7 @@ footer .navbar {
     padding-right: 0;
 }
 
-.results-dld, .implem-dld, .policy-dld, .mi-dld, .mt-dld {
+.results-dld, .implem-dld, .policy-dld, .mi-dld, .mi-dld-group, .mt-dld {
     margin-left: 10px;
 }
 
@@ -375,6 +380,19 @@ p.registration {
 
 .popover-content {
     word-wrap: break-word;
+}
+
+.modal-header .mi-dld {
+    margin-right: 10px;
+}
+
+.modal-header .mi-dld-group {
+margin-left: 10px;
+margin-right: 10px;
+}
+
+.modal-header .alert-modal-create-policy {
+    float: right !important;
 }
 
 .modal-body .jstree-default .jstree-anchor {

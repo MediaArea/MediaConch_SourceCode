@@ -281,6 +281,10 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
             cr.policies_contents.push_back(policies[i]);
 
         cr.display_content = &display_content;
+
+        if (report_set[MediaConchLib::report_MediaInfo] && mi_inform.size())
+            cr.mi_inform = &mi_inform;
+
         MCL.checker_get_report(cr, &result, error);
         MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
@@ -478,8 +482,10 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
             return set_format(MediaConchLib::format_Simple);
         else if (f == "CSV" || f == "csv")
             return set_format(MediaConchLib::format_CSV);
+        else
+            mi_inform = f;
 
-        return -1;
+        return 0;
     }
 
     //--------------------------------------------------------------------------

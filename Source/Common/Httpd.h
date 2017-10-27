@@ -70,6 +70,7 @@ public:
     URI_REQ_FUNC(Checker_Status);
     URI_REQ_FUNC(Checker_Clear);
     URI_REQ_FUNC(Checker_List);
+    URI_REQ_FUNC(Checker_List_MediaInfo_Outputs);
     URI_REQ_FUNC(Default_Values_For_Type);
 
     URI_REQ_FUNC(XSLT_Policy_Create);
@@ -135,6 +136,8 @@ public:
                                                        RESTAPI::Checker_Id_From_Filename_Res& res, void* arg);
     typedef int (*on_checker_file_information_command)(const RESTAPI::Checker_File_Information_Req* req,
                                                        RESTAPI::Checker_File_Information_Res& res, void* arg);
+    typedef int (*on_checker_list_mediainfo_outputs_command)(const RESTAPI::Checker_List_MediaInfo_Outputs_Req* req,
+                                                             RESTAPI::Checker_List_MediaInfo_Outputs_Res& res, void* arg);
     typedef int (*on_default_values_for_type_command)(const RESTAPI::Default_Values_For_Type_Req* req,
                                                       RESTAPI::Default_Values_For_Type_Res& res, void* arg);
 
@@ -196,6 +199,7 @@ public:
                      checker_clear_cb(NULL), checker_stop_cb(NULL), checker_list_cb(NULL),
                      checker_validate_cb(NULL), checker_file_from_id_cb(NULL),
                      checker_id_from_filename_cb(NULL), checker_file_information_cb(NULL),
+                     checker_list_mediainfo_outputs_cb(NULL),
                      default_values_for_type_cb(NULL),
                      xslt_policy_create_cb(NULL),
                      policy_import_cb(NULL),
@@ -241,6 +245,7 @@ public:
         on_checker_file_from_id_command           checker_file_from_id_cb;
         on_checker_id_from_filename_command       checker_id_from_filename_cb;
         on_checker_file_information_command       checker_file_information_cb;
+        on_checker_list_mediainfo_outputs_command checker_list_mediainfo_outputs_cb;
         on_default_values_for_type_command        default_values_for_type_cb;
 
         // policy

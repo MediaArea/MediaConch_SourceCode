@@ -8,6 +8,12 @@ It is used above an HTTP connection.
 
 ### History
 
+#### Version 1.15
+ * Update command:
+  * Checker_Report: add mi_inform
+ * Create new command for the checker
+  * Checker_List_MediaInfo_Outputs
+
 #### Version 1.14
  * Create new command for the checker
   * Checker_Stop
@@ -360,6 +366,7 @@ Parameters:
 - policies_ids:      Array of policies ids (Integer)
 - display_content:   String:  display content
 - display_name:      String:  display name (HTML, TEXT, XML, MAXML, JSTREE, SIMPLE, CSV)
+- mi_inform:         String:  mediainfolib output format
 - options:           Object of strings given to the XSL transformations: Verbosity should be defined here.
                      Example: "options":{"verbosity": "5", "key":"value", ...}
 

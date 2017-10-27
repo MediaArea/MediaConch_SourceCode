@@ -263,6 +263,28 @@ void LibEventHttpd::request_get_coming(struct evhttp_request *req, std::string& 
             error = rest.get_error();
     }
 
+    else if (!std::string("/checker_list_mediainfo_outputs").compare(uri_path))
+    {
+        std::string query;
+        RESTAPI::Checker_List_MediaInfo_Outputs_Req *r = NULL;
+        if (query_str)
+            query = std::string(query_str);
+        get_uri_request(query, &r);
+
+        RESTAPI::Checker_List_MediaInfo_Outputs_Res res;
+        if (commands.checker_list_mediainfo_outputs_cb && commands.checker_list_mediainfo_outputs_cb(r, res, parent) < 0)
+        {
+            delete r;
+            ret_msg = "NOVALIDCONTENT";
+            code = HTTP_BADREQUEST;
+            goto send;
+        }
+
+        delete r;
+        if (rest.serialize_checker_list_mediainfo_outputs_res(res, result, err) < 0)
+            error = rest.get_error();
+    }
+
     else if (query_str && !std::string("/default_values_for_type").compare(uri_path))
     {
         std::string query(query_str);

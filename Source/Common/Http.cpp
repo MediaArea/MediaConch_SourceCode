@@ -124,6 +124,7 @@ SEND_REQUEST_POST(Checker_Validate_Req, checker_validate);
 SEND_REQUEST_POST(Checker_File_From_Id_Req, checker_file_from_id);
 SEND_REQUEST_POST(Checker_Id_From_Filename_Req, checker_id_from_filename);
 SEND_REQUEST_POST(Checker_File_Information_Req, checker_file_information);
+SEND_REQUEST_GET(Checker_List_MediaInfo_Outputs_Req, checker_list_mediainfo_outputs);
 SEND_REQUEST_GET(Default_Values_For_Type_Req, default_values_for_type);
 
 //***************************************************************************

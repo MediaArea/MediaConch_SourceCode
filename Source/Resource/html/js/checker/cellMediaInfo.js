@@ -17,8 +17,15 @@ var mediaInfoCell = (function() {
                     <div class="modal-dialog modal-lg"> \
                         <div class="modal-content"> \
                         <div class="modal-header"> \
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> \
-                            <h4 class="modal-title">MediaInfo report</h4> \
+                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button> \
+                                 <div class="btn-group mi-dld-group pull-right"> \
+                                    <button class="btn btn-primary">Download MediaInfo report</button> \
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button> \
+                                    <ul class="dropdown-menu col-md-12 mi-select-output"> \
+                                    </ul>\
+                                </div> \
+                            <button type="button" class="btn btn-warning mi-create-report pull-right">Create policy from MediaInfo report</button> \
+                            <h4 class="modal-title pull-left">MediaInfo report</h4> \
                         </div> \
                         <div class="modal-body"> \
                             <div class="row"> \
@@ -32,18 +39,31 @@ var mediaInfoCell = (function() {
                         </div> \
                             <div class="modal-footer"> \
                                 <button type="button" class="btn btn-warning mi-create-report">Create policy from MediaInfo report</button> \
-                                <button type="button" class="btn btn-primary mi-dld">Download MediaInfo report</button> \
+                                 <div class="btn-group mi-dld-group dropup"> \
+                                    <button class="btn btn-primary">Download MediaInfo report</button> \
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button> \
+                                    <ul class="dropdown-menu col-md-12 mi-select-output"> \
+                                    </ul>\
+                                </div> \
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> \
                             </div> \
                         </div> \
                     </div> \
                 </div>');
 
+                checkerAjax.getMediaInfoOutputList(fileId);
                 displayTree(fileId);
 
                 $('#modalInfo-' + fileId + ' .mi-dld').on('click', function(e) {
                     e.preventDefault();
-                    checkerAjax.downloadReportUrl(fileId, 'mi');
+                    checkerAjax.downloadReportUrl(fileId, 'mi', 'MIXML');
+                });
+
+                $('#modalInfo-' + fileId + ' .mi-select-output').on('click', 'li', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var output = e.currentTarget.getAttribute('data-name');
+                    checkerAjax.downloadReportUrl(fileId, 'mi', output);
                 });
 
                 $('#modalInfo-' + fileId + ' .mi-create-report').on('click', function(e) {
@@ -57,6 +77,12 @@ var mediaInfoCell = (function() {
             e.preventDefault();
             checkerAjax.downloadReportUrl(fileId, 'mi');
         });
+    };
+
+    var updateOutputList = function(outputList, fileId) {
+        for(index in outputList.output) {
+            $('#modalInfo-' + fileId + ' .mi-select-output').append('<li data-name="' + outputList.output[index].name + '"><a href="#">' + outputList.output[index].desc + '</a></li>');
+        }
     };
 
     var displayTree = function(fileId) {
@@ -160,6 +186,7 @@ var mediaInfoCell = (function() {
     return {
         init: init,
         success: success,
+        updateOutputList: updateOutputList,
         createPolicySuccess: createPolicySuccess,
         createPolicyError: createPolicyError,
         reset: reset,

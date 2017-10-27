@@ -326,6 +326,7 @@ public:
         std::vector<std::string>           policies_contents;
         std::string                        display_name;
         std::string                        display_content;
+        std::string                        mi_inform;
         std::map<std::string, std::string> options;
         std::string                        to_str() const;
     };
@@ -512,6 +513,21 @@ public:
         bool                                              has_error;
         MediaConch_Nok                                   *nok;
         std::string                                       to_str() const;
+    };
+
+    struct Checker_List_MediaInfo_Outputs_Req
+    {
+        std::string  to_str() const;
+    };
+
+    struct Checker_List_MediaInfo_Outputs_Res
+    {
+        Checker_List_MediaInfo_Outputs_Res() : nok(NULL) {}
+        ~Checker_List_MediaInfo_Outputs_Res();
+
+        std::string     outputs;
+        MediaConch_Nok *nok;
+        std::string     to_str() const;
     };
 
     struct Default_Values_For_Type_Req
@@ -1032,6 +1048,7 @@ public:
     int serialize_checker_file_from_id_req(Checker_File_From_Id_Req& req, std::string&, std::string& err);
     int serialize_checker_id_from_filename_req(Checker_Id_From_Filename_Req& req, std::string&, std::string& err);
     int serialize_checker_file_information_req(Checker_File_Information_Req& req, std::string&, std::string& err);
+    int serialize_checker_list_mediainfo_outputs_req(Checker_List_MediaInfo_Outputs_Req& req, std::string&, std::string& err);
     int serialize_default_values_for_type_req(Default_Values_For_Type_Req& req, std::string&, std::string& err);
 
     int serialize_xslt_policy_create_req(XSLT_Policy_Create_Req& req, std::string&, std::string& err);
@@ -1077,6 +1094,7 @@ public:
     int serialize_checker_file_from_id_res(Checker_File_From_Id_Res& res, std::string&, std::string& err);
     int serialize_checker_id_from_filename_res(Checker_Id_From_Filename_Res& res, std::string&, std::string& err);
     int serialize_checker_file_information_res(Checker_File_Information_Res& res, std::string&, std::string& err);
+    int serialize_checker_list_mediainfo_outputs_res(Checker_List_MediaInfo_Outputs_Res& res, std::string&, std::string& err);
     int serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string&, std::string& err);
 
     int serialize_xslt_policy_create_res(XSLT_Policy_Create_Res& res, std::string&, std::string& err);
@@ -1121,6 +1139,7 @@ public:
     Checker_File_From_Id_Req            *parse_checker_file_from_id_req(const std::string& data, std::string& err);
     Checker_Id_From_Filename_Req        *parse_checker_id_from_filename_req(const std::string& data, std::string& err);
     Checker_File_Information_Req        *parse_checker_file_information_req(const std::string& data, std::string& err);
+    Checker_List_MediaInfo_Outputs_Req  *parse_checker_list_mediainfo_outputs_req(const std::string& uri, std::string& err);
     Default_Values_For_Type_Req         *parse_default_values_for_type_req(const std::string& data, std::string& err);
 
     XSLT_Policy_Create_Req              *parse_xslt_policy_create_req(const std::string&, std::string& err);
@@ -1167,6 +1186,7 @@ public:
     Checker_File_From_Id_Req            *parse_uri_checker_file_from_id_req(const std::string& uri, std::string& err);
     Checker_Id_From_Filename_Req        *parse_uri_checker_id_from_filename_req(const std::string& uri, std::string& err);
     Checker_File_Information_Req        *parse_uri_checker_file_information_req(const std::string& uri, std::string& err);
+    Checker_List_MediaInfo_Outputs_Req  *parse_uri_checker_list_mediainfo_outputs_req(const std::string& uri, std::string& err);
     Default_Values_For_Type_Req         *parse_uri_default_values_for_type_req(const std::string& uri, std::string& err);
 
     XSLT_Policy_Create_Req              *parse_uri_xslt_policy_create_req(const std::string&, std::string& err);
@@ -1211,6 +1231,7 @@ public:
     Checker_File_From_Id_Res           *parse_checker_file_from_id_res(const std::string& data, std::string& err);
     Checker_Id_From_Filename_Res       *parse_checker_id_from_filename_res(const std::string& data, std::string& err);
     Checker_File_Information_Res       *parse_checker_file_information_res(const std::string& data, std::string& err);
+    Checker_List_MediaInfo_Outputs_Res *parse_checker_list_mediainfo_outputs_res(const std::string& data, std::string& err);
     Default_Values_For_Type_Res        *parse_default_values_for_type_res(const std::string& data, std::string& err);
 
     XSLT_Policy_Create_Res             *parse_xslt_policy_create_res(const std::string&, std::string& err);

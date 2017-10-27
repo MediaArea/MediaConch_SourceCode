@@ -54,6 +54,7 @@ public:
     int send_request(RESTAPI::Checker_Validate_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_File_From_Id_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_Id_From_Filename_Req& req, std::string& err);
+    int send_request(RESTAPI::Checker_List_MediaInfo_Outputs_Req& req, std::string& err);
     int send_request(RESTAPI::Checker_File_Information_Req& req, std::string& err);
     int send_request(RESTAPI::Default_Values_For_Type_Req& req, std::string& err);
 

@@ -380,6 +380,23 @@ int DaemonClient::checker_file_information(int user, long id, MediaConchLib::Che
 }
 
 //---------------------------------------------------------------------------
+int DaemonClient::checker_list_mediainfo_outputs(std::string& outputs, std::string& err)
+{
+    RESTAPI::Checker_List_MediaInfo_Outputs_Req req;
+    RESTAPI::Checker_List_MediaInfo_Outputs_Res *res = NULL;
+
+    COMMON_HTTP_REQ_RES(checker_list_mediainfo_outputs, -1)
+
+    if (res->nok)
+        err = res->nok->error;
+    else
+        outputs = res->outputs;
+
+    delete res;
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int DaemonClient::default_values_for_type(const std::string& type, std::vector<std::string>& values, std::string& err)
 {
     RESTAPI::Default_Values_For_Type_Req req;
@@ -663,6 +680,9 @@ int DaemonClient::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_R
 
     if (cr.display_content)
         req.display_content = *cr.display_content;
+
+    if (cr.mi_inform)
+        req.mi_inform = *cr.mi_inform;
 
     std::map<std::string, std::string>::const_iterator it = cr.options.begin();
     for (; it != cr.options.end(); ++it)
