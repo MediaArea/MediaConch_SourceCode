@@ -10,9 +10,9 @@ then
     wget https://github.com/MediaArea/MediaAreaXml/raw/master/mediaconch.xsd -O "$UTILS_PATH/mediaconch.xsd"
 fi
 
-if [ ! -f "$UTILS_PATH/mediainfo.xsd" ]
+if [ ! -f "$UTILS_PATH/mediainfo_2_0.xsd" ]
 then
-    wget https://github.com/MediaArea/MediaAreaXml/raw/master/mediainfo.xsd -O "$UTILS_PATH/mediainfo.xsd"
+    wget https://mediaarea.net/mediainfo/mediainfo_2_0.xsd -O "$UTILS_PATH/mediainfo.xsd"
 fi
 
 if [ ! -f "$UTILS_PATH/mediatrace.xsd" ]
