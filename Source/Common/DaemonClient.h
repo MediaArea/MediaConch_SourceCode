@@ -71,6 +71,9 @@ public:
                                   const std::vector<std::pair<std::string,std::string> >& options, std::string& error);
     int checker_file_information(int user, long id, MediaConchLib::Checker_FileInfo& info, std::string& error);
 
+    // list_mediainfo_outputs
+    int checker_list_mediainfo_outputs(std::string& outputs, std::string& error);
+
     // default_values_for_type
     int default_values_for_type(const std::string& type, std::vector<std::string>& values, std::string& error);
 

@@ -228,9 +228,9 @@ var checkerAjax = (function() {
         webpage.on_save_policy_report(fileId, policy, display);
     };
 
-    var downloadReportUrl = function(fileId, reportType) {
+    var downloadReportUrl = function(fileId, reportType, output) {
         if (reportType === "mi")
-            webpage.on_save_mediainfo_report(fileId);
+            webpage.on_save_mediainfo_report(fileId, output ? output : "");
         else if (reportType === "mt")
             webpage.on_save_mediatrace_report(fileId);
     };
@@ -246,6 +246,12 @@ var checkerAjax = (function() {
             res = webpage.on_fill_mediatrace_report(fileId);
             return res;
         }
+    };
+
+    var getMediaInfoOutputList = function(fileId) {
+        res = webpage.on_fill_output_list();
+        data = JSON.parse(res);
+        mediaInfoCell.updateOutputList(data, fileId);
     };
 
     var closeAll = function() {
@@ -271,6 +277,7 @@ var checkerAjax = (function() {
         downloadPolicyReportUrl: downloadPolicyReportUrl,
         downloadReportUrl: downloadReportUrl,
         reportTreeUrl: reportTreeUrl,
+        getMediaInfoOutputList:getMediaInfoOutputList,
         addExisting: addExisting,
         closeAll: closeAll,
         closeElement: closeElement,

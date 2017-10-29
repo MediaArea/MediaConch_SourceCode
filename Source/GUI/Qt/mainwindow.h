@@ -109,10 +109,11 @@ public:
                                                 std::vector<MediaConchLib::Checker_ValidateRes*>& result, std::string& err);
 
     void                        checker_stop(const std::vector<long>& ids);
+    int                         get_mediainfo_output_list(std::string& output, std::string& err);
     QString                     get_mediainfo_and_mediatrace_xml(long file_id, const std::string& display_name,
                                                                  const std::string& display_content, std::string& err);
-    QString                     get_mediainfo_xml(long file_id, const std::string& display_name,
-                                                  const std::string& display_content, std::string& err);
+    QString                     get_mediainfo_report(long file_id, const std::string& display_name,
+                                                  const std::string& display_content, const std::string& mi_inform, std::string& err);
     QString                     get_mediainfo_jstree(long file_id, std::string& err);
     QString                     get_mediatrace_xml(long file_id, const std::string& display_name,
                                                    const std::string& display_content, std::string& err);

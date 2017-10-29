@@ -477,6 +477,14 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
     return id;
 }
 
+//--------------------------------------------------------------------------
+int Core::checker_list_mediainfo_outputs(std::string& output, std::string& err)
+{
+    output = Ztring(MI->Option(L"Info_OutputFormats_JSON")).To_UTF8();
+
+    return 0;
+}
+
 //---------------------------------------------------------------------------
 int Core::file_add_generated_file(int user, long src_id, long generated_id, std::string& err)
 {
@@ -912,6 +920,33 @@ int Core::register_mediaconch_to_database(int user, long file, const std::string
                                     options, report, mode, 0, err);
     db_mutex.Leave();
     return ret;
+}
+
+//---------------------------------------------------------------------------
+
+int Core::transform_mixml_report(const std::string& mi_xml, const std::string& mi_inform, std::string& report, std::string& err)
+{
+    MediaInfoNameSpace::MediaInfo* tmpMI=new MediaInfoNameSpace::MediaInfo;
+    tmpMI->Option(__T("Details"), __T("0"));
+    tmpMI->Option(__T("Inform"), Ztring().From_UTF8(mi_inform));
+
+    size_t BufferSize = strlen(mi_xml.data());
+
+    if (BufferSize == 0)
+    {
+        err = "Original report is empty.";
+        return -1;
+    }
+
+    tmpMI->Open_Buffer_Init(BufferSize);
+    tmpMI->Open_Buffer_Continue((ZenLib::int8u*)mi_xml.data(), BufferSize);
+    tmpMI->Open_Buffer_Finalize();
+
+    report = Ztring(tmpMI->Inform()).To_UTF8();
+
+    delete tmpMI;
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------

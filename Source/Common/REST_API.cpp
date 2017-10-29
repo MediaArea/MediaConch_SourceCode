@@ -238,6 +238,16 @@ RESTAPI::Checker_File_Information_Res::~Checker_File_Information_Res()
 }
 
 //---------------------------------------------------------------------------
+RESTAPI::Checker_List_MediaInfo_Outputs_Res::~Checker_List_MediaInfo_Outputs_Res()
+{
+    if (nok)
+    {
+        delete nok;
+        nok = NULL;
+    }
+}
+
+//---------------------------------------------------------------------------
 RESTAPI::Default_Values_For_Type_Res::~Default_Values_For_Type_Res()
 {
     if (nok)
@@ -503,7 +513,8 @@ std::string RESTAPI::Checker_Report_Req::to_str() const
     out << ",\"policies_contents_size\":" << policies_contents.size();
     out << ",\"display_name\":\"" << display_name;
     out << "\",\"display_content_length\":" << display_content.size();
-    out << ",\"options\":[";
+    out << ",\"mi_inform\":\"" << mi_inform;
+    out << "\",\"options\":[";
 
     std::map<std::string, std::string>::const_iterator it = options.begin();
     for (; it != options.end(); ++it)
@@ -628,6 +639,13 @@ std::string RESTAPI::Checker_File_Information_Req::to_str() const
     std::stringstream out;
 
     out << "{\"user\":" << user << ",\"id\":" << id << "}";
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
+std::string RESTAPI::Checker_List_MediaInfo_Outputs_Req::to_str() const
+{
+    std::stringstream out;
     return out.str();
 }
 
@@ -1288,6 +1306,19 @@ std::string RESTAPI::Checker_File_Information_Res::to_str() const
 }
 
 //---------------------------------------------------------------------------
+std::string RESTAPI::Checker_List_MediaInfo_Outputs_Res::to_str() const
+{
+    std::stringstream out;
+
+    if (nok)
+        out << "{\"nok\":" << nok->to_str() << "}";
+    else
+        out << outputs;
+
+    return out.str();
+}
+
+//---------------------------------------------------------------------------
 std::string RESTAPI::Default_Values_For_Type_Res::to_str() const
 {
     std::stringstream out;
@@ -1870,6 +1901,9 @@ int RESTAPI::serialize_checker_report_req(Checker_Report_Req& req, std::string& 
     if (req.display_content.length())
         child.obj["display_content"] = serialize_checker_report_string(req.display_content, err);
 
+    if (req.mi_inform.length())
+        child.obj["mi_inform"] = serialize_checker_report_string(req.mi_inform, err);
+
     if (req.options.size())
     {
         Container::Value options;
@@ -2107,6 +2141,14 @@ int RESTAPI::serialize_checker_file_information_req(Checker_File_Information_Req
         return -1;
     }
 
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int RESTAPI::serialize_checker_list_mediainfo_outputs_req(Checker_List_MediaInfo_Outputs_Req&, std::string& data, std::string&)
+{
+    //URI
+    data = std::string();
     return 0;
 }
 
@@ -3087,6 +3129,34 @@ int RESTAPI::serialize_checker_file_information_res(Checker_File_Information_Res
 }
 
 //---------------------------------------------------------------------------
+int RESTAPI::serialize_checker_list_mediainfo_outputs_res(Checker_List_MediaInfo_Outputs_Res& res, std::string& data, std::string& err)
+{
+    Container::Value v, child;
+
+    child.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+    if (res.nok)
+        child.obj["nok"] = serialize_mediaconch_nok(res.nok, err);
+    else
+    {
+        Container::Value outputs;
+        outputs.type = Container::Value::CONTAINER_TYPE_STRING;
+        outputs.s = res.outputs;
+        child.obj["outputs"] = outputs;
+    }
+
+    v.type = Container::Value::CONTAINER_TYPE_OBJECT;
+    v.obj["CHECKER_LIST_MEDIAINFO_OUTPUTS_RESULT"] = child;
+
+    if (model->serialize(v, data) < 0)
+    {
+        err = model->get_error();
+        return -1;
+    }
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int RESTAPI::serialize_default_values_for_type_res(Default_Values_For_Type_Res& res, std::string& data, std::string& err)
 {
     Container::Value v, child;
@@ -4046,7 +4116,7 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_checker_report_req(const std::string
         return NULL;
     }
 
-    Container::Value *ids, *user, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *options;
+    Container::Value *ids, *user, *reports, *policies_ids, *policies_contents, *display_name, *display_content, *mi_inform, *options;
     ids = model->get_value_by_key(*child, "ids");
     user = model->get_value_by_key(*child, "user");
     reports = model->get_value_by_key(*child, "reports");
@@ -4054,6 +4124,7 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_checker_report_req(const std::string
     policies_contents = model->get_value_by_key(*child, "policies_contents");
     display_name = model->get_value_by_key(*child, "display_name");
     display_content = model->get_value_by_key(*child, "display_content");
+    mi_inform = model->get_value_by_key(*child, "mi_inform");
     options = model->get_value_by_key(*child, "options");
 
     if (!ids || !reports || ids->type != Container::Value::CONTAINER_TYPE_ARRAY)
@@ -4097,6 +4168,9 @@ RESTAPI::Checker_Report_Req *RESTAPI::parse_checker_report_req(const std::string
         req->display_name = display_name->s;
     if (display_content && display_content->type == Container::Value::CONTAINER_TYPE_STRING)
         req->display_content = display_content->s;
+
+    if (mi_inform && mi_inform->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->mi_inform = mi_inform->s;
 
     if (options && options->type == Container::Value::CONTAINER_TYPE_OBJECT)
     {
@@ -4413,6 +4487,29 @@ RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_checker_id_from_filename_r
             }
         }
     }
+
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_List_MediaInfo_Outputs_Req *RESTAPI::parse_checker_list_mediainfo_outputs_req(const std::string& data, std::string& err)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        err = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CHECKER_LIST_MEDIAINFO_OUTPUTS");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_LIST_MEDIAINFO_OUTPUTS in the request";
+        return NULL;
+    }
+
+    Checker_List_MediaInfo_Outputs_Req *req = new Checker_List_MediaInfo_Outputs_Req;
 
     return req;
 }
@@ -5711,6 +5808,13 @@ RESTAPI::Checker_Id_From_Filename_Req *RESTAPI::parse_uri_checker_id_from_filena
 RESTAPI::Checker_File_Information_Req *RESTAPI::parse_uri_checker_file_information_req(const std::string&, std::string&)
 {
     Checker_File_Information_Req *req = new Checker_File_Information_Req;
+    return req;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_List_MediaInfo_Outputs_Req *RESTAPI::parse_uri_checker_list_mediainfo_outputs_req(const std::string&, std::string&)
+{
+    Checker_List_MediaInfo_Outputs_Req *req = new Checker_List_MediaInfo_Outputs_Req;
     return req;
 }
 
@@ -7679,6 +7783,56 @@ RESTAPI::Checker_File_Information_Res *RESTAPI::parse_checker_file_information_r
     else
     {
         err = "Missing filename field in the result.";
+        delete res;
+        return NULL;
+    }
+
+    return res;
+}
+
+//---------------------------------------------------------------------------
+RESTAPI::Checker_List_MediaInfo_Outputs_Res *RESTAPI::parse_checker_list_mediainfo_outputs_res(const std::string& data, std::string& err)
+{
+    Container::Value v, *child;
+
+    if (model->parse(data, v))
+    {
+        err = model->get_error();
+        return NULL;
+    }
+
+    child = model->get_value_by_key(v, "CHECKER_LIST_MEDIAINFO_OUTPUTS_RESULT");
+    if (!child || child->type != Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        err = "Missing CHECKER_LIST_MEDIAINFO_OUTPUTS_RESULT in the result";
+        return NULL;
+    }
+
+    Checker_List_MediaInfo_Outputs_Res *res = new Checker_List_MediaInfo_Outputs_Res;
+    Container::Value *nok = model->get_value_by_key(*child, "nok");
+    Container::Value *outputs = model->get_value_by_key(*child, "outputs");
+    if (nok)
+    {
+        if (parse_mediaconch_nok(nok, &res->nok, err) < 0)
+        {
+            delete res;
+            return NULL;
+        }
+    }
+    else if (outputs)
+    {
+        if (outputs->type != Container::Value::CONTAINER_TYPE_STRING)
+        {
+            err = "values field type is not correct in the result";
+            delete res;
+            return NULL;
+        }
+
+        res->outputs = outputs->s;
+    }
+    else
+    {
+        err = "Missing values field in the result";
         delete res;
         return NULL;
     }

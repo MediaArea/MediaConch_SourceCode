@@ -91,6 +91,7 @@ namespace MediaConch
         long                    *watch_folder_user;
         std::bitset<MediaConchLib::report_Max> report_set;
         MediaConchLib::format   format;
+        std::string             mi_inform;
         //TODO: clean
         long                    use_as_user;
         bool                    use_daemon;

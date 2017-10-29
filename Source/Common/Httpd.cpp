@@ -113,6 +113,7 @@ int Httpd::send_result()
     MAKE_URI_REQ_FUNC(checker_status, Checker_Status)
     MAKE_URI_REQ_FUNC(checker_clear, Checker_Clear)
     MAKE_URI_REQ_FUNC(checker_list, Checker_List)
+    MAKE_URI_REQ_FUNC(checker_list_mediainfo_outputs, Checker_List_MediaInfo_Outputs)
     MAKE_URI_REQ_FUNC(default_values_for_type, Default_Values_For_Type)
 
     MAKE_URI_REQ_FUNC(xslt_policy_create, XSLT_Policy_Create)

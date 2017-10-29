@@ -271,7 +271,10 @@ public:
 
     //Options
     int  test_mil_option(const std::string& key, std::string& value, std::string& report);
+
+    // MediaInfo
     bool mil_has_curl_enabled();
+    int mil_get_output_list(std::string& output_list, std::string& error);
 
     // MediaConch
     int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);

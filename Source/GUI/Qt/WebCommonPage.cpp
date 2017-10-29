@@ -59,18 +59,15 @@ namespace MediaConch
         QString proposed_filename = QFileInfo(filename).fileName() + "_" + report_name + ".txt";
 
         QString proposed = proposed_dir.absoluteFilePath(proposed_filename);
-        bool is_html = report_is_html(report);
 
-        if (is_html)
+        if (report_is_html(report))
             proposed.replace(proposed.length() - 3, 3, "html");
+        else if (report_is_xml(report))
+            proposed.replace(proposed.length() - 3, 3, "xml");
+        else if (report_is_json(report))
+            proposed.replace(proposed.length() - 3, 3, "json");
         else
-        {
-            bool is_xml = report_is_xml(report);
-            if (is_xml)
-                proposed.replace(proposed.length() - 3, 3, "xml");
-            else
-                proposed.replace(proposed.length() - 3, 3, "txt");
-        }
+            proposed.replace(proposed.length() - 3, 3, "txt");
 
         QString dl_file = QFileDialog::getSaveFileName(mainwindow, "Save report", proposed);
 
@@ -152,18 +149,34 @@ namespace MediaConch
         on_download_report(report, file_id, "MediaConchReport");
     }
 
+    QString WebCommonPage::on_fill_output_list()
+    {
+        std::string output_list;
+        std::string err;
+        mainwindow->get_mediainfo_output_list(output_list, err);
+
+        return QString().fromUtf8(output_list.c_str());
+    }
+
     QString WebCommonPage::on_fill_mediainfo_report(long file_id)
     {
         std::string err;
         return mainwindow->get_mediainfo_jstree(file_id, err);
     }
 
-    void WebCommonPage::on_save_mediainfo_report(long file_id)
+    void WebCommonPage::on_save_mediainfo_report(long file_id, const QString& output)
     {
         std::string display_name, display_content;
+        std::string mi_inform = output.toStdString();
         std::string err;
-        QString report = mainwindow->get_mediainfo_xml(file_id, display_name, display_content, err);
-        on_download_report(report, file_id, "MediaInfo");
+
+        QString report_name = "MediaInfo";
+        if (!output.isEmpty() && output != "XML" && output != "MIXML" && output != "Text" && output != "HTML")
+            report_name.append(".").append(output);
+
+        QString report = mainwindow->get_mediainfo_report(file_id, display_name, display_content, mi_inform, err);
+        report.replace("\r\n", "\n"); //There are some incoherencies in inputs, so we put all to \n and file writer will emit the right carriage return
+        on_download_report(report, file_id, report_name);
     }
 
     QString WebCommonPage::on_fill_mediatrace_report(long file_id)
@@ -761,9 +774,9 @@ namespace MediaConch
     //---------------------------------------------------------------------------
     bool WebCommonPage::report_is_html(const QString& report)
     {
-        QRegExp reg("<\\!DOCTYPE.*html", Qt::CaseInsensitive);
+        QRegExp reg("^(<\\!DOCTYPE.*html|<html>.*</html>$)", Qt::CaseInsensitive);
 
-        if (reg.indexIn(report, 0) != -1)
+        if (reg.indexIn(report.trimmed(), 0) != -1)
             return true;
 
         return false;
@@ -775,6 +788,17 @@ namespace MediaConch
         QRegExp reg("<\\?xml ", Qt::CaseInsensitive);
 
         if (reg.indexIn(report, 0) != -1)
+            return true;
+
+        return false;
+    }
+
+    //---------------------------------------------------------------------------
+    bool WebCommonPage::report_is_json(const QString& report)
+    {
+        QRegExp reg("^\\{.*\\}$", Qt::CaseInsensitive);
+
+        if (reg.indexIn(report.trimmed(), 0) != -1)
             return true;
 
         return false;

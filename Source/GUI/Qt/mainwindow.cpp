@@ -1501,6 +1501,12 @@ int MainWindow::checker_file_information(long id, MediaConchLib::Checker_FileInf
 }
 
 //---------------------------------------------------------------------------
+int MainWindow::get_mediainfo_output_list(std::string& output, std::string& err)
+{
+    return MCL.mil_get_output_list(output, err);
+}
+
+//---------------------------------------------------------------------------
 QString MainWindow::get_mediainfo_and_mediatrace_xml(long file_id,
                                                      const std::string& display_name,
                                                      const std::string& display_content,
@@ -1525,9 +1531,10 @@ QString MainWindow::get_mediainfo_and_mediatrace_xml(long file_id,
 }
 
 //---------------------------------------------------------------------------
-QString MainWindow::get_mediainfo_xml(long file_id,
+QString MainWindow::get_mediainfo_report(long file_id,
                                       const std::string& display_name,
                                       const std::string& display_content,
+                                      const std::string& mi_inform,
                                       std::string& err)
 {
     CheckerReport cr;
@@ -1540,8 +1547,10 @@ QString MainWindow::get_mediainfo_xml(long file_id,
 
     std::string d_name = display_name;
     std::string d_content = display_content;
+    std::string m_inform = mi_inform;
     cr.display_name = d_name.size() ? &d_name : NULL;
     cr.display_content = d_content.size() ? &d_content : NULL;
+    cr.mi_inform = m_inform.size() ? &m_inform : NULL;
 
     MCL.checker_get_report(cr, &result, err);
     return QString().fromUtf8(result.report.c_str(), result.report.length());

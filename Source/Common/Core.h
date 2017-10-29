@@ -115,6 +115,7 @@ public:
     //***************************************************************************
     // Checker Helper
     //***************************************************************************
+    int         checker_list_mediainfo_outputs(std::string& output, std::string& err);
     int         file_add_generated_file(int user, long src_id, long generated_id, std::string& err);
     int         update_file_error(int user, long id, bool has_error, const std::string& error_log, std::string& err);
     int         get_reports_output_Html(int user, const std::vector<long>& file,
@@ -143,6 +144,7 @@ public:
     Reports  reports;
     int      get_report_saved(int user, const std::vector<long>& file, MediaConchLib::report reportKind,
                               MediaConchLib::format f, const std::string& options, std::string& report, std::string& err);
+    int      transform_mixml_report(const std::string& mi_xml, const std::string& mi_inform, std::string& report, std::string& err);
 
     //***************************************************************************
     // Configuration
