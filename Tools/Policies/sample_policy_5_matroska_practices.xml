@@ -19,7 +19,7 @@
   </policy>
   <policy type="or" name="Video Sample Range is clarified?">
     <rule name="Range data is stored?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/"/>
-    <rule name="Range data is not Unspecified?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/Data" operator="!=">o2</rule>
+    <rule name="Range data is not Unspecified?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Range/Data" operator="!=">2</rule>
   </policy>
   <policy type="or" name="Video Colour Primary is clarified?">
     <rule name="Colour Primary data is stored?" scope="mmt" value="Segment/Tracks/TrackEntry/Video/Colour/Primaries/"/>
