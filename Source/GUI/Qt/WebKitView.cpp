@@ -15,6 +15,10 @@
 #include "WebPage.h"
 #include "mainwindow.h"
 
+#if defined(__APPLE__) && QT_VERSION < 0x050400
+#include <CoreFoundation/CFURL.h>
+#endif
+
 namespace MediaConch
 {
     WebView::WebView(QWidget *parent) : QWebView(parent), mainwindow((MainWindow*)parent)
@@ -48,7 +52,31 @@ namespace MediaConch
 
             QStringList files;
             for (int i = 0; i < urls.size(); ++i)
-                files << urls[i].toLocalFile();
+            {
+                QString filename;
+#if defined(__APPLE__) && QT_VERSION < 0x050400
+                if (urls[i].url().startsWith("file:///.file/id="))
+                {
+                    CFErrorRef error = 0;
+                    CFURLRef cfurl = urls[i].toCFURL();
+                    CFURLRef absurl = CFURLCreateFilePathURL(kCFAllocatorDefault, cfurl, &error);
+
+                    if(error)
+                        continue;
+
+                    filename = QUrl::fromCFURL(absurl).toLocalFile();
+                    CFRelease(cfurl);
+                    CFRelease(absurl);
+                }
+                else
+#endif
+                {
+                    filename = urls[i].toLocalFile();
+                }
+
+                files << filename;
+            }
+
             mainwindow->drag_and_drop_files_action(files);
         }
     }
