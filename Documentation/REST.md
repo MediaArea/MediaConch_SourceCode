@@ -138,7 +138,7 @@ It is used above an HTTP connection.
 
 ### API
 
-Current API version: $API_VERSION = 1.14
+Current API version: $API_VERSION = 1.15
 
 #### Command
 

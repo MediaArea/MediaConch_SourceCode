@@ -196,7 +196,7 @@ footer .navbar {
     padding-right: 0;
 }
 
-.results-dld, .implem-dld, .policy-dld, .mi-dld, .mi-dld-group, .mt-dld {
+.results-dld, .implem-dld, .policy-dld, .mi-dld, .mt-dld {
     margin-left: 10px;
 }
 
@@ -228,10 +228,6 @@ p.registration {
     border-radius: 4px;
     border: 1px solid silver;
     font-size: 1.1em;
-}
-
-.jstree-grid-wrapper {
-    margin-top: 10px;
 }
 
 #policyFix {
@@ -383,16 +379,12 @@ p.registration {
 }
 
 .modal-header .mi-dld {
+    margin-right: 0;
+}
+
+.modal-header .mi-dld-group, .modal-footer .mi-dld-group {
+    margin-left: 10px;
     margin-right: 10px;
-}
-
-.modal-header .mi-dld-group {
-margin-left: 10px;
-margin-right: 10px;
-}
-
-.modal-header .alert-modal-create-policy {
-    float: right !important;
 }
 
 .modal-body .jstree-default .jstree-anchor {
