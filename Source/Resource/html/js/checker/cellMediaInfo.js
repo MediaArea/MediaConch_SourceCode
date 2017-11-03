@@ -17,36 +17,42 @@ var mediaInfoCell = (function() {
                     <div class="modal-dialog modal-lg"> \
                         <div class="modal-content"> \
                         <div class="modal-header"> \
-                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button> \
-                                 <div class="btn-group mi-dld-group pull-right"> \
-                                    <button class="btn btn-primary">Download MediaInfo report</button> \
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> \
+                            <h4 class="modal-title">MediaInfo report</h4> \
+                        </div> \
+                        <div class="modal-header"> \
+                            <div class="pull-left"> \
+                                <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="jstreeSearch" id="infoSearch-' + fileId + '" placeholder="Search" /> \
+                            </div> \
+                            <div class="pull-right"> \
+                                <button type="button" class="btn btn-warning mi-create-report">Create policy from MediaInfo report</button> \
+                                 <div class="btn-group mi-dld-group"> \
+                                    <button class="btn btn-primary mi-dld">Download MediaInfo report</button> \
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button> \
                                     <ul class="dropdown-menu col-md-12 mi-select-output"> \
                                     </ul>\
                                 </div> \
-                            <button type="button" class="btn btn-warning mi-create-report pull-right">Create policy from MediaInfo report</button> \
-                            <h4 class="modal-title pull-left">MediaInfo report</h4> \
+                            </div> \
                         </div> \
                         <div class="modal-body"> \
                             <div class="row"> \
-                                <div class="col-md-6"> \
-                                    <i class="glyphicon glyphicon-search"></i><input type="text" value="" class="jstreeSearch" id="infoSearch-' + fileId + '" placeholder="Search" /> \
-                                </div> \
                                 <div class="col-md-12"> \
                                     <div id="info-' + fileId + '"></div> \
                                 </div> \
                             </div> \
                         </div> \
-                            <div class="modal-footer"> \
-                                <button type="button" class="btn btn-warning mi-create-report">Create policy from MediaInfo report</button> \
-                                 <div class="btn-group mi-dld-group dropup"> \
-                                    <button class="btn btn-primary">Download MediaInfo report</button> \
-                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button> \
-                                    <ul class="dropdown-menu col-md-12 mi-select-output"> \
-                                    </ul>\
-                                </div> \
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> \
+                        <div class="modal-footer"> \
+                            <button type="button" class="btn btn-warning mi-create-report">Create policy from MediaInfo report</button> \
+                            <div class="btn-group mi-dld-group dropup"> \
+                                <button class="btn btn-primary mi-dld">Download MediaInfo report</button> \
+                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button> \
+                                <ul class="dropdown-menu col-md-12 mi-select-output"> \
+                                </ul> \
                             </div> \
+                        </div> \
+                        <div class="modal-footer"> \
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> \
+                        </div> \
                         </div> \
                     </div> \
                 </div>');
