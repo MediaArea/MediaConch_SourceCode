@@ -144,7 +144,9 @@ public:
     Reports  reports;
     int      get_report_saved(int user, const std::vector<long>& file, MediaConchLib::report reportKind,
                               MediaConchLib::format f, const std::string& options, std::string& report, std::string& err);
-    int      transform_mixml_report(const std::string& mi_xml, const std::string& mi_inform, std::string& report, std::string& err);
+    int      transform_mixml_report(const std::string& mi_xml, const std::string& mi_inform,
+                                    const std::vector<std::pair<std::string,std::string> >& options,
+                                    std::string& report, std::string& err);
 
     //***************************************************************************
     // Configuration

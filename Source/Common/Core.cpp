@@ -924,11 +924,21 @@ int Core::register_mediaconch_to_database(int user, long file, const std::string
 
 //---------------------------------------------------------------------------
 
-int Core::transform_mixml_report(const std::string& mi_xml, const std::string& mi_inform, std::string& report, std::string& err)
+int Core::transform_mixml_report(const std::string& mi_xml, const std::string& mi_inform,
+                                 const std::vector<std::pair<std::string,std::string> >& options,
+                                 std::string& report, std::string& err)
 {
     MediaInfoNameSpace::MediaInfo* tmpMI=new MediaInfoNameSpace::MediaInfo;
+
     tmpMI->Option(__T("Details"), __T("0"));
     tmpMI->Option(__T("Inform"), Ztring().From_UTF8(mi_inform));
+
+
+    for (size_t i = 0; i < options.size(); ++i)
+    {
+        if (!options[i].first.empty() && !options[i].second.empty())
+            tmpMI->Option(Ztring().From_UTF8(options[i].first),  Ztring().From_UTF8(options[i].second));
+    }
 
     size_t BufferSize = strlen(mi_xml.data());
 
