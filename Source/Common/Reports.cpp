@@ -105,7 +105,7 @@ int Reports::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_Report
     }
 
     if (cr.report_set[MediaConchLib::report_MediaInfo] && cr.mi_inform && *cr.mi_inform != "MIXML" && *cr.mi_inform != "XML")
-        core->transform_mixml_report(result->report, *cr.mi_inform, result->report, err);
+        core->transform_mixml_report(result->report, *cr.mi_inform, std::vector<std::pair<std::string,std::string> >(), result->report, err);
 
     if (cr.display_name)
         transform_with_xslt_file(result->report, *cr.display_name, cr.options, result->report);
@@ -380,6 +380,9 @@ int Reports::get_reports_output_JStree(int user, const std::vector<long>& files,
                                        const std::bitset<MediaConchLib::report_Max>& report_set,
                                        std::string& report, std::string& err)
 {
+    std::vector<std::pair<std::string,std::string> > mi_options;
+    mi_options.push_back(std::make_pair(std::string("Language"), std::string("Config_Text_ColumnSize;60")));
+
     std::vector<long> vec;
     for (size_t i = 0; i < files.size(); ++i)
     {
@@ -393,7 +396,11 @@ int Reports::get_reports_output_JStree(int user, const std::vector<long>& files,
             std::string ret;
             if (create_report_mi_xml(user, vec, ret, err) < 0)
                 return -1;
-            report += js.format_from_inform_XML(ret);
+
+            if (core->transform_mixml_report(ret, "Text", mi_options, ret, err) < 0)
+                return -1;
+
+            report += js.format_from_inform_Text(ret);
         }
 
         if (report_set[MediaConchLib::report_MediaTrace])

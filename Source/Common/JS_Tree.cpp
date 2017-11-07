@@ -157,6 +157,168 @@ bool JsTree::has_block_data(xmlNodePtr child)
 }
 
 //---------------------------------------------------------------------------
+std::string JsTree::format_from_inform_Text(const std::string& text)
+{
+    std::istringstream stream(text);
+    std::string json("[");
+
+    bool media_sep = false;
+    find_inform_media_text(stream, media_sep, json);
+
+    json += "]";
+
+    return json;
+}
+
+//---------------------------------------------------------------------------
+void JsTree::find_inform_track_text(std::istringstream& stream, bool& sep, std::string& json)
+{
+    std::streampos pos = stream.tellg();
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (!line.empty())
+        {
+            if (line.find(":") == std::string::npos)
+            {
+                stream.clear();
+                stream.seekg(pos);
+                return;
+            }
+
+            if (sep)
+                json += ", ";
+            else
+                sep = true;
+
+            std::string name = line.substr(0, line.find_first_of(":"));
+            trim_string(name);
+            std::string value = line.substr(line.find_first_of(":") + 1);
+            trim_string(value);
+
+            json += "{\"type\":\"data\"";
+
+            if (!name.empty())
+            {
+                json += ", \"text\":\"";
+                json += name;
+                json += "\"";
+            }
+
+            if (!value.empty())
+            {
+                json += ", \"data\":{\"dataValue\":\"";
+                json += unified_json_value(value);
+                json += "\"}";
+            }
+
+            json += "}";
+        }
+
+        pos = stream.tellg();
+    }
+
+    stream.clear();
+    stream.seekg(pos);
+}
+
+//---------------------------------------------------------------------------
+void JsTree::find_inform_block_text(std::istringstream& stream, bool& sep, std::string& json)
+{
+    std::streampos pos = stream.tellg();
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        trim_string(line);
+        if (!line.empty() && line.find(":") == std::string::npos)
+        {
+            if (line == "General")
+            {
+                stream.clear();
+                stream.seekg(pos);
+                return;
+            }
+
+            if (sep)
+                json += ", ";
+            else
+                sep = true;
+
+            json += "{\"type\":\"block\", \"text\":\"";
+            json += line;
+            json += "\"";
+            json += ", \"children\":[";
+            bool track_sep = false;
+            find_inform_track_text(stream, track_sep, json);
+            json += "]}";
+        }
+
+        pos = stream.tellg();
+    }
+
+    stream.clear();
+    stream.seekg(pos);
+}
+
+//---------------------------------------------------------------------------
+void JsTree::find_inform_media_text(std::istringstream& stream, bool& sep, std::string& json)
+{
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        trim_string(line);
+        if (line == "General")
+        {
+            if (sep)
+                json += ", ";
+            else
+                sep = true;
+
+            json += "{\"type\":\"block\"";
+
+            std::streampos pos = stream.tellg();
+
+            while (std::getline(stream, line))
+            {
+                if(!line.empty() && line.find(":") == std::string::npos)
+                    break;
+
+                if (line.find("CompleteName") == 0 || line.find("Complete name") == 0)
+                {
+                    std::string name = line.substr(0, line.find_first_of(":"));
+                    trim_string(name);
+                    std::string value = line.substr(line.find_first_of(":") + 1);
+                    trim_string(value);
+
+                    if (!value.empty())
+                    {
+                        json +=", \"text\":\"";
+                        json += value;
+                        json += "\"";
+                    }
+                }
+            }
+
+            stream.clear();
+            stream.seekg(pos);
+
+            json += ", \"children\":[";
+            json += "{\"type\":\"block\", \"text\":\"General\"";
+            json += ", \"children\":[";
+            bool track_sep = false;
+            find_inform_track_text(stream, track_sep, json);
+            json += "]}";
+            bool block_sep = true;
+            find_inform_block_text(stream, block_sep, json);
+            json += "]}";
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
 std::string JsTree::format_from_inform_XML(const std::string& xml)
 {
     std::string json("[");
@@ -493,6 +655,20 @@ void JsTree::interpret_value(std::string& value, bool coma, std::string& json)
         json += ")";
     }
     json += "\"";
+}
+
+//---------------------------------------------------------------------------
+void JsTree::trim_string(std::string& str)
+{
+    size_t ltrim = str.find_first_not_of(" \t\n\r\f\v");
+    str.erase(0, ltrim);
+
+    if (ltrim == std::string::npos)
+        return;
+
+    size_t rtrim = str.find_last_not_of(" \t\n\r\f\v");
+    if (rtrim < str.size() - 1)
+        str.erase(rtrim + 1);
 }
 
 //---------------------------------------------------------------------------
