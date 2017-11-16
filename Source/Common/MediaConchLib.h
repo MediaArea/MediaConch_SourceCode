@@ -114,6 +114,11 @@ public:
     struct Checker_StatusRes
     {
         Checker_StatusRes() : id(-1), finished(false), has_error(false), percent(NULL), tool(NULL), source_id(-1) {}
+        ~Checker_StatusRes()
+        {
+            delete percent;
+            delete tool;
+        }
 
         long               id;
         bool               finished;
