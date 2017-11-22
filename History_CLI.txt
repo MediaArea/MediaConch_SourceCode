@@ -7,6 +7,15 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.11, 2017-11-22
+--------------
+Text and EBUCore 1.8 (XML and JSON) reports available directly from MediaConch command line
+Improved Matroska video frame rate detection
+Support of BWF (bext) loudness info
+Support of MOV HDR metadata
+Support of PCM endianess in Matroska files
+Several minor fixes
+
 Version 17.08, 2017-09-11
 --------------
 FFV1: fix false positive about FFV1 slice_x error when slice_w>slice_h
