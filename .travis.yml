@@ -23,17 +23,15 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo curl -L http://stahlworks.com/dev/sfk/sfk-linux-64.exe -o /usr/local/bin/sfk ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo chmod +x /usr/local/bin/sfk ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo pip install git+https://github.com/vi/mkvparse.git ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libzen0/0.4.34/libzen0_0.4.34-1_amd64.xUbuntu_14.04.deb ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libzen0/0.4.34/libzen-dev_0.4.34-1_amd64.xUbuntu_14.04.deb ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libmediainfo0/0.7.93/libmediainfo0_0.7.93-1_amd64.xUbuntu_14.04.deb ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libmediainfo0/0.7.93/libmediainfo-dev_0.7.93-1_amd64.xUbuntu_14.04.deb ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libzen0/0.4.37/libzen0_0.4.37-1_amd64.xUbuntu_14.04.deb ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then wget http://mediaarea.net/download/binary/libzen0/0.4.37/libzen-dev_0.4.37-1_amd64.xUbuntu_14.04.deb ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then sudo dpkg -i libzen*.deb ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then git -C .. clone https://github.com/MediaArea/MediaInfoLib.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then pushd ../MediaInfoLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew update ; true ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew install libxslt sqlite jansson libevent qt ffmpeg sfk xmlstarlet ; true ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then sudo pip install git+https://github.com/vi/mkvparse.git ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then sudo pip2 install git+https://github.com/vi/mkvparse.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/ZenLib.git ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then pushd ../ZenLib/Project/GNU/Library && ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make install && popd ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then git -C .. clone https://github.com/MediaArea/MediaInfoLib.git ; true ; fi
