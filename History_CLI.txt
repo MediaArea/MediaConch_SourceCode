@@ -7,6 +7,15 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 17.12, 2017-12-21
+--------------
+Endianness and Sign report for PCM Matroska tracks
+Support of external time code tracks (.qtc) in MOV
+Support of file names >64 chars long or non ASCII for referenced files in MOV
+JPEG 2000: Support of IMF profiles
+Fixed wrong color range info Matroska
+I630, "Input is not proper UTF-8" message with some MOV files
+
 Version 17.11, 2017-11-22
 --------------
 Text and EBUCore 1.8 (XML and JSON) reports available directly from MediaConch command line
