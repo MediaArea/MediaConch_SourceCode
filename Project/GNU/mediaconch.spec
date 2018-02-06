@@ -99,7 +99,11 @@ BuildRequires:  pkgconfig(Qt5WebKit)
 %endif
 %else
 %if 0%{?suse_version}
+%if 0%{?suse_version} >= 1500
+BuildRequires: libqt5-qtwebengine-devel
+%else
 BuildRequires:  libQtWebKit-devel
+%endif
 BuildRequires:  update-desktop-files
 %else
 %if 0%{?mageia}
