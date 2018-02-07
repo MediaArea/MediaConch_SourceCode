@@ -17,11 +17,11 @@ RCODE=0
 pushd "${FILES_DIRECTORY}"
 
 # get and configure ffmpeg sources
-git clone --branch release/3.3 --depth=1 https://github.com/FFmpeg/FFmpeg.git
+git clone --depth=1 https://github.com/FFmpeg/FFmpeg.git
 mv FFmpeg/* .
 rm -fr FFmpeg
 
-./configure --disable-doc --disable-yasm --disable-ffserver --disable-ffplay --disable-ffprobe --enable-static --disable-bzlib --disable-libopenjpeg --disable-iconv --disable-zlib --disable-everything --enable-indev=lavfi --enable-filter=scale,color,testsrc2 --enable-decoder=rawvideo,ffv1 --enable-encoder=rawvideo,ffv1 --enable-demuxer=matroska --enable-muxer=matroska --enable-protocol=file
+./configure --disable-doc --disable-x86asm --disable-ffplay --disable-ffprobe --enable-static --disable-bzlib --disable-libopenjpeg --disable-iconv --disable-zlib --disable-everything --enable-indev=lavfi --enable-filter=scale,color,testsrc2 --enable-decoder=rawvideo,ffv1 --enable-encoder=rawvideo,ffv1 --enable-demuxer=matroska --enable-muxer=matroska --enable-protocol=file
 
 for FILE in $(ls -v *.md) ; do
     if ! echo "${FILE}" | grep -Eq '^[0-9]+\.md$' ; then
@@ -37,7 +37,7 @@ for FILE in $(ls -v *.md) ; do
     fi
 
     echo "${SCRIPT}" > "${TEST}.sh"
-    sed -i'' 's/make/make --assume-new libavcodec/ffv1enc.c --assume-new libavcodec/ffv1enc_template.c/g ' "${TEST}.sh"
+    sed -i'.bak' 's!make!make --assume-new libavcodec/ffv1enc.c --assume-new libavcodec/ffv1enc_template.c!g' "${TEST}.sh"
     sh "${TEST}.sh"
     rm "${TEST}.sh"
 
