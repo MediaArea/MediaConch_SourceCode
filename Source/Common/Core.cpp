@@ -480,7 +480,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
 //--------------------------------------------------------------------------
 int Core::checker_list_mediainfo_outputs(std::string& output, std::string& err)
 {
-    output = Ztring(MI->Option(L"Info_OutputFormats_JSON")).To_UTF8();
+    output = Ztring(MI->Option(__T("Info_OutputFormats_JSON"))).To_UTF8();
 
     return 0;
 }
