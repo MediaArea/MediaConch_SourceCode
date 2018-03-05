@@ -111,6 +111,11 @@ var checkerTable = (function() {
         nodej.data('fileId', fileId);
 
         // Add policy, display and verbosity
+        if (fileName.startsWith("attachment:")) {
+            nodej.data('attachment', "true");
+        } else {
+            nodej.data('attachment', "false");
+        }
         nodej.data('policy', formValues.policy);
         nodej.data('policyName', formValues.policyText);
         nodej.data('display', formValues.display);
@@ -260,7 +265,7 @@ var checkerTable = (function() {
                 statusCell.success(statusFileId);
 
                 // Implementation and Policy
-                if (node.data('policy') != undefined && node.data('policy') !== "-1" && node.data('policy') !== -1) {
+                if (node.data('policy') != undefined && node.data('policy') !== "-1" && node.data('policy') !== -1 && node.data('attachment') !== "true") {
                     implementationCell.addSpinnerToCell(statusFileId);
                     policyCell.addSpinnerToCell(statusFileId);
 
@@ -272,7 +277,11 @@ var checkerTable = (function() {
 
                     reports.push({id: statusFileId, tool: status.tool});
 
-                    policyCell.emptyWithModal(statusFileId);
+                    if (node.data('attachment') !== "true") {
+                        policyCell.emptyWithModal(statusFileId);
+                    } else {
+                        policyCell.empty(statusFileId);
+                    }
                 }
 
                 // MediaInfo

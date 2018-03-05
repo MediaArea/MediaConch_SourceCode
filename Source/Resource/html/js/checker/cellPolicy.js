@@ -37,16 +37,24 @@ var policyCell = (function() {
 
         // Update cell if analysis of file is succeeded
         if ($(result.cell('#result-' + fileId, 5).node()).hasClass('success')) {
-            if (policyId !== undefined && policyId !== "-1" && policyId !== -1) {
+            if (policyId !== undefined && policyId !== "-1" && policyId !== -1 && result.$('#result-' + fileId).data('attachment') !== "true") {
                 reset(fileId);
                 addSpinnerToCell(fileId);
 
                 checkerAjax.policyStatus(fileId, policyId);
             }
-            else {
+            else if (result.$('#result-' + fileId).data('attachment') == "true") {
+                empty(fileId)
+            } else {
                 emptyWithModal(fileId)
             }
         }
+    };
+
+    var empty = function(fileId) {
+        var nodePolicy = $(result.cell('#result-' + fileId, 2).node());
+        nodePolicy.removeClass().addClass('info');
+        result.cell('#result-' + fileId, 2).data('<div><span class="policyResult">N/A</span></div>');
     };
 
     var emptyWithModal = function(fileId) {
@@ -191,6 +199,7 @@ var policyCell = (function() {
         success: success,
         error: error,
         update: update,
+        empty: empty,
         emptyWithModal: emptyWithModal,
         addSpinnerToCell: addSpinnerToCell,
         displayReport: displayReport,
