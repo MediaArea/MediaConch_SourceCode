@@ -733,9 +733,9 @@ const std::string& MediaConchLib::get_implementation_schema_file()
 }
 
 //---------------------------------------------------------------------------
-void MediaConchLib::create_default_implementation_schema()
+int MediaConchLib::create_default_implementation_schema(std::string& err)
 {
-    core->create_default_implementation_schema();
+    return core->create_default_implementation_schema(err);
 }
 
 //---------------------------------------------------------------------------

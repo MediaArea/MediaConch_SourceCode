@@ -224,7 +224,7 @@ const std::string& Core::get_implementation_schema_file()
 }
 
 //---------------------------------------------------------------------------
-void Core::create_default_implementation_schema()
+int Core::create_default_implementation_schema(std::string& err)
 {
     std::string path = get_local_data_path();
     std::string file = path + "MatroskaSchema.xml";
@@ -233,12 +233,17 @@ void Core::create_default_implementation_schema()
     ofs.open(file.c_str(), std::ofstream::out | std::ofstream::binary);
 
     if (!ofs.is_open())
-        return;
+    {
+        err = "Unable to write implementation schema file.";
+        return -1;
+    }
 
     ofs << xsl_schema_matroska_schema;
     ofs.close();
 
     set_implementation_schema_file(file);
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------

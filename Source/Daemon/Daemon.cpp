@@ -73,7 +73,13 @@ namespace MediaConch
 
         // If no Implementation Schema registered, use one by default
         if (!MCL->get_implementation_schema_file().length())
-            MCL->create_default_implementation_schema();
+        {
+            if (MCL->create_default_implementation_schema(err) != 0)
+            {
+                std::clog << err << std::endl;
+                return -1;
+            }
+        }
 
         // Load policy
         MCL->load_system_policy();

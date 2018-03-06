@@ -160,7 +160,7 @@ public:
     const std::map<std::string, std::string>& get_implementation_options() const;
     void               set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
-    void               create_default_implementation_schema();
+    int                create_default_implementation_schema(std::string& err);
     void               set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
     void               set_compression_mode(MediaConchLib::compression compress);
