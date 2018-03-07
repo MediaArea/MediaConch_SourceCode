@@ -369,7 +369,7 @@ public:
     // Implementation checker arguments
     void               set_implementation_schema_file(const std::string& file);
     const std::string& get_implementation_schema_file();
-    void               create_default_implementation_schema();
+    int                create_default_implementation_schema(std::string& err);
     void               set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
 

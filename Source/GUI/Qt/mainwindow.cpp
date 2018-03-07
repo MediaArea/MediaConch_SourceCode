@@ -89,7 +89,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Core configuration
     if (!MCL.get_implementation_schema_file().length())
-        MCL.create_default_implementation_schema();
+    {
+        if (MCL.create_default_implementation_schema(err) != 0)
+        {
+            if (err == "Unable to write implementation schema file.")
+                err += "\nCheck write permissions on MediaConch data directory.";
+
+            QMessageBox msgBox(QMessageBox::Critical, tr("Initialisation error"),
+                       QString().fromStdString(err), QMessageBox::Abort, parent);
+
+            msgBox.exec();
+            close();
+        }
+    }
+
     int nb_threads=QThread::idealThreadCount();
     if (nb_threads!=-1)
         MCL.set_default_scheduler_max_threads(nb_threads);

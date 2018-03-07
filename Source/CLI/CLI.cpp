@@ -123,7 +123,14 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
 
             // If no Implementation Schema registered, use one by default
             if (!MCL.get_implementation_schema_file().length())
-                MCL.create_default_implementation_schema();
+            {
+                if (MCL.create_default_implementation_schema(err) != 0)
+                {
+                    if (err == "Unable to write implementation schema file.")
+                        err += " Check write permissions on MediaConch data directory.";
+                    return CLI_RETURN_ERROR;
+                }
+            }
 
             if (!MCL.ReportAndFormatCombination_IsValid(files, report_set, display_content,
                                                         format, err))
