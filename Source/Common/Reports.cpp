@@ -721,6 +721,9 @@ int Reports::create_report_ma_xml(int user, const std::vector<long>& files,
         if (core->checker_file_from_id(user, files[i], file, err) < 0)
             return -1;
 
+        if (file.rfind("attachment:", 0) == 0)
+            continue;
+
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
 
