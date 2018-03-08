@@ -46,8 +46,6 @@ void CommonWebWindow::display_html()
         return;
 #endif
 
-    main_window->web_view->setHtml(html.toUtf8());
-
 #if defined(WEB_MACHINE_ENGINE)
     main_window->web_view->setHtml(html.toUtf8(), url);
 #endif
