@@ -1,6 +1,6 @@
 @rem Copyright (c) MediaArea.net SARL. All Rights Reserved.
 @rem
-@rem Use of this source code is governed by a GPL v3+ and MPL v2+ license that can
+@rem Use of this source code is governed by a BSD-style license that can
 @rem be found in the License.html file in the root of the source tree.
 @rem
 
@@ -62,8 +62,6 @@ copy  ..\Project\MSVC2017\Win32\Release\translations\qtwebengine_locales\en-US.p
 
 @rem --- Copying : Information files ---
 copy ..\License.html MediaConch_GUI_Windows_i386\
-copy ..\License.GPLv3.html MediaConch_GUI_Windows_i386\
-copy ..\License.MPLv2.html MediaConch_GUI_Windows_i386\
 copy ..\History_GUI.txt MediaConch_GUI_Windows_i386\History.txt
 copy ReadMe_GUI_Windows.txt MediaConch_GUI_Windows_i386\ReadMe.txt
 

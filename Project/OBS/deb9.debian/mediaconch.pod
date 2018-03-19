@@ -105,11 +105,10 @@ Apply the display transformation (XSL)
 
 This manual page was written by Chow Loong Jin <hyperair@debian.org> for the
 Debian system (but may be used by others). Permissions is granted to copy,
-distribute, and/or modify this document under the terms of the GNU General
-Public License, Version 3 or any later version published by the Free Software
-Foundation, or the Mozilla Public License 2.0.
+distribute, and/or modify this document under the terms of the BSD-2-Clause
+License.
 
-On Debian systems, the full text of the GNU General Public License, Version 3
-can be found in /usr/share/common-licenses/GPL-3.
+On Debian systems, the full text of the BSD-2-Clause License
+can be found in /usr/share/common-licenses/BSD.
 
 =cut

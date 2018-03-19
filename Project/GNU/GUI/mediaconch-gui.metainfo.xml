@@ -3,7 +3,7 @@
 <component type="desktop">
   <id type="desktop">mediaconch-gui.desktop</id>
   <metadata_license>CC-BY-3.0</metadata_license>
-  <project_license>MPL-2.0 OR GPL-3.0+</project_license>
+  <project_license>BSD-2-Clause</project_license>
   <name>MediaConch</name>
   <summary>Implementation checker, policy checker, reporter, and fixer</summary>
   <description>

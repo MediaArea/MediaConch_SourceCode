@@ -7,7 +7,7 @@ pkgver=17.12
 pkgrel=1
 pkgdesc="Implementation checker and policy checker for video and audio files"
 url="http://MediaArea.net/MediaConch"
-license=('custom:MPL2' 'GPL3')
+license=('BSD-2-Clause')
 source=(${pkgname}_${pkgver}.orig.tar.xz)
 md5sums=('00000000000000000000000000000000')
 arch=('i686' 'x86_64')
@@ -56,8 +56,6 @@ package_mediaconch() {
 
     cd "${srcdir}"/MediaConch
     install -D -m 0644 License.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.html
-    install -D -m 0644 License.MPLv2.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.MPLv2.html
-    install -D -m 0644 License.GPLv3.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.GPLv3.html
 
     install -D -m 0644 History_CLI.txt "${pkgdir}"/usr/share/docs/${pkgname}/History.txt
     install -D -m 0644 Release/ReadMe_CLI_Linux.txt "${pkgdir}"/usr/share/docs/${pkgname}/ReadMe.txt
@@ -76,8 +74,6 @@ package_mediaconch-server() {
 
     cd "${srcdir}"/MediaConch
     install -D -m 0644 License.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.html
-    install -D -m 0644 License.MPLv2.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.MPLv2.html
-    install -D -m 0644 License.GPLv3.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.GPLv3.html
 
     install -D -m 0644 Documentation/Daemon.md "${pkgdir}"/usr/share/docs/${pkgname}/Daemon.md
     install -D -m 0644 Documentation/Config.md "${pkgdir}"/usr/share/docs/${pkgname}/Config.md
@@ -102,8 +98,6 @@ package_mediaconch-gui() {
     install -D -m 0644 Project/GNU/GUI/mediaconch-gui.metainfo.xml "${pkgdir}"/usr/share/metainfo/mediaconch-gui.metainfo.xml
 
     install -D -m 0644 License.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.html
-    install -D -m 0644 License.MPLv2.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.MPLv2.html
-    install -D -m 0644 License.GPLv3.html "${pkgdir}"/usr/share/licenses/${pkgname}/License.GPLv3.html
 
     install -D -m 0644 History_GUI.txt "${pkgdir}"/usr/share/docs/${pkgname}/History.txt
     install -D -m 0644 Release/ReadMe_GUI_Linux.txt "${pkgdir}"/usr/share/docs/${pkgname}/ReadMe.txt

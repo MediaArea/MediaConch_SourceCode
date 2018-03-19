@@ -29,7 +29,7 @@ Release:        1
 Summary:        Implementation checker and policy checker for video and audio files (CLI)
 
 Group:          Applications/Multimedia
-License:        MPL-2.0+/GPL-3.0+
+License:        BSD-2-Clause
 URL:            http://MediaArea.net/MediaConch
 Packager:       MediaArea.net SARL <info@mediaarea.net>
 Source0:        %{name}_%{version}.tar.gz
@@ -354,9 +354,9 @@ fi
 %defattr(-,root,root,-)
 %doc Release/ReadMe_CLI_Linux.txt History_CLI.txt
 %if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
-%license License.html License.GPLv3.html License.MPLv2.html
+%license License.html
 %else
-%doc License.html License.GPLv3.html License.MPLv2.html
+%doc License.html
 %endif
 %{_bindir}/mediaconch
 
@@ -365,9 +365,9 @@ fi
 %defattr(-,root,root,-)
 %doc Documentation/Daemon.md Documentation/Config.md Documentation/REST.md
 %if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
-%license License.html License.GPLv3.html License.MPLv2.html
+%license License.html
 %else
-%doc License.html License.GPLv3.html License.MPLv2.html
+%doc License.html
 %endif
 %{_bindir}/mediaconchd
 %if 0%{?fedora_version}
@@ -381,9 +381,9 @@ fi
 %defattr(-,root,root,-)
 %doc Release/ReadMe_GUI_Linux.txt History_GUI.txt
 %if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
-%license License.html License.GPLv3.html License.MPLv2.html
+%license License.html
 %else
-%doc License.html License.GPLv3.html License.MPLv2.html
+%doc License.html
 %endif
 %{_bindir}/mediaconch-gui
 %{_datadir}/applications/*.desktop
