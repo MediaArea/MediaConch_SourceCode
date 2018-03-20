@@ -2,13 +2,13 @@ Format: 3.0 (quilt)
 Source: mediaconch
 Binary: mediaconch, mediaconch-dbg, mediaconch-server, mediaconch-server-dbg, mediaconch-gui, mediaconch-gui-dbg
 Architecture: any
-Version: 17.12-1
+Version: 18.03-1
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Homepage: http://MediaArea.net/MediaConch
 Standards-Version: 3.9.6
 Vcs-Git: https://github.com/MediaArea/MediaConch_SourceCode.git
 Vcs-Browser: https://github.com/MediaArea/MediaConch_SourceCode
-Build-Depends: debhelper (>= 9), dh-autoreconf, tofrodos, libmediainfo-dev (>= 0.7.99), libzen-dev (>= 0.4.37), qt5-qmake, qtbase5-dev, libqt5webkit5-dev, libxml2-dev, libxslt-dev, libsqlite3-dev, libjansson-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool, libcurl4-gnutls-dev, libevent-dev
+Build-Depends: debhelper (>= 9), dh-autoreconf, tofrodos, libmediainfo-dev (>= 18.03), libzen-dev (>= 0.4.37), qt5-qmake, qtbase5-dev, libqt5webkit5-dev, libxml2-dev, libxslt-dev, libsqlite3-dev, libjansson-dev, zlib1g-dev, pkg-config, automake, autoconf, libtool, libcurl4-gnutls-dev, libevent-dev
 Package-List:
  mediaconch deb utils optional arch=any
  mediaconch-server deb utils optional arch=any
@@ -17,11 +17,11 @@ Package-List:
  mediaconch-server-dbg debug utils extra arch=any
  mediaconch-gui-dbg deb debug extra arch=any
 Checksums-Sha1:
- 0000000000000000000000000000000000000000 000000 mediaconch_17.12.orig.tar.xz
- 0000000000000000000000000000000000000000 000000 mediaconch_17.12-1.debian.tar.xz
+ 0000000000000000000000000000000000000000 000000 mediaconch_18.03.orig.tar.xz
+ 0000000000000000000000000000000000000000 000000 mediaconch_18.03-1.debian.tar.xz
 Checksums-Sha256:
- 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_17.12.orig.tar.xz
- 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_17.12-1.debian.tar.xz
+ 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_18.03.orig.tar.xz
+ 0000000000000000000000000000000000000000000000000000000000000000 000000 mediaconch_18.03-1.debian.tar.xz
 Files:
- 00000000000000000000000000000000 000000 mediaconch_17.12.orig.tar.xz
- 00000000000000000000000000000000 000000 mediaconch_17.12-1.debian.tar.xz
+ 00000000000000000000000000000000 000000 mediaconch_18.03.orig.tar.xz
+ 00000000000000000000000000000000 000000 mediaconch_18.03-1.debian.tar.xz

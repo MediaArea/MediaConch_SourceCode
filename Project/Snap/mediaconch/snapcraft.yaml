@@ -1,5 +1,5 @@
 name: mediaconch
-version: 17.12
+version: 18.03
 summary: Implementation checker and policy checker for video and audio files (CLI)
 description: |
   MediaConch is an implementation checker, policy checker, reporter,
