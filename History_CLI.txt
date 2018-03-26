@@ -7,6 +7,10 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 18.03.1, 2018-03-26
+ --------------
+x Fix regression on Windows with directory names beginning by n or r.
+
 Version 18.03, 2018-03-19
 --------------
 x I782, FFV1: Golomb Rice parsing was wrong
