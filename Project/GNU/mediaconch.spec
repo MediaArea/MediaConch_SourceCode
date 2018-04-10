@@ -1,4 +1,4 @@
-%define mediaconch_version          18.03.1
+%define mediaconch_version          18.03.2
 %define libmediainfo_version        18.03.1
 %define libzen_version              0.4.37
 

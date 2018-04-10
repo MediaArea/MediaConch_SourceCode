@@ -6,7 +6,7 @@ RequestExecutionLevel admin
 !define PRODUCT_NAME "MediaConch"
 !define PRODUCT_PUBLISHER "MediaArea.net"
 !define PRODUCT_VERSION "18.03"
-!define PRODUCT_VERSION4 "${PRODUCT_VERSION}.1.0"
+!define PRODUCT_VERSION4 "${PRODUCT_VERSION}.2.0"
 !define PRODUCT_WEB_SITE "http://MediaArea.net/MediaConch"
 !define COMPANY_REGISTRY "Software\MediaArea.net"
 !define PRODUCT_REGISTRY "Software\MediaArea.net\MediaConch"
