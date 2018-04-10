@@ -111,7 +111,7 @@ var checkerTable = (function() {
         nodej.data('fileId', fileId);
 
         // Add policy, display and verbosity
-        if (fileName.startsWith("attachment:")) {
+        if (fileName.substring(0, 11) == "attachment:") {
             nodej.data('attachment', "true");
         } else {
             nodej.data('attachment', "false");
