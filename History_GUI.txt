@@ -7,6 +7,10 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 18.03.2, 2018-04-10
+ --------------
+x Fix incomplete initialization of checker window with old Qt versions.
+
 Version 18.03.1, 2018-03-26
  --------------
 x Fix regression on Windows with directory names beginning by n or r.
