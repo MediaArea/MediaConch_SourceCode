@@ -1,26 +1,26 @@
-%define mediaconch_version          18.03.2
-%define libmediainfo_version        18.03.1
-%define libzen_version              0.4.37
+%global mediaconch_version          18.03.2
+%global libmediainfo_version        18.03.1
+%global libzen_version              0.4.37
 
 %if 0%{?fedora_version} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
-%define libmediainfo_name libmediainfo
-%define libzen_name libzen
+%global libmediainfo_name libmediainfo
+%global libzen_name libzen
 %else
-%define libmediainfo_name libmediainfo0
-%define libzen_name libzen0
+%global libmediainfo_name libmediainfo0
+%global libzen_name libzen0
 %endif
 
 # CentOS also set rhel macro
 %if ! 0%{?suse_version} && ! 0%{?rhel} || 0%{?suse_version} >= 1200 || 0%{?rhel_version} >= 700 || 0%{?centos_version} >= 700
-%define build_server 1
+%global build_server 1
 %else
-%define build_server 0
+%global build_server 0
 %endif
 
 %if ! 0%{?rhel} && ! 0%{?suse_version} || 0%{?suse_version} >= 1200
-%define build_gui 1
+%global build_gui 1
 %else
-%define build_gui 0
+%global build_gui 0
 %endif
 
 Name:           mediaconch
