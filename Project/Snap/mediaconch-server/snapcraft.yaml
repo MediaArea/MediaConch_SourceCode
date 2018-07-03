@@ -12,14 +12,14 @@ confinement: strict
 grade: stable
 
 apps:
-  mediaconchd:
+  mediaconch-server:
     command: mediaconchd
     plugs:
       - home
       - network
       - network-bind
 parts:
-  mediaconchd:
+  mediaconch-server:
     plugin: autotools-subdir
     source: MediaConch
     make-directory: Project/GNU/Server
