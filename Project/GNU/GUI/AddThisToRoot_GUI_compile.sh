@@ -64,7 +64,7 @@ if test -e Shared/Source/zlib/configure; then
     cd Shared/Source/zlib
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --static $*
+    ./configure --static
     if test ! -e Makefile; then
         echo Problem while configuring zlib
         exit
@@ -82,7 +82,7 @@ if test -e libxml2/configure; then
     cd libxml2
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --without-python --without-modules --without-iconv --without-ftp --without-http --without-c14n --without-catalog --with-xpath --without-xptr --without-xinclude --without-iconv --without-icu --without-iso8859x --without-zlib --without-lzma --without-mem_debug --without-run_debug --without-regexps --with-tree --without-writer --with-pattern --with-push --without-valid --with-sax1 --without-legacy --with-output --without-schemas --with-schematron --enable-static --disable-shared $*
+    ./configure --without-python --without-modules --without-iconv --without-ftp --without-http --without-c14n --without-catalog --with-xpath --without-xptr --without-xinclude --without-iconv --without-icu --without-iso8859x --without-zlib --without-lzma --without-mem_debug --without-run_debug --without-regexps --with-tree --without-writer --with-pattern --with-push --without-valid --with-sax1 --without-legacy --with-output --without-schemas --with-schematron --enable-static --disable-shared
     if test ! -e Makefile; then
         echo Problem while configuring libxml2
         exit
@@ -100,7 +100,7 @@ if test -e libxslt/configure; then
     cd libxslt
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --with-libxml-src="$Home"/libxml2 --without-python --without-modules --without-crypto --enable-static --disable-shared $*
+    ./configure --with-libxml-src="$Home"/libxml2 --without-python --without-modules --without-crypto --enable-static --disable-shared
     if test ! -e Makefile; then
         echo Problem while configuring libxslt
         exit
@@ -118,7 +118,7 @@ if test -e jansson/configure; then
     cd jansson
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --enable-static --disable-shared $*
+    ./configure --enable-static --disable-shared
     if test ! -e Makefile; then
         echo Problem while configuring jansson
         exit
@@ -136,7 +136,7 @@ if test -e libevent/configure; then
     cd libevent
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --disable-openssl --enable-static --disable-shared $*
+    ./configure --disable-openssl --enable-static --disable-shared
     if test ! -e Makefile; then
         echo Problem while configuring libevent
         exit
@@ -154,7 +154,7 @@ if test -e sqlite/configure; then
     cd sqlite
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --enable-static --disable-shared $*
+    ./configure --enable-static --disable-shared
     if test ! -e Makefile; then
         echo Problem while configuring sqlite
         exit
