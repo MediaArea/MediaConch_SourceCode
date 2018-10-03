@@ -320,7 +320,8 @@ macx:contains(MACSTORE, yes|1) {
     QMAKE_INFO_PLIST = ../Mac/Info.plist
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 } else:macx {
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+    QMAKE_INFO_PLIST = ../Mac/Info-ns.plist
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 }
 
 LIBS             += -lz
