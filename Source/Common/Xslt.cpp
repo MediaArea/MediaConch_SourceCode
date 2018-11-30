@@ -27,12 +27,20 @@ namespace MediaConch {
 // Constructor/Destructor
 //***************************************************************************
 
+size_t Xslt::instances = 0;
+
 //---------------------------------------------------------------------------
 Xslt::Xslt(bool no_https) : Schema(no_https)
 {
     xslt_ctx = NULL;
     doc_ctx = NULL;
-    exsltRegisterAll();
+
+    CS.Enter();
+    if (instances == 0)
+        exsltRegisterAll();
+
+    instances++;
+    CS.Leave();
 }
 
 //---------------------------------------------------------------------------
@@ -49,7 +57,13 @@ Xslt::~Xslt()
         xmlFreeDoc(doc_ctx);
         doc_ctx = NULL;
     }
-    xsltCleanupGlobals();
+
+    CS.Enter();
+    instances--;
+
+    if (instances == 0)
+        xsltCleanupGlobals();
+    CS.Leave();
 }
 
 //---------------------------------------------------------------------------

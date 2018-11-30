@@ -16,6 +16,8 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include "ZenLib/CriticalSection.h"
+
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
@@ -51,6 +53,9 @@ private:
 
     xsltStylesheetPtr xslt_ctx;
     xmlDocPtr         doc_ctx;
+
+    static size_t     instances;
+    ZenLib::CriticalSection CS;
 };
 
 }
