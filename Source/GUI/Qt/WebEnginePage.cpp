@@ -32,9 +32,12 @@ namespace MediaConch
     {
     }
 
-    bool WebPage::acceptNavigationRequest(const QUrl&, QWebEnginePage::NavigationType,
+    bool WebPage::acceptNavigationRequest(const QUrl&, QWebEnginePage::NavigationType type,
                                           bool)
     {
+        if (type == QWebEnginePage::NavigationTypeTyped)
+            return true;
+
         return false;
     }
 
