@@ -33,7 +33,7 @@
                 <xsl:attribute name="tests_run">1</xsl:attribute>
                 <xsl:attribute name="fail_count">
                   <xsl:choose>
-                    <xsl:when test="level='critical'">1</xsl:when>
+                    <xsl:when test="level='error'">1</xsl:when>
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
                 </xsl:attribute>
@@ -57,7 +57,7 @@
                 <test>
                   <xsl:attribute name="outcome">
                     <xsl:choose>
-                      <xsl:when test="level='critical'">fail</xsl:when>
+                      <xsl:when test="level='error'">fail</xsl:when>
                       <xsl:otherwise>pass</xsl:otherwise>
                     </xsl:choose>
                   </xsl:attribute>
