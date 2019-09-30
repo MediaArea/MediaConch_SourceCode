@@ -80,6 +80,13 @@ BuildRequires:  jansson-devel
 %if 0%{?mageia}
 BuildRequires:  sane-backends-iscan
 BuildRequires:  libuuid-devel
+%if 0%{?mageia} > 6
+%ifarch x86_64
+BuildRequires: lib64openssl-devel
+%else
+BuildRequires: libopenssl-devel
+%endif
+%endif
 %endif
 
 # GUI dependencies
@@ -203,8 +210,8 @@ popd
 %endif # GUI
 
 %build
-export CFLAGS="%{optflags}"
-export CXXFLAGS="%{optflags}"
+export CFLAGS="-g %{optflags}"
+export CXXFLAGS="-g %{optflags}"
 
 # build CLI
 pushd Project/GNU/CLI
