@@ -1,0 +1,22 @@
+extraction:
+  cpp:
+    prepare:
+      packages: 
+        - libzen-dev
+        - libmediainfo-dev
+        - libxml2-dev
+        - libxslt-dev
+        - libsqlite3-dev
+        - libjansson-dev
+        - zlib1g-dev
+        - libcurl4-gnutls-dev
+        - libevent-dev
+    configure:
+      command:
+      - "cd Project/GNU/CLI"
+      - "sh autogen.sh"
+      - "./configure"
+    index:
+      build_command:
+      - "cd Project/GNU/CLI"
+      - "make"
