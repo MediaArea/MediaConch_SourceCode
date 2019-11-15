@@ -53,6 +53,10 @@ BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  sqlite-devel
 
+%if 0%{?rhel_version} >= 800 || 0%{?centos_version} >= 800
+BuildRequires:  gdb
+%endif
+
 %if ! 0%{?rhel} || 0%{?rhel_version} >= 700 || 0%{?centos_version} >= 700
 BuildRequires:  libevent-devel
 %endif
