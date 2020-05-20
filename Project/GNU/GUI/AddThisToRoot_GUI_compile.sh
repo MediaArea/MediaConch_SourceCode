@@ -31,7 +31,7 @@ Parallel_Make () {
 
 Home=`pwd`
 ZenLib_Options=""
-MacOptions="--with-macosx-version-min=10.5"
+MacOptions="--with-macosx-version-min=10.7"
 
 OS=$(uname -s)
 # expr isn't available on mac
@@ -52,9 +52,9 @@ elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
 fi
 
 if [ "$OS" = "mac" ] ; then
-    export CXXFLAGS="-mmacosx-version-min=10.5 $CXXFLAGS"
-    export CFLAGS="-mmacosx-version-min=10.5 $CFLAGS"
-    export LDFLAGS="-mmacosx-version-min=10.5 $LDFLAGS"
+    export CXXFLAGS="-mmacosx-version-min=10.7 $CXXFLAGS"
+    export CFLAGS="-mmacosx-version-min=10.7 $CFLAGS"
+    export LDFLAGS="-mmacosx-version-min=10.7 $LDFLAGS"
 fi
 
 ##################################################################
