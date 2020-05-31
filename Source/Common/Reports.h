@@ -136,6 +136,7 @@ private:
     Core *core;
 
     void  xml_escape_attributes(std::string& xml);
+    bool  is_attachment(const std::string& file);
 };
 
 }
