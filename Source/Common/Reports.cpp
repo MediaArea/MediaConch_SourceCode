@@ -438,6 +438,10 @@ int Reports::get_implementation_reports(int user, const std::vector<long>& files
         std::string file;
         if (core->checker_file_from_id(user, files[i], file, err) < 0)
             return -1;
+
+        if (is_attachment(file))
+            continue;
+
         xml_escape_attributes(file);
 
         report += "  <media ref=\"" + file + "\">";
@@ -721,25 +725,8 @@ int Reports::create_report_ma_xml(int user, const std::vector<long>& files,
         if (core->checker_file_from_id(user, files[i], file, err) < 0)
             return -1;
 
-        if (file.length() > 10 && file.rfind("attachment", 0) == 0)
-        {
-            bool attachment=false;
-            for (size_t pos = 10; pos < file.length(); pos++)
-            {
-                if (file[pos] == ':')
-                {
-                    attachment = true;
-                    break;
-                }
-                else if ('0' <= file[pos] && file[pos] <= '9')
-                    continue;
-                else
-                    break;
-            }
-
-            if (attachment)
-                continue;
-        }
+        if (is_attachment(file))
+            continue;
 
         xml_escape_attributes(file);
         report += "<media ref=\"" + file + "\">\n";
@@ -862,6 +849,31 @@ void Reports::xml_escape_attributes(std::string& xml)
                 break;
         }
     }
+}
+
+//---------------------------------------------------------------------------
+bool  Reports::is_attachment(const std::string& file)
+{
+    if (file.length() > 10 && file.rfind("attachment", 0) == 0)
+    {
+        bool attachment=false;
+        for (size_t pos = 10; pos < file.length(); pos++)
+        {
+            if (file[pos] == ':')
+            {
+                attachment = true;
+                break;
+            }
+            else if ('0' <= file[pos] && file[pos] <= '9')
+                continue;
+            else
+                break;
+        }
+
+        if (attachment)
+            return true;
+    }
+    return false;
 }
 
 //***************************************************************************

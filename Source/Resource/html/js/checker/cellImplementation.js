@@ -9,8 +9,14 @@ var implementationCell = (function() {
         var nodeImplem = $(result.cell(nodeCell, 1).node());
 
         if (data.valid) {
-            nodeImplem.addClass('success');
-            var implemResultText = '<span class="implemResult"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Valid</span>'
+            if (result.$('#result-' + fileId).data('attachment') !== "true") {
+                nodeImplem.addClass('success');
+                var implemResultText = '<span class="implemResult"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Valid</span>'
+            }
+            else {
+                nodeImplem.addClass('info');
+                var implemResultText = '<span class="implemResult">N/A</span>';
+            }
         }
         else {
             nodeImplem.addClass('danger');
