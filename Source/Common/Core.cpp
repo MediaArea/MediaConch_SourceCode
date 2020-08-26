@@ -1337,6 +1337,21 @@ std::string Core::get_local_data_path()
     if (!ZenLib::Dir::Exists(z_path))
         ZenLib::Dir::Create(z_path);
 
+#if defined(UNIX) || defined(MACOS) || defined(MACOSX)
+    if (!ZenLib::Dir::Exists(z_path))
+    {
+        const char* tmpdir;
+        if ((tmpdir = getenv("TMPDIR")) == NULL)
+            tmpdir = "/tmp";
+
+        std::string tmp_local_path = std::string(tmpdir) + separator + "MediaConch";
+        z_path = ZenLib::Ztring().From_UTF8(tmp_local_path);
+        if (ZenLib::Dir::Exists(z_path) || ZenLib::Dir::Create(z_path))
+            local_path = tmp_local_path;
+    }
+#endif
+
+
     return local_path;
 }
 
