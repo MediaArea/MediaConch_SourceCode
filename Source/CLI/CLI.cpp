@@ -83,6 +83,40 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
         STRINGOUT(MessageString);
 }
 
+//--------------------------------------------------------------------------
+void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_Size, void* UserHandle_Void)
+{
+    struct MediaInfo_Event_Generic*     Event_Generic=(struct MediaInfo_Event_Generic*)Data_Content;
+    unsigned short                      EventID;
+    unsigned char                       EventVersion;
+
+    /*integrity tests*/
+    if (Data_Size<4)
+        return; //There is a problem
+
+    /*Retrieving EventID*/
+    EventID     =(unsigned short)((Event_Generic->EventCode&0x00FFFF00)>>8 );
+    EventVersion=(unsigned char) ( Event_Generic->EventCode&0x000000FF     );
+
+    switch (EventID)
+    {
+        case MediaInfo_Event_Global_BytesRead:
+            if (EventVersion == 0 && Data_Size >= sizeof(struct MediaInfo_Event_Global_BytesRead_0) && UserHandle_Void != NULL)
+            {
+                struct MediaInfo_Event_Global_BytesRead_0* Event_Data=(struct MediaInfo_Event_Global_BytesRead_0*)Data_Content;
+                std::string* UserHandle=(std::string*)UserHandle_Void;
+
+                UserHandle->append((const char*)Event_Data->Content, Event_Data->Content_Size);
+            }
+            break;
+        case MediaInfo_Event_Log:
+            if (EventVersion == 0 && Data_Size >= sizeof(struct MediaInfo_Event_Log_0))
+                Log_0((struct MediaInfo_Event_Log_0*)Data_Content);
+            break;
+        default: ;
+    }
+}
+
     //**************************************************************************
     // CLI
     //**************************************************************************
@@ -116,6 +150,41 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
             // If no filenames (and no options)
             if (files.empty())
                 return Help_Nothing();
+
+            // download remote policies
+            if (MCL.mil_has_curl_enabled())
+            {
+                for (size_t i = policies.size(); i > 0; --i)
+                {
+                    if (policies[i-1].find("://")!=std::string::npos)
+                    {
+                        MediaInfoNameSpace::MediaInfo tmpMI;
+                        tmpMI.Option(__T("ParseSpeed"), __T("1"));
+
+                        for (size_t i = 0; i < options.size(); ++i)
+                        {
+                            std::string report;
+                           if (!options[i].first.empty() && !options[i].second.empty() && MCL.test_mil_option(options[i].first, options[i].second, report)==0)
+                               tmpMI.Option(ZenLib::Ztring().From_UTF8(options[i].first), ZenLib::Ztring().From_UTF8(options[i].second));
+                        }
+
+                        std::string data;
+                        std::stringstream ss;
+                        ss << "CallBack=memory://" << (ZenLib::int64u)Event_CallBackFunction << ";UserHandler=memory://" << (ZenLib::int64u)&data;
+                        tmpMI.Option(__T("File_Event_CallBackFunction"), ZenLib::Ztring().From_UTF8(ss.str().c_str()));
+                        tmpMI.Option(__T("Event_CallBackFunction"), ZenLib::Ztring().From_UTF8(ss.str().c_str()));
+                        tmpMI.Open(ZenLib::Ztring().From_UTF8(policies[i-1]));
+
+                        if (!data.empty())
+                            policies[i-1] = data;
+                        else
+                            policies.erase(policies.end()-i);
+
+                         tmpMI.Close();
+                         tmpMI.Option(__T("ParseSpeed"), __T("0.5"));
+                    }
+                }
+            }
 
             // If no report selected, use Implementation by default
             if (!report_set.count() && !policies.size())
@@ -498,6 +567,12 @@ void Log_0(struct MediaInfo_Event_Log_0* Event)
     //--------------------------------------------------------------------------
     int CLI::add_policy(const std::string& pattern)
     {
+        if (pattern.find("://")!=std::string::npos && MCL.mil_has_curl_enabled())
+        {
+            policies.push_back(pattern);
+            return 0;
+        }
+
         std::vector<std::string> filenames;
 #ifdef HAVE_GLOB
         // Policy filenames pattern matching
