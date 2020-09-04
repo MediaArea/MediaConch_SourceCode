@@ -280,7 +280,7 @@ dnl -------------------------------------------------------------------------
 dnl libxslt
 dnl
 if test -e ../../../../libxslt/libxslt/.libs/libxslt.la; then
-	CXXFLAGS="$CXXFLAGS  -I../../../../libxslt/libxslt"
+	CXXFLAGS="$CXXFLAGS -I../../../../libxslt"
 	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libxslt/libxslt"
 	MediaInfoLib_CXXFLAGS="$MediaInfoLib_CXXFLAGS -I../../../../libxslt/libexslt"
 	if test "$enable_staticlibs" = "yes"; then

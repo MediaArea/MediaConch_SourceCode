@@ -261,8 +261,7 @@ unix:exists(../../../libxml2/.libs/libxml2.a) {
 }
 
 unix:exists(../../../libxslt/libxslt/.libs/libxslt.a) {
-    INCLUDEPATH      += ../../../libxslt/libxslt
-    INCLUDEPATH      += ../../../libxslt/libexslt
+    INCLUDEPATH      += ../../../libxslt
     LIBS             += ../../../libxslt/libxslt/.libs/libxslt.a
     LIBS             += ../../../libxslt/libexslt/.libs/libexslt.a
     message("libxslt     : custom")
