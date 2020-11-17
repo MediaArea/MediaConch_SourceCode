@@ -324,9 +324,7 @@ CL_OPTION(PolicyOption)
 
     std::string file;
     file.assign(argument, egal_pos + 1, std::string::npos);
-    cli->add_policy(file);
-
-    return CLI_RETURN_NONE;
+    return cli->add_policy(file);
 }
 
 //---------------------------------------------------------------------------

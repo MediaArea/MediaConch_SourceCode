@@ -178,7 +178,10 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
                         if (!data.empty())
                             policies[i-1] = data;
                         else
-                            policies.erase(policies.end()-i);
+                        {
+                            err = "Unable to fetch policy file: " + policies[i-1] + ".";
+                            return CLI_RETURN_ERROR;
+                        }
 
                          tmpMI.Close();
                          tmpMI.Option(__T("ParseSpeed"), __T("0.5"));
@@ -594,13 +597,19 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             std::string& filename = filenames[i];
             ZenLib::Ztring z_filename = ZenLib::Ztring().From_UTF8(filename);
             if (!ZenLib::File::Exists(z_filename))
-                return -1;
+            {
+               STRINGERR(__T("Policy file: ") + z_filename + __T(" not found."));
+               return CLI_RETURN_ERROR;
+            }
 
             ZenLib::File file(z_filename);
 
             ZenLib::int64u size = file.Size_Get();
             if (size == (ZenLib::int64u)-1)
-                return -1;
+            {
+               STRINGERR(__T("Unable to open policy file: ") + z_filename + __T("."));
+               return CLI_RETURN_ERROR;
+            }
 
             ZenLib::int8u* Buffer = new ZenLib::int8u[size + 1];
 
