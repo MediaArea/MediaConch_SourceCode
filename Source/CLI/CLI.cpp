@@ -156,8 +156,9 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             {
                 for (size_t i = policies.size(); i > 0; --i)
                 {
-                    if (policies[i-1].find("://")!=std::string::npos)
+                    if (policies[i-1].find("fetch://")==0)
                     {
+                        std::string policy = policies[i-1].substr(8);
                         MediaInfoNameSpace::MediaInfo tmpMI;
                         tmpMI.Option(__T("ParseSpeed"), __T("1"));
 
@@ -173,13 +174,13 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
                         ss << "CallBack=memory://" << (ZenLib::int64u)Event_CallBackFunction << ";UserHandler=memory://" << (ZenLib::int64u)&data;
                         tmpMI.Option(__T("File_Event_CallBackFunction"), ZenLib::Ztring().From_UTF8(ss.str().c_str()));
                         tmpMI.Option(__T("Event_CallBackFunction"), ZenLib::Ztring().From_UTF8(ss.str().c_str()));
-                        tmpMI.Open(ZenLib::Ztring().From_UTF8(policies[i-1]));
+                        tmpMI.Open(ZenLib::Ztring().From_UTF8(policy));
 
                         if (!data.empty())
                             policies[i-1] = data;
                         else
                         {
-                            err = "Unable to fetch policy file: " + policies[i-1] + ".";
+                            err = "Unable to fetch policy file: " + policy + ".";
                             return CLI_RETURN_ERROR;
                         }
 
@@ -662,7 +663,7 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
     {
         if (pattern.find("://")!=std::string::npos && MCL.mil_has_curl_enabled())
         {
-            policies.push_back(pattern);
+            policies.push_back("fetch://" + pattern);
             return 0;
         }
 
