@@ -60,6 +60,7 @@ namespace MediaConch
         int  set_watch_folder_user(const std::string& user);
         void set_list_watch_folders_mode();
         void set_list_mode();
+        int  add_output(const std::string& format, const std::string& filename);
 
       private:
         CLI(const CLI&);
@@ -81,6 +82,7 @@ namespace MediaConch
         std::vector<std::string> policies;
         std::vector<std::string> plugins;
         std::vector<std::pair<std::string,std::string> > options;
+        std::vector<std::pair<MediaConchLib::format,std::string> > outputs;
         std::string              error;
         std::string              display_content;
         std::string              configuration_file;

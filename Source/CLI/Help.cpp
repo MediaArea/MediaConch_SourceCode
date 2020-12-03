@@ -88,6 +88,25 @@ int Help()
     TEXTOUT("      Apply the display transformation (XSL)");
     TEXTOUT("");
 
+    TEXTOUT("Output File:");
+    TEXTOUT("  --Output=file, -o file");
+    TEXTOUT("      Output MediaConch reports in file, trying to autodetect");
+    TEXTOUT("      the format from the extension or using the given display");
+    TEXTOUT("  Output-Text=file, -ot file");
+    TEXTOUT("      Output MediaConch reports in file in Text format");
+    TEXTOUT("  Output-Xml=file, -ox file");
+    TEXTOUT("      Output MediaConch reports in file in XML format");
+    TEXTOUT("  Output-Html=file, -oh file");
+    TEXTOUT("      Output MediaConch reports in file in HTML format");
+    TEXTOUT("  Output-Simple=file, -os file");
+    TEXTOUT("      Output MediaConch reports in file in a shorten form");
+    TEXTOUT("      (>1 line only if there are errors), default format");
+    TEXTOUT("  Output-Csv=file, -oc file");
+    TEXTOUT("      Output MediaConch reports in file in CSV format (only for policies)");
+    TEXTOUT("  Output-MaXml=file, -oa file");
+    TEXTOUT("      Output MediaConch reports in file in  MediaArea XML format");
+    TEXTOUT("");
+
     TEXTOUT("  --List");
     TEXTOUT("      List files analyzed.");
     TEXTOUT("");

@@ -107,6 +107,47 @@ static bool wait_for_another_argument(std::string& argument)
         Last_Argument = "--watchfolder-user=";
         return true;
     }
+    else if (argument=="-o")
+    {
+        Last_Argument = "--output=";
+        return true;
+    }
+    else if (argument=="-ot")
+    {
+        Last_Argument = "--output-text=";
+        return true;
+    }
+    else if (argument=="-ox")
+    {
+        Last_Argument = "--output-xml=";
+        return true;
+    }
+    else if (argument=="-oa")
+    {
+        argument = "--output-maxml=";
+        return true;
+    }
+    else if (argument=="-oj")
+    {
+        Last_Argument = "--output-jstree=";
+        return true;
+    }
+    else if (argument=="-oh")
+    {
+        Last_Argument = "--output-html=";
+        return true;
+    }
+    else if (argument=="-oc")
+    {
+        Last_Argument = "--output-csv=";
+        return true;
+    }
+    else if (argument=="-os")
+    {
+        Last_Argument = "--output-simple=";
+        return true;
+    }
+
     return false;
 }
 
@@ -237,6 +278,15 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--watchfolder",                                 WatchFolder)
     OPTION("--user",                                        User)
     OPTION("--list",                                        List)
+    OPTION("--output",                                      Output)
+    OPTION("--output-text",                                 Output)
+    OPTION("--output-xml",                                  Output)
+    OPTION("--output-maxml",                                Output)
+    OPTION("--output-jstree",                               Output)
+    OPTION("--output-html",                                 Output)
+    OPTION("--output-csv",                                  Output)
+    OPTION("--output-simple",                               Output)
+
     //Default
     OPTION("--",                                            Default)
     else
@@ -677,6 +727,30 @@ CL_OPTION(List)
     //Form : --list
     (void)argument;
     cli->set_list_mode();
+
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(Output)
+{
+    //Form : --output<-format>=file, -o file
+    size_t egal_pos = argument.find('=');
+    if (egal_pos == std::string::npos)
+    {
+        Help();
+        return CLI_RETURN_ERROR;
+    }
+
+    std::string filename;
+    filename.assign(argument, egal_pos + 1 , std::string::npos);
+
+    std::string format;
+    size_t minus_pos = argument.rfind('-', egal_pos);
+    if (minus_pos != std::string::npos && minus_pos > 1)
+        format.assign(argument, minus_pos + 1, egal_pos - minus_pos - 1);
+
+    cli->add_output(format, filename);
 
     return CLI_RETURN_NONE;
 }
