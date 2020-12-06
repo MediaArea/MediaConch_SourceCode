@@ -55,16 +55,17 @@ public:
     virtual xmlDocPtr    create_doc() = 0;
     void                 set_keep_public(bool b) { keep_public = b;}
 
-    std::string          filename;
-    std::string          name;
-    std::string          description;
-    std::string          license;
-    Policies::PolicyType type;
-    size_t               id;
-    bool                 is_system;
-    bool                 no_https;
-    bool                 is_public;
-    bool                 keep_public;
+    std::string              filename;
+    std::string              name;
+    std::string              description;
+    std::string              license;
+    std::vector<std::string> tags;
+    Policies::PolicyType     type;
+    size_t                   id;
+    bool                     is_system;
+    bool                     no_https;
+    bool                     is_public;
+    bool                     keep_public;
 
 protected:
     Policies            *policies;

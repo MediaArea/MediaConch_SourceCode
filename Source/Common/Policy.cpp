@@ -41,6 +41,7 @@ Policy::Policy(const Policy* p)
     this->name = p->name;
     this->description = p->description;
     this->license = p->license;
+    this->tags = p->tags;
     this->is_system = false;
     this->is_public = p->is_public;
     this->keep_public = p->keep_public;
@@ -57,6 +58,7 @@ Policy::Policy(const Policy& p)
 
     this->name = p.name;
     this->description = p.description;
+    this->tags = p.tags;
     this->license = p.license;
     this->is_system = p.is_system;
     this->is_public = p.is_public;
