@@ -75,8 +75,11 @@ int main(int argc, char* argv_ansi[])
         return 1;
     }
 
-    if (cli.run(err) < 0)
+    if (cli.run(err)  == CLI_RETURN_ERROR)
+    {
         STRINGOUT(ZenLib::Ztring().From_UTF8(err));
+        return 1;
+    }
 
     cli.finish();
 

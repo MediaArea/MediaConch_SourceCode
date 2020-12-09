@@ -122,7 +122,13 @@ namespace MediaConch {
             return;
 
         CS.Enter();
-        core->register_reports_to_database(el->user, el->file_id, MI);
+        if (!el->errored())
+            core->register_reports_to_database(el->user, el->file_id, MI);
+        else
+        {
+            std::string err;
+            core->update_file_error(el->user, el->file_id, true, el->error, err);
+        }
         remove_element(el);
         CS.Leave();
         run_element();
