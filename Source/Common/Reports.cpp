@@ -1277,6 +1277,16 @@ void Reports::unify_policy_options(int user, std::map<std::string, std::string>&
 
         opts["compare"] = "\"" + path + "\"";
     }
+    if (opts.find("policy_verbosity") != opts.end() && opts["policy_verbosity"].length() && opts["policy_verbosity"] != "-1")
+    {
+        std::string& verbosity = opts["policy_verbosity"];
+        if (verbosity[0] == '"')
+            verbosity = std::string("'") + verbosity + std::string("'");
+        else
+            verbosity = std::string("\"") + verbosity + std::string("\"");
+    }
+    else
+        opts["policy_verbosity"] = "\"0\"";
 }
 
 }

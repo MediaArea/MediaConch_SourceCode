@@ -67,6 +67,9 @@ int Help()
     TEXTOUT("      Create a policy (XSL) from a file");
     TEXTOUT("  --PolicyReferenceFile=VideoFile, -prf VideoFile");
     TEXTOUT("      Use the VideoFile as reference to compare in policy");
+    TEXTOUT("  --policyVerbosity=V, -pv V");
+    TEXTOUT("      Select verbosity (V) of the policy check, default 0");
+    TEXTOUT("      >= 1, show actual value also for passing rules");
     TEXTOUT("");
 
     TEXTOUT("Output Formats:");
