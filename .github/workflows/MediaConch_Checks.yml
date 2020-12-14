@@ -26,12 +26,16 @@ jobs:
             brew install automake libxslt sqlite jansson libevent qt sfk xmlstarlet ffmpeg
           fi
           sudo pip install git+https://github.com/vi/mkvparse.git
+      - name: ZenLib
+        run: |
           git -C .. clone --depth=1 https://github.com/MediaArea/ZenLib.git
           pushd ../ZenLib/Project/GNU/Library
             autoreconf -if
             ./configure --enable-static
             make
           popd
+      - name: MediaInfoLib
+        run: |
           git -C .. clone --depth=1 https://github.com/MediaArea/MediaInfoLib.git
           pushd ../MediaInfoLib/Project/GNU/Library
             autoreconf -if
