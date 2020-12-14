@@ -309,16 +309,32 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
 
         //Return plugins list
         if (plugins_list_mode)
-            return run_plugins_list(err);
+        {
+            if (run_plugins_list(err) < 0)
+               return CLI_RETURN_ERROR;
+            return CLI_RETURN_NONE;
+        }
         //Return watch folders list
         else if (list_watch_folders_mode)
-            return run_watch_folders_list(err);
+        {
+            if (run_watch_folders_list(err) < 0)
+               return CLI_RETURN_ERROR;
+            return CLI_RETURN_NONE;
+        }
         //Return list files
         else if (list_mode)
-            return run_list_files(err);
+        {
+            if (run_list_files(err) < 0)
+               return CLI_RETURN_ERROR;
+            return CLI_RETURN_NONE;
+        }
         // Add a watch folder
         else if (watch_folder.size())
-            return run_watch_folder_cmd(err);
+        {
+            if (run_watch_folder_cmd(err) < 0)
+               return CLI_RETURN_ERROR;
+            return CLI_RETURN_NONE;
+        }
 
         //Return file information
         if (file_information)
@@ -332,7 +348,7 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             int ret = MCL.checker_analyze(use_as_user, files[i], plugins, options, registered,
                                           file_id, err, force_analyze, mil_analyze);
             if (ret < 0)
-                return -1;
+                return CLI_RETURN_ERROR;
 
             if (use_daemon && asynchronous && !registered)
             {
@@ -348,7 +364,7 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
                 continue;
             else if (ready < 0)
                 //TODO: PROBLEM
-                return -1;
+                return CLI_RETURN_ERROR;
 
             if (report_kind == MediaConchLib::report_Max)
                 report_kind = MediaConchLib::report_MediaConch;
@@ -377,10 +393,10 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             int ret = MCL.checker_analyze(use_as_user, policy_reference_file, plugins, this->options, registered,
                                           file_id, err, force_analyze, mil_analyze);
             if (ret < 0)
-                return -1;
+                return CLI_RETURN_ERROR;
 
             if (run_policy_reference_file(file_id, err) < 0)
-                return -1;
+                return CLI_RETURN_ERROR;
 
             std::stringstream ss;
             ss << file_id;
@@ -443,7 +459,7 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             }
         }
 
-        return 0;
+        return CLI_RETURN_NONE;
     }
 
     //--------------------------------------------------------------------------
@@ -452,16 +468,16 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
         if (files_ids.size() != 1)
         {
             error = "Create a policy only with one file";
-            return MediaConchLib::errorHttp_INTERNAL;
+            return -1;
         }
 
         size_t pos = MCL.xslt_policy_create_from_file(use_as_user, files_ids[0], error);
         if (pos == (size_t)-1)
-            return MediaConchLib::errorHttp_INTERNAL;
+            return -1;
 
         std::string policy;
-        if (MCL.policy_dump(use_as_user, pos, false, policy, error))
-            return MediaConchLib::errorHttp_INTERNAL;
+        if (MCL.policy_dump(use_as_user, pos, false, policy, error) < 0)
+            return -1;
 
         MediaInfoLib::String policy_mil = ZenLib::Ztring().From_UTF8(policy);
         STRINGOUT(policy_mil);

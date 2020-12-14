@@ -71,12 +71,15 @@ int main(int argc, char* argv_ansi[])
     std::string err;
     if (cli.init(err) == CLI_RETURN_ERROR)
     {
-        STRINGOUT(ZenLib::Ztring().From_UTF8(err));
+        STRINGERR(ZenLib::Ztring().From_UTF8(err));
         return 1;
     }
 
-    if (cli.run(err) < 0)
-        STRINGOUT(ZenLib::Ztring().From_UTF8(err));
+    if (cli.run(err)  == CLI_RETURN_ERROR)
+    {
+        STRINGERR(ZenLib::Ztring().From_UTF8(err));
+        return 1;
+    }
 
     cli.finish();
 

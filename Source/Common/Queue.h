@@ -60,6 +60,7 @@ namespace MediaConch
         std::string                        filename;
         std::string                        real_filename;
         std::string                        options_str;
+        std::string                        error;
         std::vector<std::pair<std::string, std::string> > options;
         std::vector<std::string>           plugins;
         std::vector<Attachment*>           attachments;
@@ -69,6 +70,7 @@ namespace MediaConch
         void                               Entry();
         void                               stop();
         double                             percent_done();
+        bool                               errored();
         int                                attachment_cb(struct MediaInfo_Event_Global_AttachedFile_0 *Event);
         int                                log_cb(struct MediaInfo_Event_Log_0 *Event);
 

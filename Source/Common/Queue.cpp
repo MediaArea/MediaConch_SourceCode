@@ -140,7 +140,8 @@ void QueueElement::Entry()
     for (size_t i = 0; i < options.size(); ++i)
         MI->Option(Ztring().From_UTF8(options[i].first), Ztring().From_UTF8(options[i].second));
 
-    MI->Open(ZenLib::Ztring().From_UTF8(file));
+    if(!MI->Open(ZenLib::Ztring().From_UTF8(file)))
+        error = "Unable to open file";
     if (!IsTerminating()) //If terminating was requested, file is partially parsed (and there is some thread lock because the scheduler calls the queue which calls the scheduler) //TODO: reorganize calls
         scheduler->work_finished(this, MI);
     MI_CS.Enter();
@@ -158,6 +159,12 @@ void QueueElement::Entry()
         Ztring z_path = ZenLib::Ztring().From_UTF8(real_filename);
         ZenLib::File::Delete(z_path);
     }
+}
+
+//---------------------------------------------------------------------------
+bool QueueElement::errored()
+{
+    return !error.empty();
 }
 
 //---------------------------------------------------------------------------
