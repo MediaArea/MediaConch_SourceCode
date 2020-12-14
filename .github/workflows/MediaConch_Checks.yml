@@ -17,6 +17,7 @@ jobs:
       - name: Dependencies
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get update
             sudo apt-get install -y zlib1g-dev libxml2-dev libxslt-dev libcurl4-gnutls-dev libsqlite3-dev libjansson-dev libevent-dev libxml2-utils qtbase5-dev qtwebengine5-dev qt5-qmake qt5-default xmlstarlet ffmpeg sshpass
             sudo curl -L http://stahlworks.com/dev/sfk/sfk-linux-64.exe -o /usr/local/bin/sfk
             sudo chmod +x /usr/local/bin/sfk
@@ -25,12 +26,16 @@ jobs:
             brew install automake libxslt sqlite jansson libevent qt sfk xmlstarlet ffmpeg
           fi
           sudo pip install git+https://github.com/vi/mkvparse.git
+      - name: ZenLib
+        run: |
           git -C .. clone --depth=1 https://github.com/MediaArea/ZenLib.git
           pushd ../ZenLib/Project/GNU/Library
             autoreconf -if
             ./configure --enable-static
             make
           popd
+      - name: MediaInfoLib
+        run: |
           git -C .. clone --depth=1 https://github.com/MediaArea/MediaInfoLib.git
           pushd ../MediaInfoLib/Project/GNU/Library
             autoreconf -if
