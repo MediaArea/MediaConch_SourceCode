@@ -44,6 +44,7 @@ namespace MediaConch
         void set_implementation_schema_file(const std::string& file);
         void set_implementation_verbosity(const std::string& verbosity);
         int  set_policy_reference_file(const std::string& file);
+        void  set_policy_verbosity(const std::string& verbosity);
         int  add_plugin_to_use(const std::string& plugin);
         int  set_user_to_use(const std::string& user);
         int  set_compression_mode(const std::string& mode_str);
@@ -88,6 +89,7 @@ namespace MediaConch
         std::string              configuration_file;
         std::string              plugins_configuration_file;
         std::string              policy_reference_file;
+        std::string              policy_verbosity;
         std::string              watch_folder;
         std::string              watch_folder_reports;
         long                    *watch_folder_user;
