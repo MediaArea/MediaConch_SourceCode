@@ -221,6 +221,44 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
                 format = MediaConchLib::format_Simple;
             else if (format == MediaConchLib::format_Max && !display_content.empty())
                 format = MediaConchLib::format_Xml;
+
+            for (size_t i = 0; i < outputs.size(); ++i)
+            {
+                MediaConchLib::format format = outputs[i].first;
+                std::string filename = outputs[i].second;
+
+                if (format == MediaConchLib::format_Max && display_content.empty())
+                {
+                    // Try to autodetect wanted output format
+                    if (filename.size() >= 4 && filename.rfind(".txt") == filename.size() - 4)
+                        format = MediaConchLib::format_Text;
+                    else if (filename.size() >= 4 && filename.rfind(".xml") == filename.size() - 4)
+                        format = MediaConchLib::format_Xml;
+                    else if (filename.size() >= 5 && filename.rfind(".html") == filename.size() - 5)
+                        format = MediaConchLib::format_Html;
+                    else if (filename.size() >= 4 && filename.rfind(".csv") == filename.size() - 4)
+                        format = MediaConchLib::format_CSV;
+                    else
+                        format = MediaConchLib::format_Simple;
+
+                    outputs[i].first = format;
+                }
+
+                if (format == MediaConchLib::format_CSV && !policies.size())
+                {
+                     err = "CLI can use CSV format only with policies.";
+                     return CLI_RETURN_ERROR;
+                }
+
+                if (!MCL.ReportAndFormatCombination_IsValid(files, report_set,
+                                                            format == MediaConchLib::format_Max ? display_content : std::string(),
+                                                            format, err))
+                {
+                    if (err == "MicroMediaTrace requires an XML output.")
+                        err += " Use only --output-xml=";
+                    return CLI_RETURN_ERROR;
+                }
+            }
         }
 
         MCL.set_configuration_file(configuration_file);
@@ -350,27 +388,60 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
         }
 
         //Output
-        MediaConchLib::Checker_ReportRes result;
         cr.user = use_as_user;
         cr.report_set = report_set;
-        cr.format = format;
         cr.options["verbosity"] = MCL.get_implementation_verbosity();
 
         for (size_t i = 0; i < policies.size(); ++i)
             cr.policies_contents.push_back(policies[i]);
 
-        cr.display_content = &display_content;
-
         if (report_set[MediaConchLib::report_MediaInfo] && mi_inform.size())
             cr.mi_inform = &mi_inform;
 
-        MCL.checker_get_report(cr, &result, error);
-        MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
+        if (outputs.empty()) //Print report to screen
+        {
+            MediaConchLib::Checker_ReportRes result;
+            cr.format = format;
 
-        STRINGOUT(report_mi);
-        //Output, in a file if needed
-        if (!LogFile_FileName.empty())
-            LogFile_Action(report_mi);
+            cr.display_content = &display_content;
+
+            MCL.checker_get_report(cr, &result, error);
+            MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
+
+            STRINGOUT(report_mi);
+            //Output, in a file if needed
+            if (!LogFile_FileName.empty())
+                LogFile_Action(report_mi);
+        }
+        else //Write report to file(s)
+        {
+            for (size_t i = 0; i < outputs.size(); ++i)
+            {
+                MediaConchLib::Checker_ReportRes result;
+
+                MediaConchLib::format format = outputs[i].first;
+                std::string filename = outputs[i].second;
+
+                cr.display_content = NULL;
+                if (format == MediaConchLib::format_Max)
+                {
+                    format = MediaConchLib::format_Xml; //Needed with display
+                    cr.display_content = &display_content;
+                }
+
+                cr.format = format;
+
+                MCL.checker_get_report(cr, &result, error);
+                MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
+
+                ZenLib::File F;
+                if (!F.Create(ZenLib::Ztring().From_UTF8(outputs[i].second.c_str())))
+                    STRINGOUT(__T("Unable to write to output file: ") + ZenLib::Ztring().From_UTF8(filename));
+
+                //Filling
+                F.Write(report_mi);
+            }
+        }
 
         return 0;
     }
@@ -780,6 +851,31 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
     {
         list_mode = true;
         no_needs_files_mode = true;
+    }
+
+    //--------------------------------------------------------------------------
+    int  CLI::add_output(const std::string& format, const std::string& filename)
+    {
+        MediaConchLib::format f;
+        if (format == "text")
+            f = MediaConchLib::format_Text;
+        else if (format == "xml")
+            f = MediaConchLib::format_Xml;
+        else if (format == "maxml")
+            f = MediaConchLib::format_MaXml;
+        else if (format == "jstree")
+            f = MediaConchLib::format_JsTree;
+        else if (format == "html")
+            f = MediaConchLib::format_Html;
+        else if (format == "csv")
+            f = MediaConchLib::format_CSV;
+        else if (format == "simple")
+            f = MediaConchLib::format_Simple;
+        else
+            f = MediaConchLib::format_Max;
+
+        outputs.push_back(std::make_pair(f, filename));
+        return 0;
     }
 
     //--------------------------------------------------------------------------
