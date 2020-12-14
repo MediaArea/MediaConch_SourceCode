@@ -311,6 +311,17 @@ int XsltPolicy::find_policy_node(xmlNodePtr node, bool is_root, XsltPolicy* curr
         }
         return 0;
     }
+    else if (name == "tag")
+    {
+        // Get tag
+        xmlChar *value = xmlNodeGetContent(node);
+        if (value)
+        {
+            current->tags.push_back(std::string((const char*)value));
+            xmlFree(value);
+        }
+        return 0;
+    }
 
 
     error = "The XML policy tag accepted are 'policy' or 'rule'";
@@ -508,6 +519,27 @@ int XsltPolicy::create_node_policy_child(xmlNodePtr& node, XsltPolicy *current)
         {
             error = "Cannot add child to policy children";
             return -1;
+        }
+    }
+
+    //tags
+    if (current->tags.size())
+    {
+        for (size_t i = 0; i < current->tags.size(); ++i)
+        {
+            xmlNodePtr new_node = xmlNewNode(NULL, (const xmlChar*)"tag");
+            if (!new_node)
+            {
+                error = "Cannot create the policy children";
+                return -1;
+            }
+
+            xmlNodeSetContent(new_node, (const xmlChar*)current->tags[i].c_str());
+            if (!xmlAddChild(node, new_node))
+            {
+                error = "Cannot add child to policy children";
+                return -1;
+            }
         }
     }
 
