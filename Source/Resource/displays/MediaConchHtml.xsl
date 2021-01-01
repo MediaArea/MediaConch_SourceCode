@@ -379,6 +379,10 @@
           <strong>Operator: </strong>  <xsl:value-of select="@operator"/>
           <br/>
         </xsl:if>
+        <xsl:if test="@requested != ''">
+          <strong>Requested: </strong>  <xsl:value-of select="@requested"/>
+          <br/>
+        </xsl:if>
         <xsl:if test="@actual != ''">
           <strong>Actual: </strong>  <xsl:value-of select="@actual"/>
           <br/>

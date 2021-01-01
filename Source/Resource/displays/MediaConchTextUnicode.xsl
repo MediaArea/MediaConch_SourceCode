@@ -177,6 +177,12 @@
     <xsl:text>Outcome: </xsl:text>
     <xsl:value-of select="@outcome"/>
     <xsl:text>&#xa;</xsl:text>
+    <xsl:if test="@requested != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Requested: </xsl:text>
+      <xsl:value-of select="@requested"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
     <xsl:if test="@actual != ''">
       <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Actual: </xsl:text>
