@@ -1,6 +1,6 @@
 Format: 3.0 (quilt)
 Source: mediaconch
-Binary: mediaconch, mediaconch-dbg, mediaconch-server, mediaconch-server-dbg, mediaconch-gui, mediaconch-gui-dbg
+Binary: mediaconch, mediaconch-dbg, mediaconch-server, mediaconch-server-dbg, libmediaconch0, libmediaconch0-dbg, libmediaconch-dev, mediaconch-gui, mediaconch-gui-dbg
 Architecture: any
 Version: 18.03.2-1
 Maintainer: MediaArea.net SARL <info@mediaarea.net>

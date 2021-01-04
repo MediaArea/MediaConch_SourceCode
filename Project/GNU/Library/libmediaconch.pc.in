@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+Unicode=@MediaConchLib_Unicode@
+Libs_Static=${libdir}/lib@MediaConchLib_LibName@.a ${libdir}/libmediainfo.a ${libdir}/libzen.a -lpthread -lz
+la_name=lib@MediaInfoLib_LibName@.la
+
+Name: libmediaconch
+Version: @PACKAGE_VERSION@
+Description: MediaConchLib
+Requires: libzen libmediainfo
+Libs: -L@libdir@ -l@MediaConchLib_LibName@ -lz
+Cflags: -I@includedir@ @MediaConchLib_CXXFLAGS@

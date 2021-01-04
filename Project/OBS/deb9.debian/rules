@@ -9,6 +9,7 @@ export QT_SELECT = qt5
 paths = \
 	Project/GNU/CLI/ \
 	Project/GNU/Server/ \
+	Project/GNU/Library/ \
 	Project/Qt/
 
 auto_build_cmd =				\
@@ -22,6 +23,7 @@ auto_build_cmd =				\
 override_dh_auto_configure:
 	dh_auto_configure -DProject/GNU/CLI
 	dh_auto_configure -DProject/GNU/Server
+	dh_auto_configure -DProject/GNU/Library
 	dh_auto_configure -DProject/Qt -- USE_WEBKIT=1
 
 override_dh_auto_build:
@@ -65,6 +67,7 @@ override_dh_installchangelogs:
 override_dh_strip:
 	dh_strip -p mediaconch --dbg-package=mediaconch-dbg
 	dh_strip -p mediaconch-server --dbg-package=mediaconch-server-dbg
+	dh_strip -p libmediaconch0 --dbg-package=libmediaconch0-dbg
 	dh_strip -p mediaconch-gui --dbg-package=mediaconch-gui-dbg
 
 clean:

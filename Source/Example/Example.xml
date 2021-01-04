@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<policy type="and" name="Audio is Ogg Vorbis?" license="CC-BY-4.0+">
+  <description>Checking if audio encoding is Vorbis inside an Ogg container.</description>
+
+  <rule name="File format is Ogg?" value="Format" tracktype="General" occurrence="*" operator="=">Ogg</rule>
+  <rule name="Audio format is Vorbis?" value="Format" tracktype="Audio" occurrence="*" operator="=">Vorbis</rule>
+</policy>
