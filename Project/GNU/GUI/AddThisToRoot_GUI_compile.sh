@@ -52,9 +52,9 @@ elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
 fi
 
 if [ "$OS" = "mac" ] ; then
-    export CXXFLAGS="-mmacosx-version-min=10.7 $CXXFLAGS"
-    export CFLAGS="-mmacosx-version-min=10.7 $CFLAGS"
-    export LDFLAGS="-mmacosx-version-min=10.7 $LDFLAGS"
+    export CXXFLAGS="-mmacosx-version-min=10.10 $CXXFLAGS"
+    export CFLAGS="-mmacosx-version-min=10.10 $CFLAGS"
+    export LDFLAGS="-mmacosx-version-min=10.10 $LDFLAGS"
 fi
 
 ##################################################################

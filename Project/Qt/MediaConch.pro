@@ -317,7 +317,7 @@ macx:contains(MACSTORE, yes|1) {
     QMAKE_CFLAGS += -gdwarf-2
     QMAKE_CXXFLAGS += -gdwarf-2
     QMAKE_INFO_PLIST = ../Mac/Info.plist
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
 } else:macx {
     QMAKE_INFO_PLIST = ../Mac/Info-ns.plist
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
