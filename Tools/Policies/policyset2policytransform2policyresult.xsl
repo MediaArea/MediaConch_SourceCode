@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" version="1.0" exclude-result-prefixes="aliasxsl">
   <xsl:param name="compare" as="xsl:string"/>
+  <xsl:param name="policy_verbosity" as="xsl:string"/>
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
   <xsl:template match="/">
     <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
@@ -10,6 +11,11 @@
           <aliasxsl:attribute name="version">
             <aliasxsl:text>0.3</aliasxsl:text>
           </aliasxsl:attribute>
+          <xsl:if test="string-length($policy_verbosity)>0">
+            <aliasxsl:attribute name="verbosity">
+              <aliasxsl:text><xsl:value-of select="$policy_verbosity"/></aliasxsl:text>
+            </aliasxsl:attribute>
+          </xsl:if>
           <aliasxsl:for-each select="ma:media">
             <media>
               <aliasxsl:attribute name="ref">
@@ -47,6 +53,7 @@
         <aliasxsl:param name="outcome"/>
         <aliasxsl:param name="actual"/>
         <aliasxsl:param name="compared_to"/>
+        <aliasxsl:param name="policy_verbosity"/>
         <rule>
           <aliasxsl:if test="../@type">
             <aliasxsl:attribute name="tracktype">
@@ -96,7 +103,7 @@
           <aliasxsl:attribute name="xpath">
             <aliasxsl:value-of select="$xpath"/>
           </aliasxsl:attribute>
-          <aliasxsl:if test="$outcome='fail' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
+          <aliasxsl:if test="$policy_verbosity>0 or $outcome='fail' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
             <aliasxsl:attribute name="actual">
               <aliasxsl:value-of select="$actual"/>
             </aliasxsl:attribute>
@@ -116,6 +123,7 @@
       <aliasxsl:template name="check">
         <aliasxsl:param name="name"/>
         <aliasxsl:param name="description"/>
+        <aliasxsl:param name="tags"/>
         <aliasxsl:param name="type"/>
         <aliasxsl:param name="context"/>
         <aliasxsl:param name="value"/>
@@ -149,7 +157,7 @@
           </aliasxsl:attribute>
           <aliasxsl:attribute name="outcome">
             <aliasxsl:choose>
-              <aliasxsl:when test="$type = 'or' and $pass_count &gt;= 1">pass</aliasxsl:when>
+              <aliasxsl:when test="$type = 'or' and $pass_count > '0'">pass</aliasxsl:when>
               <aliasxsl:when test="$type = 'and' and $fail_count = '0'">pass</aliasxsl:when>
               <aliasxsl:otherwise>fail</aliasxsl:otherwise>
             </aliasxsl:choose>
@@ -159,6 +167,7 @@
               <aliasxsl:value-of select="$description"/>
             </description>
           </aliasxsl:if>
+          <aliasxsl:copy-of select="$tags"/>
           <aliasxsl:copy-of select="$context"/>
           <aliasxsl:copy-of select="$ruleresults"/>
           <aliasxsl:copy-of select="$morepolicies"/>
@@ -181,6 +190,13 @@
         </aliasxsl:with-param>
         <aliasxsl:with-param name="description">
           <xsl:value-of select="description"/>
+        </aliasxsl:with-param>
+        <aliasxsl:with-param name="tags">
+          <xsl:for-each select="tag">
+            <xsl:call-template name="tag">
+              <xsl:with-param name="tag" select="."/>
+            </xsl:call-template>
+          </xsl:for-each>
         </aliasxsl:with-param>
         <aliasxsl:with-param name="type">
           <xsl:value-of select="@type"/>
@@ -341,6 +357,11 @@
           </xsl:attribute>
         </aliasxsl:with-param>
       </xsl:if>
+      <xsl:if test="string-length($policy_verbosity)>0">
+        <aliasxsl:with-param name="policy_verbosity">
+          <xsl:value-of select="$policy_verbosity"/>
+        </aliasxsl:with-param>
+      </xsl:if>
       <aliasxsl:with-param name="outcome">
         <aliasxsl:choose>
           <aliasxsl:when>
@@ -497,5 +518,9 @@
         </xsl:choose>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+  <xsl:template name="tag">
+    <xsl:param name="tag"/>
+    <tag xmlns="https://mediaarea.net/mediaconch"><xsl:value-of select="$tag"/></tag>
   </xsl:template>
 </xsl:stylesheet>
