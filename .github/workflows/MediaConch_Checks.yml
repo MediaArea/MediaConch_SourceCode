@@ -26,7 +26,19 @@ jobs:
             brew install automake libxslt sqlite jansson libevent qt sfk xmlstarlet ffmpeg
           fi
           sudo pip install git+https://github.com/vi/mkvparse.git
+      - name: Get ZenLib info
+        id: zenlib-info
+        run: |
+          echo "::set-output name=hash::$(git ls-remote https://github.com/MediaArea/ZenLib.git HEAD | cut -f1)"
+          echo "::set-output name=path::$(dirname $PWD)/ZenLib"
+      - name: ZenLib cache
+        id: zenlib-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.zenlib-info.outputs.path }}
+          key: ${{ runner.os }}-ZenLib-${{ steps.zenlib-info.outputs.hash }}
       - name: ZenLib
+        if: steps.zenlib-cache.outputs.cache-hit != 'true'
         run: |
           git -C .. clone --depth=1 https://github.com/MediaArea/ZenLib.git
           pushd ../ZenLib/Project/GNU/Library
@@ -34,7 +46,19 @@ jobs:
             ./configure --enable-static
             make
           popd
+      - name: Get MediaInfoLib info
+        id: mediainfolib-info
+        run: |
+          echo "::set-output name=hash::$(git ls-remote https://github.com/MediaArea/MediaInfoLib.git HEAD | cut -f1)"
+          echo "::set-output name=path::$(dirname $PWD)/MediaInfoLib"
+      - name: MediaInfoLib cache
+        id: mediainfolib-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.mediainfolib-info.outputs.path }}
+          key: ${{ runner.os }}-MediaInfoLib-${{ steps.mediainfolib-info.outputs.hash }}
       - name: MediaInfoLib
+        if: steps.mediainfolib-cache.outputs.cache-hit != 'true'
         run: |
           git -C .. clone --depth=1 https://github.com/MediaArea/MediaInfoLib.git
           pushd ../MediaInfoLib/Project/GNU/Library
