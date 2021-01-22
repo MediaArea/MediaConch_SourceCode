@@ -9,6 +9,8 @@ jobs:
         os: [ubuntu-latest, macos-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    env:
+      PYTHONPATH: /usr/local/lib/python2.7:/usr/local/lib/python2.7/dist-packages:/usr/local/lib/python2.7/site-packages
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,7 +27,7 @@ jobs:
           if [ "$RUNNER_OS" == "macOS" ]; then
             brew install automake libxslt sqlite jansson libevent qt sfk xmlstarlet ffmpeg
           fi
-          sudo pip install git+https://github.com/vi/mkvparse.git
+          sudo pip -vvv --disable-pip-version-check install --prefix /usr/local git+https://github.com/vi/mkvparse.git
       - name: Get ZenLib info
         id: zenlib-info
         run: |
