@@ -3,9 +3,11 @@
 %global libzen_version              0.4.37
 
 %if 0%{?fedora_version} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
+%global libmediaconch_name libmediaconch
 %global libmediainfo_name libmediainfo
 %global libzen_name libzen
 %else
+%global libmediaconch_name libmediaconch0
 %global libmediainfo_name libmediainfo0
 %global libzen_name libzen0
 %endif
@@ -22,6 +24,8 @@
 %else
 %global build_gui 0
 %endif
+
+%global build_lib 1
 
 Name:           mediaconch
 Version:        %{mediaconch_version}
@@ -91,6 +95,11 @@ BuildRequires: lib64openssl-devel
 BuildRequires: libopenssl-devel
 %endif
 %endif
+%endif
+
+# Lib dependencies
+%if 0%{?build_lib}
+BuildRequires:  python3-devel
 %endif
 
 # GUI dependencies
@@ -163,6 +172,40 @@ This package includes the server.
 %endif
 %endif # Server
 
+%if 0%{?build_lib}
+%package -n %{libmediaconch_name}
+Summary:    Implementation checker and policy checker for video and audio files (Library)
+Group:      System/Libraries
+Requires:   %{libzen_name}%{?_isa} >= %{libzen_version}
+Requires:   %{libmediainfo_name}%{?_isa} >= %{libmediainfo_version}
+
+%description -n %{libmediaconch_name}
+MediaConch is an implementation checker, policy checker, reporter,
+and fixer that targets preservation-level audiovisual files
+(specifically Matroska, Linear Pulse Code Modulation (LPCM)
+and FF Video Codec 1 (FFV1)).
+
+This project is maintained by MediaArea and funded by PREFORMA.
+
+This package includes the library.
+
+%package -n libmediaconch-devel
+Summary:    Implementation checker and policy checker for video and audio files (development files)
+Group:      Development/Libraries
+Requires:   %{libmediainfo_name}%{?_isa} = %{version}
+
+%description -n libmediaconch-devel
+MediaConch is an implementation checker, policy checker, reporter,
+and fixer that targets preservation-level audiovisual files
+(specifically Matroska, Linear Pulse Code Modulation (LPCM)
+and FF Video Codec 1 (FFV1)).
+
+This project is maintained by MediaArea and funded by PREFORMA.
+
+This package includes the library programming interface.
+
+%endif # Lib
+
 %if 0%{?build_gui}
 %package gui
 Summary:    Implementation checker and policy checker for video and audio files (GUI)
@@ -197,6 +240,12 @@ pushd Project/GNU/Server
     autoreconf -fiv
 popd
 %endif # Server
+
+%if 0%{?build_lib}
+pushd Project/GNU/Library
+    autoreconf -fiv
+popd
+%endif # Lib
 
 %if 0%{?build_gui}
 pushd Project/Qt
@@ -271,6 +320,18 @@ pushd Project/GNU/Server
 popd
 %endif #Server
 
+# build lib
+%if 0%{?build_lib}
+pushd Project/GNU/Library
+    %if 0%{?suse_version} && ! 0%{?is_opensuse}
+        %configure --without-jansson
+    %else
+        %configure
+    %endif
+    make %{?_smp_mflags}
+popd
+%endif #Lib
+
 # now build GUI
 %if 0%{?build_gui}
 pushd Project/Qt
@@ -289,6 +350,13 @@ pushd Project/GNU/Server
     make install DESTDIR=%{buildroot}
 popd
 %endif # Server
+
+%if 0%{?build_lib}
+pushd Project/GNU/Library
+    make install DESTDIR=%{buildroot}
+popd
+rm -f %{buildroot}%{_libdir}/libmediaconch.la
+%endif # Lib
 
 %if 0%{?build_gui}
 pushd Project/Qt
@@ -387,6 +455,18 @@ fi
 %{_unitdir}/mediaconchd.service
 %endif
 %endif # Server
+
+%if 0%{?build_lib}
+%files -n %{libmediaconch_name}
+%defattr(-,root,root,-)
+%{_libdir}/libmediaconch.so.*
+
+%files -n libmediaconch-devel
+%defattr(-,root,root,-)
+%{_includedir}/MediaConch
+%{_libdir}/pkgconfig/*.pc
+%{_libdir}/libmediaconch.so
+%endif # Library
 
 %if 0%{?build_gui}
 %files gui
