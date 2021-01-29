@@ -51,6 +51,7 @@
         <aliasxsl:param name="operator"/>
         <aliasxsl:param name="xpath"/>
         <aliasxsl:param name="outcome"/>
+        <aliasxsl:param name="requested"/>
         <aliasxsl:param name="actual"/>
         <aliasxsl:param name="compared_to"/>
         <aliasxsl:param name="policy_verbosity"/>
@@ -104,6 +105,11 @@
             <aliasxsl:value-of select="$xpath"/>
           </aliasxsl:attribute>
           <aliasxsl:if test="$policy_verbosity>0 or $outcome='fail' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
+            <aliasxsl:if test="$requested">
+              <aliasxsl:attribute name="requested">
+                <aliasxsl:value-of select="$requested"/>
+              </aliasxsl:attribute>
+            </aliasxsl:if>
             <aliasxsl:attribute name="actual">
               <aliasxsl:value-of select="$actual"/>
             </aliasxsl:attribute>
@@ -344,6 +350,9 @@
       </aliasxsl:with-param>
       <aliasxsl:with-param name="xpath">
         <xsl:value-of select="$equationfull"/>
+      </aliasxsl:with-param>
+      <aliasxsl:with-param name="requested">
+        <xsl:value-of select="."/>
       </aliasxsl:with-param>
       <aliasxsl:with-param name="actual">
         <xsl:attribute name="select">
