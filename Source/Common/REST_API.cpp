@@ -736,7 +736,14 @@ std::string RESTAPI::Policy_Change_Info_Req::to_str() const
     out << ",\"id\": " << id;
     out << ",\"name\":\"" << name;
     out << "\",\"description\":\"" << description;
-    out << "\",\"license\":\"" << license;
+    out << "\",\"tags\":[";
+    for (size_t i = 0; i < tags.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "\"" << tags[i] << "\"";
+    }
+    out << "],\"license\":\"" << license;
     out << "\"}";
     return out.str();
 }
@@ -2298,7 +2305,7 @@ int RESTAPI::serialize_policy_move_req(Policy_Move_Req& req, std::string& data, 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string& data, std::string& err)
 {
-    Container::Value v, child, name, description, license, user, id;
+    Container::Value v, child, name, description, tags, license, user, id;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -2309,6 +2316,19 @@ int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::
     description.type = Container::Value::CONTAINER_TYPE_STRING;
     description.s = req.description;
     child.obj["description"] = description;
+
+    if (req.tags.size())
+    {
+        tags.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < req.tags.size(); ++i)
+        {
+            Container::Value tag;
+            tag.type = Container::Value::CONTAINER_TYPE_STRING;
+            tag.s = req.tags[i];
+            tags.array.push_back(tag);
+        }
+        child.obj["tags"] = tags;
+    }
 
     if (req.license.size())
     {
@@ -4900,6 +4920,16 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std
     req->name = name->s;
     req->description = desc->s;
 
+    Container::Value *tags = model->get_value_by_key(*child, "tags");
+    if (tags && tags->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < tags->array.size(); ++i)
+        {
+            if (tags->array[i].type == Container::Value::CONTAINER_TYPE_STRING)
+                req->tags.push_back(tags->array[i].s);
+        }
+    }
+
     Container::Value *user = model->get_value_by_key(*child, "user");
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
@@ -6229,6 +6259,13 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const
                 continue;
 
             req->description = val;
+        }
+        else if (substr == "tags")
+        {
+            if (!val.length())
+                continue;
+
+            req->tags.push_back(val);
         }
         else if (substr == "license")
         {
@@ -9176,7 +9213,7 @@ Container::Value RESTAPI::serialize_checker_validate_ok(Checker_Validate_Ok* obj
 //---------------------------------------------------------------------------
 void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v, std::string& err)
 {
-    Container::Value id, parent_id, is_system, is_public, kind, type, name, description, license, children;
+    Container::Value id, parent_id, is_system, is_public, kind, type, name, description, tags, license, children;
 
     ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -9211,6 +9248,19 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
     description.type = Container::Value::CONTAINER_TYPE_STRING;
     description.s = policy->description;
     ok_v.obj["description"] = description;
+
+    if (policy->tags.size())
+    {
+        tags.type = Container::Value::CONTAINER_TYPE_ARRAY;
+        for (size_t i = 0; i < policy->tags.size(); ++i)
+        {
+            Container::Value v;
+            v.type = Container::Value::CONTAINER_TYPE_STRING;
+            v.s = policy->tags[i];
+            tags.array.push_back(v);
+        }
+        ok_v.obj["tags"] = tags;
+    }
 
     if (policy->license.size())
     {
@@ -9899,6 +9949,18 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy, 
     Container::Value *description = model->get_value_by_key(*policy, "description");
     if (description && description->type == Container::Value::CONTAINER_TYPE_STRING)
         ok->description = description->s;
+
+    Container::Value *tags = model->get_value_by_key(*policy, "tags");
+    if (tags && tags->type == Container::Value::CONTAINER_TYPE_ARRAY)
+    {
+        for (size_t i = 0; i < tags->array.size(); ++i)
+        {
+            if (tags->array[i].type != Container::Value::CONTAINER_TYPE_STRING)
+                continue;
+
+            ok->tags.push_back(tags->array[i].s);
+        }
+    }
 
     Container::Value *license = model->get_value_by_key(*policy, "license");
     if (license && license->type == Container::Value::CONTAINER_TYPE_STRING)

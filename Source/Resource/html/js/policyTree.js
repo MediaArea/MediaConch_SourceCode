@@ -483,6 +483,7 @@ var policyTree = (function() {
     var policyEdit = function(policy, selectedPolicy) {
         instance.rename_node(selectedPolicy, policy.text);
         selectedPolicy.data.description = policy.data.description;
+        selectedPolicy.data.tags = policy.data.tags;
         selectedPolicy.data.license = policy.data.license;
         selectedPolicy.data.type = policy.data.type;
         if (undefined !== policy.data.isPublic) {

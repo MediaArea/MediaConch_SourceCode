@@ -504,11 +504,11 @@ int MediaConchLib::policy_save(int user, int pos, std::string& err)
 
 //---------------------------------------------------------------------------
 int MediaConchLib::policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                                      const std::string& license, std::string& err)
+                                      const std::vector<std::string>& tags, const std::string& license, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_change_info(user, id, name, description, license, err);
-    return core->policies.policy_change_info(user, id, name, description, license, err);
+        return daemon_client->policy_change_info(user, id, name, description, tags, license, err);
+    return core->policies.policy_change_info(user, id, name, description, tags, license, err);
 }
 
 //---------------------------------------------------------------------------
@@ -701,7 +701,14 @@ std::string MediaConchLib::Policy_Policy::to_str() const
     out << "\",\"type\":\"" << type;
     out << "\",\"name\":\"" << name;
     out << "\",\"description\":\"" << description;
-    out << "\",\"license\":\"" << license;
+    out << "\",\"tags\":[";
+    for (size_t i = 0; i < tags.size(); ++i)
+    {
+        if (i)
+            out << ",";
+        out << "\"" << tags[i] << "\"";
+    }
+    out << "],\"license\":\"" << license;
     out << "\",\"children\":[";
     for (size_t i = 0; i < children.size(); ++i)
     {

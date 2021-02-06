@@ -8,6 +8,7 @@ var policyTreePolicies = (function() {
     var edit = function(node) {
         $('#xslPolicyInfo_policyName').val(getName(node));
         $('#xslPolicyInfo_policyDescription').val(node.data.description);
+        $('#xslPolicyInfo_policyTags').val(node.data.tags ? node.data.tags.join('\n') : '');
         $('#xslPolicyInfo_policyType option[value="' + node.data.type + '"]').prop('selected', true);
 
         if ('s' == node.type || ('u' == node.type && !node.data.isEditable) ) {
@@ -15,6 +16,7 @@ var policyTreePolicies = (function() {
             $('#policyRuleCreateContainer').addClass('hidden');
             $('#xslPolicyInfo_policyName').prop('disabled', true);
             $('#xslPolicyInfo_policyDescription').prop('disabled', true);
+            $('#xslPolicyInfo_policyTags').prop('disabled', true);
             $('#xslPolicyInfo_policyType').prop('disabled', true);
             $('#xslPolicyInfo_SavePolicyInfo').addClass('hidden');
             $('.policyEditActions.policyEditUser').addClass('hidden');
@@ -31,6 +33,7 @@ var policyTreePolicies = (function() {
             $('#policyRuleCreateContainer').removeClass('hidden');
             $('#xslPolicyInfo_policyName').prop('disabled', false);
             $('#xslPolicyInfo_policyDescription').prop('disabled', false);
+            $('#xslPolicyInfo_policyTags').prop('disabled', false);
             $('#xslPolicyInfo_policyType').prop('disabled', false);
             $('#xslPolicyInfo_SavePolicyInfo').removeClass('hidden');
             $('.policyEditActions.policyEditUser').removeClass('hidden');

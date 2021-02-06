@@ -956,7 +956,7 @@ int DaemonClient::policy_dump(int user, int id, bool must_be_public, std::string
 
 //---------------------------------------------------------------------------
 int DaemonClient::policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                                     const std::string& license, std::string& err)
+                                     const std::vector<std::string>& tags, const std::string& license, std::string& err)
 {
     RESTAPI::Policy_Change_Info_Req  req;
     RESTAPI::Policy_Change_Info_Res *res = NULL;
@@ -964,6 +964,7 @@ int DaemonClient::policy_change_info(int user, int id, const std::string& name, 
     req.id = id;
     req.name = name;
     req.description = description;
+    req.tags = tags;
     req.user = user;
     req.license = license;
 

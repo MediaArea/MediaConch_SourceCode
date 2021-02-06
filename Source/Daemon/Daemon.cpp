@@ -1315,7 +1315,7 @@ namespace MediaConch
         FUN_CMD_START(Policy_Change_Info)
 
         std::string err;
-        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, req->license, err) < 0)
+        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, req->tags, req->license, err) < 0)
             FUN_CMD_NOK(res, err, -1)
 
         FUN_CMD_END(Policy_Change_Info)
