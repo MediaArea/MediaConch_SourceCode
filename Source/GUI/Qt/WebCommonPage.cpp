@@ -1405,15 +1405,20 @@ namespace MediaConch
         return json;
     }
 
-    QString WebCommonPage::policy_edit(int id, const QString& name, const QString& description, const QString& license,
+    QString WebCommonPage::policy_edit(int id, const QString& name, const QString& description, const QStringList& tags, const QString& license,
                                        const QString& type, const QString&)
     {
         //return: error?
         QString json;
         QString err;
         int code;
+
+        std::vector<std::string> tgs;
+        for(int i = 0; i < tags.size(); ++i)
+            tgs.push_back(tags[i].toUtf8().data());
+
         if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(),
-                                                   license.toUtf8().data(), err)) < 0)
+                                                   tgs, license.toUtf8().data(), err)) < 0)
         {
             string_to_json(err);
             json = QString("{\"error\":\"%1\"}").arg(err);

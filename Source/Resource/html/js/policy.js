@@ -326,6 +326,13 @@ function policyEditHelp() {
         'Policy description'
     );
 
+    // Tags
+    addHelp(
+        'policyTags',
+        'Optional keywords (one entry per line) describing the policy and nested rules.',
+        'Policy tags'
+    );
+
     // Type
     addHelp(
         'policyType',

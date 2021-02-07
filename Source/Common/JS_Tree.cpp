@@ -724,6 +724,16 @@ int JsTree::policy_to_js_tree(MediaConchLib::Policy_Policy* policy, std::string&
     {
         ss << ",\"isEditable\":true";
         ss << ",\"description\":\"" << unified_json_value(policy->description) << "\"";
+        if (policy->tags.size())
+        {
+            ss << ",\"tags\":[";
+            for (size_t i = 0; i < policy->tags.size(); ++i)
+            {    if (i)
+                     ss << ",";
+                ss << "\"" << policy->tags[i] << "\"";
+            }
+            ss << "]";
+        }
         if (policy->parent_id == -1 && policy->is_public)
             ss << ",\"isPublic\":" << std::boolalpha << policy->is_public;
         if (policy->license.size())

@@ -186,6 +186,12 @@
           -->
         </policy>
       </aliasxsl:template>
+      <aliasxsl:template name="tag">
+        <aliasxsl:param name="name"/>
+        <tag>
+          <aliasxsl:value-of select="$name"/>
+        </tag>
+      </aliasxsl:template>
     </aliasxsl:stylesheet>
   </xsl:template>
   <xsl:template name="policycheck">
@@ -200,7 +206,7 @@
         <aliasxsl:with-param name="tags">
           <xsl:for-each select="tag">
             <xsl:call-template name="tag">
-              <xsl:with-param name="tag" select="."/>
+              <xsl:with-param name="name" select="."/>
             </xsl:call-template>
           </xsl:for-each>
         </aliasxsl:with-param>
@@ -529,7 +535,11 @@
     </xsl:choose>
   </xsl:template>
   <xsl:template name="tag">
-    <xsl:param name="tag"/>
-    <tag xmlns="https://mediaarea.net/mediaconch"><xsl:value-of select="$tag"/></tag>
+    <xsl:param name="name"/>
+    <aliasxsl:call-template name="tag">
+      <aliasxsl:with-param name="name">
+        <aliasxsl:text><xsl:value-of select="$name"/></aliasxsl:text>
+      </aliasxsl:with-param>
+    </aliasxsl:call-template>
   </xsl:template>
 </xsl:stylesheet>

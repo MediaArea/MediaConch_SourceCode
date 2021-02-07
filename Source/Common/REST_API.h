@@ -691,12 +691,13 @@ public:
     {
         Policy_Change_Info_Req() : user(-1), id(-1) {}
 
-        std::string  name;
-        std::string  description;
-        std::string  license;
-        int          user;
-        int          id;
-        std::string  to_str() const;
+        std::string              name;
+        std::string              description;
+        std::vector<std::string> tags;
+        std::string              license;
+        int                      user;
+        int                      id;
+        std::string              to_str() const;
     };
 
     struct Policy_Change_Info_Res

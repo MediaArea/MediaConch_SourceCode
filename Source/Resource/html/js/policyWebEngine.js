@@ -110,6 +110,10 @@ var policyTreeAjax = (function() {
         if (description === null)
             description = "";
 
+        var tags = []
+        if ($("#xslPolicyInfo_policyTags").val() !== null)
+            tags = $("#xslPolicyInfo_policyTags").val().split("\n");
+
         var type = $("#xslPolicyInfo_policyType").val();
         if (type === null)
             type = "";
@@ -122,7 +126,7 @@ var policyTreeAjax = (function() {
         if (visibility === null)
             visibility = "";
 
-        webpage.policy_edit(policyNode.data.policyId, name, description, license, type, visibility, function(res){
+        webpage.policy_edit(policyNode.data.policyId, name, description, tags, license, type, visibility, function(res){
             data = JSON.parse(res);
             if (!data.error)
                 policyTree.policyEdit(data.policyTree, policyNode);
