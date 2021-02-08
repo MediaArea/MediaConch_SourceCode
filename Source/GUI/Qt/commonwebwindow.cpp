@@ -40,7 +40,7 @@ void CommonWebWindow::display_html()
     create_html(html);
 
     QUrl url;
-#if QT_VERSION < 0x050700
+#if QT_VERSION < 0x050700 || defined(WEB_MACHINE_ENGINE)
     url = QUrl("qrc:/html"); //Without it, it works sometimes, depending of engine and version, so let it as before for Qt<5.7 as it is always working for Qt<5.7 and never for Qt>=5.7
     if (!url.isValid())
         return;
