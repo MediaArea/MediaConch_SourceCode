@@ -117,21 +117,14 @@ if [ "$KIND" = "GUI" ]; then
     echo Signing the application...
     echo
 
-    codesign --deep --options=runtime --force --verbose --sign "Developer ID Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
-    codesign --deep --options=runtime --force --verbose --sign "Developer ID Application: ${SIGNATURE}" -i "net.mediaarea.${APPNAME_lower}.mac-${KIND_lower}" "${FILES}/${APPNAME}.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app"
+    codesign --options=runtime --force --verbose --entitlements QtWebEngineProcess-ns.entitlements --sign "Developer ID Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
+    codesign --deep --options=runtime --force --verbose --preserve-metadata=identifier,entitlements --sign "Developer ID Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app"
 
-    for FRAMEWORK in $(ls "${FILES}/${APPNAME}.app/Contents/Frameworks" | grep framework | sed 's/\.framework//') ; do
-        codesign --deep --options=runtime --force --verbose --sign "3rd Party Mac Developer Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app/Contents/Frameworks/${FRAMEWORK}.framework/Versions/5/${FRAMEWORK}"
-    done
-
-    find "${FILES}/${APPNAME}.app/Contents/PlugIns" -name "*.dylib" -exec codesign --deep --options=runtime --force --verbose --sign "3rd Party Mac Developer Application: $SIGNATURE" '{}' \;
-
-    codesign --deep --options=runtime --deep --no-strict --force --verbose --sign "Developer ID Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app/Contents/MacOS/${APPNAME}"
     echo
     echo
     echo Verifying the signature...
     echo
-    codesign --deep --options=runtime --verify --deep --verbose=1 "${FILES}/${APPNAME}.app/Contents/MacOS/${APPNAME}"
+    codesign --verify --deep --verbose=1 "${FILES}/${APPNAME}.app/Contents/MacOS/${APPNAME}"
 
     echo
     echo
