@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:aliasxsl="my:namespace" version="1.0" exclude-result-prefixes="aliasxsl">
-  <xsl:param name="compare" as="xsl:string"/>
-  <xsl:param name="policy_verbosity" as="xsl:string"/>
+  <xsl:param name="compare"/>
+  <xsl:param name="policy_verbosity"/>
   <xsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
   <xsl:template match="/">
-    <aliasxsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" extension-element-prefixes="exsl xsi ma mc">
+    <aliasxsl:stylesheet xmlns="https://mediaarea.net/mediaconch" xmlns:mc="https://mediaarea.net/mediaconch" xmlns:ma="https://mediaarea.net/mediaarea" xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exsl="http://exslt.org/common" version="1.0" exclude-result-prefixes="ma mc xsi exsl">
       <aliasxsl:output encoding="UTF-8" method="xml" version="1.0" indent="yes"/>
       <aliasxsl:template match="ma:MediaArea">
-        <MediaConch>
+        <MediaConch xmlns:mmt="https://mediaarea.net/micromediatrace" xmlns:mi="https://mediaarea.net/mediainfo">
           <aliasxsl:attribute name="version">
             <aliasxsl:text>0.3</aliasxsl:text>
           </aliasxsl:attribute>

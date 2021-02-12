@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>MediaConch policy-checker JavaScript test page</title>
+        <style>
+            body {
+                background-color: #ffffff;
+                color: #212121;
+                margin: 10px 50px;
+            }
+
+            h3 {
+                text-transform: uppercase;
+                color: #757575;
+            }
+
+            hr {
+                color: #e0e0e0;
+            }
+
+            .policy-container {
+                display: inline-block;
+                padding: 5px 5px;
+                margin: 10px 10px;
+                width: 250px;
+                background-color: #eceff1;
+            }
+
+            .policy-text {
+                display: inline;
+                float: left;
+                width: 225px;
+
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .close {
+                display: inline;
+                margin-left: 5px;
+                float: right;
+                opacity: 0.3;
+                cursor:pointer;
+            }
+
+            .close:hover {
+                opacity: 1;
+            }
+
+
+            .error-text {
+                color: #bf360c;
+            }
+
+            .option {
+                margin: 10px 10px;
+            }
+
+            .label {
+                margin-left: 10px;
+                margin-right: 10px;
+                font-weight: bold;
+                white-space: nowrap;
+                vertical-align: middle;
+            }
+
+            select {
+                width: 200px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h3>Checker</h3>
+            <div id="options-error" class="error-text"></div>
+            <span style="vertical-align: middle;" class="option">
+                <span class="label">Policy</span>
+                <select id="policy-list">
+                    <option value=""></option>
+                    <option value="Sample1">Is this NTSC or PAL SD?</option>
+                    <option value="Sample4">Example MKV FFV1 digitization policy</option>
+                    <option value="Sample6">CAVPP Preservation Master</option>
+                    <option value="Sample7">Memoriav Video files Recommendations</option>
+                    <option disabled>────────────</option>
+                    <option value="load">Add...</option>
+                </select>
+                <input style="display: none;" type="file" id="policy-input" />
+            </span>
+            <span class="option">
+                <span class="label">Display</span>
+                <select style="vertical-align: middle;" id="display-list">
+                    <option value="">MediaConch XML</option>
+                    <option value="CSV">MediaConch CSV</option>
+                    <option value="Html">MediaConch HTML</option>
+                    <option value="TextUnicode">MediaConch Text</option>
+                    <option value="Simple">MediaConch Simple</option>
+                    <option disabled>────────────</option>
+                    <option value="load">Add...</option>
+                </select>
+                <input style="display: none;" type="file" id="display-input" />
+            </span>
+            <span class="option">
+                <span class="label">Verbose XML:</span>
+                <input style="vertical-align: middle;" type="checkbox" id="verbosity-checkbox" />
+            </span>
+            <span class="option">
+                <button style="vertical-align: middle;" onclick="document.getElementById('file-input').click();">Check file...</button>
+                <input style="display: none;" type="file" id="file-input" />
+            </span>
+            <div id="active-policies"></div>
+        </div>
+        <div>
+        <h3>Result</h3>
+            <div id="result"></div>
+        </div>
+        <script type="text/javascript">
+            // Check browser
+            try {
+                new DOMParser();
+                new XMLSerializer();
+                new XSLTProcessor();
+            }
+            catch(e) {
+                const userAgent = window.navigator.userAgent;
+                document.getElementsByTagName('body')[0].innerHTML = '<div class="error-text">Unable to initialize mediaconch-policy-checker: Unsupported browser (' + userAgent + ')</div>';
+                throw new Error('Unsupported browser.');
+            }
+        </script>
+        <script type="text/javascript">
+            // Backup body
+            const bodyBackup = document.getElementsByTagName('body')[0].innerHTML;
+
+            // Show loading
+            document.getElementsByTagName('body')[0].innerText = 'Loading mediaconch-policy-checker...';
+
+            // MediaInfo JS
+            const MediaInfoJs = document.createElement('script');
+            if ('WebAssembly' in window) {
+              MediaInfoJs.src = "MediaInfoWasm.js";
+            } else {
+              MediaInfoJs.src = "MediaInfo.js";
+            }
+            document.body.appendChild(MediaInfoJs);
+
+            // Continue initialization
+            MediaInfoJs.onload = function() {
+                //Load MediaConch JS
+                const MediaConchJs = document.createElement('script');
+                MediaConchJs.src = 'MediaConch.js';
+                document.body.appendChild(MediaConchJs);
+
+                // Continue initialization
+                MediaConchJs.onload = function() {
+                    // Restore bodyBackup
+                    document.getElementsByTagName('body')[0].innerHTML = bodyBackup;
+
+                    const checker = new MediaConchPolicyChecker();
+                    checker.init().then(function(object) {
+                        // Show report
+                        const showReport = function(report) {
+                            try {
+                                const test = new DOMParser().parseFromString(report, 'text/html');
+                                if (test.doctype.name === 'html') {
+                                    document.getElementById('result').innerHTML = report;
+                                }
+                                else {
+                                    throw new Error();
+                                }
+                            }
+                            catch(e) {
+                                document.getElementById('result').innerHTML = '<pre></pre>';
+                                document.getElementById('result').children[0].innerText = report;
+                            }
+                        };
+
+                        // Report an error while creating report
+                        const reportError = function(error) {
+                            document.getElementById('result').innerHTML = `<div class="error-text">Error while creating checker report: ${error.message}</div>`;
+                        };
+
+                        //Show error
+                        const showError = function(message) {
+                            const div = document.createElement('div');
+                            div.className = 'error-text';
+                            div.innerText = message;
+                            document.getElementById('options-error').appendChild(div);
+                            setTimeout(function() {
+                                div.remove();
+                            }, 5000);
+                        };
+
+                        // List active policies
+                        const listActivePolicies = function() {
+                            var policies = '';
+                            checker.listPolicies().forEach(function(policy) {
+                                policies += `
+                                    <span id="policy-${policy.id}" class="policy-container">
+                                        <span class="policy-text">${policy.name}</span>
+                                            <span class="close" onclick="removePolicy(${policy.id});">&#xd7;</span>
+                                    </span>
+                                `;
+                            });
+                            document.getElementById('active-policies').innerHTML = policies;
+                        };
+
+                        // Add policy
+                        const addPolicy = function(policy) {
+                            const id = checker.addPolicy(policy);
+                            if (id !== null) {
+                                listActivePolicies();
+                                if (fileInput.files.length > 0) {
+                                    document.getElementById('result').innerText = 'Proccessing...';
+                                    checker.getReport().then(showReport).catch(reportError);
+                                }
+                            }
+                            else {
+                                // Show error
+                            }
+                            policyList.value = '';
+                        };
+
+                        // Remove policy
+                        const removePolicy = function(id) {
+                            if (checker.removePolicy(id) === id) {
+                                listActivePolicies();
+                                if (fileInput.files.length > 0) {
+                                    document.getElementById('result').innerText = 'Proccessing...';
+                                    checker.getReport().then(showReport).catch(reportError);
+                                }
+                            }
+                        };
+                        window.removePolicy = removePolicy;
+
+                        // Policy list
+                        const policyList = document.getElementById('policy-list');
+                        policyList.onchange = function() {
+                            const value = policyList.value;
+                            if (value. startsWith('Sample')) {
+                                // Need loading
+                                const xhr = new XMLHttpRequest();
+                                xhr.responseType = 'text';
+                                xhr.onload = function() {
+                                    if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
+                                        policyList[policyList.selectedIndex].attributes['value'].value = xhr.response;
+                                        addPolicy(xhr.response)
+                                    }
+                                    else {
+                                        showError('Unable to import policy.');
+                                    }
+                                };
+                                xhr.onerror = function() {
+                                    showError('Unable to import policy.');
+                                };
+                                xhr.open('GET', `./xml/Policy${value}.xml`);
+                                xhr.send();
+                            }
+                            else if (value === 'load') {
+                                document.getElementById('policy-input').click();
+                            }
+                            else {
+                                addPolicy(value);
+                            }
+                        };
+
+                        // Custom policy
+                        const policyInput = document.getElementById('policy-input');
+                        policyInput.onchange = function() {
+                            if (policyInput.files.length > 0) {
+                                const file = policyInput.files[0];
+                                const reader = new FileReader();
+                                reader.onload = function() {
+                                    try {
+                                        const dom = new DOMParser().parseFromString(reader.result, 'application/xml');
+                                        var name = '';
+                                        if (dom.documentElement.attributes.hasOwnProperty('name'))
+                                            name = dom.documentElement.attributes['name'].value;
+
+                                        const item = new Option(name, reader.result);
+
+                                        if (checker.addPolicy(reader.result) !== null) {
+                                            policyList.add(item, policyList[policyList.length - 1]);
+                                            listActivePolicies();
+                                            if (fileInput.files.length > 0) {
+                                                document.getElementById('result').innerText = 'Proccessing...';
+                                                checker.getReport().then(showReport).catch(reportError);
+                                            }
+                                        }
+                                        else {
+                                            showError('Unable to import policy.');
+                                        }
+                                    }
+                                    catch(e) {
+                                        showError('Unable to import policy.');
+                                    }
+                                };
+                                reader.readAsText(file);
+                            }
+                            policyList.value = '';
+                        };
+
+                        // Activate default sample policy
+                        const activateSamplePolicy = function() {
+                            const xhr = new XMLHttpRequest();
+                            xhr.responseType = 'text';
+                            xhr.onload = function() {
+                                if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
+                                    addPolicy(xhr.response)
+                                }
+                            };
+                            xhr.open('GET', `./xml/PolicySample1.xml`);
+                            xhr.send();
+                        };
+
+                        // Set display
+                        const setDisplay = function(display) {
+                            try {
+                                checker.setDisplay(display);
+                                if (fileInput.files.length > 0) {
+                                    document.getElementById('result').innerText = 'Proccessing...';
+                                    checker.getReport().then(showReport).catch(reportError);
+                                }
+                            }
+                            catch(e) {
+                                checker.setDisplay('');
+                                displayList.value = '';
+                                showError('Unable to import display.');
+                            }
+                        };
+
+                        // Displays list
+                        const displayList = document.getElementById('display-list');
+                        displayList.onchange = function() {
+                            const value = displayList.value;
+                            if (value === 'CSV' || value === 'Html' || value === 'TextUnicode' || value === 'Simple') {
+                                // Need loading
+                                const xhr = new XMLHttpRequest();
+                                xhr.responseType = 'text';
+                                xhr.onload = function() {
+                                    if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
+                                        displayList[displayList.selectedIndex].attributes['value'].value = xhr.response;
+                                        setDisplay(xhr.response);
+                                    }
+                                    else {
+                                        showError('Unable to import display.');
+                                    }
+                                };
+                                xhr.onerror = function() {
+                                    showError('Unable to import display.');
+                                };
+                                xhr.open('GET', `./xml/MediaConch${value}.xsl`);
+                                xhr.send();
+                            }
+                            else if (value === 'load') {
+                                document.getElementById('display-input').click();
+                            }
+                            else {
+                                setDisplay(value);
+                            }
+                        };
+
+                        // Custom display
+                        const displayInput = document.getElementById('display-input');
+                        displayInput.onchange = function() {
+                            if (displayInput.files.length > 0) {
+                                const file = displayInput.files[0];
+                                const reader = new FileReader();
+                                reader.onload = function() {
+                                    const item = new Option(file.name, reader.result, false, true);
+                                    
+                                    try {
+                                        checker.setDisplay(reader.result);
+                                        displayList.add(item, displayList[displayList.length - 1]);
+                                        displayList.value = item.value;
+                                        if (fileInput.files.length > 0) {
+                                            document.getElementById('result').innerText = 'Proccessing...';
+                                            checker.getReport().then(showReport).catch(reportError);
+                                        }
+                                    }
+                                    catch(e) {
+                                        checker.setDisplay('');
+                                        displayList.value = '';
+                                        showError('Unable to import display.');
+                                    }
+                                };
+                                reader.readAsText(file);
+                            }
+                        };
+
+                        // Verbosity checkbox
+                        const verbosityCheckbox = document.getElementById('verbosity-checkbox');
+                        verbosityCheckbox.onchange = function() {
+                            checker.setVerbosity(verbosityCheckbox.checked ? 1 : 0);
+                            if (fileInput.files.length > 0) {
+                                document.getElementById('result').innerText = 'Proccessing...';
+                                checker.getReport().then(showReport).catch(reportError);
+                            }
+                        };
+
+                        // File input
+                        const fileInput = document.getElementById('file-input');
+                        fileInput.onchange = function() {
+                            if (fileInput.files.length > 0) {
+                                document.getElementById('result').innerText = 'Proccessing...';
+                                checker.checkFile(fileInput.files[0]).then(function() {
+                                    checker.getReport().then(showReport).catch(reportError);
+                                }).catch(reportError);
+                            }
+                        };
+
+                        activateSamplePolicy();
+                    }).catch(function(e) {
+                        document.getElementsByTagName('body')[0].innerHTML = `<div class="error-text">Unable to initialize mediaconch-policy-checker: ${e.message}</div>`;
+                    });
+                };
+            };
+        </script>
+    </body>
+</html>
