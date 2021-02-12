@@ -133,7 +133,6 @@
 
                         mediainfo.Close();
                         resolve(report);
-                        console.dir(report)
                     });
                 }
                 catch(e) {
