@@ -74,7 +74,15 @@
                             return dataPath + '/' + path;
                         },
                         'postRun': function() {
-                            resolve();
+                            if (mediainfoModule instanceof Promise) {
+                                mediainfoModule.then(function(module) {
+                                    mediainfoModule = module;
+                                    resolve();
+                                });
+                            }
+                            else {
+                                resolve();
+                            }
                         }
                     });
                 }
