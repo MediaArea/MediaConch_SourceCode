@@ -105,6 +105,10 @@ public:
                          MediaConchLib::Checker_ReportRes *result, std::string& error,
                          const std::vector<size_t>* policies_ids = NULL,
                          const std::vector<std::string>* policies_contents = NULL);
+    int   check_policies_xmls(int user, const std::vector<long>& files,
+                               const std::map<std::string, std::string>& options,
+                               const std::vector<std::string>& policies,
+                               std::stringstream& Out, bool& valid, std::string& err);
     int   check_policies_xslts(int user, const std::vector<long>& files,
                                const std::map<std::string, std::string>& options,
                                const std::vector<std::string>& policies,

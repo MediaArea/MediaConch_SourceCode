@@ -182,6 +182,8 @@ int Help_Advanced()
     TEXTOUT("");
     TEXTOUT("--Force");
     TEXTOUT("    Force to parse the file if registered in database");
+    TEXTOUT("--Full");
+    TEXTOUT("    Full MediaInfo report (needed by some policies)");
     TEXTOUT("--NoMilAnalyze, -nmil");
     TEXTOUT("    Do not analyze with MediaInfoLib");
     TEXTOUT("--Async=yes, -as");

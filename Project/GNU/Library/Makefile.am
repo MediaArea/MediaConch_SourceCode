@@ -36,7 +36,9 @@ lib@MediaConchLib_LibName@_la_SOURCES = \
     ../../../Source/Common/PluginPreHook.cpp \
     ../../../Source/Common/PluginFileLog.cpp \
     ../../../Source/Common/WatchFoldersManager.cpp \
-    ../../../Source/Common/WatchFolder.cpp
+    ../../../Source/Common/WatchFolder.cpp \
+    ../../../Source/Checker/Checker.cpp \
+    ../../../Source/ThirdParty/tfsxml/tfsxml.c
 
 #lib@MediaConchLib_LibName@includedir = $(includedir)/MediaConch
 #lib@MediaConchLib_LibName@include_HEADERS = \
