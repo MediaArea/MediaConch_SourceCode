@@ -943,36 +943,47 @@ int Policies::create_xslt_policy_from_file(int user, long file_id, std::string& 
 }
 
 int Policies::policy_get_policy_id(Policy* p, const std::map<std::string, std::string>& opts,
-                                   std::vector<std::string>& xslt_policies, std::string& err)
+                                   std::vector<std::string>& xml_policies, std::vector<std::string>& xslt_policies, std::string& err)
 {
     if (!p)
         return -1;
 
-    std::string policy;
     if (p->type == POLICY_XSLT)
     {
-        if (((XsltPolicy*)p)->get_final_xslt(policy, opts) < 0)
+        std::string xslt_policy;
+        if (((XsltPolicy*)p)->get_final_xslt(xslt_policy, opts) < 0)
         {
             err = "Policy cannot be dumped";
             return -1;
         }
+        xslt_policies.push_back(xslt_policy);
+
+        std::string xml_policy;
+        if (p->dump_schema(xml_policy) < 0)
+        {
+            err = "Policy cannot be dump";
+            return -1;
+        }
+        xml_policies.push_back(xml_policy);
+
     }
     else
     {
+        std::string policy;
         if (p->dump_schema(policy) < 0)
         {
             err = "Policy cannot be dump";
             return -1;
         }
+        xml_policies.push_back(policy);
+        xslt_policies.push_back(policy);
     }
-
-    xslt_policies.push_back(policy);
 
     return 0;
 }
 
 int Policies::policy_get_policy_content(const std::string& policy, const std::map<std::string, std::string>& opts,
-                                        std::vector<std::string>& xslt_policies, std::string& err)
+                                        std::vector<std::string>& xml_policies, std::vector<std::string>& xslt_policies, std::string& err)
 {
     int ret = -1;
     Policy *p = new XsltPolicy(this, !core->accepts_https());
@@ -993,15 +1004,14 @@ int Policies::policy_get_policy_content(const std::string& policy, const std::ma
         }
     }
 
-    ret = policy_get_policy_id(p, opts, xslt_policies, err);
+    ret = policy_get_policy_id(p, opts, xml_policies, xslt_policies, err);
     delete p;
     return ret;
 }
 
 int Policies::policy_get_policies(int user, const std::vector<size_t>* policies_ids,
-                                  const std::vector<std::string>* policies_contents,
-                                  const std::map<std::string, std::string>& opts,
-                                  std::vector<std::string>& xslt_policies, std::string& err)
+                                  const std::vector<std::string>* policies_contents, const std::map<std::string, std::string>& opts,
+                                  std::vector<std::string>& xml_policies, std::vector<std::string>& xslt_policies, std::string& err)
 {
     if (!policies_ids && !policies_contents)
     {
@@ -1012,14 +1022,14 @@ int Policies::policy_get_policies(int user, const std::vector<size_t>* policies_
     if (policies_ids)
     {
         for (size_t i = 0; i < policies_ids->size(); ++i)
-            if (policy_get_policy_id(get_policy(user, policies_ids->at(i), err), opts, xslt_policies, err) < 0)
+            if (policy_get_policy_id(get_policy(user, policies_ids->at(i), err), opts, xml_policies, xslt_policies, err) < 0)
                 return -1;
     }
 
     if (policies_contents)
     {
         for (size_t i = 0; i < policies_contents->size(); ++i)
-            if (policy_get_policy_content(policies_contents->at(i), opts, xslt_policies, err) < 0)
+            if (policy_get_policy_content(policies_contents->at(i), opts, xml_policies, xslt_policies, err) < 0)
                 return -1;
     }
 

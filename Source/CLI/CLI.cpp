@@ -407,6 +407,9 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
         if (policy_verbosity.size())
             cr.options["policy_verbosity"] = policy_verbosity;
 
+        if (full_report)
+            cr.options["full_report"] = "1";
+
         //Output
         cr.user = use_as_user;
         cr.report_set = report_set;
@@ -778,6 +781,12 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
     void CLI::set_policy_verbosity(const std::string& verbosity)
     {
         policy_verbosity = verbosity;
+    }
+
+    //--------------------------------------------------------------------------
+    void CLI::set_full_report(bool full)
+    {
+        full_report = full;
     }
 
     //--------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 
 //---------------------------------------------------------------------------
 #include <sstream>
+#include <algorithm>
 #include <ZenLib/Dir.h>
 #include <ZenLib/File.h>
 #include <ZenLib/Ztring.h>
@@ -31,6 +32,8 @@
 #include "Common/generated/MediaTraceDisplayTextXsl.h"
 #include "Common/generated/MediaTraceDisplayHtmlXsl.h"
 #include "Common/generated/MicroMediaTraceToMediaTraceXsl.h"
+
+#include "Checker/Checker.h"
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
@@ -737,9 +740,20 @@ int Reports::create_report_ma_xml(int user, const std::vector<long>& files,
             if (core->get_report_saved(user, vec, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml, "", info, err) < 0)
                 return -1;
 
-            get_content_of_media_in_xml(info);
             if (info.length())
+            {
+                 std::map<std::string,std::string>::const_iterator it = options.find("full_report");
+                if (it != options.end() && it->second == "\"1\"")
+                {
+                    std::vector<std::pair<std::string,std::string> > mi_options;
+                    mi_options.push_back(std::make_pair(std::string("Complete"), std::string("1")));
+                    mi_options.push_back(std::make_pair(std::string("Language"), std::string("raw")));
+                    if(core->transform_mixml_report(info, "MIXML", mi_options, info, err) < 0)
+                        return -1;
+                }
+                get_content_of_media_in_xml(info);
                 report += "<MediaInfo xmlns=\"http" + (AcceptsHttps ? "s" : std::string()) + "://mediaarea.net/mediainfo\" version=\"2.0beta1\">" + info + "</MediaInfo>\n";
+            }
         }
 
         if (reports[MediaConchLib::report_MediaTrace])
@@ -985,16 +999,65 @@ int Reports::check_policies(int user, const std::vector<long>& files,
 
     unify_policy_options(user, options, err);
 
-    std::vector<std::string> policies;
-    if (core->policies.policy_get_policies(user, policies_ids, policies_contents, options, policies, err) < 0)
+    std::vector<std::string> xml_policies;
+    std::vector<std::string> xslt_policies;
+    if (core->policies.policy_get_policies(user, policies_ids, policies_contents, options, xml_policies, xslt_policies, err) < 0)
         return -1;
 
     std::stringstream Out;
     result->has_valid = true;
-    if (check_policies_xslts(user, files, options, policies, Out, result->valid, err) < 0)
-        return -1;
+    if (check_policies_xmls(user, files, options, xml_policies, Out, result->valid, err) < 0)
+    {
+        if (check_policies_xslts(user, files, options, xslt_policies, Out, result->valid, err) < 0)
+            return -1;
+    }
 
     result->report = Out.str();
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Reports::check_policies_xmls(int user, const std::vector<long>& files,
+                                   const std::map<std::string, std::string>& options,
+                                   const std::vector<std::string>& policies,
+                                   std::stringstream& Out, bool& valid, std::string& err)
+{
+    std::map<std::string,std::string> opts=options;
+    valid = true;
+
+    bool verbose = false;
+    if (opts.find("policy_verbosity") != opts.end() && opts["policy_verbosity"].length() && opts["policy_verbosity"] != "\"0\"")
+        verbose = true;
+
+    PolicyChecker checker;
+    for (size_t i = 0; i < policies.size(); ++i)
+        checker.add_policy(policies[i]);
+
+    if (checker.full_parse())
+        opts["full_report"] = "\"1\"";
+    else
+        return -1;
+
+    std::string report;
+    if (create_report_ma_xml(user, files, opts, report, get_bitset_with_mi_mmt(), err) < 0)
+    {
+        valid = false;
+        return 0;
+    }
+
+    std::string tmp;
+    if (checker.analyze(report, verbose, tmp) < 0)
+    {
+        valid = false;
+        Out << tmp;
+    }
+    else
+    {
+        Out << tmp;
+        if (!policy_is_valid(tmp))
+            valid = false;
+    }
+
     return 0;
 }
 
@@ -1142,6 +1205,8 @@ int Reports::validate_xslt_from_memory(int user, const std::vector<long>& files,
         unify_implementation_options(options);
         S->set_options(options);
     }
+    else
+        S->set_options(opts);
 
     int ret = 0;
     if (S->register_schema_from_memory(memory))
@@ -1277,6 +1342,18 @@ void Reports::unify_policy_options(int user, std::map<std::string, std::string>&
 
         opts["compare"] = "\"" + path + "\"";
     }
+
+    if (opts.find("verbosity") != opts.end() && opts["verbosity"].length() && opts["verbosity"] != "-1")
+    {
+        std::string& verbosity = opts["verbosity"];
+        if (verbosity[0] == '"')
+            verbosity = std::string("'") + verbosity + std::string("'");
+        else
+            verbosity = std::string("\"") + verbosity + std::string("\"");
+    }
+    else
+        opts["verbosity"] = "\"5\"";
+
     if (opts.find("policy_verbosity") != opts.end() && opts["policy_verbosity"].length() && opts["policy_verbosity"] != "-1")
     {
         std::string& verbosity = opts["policy_verbosity"];
@@ -1287,6 +1364,12 @@ void Reports::unify_policy_options(int user, std::map<std::string, std::string>&
     }
     else
         opts["policy_verbosity"] = "\"0\"";
+
+    if (opts.find("full_report") != opts.end() && opts["full_report"].length() && opts["full_report"] != "-1" &&  opts["full_report"] != "0")
+        opts["full_report"] = "\"1\"";
+    else
+        opts["full_report"] = "\"0\"";
+
 }
 
 }

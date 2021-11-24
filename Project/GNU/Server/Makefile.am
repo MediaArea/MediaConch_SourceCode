@@ -38,7 +38,9 @@ mediaconchd_SOURCES = \
     ../../../Source/Common/PluginPreHook.cpp \
     ../../../Source/Common/PluginFileLog.cpp \
     ../../../Source/Common/WatchFoldersManager.cpp \
-    ../../../Source/Common/WatchFolder.cpp
+    ../../../Source/Common/WatchFolder.cpp \
+    ../../../Source/Checker/Checker.cpp \
+    ../../../Source/ThirdParty/tfsxml/tfsxml.c
 
 #mediaconchd_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconchd_CPPFLAGS = $(XML_CFLAGS)

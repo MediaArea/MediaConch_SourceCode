@@ -203,6 +203,7 @@
     <ClCompile Include="..\..\..\Source\Common\WatchFoldersManager.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
+    <ClCompile Include="..\..\..\Source\Checker\Checker.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\commonwebwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp" />
@@ -225,6 +226,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\workerfiles.cpp" />
+    <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.c" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
     <ClCompile Include="_Automated\moc_commonwebwindow.cpp" />
     <ClCompile Include="_Automated\moc_helpwindow.cpp" />
@@ -305,6 +307,7 @@
     <ClInclude Include="..\..\..\Source\Common\WatchFoldersManager.h" />
     <ClInclude Include="..\..\..\Source\Common\Xslt.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
+    <ClInclude Include="..\..\..\Source\Checker\Checker.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\commonwebwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\DatabaseUi.h" />
@@ -325,6 +328,7 @@
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\workerfiles.h" />
+    <ClInclude Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
     <ClInclude Include="_Automated\ui_groupofrules.h" />
     <ClInclude Include="_Automated\ui_mainwindow.h" />

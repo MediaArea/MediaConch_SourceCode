@@ -24,6 +24,8 @@
         madiainfoReport = null;
         mediainfoModule = null;
         mediainfoVersion = '';
+        // PolicyChecker
+        checkerModule = null;
 
         if (config) {
             if (config.dataPath) {
@@ -92,6 +94,33 @@
             });
         };
 
+        // Promisified MediaInfo PolicyChecker
+        loadPolicyCheckerModule = function() {
+            return new Promise(function(resolve, reject) {
+                try {
+                    checkerModule = PolicyChecker({
+                        'locateFile': function(path) {
+                            return dataPath + '/' + path;
+                        },
+                        'postRun': function() {
+                            if (checkerModule instanceof Promise) {
+                                checkerModule.then(function(module) {
+                                    checkerModule = module;
+                                    resolve();
+                                });
+                            }
+                            else {
+                                resolve();
+                            }
+                        }
+                    });
+                }
+                catch(e) {
+                    reject(new Error('Unable to load PolicyChecker module'));
+                }
+            });
+        };
+
         // Generate mediainfo reports in suitable format for mediaconch
         createMediaInfoReport = function(file) {
             return new Promise(function(resolve, reject) {
@@ -117,7 +146,6 @@
                         mediainfo.Option('Details', '0');
                         mediainfo.Option('Inform', 'MIXML');
                         const miTemp = mediainfo.Inform();
-
                         const miNode = report.documentElement
                                              .getElementsByTagName('MediaInfo')[0];
 
@@ -165,17 +193,16 @@
                     policyXsltProc.importStylesheet(policyTransformXmlXsl);
 
                     const xmlSerializer = new XMLSerializer();
+                    const parser = new DOMParser();
+
+                    const checker = new checkerModule.PolicyChecker();
                     policies.forEach(function(policy) {
-                        if (toReturn.length > 0) {
-                            toReturn += '\n\n';
-                        }
+                        checker.add_policy(xmlSerializer.serializeToString(policy.xml));
+                    });
 
-                        let policyXsl = policyXsltProc.transformToDocument(policy.xml);
-                        policyXsl = updatePrefixInPolicy(policyXsl);
-
-                        let reportXsltProc = new XSLTProcessor();
-                        reportXsltProc.importStylesheet(policyXsl);
-                        var report = reportXsltProc.transformToDocument(mediainfoReport);
+                    if(checker.full_parse()) {
+                        const temp = checker.analyze(xmlSerializer.serializeToString(mediainfoReport), verbosity);
+                        var report = parser.parseFromString(temp, 'application/xml');
 
                         if (report.documentElement.getElementsByTagName('policy')[0] === null ||
                             report.documentElement.getElementsByTagName('policy')[0].attributes.hasOwnProperty('outcome') === false ||
@@ -205,17 +232,68 @@
                             else { // Pretty-print xml
                                 let xml = xmlSerializer.serializeToString(report);
                                 xml = prettifyXml(xml);
-
                                 toReturn += xml;
                             }
                         }
                         else { // Pretty-print xml
                             let xml = xmlSerializer.serializeToString(report);
                             xml = prettifyXml(xml);
-
                             toReturn += xml;
                         }
-                    });
+                    }
+                    else {
+                        policies.forEach(function(policy) {
+                            if (toReturn.length > 0) {
+                                toReturn += '\n\n';
+                            }
+
+                            let policyXsl = policyXsltProc.transformToDocument(policy.xml);
+                            policyXsl = updatePrefixInPolicy(policyXsl);
+
+                            let reportXsltProc = new XSLTProcessor();
+                            reportXsltProc.importStylesheet(policyXsl);
+                            var report = reportXsltProc.transformToDocument(mediainfoReport);
+
+                            if (report.documentElement.getElementsByTagName('policy')[0] === null ||
+                                report.documentElement.getElementsByTagName('policy')[0].attributes.hasOwnProperty('outcome') === false ||
+                                report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value !== 'pass') {
+                                outcome = false;
+                            }
+
+                            if (displayXsl !== null) {
+                                let displayXsltProc = new XSLTProcessor();
+                                displayXsltProc.importStylesheet(displayXsl);
+                                report = displayXsltProc.transformToDocument(report);
+
+                                // Unpack report
+                                if (displayXsl.documentElement.nodeName === 'xsl:stylesheet' &&
+                                    displayXsl.documentElement.getElementsByTagName('xsl:output')[0] &&
+                                    displayXsl.documentElement.getElementsByTagName('xsl:output')[0].attributes.hasOwnProperty('method') &&
+                                    displayXsl.documentElement.getElementsByTagName('xsl:output')[0].attributes['method'].value === 'text') {
+                                    if (report.documentElement.nodeName === 'html' &&
+                                        report.documentElement.getElementsByTagName('body')[0] &&
+                                        report.documentElement.getElementsByTagName('body')[0].getElementsByTagName('pre')[0]) {
+                                        toReturn += report.documentElement.getElementsByTagName('body')[0].getElementsByTagName('pre')[0].innerText;
+                                    }
+                                    else if(report.documentElement.nodeName === 'transformiix:result') {
+                                        toReturn += report.documentElement.textContent;
+                                    }
+                                }
+                                else { // Pretty-print xml
+                                    let xml = xmlSerializer.serializeToString(report);
+                                    xml = prettifyXml(xml);
+
+                                    toReturn += xml;
+                                }
+                            }
+                            else { // Pretty-print xml
+                                let xml = xmlSerializer.serializeToString(report);
+                                xml = prettifyXml(xml);
+
+                                toReturn += xml;
+                            }
+                        });
+                    }
                     resolve([outcome, toReturn]);
                 }
                 catch(e) {
@@ -258,14 +336,15 @@
     MediaConchPolicyChecker.prototype.init = async function() {
         const results = await Promise.all([
             (await loadPolicyTransformXmlXsl()),
-            (await loadMediaInfoModule())
+            (await loadMediaInfoModule()),
+            (await loadPolicyCheckerModule())
         ]);
 
         mediainfoVersion = mediainfoModule.MediaInfo.Option_Static('Info_Version', '').replaceAll('MediaInfoLib - v', '');
         mediainfo = new mediainfoModule.MediaInfo();
-        mediainfo.Option('ReadByHuman', '0');
         mediainfo.Option('Language', 'raw');
         mediainfo.Option('ParseSpeed', '0');
+        mediainfo.Option('Complete', '1');
 
         //TODO: check for trace support
 

@@ -1,0 +1,13 @@
+all: PolicyCheckerWasm.js PolicyChecker.js
+
+clean:
+		rm *.o ../ThirdParty/tfsxml/*.o
+
+PolicyChecker.js: ../ThirdParty/tfsxml/tfsxml.o Checker.o
+		em++ -std=c++11 -s WASM=0 -s TOTAL_MEMORY=67108864 -s NO_FILESYSTEM=1 -s MODULARIZE=1 -s EXPORT_NAME="'PolicyChecker'" --closure 0 -o $@ $(CXXFLAGS) --bind $^
+
+PolicyCheckerWasm.js: ../ThirdParty/tfsxml/tfsxml.o Checker.o
+		em++ -std=c++11 -s WASM=1 -s TOTAL_MEMORY=33554432 -s ALLOW_MEMORY_GROWTH=1 -s NO_FILESYSTEM=1 -s MODULARIZE=1 -s EXPORT_NAME="'PolicyChecker'" --closure 0 -o $@ $(CXXFLAGS) --bind $^
+
+%.o: %.cpp
+		em++ -std=c++11 -Wall -I.. -I. -c -o $@ $(CXXFLAGS) $<

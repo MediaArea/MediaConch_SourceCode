@@ -269,6 +269,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--implementationverbosity",                     ImplementationVerbosity)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
+    OPTION("--full",                                        Full)
     OPTION("--nomilanalyze",                                NoMilAnalyze)
     OPTION("--async",                                       Asynchronous)
     OPTION("--pluginslist",                                 PluginsList)
@@ -518,6 +519,14 @@ CL_OPTION(Force)
 {
     (void)argument;
     cli->set_force_analyze(true);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(Full)
+{
+    (void)argument;
+    cli->set_full_report(true);
     return CLI_RETURN_NONE;
 }
 

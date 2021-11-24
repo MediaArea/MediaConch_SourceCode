@@ -182,6 +182,8 @@
     <ClCompile Include="..\..\..\Source\Common\WatchFoldersManager.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
+    <ClCompile Include="..\..\..\Source\Checker\Checker.cpp" />
+    <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.c" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
@@ -246,6 +248,8 @@
     <ClInclude Include="..\..\..\Source\Common\WatchFoldersManager.h" />
     <ClInclude Include="..\..\..\Source\Common\Xslt.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
+    <ClInclude Include="..\..\..\Source\Checker\Checker.h" />
+    <ClInclude Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>

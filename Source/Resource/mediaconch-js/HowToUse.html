@@ -137,282 +137,288 @@
 
             // MediaInfo JS
             const MediaInfoJs = document.createElement('script');
+            const PolicyCheckerJs = document.createElement('script');
             if ('WebAssembly' in window) {
               MediaInfoJs.src = "MediaInfoWasm.js";
+              PolicyCheckerJs.src = "PolicyCheckerWasm.js";
             } else {
               MediaInfoJs.src = "MediaInfo.js";
+              PolicyCheckerJs.src = "PolicyChecker.js";
             }
             document.body.appendChild(MediaInfoJs);
+            document.body.appendChild(PolicyCheckerJs);
 
             // Continue initialization
             MediaInfoJs.onload = function() {
-                //Load MediaConch JS
-                const MediaConchJs = document.createElement('script');
-                MediaConchJs.src = 'MediaConch.js';
-                document.body.appendChild(MediaConchJs);
+                PolicyCheckerJs.onload = function() {
+                    //Load MediaConch JS
+                    const MediaConchJs = document.createElement('script');
+                    MediaConchJs.src = 'MediaConch.js';
+                    document.body.appendChild(MediaConchJs);
 
-                // Continue initialization
-                MediaConchJs.onload = function() {
-                    // Restore bodyBackup
-                    document.getElementsByTagName('body')[0].innerHTML = bodyBackup;
+                    // Continue initialization
+                    MediaConchJs.onload = function() {
+                        // Restore bodyBackup
+                        document.getElementsByTagName('body')[0].innerHTML = bodyBackup;
 
-                    const checker = new MediaConchPolicyChecker();
-                    checker.init().then(function(object) {
-                        // Show report
-                        const showReport = function(report) {
-                            try {
-                                const test = new DOMParser().parseFromString(report, 'text/html');
-                                if (test.doctype.name === 'html') {
-                                    document.getElementById('result').innerHTML = report;
+                        const checker = new MediaConchPolicyChecker();
+                        checker.init().then(function(object) {
+                            // Show report
+                            const showReport = function(report) {
+                                try {
+                                    const test = new DOMParser().parseFromString(report, 'text/html');
+                                    if (test.doctype.name === 'html') {
+                                        document.getElementById('result').innerHTML = report;
+                                    }
+                                    else {
+                                        throw new Error();
+                                    }
+                                }
+                                catch(e) {
+                                    document.getElementById('result').innerHTML = '<pre></pre>';
+                                    document.getElementById('result').children[0].innerText = report;
+                                }
+                            };
+
+                            // Report an error while creating report
+                            const reportError = function(error) {
+                                document.getElementById('result').innerHTML = `<div class="error-text">Error while creating checker report: ${error.message}</div>`;
+                            };
+
+                            //Show error
+                            const showError = function(message) {
+                                const div = document.createElement('div');
+                                div.className = 'error-text';
+                                div.innerText = message;
+                                document.getElementById('options-error').appendChild(div);
+                                setTimeout(function() {
+                                    div.remove();
+                                }, 5000);
+                            };
+
+                            // List active policies
+                            const listActivePolicies = function() {
+                                var policies = '';
+                                checker.listPolicies().forEach(function(policy) {
+                                    policies += `
+                                        <span id="policy-${policy.id}" class="policy-container">
+                                            <span class="policy-text">${policy.name}</span>
+                                                <span class="close" onclick="removePolicy(${policy.id});">&#xd7;</span>
+                                        </span>
+                                    `;
+                                });
+                                document.getElementById('active-policies').innerHTML = policies;
+                            };
+
+                            // Add policy
+                            const addPolicy = function(policy) {
+                                const id = checker.addPolicy(policy);
+                                if (id !== null) {
+                                    listActivePolicies();
+                                    if (fileInput.files.length > 0) {
+                                        document.getElementById('result').innerText = 'Proccessing...';
+                                        checker.getReport().then(showReport).catch(reportError);
+                                    }
                                 }
                                 else {
-                                    throw new Error();
+                                    // Show error
                                 }
-                            }
-                            catch(e) {
-                                document.getElementById('result').innerHTML = '<pre></pre>';
-                                document.getElementById('result').children[0].innerText = report;
-                            }
-                        };
+                                policyList.value = '';
+                            };
 
-                        // Report an error while creating report
-                        const reportError = function(error) {
-                            document.getElementById('result').innerHTML = `<div class="error-text">Error while creating checker report: ${error.message}</div>`;
-                        };
-
-                        //Show error
-                        const showError = function(message) {
-                            const div = document.createElement('div');
-                            div.className = 'error-text';
-                            div.innerText = message;
-                            document.getElementById('options-error').appendChild(div);
-                            setTimeout(function() {
-                                div.remove();
-                            }, 5000);
-                        };
-
-                        // List active policies
-                        const listActivePolicies = function() {
-                            var policies = '';
-                            checker.listPolicies().forEach(function(policy) {
-                                policies += `
-                                    <span id="policy-${policy.id}" class="policy-container">
-                                        <span class="policy-text">${policy.name}</span>
-                                            <span class="close" onclick="removePolicy(${policy.id});">&#xd7;</span>
-                                    </span>
-                                `;
-                            });
-                            document.getElementById('active-policies').innerHTML = policies;
-                        };
-
-                        // Add policy
-                        const addPolicy = function(policy) {
-                            const id = checker.addPolicy(policy);
-                            if (id !== null) {
-                                listActivePolicies();
-                                if (fileInput.files.length > 0) {
-                                    document.getElementById('result').innerText = 'Proccessing...';
-                                    checker.getReport().then(showReport).catch(reportError);
+                            // Remove policy
+                            const removePolicy = function(id) {
+                                if (checker.removePolicy(id) === id) {
+                                    listActivePolicies();
+                                    if (fileInput.files.length > 0) {
+                                        document.getElementById('result').innerText = 'Proccessing...';
+                                        checker.getReport().then(showReport).catch(reportError);
+                                    }
                                 }
-                            }
-                            else {
-                                // Show error
-                            }
-                            policyList.value = '';
-                        };
+                            };
+                            window.removePolicy = removePolicy;
 
-                        // Remove policy
-                        const removePolicy = function(id) {
-                            if (checker.removePolicy(id) === id) {
-                                listActivePolicies();
-                                if (fileInput.files.length > 0) {
-                                    document.getElementById('result').innerText = 'Proccessing...';
-                                    checker.getReport().then(showReport).catch(reportError);
+                            // Policy list
+                            const policyList = document.getElementById('policy-list');
+                            policyList.onchange = function() {
+                                const value = policyList.value;
+                                if (value. startsWith('Sample')) {
+                                    // Need loading
+                                    const xhr = new XMLHttpRequest();
+                                    xhr.responseType = 'text';
+                                    xhr.onload = function() {
+                                        if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
+                                            policyList[policyList.selectedIndex].attributes['value'].value = xhr.response;
+                                            addPolicy(xhr.response)
+                                        }
+                                        else {
+                                            showError('Unable to import policy.');
+                                        }
+                                    };
+                                    xhr.onerror = function() {
+                                        showError('Unable to import policy.');
+                                    };
+                                    xhr.open('GET', `./xml/Policy${value}.xml`);
+                                    xhr.send();
                                 }
-                            }
-                        };
-                        window.removePolicy = removePolicy;
+                                else if (value === 'load') {
+                                    document.getElementById('policy-input').click();
+                                }
+                                else {
+                                    addPolicy(value);
+                                }
+                            };
 
-                        // Policy list
-                        const policyList = document.getElementById('policy-list');
-                        policyList.onchange = function() {
-                            const value = policyList.value;
-                            if (value. startsWith('Sample')) {
-                                // Need loading
+                            // Custom policy
+                            const policyInput = document.getElementById('policy-input');
+                            policyInput.onchange = function() {
+                                if (policyInput.files.length > 0) {
+                                    const file = policyInput.files[0];
+                                    const reader = new FileReader();
+                                    reader.onload = function() {
+                                        try {
+                                            const dom = new DOMParser().parseFromString(reader.result, 'application/xml');
+                                            var name = '';
+                                            if (dom.documentElement.attributes.hasOwnProperty('name'))
+                                                name = dom.documentElement.attributes['name'].value;
+
+                                            const item = new Option(name, reader.result);
+
+                                            if (checker.addPolicy(reader.result) !== null) {
+                                                policyList.add(item, policyList[policyList.length - 1]);
+                                                listActivePolicies();
+                                                if (fileInput.files.length > 0) {
+                                                    document.getElementById('result').innerText = 'Proccessing...';
+                                                    checker.getReport().then(showReport).catch(reportError);
+                                                }
+                                            }
+                                            else {
+                                                showError('Unable to import policy.');
+                                            }
+                                        }
+                                        catch(e) {
+                                            showError('Unable to import policy.');
+                                        }
+                                    };
+                                    reader.readAsText(file);
+                                }
+                                policyList.value = '';
+                            };
+
+                            // Activate default sample policy
+                            const activateSamplePolicy = function() {
                                 const xhr = new XMLHttpRequest();
                                 xhr.responseType = 'text';
                                 xhr.onload = function() {
                                     if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
-                                        policyList[policyList.selectedIndex].attributes['value'].value = xhr.response;
                                         addPolicy(xhr.response)
                                     }
-                                    else {
-                                        showError('Unable to import policy.');
-                                    }
                                 };
-                                xhr.onerror = function() {
-                                    showError('Unable to import policy.');
-                                };
-                                xhr.open('GET', `./xml/Policy${value}.xml`);
+                                xhr.open('GET', `./xml/PolicySample1.xml`);
                                 xhr.send();
-                            }
-                            else if (value === 'load') {
-                                document.getElementById('policy-input').click();
-                            }
-                            else {
-                                addPolicy(value);
-                            }
-                        };
+                            };
 
-                        // Custom policy
-                        const policyInput = document.getElementById('policy-input');
-                        policyInput.onchange = function() {
-                            if (policyInput.files.length > 0) {
-                                const file = policyInput.files[0];
-                                const reader = new FileReader();
-                                reader.onload = function() {
-                                    try {
-                                        const dom = new DOMParser().parseFromString(reader.result, 'application/xml');
-                                        var name = '';
-                                        if (dom.documentElement.attributes.hasOwnProperty('name'))
-                                            name = dom.documentElement.attributes['name'].value;
+                            // Set display
+                            const setDisplay = function(display) {
+                                try {
+                                    checker.setDisplay(display);
+                                    if (fileInput.files.length > 0) {
+                                        document.getElementById('result').innerText = 'Proccessing...';
+                                        checker.getReport().then(showReport).catch(reportError);
+                                    }
+                                }
+                                catch(e) {
+                                    checker.setDisplay('');
+                                    displayList.value = '';
+                                    showError('Unable to import display.');
+                                }
+                            };
 
-                                        const item = new Option(name, reader.result);
+                            // Displays list
+                            const displayList = document.getElementById('display-list');
+                            displayList.onchange = function() {
+                                const value = displayList.value;
+                                if (value === 'CSV' || value === 'Html' || value === 'TextUnicode' || value === 'Simple') {
+                                    // Need loading
+                                    const xhr = new XMLHttpRequest();
+                                    xhr.responseType = 'text';
+                                    xhr.onload = function() {
+                                        if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
+                                            displayList[displayList.selectedIndex].attributes['value'].value = xhr.response;
+                                            setDisplay(xhr.response);
+                                        }
+                                        else {
+                                            showError('Unable to import display.');
+                                        }
+                                    };
+                                    xhr.onerror = function() {
+                                        showError('Unable to import display.');
+                                    };
+                                    xhr.open('GET', `./xml/MediaConch${value}.xsl`);
+                                    xhr.send();
+                                }
+                                else if (value === 'load') {
+                                    document.getElementById('display-input').click();
+                                }
+                                else {
+                                    setDisplay(value);
+                                }
+                            };
 
-                                        if (checker.addPolicy(reader.result) !== null) {
-                                            policyList.add(item, policyList[policyList.length - 1]);
-                                            listActivePolicies();
+                            // Custom display
+                            const displayInput = document.getElementById('display-input');
+                            displayInput.onchange = function() {
+                                if (displayInput.files.length > 0) {
+                                    const file = displayInput.files[0];
+                                    const reader = new FileReader();
+                                    reader.onload = function() {
+                                        const item = new Option(file.name, reader.result, false, true);
+
+                                        try {
+                                            checker.setDisplay(reader.result);
+                                            displayList.add(item, displayList[displayList.length - 1]);
+                                            displayList.value = item.value;
                                             if (fileInput.files.length > 0) {
                                                 document.getElementById('result').innerText = 'Proccessing...';
                                                 checker.getReport().then(showReport).catch(reportError);
                                             }
                                         }
-                                        else {
-                                            showError('Unable to import policy.');
+                                        catch(e) {
+                                            checker.setDisplay('');
+                                            displayList.value = '';
+                                            showError('Unable to import display.');
                                         }
-                                    }
-                                    catch(e) {
-                                        showError('Unable to import policy.');
-                                    }
-                                };
-                                reader.readAsText(file);
-                            }
-                            policyList.value = '';
-                        };
-
-                        // Activate default sample policy
-                        const activateSamplePolicy = function() {
-                            const xhr = new XMLHttpRequest();
-                            xhr.responseType = 'text';
-                            xhr.onload = function() {
-                                if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
-                                    addPolicy(xhr.response)
+                                    };
+                                    reader.readAsText(file);
                                 }
                             };
-                            xhr.open('GET', `./xml/PolicySample1.xml`);
-                            xhr.send();
-                        };
 
-                        // Set display
-                        const setDisplay = function(display) {
-                            try {
-                                checker.setDisplay(display);
+                            // Verbosity checkbox
+                            const verbosityCheckbox = document.getElementById('verbosity-checkbox');
+                            verbosityCheckbox.onchange = function() {
+                                checker.setVerbosity(verbosityCheckbox.checked ? 1 : 0);
                                 if (fileInput.files.length > 0) {
                                     document.getElementById('result').innerText = 'Proccessing...';
                                     checker.getReport().then(showReport).catch(reportError);
                                 }
-                            }
-                            catch(e) {
-                                checker.setDisplay('');
-                                displayList.value = '';
-                                showError('Unable to import display.');
-                            }
-                        };
+                            };
 
-                        // Displays list
-                        const displayList = document.getElementById('display-list');
-                        displayList.onchange = function() {
-                            const value = displayList.value;
-                            if (value === 'CSV' || value === 'Html' || value === 'TextUnicode' || value === 'Simple') {
-                                // Need loading
-                                const xhr = new XMLHttpRequest();
-                                xhr.responseType = 'text';
-                                xhr.onload = function() {
-                                    if (this.status >= 200 && this.status <= 299 && xhr.response !== null) {
-                                        displayList[displayList.selectedIndex].attributes['value'].value = xhr.response;
-                                        setDisplay(xhr.response);
-                                    }
-                                    else {
-                                        showError('Unable to import display.');
-                                    }
-                                };
-                                xhr.onerror = function() {
-                                    showError('Unable to import display.');
-                                };
-                                xhr.open('GET', `./xml/MediaConch${value}.xsl`);
-                                xhr.send();
-                            }
-                            else if (value === 'load') {
-                                document.getElementById('display-input').click();
-                            }
-                            else {
-                                setDisplay(value);
-                            }
-                        };
+                            // File input
+                            const fileInput = document.getElementById('file-input');
+                            fileInput.onchange = function() {
+                                if (fileInput.files.length > 0) {
+                                    document.getElementById('result').innerText = 'Proccessing...';
+                                    checker.checkFile(fileInput.files[0]).then(function() {
+                                        checker.getReport().then(showReport).catch(reportError);
+                                    }).catch(reportError);
+                                }
+                            };
 
-                        // Custom display
-                        const displayInput = document.getElementById('display-input');
-                        displayInput.onchange = function() {
-                            if (displayInput.files.length > 0) {
-                                const file = displayInput.files[0];
-                                const reader = new FileReader();
-                                reader.onload = function() {
-                                    const item = new Option(file.name, reader.result, false, true);
-                                    
-                                    try {
-                                        checker.setDisplay(reader.result);
-                                        displayList.add(item, displayList[displayList.length - 1]);
-                                        displayList.value = item.value;
-                                        if (fileInput.files.length > 0) {
-                                            document.getElementById('result').innerText = 'Proccessing...';
-                                            checker.getReport().then(showReport).catch(reportError);
-                                        }
-                                    }
-                                    catch(e) {
-                                        checker.setDisplay('');
-                                        displayList.value = '';
-                                        showError('Unable to import display.');
-                                    }
-                                };
-                                reader.readAsText(file);
-                            }
-                        };
-
-                        // Verbosity checkbox
-                        const verbosityCheckbox = document.getElementById('verbosity-checkbox');
-                        verbosityCheckbox.onchange = function() {
-                            checker.setVerbosity(verbosityCheckbox.checked ? 1 : 0);
-                            if (fileInput.files.length > 0) {
-                                document.getElementById('result').innerText = 'Proccessing...';
-                                checker.getReport().then(showReport).catch(reportError);
-                            }
-                        };
-
-                        // File input
-                        const fileInput = document.getElementById('file-input');
-                        fileInput.onchange = function() {
-                            if (fileInput.files.length > 0) {
-                                document.getElementById('result').innerText = 'Proccessing...';
-                                checker.checkFile(fileInput.files[0]).then(function() {
-                                    checker.getReport().then(showReport).catch(reportError);
-                                }).catch(reportError);
-                            }
-                        };
-
-                        activateSamplePolicy();
-                    }).catch(function(e) {
-                        document.getElementsByTagName('body')[0].innerHTML = `<div class="error-text">Unable to initialize mediaconch-policy-checker: ${e.message}</div>`;
-                    });
+                            activateSamplePolicy();
+                        }).catch(function(e) {
+                            document.getElementsByTagName('body')[0].innerHTML = `<div class="error-text">Unable to initialize mediaconch-policy-checker: ${e.message}</div>`;
+                        });
+                    };
                 };
             };
         </script>
