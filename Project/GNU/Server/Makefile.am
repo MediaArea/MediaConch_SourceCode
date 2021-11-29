@@ -35,6 +35,7 @@ mediaconchd_SOURCES = \
     ../../../Source/Common/Plugin.cpp \
     ../../../Source/Common/VeraPDF.cpp \
     ../../../Source/Common/DpfManager.cpp \
+    ../../../Source/Common/IMSC1.cpp \
     ../../../Source/Common/PluginPreHook.cpp \
     ../../../Source/Common/PluginFileLog.cpp \
     ../../../Source/Common/WatchFoldersManager.cpp \

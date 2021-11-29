@@ -405,7 +405,7 @@ int MediaConchLib::checker_validate(int user, report report, const std::vector<l
         return errorHttp_INVALID_DATA;
 
     if (report != report_MediaConch && !policies_ids.size() && !policies_contents.size() &&
-        report != report_MediaVeraPdf && report != report_MediaDpfManager)
+        report != report_MediaVeraPdf && report != report_MediaDpfManager && report != report_MediaImsc1Validation)
         return errorHttp_INVALID_DATA;
 
     if (use_daemon)

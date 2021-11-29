@@ -76,8 +76,8 @@ int Reports::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_Report
     else
     {
         // For VeraPDF and DPFManager, to get the original XML
-        if ((cr.report_set[MediaConchLib::report_MediaVeraPdf] || cr.report_set[MediaConchLib::report_MediaDpfManager]) &&
-            cr.format == MediaConchLib::format_Xml &&
+        if ((cr.report_set[MediaConchLib::report_MediaVeraPdf] || cr.report_set[MediaConchLib::report_MediaDpfManager] ||
+             cr.report_set[MediaConchLib::report_MediaImsc1Validation]) && cr.format == MediaConchLib::format_Xml &&
             (!cr.display_content || !cr.display_content->size()) &&
             (!cr.display_name || !cr.display_name->size()))
             cr.format = MediaConchLib::format_OrigXml;
@@ -128,7 +128,8 @@ int Reports::checker_validate(int user, MediaConchLib::report report, const std:
                               std::vector<MediaConchLib::Checker_ValidateRes*>& result, std::string& err)
 {
     if (report != MediaConchLib::report_MediaConch && !policies_ids.size() && !policies_contents.size() &&
-        report != MediaConchLib::report_MediaVeraPdf && report != MediaConchLib::report_MediaDpfManager)
+        report != MediaConchLib::report_MediaVeraPdf && report != MediaConchLib::report_MediaDpfManager &&
+        report != MediaConchLib::report_MediaImsc1Validation)
         return -1;
 
     std::vector<long> file_tmp;
@@ -165,6 +166,12 @@ int Reports::checker_validate(int user, MediaConchLib::report report, const std:
         {
             std::string report;
             if (get_dpfmanager_report(user, files[i], report, res->valid, err) < 0)
+                return -1;
+        }
+        else if (report == MediaConchLib::report_MediaImsc1Validation)
+        {
+            std::string report;
+            if (get_imsc1validation_report(user, files[i], report, res->valid, err) < 0)
                 return -1;
         }
 
@@ -373,6 +380,42 @@ int Reports::get_reports_output(int user, const std::vector<long>& files,
                 result->report += "\r\n";
             }
         }
+
+        if (report_set[MediaConchLib::report_MediaImsc1Validation])
+        {
+            for (size_t i = 0; i < files.size(); ++i)
+            {
+                std::string report;
+                bool valid = false;
+                if (get_imsc1validation_report(user, files[i], report, valid, err) < 0)
+                    return -1;
+
+                if (!policy_is_valid(report))
+                    result->valid = false;
+                else
+                    result->valid = true;
+
+                if (f == MediaConchLib::format_OrigXml || f == MediaConchLib::format_Xml)
+                {
+                    // No transformation, keep the original XML
+                    result->report += report;
+                }
+                else
+                {
+                    if (f == MediaConchLib::format_Html)
+                        transform_with_xslt_html_memory(report, report);
+                    if (f == MediaConchLib::format_Simple)
+                        transform_with_xslt_simple_memory(report, report);
+                    else if (f == MediaConchLib::format_CSV)
+                        transform_with_xslt_csv_memory(report, report);
+                    else
+                        transform_with_xslt_text_memory(report, report);
+
+                    result->report += report;
+                }
+                result->report += "\r\n";
+            }
+        }
     }
 
     return 0;
@@ -530,6 +573,20 @@ int Reports::get_dpfmanager_report(int user, long file, std::string& report, boo
         return -1;
 
     valid = dpfmanager_report_is_valid(report);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int Reports::get_imsc1validation_report(int user, long file, std::string& report, bool& valid, std::string& err)
+{
+    std::vector<long> files;
+    files.push_back(file);
+
+    if (core->get_report_saved(user, files, MediaConchLib::report_MediaImsc1Validation, MediaConchLib::format_Xml,
+                               "", report, err) < 0)
+        return -1;
+
+    valid = imsc1validation_report_is_valid(report);
     return 0;
 }
 
@@ -973,6 +1030,12 @@ bool Reports::dpfmanager_report_is_valid(const std::string& report)
         return false;
 
     return true;
+}
+
+//---------------------------------------------------------------------------
+bool Reports::imsc1validation_report_is_valid(const std::string& report)
+{
+    return implementation_is_valid(report);
 }
 
 //***************************************************************************

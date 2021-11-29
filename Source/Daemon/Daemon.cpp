@@ -866,6 +866,11 @@ namespace MediaConch
                     ok->tool = new RESTAPI::Report;
                     *ok->tool = RESTAPI::DPFMANAGER;
                 }
+                else if (*st_res.tool == (int)MediaConchLib::report_MediaImsc1Validation)
+                {
+                    ok->tool = new RESTAPI::Report;
+                    *ok->tool = RESTAPI::IMSC1VALIDATION;
+                }
             }
 
             if (st_res.percent)
@@ -928,6 +933,8 @@ namespace MediaConch
                 cr.report_set.set(MediaConchLib::report_MediaVeraPdf);
             if (req->reports[j] == RESTAPI::DPFMANAGER)
                 cr.report_set.set(MediaConchLib::report_MediaDpfManager);
+            if (req->reports[j] == RESTAPI::IMSC1VALIDATION)
+                cr.report_set.set(MediaConchLib::report_MediaImsc1Validation);
         }
 
         if (!cr.report_set.count() && !req->policies_ids.size() && !req->policies_contents.size())
@@ -1072,6 +1079,8 @@ namespace MediaConch
             report = MediaConchLib::report_MediaVeraPdf;
         else if (req->report == RESTAPI::DPFMANAGER)
             report = MediaConchLib::report_MediaDpfManager;
+        else if (req->report == RESTAPI::IMSC1VALIDATION)
+            report = MediaConchLib::report_MediaImsc1Validation;
         else if (req->report != RESTAPI::POLICY)
             return -1;
         else

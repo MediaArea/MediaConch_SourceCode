@@ -16,6 +16,7 @@
 #include "Plugin.h"
 #include "VeraPDF.h"
 #include "DpfManager.h"
+#include "IMSC1.h"
 #include "PluginPreHook.h"
 #include "PluginFileLog.h"
 #if defined(WIN32)
@@ -62,6 +63,8 @@ namespace MediaConch {
             p = new VeraPDF;
         else if (obj.at("name").s == "DPFManager")
             p = new DPFManager;
+        else if (obj.at("name").s == "IMSC1")
+            p = new IMSC1;
         else if (obj.at("name").s == "PreHook")
             p = new PluginPreHook;
         else if (obj.at("name").s == "FileLog")
