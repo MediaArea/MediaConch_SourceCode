@@ -86,6 +86,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/Plugin.cpp \
                     ../../Source/Common/VeraPDF.cpp \
                     ../../Source/Common/DpfManager.cpp \
+                    ../../Source/Common/IMSC1.cpp \
                     ../../Source/Common/PluginPreHook.cpp \
                     ../../Source/Common/PluginFileLog.cpp \
                     ../../Source/Common/WatchFoldersManager.cpp \
@@ -129,6 +130,27 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/generated/MicroMediaTraceToMediaTraceXsl.h \
                     ../../Source/Common/generated/PolicyTransformXml.h \
                     ../../Source/Common/generated/GeneratedCSVVideos.h \
+                    ../../Source/Common/generated/St205212010smpteTtXsd.h \
+                    ../../Source/Common/generated/Ttml1AnimationXsd.h \
+                    ../../Source/Common/generated/Ttml1ContentXsd.h \
+                    ../../Source/Common/generated/Ttml1CoreAttribsXsd.h \
+                    ../../Source/Common/generated/Ttml1DatatypesXsd.h \
+                    ../../Source/Common/generated/Ttml1DocumentXsd.h \
+                    ../../Source/Common/generated/Ttml1HeadXsd.h \
+                    ../../Source/Common/generated/Ttml1LayoutXsd.h \
+                    ../../Source/Common/generated/Ttml1MetadataAttribsXsd.h \
+                    ../../Source/Common/generated/Ttml1MetadataItemsXsd.h \
+                    ../../Source/Common/generated/Ttml1MetadataXsd.h \
+                    ../../Source/Common/generated/Ttml1ParameterAttribsXsd.h \
+                    ../../Source/Common/generated/Ttml1ParameterItemsXsd.h \
+                    ../../Source/Common/generated/Ttml1ParametersXsd.h \
+                    ../../Source/Common/generated/Ttml1ProfileXsd.h \
+                    ../../Source/Common/generated/Ttml1StylingAttribsXsd.h \
+                    ../../Source/Common/generated/Ttml1StylingXsd.h \
+                    ../../Source/Common/generated/Ttml1TimingAttribsXsd.h \
+                    ../../Source/Common/generated/Ttml1Xsd.h \
+                    ../../Source/Common/generated/TtmlWrapperXsd.h \
+                    ../../Source/Common/generated/XmlXsd.h \
                     ../../Source/Common/Database.h \
                     ../../Source/Common/DatabaseReport.h \
                     ../../Source/Common/NoDatabaseReport.h \
@@ -153,6 +175,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/PluginFormat.h \
                     ../../Source/Common/VeraPDF.h \
                     ../../Source/Common/DpfManager.h \
+                    ../../Source/Common/IMSC1.cpp \
                     ../../Source/Common/PluginPreHook.h \
                     ../../Source/Common/PluginLog.h \
                     ../../Source/Common/PluginFileLog.h \

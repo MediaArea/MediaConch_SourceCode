@@ -70,7 +70,7 @@ if test -e libxml2/configure; then
     cd libxml2
     test -e Makefile && rm Makefile
     chmod +x configure
-    ./configure --without-python --without-modules --without-iconv --without-ftp --without-http --without-c14n --without-catalog --with-xpath --without-xptr --without-xinclude --without-iconv --without-icu --without-iso8859x --without-zlib --without-lzma --without-mem_debug --without-run_debug --without-regexps --with-tree --without-writer --with-pattern --with-push --without-valid --with-sax1 --without-legacy --with-output --without-schemas --with-schematron --enable-static --disable-shared
+    ./configure --without-python --without-modules --without-iconv --without-ftp --without-http --without-c14n --without-catalog --with-xpath --without-xptr --without-xinclude --without-iconv --without-icu --without-iso8859x --without-zlib --without-lzma --without-mem_debug --without-run_debug --without-regexps --with-tree --without-writer --with-pattern --with-push --without-valid --with-sax1 --without-legacy --with-output --with-schemas --with-schematron --enable-static --disable-shared
     if test ! -e Makefile; then
         echo Problem while configuring libxml2
         exit

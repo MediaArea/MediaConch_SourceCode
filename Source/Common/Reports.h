@@ -83,6 +83,7 @@ public:
                                     std::string& report, bool& valid, std::string& err);
     int   get_verapdf_report(int user, long file, std::string& report, bool& valid, std::string& err);
     int   get_dpfmanager_report(int user, long file, std::string& report, bool& valid, std::string& err);
+    int   get_imsc1validation_report(int user, long file, std::string& report, bool& valid, std::string& err);
 
     // Reports change
     int   create_report_mi_xml(int user, const std::vector<long>& filename, std::string& report, std::string& err);
@@ -98,6 +99,7 @@ public:
     bool  policy_is_valid(const std::string& report);
     bool  verapdf_report_is_valid(const std::string& report);
     bool  dpfmanager_report_is_valid(const std::string& report);
+    bool  imsc1validation_report_is_valid(const std::string& report);
 
     // Policies
     int   check_policies(int user, const std::vector<long>& files,

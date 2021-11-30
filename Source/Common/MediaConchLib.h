@@ -68,6 +68,7 @@ public:
         report_MediaVeraPdf,
         report_MediaDpfManager,
         report_MicroMediaTrace,
+        report_MediaImsc1Validation,
         report_Max,
     };
 

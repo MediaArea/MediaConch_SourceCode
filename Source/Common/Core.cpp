@@ -977,9 +977,8 @@ int Core::get_report_saved(int user, const std::vector<long>& files,
         return 0;
     }
 
-    if (reportKind != MediaConchLib::report_MediaConch &&
-        reportKind != MediaConchLib::report_MediaInfo && reportKind != MediaConchLib::report_MicroMediaTrace
-        && reportKind != MediaConchLib::report_MediaVeraPdf && reportKind != MediaConchLib::report_MediaDpfManager)
+    if (reportKind != MediaConchLib::report_MediaConch && reportKind != MediaConchLib::report_MediaInfo && reportKind != MediaConchLib::report_MicroMediaTrace &&
+        reportKind != MediaConchLib::report_MediaVeraPdf && reportKind != MediaConchLib::report_MediaDpfManager && reportKind != MediaConchLib::report_MediaImsc1Validation)
     {
         err = "Report kind asked is not recognized.";
         return -1;

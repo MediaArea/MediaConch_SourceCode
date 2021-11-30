@@ -525,6 +525,8 @@ int DaemonClient::checker_status(int user, long file_id, MediaConchLib::Checker_
             *st_res.tool = (int)MediaConchLib::report_MediaVeraPdf;
         else if (*ok->tool == RESTAPI::DPFMANAGER)
             *st_res.tool = (int)MediaConchLib::report_MediaDpfManager;
+        else if (*ok->tool == RESTAPI::IMSC1VALIDATION)
+            *st_res.tool = (int)MediaConchLib::report_MediaImsc1Validation;
         else
             *st_res.tool = (int)MediaConchLib::report_MediaConch;
     }
@@ -642,6 +644,9 @@ int DaemonClient::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_R
         req.reports.push_back(RESTAPI::VERAPDF);
     if (cr.report_set[MediaConchLib::report_MediaDpfManager])
         req.reports.push_back(RESTAPI::DPFMANAGER);
+    if (cr.report_set[MediaConchLib::report_MediaImsc1Validation])
+        req.reports.push_back(RESTAPI::IMSC1VALIDATION);
+
 
     // POLICY
     if (cr.policies_ids.size())
@@ -741,6 +746,8 @@ int DaemonClient::checker_validate(int user, MediaConchLib::report report,
         req.report = RESTAPI::VERAPDF;
     else if (report == MediaConchLib::report_MediaDpfManager)
         req.report = RESTAPI::DPFMANAGER;
+    else if (report == MediaConchLib::report_MediaImsc1Validation)
+        req.report = RESTAPI::IMSC1VALIDATION;
     else if (policies_ids.size())
     {
         // POLICY

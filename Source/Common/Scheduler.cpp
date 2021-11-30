@@ -19,6 +19,7 @@
 #include "PluginsManager.h"
 #include "VeraPDF.h"
 #include "DpfManager.h"
+#include "IMSC1.h"
 #include "PluginLog.h"
 #include "PluginFileLog.h"
 #include "PluginPreHook.h"
@@ -289,6 +290,8 @@ namespace MediaConch {
             p = new VeraPDF(*(VeraPDF*)plugins[format_str]);
         else if (plugins[format_str]->get_name() == "DPFManager")
             p = new DPFManager(*(DPFManager*)plugins[format_str]);
+        else if (plugins[format_str]->get_name() == "IMSC1")
+            p = new IMSC1(*(IMSC1*)plugins[format_str]);
         else
             return 1;
 

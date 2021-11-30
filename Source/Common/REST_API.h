@@ -53,6 +53,7 @@ public:
         MEDIATRACE,
         VERAPDF,
         DPFMANAGER,
+        IMSC1VALIDATION,
     };
 
     std::string get_Report_string(Report r)
@@ -69,6 +70,7 @@ public:
             ReportString(MEDIATRACE);
             ReportString(VERAPDF);
             ReportString(DPFMANAGER);
+            ReportString(IMSC1VALIDATION);
             default:
                 break;
         }
@@ -88,6 +90,7 @@ public:
         ReportString(MEDIATRACE);
         ReportString(VERAPDF);
         ReportString(DPFMANAGER);
+        ReportString(IMSC1VALIDATION);
 
 #undef ReportString
 

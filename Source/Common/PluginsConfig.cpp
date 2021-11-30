@@ -45,20 +45,23 @@ namespace MediaConch {
 #endif
 
         std::ifstream file_handler(filename.c_str(), std::ios_base::ate);
+        std::string buffer;
 
         if (!file_handler)
         {
-            error = "Cannot open file: " + filename;
-            delete c;
-            return -1;
-        }
+            error = "Cannot open file: " + filename + ", use default";
 
-        std::string buffer;
-        buffer.reserve(file_handler.tellg());
-        file_handler.seekg(0, file_handler.beg);
-        buffer.assign(std::istreambuf_iterator<char>(file_handler),
-                      std::istreambuf_iterator<char>());
-        file_handler.close();
+            // Automatically load ISMC1 plugin by default, since its don't have external dependencies
+            buffer = "{\"Plugins\":[{\"id\":\"ISMC1\",\"name\":\"IMSC1\",\"format\":\"TTML\"}]}";
+        }
+        else
+        {
+            buffer.reserve(file_handler.tellg());
+            file_handler.seekg(0, file_handler.beg);
+            buffer.assign(std::istreambuf_iterator<char>(file_handler),
+                          std::istreambuf_iterator<char>());
+            file_handler.close();
+        }
 
         Container::Value values;
         if (c->parse(buffer.c_str(), values) < 0)
