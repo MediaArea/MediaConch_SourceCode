@@ -68,7 +68,7 @@ private:
         std::string field;
         std::string tracktype;
         std::string occurrence;
-        std::string operande;
+        std::string operand;
         std::string xpath;
         std::string requested;
         std::map<std::string, std::string> values;
