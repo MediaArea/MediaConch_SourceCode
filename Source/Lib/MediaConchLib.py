@@ -43,7 +43,7 @@ class Report:
         mediatrace:      Parsing traces.
         micromediatrace: Parsing traces (in compact format).
     """
-    mediaconch, mediainfo, _, _, mediatrace, micromediatrace, max =  list(range(0, 7))
+    mediaconch, mediainfo, mediatrace, _, _, micromediatrace, _, max =  list(range(0, 8))
 
 class MediaConchException(BaseException):
     """Raised when MediaConchLib sets get_last_error() to non-empty-string.
