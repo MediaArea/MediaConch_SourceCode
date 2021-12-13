@@ -316,12 +316,12 @@ PolicyChecker::~PolicyChecker()
 //---------------------------------------------------------------------------
 bool PolicyChecker::full_parse()
 {
-    // check for presence of _StringX element in policy)
+    // check for presence of _StringX or TimeCode* element in policy)
     for (size_t pos=0; pos<rules.size(); pos++)
     {
         std::string& field=rules[pos]->field;
         size_t index=field.find_last_not_of("0123456789");
-        if (index!=std::string::npos && index>=6 && field.substr(index-6, 7)=="_String")
+        if ((index!=std::string::npos && index>=6 && field.substr(index-6, 7)=="_String") || field.find("TimeCode")==0)
             return true;
     }
 
