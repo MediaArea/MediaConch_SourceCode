@@ -26,7 +26,7 @@ namespace MediaConch {
 class FileRegistered
 {
 public:
-    FileRegistered() : analyze_percent(0), file_id(-1), policy(-1), display(-1), verbosity(-1), report_kind(0),
+    FileRegistered() : analyze_percent(0), file_id(-1), policy(-1), display(-1), verbosity(-1), report_kind(0), mil_version(0),
         analyzed(false), implementation_valid(false), policy_valid(false), create_policy(false), need_update(true)
     {
     }
@@ -49,6 +49,7 @@ public:
         this->create_policy = f.create_policy;
         this->index = f.index;
         this->report_kind = f.report_kind;
+        this->mil_version = f.mil_version;
         this->need_update = f.need_update;
 
         for (size_t x = 0; x < f.generated_id.size(); ++x)
@@ -73,6 +74,8 @@ public:
     int                       verbosity;
 
     int                       report_kind;
+
+    unsigned long long        mil_version;
 
     unsigned int              index;
     bool                      analyzed;

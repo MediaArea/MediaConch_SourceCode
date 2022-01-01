@@ -156,6 +156,12 @@ int MediaConchLib::mil_get_output_list(std::string& output_list, std::string& er
 }
 
 //---------------------------------------------------------------------------
+unsigned long long MediaConchLib::mil_version()
+{
+    return core->mil_version();
+}
+
+//---------------------------------------------------------------------------
 bool MediaConchLib::ReportAndFormatCombination_IsValid(const std::vector<std::string>&,
                                                        const std::bitset<MediaConchLib::report_Max>& reports,
                                                        const std::string& display, MediaConchLib::format& Format,

@@ -1304,6 +1304,7 @@ std::string RESTAPI::Checker_File_Information_Res::to_str() const
             out << "{\"" << options[i].first << "\":" << "\"" << options[i].second << "\"}";
         }
         out << "],\"analyzed\":" << analyzed;
+        out << "],\"existing\":" << existing;
         out << ",\"has_error\":" << has_error;
         out << ",\"error_log\":\"" << error_log << "\"";
     }
@@ -3073,7 +3074,7 @@ int RESTAPI::serialize_checker_file_information_res(Checker_File_Information_Res
     else
     {
         Container::Value filename, file_last_modification, generated_id, source_id, generated_time,
-            generated_log, generated_error_log, options, analyzed, has_error, error_log;
+            generated_log, generated_error_log, options, analyzed, existing, has_error, error_log;
         filename.type = Container::Value::CONTAINER_TYPE_STRING;
         filename.s = res.filename;
         child.obj["filename"] = filename;
@@ -3123,6 +3124,10 @@ int RESTAPI::serialize_checker_file_information_res(Checker_File_Information_Res
         analyzed.type = Container::Value::CONTAINER_TYPE_BOOL;
         analyzed.b = res.analyzed;
         child.obj["analyzed"] = analyzed;
+
+        existing.type = Container::Value::CONTAINER_TYPE_BOOL;
+        existing.b = res.existing;
+        child.obj["existing"] = existing;
 
         has_error.type = Container::Value::CONTAINER_TYPE_BOOL;
         has_error.b = res.has_error;
@@ -7805,6 +7810,10 @@ RESTAPI::Checker_File_Information_Res *RESTAPI::parse_checker_file_information_r
         Container::Value *analyzed = model->get_value_by_key(*child, "analyzed");
         if (analyzed && analyzed->type == Container::Value::CONTAINER_TYPE_BOOL)
             res->analyzed = analyzed->b;
+
+        Container::Value *existing = model->get_value_by_key(*child, "existing");
+        if (existing && existing->type == Container::Value::CONTAINER_TYPE_BOOL)
+            res->existing = existing->b;
 
         Container::Value *has_error = model->get_value_by_key(*child, "has_error");
         if (has_error && has_error->type == Container::Value::CONTAINER_TYPE_BOOL)

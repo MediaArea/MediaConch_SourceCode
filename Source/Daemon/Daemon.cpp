@@ -1182,6 +1182,7 @@ namespace MediaConch
             res.filename = info.filename;
             res.file_last_modification = info.file_last_modification;
             res.analyzed = info.analyzed;
+            res.existing = info.existing;
             for (size_t j = 0; j < info.generated_id.size(); ++j)
                 res.generated_id.push_back(info.generated_id[j]);
             res.source_id = info.source_id;

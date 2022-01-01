@@ -28,7 +28,7 @@ namespace MediaConch {
 // SQLLiteUi
 //***************************************************************************
 
-int SQLLiteUi::ui_current_version          = 11;
+int SQLLiteUi::ui_current_version          = 12;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -111,6 +111,7 @@ int SQLLiteUi::ui_update_table()
     // UPDATE_UI_TABLE_FOR_VERSION(8); nothing to do
     // UPDATE_UI_TABLE_FOR_VERSION(9); nothing to do
     UPDATE_UI_TABLE_FOR_VERSION(10);
+    UPDATE_UI_TABLE_FOR_VERSION(11);
 
 #undef UPDATE_UI_TABLE_FOR_VERSION
 
@@ -139,8 +140,8 @@ int SQLLiteUi::ui_add_file(const FileRegistered* file)
 
     reports.clear();
     create << "INSERT INTO UI ";
-    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY, OPTIONS)";
-    create << " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY, OPTIONS, MIL_VERSION)";
+    create << " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     query = create.str();
 
     const char* end = NULL;
@@ -186,6 +187,14 @@ int SQLLiteUi::ui_add_file(const FileRegistered* file)
     if (ret != SQLITE_OK)
         return -1;
 
+    ret = sqlite3_bind_int(stmt, 8, file->verbosity);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int64(stmt, 10, (sqlite3_int64)file->mil_version);
+    if (ret != SQLITE_OK)
+        return -1;
+
     return execute();
 }
 
@@ -219,12 +228,12 @@ int SQLLiteUi::ui_create_files(const std::vector<FileRegistered*>& files)
 
     reports.clear();
     create << "INSERT INTO UI ";
-    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY, OPTIONS) VALUES";
+    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY, OPTIONS, MIL_VERSION) VALUES";
     for (size_t i = 0; i < files.size(); ++i)
     {
         if (i)
             create << ",";
-        create << " (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        create << " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     create << ";";
@@ -235,7 +244,7 @@ int SQLLiteUi::ui_create_files(const std::vector<FileRegistered*>& files)
     if (prepare_v2(query, err) < 0)
         return -1;
 
-    int nb_column = 9;
+    int nb_column = 10;
     int ret = SQLITE_OK;
     for (size_t i = 0; i < files.size(); ++i)
     {
@@ -278,6 +287,11 @@ int SQLLiteUi::ui_create_files(const std::vector<FileRegistered*>& files)
         ret = sqlite3_bind_blob(stmt, i * nb_column + 9, options.c_str(), options.length(), SQLITE_TRANSIENT);
         if (ret != SQLITE_OK)
             return -1;
+
+        ret = sqlite3_bind_int64(stmt, i * nb_column + 10, (sqlite3_int64)file->mil_version);
+        if (ret != SQLITE_OK)
+            return -1;
+
     }
 
     return execute();
@@ -296,7 +310,8 @@ int SQLLiteUi::ui_update_file(const FileRegistered* file)
     create << "IMPLEMENTATION_VALID = ?, ";
     create << "POLICY_VALID         = ?, ";
     create << "VERBOSITY            = ?, ";
-    create << "OPTIONS              = ?  ";
+    create << "OPTIONS              = ?, ";
+    create << "MIL_VERSION          = ?  ";
     create << "WHERE FILENAME       = ?  ";
     create << "AND   FILEPATH       = ? ;";
 
@@ -337,11 +352,15 @@ int SQLLiteUi::ui_update_file(const FileRegistered* file)
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 8, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int64(stmt, 8, (sqlite3_int64)file->mil_version);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 9, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 9, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 10, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -354,13 +373,13 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
     std::stringstream create;
 
     reports.clear();
-    create << "WITH Tmp(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY, OPTIONS)";
+    create << "WITH Tmp(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, VERBOSITY, OPTIONS, MIL_VERSION)";
     create << "AS (VALUES";
     for (size_t i = 0; i < files.size(); ++i)
     {
         if (i)
             create << ", ";
-        create << "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        create << "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
     create << ") ";
 
@@ -370,9 +389,9 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
     create << "ANALYZED = (SELECT ANALYZED FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "IMPLEMENTATION_VALID = (SELECT IMPLEMENTATION_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "POLICY_VALID = (SELECT POLICY_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
-    create << "VERBOSITY = (SELECT VERBOSITY FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH) ";
-    create << "OPTIONS = (SELECT OPTIONS FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH) ";
-
+    create << "VERBOSITY = (SELECT VERBOSITY FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "OPTIONS = (SELECT OPTIONS FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "MIL_VERSION = (SELECT MIL_VERSION FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH) ";
     create << " WHERE FILENAME IN (SELECT FILENAME FROM Tmp) AND  FILEPATH IN (SELECT FILEPATH FROM Tmp)";
 
     query = create.str();
@@ -383,7 +402,7 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
-    int nb_column = 9;
+    int nb_column = 10;
     for (size_t i = 0; i < files.size(); ++i)
     {
         FileRegistered* file = files[i];
@@ -425,6 +444,10 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
         ret = sqlite3_bind_blob(stmt, i * nb_column + 9, options.c_str(), options.length(), SQLITE_TRANSIENT);
         if (ret != SQLITE_OK)
             return -1;
+
+        ret = sqlite3_bind_int64(stmt, i * nb_column + 10, (sqlite3_int64)file->mil_version);
+        if (ret != SQLITE_OK)
+            return -1;
     }
 
     return execute();
@@ -442,9 +465,10 @@ int SQLLiteUi::ui_get_file(FileRegistered* file)
     std::string p_v("POLICY_VALID");
     std::string v("VERBOSITY");
     std::string o("OPTIONS");
+    std::string m_v("MIL_VERSION");
 
     reports.clear();
-    create << "SELECT " << p << ", " << d << ", " << a << ", " << i_v << ", " << p_v << ", " << v << ", " << o << " FROM UI ";
+    create << "SELECT " << p << ", " << d << ", " << a << ", " << i_v << ", " << p_v << ", " << v << ", " << o << ", " << m_v << " FROM UI ";
     create << "WHERE FILENAME = ? AND FILEPATH = ?;";
     query = create.str();
 
@@ -480,6 +504,8 @@ int SQLLiteUi::ui_get_file(FileRegistered* file)
         file->verbosity = std_string_to_int(r[v]);
     if (r.find(o) != r.end())
         options_string_to_vec(r[o], file->options);
+    if (r.find(m_v) != r.end())
+        file->mil_version = std_string_to_ullong(r[m_v]);
 
     return 0;
 }
@@ -614,10 +640,11 @@ void SQLLiteUi::ui_get_elements(std::vector<FileRegistered*>& vec)
     std::string p_v("POLICY_VALID");
     std::string v("VERBOSITY");
     std::string o("OPTIONS");
+    std::string m_v("MIL_VERSION");
 
     reports.clear();
-    create << "SELECT " << name << ", " << path << ", " << p << ", " << d;
-    create << ", " << a << ", " << i_v << ", " << p_v << ", " << v << ", " << o;
+    create << "SELECT " << name << ", " << path << ", " << p << ", " << d << ", " << a ;
+    create << ", " << i_v << ", " << p_v << ", " << v << ", " << o << ", " << m_v;
     create << " FROM UI;";
     query = create.str();
 
@@ -651,6 +678,8 @@ void SQLLiteUi::ui_get_elements(std::vector<FileRegistered*>& vec)
                 file->verbosity = std_string_to_int(reports[i][v]);
             if (reports[i].find(o) != reports[i].end())
                 options_string_to_vec(reports[i][o], file->options);
+            if (reports[i].find(m_v) != reports[i].end())
+                file->mil_version = std_string_to_ullong(reports[i][m_v]);
             if (file->analyzed)
                 file->need_update = false;
             vec.push_back(file);
@@ -761,6 +790,7 @@ int SQLLiteUi::ui_settings_update_table()
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(8);
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(9);
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(10); nothing to do
+    // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(11); nothing to do
 
 #undef UPDATE_UI_SETTINGS_TABLE_FOR_VERSION
 

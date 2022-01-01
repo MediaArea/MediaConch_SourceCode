@@ -338,7 +338,7 @@ int NoDatabaseReport::update_file_error(int user, long id, std::string& err, boo
 int NoDatabaseReport::save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                   const std::string& options,
                                   const std::string& report, MediaConchLib::compression c,
-                                  int mil_version, std::string& err)
+                                  unsigned long long int mil_version, std::string& err)
 {
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)
@@ -467,7 +467,7 @@ int NoDatabaseReport::report_is_registered(int user, long file_id, MediaConchLib
     return 0;
 }
 
-int NoDatabaseReport::version_registered(int user, long file_id, std::string& err)
+unsigned long long int NoDatabaseReport::version_registered(int user, long file_id, std::string& err)
 {
     if (file_id < 0 || file_id > (long)files_saved.size() || !files_saved[file_id] ||
         files_saved[file_id]->user != user)

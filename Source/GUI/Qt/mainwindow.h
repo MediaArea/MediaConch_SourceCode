@@ -85,6 +85,7 @@ public:
     void                        clear_msg_in_status_bar();
     void                        drag_and_drop_files_action(const QStringList& files);
     bool                        mil_has_curl_enabled();
+    unsigned long long          mil_version();
 
     // Helpers
     void                        set_widget_to_layout(QWidget* w);
@@ -132,6 +133,7 @@ public:
     int                         checker_clear(long id, QString& err);
     int                         checker_clear(QString& err);
     int                         checker_file_from_id(long id, std::string& file, std::string& err);
+    long                        checker_id_from_filename(const std::string& filename, const std::vector<std::string>& options, std::string& err);
     int                         checker_file_information(long id, MediaConchLib::Checker_FileInfo& file, std::string& err);
 
     void                        add_policy_to_list(const QString& policy);

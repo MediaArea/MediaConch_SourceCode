@@ -401,6 +401,13 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 
     std::string options_str = serialize_string_from_options_vec(options);
     id = file_is_registered_and_analyzed(user, file, analyzed, options_str, err);
+
+    if (id >= 0 && analyzed && mil_analyze) // check report's library version
+    {
+        if (get_db()->version_registered(user, id, err) < mil_version())
+            force_analyze = true;
+    }
+
     if (force_analyze)
         analyzed = false;
 
@@ -589,7 +596,10 @@ int Core::checker_file_information(int user, long id, MediaConchLib::Checker_Fil
     db_mutex.Leave();
 
     if (ret == 0)
+    {
+        info.existing = file_is_existing(info.filename);
         info.options = parse_options_vec_from_string(options);
+    }
     return ret;
 }
 
@@ -798,7 +808,7 @@ void Core::register_report_xml_to_database(int user, long file, const std::strin
     std::string err;
     db_mutex.Enter();
     get_db()->save_report(user, file, report_kind, MediaConchLib::format_Xml,
-                          options, new_report, mode, true, err);
+                          options, new_report, mode, mil_version(), err);
     db_mutex.Leave();
 }
 
@@ -815,7 +825,7 @@ void Core::register_report_mediainfo_text_to_database(int user, long file, Media
     std::string err;
     db_mutex.Enter();
     get_db()->save_report(user, file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Text,
-                          "", report, mode, true, err);
+                          "", report, mode, mil_version(), err);
     db_mutex.Leave();
 }
 
@@ -831,7 +841,7 @@ void Core::register_report_mediainfo_xml_to_database(int user, long file, MediaI
     std::string err;
     db_mutex.Enter();
     get_db()->save_report(user, file, MediaConchLib::report_MediaInfo, MediaConchLib::format_Xml,
-                          "", report, mode, true, err);
+                          "", report, mode, mil_version(), err);
     db_mutex.Leave();
 }
 
@@ -866,7 +876,7 @@ void Core::register_report_micromediatrace_xml_to_database(int user, long file, 
     std::string err;
     db_mutex.Enter();
     get_db()->save_report(user, file, MediaConchLib::report_MicroMediaTrace, MediaConchLib::format_Xml,
-                          "", report, mode, true, err);
+                          "", report, mode, mil_version(), err);
     db_mutex.Leave();
 }
 
@@ -1619,6 +1629,62 @@ std::string Core::get_date()
         str[str.length() - 1] = '\0';
 
     return str;
+}
+
+//--------------------------------------------------------------------------
+unsigned long long Core::mil_version()
+{
+    std::string version_string = ZenLib::Ztring(Menu_Option_Preferences_Option (__T("Info_Version"), __T(""))).To_UTF8();
+
+    std::string search(" - v");
+    size_t pos = version_string.find(search);
+    if (pos != std::string::npos)
+        version_string = version_string.substr(pos + search.length());
+
+    search = std::string(".");
+    const char* version = version_string.c_str();
+
+
+    long major = 0;
+    long minor = 0;
+    long patch = 0;
+    long build = 0;
+    char *end = NULL;
+
+    major = strtol(version, &end, 10);
+    if (end && *end != '\0')
+    {
+        version = ++end;
+        minor = strtol(version, &end, 10);
+        if (minor > 4095 && (!end || *end == '\0'))
+        {
+            build = minor;
+            minor = 0;
+            patch = 0;
+        }
+    }
+
+    if (end && *end != '\0')
+    {
+        version = ++end;
+        patch = strtol(version, &end, 10);
+        if (patch > 255 && (!end || *end == '\0'))
+        {
+            build = patch;
+            patch = 0;
+        }
+    }
+
+    if (end && *end != '\0')
+    {
+        version = ++end;
+        build = strtol(version, &end, 10);
+    }
+
+    return ((unsigned long long )major << 52) & 0xFFF0000000000000 |
+           ((unsigned long long )minor << 40) & 0x000FFF0000000000 |
+           ((unsigned long long )patch << 32) & 0x000000FF00000000 |
+           ((unsigned long long )build)       & 0x00000000FFFFFFFF;
 }
 
 //--------------------------------------------------------------------------

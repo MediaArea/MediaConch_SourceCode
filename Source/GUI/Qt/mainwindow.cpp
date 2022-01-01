@@ -209,6 +209,12 @@ bool MainWindow::mil_has_curl_enabled()
 }
 
 //---------------------------------------------------------------------------
+unsigned long long MainWindow::mil_version()
+{
+    return MCL.mil_version();
+}
+
+//---------------------------------------------------------------------------
 bool MainWindow::close()
 {
     clearVisualElements();
@@ -1505,6 +1511,16 @@ void MainWindow::checker_stop(const std::vector<long>& ids)
 int MainWindow::checker_file_from_id(long id, std::string& file, std::string& err)
 {
     return MCL.checker_file_from_id(user, id, file, err);
+}
+
+//---------------------------------------------------------------------------
+long MainWindow::checker_id_from_filename(const std::string& filename, const std::vector<std::string>& options, std::string& err)
+{
+    std::vector<std::pair<std::string, std::string> > opts;
+    for (size_t i = 0; i + 1 < options.size(); i += 2)
+        opts.push_back(std::make_pair(options[i], options[i + 1]));
+
+    return MCL.checker_id_from_filename(user, filename, opts, err);
 }
 
 //---------------------------------------------------------------------------
