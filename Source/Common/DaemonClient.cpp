@@ -369,6 +369,7 @@ int DaemonClient::checker_file_information(int user, long id, MediaConchLib::Che
         info.generated_log = res->generated_log;
         info.generated_error_log = res->generated_error_log;
         info.analyzed = res->analyzed;
+        info.existing = res->existing;
         info.has_error = res->has_error;
         info.error_log = res->error_log;
         for (size_t i = 0; i < res->options.size(); ++i)

@@ -214,6 +214,7 @@ int WorkerFiles::add_file_to_list(const std::string& file, const std::string& pa
     fr->create_policy = create_policy;
     for (size_t i = 0; i < options.size(); ++i)
         fr->options.push_back(options[i]);
+    fr->mil_version=mainwindow->mil_version();
 
     working_files_mutex.lock();
 
@@ -287,6 +288,7 @@ int WorkerFiles::add_file_to_list(long id, const std::string& full_file, const s
     fr->policy = -1;
     fr->display = -1;
     fr->verbosity = 5;
+    fr->mil_version=mainwindow->mil_version();
     fr->create_policy = false;
 
     working_files_mutex.lock();
@@ -363,6 +365,7 @@ int WorkerFiles::add_attachment_to_list(const std::string& file, int policy, int
     fr->create_policy = false;
     for (size_t i = 0; i < options.size(); ++i)
         fr->options.push_back(options[i]);
+    fr->mil_version=mainwindow->mil_version();
 
     working_files_mutex.lock();
 
@@ -875,6 +878,7 @@ void WorkerFiles::fill_registered_files_from_db()
         std::string err2;
         QString err;
         FileRegistered *fr = vec[i];
+        bool force = false;
 
         std::string full_file(fr->filepath);
 #ifdef WINDOWS
@@ -892,6 +896,30 @@ void WorkerFiles::fill_registered_files_from_db()
         {
             mainwindow->set_msg_to_status_bar(err);
             fr->policy = -1;
+        }
+
+        // reload or delete outdated results
+        if (full_file.rfind("attachment", 0) != 0 && fr->mil_version < mainwindow->mil_version())
+        {
+            long id = mainwindow->checker_id_from_filename(full_file, fr->options, err2);
+            MediaConchLib::Checker_FileInfo info;
+            if (id < 0 || mainwindow->checker_file_information(id,info, err2) < 0)
+            {
+                remove_registered_file_from_db(fr);
+                mainwindow->set_str_msg_to_status_bar("Information: outdated results deleted.");
+                continue;
+            }
+            else
+            {
+                if (info.existing)
+                    force = true;
+                else
+                {
+                    remove_registered_file_from_db(fr);
+                    mainwindow->set_str_msg_to_status_bar("Information: outdated results deleted.");
+                    continue;
+                }
+            }
         }
 
         fr->index = file_index++;

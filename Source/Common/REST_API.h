@@ -500,7 +500,7 @@ public:
     struct Checker_File_Information_Res
     {
         Checker_File_Information_Res() : source_id(-1), generated_time((size_t)-1),
-                                         analyzed(false), has_error(false), nok(NULL) {}
+                                         analyzed(false), existing(false), has_error(false), nok(NULL) {}
         ~Checker_File_Information_Res();
 
         std::string                                       filename;
@@ -513,6 +513,7 @@ public:
         long                                              source_id;
         size_t                                            generated_time;
         bool                                              analyzed;
+        bool                                              existing;
         bool                                              has_error;
         MediaConch_Nok                                   *nok;
         std::string                                       to_str() const;

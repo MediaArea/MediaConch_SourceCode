@@ -904,7 +904,7 @@ int SQLLiteReport::remove_all_files(int user, std::string& err)
 int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report report_kind, MediaConchLib::format format,
                                const std::string& options,
                                const std::string& report, MediaConchLib::compression compress,
-                               int mil_version, std::string& err)
+                               unsigned long long int mil_version, std::string& err)
 {
     std::stringstream create;
 
@@ -972,7 +972,7 @@ int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report rep
         return -1;
     }
 
-    ret = sqlite3_bind_int(stmt, 7, mil_version);
+    ret = sqlite3_bind_int64(stmt, 7, (sqlite3_int64)mil_version);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -985,7 +985,7 @@ int SQLLiteReport::save_report(int user, long file_id, MediaConchLib::report rep
 int SQLLiteReport::update_report(int, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                                  const std::string& options,
                                  const std::string& report, MediaConchLib::compression compress,
-                                 int mil_version, std::string& err)
+                                 unsigned long long int mil_version, std::string& err)
 {
     std::stringstream create;
 
@@ -1013,7 +1013,7 @@ int SQLLiteReport::update_report(int, long file_id, MediaConchLib::report report
         return -1;
     }
 
-    ret = sqlite3_bind_int(stmt, 3, mil_version);
+    ret = sqlite3_bind_int64(stmt, 3, (sqlite3_int64)mil_version);
     if (ret != SQLITE_OK)
     {
         err = get_sqlite_error(ret);
@@ -1266,7 +1266,7 @@ int SQLLiteReport::report_is_registered(int user, long file_id, MediaConchLib::r
     return 0;
 }
 
-int SQLLiteReport::version_registered(int user, long file_id, std::string& err)
+unsigned long long int SQLLiteReport::version_registered(int user, long file_id, std::string& err)
 {
     if (!file_id_match_user(user, file_id, err))
     {
@@ -1303,7 +1303,7 @@ int SQLLiteReport::version_registered(int user, long file_id, std::string& err)
         return -1;
     }
 
-    return std_string_to_int(reports[0][key]);
+    return std_string_to_ullong(reports[0][key]);
 }
 
 int SQLLiteReport::get_elements(int user, std::vector<std::string>& vec, std::string& err)

@@ -151,7 +151,7 @@ public:
 
     struct Checker_FileInfo
     {
-        Checker_FileInfo() : source_id(-1), generated_time((size_t)-1), analyzed(false), has_error(false) {}
+        Checker_FileInfo() : source_id(-1), generated_time((size_t)-1), analyzed(false), existing(false), has_error(false) {}
 
         std::string                                      filename;
         std::string                                      file_last_modification;
@@ -162,6 +162,7 @@ public:
         long                                             source_id;
         size_t                                           generated_time;
         bool                                             analyzed;
+        bool                                             existing;
         bool                                             has_error;
         std::string                                      error_log;
     };
@@ -282,6 +283,7 @@ public:
     // MediaInfo
     bool mil_has_curl_enabled();
     int mil_get_output_list(std::string& output_list, std::string& error);
+    unsigned long long mil_version();
 
     // MediaConch
     int  mediaconch_get_plugins(std::vector<std::string>& plugins, std::string& error);

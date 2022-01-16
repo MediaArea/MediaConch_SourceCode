@@ -75,7 +75,7 @@ public:
     virtual int  save_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
                              const std::string& options,
                              const std::string& report, MediaConchLib::compression,
-                             int mil_version, std::string& err) = 0;
+                             unsigned long long int mil_version, std::string& err) = 0;
     virtual int  remove_report(int user, long file_id, std::string& err) = 0;
     virtual int  remove_all_reports(int user, std::string& err) = 0;
     virtual int  get_report(int user, long file_id, MediaConchLib::report reportKind, MediaConchLib::format format,
@@ -84,7 +84,7 @@ public:
     virtual int  report_is_registered(int user, long file_id, MediaConchLib::report reportKind,
                                       MediaConchLib::format format, const std::string& options,
                                       bool& registered, std::string& err) = 0;
-    virtual int  version_registered(int user, long file_id, std::string& err) = 0;
+    virtual unsigned long long int  version_registered(int user, long file_id, std::string& err) = 0;
     virtual int  get_elements(int user, std::vector<std::string>& vec, std::string& err) = 0;
     virtual int  get_elements(int user, std::vector<long>& vec, std::string& err) = 0;
     virtual int  get_element_report_kind(int user, long file_id, MediaConchLib::report& report_kind, std::string& err) = 0;

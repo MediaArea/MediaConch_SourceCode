@@ -188,4 +188,13 @@ void DatabaseUi::get_sql_query_for_update_ui_table_v10(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_table_v11(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI"; // Table name
+    create << " ADD MIL_VERSION INT DEFAULT 0;";
+    q = create.str();
+}
+
 }

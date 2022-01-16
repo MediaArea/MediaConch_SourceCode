@@ -49,6 +49,7 @@ protected:
     // Helper
     long                std_string_to_int(const std::string& str);
     size_t              std_string_to_uint(const std::string& str);
+    unsigned long long  std_string_to_ullong(const std::string& str);
     int                 get_db_version(int& version);
     int                 set_db_version(int version);
     const std::string&  get_error() const;

@@ -129,6 +129,19 @@ size_t SQLLite::std_string_to_uint(const std::string& str)
 }
 
 //---------------------------------------------------------------------------
+unsigned long long SQLLite::std_string_to_ullong(const std::string& str)
+{
+    unsigned long long val;
+    char *end = NULL;
+
+    val = strtoull(str.c_str(), &end, 10);
+    // if (!end || *end != '\0')
+    //     error;
+    return val;
+}
+
+
+//---------------------------------------------------------------------------
 int SQLLite::get_db_version(int& version)
 {
     reports.clear();

@@ -193,6 +193,7 @@ public:
     // Helper
     //***************************************************************************
     static std::string get_date();
+    unsigned long long mil_version();
     void plugin_add_log(int level, const std::string& log);
     void plugin_add_log_timestamp(int level, const std::string& log);
 
