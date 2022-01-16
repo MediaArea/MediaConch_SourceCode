@@ -141,7 +141,7 @@ private:
     //create policy from mi
     int find_media_track_node(xmlNodePtr node);
     int find_media_track_node(xmlNodePtr node, std::string& type);
-    int create_rule_from_media_track_child(xmlNodePtr node, const std::string& type);
+    int create_rule_from_media_track_child(xmlNodePtr node, const std::string& type, const std::string& prefix=std::string());
 
     // HELPER
     void replace_xlmns_in_policy(std::string& xslt);
