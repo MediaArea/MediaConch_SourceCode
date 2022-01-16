@@ -684,8 +684,10 @@ xmlDocPtr XsltPolicy::create_doc()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::string& type)
+int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::string& type, const std::string& prefix)
 {
+    std::string current;
+    size_t index = 0;
     for (xmlNodePtr child = node->children; child; child = child->next)
     {
         if (child->type != XML_ELEMENT_NODE || !child->name)
@@ -699,15 +701,28 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
          || name == "FrameCount"
          || name == "StreamSize"
          || name == "BitRate"
-         || name == "Delay"
-         || name == "extra")
+         || name == "Delay")
             continue;
+
+        if(xmlChildElementCount(child))
+        {
+            if (current != name)
+            {
+                index = 0;
+                current = name;
+            }
+
+            std::stringstream ss;
+            ss << "[" << ++index << "]/";
+            create_rule_from_media_track_child(child, type,  prefix + name + ss.str());
+            continue;
+        }
 
         XsltPolicyRule *rule = new XsltPolicyRule;
 
         rule->id = rule->rule_id++;
         rule->track_type = type;
-        rule->field = (const char*)child->name;
+        rule->field = prefix + (const char*)child->name;
         rule->ope = "=";
         rule->occurrence = -1;
         xmlChar *content = xmlNodeGetContent(child);
