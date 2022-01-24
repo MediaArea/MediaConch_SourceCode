@@ -178,6 +178,7 @@
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Checker\Checker.cpp" />
+    <ClCompile Include="..\..\..\Source\IMSC1\IMSC1Plugin.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.c" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
   </ItemGroup>
@@ -264,6 +265,7 @@
     <ClInclude Include="..\..\..\Source\Common\Policy.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\Checker\Checker.h" />
+    <ClInclude Include="..\..\..\Source\IMSC1\IMSC1Plugin.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
   </ItemGroup>

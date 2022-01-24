@@ -73,7 +73,7 @@
     </head>
     <body>
         <div>
-            <h3>Checker</h3>
+            <h3>Policy Checker</h3>
             <div id="options-error" class="error-text"></div>
             <span style="vertical-align: middle;" class="option">
                 <span class="label">Policy</span>
@@ -104,6 +104,10 @@
             <span class="option">
                 <span class="label">Verbose XML:</span>
                 <input style="vertical-align: middle;" type="checkbox" id="verbosity-checkbox" />
+            </span>
+            <span class="option">
+                <span class="label">Check implementation (only for ttml files): </span>
+                <input style="vertical-align: middle;" type="checkbox" id="implementation-checkbox" checked />
             </span>
             <span class="option">
                 <button style="vertical-align: middle;" onclick="document.getElementById('file-input').click();">Check file...</button>
@@ -138,12 +142,18 @@
             // MediaInfo JS
             const MediaInfoJs = document.createElement('script');
             const PolicyCheckerJs = document.createElement('script');
+            const IMSC1PluginJs = document.createElement('script');
+
             if ('WebAssembly' in window) {
               MediaInfoJs.src = "MediaInfoWasm.js";
               PolicyCheckerJs.src = "PolicyCheckerWasm.js";
+              IMSC1PluginJs.src = "IMSC1PluginWasm.js";
+
             } else {
               MediaInfoJs.src = "MediaInfo.js";
               PolicyCheckerJs.src = "PolicyChecker.js";
+              IMSC1PluginJs.src = "IMSC1Plugin.js";
+
             }
             document.body.appendChild(MediaInfoJs);
             document.body.appendChild(PolicyCheckerJs);
@@ -403,16 +413,51 @@
                                 }
                             };
 
-                            // File input
-                            const fileInput = document.getElementById('file-input');
-                            fileInput.onchange = function() {
+                            // File check function
+                            const checkFile = function() {
                                 if (fileInput.files.length > 0) {
                                     document.getElementById('result').innerText = 'Proccessing...';
-                                    checker.checkFile(fileInput.files[0]).then(function() {
-                                        checker.getReport().then(showReport).catch(reportError);
-                                    }).catch(reportError);
+                                    if (implementationCheckbox.checked && typeof(IMSC1Plugin) === 'undefined') {
+                                        // Check filetype in MediaInfo report
+                                        checker.setCheckImplementation(false); // Disable implementation check, since the plugin isn't loaded
+                                        checker.checkFile(fileInput.files[0]).then(function() {
+                                            // Get MediaInfo report and check file type
+                                            checker.getReport(checker.ReportType.MediaInfo).then(function(miReport) {
+                                                let xml = new DOMParser().parseFromString(miReport, 'application/xml');
+                                                if (xml.documentElement.querySelectorAll("track[type='General'] > Format")[0] !== null &&
+                                                    xml.documentElement.querySelectorAll("track[type='General'] > Format")[0].textContent === 'TTML') {
+                                                    // Load IMSC1 plugin
+                                                    document.body.appendChild(IMSC1PluginJs);
+                                                    IMSC1PluginJs.onload = function() {
+                                                        // recheck file
+                                                        checker.setCheckImplementation(implementationCheckbox.checked);
+                                                        checker.checkFile(fileInput.files[0]).then(function() {
+                                                            checker.getReport().then(showReport).catch(reportError);
+                                                        }).catch(reportError);
+                                                    }
+                                                }
+                                                else {
+                                                    checker.getReport().then(showReport).catch(reportError);
+                                                }
+                                            }).catch(reportError);
+                                        }).catch(reportError);
+                                    }
+                                    else {
+                                        checker.setCheckImplementation(implementationCheckbox.checked);
+                                        checker.checkFile(fileInput.files[0]).then(function() {
+                                            checker.getReport().then(showReport).catch(reportError);
+                                        }).catch(reportError);
+                                    }
                                 }
                             };
+
+                            // Implemetation checkbox
+                            const implementationCheckbox = document.getElementById('implementation-checkbox');
+                            implementationCheckbox.onchange = checkFile;
+
+                            // File input
+                            const fileInput = document.getElementById('file-input');
+                            fileInput.onchange = checkFile;
 
                             activateSamplePolicy();
                         }).catch(function(e) {
