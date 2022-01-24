@@ -42,6 +42,7 @@ mediaconch_SOURCES = \
     ../../../Source/Common/WatchFoldersManager.cpp \
     ../../../Source/Common/WatchFolder.cpp \
     ../../../Source/Checker/Checker.cpp \
+    ../../../Source/IMSC1/IMSC1Plugin.cpp \
     ../../../Source/ThirdParty/tfsxml/tfsxml.c
 
 #mediaconch_LDFLAGS     = -no-undefined -version-info 0:0:0

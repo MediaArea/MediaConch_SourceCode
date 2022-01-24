@@ -39,11 +39,6 @@ public:
 
 private:
     IMSC1&    operator=(const IMSC1&);
-
-    int         validate_ttml_file(bool& result, std::string& message, std::string& error);
-    int         write_shema(const std::string& path, const std::string& file, const char* schema, std::string& error);
-    static void xml_error_string(void* data, const char* format, ...);
-    static void xml_error_discard(void*, const char* , ...);
 };
 
 }

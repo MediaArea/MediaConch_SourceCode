@@ -205,6 +205,7 @@
     <ClCompile Include="..\..\..\Source\Common\Xslt.cpp" />
     <ClCompile Include="..\..\..\Source\Common\XsltPolicy.cpp" />
     <ClCompile Include="..\..\..\Source\Checker\Checker.cpp" />
+    <ClCompile Include="..\..\..\Source\IMSC1\IMSC1Plugin.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\commonwebwindow.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp" />
@@ -331,6 +332,7 @@
     <ClInclude Include="..\..\..\Source\Common\Xslt.h" />
     <ClInclude Include="..\..\..\Source\Common\XsltPolicy.h" />
     <ClInclude Include="..\..\..\Source\Checker\Checker.h" />
+    <ClInclude Include="..\..\..\Source\IMSC1\IMSC1Plugin.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\commonwebwindow.h" />
     <ClInclude Include="..\..\..\Source\GUI\Qt\DatabaseUi.h" />

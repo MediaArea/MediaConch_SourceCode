@@ -1,12 +1,12 @@
 (function(root) {
     /**
-     * Create MediaConchPolicyChecker Object.
+     * Create MediaConch Object.
      * @constructor
      * @param {Object} [config]           Configuration options.
      * @param {string} [config.dataPath]  Use this path instead of the current directory for files loading.
      * @param {string} [config.verbosity] Checker report verbosity.
      */
-    MediaConchPolicyChecker = function(config) {
+    MediaConch = function(config) {
         // Internal
         ready = false;
         trace = false;
@@ -17,6 +17,11 @@
         //Policies
         policies = [];
         policyTransformXmlXsl = null;
+        //Implementation
+        imsc1ImplementationModule = null;
+        imsc1ImplementationChecker = null;
+        checkImplementation = false;
+        implementationReport = null;
         // Displays
         displayXsl = null;
         // MediaInfo
@@ -94,7 +99,7 @@
             });
         };
 
-        // Promisified MediaInfo PolicyChecker
+        // Promisified MediaConch PolicyChecker
         loadPolicyCheckerModule = function() {
             return new Promise(function(resolve, reject) {
                 try {
@@ -117,6 +122,33 @@
                 }
                 catch(e) {
                     reject(new Error('Unable to load PolicyChecker module'));
+                }
+            });
+        };
+
+        // Promisified MediaConch IMSC1ImplementationChecker
+        loadIMSC1ImplementationCheckerModule = function() {
+            return new Promise(function(resolve, reject) {
+                try {
+                    imsc1ImplementationModule = IMSC1Plugin({
+                        'locateFile': function(path) {
+                            return dataPath + '/' + path;
+                        },
+                        'postRun': function() {
+                            if (imsc1ImplementationModule instanceof Promise) {
+                                imsc1ImplementationModule.then(function(module) {
+                                    imsc1ImplementationModule = module;
+                                    resolve();
+                                });
+                            }
+                            else {
+                                resolve();
+                            }
+                        }
+                    });
+                }
+                catch(e) {
+                    reject(new Error('Unable to load IMSC1ImplementationChecker module'));
                 }
             });
         };
@@ -177,11 +209,38 @@
             });
         };
 
+        // Generate implementation report
+        createImplementationReport = function(file, mixml) {
+            return new Promise(function(resolve, reject) {
+                if (!(file instanceof(File))) {
+                    reject(new Error('Not a File object'));
+                }
+
+                const parser = new DOMParser();
+                try {
+                        if (mixml.documentElement.querySelectorAll("track[type='General'] > Format")[0] === null ||
+                            mixml.documentElement.querySelectorAll("track[type='General'] > Format")[0].textContent !== 'TTML') {
+                            resolve(null);
+                        }
+
+                        file.text().then(function(data) {
+                        const temp = imsc1ImplementationChecker.validate_buffer(data, file.name);
+                        const report = parser.parseFromString(temp, 'application/xml');
+
+                        resolve(report);
+                    });
+                }
+                catch(e) {
+                    reject(new Error('Unable to create implementation report'));
+                }
+            });
+        };
+
         // Apply policies and display to media info report
         createMediaConchReport = function() {
             return new Promise(function(resolve, reject) {
                 try {
-                    if (mediainfoReport === null || policies.length === 0) {
+                    if ((mediainfoReport === null || policies.length === 0) && (!checkImplementation || implementationReport === null)) {
                         resolve([true, '<MediaArea xmlns="https://mediaarea.net/mediaarea"/>\n']);
                     }
 
@@ -194,6 +253,47 @@
 
                     const xmlSerializer = new XMLSerializer();
                     const parser = new DOMParser();
+
+                    if ( checkImplementation && implementationReport !== null)
+                    {
+                        if (implementationReport.documentElement.getElementsByTagName('implementationChecks')[0] === null ||
+                            implementationReport.documentElement.getElementsByTagName('implementationChecks')[0].attributes.hasOwnProperty('fail_count') === false ||
+                            implementationReport.documentElement.getElementsByTagName('implementationChecks')[0].attributes['fail_count'].value !== '0') {
+                            outcome = false;
+                        }
+
+                        if (displayXsl !== null) {
+                            let displayXsltProc = new XSLTProcessor();
+                            displayXsltProc.importStylesheet(displayXsl);
+                            report = displayXsltProc.transformToDocument(implementationReport);
+
+                            // Unpack report
+                            if (displayXsl.documentElement.nodeName === 'xsl:stylesheet' &&
+                                displayXsl.documentElement.getElementsByTagName('xsl:output')[0] &&
+                                displayXsl.documentElement.getElementsByTagName('xsl:output')[0].attributes.hasOwnProperty('method') &&
+                                displayXsl.documentElement.getElementsByTagName('xsl:output')[0].attributes['method'].value === 'text') {
+                                if (report.documentElement.nodeName === 'html' &&
+                                    report.documentElement.getElementsByTagName('body')[0] &&
+                                    report.documentElement.getElementsByTagName('body')[0].getElementsByTagName('pre')[0]) {
+                                    toReturn += report.documentElement.getElementsByTagName('body')[0].getElementsByTagName('pre')[0].innerText;
+                                }
+                                else if(report.documentElement.nodeName === 'transformiix:result') {
+                                    toReturn += report.documentElement.textContent;
+                                }
+                            }
+                            else { // Pretty-print xml
+                                let xml = xmlSerializer.serializeToString(report);
+                                xml = prettifyXml(xml);
+                                toReturn += xml;
+                            }
+                        }
+                        else { // Pretty-print xml
+                            let xml = xmlSerializer.serializeToString(implementationReport);
+                            xml = prettifyXml(xml);
+                            toReturn += xml;
+                        }
+                        toReturn += '\n';
+                    }
 
                     const checker = new checkerModule.PolicyChecker();
                     policies.forEach(function(policy) {
@@ -327,13 +427,24 @@
             });
         };
     };
-    root.MediaConchPolicyChecker = MediaConchPolicyChecker;
+    root.MediaConch = MediaConch;
+    root.MediaConchPolicyChecker = MediaConch;
 
     /**
-     * Initialize MediaConchPolicyChecker object.
+     * Enum for reports type.
+     * @readonly
+     * @enum {number}
+     */
+     MediaConch.prototype.ReportType = Object.freeze({
+         MediaConch: 0,
+         MediaInfo: 1
+     });
+
+    /**
+     * Initialize MediaConch object.
      * @return {Promise} Promise of initialized object.
      */
-    MediaConchPolicyChecker.prototype.init = async function() {
+    MediaConch.prototype.init = async function() {
         const results = await Promise.all([
             (await loadPolicyTransformXmlXsl()),
             (await loadMediaInfoModule()),
@@ -359,9 +470,9 @@
      * @throws {Error}          Will throw an error if the object is not in ready state.
      * @return {?number}        Policy ID (null if the policy is not valid).
      */
-    MediaConchPolicyChecker.prototype.addPolicy = function(policy) {
+    MediaConch.prototype.addPolicy = function(policy) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         const dom = new DOMParser().parseFromString(policy, 'application/xml');
@@ -391,9 +502,9 @@
      * @throws {Error}      Will throw an error if the object is not in ready state.
      * @return {?number}    Removed policy ID (null if not found).
      */
-    MediaConchPolicyChecker.prototype.removePolicy = function(id) {
+    MediaConch.prototype.removePolicy = function(id) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         for (var i = 0; i < policies.length; ++i) {
@@ -413,9 +524,9 @@
      * @returns {number}   policies[].id   Policy ID.
      * @returns {string}   policies[].name Policy name.
      */
-    MediaConchPolicyChecker.prototype.listPolicies = function(id) {
+    MediaConch.prototype.listPolicies = function(id) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         const toReturn = [];
@@ -435,9 +546,9 @@
      * @throws {Error}       Will throw an error if the object is not in ready state.
      * @returns {?string}    Policy content XML (null if not found).
      */
-    MediaConchPolicyChecker.prototype.getPolicy = function(id) {
+    MediaConch.prototype.getPolicy = function(id) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         for (var i = 0; i < policies.length; ++i) {
@@ -454,9 +565,9 @@
      * @param  {string} display Custom display xslt stylesheet or '' for raw xml report.
      * @throws {Error}          Will throw an error if the object is not in ready state or if the custom stylesheet is not valid.
      */
-    MediaConchPolicyChecker.prototype.setDisplay = function(display) {
+    MediaConch.prototype.setDisplay = function(display) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         if (display === '') {
@@ -476,9 +587,9 @@
      * @throws {Error}    Will throw an error if the object is not in ready state.
      * @returns {?string} Current display sheet (null if none).
      */
-    MediaConchPolicyChecker.prototype.getDisplay = function() {
+    MediaConch.prototype.getDisplay = function() {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         if(displayXsl === null)
@@ -492,9 +603,9 @@
      * @param  {number} level Verbosity level.
      * @throws {Error}        Will throw an error if the object is not in ready state.
      */
-    MediaConchPolicyChecker.prototype.setVerbosity = function(level) {
+    MediaConch.prototype.setVerbosity = function(level) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         verbosity = level;
@@ -505,12 +616,38 @@
      * @throws {Error}       Will throw an error if the object is not in ready state.
      * @returns {?string}    Policy content XML (null if not found).
      */
-    MediaConchPolicyChecker.prototype.getVerbosity = function() {
+    MediaConch.prototype.getVerbosity = function() {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
         return verbosity;
+    };
+
+    /**
+     * Check the implementation for newly opened files.
+     * @param   {boolean}  state.
+     * @throws {Error}       Will throw an error if the object is not in ready state.
+     */
+    MediaConch.prototype.setCheckImplementation = function(state) {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        checkImplementation = state;
+    };
+
+    /**
+     * Get the implementation check state.
+     * @throws {Error}       Will throw an error if the object is not in ready state.
+     * @returns {?string}    Implementation check state.
+     */
+    MediaConch.prototype.getCheckImplementation = function() {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        return checkImplementation;
     };
 
     /**
@@ -519,24 +656,44 @@
      * @throws  {Error}        Will throw an error if the object is not in ready state.
      * @returns {Promise}      Promise of validation result as boolean.
      */
-    MediaConchPolicyChecker.prototype.checkFile = async function(file) {
+    MediaConch.prototype.checkFile = async function(file) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
         mediainfoReport = await createMediaInfoReport(file);
+
+        if (checkImplementation) {
+            if (imsc1ImplementationModule === null) {
+                await loadIMSC1ImplementationCheckerModule();
+                imsc1ImplementationChecker = new imsc1ImplementationModule.IMSC1Plugin("/tmp/");
+            }
+            implementationReport = await createImplementationReport(file, mediainfoReport);
+        }
+        else
+            implementationReport = null;
+
         return (await createMediaConchReport())[0];
     };
 
     /**
-     * Get the validation report of the last checked file (e.g. after changing the verbosity or the display).
+     * Get the report of the last checked file (e.g. after changing the verbosity or the display).
+     * @param   {MediaConch.ReportType} requested report type(MediaInfo or MediaConch).
      * @throws  {Error} Will throw an error if the object is not in ready state.
-     * @returns {Promise} Promise of validation report as string.
+     * @returns {Promise} Promise of mediainfo or mediaconch report as string.
      */
-    MediaConchPolicyChecker.prototype.getReport = async function() {
+    MediaConch.prototype.getReport = async function(type=MediaConch.prototype.ReportType.MediaConch) {
         if (!ready) {
-            throw new Error('MediaConchPolicyChecker is not ready. Call init() function before use.');
+            throw new Error('MediaConch is not ready. Call init() function before use.');
         }
 
+        if (type===MediaConch.prototype.ReportType.MediaInfo) {
+            if (mediainfoReport !== null) {
+                return Promise.resolve(prettifyXml(new XMLSerializer().serializeToString(mediainfoReport)));
+            }
+            else {
+                return Promise.resolve(null);
+            }
+        }
         return (await createMediaConchReport())[1];
     };
 }(this));

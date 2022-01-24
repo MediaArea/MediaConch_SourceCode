@@ -1,0 +1,13 @@
+all: IMSC1PluginWasm.js IMSC1Plugin.js
+
+clean:
+		rm *.o
+
+IMSC1Plugin.js:  IMSC1Plugin.o
+		em++ -std=c++11 -Os -s WASM=0 -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 -s MODULARIZE=1 -s EXPORT_NAME="'IMSC1Plugin'" --closure 0 -o $@ $(CXXFLAGS) --bind $^ -L../../../libxml2/.libs -lxml2
+
+IMSC1PluginWasm.js: IMSC1Plugin.o
+		em++ -std=c++11 -Os -s WASM=1 -s TOTAL_MEMORY=33554432 -s ALLOW_MEMORY_GROWTH=1 -s FORCE_FILESYSTEM=1 -s MODULARIZE=1 -s EXPORT_NAME="'IMSC1Plugin'" --closure 0 -o $@ $(CXXFLAGS) --bind $^ -L../../../libxml2/.libs -lxml2
+
+%.o: %.cpp
+		em++ -std=c++11 -Wall  -I.. -I../../../libxml2/include -c -o $@ $(CXXFLAGS) $<
