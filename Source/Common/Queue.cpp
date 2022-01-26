@@ -116,8 +116,6 @@ void QueueElement::Entry()
             break;
         }
     }
-    if (found == false)
-        MI->Option(__T("ParseSpeed"), __T("0"));
 
     // Configuration of the parsing
     found = false;

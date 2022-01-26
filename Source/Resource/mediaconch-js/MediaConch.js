@@ -454,7 +454,6 @@
         mediainfoVersion = mediainfoModule.MediaInfo.Option_Static('Info_Version', '').replaceAll('MediaInfoLib - v', '');
         mediainfo = new mediainfoModule.MediaInfo();
         mediainfo.Option('Language', 'raw');
-        mediainfo.Option('ParseSpeed', '0');
         mediainfo.Option('Complete', '1');
 
         //TODO: check for trace support
