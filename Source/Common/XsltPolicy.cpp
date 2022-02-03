@@ -701,7 +701,9 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
          || name == "FrameCount"
          || name == "StreamSize"
          || name == "BitRate"
-         || name == "Delay")
+         || name == "Delay"
+         || name == "Count"
+         || name == "CodecID_Url")
             continue;
 
         if(xmlChildElementCount(child))
