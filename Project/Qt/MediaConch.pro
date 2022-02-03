@@ -92,6 +92,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Common/WatchFoldersManager.cpp \
                     ../../Source/Common/WatchFolder.cpp \
                     ../../Source/Checker/Checker.cpp \
+                    ../../Source/Checker/Path.cpp \
                     ../../Source/IMSC1/IMSC1Plugin.cpp \
                     ../../Source/ThirdParty/tfsxml/tfsxml.c \
                     ../../Source/GUI/Qt/main.cpp \
@@ -182,6 +183,7 @@ HEADERS          += ../../Source/Common/MediaConchLib.h \
                     ../../Source/Common/PluginFileLog.h \
                     ../../Source/Common/WatchFoldersManager.h \
                     ../../Source/Checker/Checker.h \
+                    ../../Source/Checker/Path.h \
                     ../../Source/IMSC1/IMSC1Plugin.h \
                     ../../Source/ThirdParty/tfsxml/tfsxml.h \
                     ../../Source/GUI/Qt/commonwebwindow.h \

@@ -17,6 +17,7 @@
 
 //---------------------------------------------------------------------------
 #include "ThirdParty/tfsxml/tfsxml.h"
+#include "Path.h"
 
 #include <string>
 #include <vector>
@@ -64,6 +65,7 @@ private:
         virtual void resolve();
         virtual std::string to_string(size_t level, bool verbose=false);
 
+        std::vector<PathElement> path;
         std::string scope;
         std::string field;
         std::string tracktype;
@@ -71,7 +73,7 @@ private:
         std::string operand;
         std::string xpath;
         std::string requested;
-        std::map<std::string, std::string> values;
+        std::vector<std::string> values;
 
     private:
         bool resolved;
@@ -101,7 +103,7 @@ private:
 
     RuleElement* parse_rule(tfsxml_string& tfsxml_priv);
     PolicyElement* parse_policy(tfsxml_string& tfsxml_priv);
-    void parse_mi_track(tfsxml_string& tfsxml_priv);
+    void parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, size_t level);
 
     std::vector<PolicyElement*> policies;
     std::vector<RuleElement*> rules;
