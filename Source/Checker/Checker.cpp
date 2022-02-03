@@ -16,10 +16,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
-//TODO: check xml entities on input
 //TODO: mmt
 //TODO: reference_file
-//TODO: multiples policies
 
 //---------------------------------------------------------------------------
 // Helpers
@@ -182,6 +180,9 @@ bool PolicyChecker::PolicyElement::result()
 //---------------------------------------------------------------------------
 std::string PolicyChecker::PolicyElement::to_string(size_t level, bool verbose)
 {
+    if(!resolved)
+        resolve();
+
     std::stringstream ss;
 
     ss << indent(level) << "<policy name=\"" << xml_encode(name) << "\" type=\"" << xml_encode(type) << "\" rules_run=\"" << children.size() << "\" pass_count=\""
@@ -226,42 +227,26 @@ void PolicyChecker::RuleElement::resolve()
 {
     if (operand=="exists")
     {
-        if (occurrence=="*")
             pass=!values.empty();
-        else
-            pass=values.find(occurrence)!=values.end();
     }
     else if (operand=="must not exist")
     {
-        if (occurrence=="*")
             pass=values.empty();
-        else
-            pass=values.find(occurrence)==values.end();
     }
     else if (operand=="starts with")
     {
-        if (occurrence=="*")
-            for (std::map<std::string, std::string>::iterator it=values.begin(); it!=values.end(); it++)
-                pass
-                |=(it->second.rfind(requested, 0)==0);
-        else
-             pass=values.find(occurrence)!=values.end() && values[occurrence].rfind(requested, 0)==0;
+            for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
+                pass|=(it->rfind(requested, 0)==0);
     }
     else if (operand=="must no starts with")
     {
-        if (occurrence=="*")
-            for (std::map<std::string, std::string>::iterator it=values.begin(); it!=values.end(); it++)
-                pass|=(it->second.rfind(requested, 0)!=0);
-        else
-            pass=values.find(occurrence)!=values.end() && values[occurrence].rfind(requested, 0) != 0; //TODO: check xslt behavior
+            for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
+                pass|=(it->rfind(requested, 0)!=0);
     }
     else if (operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
-        if (occurrence=="*")
-            for (std::map<std::string, std::string>::iterator it=values.begin(); it!=values.end(); it++)
-                 pass|=compare(it->second, requested, operand);
-        else
-            pass=values.find(occurrence)!=values.end() && compare(values[occurrence], requested, operand);
+            for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
+                 pass|=compare(*it, requested, operand);
     }
 
     resolved=true;
@@ -286,9 +271,9 @@ std::string PolicyChecker::RuleElement::to_string(size_t level, bool verbose)
     if (!scope.empty())
         ss << " scope=\"" << xml_encode(scope) << "\"";
     ss << " value=\"" << xml_encode(field) << "\" tracktype=\"" << xml_encode(tracktype) << "\" occurrence=\"" << xml_encode(occurrence)
-       << "\" operator=\"" << xml_encode(operand) << "\" xpath=\"" << xml_encode(xpath) << "\"";
+       << "\" operator=\"" << xml_encode(operand) << "\" xpath=\"" << xpath << "\"";
     if (!outcome || verbose)
-        ss << " requested=\"" << xml_encode(requested) << "\" actual=\"" << (values.size() ? xml_encode(values.begin()->second) : std::string()) << "\"";
+        ss << " requested=\"" << xml_encode(requested) << "\" actual=\"" << (values.size() ? xml_encode(values.front()) : std::string()) << "\"";
     ss << " outcome=\"" << (outcome ? "pass" : "fail") << "\"/>" << std::endl;
 
     return ss.str();
@@ -362,6 +347,7 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
         //if (rule->operand == "=" || rule->operand.rfind("<", 0) == 0 || rule->operand.rfind(">", 0) == 0 || rule->operand.rfind("&", 0) == 0 /* &lt; &lt;=...*/) // TODO: disable also for string fields
         //    ss << rule->operand << "'" << rule->requested << "'";
         rule->xpath=ss.str();
+        rule->path = parse_path(rule->xpath);
     }
 
     rules.push_back(rule);
@@ -414,75 +400,6 @@ PolicyChecker::PolicyElement* PolicyChecker::parse_policy(tfsxml_string& tfsxml_
 }
 
 //---------------------------------------------------------------------------
-void PolicyChecker::parse_mi_track(tfsxml_string& tfsxml_priv)
-{
-    tfsxml_string result;
-
-    if (!tfsxml_enter(&tfsxml_priv))
-    {
-        std::string tracktype;
-        std::string tracknumber;
-        std::vector<RuleElement*> local;
-        tfsxml_string tfsxml_priv_save = tfsxml_priv;
-
-        // Search for StreamKind
-        while (!tfsxml_next_named(&tfsxml_priv, &result, "StreamKind"))
-        {
-            if (!tfsxml_value(&tfsxml_priv, &result))
-            {
-                tracktype=std::string(result.buf, result.len);
-                break;
-            }
-        }
-        tfsxml_priv=tfsxml_priv_save;
-
-        // search for StreamCount
-        while (!tfsxml_next_named(&tfsxml_priv, &result, "StreamCount"))
-        {
-            if (!tfsxml_value(&tfsxml_priv, &result))
-            {
-                tracknumber=std::string(result.buf, result.len);
-                break;
-            }
-        }
-        tfsxml_priv=tfsxml_priv_save;
-
-        // Search rules
-        for (size_t pos=0; pos<rules.size(); pos++)
-        {
-            if (!rules[pos])
-                continue;
-
-            if((rules[pos]->scope.empty() || rules[pos]->scope == "mi") && rules[pos]->tracktype==tracktype && (rules[pos]->occurrence== "*" || rules[pos]->occurrence==tracknumber))
-                local.push_back(rules[pos]);
-        }
-
-        if (local.empty())
-        {
-            while (!tfsxml_next(&tfsxml_priv, &result)); //TODO: fix parsing
-            return;
-        }
-
-        // Populate values
-        while (!tfsxml_next(&tfsxml_priv, &result))
-        {
-            std::string field=std::string(result.buf, result.len);
-            if (field!="extra" && !tfsxml_value(&tfsxml_priv, &result))
-            {
-                for (size_t pos=0; pos<local.size(); pos++) //TODO: return if empty;
-                {
-                    if (local[pos] && local[pos]->field==field)
-                    {
-                        local[pos]->values[tracknumber]=std::string(result.buf, result.len);
-                        local[pos]=NULL;
-                    }
-                }
-            }
-        }
-    }
-}
-
-//---------------------------------------------------------------------------
 void PolicyChecker::add_policy(const std::string& policy)
 {
     tfsxml_string tfsxml_priv;
@@ -499,6 +416,48 @@ void PolicyChecker::add_policy(const std::string& policy)
             break;
         }
     }
+}
+
+//---------------------------------------------------------------------------
+void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, size_t level)
+{
+    if (rules.empty())
+        return;
+
+    tfsxml_string tfsxml_priv_save = tfsxml_priv;
+    if (!tfsxml_enter(&tfsxml_priv))
+    {
+        std::map<std::string, size_t> occurences;
+
+        tfsxml_string result;
+        while (!tfsxml_next(&tfsxml_priv, &result))
+        {
+            std::vector<RuleElement*> matching_rules;
+
+            std::string field = std::string(result.buf, result.len);
+            occurences[field]++;
+
+            for (size_t pos = 0; pos < rules.size(); pos++)
+            {
+                if (level < rules[pos]->path.size() && path_is_matching(tfsxml_priv, result, rules[pos]->path[level], occurences[field]))
+                {
+                    tfsxml_string tfsxml_priv_copy = tfsxml_priv;
+                    if (level == rules[pos]->path.size() - 1)
+                    {
+                        tfsxml_string value;
+                        if (!tfsxml_value(&tfsxml_priv_copy, &value))
+                            rules[pos]->values.push_back(std::string(value.buf, value.len));
+                    }
+                    else
+                        matching_rules.push_back(rules[pos]);
+                }
+            }
+
+            if (!matching_rules.empty())
+                parse_node(tfsxml_priv, matching_rules, level + 1);
+        }
+    }
+    tfsxml_priv=tfsxml_priv_save;
 }
 
 //---------------------------------------------------------------------------
@@ -528,24 +487,7 @@ int PolicyChecker::analyze(const std::string& report, bool verbose, std::string&
                 }
 
                 ss << indent(level++) << "<media ref=\"" << media << "\">" << std::endl;
-                if (!tfsxml_enter(&tfsxml_priv))
-                {
-                    while (!tfsxml_next(&tfsxml_priv, &result))
-                    {
-                        if (!tfsxml_strcmp_charp(result, "MediaInfo"))
-                        {
-                            if (!tfsxml_enter(&tfsxml_priv))
-                            {
-                                while (!tfsxml_next_named(&tfsxml_priv, &result, "track"))
-                                    parse_mi_track(tfsxml_priv);
-                            }
-                        }
-                        else if (!tfsxml_strcmp_charp(result, "MicroMediaTrace"))
-                        {
-                            //TODO:
-                        }
-                    }
-                }
+                parse_node(tfsxml_priv, rules, 0);
                 for (size_t pos=0; pos<policies.size(); pos++)
                     ss << policies[pos]->to_string(level, verbose);
                 ss << indent(--level) << "</media>" << std::endl;
