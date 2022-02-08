@@ -459,7 +459,10 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
 
                 ZenLib::File F;
                 if (!F.Create(ZenLib::Ztring().From_UTF8(outputs[i].second.c_str())))
+                {
                     STRINGOUT(__T("Unable to write to output file: ") + ZenLib::Ztring().From_UTF8(filename));
+                    return CLI_RETURN_ERROR;
+                }
 
                 //Filling
                 F.Write(report_mi);
