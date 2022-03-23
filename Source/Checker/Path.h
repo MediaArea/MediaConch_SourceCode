@@ -39,7 +39,7 @@ struct PathElement
 };
 
 std::vector<PathElement> parse_path(const std::string& xpath);
-bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t occurence);
+bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurence);
 }
 
 #endif
