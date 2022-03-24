@@ -437,10 +437,8 @@ void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleEleme
             std::string field = std::string(result.buf, result.len);
             for (size_t pos = 0; pos < rules.size(); pos++)
             {
-                if (level < rules[pos]->path.size() && path_is_matching(tfsxml_priv, result, rules[pos]->path[level], occurences[&rules[pos]->path[level]] + 1))
+                if (level < rules[pos]->path.size() && path_is_matching(tfsxml_priv, result, rules[pos]->path[level], occurences[&rules[pos]->path[level]]))
                 {
-                    occurences[&rules[pos]->path[level]]++;
-
                     tfsxml_string tfsxml_priv_copy = tfsxml_priv;
                     if (level == rules[pos]->path.size() - 1)
                     {

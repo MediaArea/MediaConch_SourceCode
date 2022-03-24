@@ -107,16 +107,12 @@ std::vector<PathElement> parse_path(const std::string& xpath)
 
 
 //---------------------------------------------------------------------------
-bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t occurence)
+bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurence)
 {
     tfsxml_string value;
 
     // compare names
     if (tfsxml_strcmp_charp(node, path.name.c_str()))
-        return false;
-
-    // compare occurence
-    if (path.occurence!=(size_t)-1 && path.occurence!=occurence)
         return false;
 
     // compare attributes
@@ -141,6 +137,13 @@ bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathEleme
             it++;
         }
    }
+
+    occurence++;
+
+    // compare occurence
+    if (path.occurence!=(size_t)-1 && path.occurence!=occurence)
+        return false;
+
    return true;
 }
 
