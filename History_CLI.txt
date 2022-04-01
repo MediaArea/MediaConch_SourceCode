@@ -7,6 +7,20 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 22.03, 2022-03-31
+--------------
+Update to MediaInfo library 22.03, see MediaInfo change log for the list of changes in the file formats support
+Dedicated package for full online (no need to upload the file) policy checker in the web browser (technology preview)
+Policy checker can handle time code comparison, including less than and greater than
+IMSC1 implementation checker
+Policy creation from a MediaInfo report includes the extra (not common to several formats) fields
+Policy creation from a MediaInfo report includes several forms of some fields
+Parsing speed is now the MediaInfo library default (use --ParseSpeed=0 for getting back the previous behavior)
+Report result cache is cleared when a new version of the tool is installed (including development snapshots)
+Does not validate Matroska attachments content against Matroska rules
+More platforms supported, including Amazon Lambda (x86_64 and ARM)
+Windows 7+, macOS 10.10+, RHEL/CentOS 7+, SLE 12+, Debian 9+, Ubuntu 18.04+, Fedora 34+
+
 Version 18.03.2, 2018-04-10
  --------------
 (No changes)

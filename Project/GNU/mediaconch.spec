@@ -1,6 +1,6 @@
-%global mediaconch_version          18.03.2
-%global libmediainfo_version        18.03.1
-%global libzen_version              0.4.37
+%global mediaconch_version          22.03
+%global libmediainfo_version        22.03
+%global libzen_version              0.4.39
 
 %if 0%{?fedora_version} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
 %global libmediaconch_name libmediaconch
