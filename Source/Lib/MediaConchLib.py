@@ -241,7 +241,7 @@ class MediaConch:
         Raises:
             MediaConchException: If self._throws is set to True and MediaConchLib report an error.
         """
-        self._MediaConch_set_mil_option(self._handle, name, value)
+        self._MediaConch_set_mil_option(self._handle, name.encode("utf-8"), value.encode("utf-8"))
         if self._throws:
             last_error = self.get_last_error()
             if last_error:
