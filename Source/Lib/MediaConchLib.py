@@ -7,7 +7,8 @@
 """MediaConchLib Python wrapper module.
 """
 
-import sys as _sys
+import os as _os
+import platform as _platform
 from ctypes import CDLL as _CDLL
 from ctypes import c_void_p as _c_void_p
 from ctypes import c_char_p as _c_char_p
@@ -16,10 +17,26 @@ from ctypes import c_bool as _c_bool
 from ctypes import c_long as _c_long
 from ctypes import c_int as _c_int
 
-if _sys.platform == "darwin":
-    _MediaConchLib_Handler = _CDLL("libmediaconch.0.dylib")
+
+
+_module = _os.path.abspath(_os.path.dirname(__file__))
+_machine = _platform.machine().lower()
+_system = _platform.system().lower()
+
+if _machine in ["i386", "i686"]:
+    _machine = "x86_32"
+elif _machine in ["amd64"]:
+    _machine = "x86_64"
+
+if _system == "darwin":
+    _library = "libmediaconch.0.dylib"
 else:
-    _MediaConchLib_Handler = _CDLL("libmediaconch.so.0")
+    _library = "libmediaconch.so.0"
+
+try:
+    _MediaConchLib_Handler = _CDLL("{}/{}/{}/{}".format(_module, _system, _machine, _library))
+except:
+    _MediaConchLib_Handler = _CDLL(_library)
 
 class Format:
     """Possibles MediaConch output formats.
