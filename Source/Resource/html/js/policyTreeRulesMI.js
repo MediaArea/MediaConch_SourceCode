@@ -24,7 +24,12 @@ var policyTreeRulesMI = (function() {
             if (null != node.data.value) {
                 $('#xslPolicyRule_value').append('<option value="' + node.data.value + '" selected>' + node.data.value + '</option>');
             }
-
+            if ('' != node.data.level && $('#xslPolicyRule_level option[value="' + node.data.level + '"]').length) {
+                $('#xslPolicyRule_level option[value="' + node.data.level + '"]').prop('selected', true);
+            }
+            else {
+                $('#xslPolicyRule_level option[value=""]').prop('selected', true);
+            }
             $('#xslPolicyRule_trackType option[value="' + node.data.tracktype + '"]').prop('selected', true);
             $('#xslPolicyRule_trackType').trigger('change');
             $('#xslPolicyRule_occurrence').val(-1 == node.data.occurrence ? '' : node.data.occurrence);
@@ -40,6 +45,9 @@ var policyTreeRulesMI = (function() {
             $('#xslPolicyRule_field option').remove();
             $('#xslPolicyRule_field option[value=""]').prop('selected', true);
             $('#xslPolicyRule_field').trigger('change');
+            $('#xslPolicyRule_level option').remove();
+            $('#xslPolicyRule_level option[value=""]').prop('selected', true);
+            $('#xslPolicyRule_level').trigger('change');
             $('#xslPolicyRule_value option').remove();
             $('#xslPolicyRule_value option[value=""]').prop('selected', true);
             $('#xslPolicyRule_value').trigger('change');
@@ -54,6 +62,7 @@ var policyTreeRulesMI = (function() {
             $('#xslPolicyRule_title').prop('disabled', true);
             $('#xslPolicyRule_trackType').prop('disabled', true);
             $('#xslPolicyRule_field').prop('disabled', true);
+            $('#xslPolicyRule_level').prop('disabled', true);
             $('#xslPolicyRule_occurrence').prop('disabled', true);
             $('#xslPolicyRule_validator').prop('disabled', true);
             $('#xslPolicyRule_value').prop('disabled', true);
@@ -65,6 +74,7 @@ var policyTreeRulesMI = (function() {
             $('#xslPolicyRule_title').prop('disabled', false);
             $('#xslPolicyRule_trackType').prop('disabled', false);
             $('#xslPolicyRule_field').prop('disabled', false);
+            $('#xslPolicyRule_level').prop('disabled', false);
             displayOccurenceField($('#xslPolicyRule_trackType').val());
             $('#xslPolicyRule_validator').prop('disabled', false);
             $('#xslPolicyRule_value').prop('disabled', false);

@@ -19,6 +19,12 @@ var policyTreeRulesMT = (function() {
 
         if (policyTreeRules.isRuleMT(node)) {
             $('#xslPolicyRuleMt_field').val(node.data.field);
+            if ('' != node.data.level && $('#xslPolicyRuleMt_level option[value="' + node.data.level + '"]').length) {
+                $('#xslPolicyRuleMt_level option[value="' + node.data.level + '"]').prop('selected', true);
+            }
+            else {
+                $('#xslPolicyRuleMt_level option[value=""]').prop('selected', true);
+            }
             if ('' != node.data.ope && $('#xslPolicyRuleMt_validator option[value="' + node.data.ope + '"]').length) {
                 $('#xslPolicyRuleMt_validator option[value="' + node.data.ope + '"]').prop('selected', true);
             }
@@ -30,6 +36,7 @@ var policyTreeRulesMT = (function() {
         }
         else {
             $('#xslPolicyRuleMt_field').val('');
+            $('#xslPolicyRuleMt_level option[value=""]').prop('selected', true);
             $('#xslPolicyRuleMt_validator option[value="exists"]').prop('selected', true);
             $('#xslPolicyRuleMt_validator').trigger('change');
             $('#xslPolicyRuleMt_value').val('');
@@ -38,6 +45,7 @@ var policyTreeRulesMT = (function() {
         if (system) {
             $('#xslPolicyRuleMt_title').prop('disabled', true);
             $('#xslPolicyRuleMt_field').prop('disabled', true);
+            $('#xslPolicyRuleMt_level').prop('disabled', true);
             $('#xslPolicyRuleMt_validator').prop('disabled', true);
             $('#xslPolicyRuleMt_value').prop('disabled', true);
             $('#xslPolicyRuleMt_SaveRule').addClass('hidden');
@@ -47,6 +55,7 @@ var policyTreeRulesMT = (function() {
         else {
             $('#xslPolicyRuleMt_title').prop('disabled', false);
             $('#xslPolicyRuleMt_field').prop('disabled', false);
+            $('#xslPolicyRuleMt_level').prop('disabled', false);
             $('#xslPolicyRuleMt_validator').prop('disabled', false);
             $('#xslPolicyRuleMt_value').prop('disabled', false);
             $('#xslPolicyRuleMt_SaveRule').removeClass('hidden');

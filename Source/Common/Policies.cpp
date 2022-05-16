@@ -443,6 +443,7 @@ MediaConchLib::XSLT_Policy_Rule* Policies::xslt_policy_rule_to_mcl_policy(XsltPo
     r->tracktype = rule->track_type;
     r->field = rule->field;
     r->scope = rule->scope;
+    r->level = rule->level;
     r->occurrence = rule->occurrence;
     r->ope = rule->ope;
     r->value = rule->value;
@@ -462,6 +463,7 @@ MediaConchLib::Policy_Policy *Policies::xslt_policy_to_mcl_policy(XsltPolicy *po
     p->name = policy->name;
     p->description = policy->description;
     p->tags = policy->tags;
+    p->level = policy->level;
     p->license = policy->license;
     p->is_system = policy->is_system;
     p->is_public = policy->is_public;
@@ -786,8 +788,8 @@ int Policies::clear_policies(int user, std::string& err)
     return 0;
 }
 
-int Policies::policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                                 const std::vector<std::string>& tags, const std::string& license, std::string& err)
+int Policies::policy_change_info(int user, int id, const std::string& name, const std::string& description, const std::vector<std::string>& tags,
+                                 const std::string& level, const std::string& license, std::string& err)
 {
     Policy *p = get_policy(user, id, err);
     if (!p)
@@ -805,6 +807,8 @@ int Policies::policy_change_info(int user, int id, const std::string& name, cons
     p->description = description;
     if (tags.size())
         p->tags = tags;
+    if (level.size())
+        p->level = level;
     if (license.size())
         p->license = license;
 

@@ -10,7 +10,15 @@ var policyCell = (function() {
         var policyResultText = '<span class="policyResult">';
         if (data.valid) {
             nodePolicy.removeClass().addClass('success');
-            policyResultText += '<span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span><span class="hidden">P</span> '
+            if (data.warn) {
+                policyResultText += '<span class="glyphicon glyphicon-warning-sign" style="color:gold" aria-hidden="true"></span><span class="hidden">P</span> '
+            }
+            else if (data.info) {
+                policyResultText += '<span class=" 	glyphicon glyphicon-info-sign" style="color:blue" aria-hidden="true"></span><span class="hidden">P</span> '
+            }
+            else {
+                policyResultText += '<span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span><span class="hidden">P</span> '
+            }
         }
         else {
             nodePolicy.removeClass().addClass('danger');

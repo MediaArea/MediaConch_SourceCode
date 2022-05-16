@@ -10,7 +10,12 @@ var policyTreePolicies = (function() {
         $('#xslPolicyInfo_policyDescription').val(node.data.description);
         $('#xslPolicyInfo_policyTags').val(node.data.tags ? node.data.tags.join('\n') : '');
         $('#xslPolicyInfo_policyType option[value="' + node.data.type + '"]').prop('selected', true);
-
+        if ('' != node.data.level && $('#xslPolicyInfo_policyLevel option[value="' + node.data.level + '"]').length) {
+            $('#xslPolicyInfo_policyLevel option[value="' + node.data.level + '"]').prop('selected', true);
+        }
+        else {
+            $('#xslPolicyInfo_policyLevel option[value=""]').prop('selected', true);
+        }
         if ('s' == node.type || ('u' == node.type && !node.data.isEditable) ) {
             $('#policyDelete').removeClass('hidden');
             $('#policyRuleCreateContainer').addClass('hidden');
@@ -18,6 +23,7 @@ var policyTreePolicies = (function() {
             $('#xslPolicyInfo_policyDescription').prop('disabled', true);
             $('#xslPolicyInfo_policyTags').prop('disabled', true);
             $('#xslPolicyInfo_policyType').prop('disabled', true);
+            $('#xslPolicyInfo_policyLevel').prop('disabled', true);
             $('#xslPolicyInfo_SavePolicyInfo').addClass('hidden');
             $('.policyEditActions.policyEditUser').addClass('hidden');
             $('.policyEditActions.policyVisibility').addClass('hidden');
@@ -35,6 +41,7 @@ var policyTreePolicies = (function() {
             $('#xslPolicyInfo_policyDescription').prop('disabled', false);
             $('#xslPolicyInfo_policyTags').prop('disabled', false);
             $('#xslPolicyInfo_policyType').prop('disabled', false);
+            $('#xslPolicyInfo_policyLevel').prop('disabled', false);
             $('#xslPolicyInfo_SavePolicyInfo').removeClass('hidden');
             $('.policyEditActions.policyEditUser').removeClass('hidden');
             $('.policyEditActions.policyVisibility').addClass('hidden');

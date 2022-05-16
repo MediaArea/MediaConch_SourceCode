@@ -696,6 +696,7 @@ int JsTree::rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& 
     ss << ",\"tracktype\":\"" << unified_json_value(rule->tracktype);
     ss << "\",\"field\":\"" << unified_json_value(rule->field);
     ss << "\",\"scope\":\"" << unified_json_value(rule->scope);
+    ss << "\",\"level\":\"" << unified_json_value(rule->level);
     ss << "\",\"occurrence\":" << rule->occurrence;
     ss << ",\"ope\":\"" << unified_json_value(rule->ope);
     ss << "\",\"value\":\"" << unified_json_value(rule->value);
@@ -734,6 +735,7 @@ int JsTree::policy_to_js_tree(MediaConchLib::Policy_Policy* policy, std::string&
             }
             ss << "]";
         }
+        ss << ",\"level\":\"" << unified_json_value(policy->level) << "\"";
         if (policy->parent_id == -1 && policy->is_public)
             ss << ",\"isPublic\":" << std::boolalpha << policy->is_public;
         if (policy->license.size())

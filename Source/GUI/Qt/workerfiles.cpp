@@ -439,7 +439,7 @@ int WorkerFiles::update_policy_of_file_registered_from_file(long file_id, long p
 
     fr->policy = policy;
 
-    bool policy_valid = false;
+    bool policy_valid = false, policy_has_info = false, policy_has_warning =false;
     if (!fr->analyzed)
     {
         error = "File not analyzed";
@@ -464,6 +464,8 @@ int WorkerFiles::update_policy_of_file_registered_from_file(long file_id, long p
         if (res.size() == 1)
         {
             policy_valid = res[0]->valid;
+            policy_has_info = res[0]->has_info;
+            policy_has_warning = res[0]->has_warning;
             for (size_t j = 0; j < res.size() ; ++j)
                 delete res[j];
             res.clear();
@@ -472,6 +474,8 @@ int WorkerFiles::update_policy_of_file_registered_from_file(long file_id, long p
 
     working_files_mutex.lock();
     working_files[file]->policy_valid = policy_valid;
+    working_files[file]->policy_has_info = policy_has_info;
+    working_files[file]->policy_has_warning = policy_has_warning;
     FileRegistered tmp = *working_files[file];
     working_files_mutex.unlock();
 
@@ -674,6 +678,8 @@ void WorkerFiles::update_unfinished_files()
                     continue;
 
                 fr->policy_valid = res[0]->valid;
+                fr->policy_has_info = res[0]->has_info;
+                fr->policy_has_warning = res[0]->has_warning;
                 for (size_t j = 0; j < res.size(); ++j)
                     delete res[j];
                 res.clear();

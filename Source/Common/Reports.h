@@ -97,6 +97,7 @@ public:
     // Reports validity
     bool  implementation_is_valid(const std::string& report);
     bool  policy_is_valid(const std::string& report);
+    bool  policy_has_info_or_warning(const std::string& report, bool& has_info, bool& has_warning);
     bool  verapdf_report_is_valid(const std::string& report);
     bool  dpfmanager_report_is_valid(const std::string& report);
     bool  imsc1validation_report_is_valid(const std::string& report);
@@ -110,11 +111,13 @@ public:
     int   check_policies_xmls(int user, const std::vector<long>& files,
                                const std::map<std::string, std::string>& options,
                                const std::vector<std::string>& policies,
-                               std::stringstream& Out, bool& valid, std::string& err);
+                               std::stringstream& Out, bool& valid,
+                               bool& has_info, bool& has_warning, std::string& err);
     int   check_policies_xslts(int user, const std::vector<long>& files,
                                const std::map<std::string, std::string>& options,
                                const std::vector<std::string>& policies,
-                               std::stringstream& Out, bool& valid, std::string& err);
+                               std::stringstream& Out, bool& valid,
+                               bool& has_info, bool& has_warning, std::string& err);
 
     // Display
     int   transform_with_xslt_file(const std::string& report, const std::string& Xslt,

@@ -342,6 +342,13 @@ function policyEditHelp() {
         'Policy type'
     );
 
+    // Description
+    addHelp(
+        'policyLevel',
+        'Optional error level if the policy is failing.',
+        'Policy level'
+    );
+
     // License
     addHelp(
         'policyLicense',

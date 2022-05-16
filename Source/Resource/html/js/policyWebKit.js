@@ -113,6 +113,10 @@ var policyTreeAjax = (function() {
         if (type === null)
             type = "";
 
+        var level = $("#xslPolicyInfo_policyLevel").val();
+        if (level === null)
+            level = "";
+
         var license = $("#xslPolicyInfo_policyLicense").val();
         if (license === null || license === "Other")
             license = "";
@@ -121,7 +125,7 @@ var policyTreeAjax = (function() {
         if (visibility === null)
             visibility = "";
 
-        res = webpage.policy_edit(policyNode.data.policyId, name, description, tags, license, type, visibility);
+        res = webpage.policy_edit(policyNode.data.policyId, name, description, tags, license, type, level, visibility);
         data = JSON.parse(res);
         if (!data.error)
             policyTree.policyEdit(data.policyTree, policyNode);
@@ -198,7 +202,7 @@ var policyTreeAjax = (function() {
          * @param int policyId policy ID of the policy that will contain the rule
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE,  "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE,  "ope":OPERATOR}}
          */
         res = webpage.xslt_policy_rule_create(policyNode.data.policyId);
         data = JSON.parse(res);
@@ -215,10 +219,11 @@ var policyTreeAjax = (function() {
          * @param int policyId policy ID of the policy that contain the rule
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIEL, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
          */
 
         var scope = "";
+        var level = "";
         var name = "";
         var tracktype = "";
         var field = "";
@@ -238,6 +243,10 @@ var policyTreeAjax = (function() {
             field = $("#xslPolicyRuleMt_field").val();
             if (field === null)
                 field = "";
+
+            level = $("#xslPolicyRuleMt_level").val();
+            if (level === null)
+                level = "";
 
             ope = $("#xslPolicyRuleMt_validator").val();
             if (ope === null)
@@ -261,6 +270,10 @@ var policyTreeAjax = (function() {
             if (field === null)
                 field = "";
 
+            level = $("#xslPolicyRule_level").val();
+            if (level === null)
+                level = "";
+
             occurrence = $("#xslPolicyRule_occurrence").val();
             if (occurrence === null || occurrence === "*" || occurrence === "")
                 occurrence = -1;
@@ -274,7 +287,7 @@ var policyTreeAjax = (function() {
                 value = "";
         }
 
-        res = webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, value, scope);
+        res = webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, value, scope, level);
         data = JSON.parse(res);
         if (!data.error)
             policyTree.ruleEdit(data.rule, ruleNode);
@@ -307,7 +320,7 @@ var policyTreeAjax = (function() {
          * @param int dstPolicyId policy ID of the destination policy
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE,  "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE,  "ope":OPERATOR}}
          */
 
         res = webpage.xslt_policy_rule_duplicate(policyId, ruleNode.data.ruleId, dstNode.data.policyId);
@@ -326,7 +339,7 @@ var policyTreeAjax = (function() {
          * @param int dstPolicyId policy ID of the destination policy
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
          */
 
         res = webpage.xslt_policy_rule_move(policyId, ruleNode.data.ruleId, policyTree.getPolicyId(dstNode));

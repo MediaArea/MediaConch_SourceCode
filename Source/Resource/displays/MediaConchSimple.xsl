@@ -56,7 +56,7 @@
     </xsl:for-each>
   </xsl:template>
   <xsl:template match="mc:policy|mc:rule">
-    <xsl:if test="@outcome!='pass'">
+    <xsl:if test="@outcome!='pass' or descendant::*[@outcome!='pass']">
       <xsl:text>&#xa;</xsl:text>
       <xsl:text> </xsl:text>
       <xsl:text>  --</xsl:text>
@@ -66,7 +66,7 @@
       <xsl:text>:</xsl:text>
       <xsl:value-of select="@name"/>
       <xsl:text>]</xsl:text>
-      <xsl:apply-templates select="mc:rule[@outcome!='pass']|mc:policy[@outcome!='pass']"/>
+      <xsl:apply-templates select="mc:rule[@outcome!='pass']|mc:policy[@outcome!='pass']|descendant::*[@outcome!='pass']"/>
     </xsl:if>
   </xsl:template>
 </xsl:stylesheet>

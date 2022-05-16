@@ -510,11 +510,11 @@ int MediaConchLib::policy_save(int user, int pos, std::string& err)
 
 //---------------------------------------------------------------------------
 int MediaConchLib::policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                                      const std::vector<std::string>& tags, const std::string& license, std::string& err)
+                                      const std::vector<std::string>& tags, const std::string& level, const std::string& license, std::string& err)
 {
     if (use_daemon)
-        return daemon_client->policy_change_info(user, id, name, description, tags, license, err);
-    return core->policies.policy_change_info(user, id, name, description, tags, license, err);
+        return daemon_client->policy_change_info(user, id, name, description, tags, level, license, err);
+    return core->policies.policy_change_info(user, id, name, description, tags, level, license, err);
 }
 
 //---------------------------------------------------------------------------
@@ -684,6 +684,8 @@ std::string MediaConchLib::XSLT_Policy_Rule::to_str() const
         out << ",\"field\":\"" << field << "\"";
     if (scope.size())
         out << ",\"scope\":\"" << scope << "\"";
+    if (level.size())
+        out << ",\"level\":\"" << level << "\"";
     out << ",occurrence:" << occurrence;
     if (ope.size())
         out << ",\"ope\":\"" << ope << "\"";
@@ -714,7 +716,8 @@ std::string MediaConchLib::Policy_Policy::to_str() const
             out << ",";
         out << "\"" << tags[i] << "\"";
     }
-    out << "],\"license\":\"" << license;
+    out << "],\"level\":\"" << level;
+    out << "\",\"license\":\"" << license;
     out << "\",\"children\":[";
     for (size_t i = 0; i < children.size(); ++i)
     {

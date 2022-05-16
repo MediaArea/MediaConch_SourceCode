@@ -140,7 +140,7 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-PolicyChecker::PolicyElement::PolicyElement() : resolved(false), pass_count(0), fail_count(0)
+PolicyChecker::PolicyElement::PolicyElement() : resolved(false), pass_count(0), info_count(0), warn_count(0), fail_count(0)
 {
 }
 
@@ -155,14 +155,34 @@ PolicyChecker::PolicyElement::~PolicyElement()
 }
 
 //---------------------------------------------------------------------------
+PolicyChecker::ElementLevel PolicyChecker::PolicyElement::error_level()
+{
+    if (level=="info")
+        return INFO;
+    else if (level=="warn")
+        return WARN;
+    else if (level=="fail")
+        return FAIL;
+
+    return NONE;
+}
+
+//---------------------------------------------------------------------------
 void PolicyChecker::PolicyElement::resolve()
 {
     for (size_t pos=0; pos<children.size(); pos++)
     {
         if (children[pos]->result())
-             pass_count++;
+            pass_count++;
          else
-             fail_count++;
+         {
+            if (children[pos]->error_level()==INFO)
+                info_count++;
+            else if (children[pos]->error_level()==WARN)
+                warn_count++;
+            else
+                fail_count++;
+        }
     }
 
     resolved=true;
@@ -174,7 +194,7 @@ bool PolicyChecker::PolicyElement::result()
     if(!resolved)
         resolve();
 
-    return (type=="or" && pass_count) || (type=="and" && !fail_count);
+    return (type=="or" && (pass_count || info_count || warn_count)) || (type=="and" && !fail_count);
 }
 
 //---------------------------------------------------------------------------
@@ -183,10 +203,24 @@ std::string PolicyChecker::PolicyElement::to_string(size_t level, bool verbose)
     if(!resolved)
         resolve();
 
+    bool outcome = result();
+    std::string outcome_str;
+    if (outcome)
+        outcome_str="pass";
+    else if (!outcome && error_level()==INFO)
+        outcome_str="info";
+    else if (!outcome && error_level()==WARN)
+        outcome_str="warn";
+    else
+        outcome_str="fail";
+
     std::stringstream ss;
 
-    ss << indent(level) << "<policy name=\"" << xml_encode(name) << "\" type=\"" << xml_encode(type) << "\" rules_run=\"" << children.size() << "\" pass_count=\""
-                        << pass_count << "\" fail_count=\"" << fail_count << "\" outcome=\"" << (result() ? "pass" : "fail") << "\">" << std::endl;
+    ss << indent(level) << "<policy name=\"" << xml_encode(name) << "\" type=\"" << xml_encode(type);
+    if (!this->level.empty())
+        ss << "\" level=\"" << xml_encode(this->level);
+    ss << "\" rules_run=\"" << children.size() << "\" pass_count=\"" << pass_count << "\" info_count=\"" << info_count << "\" warn_count=\"" << warn_count
+       << "\" fail_count=\"" << fail_count << "\" outcome=\"" << outcome_str << "\">" << std::endl;
     level++;
     if (!description.empty())
         ss << indent(level) << "<description>" << description << "</description>" << std::endl;
@@ -217,9 +251,22 @@ PolicyChecker::RuleElement::~RuleElement()
 //---------------------------------------------------------------------------
 void PolicyChecker::RuleElement::reset()
 {
-    pass=false;
     resolved=false;
+    pass=false;
     values.clear();
+}
+
+//---------------------------------------------------------------------------
+PolicyChecker::ElementLevel PolicyChecker::RuleElement::error_level()
+{
+    if (level=="info")
+        return INFO;
+    else if (level=="warn")
+        return WARN;
+    else if (level=="fail")
+        return FAIL;
+
+    return NONE;
 }
 
 //---------------------------------------------------------------------------
@@ -235,18 +282,18 @@ void PolicyChecker::RuleElement::resolve()
     }
     else if (operand=="starts with")
     {
-            for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
-                pass|=(it->rfind(requested, 0)==0);
+        for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
+            pass|=(it->rfind(requested, 0)==0);
     }
     else if (operand=="must no starts with")
     {
-            for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
-                pass|=(it->rfind(requested, 0)!=0);
+        for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
+            pass|=(it->rfind(requested, 0)!=0);
     }
     else if (operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
-            for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
-                 pass|=compare(*it, requested, operand);
+        for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
+            pass|=compare(*it, requested, operand);
     }
 
     resolved=true;
@@ -266,15 +313,26 @@ std::string PolicyChecker::RuleElement::to_string(size_t level, bool verbose)
 {
     std::stringstream ss;
     bool outcome = result();
+    std::string outcome_str;
+    if (outcome)
+        outcome_str="pass";
+    else if (!outcome && error_level()==INFO)
+        outcome_str="info";
+    else if (!outcome && error_level()==WARN)
+        outcome_str="warn";
+    else
+        outcome_str="fail";
 
     ss << indent(level) << "<rule name=\"" << xml_encode(name) << "\"";
     if (!scope.empty())
         ss << " scope=\"" << xml_encode(scope) << "\"";
     ss << " value=\"" << xml_encode(field) << "\" tracktype=\"" << xml_encode(tracktype) << "\" occurrence=\"" << xml_encode(occurrence)
        << "\" operator=\"" << xml_encode(operand) << "\" xpath=\"" << xpath << "\"";
+    if (!this->level.empty())
+        ss << " level=\"" << xml_encode(this->level) << "\"";
     if (!outcome || verbose)
         ss << " requested=\"" << xml_encode(requested) << "\" actual=\"" << (values.size() ? xml_encode(values.front()) : std::string()) << "\"";
-    ss << " outcome=\"" << (outcome ? "pass" : "fail") << "\"/>" << std::endl;
+    ss << " outcome=\"" << outcome_str << "\"/>" << std::endl;
 
     return ss.str();
 }
@@ -326,6 +384,8 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
             rule->name=tfsxml_decode(attribute_value);
         else if (!tfsxml_strcmp_charp(attribute_name, "scope"))
             rule->scope=tfsxml_decode(attribute_value);
+        else if (!tfsxml_strcmp_charp(attribute_name, "level"))
+            rule->level=tfsxml_decode(attribute_value);
         else if (!tfsxml_strcmp_charp(attribute_name, "value"))
             rule->field=tfsxml_decode(attribute_value);
         else if (!tfsxml_strcmp_charp(attribute_name, "tracktype"))
@@ -368,6 +428,8 @@ PolicyChecker::PolicyElement* PolicyChecker::parse_policy(tfsxml_string& tfsxml_
             policy->name=tfsxml_decode(attribute_value);
         else if (!tfsxml_strcmp_charp(attribute_name, "type"))
             policy->type=tfsxml_decode(attribute_value);
+        else if (!tfsxml_strcmp_charp(attribute_name, "level"))
+            policy->level=tfsxml_decode(attribute_value);
         else if (!tfsxml_strcmp_charp(attribute_name, "version"))
             policy->version=tfsxml_decode(attribute_value);
     }

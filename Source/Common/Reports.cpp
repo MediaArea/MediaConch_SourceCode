@@ -148,6 +148,8 @@ int Reports::checker_validate(int user, MediaConchLib::report report, const std:
                                      policies_contents.size() ? &policies_contents : NULL) < 0)
                 continue;
             res->valid = tmp_res.has_valid ? tmp_res.valid : true;
+            res->has_info = tmp_res.has_info;
+            res->has_warning = tmp_res.has_warning;
         }
         else if (report == MediaConchLib::report_MediaConch)
         {
@@ -1005,6 +1007,34 @@ bool Reports::policy_is_valid(const std::string& report)
 }
 
 //---------------------------------------------------------------------------
+bool Reports::policy_has_info_or_warning(const std::string& report, bool& has_info, bool& has_warning)
+{
+    has_info=false;
+    has_warning=false;
+
+
+    size_t pos=0;
+    std::string search(" outcome=\"");
+    while ((pos = report.find(search, pos)) != std::string::npos)
+    {
+        if (pos + search.size() + 4 < report.size())
+        {
+            if (report[pos + search.size()] == 'i' && report[pos + search.size() + 1] == 'n' && report[pos + search.size() + 2] == 'f' && report[pos + search.size() + 3] == 'o')
+                has_info = true;
+            else if (report[pos + search.size()] == 'w' && report[pos + search.size() + 1] == 'a' && report[pos + search.size() + 2] == 'r' && report[pos + search.size() + 3] == 'n')
+                has_warning = true;
+
+            if (has_info && has_warning)
+                break;
+        }
+
+        pos += search.size();
+    }
+
+    return has_info || has_warning;
+}
+
+//---------------------------------------------------------------------------
 bool Reports::verapdf_report_is_valid(const std::string& report)
 {
     size_t pos = report.find("<summary");
@@ -1069,9 +1099,9 @@ int Reports::check_policies(int user, const std::vector<long>& files,
 
     std::stringstream Out;
     result->has_valid = true;
-    if (check_policies_xmls(user, files, options, xml_policies, Out, result->valid, err) < 0)
+    if (check_policies_xmls(user, files, options, xml_policies, Out, result->valid, result->has_info, result->has_warning, err) < 0)
     {
-        if (check_policies_xslts(user, files, options, xslt_policies, Out, result->valid, err) < 0)
+        if (check_policies_xslts(user, files, options, xslt_policies, Out, result->valid, result->has_info, result->has_warning, err) < 0)
             return -1;
     }
 
@@ -1083,7 +1113,8 @@ int Reports::check_policies(int user, const std::vector<long>& files,
 int Reports::check_policies_xmls(int user, const std::vector<long>& files,
                                    const std::map<std::string, std::string>& options,
                                    const std::vector<std::string>& policies,
-                                   std::stringstream& Out, bool& valid, std::string& err)
+                                   std::stringstream& Out, bool& valid,
+                                   bool& has_info, bool& has_warning, std::string& err)
 {
     std::map<std::string,std::string> opts=options;
     valid = true;
@@ -1119,6 +1150,7 @@ int Reports::check_policies_xmls(int user, const std::vector<long>& files,
         Out << tmp;
         if (!policy_is_valid(tmp))
             valid = false;
+        policy_has_info_or_warning(tmp, has_info, has_warning);
     }
 
     return 0;
@@ -1128,7 +1160,8 @@ int Reports::check_policies_xmls(int user, const std::vector<long>& files,
 int Reports::check_policies_xslts(int user, const std::vector<long>& files,
                                    const std::map<std::string, std::string>& options,
                                    const std::vector<std::string>& policies,
-                                   std::stringstream& Out, bool& valid, std::string& err)
+                                   std::stringstream& Out, bool& valid,
+                                   bool& has_info, bool& has_warning, std::string& err)
 {
     valid = true;
     for (size_t i = 0; i < policies.size(); ++i)
@@ -1145,6 +1178,8 @@ int Reports::check_policies_xslts(int user, const std::vector<long>& files,
             Out << tmp;
             if (!policy_is_valid(tmp))
                 valid = false;
+
+            policy_has_info_or_warning(tmp, has_info, has_warning);
         }
     }
     return 0;

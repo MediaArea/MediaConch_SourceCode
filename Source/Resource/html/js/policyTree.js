@@ -484,6 +484,7 @@ var policyTree = (function() {
         instance.rename_node(selectedPolicy, policy.text);
         selectedPolicy.data.description = policy.data.description;
         selectedPolicy.data.tags = policy.data.tags;
+        selectedPolicy.data.level = policy.data.level;
         selectedPolicy.data.license = policy.data.license;
         selectedPolicy.data.type = policy.data.type;
         if (undefined !== policy.data.isPublic) {
@@ -529,6 +530,7 @@ var policyTree = (function() {
         selectedRule.data.ope = (undefined == rule.ope) ? '' : rule.ope;
         selectedRule.data.value = (undefined == rule.value) ? '' : rule.value;
         selectedRule.data.scope = (undefined == rule.scope) ? '' : rule.scope;
+        selectedRule.data.level = (undefined == rule.level) ? '' : rule.level;
         mcoMessage.success('Rule successfuly edited');
     }
 
@@ -567,6 +569,7 @@ var policyTree = (function() {
                 ope: (undefined == rule.ope) ? '' : rule.ope,
                 value: (undefined == rule.value) ? '' : rule.value,
                 scope: (undefined == rule.scope) ? '' : rule.scope,
+                level: (undefined == rule.level) ? '' : rule.level,
             }
         }
     }

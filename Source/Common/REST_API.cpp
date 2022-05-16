@@ -743,7 +743,8 @@ std::string RESTAPI::Policy_Change_Info_Req::to_str() const
             out << ",";
         out << "\"" << tags[i] << "\"";
     }
-    out << "],\"license\":\"" << license;
+    out << "],\"level\":\"" << level;
+    out << "\",\"license\":\"" << license;
     out << "\"}";
     return out.str();
 }
@@ -1124,6 +1125,10 @@ std::string RESTAPI::Checker_Report_Ok::to_str() const
     out << "{report_length: " << report.length();
     if (has_valid)
         out << ", valid: " << std::boolalpha << valid;
+    if (has_info)
+        out << ", has_info: " << std::boolalpha << has_info;
+    if (has_warning)
+        out << ", has_warning: " << std::boolalpha << has_warning;
     out << "}";
     return out.str();
 }
@@ -1217,7 +1222,9 @@ std::string RESTAPI::Checker_Validate_Ok::to_str() const
 {
     std::stringstream out;
 
-    out << "{\"id\":" << id << ",\"valid\":" << std::boolalpha << valid << "}";
+    out << "{\"id\":" << id << ",\"valid\":" << std::boolalpha << valid
+        << ",\"has_info\":" << std::boolalpha << has_info
+        << ",\"has_warning\":" << std::boolalpha << has_warning << "}";
     return out.str();
 }
 
@@ -2306,7 +2313,7 @@ int RESTAPI::serialize_policy_move_req(Policy_Move_Req& req, std::string& data, 
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::string& data, std::string& err)
 {
-    Container::Value v, child, name, description, tags, license, user, id;
+    Container::Value v, child, name, description, tags, level, license, user, id;
 
     child.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -2329,6 +2336,13 @@ int RESTAPI::serialize_policy_change_info_req(Policy_Change_Info_Req& req, std::
             tags.array.push_back(tag);
         }
         child.obj["tags"] = tags;
+    }
+
+    if (req.level.size())
+    {
+        level.type = Container::Value::CONTAINER_TYPE_STRING;
+        level.s = req.level;
+        child.obj["level"] = level;
     }
 
     if (req.license.size())
@@ -2523,7 +2537,7 @@ int RESTAPI::serialize_xslt_policy_create_from_file_req(XSLT_Policy_Create_From_
 //---------------------------------------------------------------------------
 int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, Container::Value& val, std::string&)
 {
-    Container::Value id, name, tracktype, field, scope, occurrence, ope, value;
+    Container::Value id, name, tracktype, field, scope, level, occurrence, ope, value;
     val.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
     id.type = Container::Value::CONTAINER_TYPE_INTEGER;
@@ -2556,6 +2570,13 @@ int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, C
         scope.type = Container::Value::CONTAINER_TYPE_STRING;
         scope.s = rule.scope;
         val.obj["scope"] = scope;
+    }
+
+    if (rule.level.size())
+    {
+        level.type = Container::Value::CONTAINER_TYPE_STRING;
+        level.s = rule.level;
+        val.obj["level"] = level;
     }
 
     occurrence.type = Container::Value::CONTAINER_TYPE_INTEGER;
@@ -4939,6 +4960,10 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_policy_change_info_req(const std
     if (user && user->type == Container::Value::CONTAINER_TYPE_INTEGER)
         req->user = user->l;
 
+    Container::Value *level = model->get_value_by_key(*child, "level");
+    if (level && level->type == Container::Value::CONTAINER_TYPE_STRING)
+        req->level = level->s;
+
     Container::Value *license = model->get_value_by_key(*child, "license");
     if (license && license->type == Container::Value::CONTAINER_TYPE_STRING)
         req->license = license->s;
@@ -5322,6 +5347,10 @@ int RESTAPI::parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_P
     Container::Value *scope = model->get_value_by_key(*val, "scope");
     if (scope && scope->type == Container::Value::CONTAINER_TYPE_STRING)
         rule->scope = scope->s;
+
+    Container::Value *level = model->get_value_by_key(*val, "level");
+    if (level && level->type == Container::Value::CONTAINER_TYPE_STRING)
+        rule->level = level->s;
 
     Container::Value *occurrence = model->get_value_by_key(*val, "occurrence");
     if (occurrence && occurrence->type == Container::Value::CONTAINER_TYPE_INTEGER)
@@ -6271,6 +6300,13 @@ RESTAPI::Policy_Change_Info_Req *RESTAPI::parse_uri_policy_change_info_req(const
                 continue;
 
             req->tags.push_back(val);
+        }
+        else if (substr == "level")
+        {
+            if (!val.length())
+                continue;
+
+            req->level = val;
         }
         else if (substr == "license")
         {
@@ -9161,7 +9197,7 @@ int RESTAPI::serialize_checker_report_ok(Checker_Report_Ok* obj, Container::Valu
     }
 
     ok.type = Container::Value::CONTAINER_TYPE_OBJECT;
-    Container::Value report, valid;
+    Container::Value report, valid, has_info, has_warning;
 
     if (obj->report.length() > 0)
     {
@@ -9175,6 +9211,20 @@ int RESTAPI::serialize_checker_report_ok(Checker_Report_Ok* obj, Container::Valu
         valid.type = Container::Value::CONTAINER_TYPE_BOOL;
         valid.b = obj->valid;
         ok.obj["valid"] = valid;
+    }
+
+    if (obj->has_info)
+    {
+        has_info.type = Container::Value::CONTAINER_TYPE_BOOL;
+        has_info.b = obj->has_info;
+        ok.obj["has_info"] = has_info;
+    }
+
+    if (obj->has_warning)
+    {
+        has_warning.type = Container::Value::CONTAINER_TYPE_BOOL;
+        has_warning.b = obj->has_warning;
+        ok.obj["has_warning"] = has_warning;
     }
 
     return 0;
@@ -9206,7 +9256,7 @@ Container::Value RESTAPI::serialize_checker_validate_ok(Checker_Validate_Ok* obj
     if (!obj)
         return ok;
 
-    Container::Value id, valid;
+    Container::Value id, valid, has_info, has_warning;
 
     id.type = Container::Value::CONTAINER_TYPE_INTEGER;
     id.l = obj->id;
@@ -9216,13 +9266,21 @@ Container::Value RESTAPI::serialize_checker_validate_ok(Checker_Validate_Ok* obj
     valid.b = obj->valid;
     ok.obj["valid"] = valid;
 
+    has_info.type = Container::Value::CONTAINER_TYPE_BOOL;
+    has_info.b = obj->has_info;
+    ok.obj["has_info"] = has_info;
+
+    has_warning.type = Container::Value::CONTAINER_TYPE_BOOL;
+    has_warning.b = obj->has_warning;
+    ok.obj["has_warning"] = has_warning;
+
     return ok;
 }
 
 //---------------------------------------------------------------------------
 void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container::Value &ok_v, std::string& err)
 {
-    Container::Value id, parent_id, is_system, is_public, kind, type, name, description, tags, license, children;
+    Container::Value id, parent_id, is_system, is_public, kind, type, name, description, tags, level, license, children;
 
     ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -9271,6 +9329,14 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
         ok_v.obj["tags"] = tags;
     }
 
+    if (policy->level.size())
+    {
+        level.type = Container::Value::CONTAINER_TYPE_STRING;
+        level.s = policy->level;
+        ok_v.obj["level"] = level;
+    }
+
+
     if (policy->license.size())
     {
         license.type = Container::Value::CONTAINER_TYPE_STRING;
@@ -9295,7 +9361,7 @@ void RESTAPI::serialize_a_policy(MediaConchLib::Policy_Policy* policy, Container
 //---------------------------------------------------------------------------
 void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule, Container::Value &ok_v, std::string&)
 {
-    Container::Value id, name, tracktype, field, scope, occurrence, ope, value;
+    Container::Value id, name, tracktype, field, scope, level, occurrence, ope, value;
 
     ok_v.type = Container::Value::CONTAINER_TYPE_OBJECT;
 
@@ -9329,6 +9395,13 @@ void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule
         scope.type = Container::Value::CONTAINER_TYPE_STRING;
         scope.s = rule->scope;
         ok_v.obj["scope"] = scope;
+    }
+
+    if (rule->level.size())
+    {
+        level.type = Container::Value::CONTAINER_TYPE_STRING;
+        level.s = rule->level;
+        ok_v.obj["level"] = level;
     }
 
     occurrence.type = Container::Value::CONTAINER_TYPE_INTEGER;
@@ -9713,10 +9786,12 @@ int RESTAPI::parse_checker_report_ok(Container::Value *v, Checker_Report_Ok** ok
         return -1;
     }
 
-    Container::Value *report, *valid;
+    Container::Value *report, *valid, *has_info, *has_warning;
 
     report = model->get_value_by_key(*v, "report");
     valid = model->get_value_by_key(*v, "valid");
+    has_info = model->get_value_by_key(*v, "has_info");
+    has_warning = model->get_value_by_key(*v, "has_warning");
 
     *ok = new Checker_Report_Ok;
 
@@ -9743,6 +9818,30 @@ int RESTAPI::parse_checker_report_ok(Container::Value *v, Checker_Report_Ok** ok
         }
         (*ok)->has_valid = true;
         (*ok)->valid = valid->b;
+    }
+
+    if (has_info)
+    {
+        if (has_info->type != Container::Value::CONTAINER_TYPE_BOOL)
+        {
+            err = "checker report ok has_info has not the correct type.";
+            delete *ok;
+            *ok = NULL;
+            return -1;
+        }
+        (*ok)->has_info = has_info->b;
+    }
+
+    if (has_warning)
+    {
+        if (has_warning->type != Container::Value::CONTAINER_TYPE_BOOL)
+        {
+            err = "checker report ok has_warning has not the correct type.";
+            delete *ok;
+            *ok = NULL;
+            return -1;
+        }
+        (*ok)->has_warning = has_warning->b;
     }
 
     return 0;
@@ -9786,9 +9885,11 @@ int RESTAPI::parse_checker_validate_ok(Container::Value *v, std::vector<Checker_
     for (size_t i = 0; i < v->array.size(); ++i)
     {
         Checker_Validate_Ok* ok = new Checker_Validate_Ok;
-        Container::Value *id, *valid;
+        Container::Value *id, *valid, *has_info, *has_warning;
         id = model->get_value_by_key(v->array[i], "id");
         valid = model->get_value_by_key(v->array[i], "valid");
+        has_info = model->get_value_by_key(v->array[i], "has_info");
+        has_warning = model->get_value_by_key(v->array[i], "has_warning");
 
         if (id)
         {
@@ -9809,6 +9910,27 @@ int RESTAPI::parse_checker_validate_ok(Container::Value *v, std::vector<Checker_
             }
             ok->valid = valid->b;
         }
+
+        if (has_info)
+        {
+            if (has_info->type != Container::Value::CONTAINER_TYPE_BOOL)
+            {
+                err = "checker validate has_info has not the correct type.";
+                return -1;
+            }
+            ok->has_info = has_info->b;
+        }
+
+        if (has_warning)
+        {
+            if (has_warning->type != Container::Value::CONTAINER_TYPE_BOOL)
+            {
+                err = "checker validate has_warning has not the correct type.";
+                return -1;
+            }
+            ok->has_warning = has_warning->b;
+        }
+
         oks.push_back(ok);
     }
 
@@ -9971,6 +10093,10 @@ MediaConchLib::Policy_Policy* RESTAPI::parse_a_policy(Container::Value *policy, 
         }
     }
 
+    Container::Value *level = model->get_value_by_key(*policy, "level");
+    if (level && level->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->level = level->s;
+
     Container::Value *license = model->get_value_by_key(*policy, "license");
     if (license && license->type == Container::Value::CONTAINER_TYPE_STRING)
         ok->license = license->s;
@@ -10045,6 +10171,10 @@ MediaConchLib::XSLT_Policy_Rule* RESTAPI::parse_a_xslt_policy_rule(Container::Va
     Container::Value *scope = model->get_value_by_key(*rule, "scope");
     if (scope && scope->type == Container::Value::CONTAINER_TYPE_STRING)
         ok->scope = scope->s;
+
+    Container::Value *level = model->get_value_by_key(*rule, "level");
+    if (level && level->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->level = level->s;
 
     Container::Value *occurrence = model->get_value_by_key(*rule, "occurrence");
     if (occurrence && occurrence->type == Container::Value::CONTAINER_TYPE_INTEGER)

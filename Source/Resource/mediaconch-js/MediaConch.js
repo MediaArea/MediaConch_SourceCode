@@ -306,7 +306,7 @@
 
                         if (report.documentElement.getElementsByTagName('policy')[0] === null ||
                             report.documentElement.getElementsByTagName('policy')[0].attributes.hasOwnProperty('outcome') === false ||
-                            report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value !== 'pass') {
+                            report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value === 'fail') {
                             outcome = false;
                         }
 
@@ -356,7 +356,7 @@
 
                             if (report.documentElement.getElementsByTagName('policy')[0] === null ||
                                 report.documentElement.getElementsByTagName('policy')[0].attributes.hasOwnProperty('outcome') === false ||
-                                report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value !== 'pass') {
+                                report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value === 'fail') {
                                 outcome = false;
                             }
 

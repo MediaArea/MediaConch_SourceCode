@@ -991,6 +991,8 @@ namespace MediaConch
             res.ok = new RESTAPI::Checker_Report_Ok;
             res.ok->report = result.report;
             res.ok->has_valid = result.has_valid;
+            res.ok->has_info = result.has_info;
+            res.ok->has_warning = result.has_warning;
             res.ok->valid = result.valid;
         }
 
@@ -1138,6 +1140,8 @@ namespace MediaConch
             RESTAPI::Checker_Validate_Ok* ok = new RESTAPI::Checker_Validate_Ok;
             ok->id = result[i]->id;
             ok->valid = result[i]->valid;
+            ok->has_info = result[i]->has_info;
+            ok->has_warning = result[i]->has_warning;
             res.ok.push_back(ok);
         }
 
@@ -1325,7 +1329,7 @@ namespace MediaConch
         FUN_CMD_START(Policy_Change_Info)
 
         std::string err;
-        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, req->tags, req->license, err) < 0)
+        if (d->MCL->policy_change_info(req->user, req->id, req->name, req->description, req->tags, req->level, req->license, err) < 0)
             FUN_CMD_NOK(res, err, -1)
 
         FUN_CMD_END(Policy_Change_Info)
@@ -1524,6 +1528,7 @@ namespace MediaConch
             res.rule.tracktype = rule->track_type;
             res.rule.field = rule->field;
             res.rule.scope = rule->scope;
+            res.rule.level = rule->level;
             res.rule.occurrence = rule->occurrence;
             res.rule.ope = rule->ope;
             res.rule.value = rule->value;
@@ -1545,6 +1550,7 @@ namespace MediaConch
         rule.track_type = req->rule.tracktype;
         rule.field = req->rule.field;
         rule.scope = req->rule.scope;
+        rule.level = req->rule.level;
         rule.occurrence = req->rule.occurrence;
         rule.ope = req->rule.ope;
         rule.value = req->rule.value;
