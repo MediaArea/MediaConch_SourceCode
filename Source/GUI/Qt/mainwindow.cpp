@@ -1010,11 +1010,11 @@ int MainWindow::policy_move(int id, int dst_policy_id, QString& err)
 }
 
 //---------------------------------------------------------------------------
-int MainWindow::policy_change_info(int id, const std::string& name, const std::string& description,
-                                   const std::vector<std::string>& tags, const std::string& license, QString& err)
+int MainWindow::policy_change_info(int id, const std::string& name, const std::string& description, const std::vector<std::string>& tags,
+                                   const std::string& level, const std::string& license, QString& err)
 {
     std::string error;
-    int ret = MCL.policy_change_info(user, id, name, description, tags, license, error);
+    int ret = MCL.policy_change_info(user, id, name, description, tags, level, license, error);
     if (ret < 0)
         err = QString().fromUtf8(error.c_str(), error.size());
     return ret;

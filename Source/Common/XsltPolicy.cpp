@@ -87,6 +87,7 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule* r) : XsltPolicyNode(r)
     this->track_type = r->track_type;
     this->field      = r->field;
     this->scope      = r->scope;
+    this->level      = r->level;
     this->occurrence = r->occurrence;
     this->value      = r->value;
 }
@@ -102,6 +103,7 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule& r) : XsltPolicyNode(r)
     this->track_type = r.track_type;
     this->field      = r.field;
     this->scope      = r.scope;
+    this->level      = r.level;
     this->occurrence = r.occurrence;
     this->value      = r.value;
 }
@@ -114,6 +116,7 @@ int XsltPolicyRule::edit_policy_rule(const XsltPolicyRule* rule, std::string&)
     this->track_type = rule->track_type;
     this->field      = rule->field;
     this->scope      = rule->scope;
+    this->level      = rule->level;
     this->occurrence = rule->occurrence;
     this->value      = rule->value;
 
@@ -379,6 +382,13 @@ int XsltPolicy::parse_policy_policy(xmlNodePtr node, bool is_root, XsltPolicy* c
         xmlFree(is_public);
     }
 
+    xmlChar *level = xmlGetNoNsProp(node, (const unsigned char*)"level");
+    if (level)
+    {
+        p->level = std::string((const char*)level);
+        xmlFree(level);
+    }
+
     xmlChar *license = xmlGetNoNsProp(node, (const unsigned char*)"license");
     if (license && is_root)
     {
@@ -451,6 +461,14 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
     {
         r->scope = std::string((const char*)scope);
         xmlFree(scope);
+    }
+
+    //Get level
+    xmlChar *level = xmlGetNoNsProp(node, (const unsigned char*)"level");
+    if (level)
+    {
+        r->level = std::string((const char*)level);
+        xmlFree(level);
     }
 
     //Get occurrence
@@ -543,6 +561,10 @@ int XsltPolicy::create_node_policy_child(xmlNodePtr& node, XsltPolicy *current)
         }
     }
 
+    //level
+    if (current->level.size())
+        xmlNewProp(node, (const xmlChar *)"level", (const xmlChar *)current->level.c_str());
+
     //isPublic
     if (current->keep_public && current->is_public)
         xmlNewProp(node, (const xmlChar *)"isPublic", (const xmlChar *)"true");
@@ -598,9 +620,13 @@ int XsltPolicy::create_node_rule_child(xmlNodePtr& node, XsltPolicyRule *current
     if (current->ope.size())
         xmlNewProp(node, (const xmlChar *)"operator", (const xmlChar *)current->ope.c_str());
 
-    //operator
+    //scope
     if (current->scope.size())
         xmlNewProp(node, (const xmlChar *)"scope", (const xmlChar *)current->scope.c_str());
+
+    //level
+    if (current->level.size())
+        xmlNewProp(node, (const xmlChar *)"level", (const xmlChar *)current->level.c_str());
 
     //value
     if (current->value.size())

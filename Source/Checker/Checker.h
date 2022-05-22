@@ -39,6 +39,13 @@ public:
     void add_policy(const std::string& policy);
     int analyze(const std::string& report, bool verbose, std::string& out);
 
+    typedef enum ElementLevel {
+        NONE = 0,
+        INFO,
+        WARN,
+        FAIL,
+    };
+
 private:
     class Element
     {
@@ -49,6 +56,7 @@ private:
 
         virtual bool result()=0;
         virtual void resolve()=0;
+        virtual ElementLevel error_level()=0;
         virtual std::string to_string(size_t level, bool verbose=false)=0;
 
         std::string name;
@@ -63,10 +71,12 @@ private:
 
         virtual bool result();
         virtual void resolve();
+        virtual ElementLevel error_level();
         virtual std::string to_string(size_t level, bool verbose=false);
 
         std::vector<PathElement> path;
         std::string scope;
+        std::string level;
         std::string field;
         std::string tracktype;
         std::string occurrence;
@@ -87,9 +97,11 @@ private:
 
         virtual bool result();
         virtual void resolve();
+        virtual ElementLevel error_level();
         virtual std::string to_string(size_t level, bool verbose=false);
 
         std::string type;
+        std::string level;
         std::string version;
         std::string description;
         std::vector<std::string> tags;
@@ -98,6 +110,8 @@ private:
     private:
         bool resolved;
         size_t pass_count;
+        size_t info_count;
+        size_t warn_count;
         size_t fail_count;
     };
 

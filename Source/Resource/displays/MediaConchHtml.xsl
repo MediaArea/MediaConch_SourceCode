@@ -309,6 +309,12 @@
               (Actual:<xsl:value-of select="@actual"/>)
             </xsl:if>
           </xsl:when>
+          <xsl:when test="@outcome = 'warn'">
+            <xsl:text>  &#x26A0; warn</xsl:text>
+          </xsl:when>
+          <xsl:when test="@outcome = 'info'">
+            <xsl:text>  &#x2139; info</xsl:text>
+          </xsl:when>
           <xsl:when test="@outcome = 'pass'">
             <xsl:text>  &#x2705; pass</xsl:text>
           </xsl:when>
@@ -325,8 +331,13 @@
       </xsl:if>
       <p>
       <strong>Type:</strong><xsl:text> </xsl:text><xsl:value-of select="@type"/>
+      <xsl:if test="@level != ''">
+        | <strong>Level: </strong>  <xsl:value-of select="@level"/>
+      </xsl:if>
       | <strong>Rules run:</strong><xsl:text> </xsl:text><xsl:value-of select="@rules_run"/>
       | <strong>Fail count:</strong><xsl:text> </xsl:text><xsl:value-of select="@fail_count"/>
+      | <strong>Warn count:</strong><xsl:text> </xsl:text><xsl:value-of select="@warn_count"/>
+      | <strong>Info count:</strong><xsl:text> </xsl:text><xsl:value-of select="@info_count"/>
       | <strong>Pass count:</strong><xsl:text> </xsl:text><xsl:value-of select="@pass_count"/></p> 
         <xsl:apply-templates select="mc:rule|mc:policy"/>
       </div>
@@ -345,6 +356,14 @@
       <xsl:text> </xsl:text>
       <xsl:if test="@outcome = 'pass'">
         <xsl:text>&#x2705;  </xsl:text>
+        <xsl:value-of select="@outcome"/>
+      </xsl:if>
+      <xsl:if test="@outcome = 'info'">
+        <xsl:text>&#x2139;  </xsl:text>
+        <xsl:value-of select="@outcome"/>
+      </xsl:if>
+      <xsl:if test="@outcome = 'warn'">
+        <xsl:text>&#x26A0;  </xsl:text>
         <xsl:value-of select="@outcome"/>
       </xsl:if>
       <xsl:if test="@outcome = 'fail'">
@@ -389,6 +408,10 @@
         </xsl:if>
         <xsl:if test="@compared_to != ''">
           <strong>Compared to: </strong>  <xsl:value-of select="@compared_to"/>
+          <br/>
+        </xsl:if>
+        <xsl:if test="@level != ''">
+          <strong>Level: </strong>  <xsl:value-of select="@level"/>
           <br/>
         </xsl:if>
         <strong><xsl:text>Xpath:  </xsl:text></strong>

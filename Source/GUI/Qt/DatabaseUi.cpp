@@ -197,4 +197,15 @@ void DatabaseUi::get_sql_query_for_update_ui_table_v11(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_table_v12(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI"; // Table name
+    create << " ADD POLICY_HAS_INFO BOOL DEFAULT FALSE;";
+    create << "ALTER TABLE UI"; // Table name
+    create << " ADD POLICY_HAS_WARNING BOOL DEFAULT FALSE;";
+    q = create.str();
+}
+
 }

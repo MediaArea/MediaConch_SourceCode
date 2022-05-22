@@ -59,6 +59,7 @@ public:
     std::string              name;
     std::string              description;
     std::string              license;
+    std::string              level;
     std::vector<std::string> tags;
     Policies::PolicyType     type;
     size_t                   id;

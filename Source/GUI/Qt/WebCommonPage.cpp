@@ -850,25 +850,25 @@ namespace MediaConch
 
     QString WebCommonPage::policy_is_valid(long file_id, long policy_id)
     {
-        //{"valid":false,"fileId":"fileId","error":null}
+        //{"valid":false,"info":false,"warn":false,"fileId":"fileId","error":null}
         std::string err;
         QString json = QString("{\"fileId\":\"%1\",").arg(file_id);
         bool policy_valid = false;
         if (mainwindow->update_policy_of_file_in_list(file_id, policy_id, err) < 0)
         {
-            json += QString("\"valid\":false,\"error\":\"%2\"}")
+            json += QString("\"valid\":false,\"info\":false,\"warn\":false,\"error\":\"%2\"}")
                 .arg(QString().fromUtf8(err.c_str(), err.size()));
         }
 
         FileRegistered* fr = mainwindow->get_file_registered_from_id(file_id);
         if (!fr)
         {
-            json += QString("\"valid\":false,\"error\":\"%2\"}")
+            json += QString("\"valid\":false,\"info\":false,\"warn\":false,\"error\":\"%2\"}")
                 .arg(QString().fromUtf8("File has been removed."));
         }
 
-        json += QString("\"valid\":%1,\"error\":%2}")
-            .arg(fr->policy_valid ? "true" : "false").arg("null");
+        json += QString("\"valid\":%1,\"info\":%2,\"warn\":%3,\"error\":%4}")
+            .arg(fr->policy_valid ? "true" : "false").arg(fr->policy_has_info ? "true" : "false").arg(fr->policy_has_warning ? "true" : "false").arg("null");
 
         delete fr;
         return json;
@@ -1088,6 +1088,16 @@ namespace MediaConch
         }
         else
             rule_data += ",\"scope\":\"\"";
+
+        len = r->level.length();
+        if (len > 0)
+        {
+            QString level = QString().fromUtf8(r->level.c_str(), r->level.length());
+            string_to_json(level);
+            rule_data += QString(",\"level\":\"%1\"").arg(level);
+        }
+        else
+            rule_data += ",\"level\":\"\"";
 
         rule_data += "}";
     }
@@ -1406,7 +1416,7 @@ namespace MediaConch
     }
 
     QString WebCommonPage::policy_edit(int id, const QString& name, const QString& description, const QStringList& tags, const QString& license,
-                                       const QString& type, const QString&)
+                                       const QString& type, const QString& level, const QString&)
     {
         //return: error?
         QString json;
@@ -1418,7 +1428,7 @@ namespace MediaConch
             tgs.push_back(tags[i].toUtf8().data());
 
         if ((code = mainwindow->policy_change_info((size_t)id, name.toUtf8().data(), description.toUtf8().data(),
-                                                   tgs, license.toUtf8().data(), err)) < 0)
+                                                   tgs, level.toUtf8().data(), license.toUtf8().data(), err)) < 0)
         {
             string_to_json(err);
             json = QString("{\"error\":\"%1\"}").arg(err);
@@ -1492,7 +1502,7 @@ namespace MediaConch
         return json;
     }
 
-    QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope)
+    QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope, const QString& level)
     {
         QString err;
         QString json;
@@ -1505,6 +1515,7 @@ namespace MediaConch
         rule.occurrence    = occurrence;
         rule.value         = value.toUtf8().data();
         rule.scope         = scope.toUtf8().data();
+        rule.level         = level.toUtf8().data();
 
         int code;
         if ((code = mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err)) < 0)

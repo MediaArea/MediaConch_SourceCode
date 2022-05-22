@@ -336,9 +336,11 @@ public:
 
     struct Checker_Report_Ok
     {
-        Checker_Report_Ok() :   has_valid(false) {}
+        Checker_Report_Ok() :   has_valid(false), has_info(false), has_warning(false) {}
         std::string             report;
         bool                    has_valid;
+        bool                    has_info;
+        bool                    has_warning;
         bool                    valid;
         std::string             to_str() const;
     };
@@ -432,10 +434,12 @@ public:
 
     struct Checker_Validate_Ok
     {
-        Checker_Validate_Ok() :    valid(false) {}
+        Checker_Validate_Ok() :    valid(false), has_info(false), has_warning(false) {}
 
         long                       id;
         bool                       valid;
+        bool                       has_info;
+        bool                       has_warning;
         std::string                to_str() const;
     };
 
@@ -698,6 +702,7 @@ public:
         std::string              name;
         std::string              description;
         std::vector<std::string> tags;
+        std::string              level;
         std::string              license;
         int                      user;
         int                      id;

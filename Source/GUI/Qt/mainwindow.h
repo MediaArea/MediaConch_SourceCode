@@ -145,8 +145,8 @@ public:
     int                         xslt_policy_create(int parent_id, QString& err);
     int                         policy_duplicate(int id, int dst_policy_id, QString& err);
     int                         policy_move(int id, int dst_policy_id, QString& err);
-    int                         policy_change_info(int id, const std::string& name, const std::string& description,
-                                                   const std::vector<std::string>& tags, const std::string& license, QString& err);
+    int                         policy_change_info(int id, const std::string& name, const std::string& description, const std::vector<std::string>& tags,
+                                                   const std::string& level, const std::string& license, QString& err);
     int                         policy_change_type(int id, const std::string& type, QString& err);
     int                         policy_change_is_public(int id, bool is_public, QString& err);
     int                         policy_get(int pos, const std::string& format, MediaConchLib::Get_Policy& p, QString& err);

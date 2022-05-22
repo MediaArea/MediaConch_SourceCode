@@ -125,6 +125,10 @@ var policyTree = (function() {
                 data += '<li>Field: ' + node.data.field + '</li>';
             }
 
+            if (undefined != node.data.level) {
+                data += '<li>Level: ' + node.data.level + '</li>';
+            }
+
             if (undefined == node.data.occurrence || -1 == node.data.occurrence || '*' == node.data.occurrence) {
                 data += '<li>Occurence: *</li>';
             }

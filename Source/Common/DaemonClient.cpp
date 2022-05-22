@@ -716,6 +716,8 @@ int DaemonClient::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_R
 
     result->report = res->ok->report;
     result->has_valid = res->ok->has_valid;
+    result->has_info = res->ok->has_info;
+    result->has_warning = res->ok->has_warning;
     result->valid = res->ok->valid;
 
     delete res;
@@ -795,6 +797,8 @@ int DaemonClient::checker_validate(int user, MediaConchLib::report report,
         MediaConchLib::Checker_ValidateRes* v = new MediaConchLib::Checker_ValidateRes;
         v->id = res->ok[i]->id;
         v->valid = res->ok[i]->valid;
+        v->has_info = res->ok[i]->has_info;
+        v->has_warning = res->ok[i]->has_warning;
         result.push_back(v);
     }
 
@@ -964,7 +968,7 @@ int DaemonClient::policy_dump(int user, int id, bool must_be_public, std::string
 
 //---------------------------------------------------------------------------
 int DaemonClient::policy_change_info(int user, int id, const std::string& name, const std::string& description,
-                                     const std::vector<std::string>& tags, const std::string& license, std::string& err)
+                                     const std::vector<std::string>& tags, const std::string& level, const std::string& license, std::string& err)
 {
     RESTAPI::Policy_Change_Info_Req  req;
     RESTAPI::Policy_Change_Info_Res *res = NULL;
@@ -974,6 +978,7 @@ int DaemonClient::policy_change_info(int user, int id, const std::string& name, 
     req.description = description;
     req.tags = tags;
     req.user = user;
+    req.level = level;
     req.license = license;
 
     COMMON_HTTP_REQ_RES(policy_change_info, -1)
@@ -1295,6 +1300,7 @@ XsltPolicyRule *DaemonClient::xslt_policy_rule_get(int user, int policy_id, int 
         rule->track_type = res->rule.tracktype;
         rule->field = res->rule.field;
         rule->scope = res->rule.scope;
+        rule->level = res->rule.level;
         rule->occurrence = res->rule.occurrence;
         rule->ope = rule->ope;
         rule->value = res->rule.value;
@@ -1317,6 +1323,7 @@ int DaemonClient::xslt_policy_rule_edit(int user, int policy_id, int rule_id, co
     req.rule.tracktype = rule->track_type;
     req.rule.field = rule->field;
     req.rule.scope = rule->scope;
+    req.rule.level = rule->level;
     req.rule.occurrence = rule->occurrence;
     req.rule.ope = rule->ope;
     req.rule.value = rule->value;

@@ -50,6 +50,7 @@
         <aliasxsl:param name="occurrence"/>
         <aliasxsl:param name="operator"/>
         <aliasxsl:param name="xpath"/>
+        <aliasxsl:param name="level"/>
         <aliasxsl:param name="outcome"/>
         <aliasxsl:param name="requested"/>
         <aliasxsl:param name="actual"/>
@@ -104,6 +105,11 @@
           <aliasxsl:attribute name="xpath">
             <aliasxsl:value-of select="$xpath"/>
           </aliasxsl:attribute>
+          <aliasxsl:if test="$level">
+            <aliasxsl:attribute name="level">
+              <aliasxsl:value-of select="$level"/>
+            </aliasxsl:attribute>
+          </aliasxsl:if>
           <aliasxsl:if test="$policy_verbosity>0 or $outcome='fail' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
             <aliasxsl:if test="$requested">
               <aliasxsl:attribute name="requested">
@@ -131,6 +137,7 @@
         <aliasxsl:param name="description"/>
         <aliasxsl:param name="tags"/>
         <aliasxsl:param name="type"/>
+        <aliasxsl:param name="level"/>
         <aliasxsl:param name="context"/>
         <aliasxsl:param name="value"/>
         <aliasxsl:param name="rule"/>
@@ -143,11 +150,20 @@
           <aliasxsl:attribute name="type">
             <aliasxsl:value-of select="$type"/>
           </aliasxsl:attribute>
+          <aliasxsl:attribute name="level">
+            <aliasxsl:value-of select="$level"/>
+          </aliasxsl:attribute>
           <aliasxsl:variable name="rules_run">
             <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule) + count(exsl:node-set($morepolicies)/mc:policy)"/>
           </aliasxsl:variable>
           <aliasxsl:variable name="fail_count">
             <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule[@outcome='fail']) + count(exsl:node-set($morepolicies)/mc:policy[@outcome='fail'])"/>
+          </aliasxsl:variable>
+          <aliasxsl:variable name="warn_count">
+            <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule[@outcome='warn']) + count(exsl:node-set($morepolicies)/mc:policy[@outcome='warn'])"/>
+          </aliasxsl:variable>
+          <aliasxsl:variable name="info_count">
+            <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule[@outcome='info']) + count(exsl:node-set($morepolicies)/mc:policy[@outcome='info'])"/>
           </aliasxsl:variable>
           <aliasxsl:variable name="pass_count">
             <aliasxsl:value-of select="count(exsl:node-set($ruleresults)/mc:rule[@outcome='pass']) + count(exsl:node-set($morepolicies)/mc:policy[@outcome='pass'])"/>
@@ -158,13 +174,21 @@
           <aliasxsl:attribute name="fail_count">
             <aliasxsl:value-of select="$fail_count"/>
           </aliasxsl:attribute>
+          <aliasxsl:attribute name="warn_count">
+            <aliasxsl:value-of select="$warn_count"/>
+          </aliasxsl:attribute>
+          <aliasxsl:attribute name="info_count">
+            <aliasxsl:value-of select="$info_count"/>
+          </aliasxsl:attribute>
           <aliasxsl:attribute name="pass_count">
             <aliasxsl:value-of select="$pass_count"/>
           </aliasxsl:attribute>
           <aliasxsl:attribute name="outcome">
             <aliasxsl:choose>
-              <aliasxsl:when test="$type = 'or' and $pass_count > '0'">pass</aliasxsl:when>
+              <aliasxsl:when test="$type = 'or' and ($pass_count > '0' or $info_count > '0' or $warn_count > '0')">pass</aliasxsl:when>
               <aliasxsl:when test="$type = 'and' and $fail_count = '0'">pass</aliasxsl:when>
+              <aliasxsl:when test="$level = 'warn'">warn</aliasxsl:when>
+              <aliasxsl:when test="$level = 'info'">info</aliasxsl:when>
               <aliasxsl:otherwise>fail</aliasxsl:otherwise>
             </aliasxsl:choose>
           </aliasxsl:attribute>
@@ -212,6 +236,9 @@
         </aliasxsl:with-param>
         <aliasxsl:with-param name="type">
           <xsl:value-of select="@type"/>
+        </aliasxsl:with-param>
+        <aliasxsl:with-param name="level">
+          <xsl:value-of select="@level"/>
         </aliasxsl:with-param>
         <aliasxsl:with-param name="ruleresults">
           <xsl:for-each select="rule">
@@ -357,6 +384,9 @@
       <aliasxsl:with-param name="xpath">
         <xsl:value-of select="$equationfull"/>
       </aliasxsl:with-param>
+      <aliasxsl:with-param name="level">
+        <xsl:value-of select="@level"/>
+      </aliasxsl:with-param>
       <aliasxsl:with-param name="requested">
         <xsl:value-of select="."/>
       </aliasxsl:with-param>
@@ -385,7 +415,19 @@
             </xsl:attribute>
             <xsl:text>pass</xsl:text>
           </aliasxsl:when>
-          <aliasxsl:otherwise>fail</aliasxsl:otherwise>
+          <aliasxsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="@level='warn'">
+                <xsl:text>warn</xsl:text>
+              </xsl:when>
+              <xsl:when test="@level='info'">
+                <xsl:text>info</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>fail</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </aliasxsl:otherwise>
         </aliasxsl:choose>
       </aliasxsl:with-param>
     </aliasxsl:call-template>

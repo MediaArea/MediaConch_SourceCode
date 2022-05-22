@@ -133,6 +133,12 @@
       <xsl:value-of select="@type"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
+    <xsl:if test="@level != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Level: </xsl:text>
+      <xsl:value-of select="@level"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
     <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
     <xsl:text>Outcome: </xsl:text>
     <xsl:value-of select="@outcome"/>
@@ -147,6 +153,18 @@
       <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Fail count: </xsl:text>
       <xsl:value-of select="@fail_count"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:if test="@warn_count != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Warn count: </xsl:text>
+      <xsl:value-of select="@warn_count"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:if test="@info_count != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Info count: </xsl:text>
+      <xsl:value-of select="@pass_count"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="@pass_count != ''">
@@ -165,6 +183,12 @@
       <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Name: </xsl:text>
       <xsl:value-of select="@name"/>
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:if test="@level != ''">
+      <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
+      <xsl:text>Level: </xsl:text>
+      <xsl:value-of select="@level"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="@xpath != ''">
