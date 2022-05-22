@@ -447,6 +447,49 @@
                                         checker.checkFile(fileInput.files[0]).then(function() {
                                             checker.getReport().then(showReport).catch(reportError);
                                         }).catch(reportError);
+                                        /*
+                                        // By buffer example:
+                                        var offset = 0;
+                                        var file = fileInput.files[0];
+
+                                        checker.checkBufferInit(file.size, 0, file.name);
+                                        var loop = function(length) {
+                                            var r = new FileReader();
+                                            var blob = file.slice(offset, offset + length);
+                                            r.onload = processChunk;
+                                            r.readAsArrayBuffer(blob);
+                                        };
+
+                                        var processChunk = function(e) {
+                                            // Send the buffer to MediaInfo
+                                            var state = checker.checkBufferContinue(e.target.result);
+
+                                            //Test if there is a MediaInfo request to go elsewhere
+                                            var seekTo = checker.checkBufferGoToGet();
+                                            if(seekTo === -1) {
+                                                offset += e.target.result.byteLength;
+                                            } else {
+                                                offset = seekTo;
+                                                checker.checkBufferGoTo(file.size, seekTo); // Inform MediaInfo we have seek
+                                            }
+
+                                            // Bit 3 set means finalized
+                                            if (state&0x08 || e.target.result.byteLength < 1) {
+                                                checker.checkBufferFinalize();
+
+                                                checker.checkBufferResult().then(function() {
+                                                    checker.getReport().then(showReport).catch(reportError);
+                                                }).catch(reportError);
+
+                                                return;
+                                            }
+
+                                            loop(1024*1024);
+                                        };
+
+                                        // Start
+                                        loop(1024*1024);
+                                        */
                                     }
                                 }
                             };

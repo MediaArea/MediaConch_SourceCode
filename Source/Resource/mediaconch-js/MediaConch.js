@@ -22,6 +22,8 @@
         imsc1ImplementationChecker = null;
         checkImplementation = false;
         implementationReport = null;
+        // Buffer
+        fileBuffer = null;
         // Displays
         displayXsl = null;
         // MediaInfo
@@ -154,15 +156,11 @@
         };
 
         // Generate mediainfo reports in suitable format for mediaconch
-        createMediaInfoReport = function(file) {
+        createMediaInfoReport = function() {
             return new Promise(function(resolve, reject) {
-                if (!(file instanceof(File))) {
-                    reject(new Error('Not a File object'));
-                }
-
                 const template = '<MediaArea xmlns="https://mediaarea.net/mediaarea">\n'
                                + '<creatingLibrary version="' + mediainfoVersion + '" url="https://mediaarea.net/MediaInfo">MediaInfoLib</creatingLibrary>\n'
-                               + '<media ref="' + file.name + '">\n'
+                               + '<media ref="' + mediainfo.Get(mediainfoModule.Stream.General, 0, 'CompleteName') + '">\n'
                                + '<MediaInfo xmlns="https://mediaarea.net/mediainfo"/>\n'
                                + (trace ? '<MicroMediaTrace xmlns="https://mediaarea.net/micromediatrace"/>\n' : '')
                                + '</media>\n'
@@ -172,36 +170,33 @@
                     const report = parser.parseFromString(template, 'application/xml');
 
                     //TODO: Fix MMT bug and check if MMT is needed by policies
-                    mediainfo.Option('Details', '1');
-                    mediainfo.Option("Trace_Format", "MICRO_XML");
-                    mediainfo.Open(file, function() {
-                        mediainfo.Option('Details', '0');
-                        mediainfo.Option('Inform', 'MIXML');
-                        const miTemp = mediainfo.Inform();
-                        const miNode = report.documentElement
-                                             .getElementsByTagName('MediaInfo')[0];
+                    mediainfo.Option('Details', '0');
+                    mediainfo.Option('Inform', 'MIXML');
 
-                        miNode.innerHTML = parser.parseFromString(miTemp, 'application/xml')
-                                                 .documentElement
-                                                 .getElementsByTagName('media')[0].innerHTML;
+                    const miTemp = mediainfo.Inform();
 
-                        if (trace) {
-                            mediainfo.Option('Details', '1');
-                            mediainfo.Option('Inform', 'MICRO_XML');
-                            mediainfo.Inform();
-                            const mmtTemp = mediainfo.Inform();
+                    const miNode = report.documentElement
+                                         .getElementsByTagName('MediaInfo')[0];
 
-                            const mmtNode = report.documentElement
-                                                  .getElementsByTagName('MicroMediaTrace')[0];
+                    miNode.innerHTML = parser.parseFromString(miTemp, 'application/xml')
+                                             .documentElement
+                                             .getElementsByTagName('media')[0].innerHTML;
 
-                            mmtNode.innerHTML = parser.parseFromString(mmtTemp, 'application/xml')
-                                                      .documentElement
-                                                      .getElementsByTagName('media')[0].innerHTML;
-                        }
+                    if (trace) {
+                        mediainfo.Option('Details', '1');
+                        mediainfo.Option('Inform', 'MICRO_XML');
+                        mediainfo.Inform();
+                        const mmtTemp = mediainfo.Inform();
 
-                        mediainfo.Close();
-                        resolve(report);
-                    });
+                        const mmtNode = report.documentElement
+                                              .getElementsByTagName('MicroMediaTrace')[0];
+
+                        mmtNode.innerHTML = parser.parseFromString(mmtTemp, 'application/xml')
+                                                  .documentElement
+                                                  .getElementsByTagName('media')[0].innerHTML;
+                    }
+
+                    resolve(report);
                 }
                 catch(e) {
                     reject(new Error('Unable to create MediaInfo report'));
@@ -306,7 +301,7 @@
 
                         if (report.documentElement.getElementsByTagName('policy')[0] === null ||
                             report.documentElement.getElementsByTagName('policy')[0].attributes.hasOwnProperty('outcome') === false ||
-                            report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value !== 'pass') {
+                            report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value === 'fail') {
                             outcome = false;
                         }
 
@@ -356,7 +351,7 @@
 
                             if (report.documentElement.getElementsByTagName('policy')[0] === null ||
                                 report.documentElement.getElementsByTagName('policy')[0].attributes.hasOwnProperty('outcome') === false ||
-                                report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value !== 'pass') {
+                                report.documentElement.getElementsByTagName('policy')[0].attributes['outcome'].value === 'fail') {
                                 outcome = false;
                             }
 
@@ -652,14 +647,28 @@
     /**
      * Validate file against policies.
      * @param   {File}    file The file to validate.
-     * @throws  {Error}        Will throw an error if the object is not in ready state.
+     * @throws  {Error}        Will throw an error if the object is not in ready state or invalid File object.
      * @returns {Promise}      Promise of validation result as boolean.
      */
     MediaConch.prototype.checkFile = async function(file) {
         if (!ready) {
             throw new Error('MediaConch is not ready. Call init() function before use.');
         }
-        mediainfoReport = await createMediaInfoReport(file);
+
+        if (!(file instanceof(File))) {
+            throw new Error('Not a File object');
+        }
+
+        mediainfo.Option('Details', '1');
+        mediainfo.Option("Trace_Format", "MICRO_XML");
+        await new Promise(function(resolve, reject) {
+            mediainfo.Open(file, function() {
+                resolve();
+            });
+        });
+
+        mediainfoReport = await createMediaInfoReport();
+        mediainfo.Close();
 
         if (checkImplementation) {
             if (imsc1ImplementationModule === null) {
@@ -670,6 +679,144 @@
         }
         else
             implementationReport = null;
+
+        return (await createMediaConchReport())[0];
+    };
+
+    /**
+     * Validate file buffer against policies - init.
+     * @param   {Size}         File size (-1 if not known).
+     * @param   {Offset}       File offset of next chunk.
+     * @param   {Name}         File name for the ref attribute.
+     * @throws  {Error}        Will throw an error if the object is not in ready state.
+     * @returns {Number}       MediaInfo_Open_Buffer_Init() result.
+     */
+    MediaConch.prototype.checkBufferInit = function(size, offset, name) {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        mediainfo.Option('File_FileName', name);
+
+        mediainfo.Option('Details', '1');
+        mediainfo.Option("Trace_Format", "MICRO_XML");
+
+        if (checkImplementation) {
+            fileBuffer = new Uint8Array(0);
+        }
+
+        return mediainfo.Open_Buffer_Init(size, offset);
+    };
+
+    /**
+     * Validate file buffer against policies - send buffer data.
+     * @param   {Data}         8 bit data as ArrayBuffer.
+     * @throws  {Error}        Will throw an error if the object is not in ready state.
+     * @returns {Number}       MediaInfo_Open_Buffer_Continue() result.
+     */
+    MediaConch.prototype.checkBufferContinue = function(data) {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        var ret = mediainfo.Open_Buffer_Continue(data);
+
+        if (checkImplementation && fileBuffer !== null) {
+            if (ret&0x01) {
+                var type = mediainfo.Get(mediainfoModule.Stream.General, 0, 'Format');
+                if (type === 'TTML') {
+                    const buffer = new Uint8Array(fileBuffer.byteLength + data.byteLength);
+                    buffer.set(fileBuffer, 0);
+                    buffer.set(new Uint8Array(data), fileBuffer.byteLength);
+                    fileBuffer = buffer;
+                }
+                else {
+                    fileBuffer = null;
+                }
+            }
+            else if (fileBuffer.length < 16777216) {
+                    const buffer = new Uint8Array(fileBuffer.byteLength + data.byteLength);
+                    buffer.set(fileBuffer, 0);
+                    buffer.set(new Uint8Array(data), fileBuffer.byteLength);
+                    fileBuffer = buffer;
+            }
+            else {
+                fileBuffer = null;
+            }
+        }
+
+        return ret;
+    };
+
+    /**
+     * Validate file buffer against policies - get goto request.
+     * @throws  {Error}        Will throw an error if the object is not in ready state.
+     * @returns {Number}       MediaInfo_Open_Buffer_GoTo_Get() result.
+     */
+    MediaConch.prototype.checkBufferGoToGet = function() {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        return mediainfo.Open_Buffer_Continue_Goto_Get();
+    };
+
+    /**
+     * Validate file buffer against policies - goto inform.
+     * @param   {Size}         File size (-1 if not known).
+     * @param   {Offset}       File offset of next chunk.
+     * @throws  {Error}        Will throw an error if the object is not in ready state.
+     * @returns {Number}       MediaInfo_Open_Buffer_Init() result.
+     */
+    MediaConch.prototype.checkBufferGoTo = function(size, offset) {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        if (checkImplementation && fileBuffer) {
+            fileBuffer = null;
+        }
+
+        return mediainfo.Open_Buffer_Init(size, offset);
+    };
+
+    /**
+     * Validate file buffer against policies - finalize.
+     * @throws  {Error}        Will throw an error if the object is not in ready state.
+     * @returns {Number}       MediaInfo_Open_Buffer_Finalize() result.
+     */
+    MediaConch.prototype.checkBufferFinalize = function() {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        return mediainfo.Open_Buffer_Finalize();
+    };
+
+    /**
+     * Validate file buffer against policies - get results.
+     * @throws  {Error}        Will throw an error if the object is not in ready state.
+     * @returns {Promise}      Promise of validation result as boolean.
+     */
+    MediaConch.prototype.checkBufferResult = async function() {
+        if (!ready) {
+            throw new Error('MediaConch is not ready. Call init() function before use.');
+        }
+
+        mediainfoReport = await createMediaInfoReport();
+        if (checkImplementation && fileBuffer) {
+            if (imsc1ImplementationModule === null) {
+                await loadIMSC1ImplementationCheckerModule();
+                imsc1ImplementationChecker = new imsc1ImplementationModule.IMSC1Plugin("/tmp/");
+            }
+
+            const temp = imsc1ImplementationChecker.validate_buffer(fileBuffer, mediainfo.Get(mediainfoModule.Stream.General, 0, 'CompleteName'));
+            implementationReport = new DOMParser().parseFromString(temp, 'application/xml');
+        }
+        else {
+            implementationReport = null;
+        }
+        mediainfo.Close();
 
         return (await createMediaConchReport())[0];
     };
