@@ -39,24 +39,30 @@ public:
     void add_policy(const std::string& policy);
     int analyze(const std::string& report, bool verbose, std::string& out);
 
-    typedef enum ElementLevel {
-        NONE = 0,
-        INFO,
-        WARN,
-        FAIL,
-    };
-
 private:
     class Element
     {
     public:
+        typedef enum Level {
+            LEVEL_NONE = 0,
+            LEVEL_INFO,
+            LEVEL_WARN,
+            LEVEL_FAIL,
+        };
+
+        typedef enum Result {
+            RESULT_PASS = 0,
+            RESULT_INFO,
+            RESULT_WARN,
+            RESULT_FAIL,
+        };
+
         Element() {};
         virtual ~Element() {};
 
-
-        virtual bool result()=0;
         virtual void resolve()=0;
-        virtual ElementLevel error_level()=0;
+        virtual Result result()=0;
+        virtual Level error_level()=0;
         virtual std::string to_string(size_t level, bool verbose=false)=0;
 
         std::string name;
@@ -69,9 +75,9 @@ private:
 
         void reset();
 
-        virtual bool result();
         virtual void resolve();
-        virtual ElementLevel error_level();
+        virtual Result result();
+        virtual Level error_level();
         virtual std::string to_string(size_t level, bool verbose=false);
 
         std::vector<PathElement> path;
@@ -95,9 +101,9 @@ private:
         PolicyElement();
         ~PolicyElement();
 
-        virtual bool result();
         virtual void resolve();
-        virtual ElementLevel error_level();
+        virtual Result result();
+        virtual Level error_level();
         virtual std::string to_string(size_t level, bool verbose=false);
 
         std::string type;

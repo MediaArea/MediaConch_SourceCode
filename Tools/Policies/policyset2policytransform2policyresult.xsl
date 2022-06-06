@@ -110,7 +110,7 @@
               <aliasxsl:value-of select="$level"/>
             </aliasxsl:attribute>
           </aliasxsl:if>
-          <aliasxsl:if test="$policy_verbosity>0 or $outcome='fail' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
+          <aliasxsl:if test="$policy_verbosity>0 or $outcome!='pass' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
             <aliasxsl:if test="$requested">
               <aliasxsl:attribute name="requested">
                 <aliasxsl:value-of select="$requested"/>
@@ -185,11 +185,17 @@
           </aliasxsl:attribute>
           <aliasxsl:attribute name="outcome">
             <aliasxsl:choose>
-              <aliasxsl:when test="$type = 'or' and ($pass_count > '0' or $info_count > '0' or $warn_count > '0')">pass</aliasxsl:when>
-              <aliasxsl:when test="$type = 'and' and $fail_count = '0'">pass</aliasxsl:when>
-              <aliasxsl:when test="$level = 'warn'">warn</aliasxsl:when>
-              <aliasxsl:when test="$level = 'info'">info</aliasxsl:when>
-              <aliasxsl:otherwise>fail</aliasxsl:otherwise>
+              <aliasxsl:when test="$type = 'or' and $warn_count > '0' and $info_count = '0' and $pass_count = '0' and $level != 'info'">warn</aliasxsl:when>
+              <aliasxsl:when test="$type = 'or' and $warn_count > '0' and $info_count = '0' and $pass_count = '0' and $level = 'info'" >info</aliasxsl:when>
+              <aliasxsl:when test="$type = 'or' and $info_count > '0' and $pass_count = '0'"                                           >info</aliasxsl:when>
+              <aliasxsl:when test="$type = 'or' and $pass_count > '0'"                                                                 >pass</aliasxsl:when>
+              <aliasxsl:when test="$type = 'and' and $fail_count = '0' and $warn_count > '0' and $level != 'info'"                     >warn</aliasxsl:when>
+              <aliasxsl:when test="$type = 'and' and $fail_count = '0' and $warn_count > '0' and $level = 'info'"                      >info</aliasxsl:when>
+              <aliasxsl:when test="$type = 'and' and $fail_count = '0' and $info_count > '0'"                                          >info</aliasxsl:when>
+              <aliasxsl:when test="$type = 'and' and $fail_count = '0'"                                                                >pass</aliasxsl:when>
+              <aliasxsl:when test="$level = 'warn'"                                                                                    >warn</aliasxsl:when>
+              <aliasxsl:when test="$level = 'info'"                                                                                    >info</aliasxsl:when>
+              <aliasxsl:otherwise                                                                                                      >fail</aliasxsl:otherwise>
             </aliasxsl:choose>
           </aliasxsl:attribute>
           <aliasxsl:if test="$description">
