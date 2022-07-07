@@ -697,8 +697,8 @@ int JsTree::rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& 
     ss << "\",\"field\":\"" << unified_json_value(rule->field);
     ss << "\",\"scope\":\"" << unified_json_value(rule->scope);
     ss << "\",\"level\":\"" << unified_json_value(rule->level);
-    ss << "\",\"occurrence\":" << rule->occurrence;
-    ss << ",\"ope\":\"" << unified_json_value(rule->ope);
+    ss << "\",\"occurrence\":\"" << unified_json_value(rule->occurrence);
+    ss << "\",\"ope\":\"" << unified_json_value(rule->ope);
     ss << "\",\"value\":\"" << unified_json_value(rule->value);
     ss <<"\"}}";
 

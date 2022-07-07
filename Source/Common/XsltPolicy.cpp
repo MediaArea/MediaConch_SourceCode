@@ -68,7 +68,6 @@ size_t XsltPolicyRule::rule_id = 0;
 XsltPolicyRule::XsltPolicyRule() : XsltPolicyNode()
 {
     kind = XSLT_POLICY_RULE;
-    this->occurrence = -1;
 }
 
 //---------------------------------------------------------------------------
@@ -475,15 +474,7 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
     xmlChar *occurrence = xmlGetNoNsProp(node, (const unsigned char*)"occurrence");
     if (occurrence)
     {
-        std::string occ((const char*)occurrence);
-
-        if (occ == "*")
-            r->occurrence = -1;
-        else
-        {
-            char *end;
-            r->occurrence = strtol(occ.c_str(), &end, 10);
-        }
+        r->occurrence = std::string((const char*)occurrence);
         xmlFree(occurrence);
     }
 
@@ -605,16 +596,8 @@ int XsltPolicy::create_node_rule_child(xmlNodePtr& node, XsltPolicyRule *current
         xmlNewProp(node, (const xmlChar *)"tracktype", (const xmlChar *)current->track_type.c_str());
 
     //occurrence
-    std::stringstream ss;
-    std::string occurrence;
-    if (current->occurrence >= 0)
-    {
-        ss << current->occurrence;
-        occurrence = ss.str();
-    }
-    else
-        occurrence = "*";
-    xmlNewProp(node, (const xmlChar *)"occurrence", (const xmlChar *)occurrence.c_str());
+    if (current->occurrence.size())
+        xmlNewProp(node, (const xmlChar *)"occurrence", (const xmlChar *)current->occurrence.c_str());
 
     //operator
     if (current->ope.size())
@@ -752,7 +735,7 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
         rule->track_type = type;
         rule->field = prefix + (const char*)child->name;
         rule->ope = "=";
-        rule->occurrence = -1;
+        rule->occurrence = "*";
         xmlChar *content = xmlNodeGetContent(child);
         if (content)
             rule->value = (const char*)content;

@@ -175,7 +175,7 @@ public:
 
     struct XSLT_Policy_Rule
     {
-        XSLT_Policy_Rule() : id(-1), occurrence(-1) {}
+        XSLT_Policy_Rule() : id(-1) {}
 
         int          id;
         std::string  name;
@@ -183,7 +183,7 @@ public:
         std::string  field;
         std::string  scope;
         std::string  level;
-        int          occurrence;
+        std::string  occurrence;
         std::string  ope;
         std::string  value;
         std::string  to_str() const;

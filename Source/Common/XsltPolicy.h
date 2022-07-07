@@ -87,7 +87,7 @@ public:
     std::string   field;
     std::string   scope;
     std::string   level;
-    int           occurrence;
+    std::string   occurrence;
     std::string   value;
 
     static size_t rule_id;
