@@ -32,14 +32,14 @@ struct PathElement
 {
     std::string name;
     std::map<std::string, std::string> attributes;
-    size_t occurence;
+    size_t occurrence;
     bool valid;
 
-    PathElement() : occurence((size_t)-1), valid(false) {};
+    PathElement() : occurrence((size_t)-1), valid(false) {};
 };
 
 std::vector<PathElement> parse_path(const std::string& xpath);
-bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurence);
+bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurrence);
 }
 
 #endif
