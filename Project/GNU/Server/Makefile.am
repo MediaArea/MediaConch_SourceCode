@@ -1,5 +1,7 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
+AM_CXXFLAGS = -std=c++11
+
 bin_PROGRAMS = mediaconchd
 mediaconchd_SOURCES = \
     ../../../Source/Daemon/Daemon_Main.cpp \

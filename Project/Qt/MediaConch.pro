@@ -49,7 +49,7 @@ isEmpty(WEB_MACHINE) {
 macx:TARGET = MediaConch
 TEMPLATE = app
 
-CONFIG += qt release
+CONFIG += qt release c++11
 CONFIG += no_keywords
 
 unix:CONFIG += link_pkgconfig
