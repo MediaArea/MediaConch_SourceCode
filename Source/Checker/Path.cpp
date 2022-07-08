@@ -59,7 +59,7 @@ std::vector<PathElement> parse_path(const std::string& xpath)
                 {
                     if (parameter=="*")
                     {
-                        path.occurence=(size_t)-1;
+                        path.occurrence=(size_t)-1;
                         continue;
                     }
 
@@ -67,7 +67,7 @@ std::vector<PathElement> parse_path(const std::string& xpath)
                     size_t val=strtoul(parameter.c_str(), &end, 10);
                     if (val && !strlen(end))
                     {
-                        path.occurence=val;
+                        path.occurrence=val;
                         continue;
                     }
                 }
@@ -107,7 +107,7 @@ std::vector<PathElement> parse_path(const std::string& xpath)
 
 
 //---------------------------------------------------------------------------
-bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurence)
+bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurrence)
 {
     tfsxml_string value;
 
@@ -138,10 +138,10 @@ bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathEleme
         }
    }
 
-    occurence++;
+    occurrence++;
 
-    // compare occurence
-    if (path.occurence!=(size_t)-1 && path.occurence!=occurence)
+    // compare occurrence
+    if (path.occurrence!=(size_t)-1 && path.occurrence!=occurrence)
         return false;
 
    return true;

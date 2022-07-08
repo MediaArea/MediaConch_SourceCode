@@ -13,9 +13,12 @@
 //---------------------------------------------------------------------------
 #include "Checker.h"
 
+#include <functional>
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
+
 //TODO: mmt
 //TODO: reference_file
 
@@ -37,7 +40,7 @@ std::string xml_encode(const std::string& data)
             case '&': ss << "&amp;"; break;
             case '<': ss << "&lt;"; break;
             case '>': ss << "&gt;"; break;
-            case '\t': ss << "&#x9;";
+            case '\t': ss << "&#x9;"; break;
             case '\n': ss << "&#xA;"; break;
             case '\r':
                 ss << "&#xA;";
@@ -95,6 +98,18 @@ bool compare(const std::string& value, const std::string& reference, const std::
     }
 
     return false;
+}
+
+//---------------------------------------------------------------------------
+bool start_with(const std::string& value, const std::string& reference)
+{
+    return value.rfind(reference, 0)==0;
+}
+
+//---------------------------------------------------------------------------
+bool not_start_with(const std::string& value, const std::string& reference)
+{
+    return value.rfind(reference, 0)!=0;
 }
 
 //---------------------------------------------------------------------------
@@ -321,18 +336,24 @@ void PolicyChecker::RuleElement::resolve()
     }
     else if (operand=="starts with")
     {
-        for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
-            pass|=(it->rfind(requested, 0)==0);
+       if (occurrence=="all")
+           pass = std::all_of(values.begin(), values.end(), std::bind(&start_with, std::placeholders::_1, requested));
+       else
+           pass = std::any_of(values.begin(), values.end(), std::bind(&start_with, std::placeholders::_1, requested));
     }
     else if (operand=="must no starts with")
     {
-        for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
-            pass|=(it->rfind(requested, 0)!=0);
+       if (occurrence=="all")
+           pass = std::all_of(values.begin(), values.end(), std::bind(&not_start_with, std::placeholders::_1, requested));
+       else
+           pass = std::any_of(values.begin(), values.end(), std::bind(&not_start_with, std::placeholders::_1, requested));
     }
     else if (operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
-        for (std::vector<std::string>::iterator it=values.begin(); it!=values.end(); it++)
-            pass|=compare(*it, requested, operand);
+       if (occurrence=="all")
+           pass = std::all_of(values.begin(), values.end(), std::bind(&compare, std::placeholders::_1, requested, operand));
+       else
+           pass = std::any_of(values.begin(), values.end(), std::bind(&compare, std::placeholders::_1, requested, operand));
     }
 
     resolved=true;
@@ -417,6 +438,10 @@ bool PolicyChecker::full_parse()
         size_t index=field.find_last_not_of("0123456789");
         if ((index!=std::string::npos && index>=6 && field.substr(index-6, 7)=="_String") || field.find("TimeCode")==0)
             return true;
+
+        //TODO: custom pasrer without full parse
+        if (rules[pos]->occurrence=="all" || rules[pos]->occurrence=="any")
+            return true;
     }
 
     return false;
@@ -447,6 +472,10 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
             rule->operand=tfsxml_decode(attribute_value);
     }
 
+    std::string occurrence=rule->occurrence;
+    if (occurrence.empty() || occurrence=="all" || occurrence=="any")
+        occurrence="*";
+
     tfsxml_string value;
     if (!tfsxml_value(&tfsxml_priv, &value))
         rule->requested=std::string(value.buf, value.len);
@@ -454,7 +483,7 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
     if (rule->scope.empty() || rule->scope=="mi")
     {
         std::stringstream ss;
-        ss << "mi:MediaInfo/mi:track[@type='" << rule->tracktype << "'][" << rule->occurrence << "]" << tokenize(rule->scope, rule->field, "/");
+        ss << "mi:MediaInfo/mi:track[@type='" << rule->tracktype << "'][" << occurrence << "]" << tokenize(rule->scope, rule->field, "/");
         //if (rule->operand == "=" || rule->operand.rfind("<", 0) == 0 || rule->operand.rfind(">", 0) == 0 || rule->operand.rfind("&", 0) == 0 /* &lt; &lt;=...*/) // TODO: disable also for string fields
         //    ss << rule->operand << "'" << rule->requested << "'";
         rule->xpath=ss.str();
@@ -540,7 +569,7 @@ void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleEleme
     tfsxml_string tfsxml_priv_save = tfsxml_priv;
     if (!tfsxml_enter(&tfsxml_priv))
     {
-        std::map<PathElement*, size_t> occurences;
+        std::map<PathElement*, size_t> occurrences;
 
         tfsxml_string result;
         while (!tfsxml_next(&tfsxml_priv, &result))
@@ -550,7 +579,7 @@ void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleEleme
             std::string field = std::string(result.buf, result.len);
             for (size_t pos = 0; pos < rules.size(); pos++)
             {
-                if (level < rules[pos]->path.size() && path_is_matching(tfsxml_priv, result, rules[pos]->path[level], occurences[&rules[pos]->path[level]]))
+                if (level < rules[pos]->path.size() && path_is_matching(tfsxml_priv, result, rules[pos]->path[level], occurrences[&rules[pos]->path[level]]))
                 {
                     tfsxml_string tfsxml_priv_copy = tfsxml_priv;
                     if (level == rules[pos]->path.size() - 1)

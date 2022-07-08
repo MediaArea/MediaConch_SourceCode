@@ -686,7 +686,8 @@ std::string MediaConchLib::XSLT_Policy_Rule::to_str() const
         out << ",\"scope\":\"" << scope << "\"";
     if (level.size())
         out << ",\"level\":\"" << level << "\"";
-    out << ",occurrence:" << occurrence;
+    if (occurrence.size())
+        out << ",occurrence:\"" << occurrence << "\"";
     if (ope.size())
         out << ",\"ope\":\"" << ope << "\"";
     if (value.size())

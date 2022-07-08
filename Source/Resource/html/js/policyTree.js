@@ -526,7 +526,7 @@ var policyTree = (function() {
         instance.rename_node(selectedRule, (undefined == rule.name) ? '' : rule.name);
         selectedRule.data.tracktype = (undefined == rule.tracktype) ? '' : rule.tracktype;
         selectedRule.data.field = (undefined == rule.field) ? '' : rule.field;
-        selectedRule.data.occurrence = (undefined == rule.occurrence || -1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence;
+        selectedRule.data.occurrence = (undefined == rule.occurrence) ? '' : rule.occurrence;
         selectedRule.data.ope = (undefined == rule.ope) ? '' : rule.ope;
         selectedRule.data.value = (undefined == rule.value) ? '' : rule.value;
         selectedRule.data.scope = (undefined == rule.scope) ? '' : rule.scope;
@@ -565,7 +565,7 @@ var policyTree = (function() {
                 ruleId: rule.id,
                 tracktype: (undefined == rule.tracktype) ? '' : rule.tracktype,
                 field: (undefined == rule.field) ? '' : rule.field,
-                occurrence: (undefined == rule.occurrence || -1 == rule.occurrence || '*' == rule.occurrence) ? '' : rule.occurrence,
+                occurrence: (undefined == rule.occurrence) ? '' : rule.occurrence,
                 ope: (undefined == rule.ope) ? '' : rule.ope,
                 value: (undefined == rule.value) ? '' : rule.value,
                 scope: (undefined == rule.scope) ? '' : rule.scope,

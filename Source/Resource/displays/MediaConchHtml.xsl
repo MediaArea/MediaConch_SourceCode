@@ -390,8 +390,8 @@
           <strong>Tracktype: </strong>  <xsl:value-of select="@tracktype"/>
           <br/>
         </xsl:if>
-        <xsl:if test="@occurence != ''">
-          <strong>Occurence: </strong>  <xsl:value-of select="@occurence"/>
+        <xsl:if test="@occurrence != ''">
+          <strong>Occurrence: </strong>  <xsl:value-of select="@occurrence"/>
           <br/>
         </xsl:if>
         <xsl:if test="@operator != ''">

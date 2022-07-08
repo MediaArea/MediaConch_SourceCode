@@ -18,6 +18,7 @@ var policyTreeRulesMI = (function() {
         $('#xslPolicyRule_title').val(node.text);
 
         if (policyTreeRules.isRuleMI(node)) {
+            $('#xslPolicyRule_occurrence').val(node.data.occurrence);
             $('#xslPolicyRule_field option').remove();
             $('#xslPolicyRule_field').append('<option value="' + node.data.field + '" selected>' + node.data.field + '</option>');
             $('#xslPolicyRule_value option').remove();
@@ -32,7 +33,6 @@ var policyTreeRulesMI = (function() {
             }
             $('#xslPolicyRule_trackType option[value="' + node.data.tracktype + '"]').prop('selected', true);
             $('#xslPolicyRule_trackType').trigger('change');
-            $('#xslPolicyRule_occurrence').val(-1 == node.data.occurrence ? '' : node.data.occurrence);
             if ('' != node.data.ope && $('#xslPolicyRule_validator option[value="' + node.data.ope + '"]').length) {
                 $('#xslPolicyRule_validator option[value="' + node.data.ope + '"]').prop('selected', true);
             }
@@ -53,7 +53,6 @@ var policyTreeRulesMI = (function() {
             $('#xslPolicyRule_value').trigger('change');
             $('#xslPolicyRule_trackType option[value=""]').prop('selected', true);
             $('#xslPolicyRule_trackType').trigger('change');
-            $('#xslPolicyRule_occurrence').val('');
             $('#xslPolicyRule_validator option[value="exists"]').prop('selected', true);
             $('#xslPolicyRule_validator').trigger('change');
         }

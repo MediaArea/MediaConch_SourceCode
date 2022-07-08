@@ -129,7 +129,7 @@ var policyTree = (function() {
                 data += '<li>Level: ' + node.data.level + '</li>';
             }
 
-            if (undefined == node.data.occurrence || -1 == node.data.occurrence || '*' == node.data.occurrence) {
+            if (undefined == node.data.occurrence || '' == node.data.occurrence || '*' == node.data.occurrence) {
                 data += '<li>Occurence: *</li>';
             }
             else {

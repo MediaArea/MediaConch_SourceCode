@@ -227,7 +227,7 @@ var policyTreeAjax = (function() {
         var name = "";
         var tracktype = "";
         var field = "";
-        var occurrence = -1;
+        var occurrence = "";
         var ope = "";
         var value = "";
 
@@ -275,8 +275,8 @@ var policyTreeAjax = (function() {
                 level = "";
 
             occurrence = $("#xslPolicyRule_occurrence").val();
-            if (occurrence === null || occurrence === "*" || occurrence === "")
-                occurrence = -1;
+            if (occurrence === null)
+                occurrence = "";
 
             ope = $("#xslPolicyRule_validator").val();
             if (ope === null)

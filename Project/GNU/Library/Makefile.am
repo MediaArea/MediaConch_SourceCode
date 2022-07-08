@@ -1,5 +1,7 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
+AM_CXXFLAGS = -std=c++11
+
 lib_LTLIBRARIES = lib@MediaConchLib_LibName@.la
 lib@MediaConchLib_LibName@_la_SOURCES = \
     ../../../Source/Lib/Lib.cpp \

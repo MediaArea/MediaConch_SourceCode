@@ -2579,8 +2579,8 @@ int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, C
         val.obj["level"] = level;
     }
 
-    occurrence.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    occurrence.l = rule.occurrence;
+    occurrence.type = Container::Value::CONTAINER_TYPE_STRING;
+    occurrence.s = rule.occurrence;
     val.obj["occurrence"] = occurrence;
 
     if (rule.ope.size())
@@ -5353,8 +5353,8 @@ int RESTAPI::parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_P
         rule->level = level->s;
 
     Container::Value *occurrence = model->get_value_by_key(*val, "occurrence");
-    if (occurrence && occurrence->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        rule->occurrence = occurrence->l;
+    if (occurrence && occurrence->type == Container::Value::CONTAINER_TYPE_STRING)
+        rule->occurrence = occurrence->s;
 
     Container::Value *ope = model->get_value_by_key(*val, "ope");
     if (ope && ope->type == Container::Value::CONTAINER_TYPE_STRING)
@@ -9404,8 +9404,8 @@ void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule
         ok_v.obj["level"] = level;
     }
 
-    occurrence.type = Container::Value::CONTAINER_TYPE_INTEGER;
-    occurrence.l = rule->occurrence;
+    occurrence.type = Container::Value::CONTAINER_TYPE_STRING;
+    occurrence.s = rule->occurrence;
     ok_v.obj["occurrence"] = occurrence;
 
     if (rule->ope.size())
@@ -10177,8 +10177,8 @@ MediaConchLib::XSLT_Policy_Rule* RESTAPI::parse_a_xslt_policy_rule(Container::Va
         ok->level = level->s;
 
     Container::Value *occurrence = model->get_value_by_key(*rule, "occurrence");
-    if (occurrence && occurrence->type == Container::Value::CONTAINER_TYPE_INTEGER)
-        ok->occurrence = occurrence->l;
+    if (occurrence && occurrence->type == Container::Value::CONTAINER_TYPE_STRING)
+        ok->occurrence = occurrence->s;
 
     Container::Value *ope = model->get_value_by_key(*rule, "ope");
     if (ope && ope->type == Container::Value::CONTAINER_TYPE_STRING)

@@ -1054,10 +1054,15 @@ namespace MediaConch
         else
             rule_data += ",\"field\":\"\"";
 
-        if (r->occurrence >= 0)
-            rule_data += QString(",\"occurrence\":%1").arg(r->occurrence);
+        len = r->occurrence.length();
+        if (len > 0)
+        {
+            QString occurrence = QString().fromUtf8(r->occurrence.c_str(), r->occurrence.length());
+            string_to_json(occurrence);
+            rule_data += QString(",\"occurrence\":\"%1\"").arg(occurrence);
+        }
         else
-            rule_data += ",\"occurrence\":\"-1\"";
+            rule_data += ",\"occurrence\":\"*\"";
 
         len = r->ope.length();
         if (len > 0)
@@ -1502,7 +1507,7 @@ namespace MediaConch
         return json;
     }
 
-    QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, int occurrence, const QString& ope, const QString& value, const QString& scope, const QString& level)
+    QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, const QString& occurrence, const QString& ope, const QString& value, const QString& scope, const QString& level)
     {
         QString err;
         QString json;
@@ -1512,7 +1517,7 @@ namespace MediaConch
         rule.ope           = ope.toUtf8().data();
         rule.track_type    = type.toUtf8().data();
         rule.field         = field.toUtf8().data();
-        rule.occurrence    = occurrence;
+        rule.occurrence    = occurrence.toUtf8().data();
         rule.value         = value.toUtf8().data();
         rule.scope         = scope.toUtf8().data();
         rule.level         = level.toUtf8().data();
