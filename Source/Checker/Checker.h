@@ -74,6 +74,7 @@ private:
         ~RuleElement();
 
         void reset();
+        bool compare(const std::string& value);
 
         virtual void resolve();
         virtual Result result();
@@ -90,6 +91,7 @@ private:
         std::string xpath;
         std::string requested;
         std::vector<std::string> values;
+        std::vector<std::string> failing_values;
 
     private:
         bool resolved;
