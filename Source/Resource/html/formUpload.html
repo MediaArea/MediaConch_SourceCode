@@ -33,7 +33,13 @@
     <div class="form-group">
       <div class="checkbox">
         <label class="label_fixer"><input type="checkbox" id="checkerUpload_fixer" name="checkerUpload_fixer" value="1" /> Enable fixer</label>
-        <label class="label_parsespeed"><input class="checkboxParseSpeed" type="checkbox" id="checkerUpload_parseSpeed" name="checkerUpload_parseSpeed" value="1" />Full parse</label>
+        <label class="label_parsespeed">Parse speed <select id="checkerUpload_parseSpeed" name="checkerUpload_parseSpeed" class="selectParseSpeed">
+          <option value="0">Very quick (0)</option>
+          <option value="0.3">Quick (0.3)</option>
+          <option value="0.5" selected>Default (0.5)</option>
+          <option value="0.7">Advanced (0.7)</option>
+          <option value="1">Full (1)</option>
+        </select></label>
       </div>
     </div>
   </div>
