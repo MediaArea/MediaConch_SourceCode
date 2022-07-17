@@ -54,65 +54,6 @@ std::string xml_encode(const std::string& data)
 }
 
 //---------------------------------------------------------------------------
-bool compare(const std::string& value, const std::string& reference, const std::string& operand)
-{
-    char* val_end=NULL;
-    double val = strtod(value.c_str(), &val_end);
-    char* ref_end=NULL;
-    double ref = strtod(reference.c_str(), &ref_end);
-
-    if (operand == "<")
-    {
-        if (!strlen(val_end) && !strlen(ref_end))
-            return val < ref;
-        else
-            return strcmp(value.c_str(), reference.c_str()) < 0;
-    }
-    else if (operand == "<=")
-    {
-        if (!strlen(val_end) && !strlen(ref_end))
-            return val <= ref;
-        else
-            return strcmp(value.c_str(), reference.c_str()) <= 0;
-    }
-    else if (operand == "=")
-    {
-        if (!strlen(val_end) && !strlen(ref_end))
-            return val == ref;
-        else
-            return strcmp(value.c_str(), reference.c_str()) == 0;
-    }
-    else if (operand == ">=")
-    {
-        if (!strlen(val_end) && !strlen(ref_end))
-            return val >= ref;
-        else
-            return strcmp(value.c_str(), reference.c_str()) >= 0;
-    }
-    else if (operand == ">")
-    {
-        if (!strlen(val_end) && !strlen(ref_end))
-            return val > ref;
-        else
-            return strcmp(value.c_str(), reference.c_str()) > 0;
-    }
-
-    return false;
-}
-
-//---------------------------------------------------------------------------
-bool start_with(const std::string& value, const std::string& reference)
-{
-    return value.rfind(reference, 0)==0;
-}
-
-//---------------------------------------------------------------------------
-bool not_start_with(const std::string& value, const std::string& reference)
-{
-    return value.rfind(reference, 0)!=0;
-}
-
-//---------------------------------------------------------------------------
 std::string indent(size_t level)
 {
     return std::string( level*2, ' ');
@@ -311,6 +252,66 @@ void PolicyChecker::RuleElement::reset()
 }
 
 //---------------------------------------------------------------------------
+bool  PolicyChecker::RuleElement::compare(const std::string& value)
+{
+    bool to_return = false;
+
+    char* val_end=NULL;
+    double val = strtod(value.c_str(), &val_end);
+    char* ref_end=NULL;
+    double ref = strtod(requested.c_str(), &ref_end);
+
+    if (operand=="starts with")
+    {
+        to_return = value.rfind(requested, 0) == 0;
+    }
+    else if (operand=="must no starts with")
+    {
+        to_return = value.rfind(requested, 0) != 0;
+    }
+    else if (operand == "<")
+    {
+        if (!strlen(val_end) && !strlen(ref_end))
+            to_return = val < ref;
+        else
+            to_return = strcmp(value.c_str(), requested.c_str()) < 0;
+    }
+    else if (operand == "<=")
+    {
+        if (!strlen(val_end) && !strlen(ref_end))
+            to_return = val <= ref;
+        else
+            to_return = strcmp(value.c_str(), requested.c_str()) <= 0;
+    }
+    else if (operand == "=")
+    {
+        if (!strlen(val_end) && !strlen(ref_end))
+            to_return = val == ref;
+        else
+            to_return = strcmp(value.c_str(), requested.c_str()) == 0;
+    }
+    else if (operand == ">=")
+    {
+        if (!strlen(val_end) && !strlen(ref_end))
+            to_return = val >= ref;
+        else
+            to_return = strcmp(value.c_str(), requested.c_str()) >= 0;
+    }
+    else if (operand == ">")
+    {
+        if (!strlen(val_end) && !strlen(ref_end))
+            to_return = val > ref;
+        else
+            to_return = strcmp(value.c_str(), requested.c_str()) > 0;
+    }
+
+    if (!to_return)
+        failing_values.push_back(value);
+
+    return to_return;
+}
+
+//---------------------------------------------------------------------------
 PolicyChecker::Element::Level PolicyChecker::RuleElement::error_level()
 {
     if (level=="info")
@@ -334,26 +335,12 @@ void PolicyChecker::RuleElement::resolve()
     {
             pass=values.empty();
     }
-    else if (operand=="starts with")
+    else if (operand=="starts with" || operand=="must no starts with" || operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
        if (occurrence=="all")
-           pass = std::all_of(values.begin(), values.end(), std::bind(&start_with, std::placeholders::_1, requested));
+           pass = std::all_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
        else
-           pass = std::any_of(values.begin(), values.end(), std::bind(&start_with, std::placeholders::_1, requested));
-    }
-    else if (operand=="must no starts with")
-    {
-       if (occurrence=="all")
-           pass = std::all_of(values.begin(), values.end(), std::bind(&not_start_with, std::placeholders::_1, requested));
-       else
-           pass = std::any_of(values.begin(), values.end(), std::bind(&not_start_with, std::placeholders::_1, requested));
-    }
-    else if (operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
-    {
-       if (occurrence=="all")
-           pass = std::all_of(values.begin(), values.end(), std::bind(&compare, std::placeholders::_1, requested, operand));
-       else
-           pass = std::any_of(values.begin(), values.end(), std::bind(&compare, std::placeholders::_1, requested, operand));
+           pass = std::any_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
     }
 
     resolved=true;
@@ -395,6 +382,12 @@ std::string PolicyChecker::RuleElement::to_string(size_t level, bool verbose)
         outcome_str="pass"; break;
     }
 
+    std::string value_str;
+    if (result()>RESULT_PASS)
+        value_str=failing_values.size() ? failing_values.front() : std::string();
+    else if (verbose)
+        value_str=values.size() ? values.front() : std::string();
+
     ss << indent(level) << "<rule name=\"" << xml_encode(name) << "\"";
     if (!scope.empty())
         ss << " scope=\"" << xml_encode(scope) << "\"";
@@ -403,7 +396,7 @@ std::string PolicyChecker::RuleElement::to_string(size_t level, bool verbose)
     if (!this->level.empty())
         ss << " level=\"" << xml_encode(this->level) << "\"";
     if (result()>RESULT_PASS || verbose)
-        ss << " requested=\"" << xml_encode(requested) << "\" actual=\"" << (values.size() ? xml_encode(values.front()) : std::string()) << "\"";
+        ss << " requested=\"" << xml_encode(requested) << "\" actual=\"" << xml_encode(value_str) << "\"";
     ss << " outcome=\"" << outcome_str << "\"/>" << std::endl;
 
     return ss.str();
@@ -440,7 +433,7 @@ bool PolicyChecker::full_parse()
             return true;
 
         //TODO: custom pasrer without full parse
-        if (rules[pos]->occurrence=="all" || rules[pos]->occurrence=="any")
+        if (rules[pos]->occurrence=="*" || rules[pos]->occurrence=="all" || rules[pos]->occurrence=="any")
             return true;
     }
 
