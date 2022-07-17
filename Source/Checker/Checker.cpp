@@ -337,7 +337,9 @@ void PolicyChecker::RuleElement::resolve()
     }
     else if (operand=="starts with" || operand=="must no starts with" || operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
-       if (occurrence=="all")
+       if (values.empty())
+          pass = operand=="must no starts with" ? true : false;
+       else if (occurrence=="all")
            pass = std::all_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
        else
            pass = std::any_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
