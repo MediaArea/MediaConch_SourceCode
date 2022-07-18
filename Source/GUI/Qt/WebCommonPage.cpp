@@ -747,10 +747,10 @@ namespace MediaConch
         }
 
         QStringList options;
-        if (checker_full_parse)
+        if (!checker_parse_speed.isEmpty())
         {
             options << "file_parsespeed";
-            options << "1";
+            options << checker_parse_speed;
         }
         QString res = on_file_upload_selected(QString().setNum(mainwindow->select_correct_policy()),
                                               QString().setNum(mainwindow->select_correct_display()),
@@ -1800,8 +1800,8 @@ namespace MediaConch
         return QString("{}");
     }
 
-    void WebCommonPage::set_full_parse(bool fp)
+    void WebCommonPage::set_parse_speed(const QString& parse_speed)
     {
-        checker_full_parse = fp;
+        checker_parse_speed = parse_speed;
     }
 }

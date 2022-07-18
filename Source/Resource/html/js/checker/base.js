@@ -8,13 +8,13 @@ var checker = (function() {
         bindings();
 
         //
-        $('.checkboxParseSpeed').change(function(){
-            webpage.set_full_parse($(this).is(':checked'));
+        $('.selectParseSpeed').change(function(){
+            webpage.set_parse_speed($(this).val());
         })
 
         // help
         addHelp('.label_fixer', 'Try to fix buggy files, technology preview, see <a href="https://mediaarea.net/MediaConch/fixity.html" onclick="urlUtils.openInBrowser(event);">the fixity webpage</a> for how to test it.', 'Fixer', 'checkerFixerHelp');
-        addHelp('.label_parsespeed', 'By default, only few frames are parsed, fast, suitable for policy checker and container implementation checker. Enable this option for checking all frames in the file, slower.', 'Full parsing', 'checkerParseSpeedHelp');
+        addHelp('.label_parsespeed', 'By default, only few frames are parsed, fast, suitable for policy checker and container implementation checker. Change this option for an more or less complete parsing of the frames in the file.', 'Parse speed', 'checkerParseSpeedHelp');
     }
 
     var formBindings = function() {
