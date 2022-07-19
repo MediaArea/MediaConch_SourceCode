@@ -265,7 +265,7 @@ bool  PolicyChecker::RuleElement::compare(const std::string& value)
     {
         to_return = value.rfind(requested, 0) == 0;
     }
-    else if (operand=="must no starts with")
+    else if (operand=="must not start with")
     {
         to_return = value.rfind(requested, 0) != 0;
     }
@@ -335,9 +335,11 @@ void PolicyChecker::RuleElement::resolve()
     {
             pass=values.empty();
     }
-    else if (operand=="starts with" || operand=="must no starts with" || operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
+    else if (operand=="starts with" || operand=="must not start with" || operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
-       if (occurrence=="all")
+       if (values.empty())
+          pass = operand=="must not start with" ? true : false;
+       else if (occurrence=="all")
            pass = std::all_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
        else
            pass = std::any_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
