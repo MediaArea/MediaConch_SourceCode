@@ -17,7 +17,7 @@ RCODE=0
 pushd "${FILES_DIRECTORY}"
 
 # get and configure ffmpeg sources
-git clone --depth=1 https://github.com/FFmpeg/FFmpeg.git
+git clone --depth=1 https://github.com/FFmpeg/FFmpeg.git -b n5.1
 mv FFmpeg/* .
 rm -fr FFmpeg
 
