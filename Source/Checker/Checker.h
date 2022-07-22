@@ -36,6 +36,7 @@ public:
     ~PolicyChecker();
 
     bool full_parse();
+    bool is_policy_supported();
     void add_policy(const std::string& policy);
     int analyze(const std::string& report, bool verbose, std::string& out);
 
@@ -129,6 +130,9 @@ private:
 
     std::vector<PolicyElement*> policies;
     std::vector<RuleElement*> rules;
+
+    bool supported;
+    bool full;
 };
 
 }
