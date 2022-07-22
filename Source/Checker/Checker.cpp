@@ -409,7 +409,7 @@ std::string PolicyChecker::RuleElement::to_string(size_t level, bool verbose)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-PolicyChecker::PolicyChecker()
+PolicyChecker::PolicyChecker() : supported(true), full(false)
 {
 }
 
@@ -424,22 +424,16 @@ PolicyChecker::~PolicyChecker()
 }
 
 //---------------------------------------------------------------------------
+bool PolicyChecker::is_policy_supported()
+{
+    return supported;
+}
+
+
+//---------------------------------------------------------------------------
 bool PolicyChecker::full_parse()
 {
-    // check for presence of _StringX or TimeCode* element in policy)
-    for (size_t pos=0; pos<rules.size(); pos++)
-    {
-        std::string& field=rules[pos]->field;
-        size_t index=field.find_last_not_of("0123456789");
-        if ((index!=std::string::npos && index>=6 && field.substr(index-6, 7)=="_String") || field.find("TimeCode")==0)
-            return true;
-
-        //TODO: custom pasrer without full parse
-        if (rules[pos]->occurrence=="*" || rules[pos]->occurrence=="all" || rules[pos]->occurrence=="any")
-            return true;
-    }
-
-    return false;
+    return full;
 }
 
 //---------------------------------------------------------------------------
@@ -475,14 +469,21 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
     if (!tfsxml_value(&tfsxml_priv, &value))
         rule->requested=std::string(value.buf, value.len);
 
+    // Check for presence of _StringX or TimeCode* element in policy
+    size_t index=rule->field.find_last_not_of("0123456789");
+    if ((index!=std::string::npos && index>=6 && rule->field.substr(index-6, 7)=="_String") || rule->field.find("TimeCode")==0)
+        full=true;
+
+// Check for currently unsupported features
+    if (rule->scope=="mmt" || rule->requested=="compare")
+        supported=false;
+
     if (rule->scope.empty() || rule->scope=="mi")
     {
         std::stringstream ss;
         ss << "mi:MediaInfo/mi:track[@type='" << rule->tracktype << "'][" << occurrence << "]" << tokenize(rule->scope, rule->field, "/");
-        //if (rule->operand == "=" || rule->operand.rfind("<", 0) == 0 || rule->operand.rfind(">", 0) == 0 || rule->operand.rfind("&", 0) == 0 /* &lt; &lt;=...*/) // TODO: disable also for string fields
-        //    ss << rule->operand << "'" << rule->requested << "'";
         rule->xpath=ss.str();
-        rule->path = parse_path(rule->xpath);
+        rule->path=parse_path(rule->xpath);
     }
 
     rules.push_back(rule);
@@ -647,6 +648,7 @@ int PolicyChecker::analyze(const std::string& report, bool verbose, std::string&
 EMSCRIPTEN_BINDINGS(mediaconch_policychecker) {
     emscripten::class_<MediaConch::PolicyChecker>("PolicyChecker")
         .constructor()
+        .function("is_policy_supported", &MediaConch::PolicyChecker::is_policy_supported)
         .function("full_parse", &MediaConch::PolicyChecker::full_parse)
         .function("add_policy", &MediaConch::PolicyChecker::add_policy)
         .function("analyze", emscripten::optional_override([](MediaConch::PolicyChecker& self, const std::string& report, bool verbose) {

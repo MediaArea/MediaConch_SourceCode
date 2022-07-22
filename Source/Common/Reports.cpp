@@ -1127,10 +1127,11 @@ int Reports::check_policies_xmls(int user, const std::vector<long>& files,
     for (size_t i = 0; i < policies.size(); ++i)
         checker.add_policy(policies[i]);
 
+    if (!checker.is_policy_supported())
+        return -1;
+
     if (checker.full_parse())
         opts["full_report"] = "\"1\"";
-    else
-        return -1;
 
     std::string report;
     if (create_report_ma_xml(user, files, opts, report, get_bitset_with_mi_mmt(), err) < 0)
