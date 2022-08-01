@@ -5,10 +5,10 @@ var checkerAjax = (function() {
         var options = [];
         if (formType === 'file')
         {
-            if ($('#checkerUpload_parseSpeed').val() !== '0.5')
+            if ($('#checkerUpload_parsespeed_selector').val() !== '0.5')
             {
                 options.push("file_parsespeed");
-                options.push($('#checkerUpload_parseSpeed').val());
+                options.push($('#checkerUpload_parsespeed_selector').val());
             }
 
             webpage.on_file_upload_selected($('.tab-content .active .policyList').val(),
@@ -23,10 +23,10 @@ var checkerAjax = (function() {
         }
         else if (formType === 'url')
         {
-            if ($('#checkerOnline_parseSpeed').val() !== '0.5')
+            if ($('#checkerOnline_parsespeed_selector').val() !== '0.5')
             {
                 options.push("file_parsespeed");
-                options.push($('#checkerOnline_parseSpeed').val());
+                options.push($('#checkerOnline_parsespeed_selector').val());
             }
 
             webpage.on_file_online_selected($('#checkerOnline_file').val(),
@@ -41,10 +41,10 @@ var checkerAjax = (function() {
         }
         else if (formType === 'repository')
         {
-            if ($('#checkerRepository_parseSpeed').val() !== '0.5')
+            if ($('#checkerRepository_parsespeed_selector').val() !== '0.5')
             {
                 options.push("file_parsespeed");
-                options.push($('#checkerRepository_parseSpeed').val());
+                options.push($('#checkerRepository_parsespeed_selector').val());
             }
 
             webpage.on_file_repository_selected($('.tab-content .active .policyList').val(),

@@ -1,5 +1,5 @@
 <form name="checkerOnline" method="post" action="" class="form-horizontal" enctype="multipart/form-data">
-  <div class="col-md-4" id="checkerOnline">
+  <div class="col-md-3" id="checkerOnline">
     <div class="form-group">
       <label class="col-sm-2 control-label" for="checkerOnline_policy">Policy</label>
       <div class="col-sm-10">
@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="form-group">
       <label class="col-sm-2 control-label" for="checkerOnline_display_selector">Display</label>
       <div class="col-sm-10">
@@ -19,26 +19,22 @@
     </div>
   </div>
 
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="form-group">
-      <label class="col-md-3 col-sm-2 control-label" for="checkerOnline_verbosity_selector">Verbosity</label>
-      <div class="col-md-9 col-sm-10">
+      <label class="col-sm-4 control-label" for="checkerOnline_verbosity_selector">Verbosity</label>
+      <div class="col-sm-8">
         <select  id="checkerOnline_verbosity_selector" name="checkerOnline_verbosity_selector" class="verbosityList form-control">
         </select>
       </div>
     </div>
   </div>
 
-  <div class="col-md-12 checkerParseSpeed">
+  <div class="col-md-3">
     <div class="form-group">
-      <div class="checkbox">
-        <label class="label_parsespeed">Parse speed <select id="checkerOnline_parseSpeed" name="checkerOnline_parseSpeed" class="selectParseSpeed">
-          <option value="0">Very quick (0)</option>
-          <option value="0.3">Quick (0.3)</option>
-          <option value="0.5" selected>Default (0.5)</option>
-          <option value="0.7">Advanced (0.7)</option>
-          <option value="1">Full (1)</option>
-        </select></label>
+      <label class="col-sm-4 control-label" for="checkerOnline_parsespeed_selector">Parse&nbsp;speed</label>
+      <div class="col-sm-8">
+        <select id="checkerOnline_parsespeed_selector" name="checkerOnline_parsespeed_selector" class="parsespeedList form-control">
+        </select>
       </div>
     </div>
   </div>

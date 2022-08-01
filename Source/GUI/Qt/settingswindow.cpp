@@ -95,6 +95,10 @@ void SettingsWindow::fill_settings_html(QString& html)
     QString verbosity;
     create_verbosity_options(verbosity);
     add_verbosity_to_html_selection(verbosity, html, "settings_verbosity_selector");
+
+    QString parsespeed;
+    create_parsespeed_options(parsespeed);
+    add_parsespeed_to_html_selection(parsespeed, html, "settings_parsespeed_selector");
 }
 
 //---------------------------------------------------------------------------
@@ -230,6 +234,42 @@ void SettingsWindow::create_verbosity_options(QString& verbosity)
 }
 
 //---------------------------------------------------------------------------
+void SettingsWindow::create_parsespeed_options(QString& parsespeed)
+{
+    std::string selected_parsespeed = main_window->get_settings().get_default_parsespeed();
+
+    if (selected_parsespeed == "last")
+        parsespeed += QString("<option selected=\"selected\" value=\"-1\">Last parsespeed used</option>");
+    else
+        parsespeed += QString("<option value=\"-1\">Last parsespeed used</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("0" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0\">Very quick (0)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("0.3" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0.3\">Quick (0.3)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("0.5" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0.5\">Default (0.5)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("0.7" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0.7\">Advanced (0.7)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("1" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"1\">Full (1)</option>");
+}
+
+//---------------------------------------------------------------------------
 void SettingsWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
 {
     QRegExp reg("class=\"policyList form-control\">");
@@ -278,6 +318,23 @@ void SettingsWindow::add_verbosity_to_html_selection(QString& verbosity, QString
     {
         pos += reg.matchedLength();
         html.insert(pos, verbosity);
+    }
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_parsespeed_to_html_selection(QString& parsespeed, QString& html, const QString& selector)
+{
+    QRegExp reg("class=\"parsespeedList form-control\">");
+    reg.setMinimal(true);
+
+    int pos = html.indexOf(selector);
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, parsespeed);
     }
 }
 

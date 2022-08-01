@@ -180,6 +180,37 @@ void CheckerWindow::create_verbosity_options(QString& verbosity)
 }
 
 //---------------------------------------------------------------------------
+void CheckerWindow::create_parsespeed_options(QString& parsespeed)
+{
+    std::string selected_parsespeed = main_window->select_correct_parsespeed();
+
+    parsespeed +=  QString("<option ");
+    if ("0" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0\">Very quick (0)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("0.3" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0.3\">Quick (0.3)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("0.5" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0.5\">Default (0.5)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("0.7" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"0.7\">Advanced (0.7)</option>");
+
+    parsespeed +=  QString("<option ");
+    if ("1" == selected_parsespeed)
+        parsespeed += QString("selected=\"selected\" ");
+    parsespeed += QString("value=\"1\">Full (1)</option>");
+}
+
+//---------------------------------------------------------------------------
 void CheckerWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
 {
     QRegExp reg("class=\"policyList form-control\">");
@@ -228,6 +259,23 @@ void CheckerWindow::add_verbosity_to_html_selection(QString& verbosity, QString&
     {
         pos += reg.matchedLength();
         html.insert(pos, verbosity);
+    }
+}
+
+//---------------------------------------------------------------------------
+void CheckerWindow::add_parsespeed_to_html_selection(QString& parsespeed, QString& html, const QString& selector)
+{
+    QRegExp reg("class=\"parsespeedList form-control\">");
+    reg.setMinimal(true);
+
+    int pos = html.indexOf(selector);
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, parsespeed);
     }
 }
 
@@ -325,6 +373,10 @@ QString CheckerWindow::create_form_upload()
     create_verbosity_options(verbosity);
     add_verbosity_to_html_selection(verbosity, ret, "checkerUpload_verbosity_selector");
 
+    QString parsespeed;
+    create_parsespeed_options(parsespeed);
+    add_parsespeed_to_html_selection(parsespeed, ret, "checkerUpload_parsespeed_selector");
+
     return ret;
 }
 
@@ -349,6 +401,10 @@ QString CheckerWindow::create_form_online()
     QString verbosity;
     create_verbosity_options(verbosity);
     add_verbosity_to_html_selection(verbosity, ret, "checkerOnline_verbosity_selector");
+
+    QString parsespeed;
+    create_parsespeed_options(parsespeed);
+    add_parsespeed_to_html_selection(parsespeed, ret, "checkerOnline_parsespeed_selector");
 
     return ret;
 }
@@ -415,6 +471,10 @@ QString CheckerWindow::create_form_repository()
     QString verbosity;
     create_verbosity_options(verbosity);
     add_verbosity_to_html_selection(verbosity, ret, "checkerRepository_display_selector");
+
+    QString parsespeed;
+    create_parsespeed_options(parsespeed);
+    add_parsespeed_to_html_selection(parsespeed, ret, "checkerRepository_parsespeed_selector");
 
     return ret;
 }

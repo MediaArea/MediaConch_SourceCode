@@ -8,7 +8,7 @@ var checker = (function() {
         bindings();
 
         //
-        $('.selectParseSpeed').change(function(){
+        $('.parsespeedList').change(function(){
             webpage.set_parse_speed($(this).val());
         })
 
@@ -49,7 +49,8 @@ var checker = (function() {
         var formValues = {policy:form.find('.policyList').val(),
             policyText:form.find('.policyList option:selected').text(),
             display:form.find('.displayList').val(),
-            verbosity:form.find('.verbosityList').val()
+            verbosity:form.find('.verbosityList').val(),
+            parsespeed:form.find('.parsespeedList').val()
         };
 
         return formValues;

@@ -172,6 +172,7 @@ public:
     int                         select_correct_policy();
     int                         select_correct_display();
     int                         select_correct_verbosity();
+    std::string                 select_correct_parsespeed();
     std::string                 select_correct_save_report_path();
     std::string                 select_correct_save_policy_path();
     std::string                 select_correct_save_display_path();

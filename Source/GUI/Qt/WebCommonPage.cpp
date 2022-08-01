@@ -451,6 +451,7 @@ namespace MediaConch
     void WebCommonPage::on_save_settings_selected(const QString& policy,
                                             const QString& display,
                                             const QString& verbosity,
+                                            const QString& parsespeed,
                                             const QString& save_report_path, const QString& load_files_path,
                                             const QString& save_policy_path, const QString& load_policy_path,
                                             const QString& save_display_path, const QString& load_display_path)
@@ -480,6 +481,12 @@ namespace MediaConch
 
         //verbosity
         settings.change_default_verbosity(verbosity.toInt());
+
+        //verbosity
+        if (parsespeed == "-1")
+            settings.change_default_parsespeed("last");
+        else
+            settings.change_default_parsespeed(parsespeed.toStdString());
 
         //Save report path
         std::string r_s_path;
@@ -599,10 +606,12 @@ namespace MediaConch
         int display_i = mainwindow->select_correct_display();
         int verbosity_i = mainwindow->select_correct_verbosity();
         bool has_libcurl = mainwindow->mil_has_curl_enabled();
+        QString parsespeed = QString().fromStdString(mainwindow->select_correct_parsespeed());
 
         use_javascript(QString("document.getElementById('checkerUpload_policy').value = %1;").arg(policy_i));
         use_javascript(QString("document.getElementById('checkerUpload_display_selector').value = %1;").arg(display_i));
         use_javascript(QString("document.getElementById('checkerUpload_verbosity_selector').value = %1;").arg(verbosity_i));
+        use_javascript(QString("document.getElementById('checkerUpload_parsespeed_selector').value = \"%1\";").arg(parsespeed));
         use_javascript("document.getElementById('checkerUpload_file').value = \"\";");
 
         if (has_libcurl)
@@ -610,12 +619,14 @@ namespace MediaConch
             use_javascript(QString("document.getElementById('checkerOnline_policy').value = %1;").arg(policy_i));
             use_javascript(QString("document.getElementById('checkerOnline_display_selector').value = %1;").arg(display_i));
             use_javascript(QString("document.getElementById('checkerOnline_verbosity_selector').value = %1;").arg(verbosity_i));
+            use_javascript(QString("document.getElementById('checkerOnline_parsespeed_selector').value = \"%1\";").arg(parsespeed));
             use_javascript("document.getElementById('checkerOnline_file').value = \"\";");
         }
 
         use_javascript(QString("document.getElementById('checkerRepository_policy').value = %1;").arg(policy_i));
         use_javascript(QString("document.getElementById('checkerRepository_display_selector').value = %1;").arg(display_i));
         use_javascript(QString("document.getElementById('checkerRepository_verbosity_selector').value = %1;").arg(verbosity_i));
+        use_javascript(QString("document.getElementById('checkerRepository_parsespeed_selector').value = \"%1\";").arg(parsespeed));
         use_javascript("document.getElementById('checkerRepository_directory').value = \"\";");
     }
 

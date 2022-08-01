@@ -28,7 +28,7 @@ namespace MediaConch {
 // SQLLiteUi
 //***************************************************************************
 
-int SQLLiteUi::ui_current_version          = 13;
+int SQLLiteUi::ui_current_version          = 14;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -113,6 +113,7 @@ int SQLLiteUi::ui_update_table()
     UPDATE_UI_TABLE_FOR_VERSION(10);
     UPDATE_UI_TABLE_FOR_VERSION(11);
     UPDATE_UI_TABLE_FOR_VERSION(12);
+    // UPDATE_UI_TABLE_FOR_VERSION(13); nothing to do
 
 #undef UPDATE_UI_TABLE_FOR_VERSION
 
@@ -848,6 +849,7 @@ int SQLLiteUi::ui_settings_update_table()
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(10); nothing to do
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(11); nothing to do
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(12); nothing to do
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(13);
 
 #undef UPDATE_UI_SETTINGS_TABLE_FOR_VERSION
 
@@ -1087,6 +1089,64 @@ int SQLLiteUi::ui_settings_get_default_verbosity(int& verbosity, int user_id)
 }
 
 //---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_default_parsespeed(const std::string& parsespeed, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   DEFAULT_PARSESPEED = ? ";
+    create << "WHERE USER_ID         = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, parsespeed.c_str(), parsespeed.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_default_parsespeed(std::string& parsespeed, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT DEFAULT_PARSESPEED FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("DEFAULT_PARSESPEED") != reports[0].end())
+        parsespeed = reports[0]["DEFAULT_PARSESPEED"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int SQLLiteUi::ui_settings_save_last_policy(const std::string& policy, int user_id)
 {
     if (ui_settings_check_user_id(user_id))
@@ -1255,6 +1315,64 @@ int SQLLiteUi::ui_settings_get_last_verbosity(int& verbosity, int user_id)
 
     if (reports[0].find("LAST_VERBOSITY") != reports[0].end())
         verbosity = std_string_to_int(reports[0]["LAST_VERBOSITY"]);
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_last_parsespeed(const std::string& parsespeed, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   LAST_PARSESPEED = ? ";
+    create << "WHERE USER_ID         = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, parsespeed.c_str(), parsespeed.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_last_parsespeed(std::string& parsespeed, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT LAST_PARSESPEED FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("LAST_PARSESPEED") != reports[0].end())
+        parsespeed = reports[0]["LAST_PARSESPEED"];
     return 0;
 }
 

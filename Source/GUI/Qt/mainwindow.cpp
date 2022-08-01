@@ -246,6 +246,12 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
     uisettings.change_last_display(displays_list[display_i].toUtf8().data());
     uisettings.change_last_verbosity(verbosity_i);
 
+    int parsespeed_idx = options.lastIndexOf("file_parsespeed");
+    if (parsespeed_idx != -1 && parsespeed_idx < options.size())
+        uisettings.change_last_parsespeed(options[parsespeed_idx + 1].toStdString());
+    else
+        uisettings.change_last_parsespeed("");
+
     std::string full_path = filepath;
 #ifdef WINDOWS
     if (full_path.length() && full_path[full_path.size() - 1] != '/' && full_path[full_path.size() - 1] != '\\')
@@ -1260,6 +1266,18 @@ int MainWindow::select_correct_verbosity()
     if (verbosity == -1)
         verbosity = uisettings.get_last_verbosity();
     return verbosity;
+}
+
+//---------------------------------------------------------------------------
+std::string MainWindow::select_correct_parsespeed()
+{
+    // Parsespeed
+    std::string parsespeed = uisettings.get_default_parsespeed();
+    if (parsespeed == "last")
+        parsespeed = uisettings.get_last_parsespeed();
+    if (parsespeed.empty())
+        parsespeed = "0.5";
+    return parsespeed;
 }
 
 //---------------------------------------------------------------------------

@@ -33,6 +33,7 @@ int UiSettings::init()
     default_display = "last";
     default_verbosity = 5;
     last_verbosity = 5;
+    default_parsespeed = "last";
 
     if (!database)
         return -1;
@@ -41,6 +42,8 @@ int UiSettings::init()
     if (database->ui_settings_get_default_display(default_display))
         return -1;
     if (database->ui_settings_get_default_verbosity(default_verbosity))
+        return -1;
+    if (database->ui_settings_get_default_parsespeed(default_parsespeed))
         return -1;
     if (database->ui_settings_get_default_save_report_path(default_save_report_path))
         return -1;
@@ -60,6 +63,8 @@ int UiSettings::init()
     if (database->ui_settings_get_last_display(last_display))
         return -1;
     if (database->ui_settings_get_last_verbosity(last_verbosity))
+        return -1;
+    if (database->ui_settings_get_last_parsespeed(last_parsespeed))
         return -1;
     if (database->ui_settings_get_last_save_report_path(last_save_report_path))
         return -1;
@@ -138,6 +143,24 @@ void UiSettings::change_default_verbosity(int verbosity)
         return;
 
     default_verbosity = verbosity;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_default_parsespeed() const
+{
+    return default_parsespeed;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_default_parsespeed(const std::string& parsespeed)
+{
+    if (!database || default_parsespeed == parsespeed)
+        return;
+
+    if (database->ui_settings_save_default_parsespeed(parsespeed) < 0)
+        return;
+
+    default_parsespeed = parsespeed;
 }
 
 //---------------------------------------------------------------------------
@@ -302,6 +325,25 @@ void UiSettings::change_last_verbosity(int verbosity)
 
     last_verbosity = verbosity;
 }
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_last_parsespeed() const
+{
+    return last_parsespeed;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_last_parsespeed(const std::string& parsespeed)
+{
+    if (!database || last_parsespeed == parsespeed)
+        return;
+
+    if (database->ui_settings_save_last_parsespeed(parsespeed) < 0)
+        return;
+
+    last_parsespeed = parsespeed;
+}
+
 
 //---------------------------------------------------------------------------
 std::string UiSettings::get_last_save_report_path() const

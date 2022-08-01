@@ -52,6 +52,8 @@ private:
     void create_displays_options(QString& displays);
     void add_verbosity_to_html_selection(QString& verbosity, QString& html, const QString& selector);
     void create_verbosity_options(QString& verbosity);
+    void add_parsespeed_to_html_selection(QString& parsespeed, QString& html, const QString& selector);
+    void create_parsespeed_options(QString& parsespeed);
     void remove_template_tags(QString& data);
     void load_include_in_template(QString& html);
     void remove_element_in_template(QString& html);
