@@ -53,6 +53,11 @@ public:
     virtual int ui_settings_save_last_verbosity(int, int user_id = -1);
     virtual int ui_settings_get_last_verbosity(int&, int user_id = -1);
 
+    virtual int ui_settings_save_default_parsespeed(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_default_parsespeed(std::string&, int user_id = -1);
+    virtual int ui_settings_save_last_parsespeed(const std::string&, int user_id = -1);
+    virtual int ui_settings_get_last_parsespeed(std::string&, int user_id = -1);
+
     virtual int ui_settings_save_default_load_files_path(const std::string&, int user_id = -1);
     virtual int ui_settings_get_default_load_files_path(std::string&, int user_id = -1);
     virtual int ui_settings_save_last_load_files_path(const std::string&, int user_id = -1);

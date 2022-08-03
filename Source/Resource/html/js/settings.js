@@ -5,6 +5,7 @@ $(document).ready(function() {
         webpage.on_save_settings_selected($('#settings_policy').val(),
                                           $('#settings_display_selector').val(),
                                           $('#settings_verbosity_selector').val(),
+                                          $('#settings_parsespeed_selector').val(),
                                           $('input[name=settings_save_report_path]:checked').val(),
                                           $('input[name=settings_load_files_path]:checked').val(),
                                           $('input[name=settings_save_policy_path]:checked').val(),

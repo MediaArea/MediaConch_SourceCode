@@ -33,6 +33,8 @@ private:
     void create_displays_options(QString& displays);
     void add_verbosity_to_html_selection(QString& verbosity, QString& html, const QString& selector);
     void create_verbosity_options(QString& verbosity);
+    void add_parsespeed_to_html_selection(QString& parsespeed, QString& html, const QString& selector);
+    void create_parsespeed_options(QString& parsespeed);
 
     void create_html_base(QString& base, const QString& settings);
     void change_qt_scripts_in_template(QString& html);

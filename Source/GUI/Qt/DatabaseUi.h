@@ -70,6 +70,11 @@ public:
     virtual int ui_settings_save_last_verbosity(int, int user_id = -1) = 0;
     virtual int ui_settings_get_last_verbosity(int&, int user_id = -1) = 0;
 
+    virtual int ui_settings_save_default_parsespeed(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_default_parsespeed(std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_save_last_parsespeed(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_last_parsespeed(std::string&, int user_id = -1) = 0;
+
     virtual int ui_settings_save_default_load_files_path(const std::string&, int user_id = -1) = 0;
     virtual int ui_settings_get_default_load_files_path(std::string&, int user_id = -1) = 0;
     virtual int ui_settings_save_last_load_files_path(const std::string&, int user_id = -1) = 0;
@@ -120,6 +125,7 @@ protected:
     void        get_sql_query_for_update_ui_table_v10(std::string& q);
     void        get_sql_query_for_update_ui_table_v11(std::string& q);
     void        get_sql_query_for_update_ui_table_v12(std::string& q);
+    void        get_sql_query_for_update_ui_settings_table_v13(std::string& q);
 
 private:
     DatabaseUi (const DatabaseUi&);

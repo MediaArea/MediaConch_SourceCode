@@ -208,4 +208,15 @@ void DatabaseUi::get_sql_query_for_update_ui_table_v12(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_settings_table_v13(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI_SETTINGS"; // Table name
+    create << " ADD DEFAULT_PARSESPEED TEXT NOT NULL DEFAULT 'last';";
+    create << "ALTER TABLE UI_SETTINGS"; // Table name
+    create << " ADD LAST_PARSESPEED TEXT DEFAULT NULL;";
+    q = create.str();
+}
+
 }

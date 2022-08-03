@@ -151,6 +151,18 @@ int NoDatabaseUi::ui_settings_get_default_verbosity(int&, int)
 }
 
 //---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_save_default_parsespeed(const std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_get_default_parsespeed(std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int NoDatabaseUi::ui_settings_save_last_policy(const std::string&, int)
 {
     return 0;
@@ -182,6 +194,18 @@ int NoDatabaseUi::ui_settings_save_last_verbosity(int, int)
 
 //---------------------------------------------------------------------------
 int NoDatabaseUi::ui_settings_get_last_verbosity(int&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_save_last_parsespeed(const std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_get_last_parsespeed(std::string&, int)
 {
     return 0;
 }
