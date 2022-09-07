@@ -78,9 +78,9 @@ public:
                                     std::string& report, std::string& err);
     int   get_implementation_reports(int user, const std::vector<long>& files,
                                      const std::map<std::string, std::string>& options,
-                                     std::string& report, bool& valid, std::string& err);
+                                     std::string& report, bool& valid, bool& has_info, bool& has_warning, std::string& err);
     int   get_implementation_report(int user, long file, const std::map<std::string, std::string>& options,
-                                    std::string& report, bool& valid, std::string& err);
+                                    std::string& report, bool& valid, bool& has_info, bool& has_warning, std::string& err);
     int   get_verapdf_report(int user, long file, std::string& report, bool& valid, std::string& err);
     int   get_dpfmanager_report(int user, long file, std::string& report, bool& valid, std::string& err);
     int   get_imsc1validation_report(int user, long file, std::string& report, bool& valid, std::string& err);
@@ -96,6 +96,7 @@ public:
 
     // Reports validity
     bool  implementation_is_valid(const std::string& report);
+    bool  implementation_has_info_or_warning(const std::string& report, bool& has_info, bool& has_warning);
     bool  policy_is_valid(const std::string& report);
     bool  policy_has_info_or_warning(const std::string& report, bool& has_info, bool& has_warning);
     bool  verapdf_report_is_valid(const std::string& report);

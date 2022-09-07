@@ -11,7 +11,15 @@ var implementationCell = (function() {
         if (data.valid) {
             if (result.$('#result-' + fileId).data('attachment') !== "true") {
                 nodeImplem.addClass('success');
-                var implemResultText = '<span class="implemResult"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Valid</span>'
+                if (data.warn) {
+                    var implemResultText = '<span class="implemResult"><span class="glyphicon glyphicon-warning-sign text-warning" style="color:gold" aria-hidden="true"></span> Warning</span>'
+                }
+                else if (data.info) {
+                    var implemResultText = '<span class="implemResult"><span class="glyphicon glyphicon-info-sign text-info" style="color:blue" aria-hidden="true"></span> Info</span>'
+                }
+                else {
+                    var implemResultText = '<span class="implemResult"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> Valid</span>'
+                }
             }
             else {
                 nodeImplem.addClass('info');

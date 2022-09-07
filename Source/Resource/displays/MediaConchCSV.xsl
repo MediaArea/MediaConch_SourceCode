@@ -32,8 +32,10 @@
       <xsl:for-each select="mc:implementationChecks/mc:check">
         <xsl:text>,</xsl:text>
         <xsl:choose>
-          <xsl:when test="@fail_count = '0'">pass</xsl:when>
           <xsl:when test="@fail_count > '0'">fail</xsl:when>
+          <xsl:when test="@warn_count > '0'">warn</xsl:when>
+          <xsl:when test="@info_count > '0'">info</xsl:when>
+          <xsl:otherwise>pass</xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
     </xsl:for-each>

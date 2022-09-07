@@ -45,13 +45,18 @@
         <xsl:text>  |  </xsl:text>
         <xsl:if test="@tests_run !=''">
           <xsl:text>Tests run: </xsl:text><xsl:value-of select="@tests_run"/>
-          <xsl:text>  | </xsl:text>
+          <xsl:text>  |  </xsl:text>
         </xsl:if>
         <xsl:text> Results: </xsl:text>
         <xsl:choose>
           <xsl:when test="@fail_count &gt; 0">
-            <xsl:text>[X]  </xsl:text>
-            <xsl:text>Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
+            <xsl:text>[X]  </xsl:text><xsl:value-of select="@outcome"/>
+          </xsl:when>
+          <xsl:when test="@warn_count &gt; 0">
+            <xsl:text>[W]  </xsl:text><xsl:value-of select="@outcome"/>
+          </xsl:when>
+          <xsl:when test="@info_count &gt; 0">
+            <xsl:text>[I]  </xsl:text><xsl:value-of select="@outcome"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>[O]  </xsl:text><xsl:value-of select="@outcome"/>
@@ -59,18 +64,20 @@
         </xsl:choose>
           <xsl:text>&#xa;</xsl:text>
           <xsl:if test="@name"><xsl:text>Name: </xsl:text><xsl:value-of select="@name"/>
-        </xsl:if>    
+        </xsl:if>
         <xsl:text>&#xa;</xsl:text>
         <xsl:for-each select="mc:test">
+        <xsl:if test="mc:context/@name != ''">
           <xsl:value-of select="@outcome"/>
           <xsl:text> -- </xsl:text>
-        <xsl:if test="mc:context/@name != ''">
           <xsl:value-of select="mc:context/@name"/>
           <xsl:text>: </xsl:text>
           <xsl:value-of select="mc:context"/>
           <xsl:text>&#xa;</xsl:text>
         </xsl:if>
         <xsl:for-each select="mc:value">
+          <xsl:value-of select="../@outcome"/>
+          <xsl:text> -- </xsl:text>
           <xsl:if test="@name != ''">
             <xsl:value-of select="@name"/>
             <xsl:text>: </xsl:text>

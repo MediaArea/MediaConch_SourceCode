@@ -28,7 +28,7 @@ namespace MediaConch {
 // SQLLiteUi
 //***************************************************************************
 
-int SQLLiteUi::ui_current_version          = 14;
+int SQLLiteUi::ui_current_version          = 15;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -114,6 +114,7 @@ int SQLLiteUi::ui_update_table()
     UPDATE_UI_TABLE_FOR_VERSION(11);
     UPDATE_UI_TABLE_FOR_VERSION(12);
     // UPDATE_UI_TABLE_FOR_VERSION(13); nothing to do
+    UPDATE_UI_TABLE_FOR_VERSION(14);
 
 #undef UPDATE_UI_TABLE_FOR_VERSION
 
@@ -142,8 +143,8 @@ int SQLLiteUi::ui_add_file(const FileRegistered* file)
 
     reports.clear();
     create << "INSERT INTO UI ";
-    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, POLICY_HAS_INFO, POLICY_HAS_WARNING, VERBOSITY, OPTIONS, MIL_VERSION)";
-    create << " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, IMPLEMENTATION_HAS_INFO, IMPLEMENTATION_HAS_WARNING, POLICY_VALID, POLICY_HAS_INFO, POLICY_HAS_WARNING, VERBOSITY, OPTIONS, MIL_VERSION)";
+    create << " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     query = create.str();
 
     const char* end = NULL;
@@ -175,29 +176,37 @@ int SQLLiteUi::ui_add_file(const FileRegistered* file)
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 7, file->policy_valid);
+    ret = sqlite3_bind_int(stmt, 7, file->implementation_has_info);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 8, file->policy_has_info);
+    ret = sqlite3_bind_int(stmt, 8, file->implementation_has_warning);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 9, file->policy_has_warning);
+    ret = sqlite3_bind_int(stmt, 9, file->policy_valid);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 10, file->verbosity);
+    ret = sqlite3_bind_int(stmt, 10, file->policy_has_info);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 11, file->policy_has_warning);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 12, file->verbosity);
     if (ret != SQLITE_OK)
         return -1;
 
     std::string options;
     options_vec_to_string(file->options, options);
-    ret = sqlite3_bind_blob(stmt, 11, options.c_str(), options.length(), SQLITE_TRANSIENT);
+    ret = sqlite3_bind_blob(stmt, 13, options.c_str(), options.length(), SQLITE_TRANSIENT);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int64(stmt, 12, (sqlite3_int64)file->mil_version);
+    ret = sqlite3_bind_int64(stmt, 14, (sqlite3_int64)file->mil_version);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -234,12 +243,12 @@ int SQLLiteUi::ui_create_files(const std::vector<FileRegistered*>& files)
 
     reports.clear();
     create << "INSERT INTO UI ";
-    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, POLICY_HAS_INFO, POLICY_HAS_WARNING, VERBOSITY, OPTIONS, MIL_VERSION) VALUES";
+    create << "(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, IMPLEMENTATION_HAS_INFO, IMPLEMENTATION_HAS_WARNING, POLICY_VALID, POLICY_HAS_INFO, POLICY_HAS_WARNING, VERBOSITY, OPTIONS, MIL_VERSION) VALUES";
     for (size_t i = 0; i < files.size(); ++i)
     {
         if (i)
             create << ",";
-        create << " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        create << " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     create << ";";
@@ -279,30 +288,38 @@ int SQLLiteUi::ui_create_files(const std::vector<FileRegistered*>& files)
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 7, file->policy_valid);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 7, file->implementation_has_info);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 8, file->policy_has_info);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 8, file->implementation_has_warning);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 9, file->policy_has_warning);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 9, file->policy_valid);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 10, file->verbosity);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 10, file->policy_has_info);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * nb_column + 11, file->policy_has_warning);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * nb_column + 12, file->verbosity);
         if (ret != SQLITE_OK)
             return -1;
 
         std::string options;
         options_vec_to_string(file->options, options);
 
-        ret = sqlite3_bind_blob(stmt, i * nb_column + 11, options.c_str(), options.length(), SQLITE_TRANSIENT);
+        ret = sqlite3_bind_blob(stmt, i * nb_column + 13, options.c_str(), options.length(), SQLITE_TRANSIENT);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int64(stmt, i * nb_column + 12, (sqlite3_int64)file->mil_version);
+        ret = sqlite3_bind_int64(stmt, i * nb_column + 14, (sqlite3_int64)file->mil_version);
         if (ret != SQLITE_OK)
             return -1;
 
@@ -318,18 +335,20 @@ int SQLLiteUi::ui_update_file(const FileRegistered* file)
 
     reports.clear();
     create << "UPDATE UI ";
-    create << "SET POLICY           = ?, ";
-    create << "DISPLAY              = ?, ";
-    create << "ANALYZED             = ?, ";
-    create << "IMPLEMENTATION_VALID = ?, ";
-    create << "POLICY_VALID         = ?, ";
-    create << "POLICY_HAS_INFO      = ?, ";
-    create << "POLICY_HAS_WARNING   = ?, ";
-    create << "VERBOSITY            = ?, ";
-    create << "OPTIONS              = ?, ";
-    create << "MIL_VERSION          = ?  ";
-    create << "WHERE FILENAME       = ?  ";
-    create << "AND   FILEPATH       = ? ;";
+    create << "SET POLICY                 = ?, ";
+    create << "DISPLAY                    = ?, ";
+    create << "ANALYZED                   = ?, ";
+    create << "IMPLEMENTATION_VALID       = ?, ";
+    create << "IMPLEMENTATION_HAS_INFO    = ?, ";
+    create << "IMPLEMENTATION_HAS_WARNING = ?, ";
+    create << "POLICY_VALID               = ?, ";
+    create << "POLICY_HAS_INFO            = ?, ";
+    create << "POLICY_HAS_WARNING         = ?, ";
+    create << "VERBOSITY                  = ?, ";
+    create << "OPTIONS                    = ?, ";
+    create << "MIL_VERSION                = ?  ";
+    create << "WHERE FILENAME             = ?  ";
+    create << "AND   FILEPATH             = ? ;";
 
     query = create.str();
 
@@ -354,37 +373,45 @@ int SQLLiteUi::ui_update_file(const FileRegistered* file)
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 5, file->policy_valid);
+    ret = sqlite3_bind_int(stmt, 5, file->implementation_has_info);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 6, file->policy_has_info);
+    ret = sqlite3_bind_int(stmt, 6, file->implementation_has_warning);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 7, file->policy_has_warning);
+    ret = sqlite3_bind_int(stmt, 7, file->policy_valid);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int(stmt, 8, file->verbosity);
+    ret = sqlite3_bind_int(stmt, 8, file->policy_has_info);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 9, file->policy_has_warning);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 10, file->verbosity);
     if (ret != SQLITE_OK)
         return -1;
 
     std::string options;
     options_vec_to_string(file->options, options);
-    ret = sqlite3_bind_blob(stmt, 9, options.c_str(), options.length(), SQLITE_TRANSIENT);
+    ret = sqlite3_bind_blob(stmt, 11, options.c_str(), options.length(), SQLITE_TRANSIENT);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_int64(stmt, 10, (sqlite3_int64)file->mil_version);
+    ret = sqlite3_bind_int64(stmt, 12, (sqlite3_int64)file->mil_version);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 11, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 13, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 12, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_blob(stmt, 14, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -397,13 +424,13 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
     std::stringstream create;
 
     reports.clear();
-    create << "WITH Tmp(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, POLICY_VALID, POLICY_HAS_INFO, POLICY_HAS_WARNING, VERBOSITY, OPTIONS, MIL_VERSION)";
+    create << "WITH Tmp(FILENAME, FILEPATH, POLICY, DISPLAY, ANALYZED, IMPLEMENTATION_VALID, IMPLEMENTATION_HAS_INFO, IMPLEMENTATION_HAS_WARNING, POLICY_VALID, POLICY_HAS_INFO, POLICY_HAS_WARNING, VERBOSITY, OPTIONS, MIL_VERSION)";
     create << "AS (VALUES";
     for (size_t i = 0; i < files.size(); ++i)
     {
         if (i)
             create << ", ";
-        create << "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        create << "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
     create << ") ";
 
@@ -412,6 +439,8 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
     create << "DISPLAY = (SELECT DISPLAY FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "ANALYZED = (SELECT ANALYZED FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "IMPLEMENTATION_VALID = (SELECT IMPLEMENTATION_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "IMPLEMENTATION_HAS_INFO = (SELECT IMPLEMENTATION_HAS_INFO FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
+    create << "IMPLEMENTATION_HAS_WARNING = (SELECT IMPLEMENTATION_HAS_WARNING FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "POLICY_VALID = (SELECT POLICY_VALID FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "POLICY_HAS_INFO = (SELECT POLICY_HAS_INFO FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
     create << "POLICY_HAS_WARNING = (SELECT POLICY_HAS_WARNING FROM Tmp WHERE UI.FILENAME = Tmp.FILENAME AND UI.FILEPATH = Tmp.FILEPATH), ";
@@ -457,29 +486,38 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 7, file->policy_valid);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 7, file->implementation_has_info);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 8, file->policy_has_info);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 8, file->implementation_has_warning);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 9, file->policy_has_warning);
+
+        ret = sqlite3_bind_int(stmt, i * nb_column + 9, file->policy_valid);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int(stmt, i * nb_column + 10, file->verbosity);
+        ret = sqlite3_bind_int(stmt, i * nb_column + 10, file->policy_has_info);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * nb_column + 11, file->policy_has_warning);
+        if (ret != SQLITE_OK)
+            return -1;
+
+        ret = sqlite3_bind_int(stmt, i * nb_column + 12, file->verbosity);
         if (ret != SQLITE_OK)
             return -1;
 
         std::string options;
         options_vec_to_string(file->options, options);
-        ret = sqlite3_bind_blob(stmt, i * nb_column + 11, options.c_str(), options.length(), SQLITE_TRANSIENT);
+        ret = sqlite3_bind_blob(stmt, i * nb_column + 13, options.c_str(), options.length(), SQLITE_TRANSIENT);
         if (ret != SQLITE_OK)
             return -1;
 
-        ret = sqlite3_bind_int64(stmt, i * nb_column + 12, (sqlite3_int64)file->mil_version);
+        ret = sqlite3_bind_int64(stmt, i * nb_column + 14, (sqlite3_int64)file->mil_version);
         if (ret != SQLITE_OK)
             return -1;
     }
@@ -496,6 +534,8 @@ int SQLLiteUi::ui_get_file(FileRegistered* file)
     std::string d("DISPLAY");
     std::string a("ANALYZED");
     std::string i_v("IMPLEMENTATION_VALID");
+    std::string i_i("IMPLEMENTATION_HAS_INFO");
+    std::string i_w("IMPLEMENTATION_HAS_WARNING");
     std::string p_v("POLICY_VALID");
     std::string p_i("POLICY_HAS_INFO");
     std::string p_w("POLICY_HAS_WARNING");
@@ -504,7 +544,7 @@ int SQLLiteUi::ui_get_file(FileRegistered* file)
     std::string m_v("MIL_VERSION");
 
     reports.clear();
-    create << "SELECT " << p << ", " << d << ", " << a << ", " << i_v << ", " << p_v << ", "<< p_i << ", " << p_w << ", " << v << ", " << o << ", " << m_v << " FROM UI ";
+    create << "SELECT " << p << ", " << d << ", " << a << ", " << i_v << ", " << i_i << ", " << i_w << ", " << p_v << ", "<< p_i << ", " << p_w << ", " << v << ", " << o << ", " << m_v << " FROM UI ";
     create << "WHERE FILENAME = ? AND FILEPATH = ?;";
     query = create.str();
 
@@ -534,6 +574,10 @@ int SQLLiteUi::ui_get_file(FileRegistered* file)
         file->analyzed = std_string_to_int(r[a]);
     if (r.find(i_v) != r.end())
         file->implementation_valid = std_string_to_int(r[i_v]);
+    if (r.find(i_i) != r.end())
+        file->implementation_has_info = std_string_to_int(r[i_i]);
+    if (r.find(i_w) != r.end())
+        file->implementation_has_warning = std_string_to_int(r[i_w]);
     if (r.find(p_v) != r.end())
         file->policy_valid = std_string_to_int(r[p_v]);
     if (r.find(p_i) != r.end())
@@ -677,6 +721,8 @@ void SQLLiteUi::ui_get_elements(std::vector<FileRegistered*>& vec)
     std::string d("DISPLAY");
     std::string a("ANALYZED");
     std::string i_v("IMPLEMENTATION_VALID");
+    std::string i_i("IMPLEMENTATION_HAS_INFO");
+    std::string i_w("IMPLEMENTATION_HAS_WARNING");
     std::string p_v("POLICY_VALID");
     std::string p_i("POLICY_HAS_INFO");
     std::string p_w("POLICY_HAS_WARNING");
@@ -686,7 +732,7 @@ void SQLLiteUi::ui_get_elements(std::vector<FileRegistered*>& vec)
 
     reports.clear();
     create << "SELECT " << name << ", " << path << ", " << p << ", " << d << ", " << a ;
-    create << ", " << i_v << ", " << p_v << ", " << p_i << ", " << p_w << ", " << v << ", " << o << ", " << m_v;
+    create << ", " << i_v << ", " << p_v << ", " << p_i << ", " << i_i << ", " << i_w << ", " << p_w << ", " << v << ", " << o << ", " << m_v;
     create << " FROM UI;";
     query = create.str();
 
@@ -714,6 +760,10 @@ void SQLLiteUi::ui_get_elements(std::vector<FileRegistered*>& vec)
                 file->analyzed = std_string_to_int(reports[i][a]);
             if (reports[i].find(i_v) != reports[i].end())
                 file->implementation_valid = std_string_to_int(reports[i][i_v]);
+            if (reports[i].find(i_i) != reports[i].end())
+                file->implementation_has_info = std_string_to_int(reports[i][i_i]);
+            if (reports[i].find(i_w) != reports[i].end())
+                file->implementation_has_warning = std_string_to_int(reports[i][i_w]);
             if (reports[i].find(p_v) != reports[i].end())
                 file->policy_valid = std_string_to_int(reports[i][p_v]);
             if (reports[i].find(p_i) != reports[i].end())
@@ -740,13 +790,15 @@ int SQLLiteUi::ui_reset_file_for_reload(FileRegistered* file)
 
     reports.clear();
     create << "UPDATE UI ";
-    create << "SET ANALYZED         = ?, ";
-    create << "IMPLEMENTATION_VALID = ?, ";
-    create << "POLICY_VALID         = ?, ";
-    create << "POLICY_HAS_INFO      = ?, ";
-    create << "POLICY_HAS_WARNING   = ?, ";
-    create << "WHERE FILENAME       = ?  ";
-    create << "AND   FILEPATH       = ? ;";
+    create << "SET ANALYZED               = ?, ";
+    create << "IMPLEMENTATION_VALID       = ?, ";
+    create << "IMPLEMENTATION_HAS_INFO    = ?, ";
+    create << "IMPLEMENTATION_HAS_WARNING = ?, ";
+    create << "POLICY_VALID               = ?, ";
+    create << "POLICY_HAS_INFO            = ?, ";
+    create << "POLICY_HAS_WARNING         = ?, ";
+    create << "WHERE FILENAME             = ?  ";
+    create << "AND   FILEPATH             = ? ;";
 
     query = create.str();
 
@@ -776,11 +828,19 @@ int SQLLiteUi::ui_reset_file_for_reload(FileRegistered* file)
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 6, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int(stmt, 6, false);
     if (ret != SQLITE_OK)
         return -1;
 
-    ret = sqlite3_bind_blob(stmt, 7, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
+    ret = sqlite3_bind_int(stmt, 7, false);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 8, file->filename.c_str(), file->filename.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 9, file->filepath.c_str(), file->filepath.length(), SQLITE_STATIC);
     if (ret != SQLITE_OK)
         return -1;
 
@@ -850,7 +910,7 @@ int SQLLiteUi::ui_settings_update_table()
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(11); nothing to do
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(12); nothing to do
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(13);
-
+    // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(14); nothing to do
 #undef UPDATE_UI_SETTINGS_TABLE_FOR_VERSION
 
     return 0;

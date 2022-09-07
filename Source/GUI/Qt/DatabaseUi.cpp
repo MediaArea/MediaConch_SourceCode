@@ -219,4 +219,15 @@ void DatabaseUi::get_sql_query_for_update_ui_settings_table_v13(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_table_v14(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI"; // Table name
+    create << " ADD IMPLEMENTATION_HAS_INFO BOOL DEFAULT FALSE;";
+    create << "ALTER TABLE UI"; // Table name
+    create << " ADD IMPLEMENTATION_HAS_WARNING BOOL DEFAULT FALSE;";
+    q = create.str();
+}
+
 }
