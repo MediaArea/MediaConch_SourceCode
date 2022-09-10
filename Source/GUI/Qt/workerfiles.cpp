@@ -661,6 +661,8 @@ void WorkerFiles::update_unfinished_files()
                 continue;
             }
             fr->implementation_valid = res[0]->valid;
+            fr->implementation_has_info = res[0]->has_info;
+            fr->implementation_has_warning = res[0]->has_warning;
 
             for (size_t j = 0; j < res.size(); ++j)
                 delete res[j];

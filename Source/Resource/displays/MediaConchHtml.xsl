@@ -214,18 +214,35 @@
                 <strong><xsl:value-of select="@icid"/></strong>
                 <xsl:if test="@tests_run !=''">
                   <xsl:text>  Tests run: </xsl:text><xsl:value-of select="@tests_run"/>
-                  <xsl:text>  | </xsl:text>
+                  <xsl:text>  |  </xsl:text>
                 </xsl:if>
-                <xsl:text> Results: </xsl:text>
+                <xsl:text>Results: </xsl:text>
                 <xsl:choose>
                   <xsl:when test="@fail_count &gt; 0">
-                    <xsl:text>&#x274C;  </xsl:text>
-                    <xsl:text>  Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
+                    <xsl:text>&#x274C;</xsl:text><xsl:value-of select="@outcome"/>
+                  </xsl:when>
+                  <xsl:when test="@warn_count &gt; 0">
+                    <xsl:text>&#x26A0;</xsl:text><xsl:value-of select="@outcome"/>
+                  </xsl:when>
+                  <xsl:when test="@info_count &gt; 0">
+                    <xsl:text>&#x2139;</xsl:text><xsl:value-of select="@outcome"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:text>&#x2705;  </xsl:text><xsl:value-of select="@outcome"/>
+                    <xsl:text>&#x2705;</xsl:text><xsl:value-of select="@outcome"/>
                   </xsl:otherwise>
                 </xsl:choose>
+                  <xsl:if test="@fail_count &gt; 0">
+                    <xsl:text>  |  </xsl:text>
+                    <xsl:text>Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
+                  </xsl:if>
+                  <xsl:if test="@warn_count &gt; 0">
+                    <xsl:text>  |  </xsl:text>
+                    <xsl:text>Warn count: </xsl:text><xsl:value-of select="@warn_count"/>
+                  </xsl:if>
+                  <xsl:if test="@info_count &gt; 0">
+                    <xsl:text>  |  </xsl:text>
+                    <xsl:text>Info count: </xsl:text><xsl:value-of select="@info_count"/>
+                  </xsl:if>
               <xsl:for-each select="mc:test">
                 <div class="extra">
                   <xsl:if test="../@name">
@@ -237,6 +254,22 @@
                   <xsl:value-of select="@outcome"/>
                   <xsl:if test="@outcome = 'pass'">
                     <xsl:text> &#x2705;  </xsl:text>
+                  </xsl:if>
+                  <xsl:if test="@outcome = 'info'">
+                    <xsl:text> &#x2139;  </xsl:text>
+                    <xsl:if test="@reason">
+                      <xsl:text>(Reason: </xsl:text>
+                      <xsl:value-of select="@reason"/>
+                      <xsl:text>)</xsl:text>
+                    </xsl:if>
+                  </xsl:if>
+                  <xsl:if test="@outcome = 'warn'">
+                    <xsl:text> &#x26A0;  </xsl:text>
+                    <xsl:if test="@reason">
+                      <xsl:text>(Reason: </xsl:text>
+                      <xsl:value-of select="@reason"/>
+                      <xsl:text>)</xsl:text>
+                    </xsl:if>
                   </xsl:if>
                   <xsl:if test="@outcome = 'fail'">
                     <xsl:text> &#x274C;  </xsl:text>
@@ -259,21 +292,23 @@
                     <xsl:text>: </xsl:text>
                     <xsl:value-of select="."/><br/>
                  </xsl:for-each>
-                  <xsl:if test="mc:value/@name !=''">
-                     <strong>Name: </strong><xsl:value-of select="mc:value/@name"/><br/>
+                 <xsl:for-each select="mc:value">
+                   <xsl:if test="@name !=''">
+                     <strong>Name: </strong><xsl:value-of select="@name"/><br/>
                    </xsl:if>
-                   <xsl:if test="mc:value/@offset !=''">
-                     <strong>Offset: </strong><xsl:value-of select="mc:value/@offset"/><br/>
+                   <xsl:if test="@offset !=''">
+                     <strong>Offset: </strong><xsl:value-of select="@offset"/><br/>
                    </xsl:if>
-                   <xsl:if test="mc:value/@formatid !=''">
-                     <strong>ID: </strong><xsl:value-of select="mc:value/@formatid"/><br/>
+                   <xsl:if test="@formatid !=''">
+                     <strong>ID: </strong><xsl:value-of select="@formatid"/><br/>
                    </xsl:if>
-                   <xsl:if test="mc:value/@context !=''">
-                     <strong>Value context: </strong><xsl:value-of select="mc:value/@context"/><br/>
+                   <xsl:if test="@context !=''">
+                     <strong>Value context: </strong><xsl:value-of select="@context"/><br/>
                    </xsl:if>
-                   <xsl:if test="mc:value/. !=''">
-                     <strong>Value: </strong><xsl:value-of select="mc:value/."/><br/>
+                   <xsl:if test=". !=''">
+                     <strong>Value: </strong><xsl:value-of select="."/><br/>
                    </xsl:if>
+                 </xsl:for-each>
                    <hr/>
                   </div> 
                 </xsl:for-each>
@@ -390,8 +425,8 @@
           <strong>Tracktype: </strong>  <xsl:value-of select="@tracktype"/>
           <br/>
         </xsl:if>
-        <xsl:if test="@occurrence != ''">
-          <strong>Occurrence: </strong>  <xsl:value-of select="@occurrence"/>
+        <xsl:if test="@occurence != ''">
+          <strong>Occurence: </strong>  <xsl:value-of select="@occurence"/>
           <br/>
         </xsl:if>
         <xsl:if test="@operator != ''">

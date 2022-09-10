@@ -51,7 +51,12 @@
         <xsl:choose>
           <xsl:when test="@fail_count &gt; 0">
             <xsl:text>[❌ ]  </xsl:text>
-            <xsl:text>Fail count: </xsl:text><xsl:value-of select="@fail_count"/>
+          </xsl:when>
+          <xsl:when test="@warn_count &gt; 0">
+            <xsl:text>[⚠ ]  </xsl:text>
+          </xsl:when>
+          <xsl:when test="@fail_count &gt; 0">
+            <xsl:text>[🛈 ]  </xsl:text>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>[✅ ]  </xsl:text><xsl:value-of select="@outcome"/>
@@ -62,15 +67,17 @@
           </xsl:if>
         <xsl:text>&#xa;</xsl:text>
         <xsl:for-each select="mc:test">
+        <xsl:if test="mc:context/@name != ''">
           <xsl:value-of select="@outcome"/>
           <xsl:text> -- </xsl:text>
-        <xsl:if test="mc:context/@name != ''">
           <xsl:value-of select="mc:context/@name"/>
           <xsl:text>: </xsl:text>
           <xsl:value-of select="mc:context"/>
           <xsl:text>&#xa;</xsl:text>
         </xsl:if>
         <xsl:for-each select="mc:value">
+          <xsl:value-of select="../@outcome"/>
+          <xsl:text> -- </xsl:text>
           <xsl:if test="@name != ''">
             <xsl:value-of select="@name"/>
             <xsl:text>: </xsl:text>
@@ -91,7 +98,7 @@
             <xsl:text>        Format ID: </xsl:text>
             <xsl:value-of select="@formatid"/>
             <xsl:text>&#xa;</xsl:text>
-          </xsl:if>               
+          </xsl:if>
         </xsl:for-each>
         <xsl:if test="@reason != ''">
           <xsl:text>        Reason: </xsl:text>
@@ -170,7 +177,7 @@
     <xsl:if test="@pass_count != ''">
       <xsl:value-of select="substring('                    ',1,count(ancestor::*))"/>
       <xsl:text>Pass count: </xsl:text>
-      <xsl:value-of select="@pass_count"/>  
+      <xsl:value-of select="@pass_count"/>
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
     <xsl:apply-templates select="mc:rule|mc:policy"/>

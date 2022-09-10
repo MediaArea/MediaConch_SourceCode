@@ -892,21 +892,24 @@ namespace MediaConch
         FileRegistered* fr = mainwindow->get_file_registered_from_id(file_id);
         if (!fr)
         {
-            json += QString("\"valid\":%1,\"error\":\"%2\"}")
-                .arg("false").arg("File not reachable");
+            json += QString("\"valid\":%1,\"info\":%2,\"warn\":%3,\"error\":\"%4\"}")
+                .arg("false").arg("false").arg("false").arg("File not reachable");
             return json;
         }
 
         if (!fr->analyzed)
         {
-            json += QString("\"valid\":%1,\"error\":\"%2\"}")
-                .arg("false").arg("File not analyzed");
+            json += QString("\"valid\":%1,\"info\":%2,\"warn\":%3,\"error\":\"%4\"}")
+                .arg("false").arg("false").arg("false").arg("File not analyzed");
             delete fr;
             return json;
         }
 
-        json += QString("\"valid\":%1,\"error\":%2}")
-            .arg(fr->implementation_valid ? "true" : "false").arg("null");
+        json += QString("\"valid\":%1,\"info\":%2,\"warn\":%3,\"error\":%4}")
+            .arg(fr->implementation_valid ? "true" : "false")
+            .arg(fr->implementation_has_info ? "true" : "false")
+            .arg(fr->implementation_has_warning ? "true" : "false")
+            .arg("null");
 
         delete fr;
         return json;

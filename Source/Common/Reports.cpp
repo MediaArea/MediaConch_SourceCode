@@ -155,7 +155,7 @@ int Reports::checker_validate(int user, MediaConchLib::report report, const std:
         {
             //XXX
             std::string report;
-            if (get_implementation_report(user, files[i], options, report, res->valid, err) < 0)
+            if (get_implementation_report(user, files[i], options, report, res->valid, res->has_info, res->has_warning, err) < 0)
                 return -1;
         }
         else if (report == MediaConchLib::report_MediaVeraPdf)
@@ -268,7 +268,9 @@ int Reports::get_reports_output(int user, const std::vector<long>& files,
             std::string tmp;
             std::string err;
             bool is_valid = false;
-            if (get_implementation_reports(user, files, options, tmp, is_valid, err) < 0)
+            bool has_info = false;
+            bool has_warning = false;
+            if (get_implementation_reports(user, files, options, tmp, is_valid, has_info, has_warning, err) < 0)
                 tmp = std::string();
 
             if (f == MediaConchLib::format_Html)
@@ -286,6 +288,13 @@ int Reports::get_reports_output(int user, const std::vector<long>& files,
 
             if (!result->has_valid)
                 result->has_valid = true;
+
+            if (!result->has_info)
+                result->has_info = has_info;
+
+            if (!result->has_warning)
+                result->has_warning = has_warning;
+
             if (!is_valid)
                 result->valid = false;
 
@@ -466,10 +475,12 @@ int Reports::get_reports_output_JStree(int user, const std::vector<long>& files,
 //---------------------------------------------------------------------------
 int Reports::get_implementation_reports(int user, const std::vector<long>& files,
                                         const std::map<std::string, std::string>& options,
-                                        std::string& report, bool& valid, std::string& err)
+                                        std::string& report, bool& valid, bool& has_info, bool& has_warning, std::string& err)
 {
     bool AcceptsHttps = core->accepts_https();
     valid = true;
+    has_info = false;
+    has_warning = false;
 
     std::stringstream verbo;
     std::map<std::string, std::string>::const_iterator it = options.find("verbosity");
@@ -495,7 +506,9 @@ int Reports::get_implementation_reports(int user, const std::vector<long>& files
         report += "  <media ref=\"" + file + "\">";
         std::string implem;
         bool v = false;
-        if (get_implementation_report(user, files[i], options, implem, v, err) < 0)
+        bool info = false;
+        bool warn = false;
+        if (get_implementation_report(user, files[i], options, implem, v, info, warn, err) < 0)
             implem = std::string();
         else
             get_content_of_media_in_xml(implem);
@@ -504,6 +517,9 @@ int Reports::get_implementation_reports(int user, const std::vector<long>& files
 
         if (!v)
             valid = false;
+
+        has_info |= info;
+        has_warning |= warn;
     }
 
     report += "</MediaConch>\n";
@@ -513,10 +529,12 @@ int Reports::get_implementation_reports(int user, const std::vector<long>& files
 
 //---------------------------------------------------------------------------
 int Reports::get_implementation_report(int user, long file, const std::map<std::string, std::string>& options,
-                                       std::string& report, bool& valid, std::string& err)
+                                       std::string& report, bool& valid, bool& has_info, bool& has_warning, std::string& err)
 {
     std::string options_str = Core::serialize_string_from_options_map(options);
     valid = true;
+    has_info = false;
+    has_warning = false;
     std::string tmp_report;
 
     bool registered = false;
@@ -544,7 +562,10 @@ int Reports::get_implementation_report(int user, long file, const std::map<std::
         return -1;
 
     if (valid)
+    {
         valid = implementation_is_valid(tmp_report);
+        implementation_has_info_or_warning(tmp_report, has_info, has_warning);
+    }
     report += tmp_report;
 
     return 0;
@@ -846,7 +867,9 @@ int Reports::create_report_ma_xml(int user, const std::vector<long>& files,
         {
             std::string implem;
             bool valid;
-            if (get_implementation_report(user, files[i], options, implem, valid, err) < 0)
+            bool info;
+            bool warning;
+            if (get_implementation_report(user, files[i], options, implem, valid, info, warning, err) < 0)
                 implem = std::string();
             else
                 get_content_of_media_in_xml(implem);
@@ -984,6 +1007,33 @@ bool Reports::implementation_is_valid(const std::string& report)
 }
 
 //---------------------------------------------------------------------------
+bool Reports::implementation_has_info_or_warning(const std::string& report, bool& has_info, bool& has_warning)
+{
+    has_info=false;
+    has_warning=false;
+
+    size_t pos=0;
+    std::string search(" outcome=\"");
+    while ((pos = report.find(search, pos)) != std::string::npos)
+    {
+        if (pos + search.size() + 4 < report.size())
+        {
+            if (report[pos + search.size()] == 'i' && report[pos + search.size() + 1] == 'n' && report[pos + search.size() + 2] == 'f' && report[pos + search.size() + 3] == 'o')
+                has_info = true;
+            else if (report[pos + search.size()] == 'w' && report[pos + search.size() + 1] == 'a' && report[pos + search.size() + 2] == 'r' && report[pos + search.size() + 3] == 'n')
+                has_warning = true;
+
+            if (has_info && has_warning)
+                break;
+        }
+
+        pos += search.size();
+    }
+
+    return has_info || has_warning;
+}
+
+//---------------------------------------------------------------------------
 bool Reports::policy_is_valid(const std::string& report)
 {
     size_t pos = report.find("<policy ");
@@ -1011,7 +1061,6 @@ bool Reports::policy_has_info_or_warning(const std::string& report, bool& has_in
 {
     has_info=false;
     has_warning=false;
-
 
     size_t pos=0;
     std::string search(" outcome=\"");

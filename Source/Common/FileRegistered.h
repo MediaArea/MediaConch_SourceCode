@@ -27,7 +27,8 @@ class FileRegistered
 {
 public:
     FileRegistered() : analyze_percent(0), file_id(-1), policy(-1), display(-1), verbosity(-1), report_kind(0), mil_version(0),
-        analyzed(false), implementation_valid(false), policy_valid(false), policy_has_info(false), policy_has_warning(false), create_policy(false), need_update(true)
+        analyzed(false), implementation_valid(false), implementation_has_info(false), implementation_has_warning(false),
+        policy_valid(false), policy_has_info(false), policy_has_warning(false), create_policy(false), need_update(true)
     {
     }
 
@@ -45,6 +46,8 @@ public:
         this->analyze_percent = f.analyze_percent;
         this->analyzed = f.analyzed;
         this->implementation_valid = f.implementation_valid;
+        this->implementation_has_info = f.implementation_has_info;
+        this->implementation_has_warning = f.implementation_has_warning;
         this->policy_valid = f.policy_valid;
         this->policy_has_info = f.policy_has_info;
         this->policy_has_warning = f.policy_has_warning;
@@ -82,6 +85,8 @@ public:
     unsigned int              index;
     bool                      analyzed;
     bool                      implementation_valid;
+    bool                      implementation_has_info;
+    bool                      implementation_has_warning;
     bool                      policy_valid;
     bool                      policy_has_info;
     bool                      policy_has_warning;
