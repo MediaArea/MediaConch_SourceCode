@@ -41,6 +41,7 @@ Policy::Policy(const Policy* p)
     this->name = p->name;
     this->description = p->description;
     this->tags = p->tags;
+    this->type = p->type;
     this->level = p->level;
     this->license = p->license;
     this->is_system = false;
@@ -60,6 +61,7 @@ Policy::Policy(const Policy& p)
     this->name = p.name;
     this->description = p.description;
     this->tags = p.tags;
+    this->type = p.type;
     this->level = p.level;
     this->license = p.license;
     this->is_system = p.is_system;
