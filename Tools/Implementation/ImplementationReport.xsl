@@ -459,7 +459,7 @@
                     <!-- /PCM-IS-CBR -->
                   </xsl:with-param>
                 </xsl:call-template>
-                <xsl:if test="mi:extra/mi:Errors or mi:extra/mi:Warnings or mi:extra/mi:Infos or (mi:extra/mi:Metadata_Format and starts-with(mi:extra/mi:Metadata_Format, 'ADM, '))">
+                <xsl:if test="mi:extra/mi:ConformanceErrors or mi:extra/mi:ConformanceWarnings or mi:extra/mi:ConformanceInfos or (mi:extra/mi:Metadata_Format and starts-with(mi:extra/mi:Metadata_Format, 'ADM, '))">
                   <xsl:variable name="format">
                     <xsl:choose>
                       <xsl:when test="mi:extra/mi:Metadata_Format and starts-with(mi:extra/mi:Metadata_Format, 'ADM, ')">
@@ -482,7 +482,7 @@
                   </xsl:call-template>
                 </xsl:if>
               </xsl:when>
-              <xsl:when test="mi:extra/mi:Errors or mi:extra/mi:Warnings or mi:extra/mi:Infos or (mi:extra/mi:Metadata_Format and starts-with(mi:extra/mi:Metadata_Format, 'ADM, '))">
+              <xsl:when test="mi:extra/mi:ConformanceErrors or mi:extra/mi:ConformanceWarnings or mi:extra/mi:ConformanceInfos or (mi:extra/mi:Metadata_Format and starts-with(mi:extra/mi:Metadata_Format, 'ADM, '))">
                 <xsl:variable name="format">
                   <xsl:choose>
                     <xsl:when test="mi:extra/mi:Metadata_Format and starts-with(mi:extra/mi:Metadata_Format, 'ADM, ')">
@@ -2038,8 +2038,8 @@
       <xsl:with-param name="version" select="$version"/>
       <xsl:with-param name="test">
           <xsl:choose>
-            <xsl:when test="count($element/mi:extra/mi:Errors/child::*)&gt;0 or count($element/mi:extra/mi:Warnings/child::*)&gt;0 or count($element/mi:extra/mi:Infos/child::*)&gt;0">
-              <xsl:for-each select="$element/mi:extra/mi:Errors/child::*">
+            <xsl:when test="count($element/mi:extra/mi:ConformanceErrors/child::*)&gt;0 or count($element/mi:extra/mi:ConformanceWarnings/child::*)&gt;0 or count($element/mi:extra/mi:ConformanceInfos/child::*)&gt;0">
+              <xsl:for-each select="$element/mi:extra/mi:ConformanceErrors/child::*">
                 <test>
                   <xsl:attribute name="outcome">fail</xsl:attribute>
                   <xsl:call-template name="adm_element_sub">
@@ -2048,7 +2048,7 @@
                   </xsl:call-template>
                 </test>
               </xsl:for-each>
-              <xsl:for-each select="$element/mi:extra/mi:Warnings/child::*">
+              <xsl:for-each select="$element/mi:extra/mi:ConformanceWarnings/child::*">
                 <test>
                   <xsl:attribute name="outcome">warn</xsl:attribute>
                   <xsl:call-template name="adm_element_sub">
@@ -2058,7 +2058,7 @@
                 </test>
               </xsl:for-each>
 
-              <xsl:for-each select="$element/mi:extra/mi:Infos/child::*">
+              <xsl:for-each select="$element/mi:extra/mi:ConformanceInfos/child::*">
                 <test>
                   <xsl:attribute name="outcome">info</xsl:attribute>
                   <xsl:call-template name="adm_element_sub">

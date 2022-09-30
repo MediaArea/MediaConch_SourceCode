@@ -717,9 +717,9 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
          || name == "Delay"
          || name == "Count"
          || name == "CodecID_Url"
-         || name == "Errors"
-         || name == "Warnings"
-         || name == "Infos")
+         || name == "ConformanceErrors"
+         || name == "ConformanceWarnings"
+         || name == "ConformanceInfos")
             continue;
 
         if(xmlChildElementCount(child))
