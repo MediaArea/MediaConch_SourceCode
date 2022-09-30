@@ -452,6 +452,10 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
     {
         r->field = std::string((const char*)field);
         xmlFree(field);
+
+        // Handle old typo in MediaInfoLib
+        if (r->field == "TimeCode_Striped")
+            r->field = "TimeCode_Stripped";
     }
 
     //Get scope
