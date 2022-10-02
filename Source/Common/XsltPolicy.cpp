@@ -452,6 +452,10 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
     {
         r->field = std::string((const char*)field);
         xmlFree(field);
+
+        // Handle old typo in MediaInfoLib
+        if (r->field == "TimeCode_Striped")
+            r->field = "TimeCode_Stripped";
     }
 
     //Get scope
@@ -713,9 +717,9 @@ int XsltPolicy::create_rule_from_media_track_child(xmlNodePtr node, const std::s
          || name == "Delay"
          || name == "Count"
          || name == "CodecID_Url"
-         || name == "Errors"
-         || name == "Warnings"
-         || name == "Infos")
+         || name == "ConformanceErrors"
+         || name == "ConformanceWarnings"
+         || name == "ConformanceInfos")
             continue;
 
         if(xmlChildElementCount(child))
