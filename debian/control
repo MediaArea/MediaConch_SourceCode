@@ -4,7 +4,7 @@ Section: utils
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Build-Depends: debhelper (>= 9),
                dh-autoreconf,
-               libmediainfo-dev (>= 22.03),
+               libmediainfo-dev (>= 22.09),
                libzen-dev (>= 0.4.39),
                qt5-qmake,
                qtbase5-dev,
@@ -24,7 +24,7 @@ Vcs-Browser: https://github.com/MediaArea/MediaConch_SourceCode
 
 Package: mediaconch
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 22.03), libzen0 (>= 0.4.39)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 22.09), libzen0 (>= 0.4.39)
 Description: implementation and policy checker, reporter and fixer for media files (command-line utility)
  MediaConch is an extensible, open source software project consisting of an
  implementation checker, policy checker, reporter, and fixer that targets
@@ -40,7 +40,7 @@ Description: implementation and policy checker, reporter and fixer for media fil
 
 Package: mediaconch-server
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 22.03), libzen0 (>= 0.4.39)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmediainfo0 (>= 22.09), libzen0 (>= 0.4.39)
 Description: implementation and policy checker, reporter and fixer for media files (server daemon)
  MediaConch is an extensible, open source software project consisting of an
  implementation checker, policy checker, reporter, and fixer that targets
@@ -56,7 +56,7 @@ Description: implementation and policy checker, reporter and fixer for media fil
 
 Package: mediaconch-gui
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},  libmediainfo0 (>= 22.03), libzen0 (>= 0.4.39)
+Depends: ${shlibs:Depends}, ${misc:Depends},  libmediainfo0 (>= 22.09), libzen0 (>= 0.4.39)
 Description: implementation and policy checker, reporter and fixer for media files (GUI application)
  MediaConch is an extensible, open source software project consisting of an
  implementation checker, policy checker, reporter, and fixer that targets

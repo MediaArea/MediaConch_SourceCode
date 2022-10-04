@@ -3,7 +3,7 @@
 # This PKGBUILD is for OBS
 
 pkgname=('mediaconch' 'mediaconch-server' 'mediaconch-gui')
-pkgver=22.03
+pkgver=22.09
 pkgrel=1
 pkgdesc="Implementation checker and policy checker for video and audio files"
 url="http://MediaArea.net/MediaConch"
@@ -13,7 +13,7 @@ md5sums=('00000000000000000000000000000000')
 arch=('i686' 'x86_64')
 
 # Buildtime dependencies for all packages need to be listed here
-makedepends=('desktop-file-utils' 'libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webengine' 'libzen>=0.4.39' 'libmediainfo>=22.03')
+makedepends=('desktop-file-utils' 'libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webengine' 'libzen>=0.4.39' 'libmediainfo>=22.09')
 # OBS don't provide jansson
 #makedepends=(${makedepends[@]} jansson)
 
@@ -49,7 +49,7 @@ build() {
 
 package_mediaconch() {
     pkgdesc="${pkgdesc} (CLI)"
-    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'libzen>=0.4.39' 'libmediainfo>=22.03')
+    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'libzen>=0.4.39' 'libmediainfo>=22.09')
 
     cd "${srcdir}"/MediaConch/Project/GNU/CLI
     make DESTDIR="${pkgdir}" install-strip
@@ -63,7 +63,7 @@ package_mediaconch() {
 
 package_mediaconch-server() {
     pkgdesc="${pkgdesc} (Server)"
-    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'libzen>=0.4.39' 'libmediainfo>=22.03')
+    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'libzen>=0.4.39' 'libmediainfo>=22.09')
     backup=('etc/mediaconch/MediaConch.rc')
 
     cd "${srcdir}"/MediaConch/Project/GNU/Server
@@ -82,7 +82,7 @@ package_mediaconch-server() {
 
 package_mediaconch-gui() {
     pkgdesc="${pkgdesc} (GUI)"
-    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webkit' 'libzen>=0.4.39' 'libmediainfo>=22.03')
+    depends=('libxml2' 'libxslt' 'sqlite' 'libevent' 'qt5-base' 'qt5-webkit' 'libzen>=0.4.39' 'libmediainfo>=22.09')
 
     cd "${srcdir}"/MediaConch
     install -D -m 0755 Project/Qt/mediaconch-gui "${pkgdir}"/usr/bin/mediaconch-gui
