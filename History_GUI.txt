@@ -7,6 +7,14 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 22.09, 2022-10-04
+--------------
+Update to MediaInfo library 22.09, see MediaInfo change log for the list of changes in the file formats support
+Basic USAC/xHE-AAC conformance checker focused on IOD and sampling rate, more to come
+GUI: Support custom parse speed option
+Policy creation: Add Warning and Info severity levels in addition to Error
+Policy creation: 'all' or 'any' keywords for occurrence field
+
 Version 22.03, 2022-03-31
 --------------
 Update to MediaInfo library 22.03, see MediaInfo change log for the list of changes in the file formats support
