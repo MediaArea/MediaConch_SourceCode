@@ -327,13 +327,13 @@ PolicyChecker::Element::Level PolicyChecker::RuleElement::error_level()
 //---------------------------------------------------------------------------
 void PolicyChecker::RuleElement::resolve()
 {
-    if (operand=="exists")
+    if (operand=="" || operand=="exists")
     {
-            pass=!values.empty();
+        pass=!values.empty();
     }
     else if (operand=="must not exist")
     {
-            pass=values.empty();
+        pass=values.empty();
     }
     else if (operand=="starts with" || operand=="must not start with" || operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
