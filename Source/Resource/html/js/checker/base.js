@@ -8,6 +8,7 @@ var checker = (function() {
         bindings();
 
         //
+        webpage.set_parse_speed($('.parsespeedList').val());
         $('.parsespeedList').change(function(){
             webpage.set_parse_speed($(this).val());
         })
