@@ -56,19 +56,11 @@ BuildRequires:  zlib-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  sqlite-devel
-
-%if 0%{?rhel_version} >= 800 || 0%{?centos_version} >= 800
-BuildRequires:  gdb
-%endif
-
-%if ! 0%{?rhel} || 0%{?rhel_version} >= 700 || 0%{?centos_version} >= 700
 BuildRequires:  libevent-devel
-%endif
-
-%if 0%{?centos_version} < 600 || 0%{?rhel_version} < 600
-BuildRequires:  curl-devel
-%else
 BuildRequires:  libcurl-devel
+
+%if 0%{?rhel} >= 8
+BuildRequires:  alternatives
 %endif
 
 %if 0%{?fedora_version}
@@ -80,44 +72,31 @@ BuildRequires:  pkgconfig(systemd)
 BuildRequires:  libjansson-devel
 %endif
 %else
-%if ! 0%{?rhel} || 0%{?centos_version} >= 700
 BuildRequires:  jansson-devel
-%endif
 %endif
 
 %if 0%{?mageia}
-BuildRequires:  sane-backends-iscan
-BuildRequires:  libuuid-devel
-%if 0%{?mageia} > 6
 %ifarch x86_64
 BuildRequires: lib64openssl-devel
 %else
 BuildRequires: libopenssl-devel
 %endif
 %endif
-%endif
 
 # Lib dependencies
 %if 0%{?build_lib}
+%if ! 0%{?rhel}
 BuildRequires:  python3-devel
+%endif
 %endif
 
 # GUI dependencies
 %if 0%{?build_gui}
-%if 0%{?fedora_version} || 0%{?centos} >= 7
-BuildRequires:  pkgconfig(Qt5)
 %if 0%{?fedora_version}
+BuildRequires:  pkgconfig(Qt5)
+BuildRequires:  pkgconfig(Qt5WebEngine)
 BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
-%endif
-%if 0%{?fedora_version} == 99
-BuildRequires:  gnu-free-sans-fonts
-%endif
-%if 0%{?fedora_version} >= 24
-BuildRequires:  pkgconfig(Qt5WebEngine)
-%else
-BuildRequires:  pkgconfig(Qt5WebKit)
-%endif
 %else
 %if 0%{?suse_version}
 %if 0%{?suse_version} >= 1500
@@ -133,8 +112,6 @@ BuildRequires:  lib64qtwebkit2.2-devel
 %else
 BuildRequires:  libqtwebkit2.2-devel
 %endif
-%else
-BuildRequires:  libqt4-devel
 %endif
 %endif
 %endif
@@ -269,33 +246,9 @@ export CXXFLAGS="-g %{optflags}"
 # build CLI
 pushd Project/GNU/CLI
     %if 0%{?suse_version} && ! 0%{?is_opensuse}
-        %if 0%{?suse_version} < 1200
-            %configure --without-jansson --without-libevent
-        %else
-            %configure --without-jansson
-        %endif
+        %configure --without-jansson
     %else
-        %if 0%{?suse_version} && 0%{?suse_version} < 1200
-            %configure --without-libevent
-        %else
-            %if ! 0%{?rhel} || 0%{?centos_version} >= 700
-                %if 0%{?mageia} >= 6
-                    %configure --disable-dependency-tracking
-                %else
-                    %configure
-                %endif
-            %else
-                %if 0%{?rhel} == 5
-                    %configure --without-jansson --without-libevent --without-sqlite
-                %else
-                    %if 0%{?rhel} == 6
-                        %configure --without-jansson --without-libevent
-                    %else
-                        %configure --without-jansson
-                    %endif
-                %endif
-            %endif
-        %endif
+        %configure
     %endif
     make %{?_smp_mflags}
 popd
@@ -306,15 +259,7 @@ pushd Project/GNU/Server
     %if 0%{?suse_version} && ! 0%{?is_opensuse}
         %configure --without-jansson
     %else
-        %if 0%{?rhel} && ! 0%{?centos}
-            %configure --without-jansson
-        %else
-            %if 0%{?mageia} >= 6
-                %configure --disable-dependency-tracking
-            %else
-                %configure
-            %endif
-        %endif
+        %configure
     %endif
     make %{?_smp_mflags}
 popd
