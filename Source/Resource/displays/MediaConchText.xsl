@@ -82,8 +82,8 @@
             <xsl:value-of select="@name"/>
             <xsl:text>: </xsl:text>
             <xsl:value-of select="."/>
-            <xsl:text>&#xa;</xsl:text>
           </xsl:if>
+          <xsl:text>&#xa;</xsl:text>
           <xsl:if test="@offset != ''">
             <xsl:text>        Offset: </xsl:text>
             <xsl:value-of select="@offset"/>
@@ -92,6 +92,11 @@
           <xsl:if test="@context != ''">
             <xsl:text>        Context: </xsl:text>
             <xsl:value-of select="@context"/>
+            <xsl:text>&#xa;</xsl:text>
+          </xsl:if>
+          <xsl:if test="text() != ''">
+            <xsl:text>        Value: </xsl:text>
+            <xsl:value-of select="text()"/>
             <xsl:text>&#xa;</xsl:text>
           </xsl:if>
           <xsl:if test="@formatid != ''">
