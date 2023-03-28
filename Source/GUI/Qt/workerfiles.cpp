@@ -907,7 +907,7 @@ void WorkerFiles::fill_registered_files_from_db()
         }
 
         // reload or delete outdated results
-        if (full_file.rfind("attachment", 0) != 0 && fr->mil_version < mainwindow->mil_version())
+        if (full_file.rfind("attachment", 0) != 0 && fr->mil_version != mainwindow->mil_version())
         {
             long id = mainwindow->checker_id_from_filename(full_file, fr->options, err2);
             MediaConchLib::Checker_FileInfo info;
