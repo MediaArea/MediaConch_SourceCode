@@ -48,6 +48,10 @@
           <xsl:value-of select="substring('                            ',1,count(ancestor::*))"/>
           <xsl:text>[</xsl:text>
           <xsl:value-of select="@context"/>
+          <xsl:if test="text() != ''">
+            <xsl:text>: </xsl:text>
+            <xsl:value-of select="text()"/>
+          </xsl:if>
           <xsl:if test="@offset">
             <xsl:text> at bytes offset of </xsl:text>
             <xsl:value-of select="@offset"/>
