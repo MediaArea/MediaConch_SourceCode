@@ -404,7 +404,7 @@ long Core::checker_analyze(int user, const std::string& file, bool& registered,
 
     if (id >= 0 && analyzed && mil_analyze) // check report's library version
     {
-        if (get_db()->version_registered(user, id, err) < mil_version())
+        if (get_db()->version_registered(user, id, err) != mil_version())
             force_analyze = true;
     }
 
