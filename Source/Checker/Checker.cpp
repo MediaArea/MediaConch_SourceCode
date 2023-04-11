@@ -469,9 +469,9 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
     if (!tfsxml_value(&tfsxml_priv, &value))
         rule->requested=std::string(value.buf, value.len);
 
-    // Check for presence of _StringX or TimeCode* element in policy
+    // Check for presence of _StringX, TimeCode*, FrameRate_* elements in policy
     size_t index=rule->field.find_last_not_of("0123456789");
-    if ((index!=std::string::npos && index>=6 && rule->field.substr(index-6, 7)=="_String") || rule->field.find("TimeCode")==0)
+    if ((index!=std::string::npos && index>=6 && rule->field.substr(index-6, 7)=="_String") || rule->field.find("TimeCode")==0 || rule->field.find("FrameRate_")==0)
         full=true;
 
 // Check for currently unsupported features
