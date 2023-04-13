@@ -85,13 +85,13 @@ SetCompressor /FINAL /SOLID lzma
 
 ; Info
 VIProductVersion "${PRODUCT_VERSION4}"
-VIAddVersionKey "CompanyName"      "${PRODUCT_PUBLISHER}"
-VIAddVersionKey "ProductName"      "${PRODUCT_NAME}"
-VIAddVersionKey "ProductVersion"   "${PRODUCT_VERSION4}"
-VIAddVersionKey "FileDescription"  "Implementation checker, policy checker, reporter, and fixer"
-VIAddVersionKey "FileVersion"      "${PRODUCT_VERSION4}"
-VIAddVersionKey "LegalCopyright"   "${PRODUCT_PUBLISHER}"
-VIAddVersionKey "OriginalFilename" "${PRODUCT_NAME}_GUI_${PRODUCT_VERSION}_Windows.exe"
+VIAddVersionKey /LANG=0 "CompanyName"      "${PRODUCT_PUBLISHER}"
+VIAddVersionKey /LANG=0 "ProductName"      "${PRODUCT_NAME}"
+VIAddVersionKey /LANG=0 "ProductVersion"   "${PRODUCT_VERSION4}"
+VIAddVersionKey /LANG=0 "FileDescription"  "Implementation checker, policy checker, reporter, and fixer"
+VIAddVersionKey /LANG=0 "FileVersion"      "${PRODUCT_VERSION4}"
+VIAddVersionKey /LANG=0 "LegalCopyright"   "${PRODUCT_PUBLISHER}"
+VIAddVersionKey /LANG=0 "OriginalFilename" "${PRODUCT_NAME}_GUI_${PRODUCT_VERSION}_Windows.exe"
 BrandingText " "
 
 ; Modern UI end
