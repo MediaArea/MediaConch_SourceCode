@@ -19,7 +19,9 @@ if "%BPATH%"=="" (
 del   MediaConch_GUI_Windows.exe
 
 rem --- Installer ---
-%BPATH%\Windows\NSIS\makensis ..\Source\Install\MediaConch_GUI_Windows.nsi
+pushd %BPATH%\Windows\NSIS
+makensis.exe "%~dp0\..\Source\Install\MediaConch_GUI_Windows.nsi"
+popd
 
 rem --- Clean up ---
 if "%1"=="SkipCleanUp" goto SkipCleanUp
