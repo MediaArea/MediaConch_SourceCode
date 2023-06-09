@@ -471,7 +471,7 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
 
     // Check for presence of _StringX or TimeCode* element in policy
     size_t index=rule->field.find_last_not_of("0123456789");
-    if ((index!=std::string::npos && index>=6 && rule->field.substr(index-6, 7)=="_String") || rule->field.find("TimeCode")==0)
+    if ((index!=std::string::npos && index>=6 && rule->field.substr(index-6, 7)=="_String") || rule->field.find("TimeCode")==0 || rule->field.rfind("_Total")==rule->field.size()-6)
         full=true;
 
 // Check for currently unsupported features
