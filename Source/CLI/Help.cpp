@@ -297,7 +297,7 @@ int Help_Xslt()
 //---------------------------------------------------------------------------
 int Version()
 {
-    TEXTOUT("MediaConch Command Line Interface 23.03");
+    TEXTOUT("MediaConch Command Line Interface 23.06");
 
     return CLI_RETURN_FINISH;
 }
