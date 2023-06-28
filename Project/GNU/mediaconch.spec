@@ -2,7 +2,7 @@
 %global libmediainfo_version        23.07
 %global libzen_version              0.4.41
 
-%if 0%{?fedora_version} || 0%{?centos_version} >= 600 || 0%{?rhel_version} >= 600
+%if 0%{?fedora_version} || 0%{?rhel}
 %global libmediaconch_name libmediaconch
 %global libmediainfo_name libmediainfo
 %global libzen_name libzen
@@ -13,7 +13,7 @@
 %endif
 
 # CentOS also set rhel macro
-%if ! 0%{?suse_version} && ! 0%{?rhel} || 0%{?suse_version} >= 1200 || 0%{?rhel_version} >= 700 || 0%{?centos_version} >= 700
+%if ! 0%{?suse_version} || 0%{?suse_version} >= 1200
 %global build_server 1
 %else
 %global build_server 0
@@ -378,7 +378,7 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc Release/ReadMe_CLI_Linux.txt History_CLI.txt
-%if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
+%if 0%{?fedora_version} || 0%{?rhel}
 %license License.html
 %else
 %doc License.html
@@ -389,7 +389,7 @@ fi
 %files server
 %defattr(-,root,root,-)
 %doc Documentation/Daemon.md Documentation/Config.md Documentation/REST.md
-%if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
+%if 0%{?fedora_version} || 0%{?rhel}
 %license License.html
 %else
 %doc License.html
@@ -417,7 +417,7 @@ fi
 %files gui
 %defattr(-,root,root,-)
 %doc Release/ReadMe_GUI_Linux.txt History_GUI.txt
-%if 0%{?fedora_version} || 0%{?centos_version} >= 700 || 0%{?rhel_version} >= 700
+%if 0%{?fedora_version} || 0%{?rhel}
 %license License.html
 %else
 %doc License.html
