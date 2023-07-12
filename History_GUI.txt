@@ -7,6 +7,11 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 23.07, 2023-07-12
+-------------
+Update to MediaInfo library 23.07, see MediaInfo change log for the list of changes in the file formats support
+Small update of USAC/xHE-AAC conformance checker
+
 Version 23.06, 2023-06-28
 -------------
 Update to MediaInfo library 23.06, see MediaInfo change log for the list of changes in the file formats support
