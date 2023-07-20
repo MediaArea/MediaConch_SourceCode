@@ -14,6 +14,7 @@
 #include <map>
 #include <ZenLib/Ztring.h>
 #include <ZenLib/File.h>
+#include "Common/Version.h"
 #include "Common/Httpd.h"
 #include "Common/Core.h"
 #include "Common/LibEventHttpd.h"
@@ -41,7 +42,7 @@ namespace MediaConch
     //**************************************************************************
     // Daemon
     //**************************************************************************
-    std::string Daemon::version = "23.07.0";
+    std::string Daemon::version = MEDIACONCH_VERSION;
 
     //--------------------------------------------------------------------------
     Daemon::Daemon() : is_daemon(true), httpd(NULL), logger(NULL), watch_folder_user(NULL),

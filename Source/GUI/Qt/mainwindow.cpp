@@ -15,6 +15,7 @@
 #include "helpwindow.h"
 #include "WebView.h"
 #include "WebPage.h"
+#include "Common/Version.h"
 #include "Common/Reports.h"
 #include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
 #include "Common/FileRegistered.h"
@@ -62,7 +63,7 @@ namespace MediaConch {
 //***************************************************************************
 
 const std::string MainWindow::database_filename = std::string("MediaConchUi.db");
-const std::string MainWindow::version = "16.10";
+const std::string MainWindow::version = MEDIACONCH_VERSION;
 
 //***************************************************************************
 // Constructor / Desructor
