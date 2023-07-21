@@ -11,6 +11,7 @@
 #include <ZenLib/File.h>
 #include <ZenLib/Ztring.h>
 
+#include "Version.h"
 #include "Reports.h"
 #include "Core.h"
 #include "PluginLog.h"
@@ -492,6 +493,8 @@ int Reports::get_implementation_reports(int user, const std::vector<long>& files
     report = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     report += "<MediaConch xmlns=\"http" + (AcceptsHttps ? "s" : std::string()) +
         "://mediaarea.net/mediaconch\" version=\"0.2\" verbosity=\"" + verbo.str() + "\">\n";
+    report += "  <creatingApplication version=\"" MEDIACONCH_VERSION "\" url=\"https://mediaarea.net/MediaConch\">MediaConch</creatingApplication>\n";
+
     for (size_t i = 0; i < files.size(); ++i)
     {
         std::string file;

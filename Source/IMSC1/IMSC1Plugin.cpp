@@ -1,4 +1,5 @@
 #include "IMSC1Plugin.h"
+#include "Common/Version.h"
 #include "Common/generated/XmlXsd.h"
 #include "Common/generated/Ttml1Xsd.h"
 #include "Common/generated/Ttml1DocumentXsd.h"
@@ -89,6 +90,12 @@ namespace MediaConch {
         xmlNewNs(root_node, (const xmlChar*)"https://mediaarea.net/mediaconch", NULL);
         xmlSetProp(root_node, (const xmlChar*)"version", (const xmlChar*)"0.2");
         xmlDocSetRootElement(doc, root_node);
+
+        xmlNodePtr version_node = xmlNewNode(NULL, (const xmlChar*)"creatingApplication");
+        xmlSetProp(version_node, (const xmlChar*)"version", (const xmlChar*)MEDIACONCH_VERSION);
+        xmlSetProp(version_node, (const xmlChar*)"url", (const xmlChar*)"https://mediaarea.net/MediaConch");
+        xmlNodeSetContent(version_node, (const xmlChar*)"MediaConch");
+        xmlAddChild(root_node, version_node);
 
         xmlNodePtr media_node = xmlNewNode(NULL, (const xmlChar*)"media");
         xmlSetProp(media_node, (const xmlChar*)"ref", (const xmlChar*)filename.c_str());

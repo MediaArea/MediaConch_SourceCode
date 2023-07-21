@@ -11,6 +11,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include "Common/Version.h"
 #include "Checker.h"
 
 #include <functional>
@@ -26,6 +27,14 @@
 // Helpers
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+std::ostream& operator<<(std::ostream& out, tfsxml_string const& in)
+{
+    if (in.len)
+        out << std::string(in.buf, in.len);
+
+    return out;
+}
 
 //---------------------------------------------------------------------------
 std::string xml_encode(const std::string& data)
@@ -601,9 +610,10 @@ int PolicyChecker::analyze(const std::string& report, bool verbose, std::string&
 {
     std::stringstream ss;
     size_t level=0;
+    bool creating_library_present=false;
 
     ss << indent(level++) << "<MediaConch xmlns=\"https://mediaarea.net/mediaconch\" xmlns:mmt=\"https://mediaarea.net/micromediatrace\" xmlns:mi=\"https://mediaarea.net/mediainfo\" version=\"0.3\">" << std::endl;
-
+    ss << indent(level  ) << "<creatingApplication version=\"" MEDIACONCH_VERSION "\" url=\"https://mediaarea.net/MediaConch\">MediaConch</creatingApplication>" << std::endl;
     tfsxml_string tfsxml_priv;
     tfsxml_string result;
     tfsxml_init(&tfsxml_priv, (const void*)report.c_str(), report.size());
@@ -611,30 +621,52 @@ int PolicyChecker::analyze(const std::string& report, bool verbose, std::string&
     {
         if (!tfsxml_enter(&tfsxml_priv))
         {
-            while (!tfsxml_next_named(&tfsxml_priv, &result, "media"))
+            while (!tfsxml_next(&tfsxml_priv, &result))
             {
-                std::string media;
-                tfsxml_string attribute_name;
-                tfsxml_string attribute_value;
-                while (!tfsxml_attr(&tfsxml_priv, &attribute_name, &attribute_value))
+                if (!tfsxml_strcmp_charp(result, "media"))
                 {
-                    if (!tfsxml_strcmp_charp(attribute_name, "ref"))
-                        media=std::string(attribute_value.buf, attribute_value.len);
+                    std::string media;
+                    tfsxml_string attribute_name;
+                    tfsxml_string attribute_value;
+                    while (!tfsxml_attr(&tfsxml_priv, &attribute_name, &attribute_value))
+                    {
+                        if (!tfsxml_strcmp_charp(attribute_name, "ref"))
+                            media=std::string(attribute_value.buf, attribute_value.len);
+                    }
+
+                    ss << indent(level++) << "<media ref=\"" << media << "\">" << std::endl;
+                    parse_node(tfsxml_priv, rules, 0);
+                    for (size_t pos=0; pos<policies.size(); pos++)
+                        ss << policies[pos]->to_string(level, verbose);
+                    ss << indent(--level) << "</media>" << std::endl;
+
+                    // reset states
+                    for (size_t pos=0; pos < rules.size(); pos++)
+                        rules[pos]->reset();
                 }
+                else if (!creating_library_present && !tfsxml_strcmp_charp(result, "creatingLibrary"))
+                {
+                    ss << indent(level) << "<creatingLibrary";
 
-                ss << indent(level++) << "<media ref=\"" << media << "\">" << std::endl;
-                parse_node(tfsxml_priv, rules, 0);
-                for (size_t pos=0; pos<policies.size(); pos++)
-                    ss << policies[pos]->to_string(level, verbose);
-                ss << indent(--level) << "</media>" << std::endl;
+                    tfsxml_string attribute_name, attribute_value, content;
+                    while (!tfsxml_attr(&tfsxml_priv, &attribute_name, &attribute_value))
+                    {
+                       ss << " " << attribute_name;
+                        if (attribute_value.len)
+                            ss << "=\"" << attribute_value << "\"";
+                    }
 
-                // reset states
-                for (size_t pos=0; pos < rules.size(); pos++)
-                    rules[pos]->reset();
+                    if (!tfsxml_value(&tfsxml_priv, &content))
+                        ss << ">" << content << "</creatingLibrary>";
+                    else
+                        ss << "/>";
+                    ss << std::endl;
+
+                    creating_library_present=true;
+                }
             }
         }
     }
-
     ss << indent(--level) << "</MediaConch>" << std::endl;
 
     out = ss.str();

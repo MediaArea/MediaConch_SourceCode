@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "Help.h"
 #include "Config.h"
+#include "Common/Version.h"
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -297,7 +298,7 @@ int Help_Xslt()
 //---------------------------------------------------------------------------
 int Version()
 {
-    TEXTOUT("MediaConch Command Line Interface 23.07");
+    TEXTOUT("MediaConch Command Line Interface " MEDIACONCH_VERSION);
 
     return CLI_RETURN_FINISH;
 }
