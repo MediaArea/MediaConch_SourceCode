@@ -299,6 +299,13 @@ bool  PolicyChecker::RuleElement::compare(const std::string& value)
         else
             to_return = strcmp(value.c_str(), requested.c_str()) == 0;
     }
+    else if (operand == "!=")
+    {
+        if (!strlen(val_end) && !strlen(ref_end))
+            to_return = val != ref;
+        else
+            to_return = strcmp(value.c_str(), requested.c_str()) != 0;
+    }
     else if (operand == ">=")
     {
         if (!strlen(val_end) && !strlen(ref_end))
@@ -344,7 +351,7 @@ void PolicyChecker::RuleElement::resolve()
     {
         pass=values.empty();
     }
-    else if (operand=="starts with" || operand=="must not start with" || operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
+    else if (operand=="starts with" || operand=="must not start with" || operand=="<" || operand=="<=" || operand=="="  || operand=="!=" || operand==">=" || operand==">")
     {
        if (values.empty())
           pass = operand=="must not start with" ? true : false;
