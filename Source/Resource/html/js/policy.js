@@ -48,6 +48,18 @@ function setSelect2Plugin() {
         width: '100%'
     });
 
+    $('#xslPolicyRule_occurrence').select2({
+        tags: true,
+        theme: 'bootstrap',
+        width: '100%'
+    });
+
+    $('#xslPolicyRule_level').select2({
+        theme: 'bootstrap',
+        width: '100%',
+        minimumResultsForSearch: Infinity
+    });
+
     // Replace input text by select
     $('#xslPolicyRule_value').replaceWith('<select id="' + $('#xslPolicyRule_value').prop('id') + '"  name="' + $('#xslPolicyRule_value').prop('name') + '"class="' + $('#xslPolicyRule_value').prop('class') + '">')
     $('#xslPolicyRule_value').select2({

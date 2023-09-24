@@ -243,7 +243,7 @@ std::string PolicyChecker::PolicyElement::to_string(size_t level, bool verbose)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-PolicyChecker::RuleElement::RuleElement() : resolved(false), pass(false)
+PolicyChecker::RuleElement::RuleElement() : resolved(false), pass(false), tracks(0)
 {
 }
 
@@ -257,6 +257,7 @@ void PolicyChecker::RuleElement::reset()
 {
     resolved=false;
     pass=false;
+    tracks=0;
     values.clear();
 }
 
@@ -338,11 +339,17 @@ void PolicyChecker::RuleElement::resolve()
 {
     if (operand=="" || operand=="exists")
     {
-        pass=!values.empty();
+        if (occurrence=="all")
+            pass=!values.empty() && values.size()==tracks;
+        else
+            pass=!values.empty();
     }
     else if (operand=="must not exist")
     {
-        pass=values.empty();
+        if (occurrence=="any")
+            pass=values.size()<tracks;
+        else // keep old behavior for legacy "*" value
+            pass=values.empty();
     }
     else if (operand=="starts with" || operand=="must not start with" || operand=="<" || operand=="<=" || operand=="=" || operand==">=" || operand==">")
     {
@@ -586,6 +593,9 @@ void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleEleme
             {
                 if (level < rules[pos]->path.size() && path_is_matching(tfsxml_priv, result, rules[pos]->path[level], occurrences[&rules[pos]->path[level]]))
                 {
+                    if (level == 1 && (rules[pos]->scope.empty() || rules[pos]->scope == "mi")) // at track level
+                        rules[pos]->tracks++;
+
                     tfsxml_string tfsxml_priv_copy = tfsxml_priv;
                     if (level == rules[pos]->path.size() - 1)
                     {
