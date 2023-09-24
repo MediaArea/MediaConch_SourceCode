@@ -21,7 +21,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 
 //---------------------------------------------------------------------------
 
@@ -93,6 +92,7 @@ private:
         std::string requested;
         std::vector<std::string> values;
         std::vector<std::string> failing_values;
+        size_t tracks;
 
     private:
         bool resolved;

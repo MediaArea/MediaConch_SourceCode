@@ -18,7 +18,36 @@ var policyTreeRulesMI = (function() {
         $('#xslPolicyRule_title').val(node.text);
 
         if (policyTreeRules.isRuleMI(node)) {
-            $('#xslPolicyRule_occurrence').val(node.data.occurrence);
+            $('#xslPolicyRule_occurrence option').remove();
+            [
+                {name: '', value: ''},
+                {name: 'Any', value: 'any'},
+                {name: 'All', value: 'all'},
+                {name: '1', value: '1'},
+                {name: '2', value: '2'},
+                {name: '3', value: '3'},
+                {name: '4', value: '4'},
+                {name: '5', value: '5'},
+                {name: '6', value: '6'},
+                {name: '7', value: '7'},
+                {name: '8', value: '8'},
+                {name: '9', value: '9'},
+                {name: '10', value: '10'},
+                {name: '11', value: '11'},
+                {name: '12', value: '12'},
+                {name: '13', value: '13'},
+                {name: '14', value: '14'},
+                {name: '15', value: '15'},
+                {name: '16', value: '16'}
+            ].forEach(element => {
+                $('#xslPolicyRule_occurrence').append('<option value="' + element.value + '">' + element.name + '</option>');
+            });
+            if ($('#xslPolicyRule_occurrence option[value="' + node.data.occurrence + '"]').length) {
+                $('#xslPolicyRule_occurrence option[value="' + node.data.occurrence + '"]').prop('selected', true);
+            }
+            else {
+                $('#xslPolicyRule_occurrence').append('<option value="' + node.data.occurrence + '" selected>' + node.data.occurrence + '</option>');
+            }
             $('#xslPolicyRule_field option').remove();
             $('#xslPolicyRule_field').append('<option value="' + node.data.field + '" selected>' + node.data.field + '</option>');
             $('#xslPolicyRule_value option').remove();
@@ -42,6 +71,9 @@ var policyTreeRulesMI = (function() {
             $('#xslPolicyRule_validator').trigger('change');
         }
         else {
+            $('#xslPolicyRule_occurence option').remove();
+            $('#xslPolicyRule_occurence option[value=""]').prop('selected', true);
+            $('#xslPolicyRule_occurence').trigger('change');
             $('#xslPolicyRule_field option').remove();
             $('#xslPolicyRule_field option[value=""]').prop('selected', true);
             $('#xslPolicyRule_field').trigger('change');

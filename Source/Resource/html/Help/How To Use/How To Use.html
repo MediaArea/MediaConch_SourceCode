@@ -130,7 +130,21 @@
 
 <h3 id="occurrence">Occurrence</h3>
 
-<p>Allows a user to select whether a rule or assert occurs more than once in reportage.</p>
+<p>Allows a user to select whether a rule or assert occurs more than once in reportage. Possible values are: <strong>any</strong>, <strong>all</strong>, <strong>*</strong>, or a stream number.</p>
+
+<p><strong>any</strong>: Requires <strong>field</strong> to match the validator in at least one stream matching of <strong>type</strong>.</p>
+
+<p>Example: <em>Occurrence:any</em></p>
+
+<p><strong>all</strong>: Requires <strong>field</strong>, if present, to match the validator in all streams of <strong>type</strong>.</p>
+
+<p>Example: <em>Occurrence:all</em></p>
+
+<p><strong>*</strong>: Legacy, use <strong>all</strong> or <strong>any</strong> instead. Means <strong>any</strong>, except for the <strong>does_not_exist</strong> validator where it means <strong>all</strong>.</p>
+
+<p>Example: <em>Occurrence:*</em></p>
+
+<p><strong>stream number</strong>: Requires <strong>field</strong> of the Nth stream of <strong>type</strong> to match the validator.</p>
 
 <p>Example: <em>Occurrence:1</em></p>
 
