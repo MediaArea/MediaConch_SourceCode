@@ -18,6 +18,7 @@
 #include <ZenLib/ZtringList.h>
 #include <ZenLib/Dir.h>
 #include <ZenLib/File.h>
+#include <libxml/parser.h>
 #include "Policies.h"
 #include "Core.h"
 #include "Policy.h"

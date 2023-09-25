@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <libxml/parser.h>
 
 //---------------------------------------------------------------------------
 namespace MediaConch {
