@@ -4,7 +4,7 @@ Section: utils
 Maintainer: MediaArea.net SARL <info@mediaarea.net>
 Build-Depends: debhelper (>= 9),
                dh-autoreconf,
-               libmediainfo-dev (>= 23.07),
+               libmediainfo-dev (>= 23.10),
                libzen-dev (>= 0.4.41),
                qt5-qmake,
                qtbase5-dev,
