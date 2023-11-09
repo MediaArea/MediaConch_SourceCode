@@ -90,7 +90,7 @@ jobs:
         run: |
           cd Project/Qt
           export PATH=/usr/local/opt/qt@5/bin:$PATH
-          ./prepare INCLUDEPATH+=/usr/local/include CONFIG+=c++11 -after QMAKE_MACOSX_DEPLOYMENT_TARGET=10.9
+          ./prepare INCLUDEPATH+=/usr/local/include CONFIG+=c++11 -after QMAKE_MACOSX_DEPLOYMENT_TARGET=10.9 QMAKE_LFLAGS-=-Wl,-ld_classic
       - name: Build GUI
         run: |
           cd Project/Qt
