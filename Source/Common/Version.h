@@ -9,6 +9,6 @@
 #define VersionH
 //---------------------------------------------------------------------------
 
-#define MEDIACONCH_VERSION "23.07"
+#define MEDIACONCH_VERSION "23.10"
 
 #endif
