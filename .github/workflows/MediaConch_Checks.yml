@@ -81,7 +81,7 @@ jobs:
       - name: Check files
         run: |
           cd Project/GNU/CLI
-          make clone_sample_files clone_checks_files
+          make clone_sample_files
       - name: Check
         run: |
           cd Project/GNU/CLI

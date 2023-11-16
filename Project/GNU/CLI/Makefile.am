@@ -63,14 +63,8 @@ TESTS = \
     test/test_ffv1.sh
 
 SAMPLES_DIR = test/SampleFiles
-CHECKS_DIR = test/ImplementationChecks
 
 clone_sample_files: $(SAMPLES_DIR)
 
-clone_checks_files: $(CHECKS_DIR)
-
 $(SAMPLES_DIR):
 	git clone https://github.com/MediaArea/MediaConch_SampleFiles test/SampleFiles
-
-$(CHECKS_DIR):
-	git clone https://github.com/MediaArea/groundtruth test/ImplementationChecks
