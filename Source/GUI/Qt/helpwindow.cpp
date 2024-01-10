@@ -8,10 +8,10 @@
 #include <QPushButton>
 #include <QTabWidget>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QTextBrowser>
+#include <QScreen>
 
 namespace MediaConch {
 
@@ -22,9 +22,10 @@ namespace MediaConch {
 //---------------------------------------------------------------------------
 Help::Help(QWidget *parent) : QDialog(parent)
 {
-    move(QApplication::desktop()->screenGeometry().width()/5, y());
-    resize(QApplication::desktop()->screenGeometry().width()-QApplication::desktop()->screenGeometry().width()/5*2,
-           QApplication::desktop()->screenGeometry().height()*3/4);
+
+    QRect ScreenGeometry = QGuiApplication::primaryScreen()->geometry();
+    move(ScreenGeometry.width()/5, y());
+    resize(ScreenGeometry.width()-ScreenGeometry.width()/5*2, ScreenGeometry.height()*3/4);
     setWindowFlags(windowFlags()&(0xFFFFFFFF-Qt::WindowContextHelpButtonHint));
     setWindowTitle("MediaConch help");
 

@@ -8,6 +8,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStringList>
 #include <QFileInfo>
 #include <QString>
 #include <map>
@@ -26,7 +27,6 @@ namespace Ui {
 class QVBoxLayout;
 class QLabel;
 class QFile;
-class QStringList;
 class QLineEdit;
 
 namespace MediaConch {

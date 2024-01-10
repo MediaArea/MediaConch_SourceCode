@@ -29,7 +29,6 @@
 #include <QActionGroup>
 #include <QSpinBox>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QMimeData>
 #include <QLabel>
@@ -46,14 +45,9 @@
 #include <QTimer>
 #include <QTextStream>
 #include <QThread>
-#if QT_VERSION >= 0x050000
+#include <QScreen>
 #include <QStandardPaths>
-#else
-#include <QDesktopServices>
-#endif
-#if QT_VERSION >= 0x050200
-    #include <QFontDatabase>
-#endif
+#include <QFontDatabase>
 #include <sstream>
 
 namespace MediaConch {
@@ -138,14 +132,14 @@ MainWindow::MainWindow(QWidget *parent) :
     // Window
     setWindowIcon(QIcon(":/icon/icon.png"));
     int left=70;
-    int width=QApplication::desktop()->screenGeometry().width();
+    int width=QGuiApplication::primaryScreen()->geometry().width();
     if (width>1366)
     {
         left+=(width-1366)/2;
         width=1366;
     }
     move(left, 70);
-    resize(width-140, QApplication::desktop()->screenGeometry().height()-140);
+    resize(width-140, QGuiApplication::primaryScreen()->geometry().height()-140);
     setAcceptDrops(false);
 
     // Status bar

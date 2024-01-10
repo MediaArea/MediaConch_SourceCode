@@ -76,9 +76,9 @@ namespace MediaConch
         {
             QString value_input;
             if (select_file_name == "checkerRepository_directory")
-                value_input = QFileDialog::getExistingDirectory(view(), NULL, suggested);
+                value_input = QFileDialog::getExistingDirectory(NULL, NULL, suggested);
             else
-                value_input = QFileDialog::getOpenFileName(view(), NULL, suggested);
+                value_input = QFileDialog::getOpenFileName(NULL, NULL, suggested);
 
             QMap<QString, QStringList>::iterator it = file_selector.find(select_file_name);
             if (!value_input.length())
@@ -103,7 +103,7 @@ namespace MediaConch
         }
         else
         {
-            QStringList names = QFileDialog::getOpenFileNames(view(), QString::null, suggested);
+            QStringList names = QFileDialog::getOpenFileNames(NULL, QString(), suggested);
 
             if (names.size())
             {

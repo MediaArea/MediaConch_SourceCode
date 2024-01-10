@@ -11,6 +11,7 @@
 #include "progressbar.h"
 #include <QFile>
 #include <QProgressBar>
+#include <QRegularExpression>
 
 namespace MediaConch {
 
@@ -272,17 +273,16 @@ void SettingsWindow::create_parsespeed_options(QString& parsespeed)
 //---------------------------------------------------------------------------
 void SettingsWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"policyList form-control\">");
+    QRegularExpression reg("class=\"policyList form-control\">", QRegularExpression::InvertedGreedinessOption);
     int pos = html.indexOf(selector);
-
-    reg.setMinimal(true);
 
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, policies);
     }
 }
@@ -290,16 +290,16 @@ void SettingsWindow::add_policy_to_html_selection(QString& policies, QString& ht
 //---------------------------------------------------------------------------
 void SettingsWindow::add_display_to_html_selection(QString& displays, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"displayList form-control\">");
-    reg.setMinimal(true);
+    QRegularExpression reg("class=\"displayList form-control\">", QRegularExpression::InvertedGreedinessOption);
 
     int pos = html.indexOf(selector);
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, displays);
     }
 }
@@ -307,16 +307,16 @@ void SettingsWindow::add_display_to_html_selection(QString& displays, QString& h
 //---------------------------------------------------------------------------
 void SettingsWindow::add_verbosity_to_html_selection(QString& verbosity, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"verbosityList form-control\">");
-    reg.setMinimal(true);
+    QRegularExpression reg("class=\"verbosityList form-control\">", QRegularExpression::InvertedGreedinessOption);
 
     int pos = html.indexOf(selector);
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, verbosity);
     }
 }
@@ -324,16 +324,16 @@ void SettingsWindow::add_verbosity_to_html_selection(QString& verbosity, QString
 //---------------------------------------------------------------------------
 void SettingsWindow::add_parsespeed_to_html_selection(QString& parsespeed, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"parsespeedList form-control\">");
-    reg.setMinimal(true);
+    QRegularExpression reg("class=\"parsespeedList form-control\">", QRegularExpression::InvertedGreedinessOption);
 
     int pos = html.indexOf(selector);
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, parsespeed);
     }
 }
@@ -341,33 +341,24 @@ void SettingsWindow::add_parsespeed_to_html_selection(QString& parsespeed, QStri
 //---------------------------------------------------------------------------
 void SettingsWindow::change_checker_in_template(QString& html, const QString& settings)
 {
-    QRegExp reg("\\{% block checker %\\}\\{% endblock %\\}");
-    int pos = 0;
-
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), settings);
+    QRegularExpression reg("\\{% block checker %\\}\\{% endblock %\\}", QRegularExpression::InvertedGreedinessOption);
+    html.replace(reg, settings);
 }
 
 //---------------------------------------------------------------------------
 void SettingsWindow::remove_result_in_template(QString& html)
 {
-    QRegExp reg("\\{% block result %\\}\\{% endblock %\\}");
-    int pos = 0;
-
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), "");
+    QRegularExpression reg("\\{% block result %\\}\\{% endblock %\\}", QRegularExpression::InvertedGreedinessOption);
+    html.replace(reg, "");
 }
 
 //---------------------------------------------------------------------------
 void SettingsWindow::change_qt_scripts_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
+    QRegularExpression reg("\\{\\{ QT_SCRIPTS \\}\\}", QRegularExpression::InvertedGreedinessOption);
     QString script;
     int     pos = 0;
 
-    reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
     script = "        <script type=\"text/javascript\" src=\"qrc:/settings.js\"></script>\n";
 #elif defined(WEB_MACHINE_ENGINE)
@@ -378,25 +369,26 @@ void SettingsWindow::change_qt_scripts_in_template(QString& html)
     script += "        <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/menu.js\"></script>\n";
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), script);
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
+        html.replace(pos, match.capturedLength(), script);
 }
 
 //---------------------------------------------------------------------------
 void SettingsWindow::set_webmachine_script_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}");
+    QRegularExpression reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}", QRegularExpression::InvertedGreedinessOption);
     QString machine;
     int     pos = 0;
 
-    reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
     machine = "WEB_MACHINE_KIT";
 #elif defined(WEB_MACHINE_ENGINE)
     machine = "WEB_MACHINE_ENGINE";
 #endif
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), machine);
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
+        html.replace(pos, match.capturedLength(), machine);
 }
 
 //---------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #ifndef PUBLICPOLICIESWINDOW_H
 #define PUBLICPOLICIESWINDOW_H
 
+#include <QStringList>
 #include <QFileInfo>
 #include <QString>
 #include "WebChoose.h"
@@ -16,7 +17,6 @@ class QVBoxLayout;
 class QLabel;
 class QTreeWidgetItem;
 class QFile;
-class QStringList;
 class QFrame;
 
 namespace MediaConch {
