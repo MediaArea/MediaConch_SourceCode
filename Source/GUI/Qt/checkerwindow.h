@@ -65,7 +65,7 @@ private:
     QString create_form_online();
     QString create_form_repository();
     void remove_form_online(int pos, QString& html);
-    void remove_li_online(int& pos, QString& html);
+    void remove_li_online(QString& html);
     void change_collapse_form(QString& html);
     void change_checker_in_template(const QString& checker, QString& html);
     void change_body_script_in_template(QString& html);

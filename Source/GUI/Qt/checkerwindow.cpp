@@ -17,9 +17,9 @@
 
 #include <QTextEdit>
 #include <QProgressBar>
-#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QUrl>
+#include <QRegularExpression>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -213,17 +213,16 @@ void CheckerWindow::create_parsespeed_options(QString& parsespeed)
 //---------------------------------------------------------------------------
 void CheckerWindow::add_policy_to_html_selection(QString& policies, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"policyList form-control\">");
+    QRegularExpression reg("class=\"policyList form-control\">", QRegularExpression::InvertedGreedinessOption);
     int pos = html.indexOf(selector);
-
-    reg.setMinimal(true);
 
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, policies);
     }
 }
@@ -231,16 +230,16 @@ void CheckerWindow::add_policy_to_html_selection(QString& policies, QString& htm
 //---------------------------------------------------------------------------
 void CheckerWindow::add_display_to_html_selection(QString& displays, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"displayList form-control\">");
-    reg.setMinimal(true);
+    QRegularExpression reg("class=\"displayList form-control\">", QRegularExpression::InvertedGreedinessOption);
 
     int pos = html.indexOf(selector);
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, displays);
     }
 }
@@ -248,16 +247,16 @@ void CheckerWindow::add_display_to_html_selection(QString& displays, QString& ht
 //---------------------------------------------------------------------------
 void CheckerWindow::add_verbosity_to_html_selection(QString& verbosity, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"verbosityList form-control\">");
-    reg.setMinimal(true);
+    QRegularExpression reg("class=\"verbosityList form-control\">", QRegularExpression::InvertedGreedinessOption);
 
     int pos = html.indexOf(selector);
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, verbosity);
     }
 }
@@ -265,16 +264,16 @@ void CheckerWindow::add_verbosity_to_html_selection(QString& verbosity, QString&
 //---------------------------------------------------------------------------
 void CheckerWindow::add_parsespeed_to_html_selection(QString& parsespeed, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"parsespeedList form-control\">");
-    reg.setMinimal(true);
+    QRegularExpression reg("class=\"parsespeedList form-control\">", QRegularExpression::InvertedGreedinessOption);
 
     int pos = html.indexOf(selector);
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, parsespeed);
     }
 }
@@ -282,19 +281,20 @@ void CheckerWindow::add_parsespeed_to_html_selection(QString& parsespeed, QStrin
 //---------------------------------------------------------------------------
 void CheckerWindow::load_include_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{[\\s]+include\\('AppBundle:(\\w+):(\\w+).html.twig'(,[\\s]*\\{ '\\w+':[\\s]*\\w+[\\s]*\\})?\\)[\\s]\\}\\}");
+    QRegularExpression reg("\\{\\{[\\s]+include\\('AppBundle:(\\w+):(\\w+).html.twig'(,[\\s]*\\{ '\\w+':[\\s]*\\w+[\\s]*\\})?\\)[\\s]\\}\\}");
+    QRegularExpressionMatch match;
     int pos = 0;
 
-    while ((pos = reg.indexIn(html, pos)) != -1)
+    while ((pos = (match = reg.match(html, pos)).capturedStart()) != -1)
     {
-        QString app = reg.cap(1);
-        QString module = reg.cap(2);
+        QString app = match.captured(1);
+        QString module = match.captured(2);
         if (app == "Default" && module == "quotaExceeded")
         {
-            html.replace(pos, reg.matchedLength(), "");
+            html.replace(match.capturedStart(), match.capturedLength(), "");
             continue;
         }
-        html.replace(pos, reg.matchedLength(), "");
+        html.replace(match.capturedStart(), match.capturedLength(), "");
         pos = 0;
     }
 }
@@ -302,50 +302,47 @@ void CheckerWindow::load_include_in_template(QString& html)
 //---------------------------------------------------------------------------
 void CheckerWindow::remove_element_in_template(QString& html)
 {
-    QRegExp reg("\\{% (.*) %\\}");
-    int pos = 0;
-
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), "");
+    QRegularExpression reg("\\{% (.*) %\\}", QRegularExpression::InvertedGreedinessOption);
+    html.replace(reg, "");
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::change_collapse_form(QString& html)
 {
-    QRegExp reg("class=\"panel-collapse collapse in\"");
-    int pos = 0;
-
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), "class=\"panel-collapse collapse\"");
+    QRegularExpression reg("class=\"panel-collapse collapse in\"");
+    html.replace(reg, "class=\"panel-collapse collapse\"");
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::load_form_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{[\\s]+form\\((\\w+)\\)[\\s]\\}\\}");
-    int pos = 0;
+    QRegularExpression reg("\\{\\{[\\s]+form\\((\\w+)\\)[\\s]\\}\\}");
+    QRegularExpressionMatch match;
 
     bool has_libcurl = main_window->mil_has_curl_enabled();
-    while ((pos = reg.indexIn(html, pos)) != -1)
+
+    int pos = 0;
+    while ((pos = (match = reg.match(html)).capturedStart()) != -1)
     {
-        QString value = reg.cap(1);
+        QString value = match.captured(1);
         if (value == "formUpload")
-            html.replace(pos, reg.matchedLength(), create_form_upload());
+        {
+            html.replace(match.capturedStart(), match.capturedLength(), create_form_upload());
+        }
         else if (value == "formOnline")
         {
             if (has_libcurl)
-                html.replace(pos, reg.matchedLength(), create_form_online());
+                html.replace(match.capturedStart(), match.capturedLength(), create_form_online());
             else
             {
                 remove_form_online(pos, html);
-                remove_li_online(pos, html);
+                remove_li_online(html);
             }
         }
         else if (value == "formRepository")
-            html.replace(pos, reg.matchedLength(), create_form_repository());
+            html.replace(match.capturedStart(), match.capturedLength(), create_form_repository());
         else
-            html.replace(pos, reg.matchedLength(), "");
+            html.replace(match.capturedStart(), match.capturedLength(), "");
     }
 
     change_collapse_form(html);
@@ -413,40 +410,31 @@ QString CheckerWindow::create_form_online()
 void CheckerWindow::remove_form_online(int pos, QString& html)
 {
     int start_div_pos = pos;
-    QRegExp reg("<div role=\"tabpanel\" class=\"tab-pane panel col-md-12\" id=\"url\">");
-    reg.setMinimal(true);
-    start_div_pos = reg.lastIndexIn(html, start_div_pos);
+    start_div_pos = html.lastIndexOf("<div role=\"tabpanel\" class=\"tab-pane panel col-md-12\" id=\"url\">", start_div_pos);
 
-    reg = QRegExp("</div>");
-    reg.setMinimal(true);
-    int end_div_pos = pos;
-    if ((end_div_pos = reg.indexIn(html, end_div_pos)) != -1)
-        end_div_pos += reg.matchedLength();
+    int end_div_pos = html.indexOf("</div>", start_div_pos);
+    if (end_div_pos != -1)
+        end_div_pos += 6;
 
     if (end_div_pos != -1 && start_div_pos != -1)
         html.remove(start_div_pos, end_div_pos - start_div_pos);
 }
 
 //---------------------------------------------------------------------------
-void CheckerWindow::remove_li_online(int& pos, QString& html)
+void CheckerWindow::remove_li_online(QString& html)
 {
-    QRegExp reg("<li role=\"presentation\" class=\"\"><a href=\"#url\"");
-    reg.setMinimal(true);
-    int start = reg.lastIndexIn(html);
+    int start = html.lastIndexOf("<li role=\"presentation\" class=\"\"><a href=\"#url\"");
     if (start == -1)
         return;
 
-    reg = QRegExp("</li>");
-    reg.setMinimal(true);
-    int end_pos = -1;
-    if ((end_pos = reg.indexIn(html, start)) != -1)
-        end_pos += reg.matchedLength();
+    int end_pos = html.indexOf("</li>", start);
+    if (end_pos != -1)
+        end_pos += 5;
 
     if (end_pos != -1 && start != -1)
     {
         int len = end_pos - start;
         html.remove(start, len);
-        pos -= len;
     }
 }
 
@@ -503,22 +491,23 @@ void CheckerWindow::create_html_checker(QString& checker)
 //---------------------------------------------------------------------------
 void CheckerWindow::change_checker_in_template(const QString& checker, QString& html)
 {
-    QRegExp reg("\\{% block checker %\\}\\{% endblock %\\}");
+    QRegularExpression reg("\\{% block checker %\\}\\{% endblock %\\}", QRegularExpression::InvertedGreedinessOption);
     int pos = 0;
 
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), checker);
+    QRegularExpressionMatch match;
+    while ((match = reg.match(html, pos)).hasMatch())
+    {
+        pos = match.capturedStart();
+        html.replace(pos, match.capturedLength(), checker);
+    }
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::change_body_script_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
+    QRegularExpression reg("\\{\\{ QT_SCRIPTS \\}\\}", QRegularExpression::InvertedGreedinessOption);
     QString script;
     int     pos = 0;
-
-    reg.setMinimal(true);
 
 #if defined(WEB_MACHINE_KIT)
     script += "        <script type=\"text/javascript\" src=\"qrc:/checker/webkit.js\"></script>\n";
@@ -539,25 +528,26 @@ void CheckerWindow::change_body_script_in_template(QString& html)
               "        <script type=\"text/javascript\" src=\"qrc:/utils/text.js\"></script>\n"
               "        <script type=\"text/javascript\" src=\"qrc:/menu.js\"></script>\n";
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), script);
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
+        html.replace(pos, match.capturedLength(), script);
 }
 
 //---------------------------------------------------------------------------
 void CheckerWindow::set_webmachine_script_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}");
+    QRegularExpression reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}", QRegularExpression::InvertedGreedinessOption);
     QString machine;
     int     pos = 0;
 
-    reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
     machine = "WEB_MACHINE_KIT";
 #elif defined(WEB_MACHINE_ENGINE)
     machine = "WEB_MACHINE_ENGINE";
 #endif
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), machine);
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
+        html.replace(pos, match.capturedLength(), machine);
 }
 
 //---------------------------------------------------------------------------
