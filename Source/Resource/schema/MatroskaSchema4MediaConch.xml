@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EBMLSchema4MediaConch>
+  <element name="EBML" id="0x1A45DFA3" type="master" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Root"/>
+  <element name="EBMLVersion" id="0x4286" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="EBMLReadVersion" id="0x42F7" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="EBMLMaxIDLength" id="0x42F2" type="uinteger" default="4" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="EBMLMaxSizeLength" id="0x42F3" type="uinteger" default="8" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="DocType" id="0x4282" type="string" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="DocTypeVersion" id="0x4287" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="DocTypeReadVersion" id="0x4285" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="Void" id="0xEC" type="binary" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="*"/>
+  <element name="CRC-32" id="0xBF" type="binary" size="4" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="1*"/>
+  <element name="EBML" id="0x1A45DFA3" type="master" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Root"/>
+  <element name="EBMLVersion" id="0x4286" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="EBMLReadVersion" id="0x42F7" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="EBMLMaxIDLength" id="0x42F2" type="uinteger" default="4" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="EBMLMaxSizeLength" id="0x42F3" type="uinteger" default="8" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="DocType" id="0x4282" type="string" default="matroska" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="DocTypeVersion" id="0x4287" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="DocTypeReadVersion" id="0x4285" type="uinteger" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EBML"/>
+  <element name="Void" id="0xEC" type="binary" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="*"/>
+  <element name="CRC-32" id="0xBF" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="1*"/>
+  <element name="Segment" id="0x18538067" type="master" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Root"/>
+  <element name="SeekHead" id="0x114D9B74" type="master" minver="1" minOccurs="0" maxOccurs="2" recursive="false" parent="Segment"/>
+  <element name="Seek" id="0x4DBB" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="SeekHead"/>
+  <element name="SeekID" id="0x53AB" type="binary" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Seek"/>
+  <element name="SeekPosition" id="0x53AC" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Seek"/>
+  <element name="Info" id="0x1549A966" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="Segment"/>
+  <element name="SegmentUID" id="0x73A4" type="binary" size="16" range="not 0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="SegmentFilename" id="0x7384" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="PrevUID" id="0x3CB923" type="binary" size="16" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="PrevFilename" id="0x3C83AB" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="NextUID" id="0x3EB923" type="binary" size="16" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="NextFilename" id="0x3E83BB" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="SegmentFamily" id="0x4444" type="binary" size="16" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Info"/>
+  <element name="ChapterTranslate" id="0x6924" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Info"/>
+  <element name="ChapterTranslateEditionUID" id="0x69FC" type="uinteger" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="ChapterTranslate"/>
+  <element name="ChapterTranslateCodec" id="0x69BF" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapterTranslate"/>
+  <element name="ChapterTranslateID" id="0x69A5" type="binary" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapterTranslate"/>
+  <element name="TimecodeScale" id="0x2AD7B1" type="uinteger" default="1000000" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="Duration" id="0x4489" type="float" range="&gt; 0x0p+0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="DateUTC" id="0x4461" type="date" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="Title" id="0x7BA9" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="MuxingApp" id="0x4D80" type="utf-8" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="WritingApp" id="0x5741" type="utf-8" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Info"/>
+  <element name="Cluster" id="0x1F43B675" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Segment"/>
+  <element name="Timecode" id="0xE7" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Cluster"/>
+  <element name="SilentTracks" id="0x5854" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Cluster"/>
+  <element name="SilentTrackNumber" id="0x58D7" type="uinteger" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="SilentTracks"/>
+  <element name="Position" id="0xA7" type="uinteger" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Cluster"/>
+  <element name="PrevSize" id="0xAB" type="uinteger" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Cluster"/>
+  <element name="SimpleBlock" id="0xA3" type="binary" minver="2" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Cluster"/>
+  <element name="BlockGroup" id="0xA0" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Cluster"/>
+  <element name="Block" id="0xA1" type="binary" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="BlockVirtual" id="0xA2" type="binary" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="BlockAdditions" id="0x75A1" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="BlockMore" id="0xA6" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="BlockAdditions"/>
+  <element name="BlockAddID" id="0xEE" type="uinteger" range="not 0" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="BlockMore"/>
+  <element name="BlockAdditional" id="0xA5" type="binary" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="BlockMore"/>
+  <element name="BlockDuration" id="0x9B" type="uinteger" default="DefaultDuration" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="ReferencePriority" id="0xFA" type="uinteger" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="ReferenceBlock" id="0xFB" type="integer" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="BlockGroup"/>
+  <element name="ReferenceVirtual" id="0xFD" type="integer" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="CodecState" id="0xA4" type="binary" minver="2" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="DiscardPadding" id="0x75A2" type="integer" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="Slices" id="0x8E" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="TimeSlice" id="0xE8" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Slices"/>
+  <element name="LaceNumber" id="0xCC" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TimeSlice"/>
+  <element name="FrameNumber" id="0xCD" type="uinteger" default="0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TimeSlice"/>
+  <element name="BlockAdditionID" id="0xCB" type="uinteger" default="0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TimeSlice"/>
+  <element name="Delay" id="0xCE" type="uinteger" default="0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TimeSlice"/>
+  <element name="SliceDuration" id="0xCF" type="uinteger" default="0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TimeSlice"/>
+  <element name="ReferenceFrame" id="0xC8" type="master" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockGroup"/>
+  <element name="ReferenceOffset" id="0xC9" type="uinteger" minver="0" maxver="0" minOccurs="1" maxOccurs="1" recursive="false" parent="ReferenceFrame"/>
+  <element name="ReferenceTimeCode" id="0xCA" type="uinteger" minver="0" maxver="0" minOccurs="1" maxOccurs="1" recursive="false" parent="ReferenceFrame"/>
+  <element name="EncryptedBlock" id="0xAF" type="binary" minver="0" maxver="0" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Cluster"/>
+  <element name="Tracks" id="0x1654AE6B" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Segment"/>
+  <element name="TrackEntry" id="0xAE" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="Tracks"/>
+  <element name="TrackNumber" id="0xD7" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrackUID" id="0x73C5" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrackType" id="0x83" type="uinteger" range="1-254" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="FlagEnabled" id="0xB9" type="uinteger" range="0-1" default="1" minver="2" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="FlagDefault" id="0x88" type="uinteger" range="0-1" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="FlagForced" id="0x55AA" type="uinteger" range="0-1" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="FlagLacing" id="0x9C" type="uinteger" range="0-1" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="MinCache" id="0x6DE7" type="uinteger" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="MaxCache" id="0x6DF8" type="uinteger" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="DefaultDuration" id="0x23E383" type="uinteger" range="not 0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="DefaultDecodedFieldDuration" id="0x234E7A" type="uinteger" range="not 0" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrackTimecodeScale" id="0x23314F" type="float" range="&gt; 0x0p+0" default="0x1p+0" minver="0" maxver="0" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrackOffset" id="0x537F" type="integer" default="0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="MaxBlockAdditionID" id="0x55EE" type="uinteger" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="BlockAdditionMapping" id="0x41E4" type="master" minver="4" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="TrackEntry"/>
+  <element name="BlockAddIDValue" id="0x41F0" type="uinteger" range="&gt;=2" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockAdditionMapping"/>
+  <element name="BlockAddIDName" id="0x41A4" type="string" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockAdditionMapping"/>
+  <element name="BlockAddIDType" id="0x41E7" type="uinteger" default="0" minver="4" minOccurs="1" maxOccurs="1" recursive="false" parent="BlockAdditionMapping"/>
+  <element name="BlockAddIDExtraData" id="0x41ED" type="binary" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="BlockAdditionMapping"/>
+  <element name="Name" id="0x536E" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="Language" id="0x22B59C" type="string" default="eng" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="CodecID" id="0x86" type="string" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="CodecPrivate" id="0x63A2" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="CodecName" id="0x258688" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="AttachmentLink" id="0x7446" type="uinteger" range="not 0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="CodecSettings" id="0x3A9697" type="utf-8" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="CodecInfoURL" id="0x3B4040" type="string" minver="0" maxver="0" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="TrackEntry"/>
+  <element name="CodecDownloadURL" id="0x26B240" type="string" minver="0" maxver="0" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="TrackEntry"/>
+  <element name="CodecDecodeAll" id="0xAA" type="uinteger" range="0-1" default="1" minver="2" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrackOverlay" id="0x6FAB" type="uinteger" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="TrackEntry"/>
+  <element name="CodecDelay" id="0x56AA" type="uinteger" default="0" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="SeekPreRoll" id="0x56BB" type="uinteger" default="0" minver="4" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrackTranslate" id="0x6624" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="TrackEntry"/>
+  <element name="TrackTranslateEditionUID" id="0x66FC" type="uinteger" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="TrackTranslate"/>
+  <element name="TrackTranslateCodec" id="0x66BF" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackTranslate"/>
+  <element name="TrackTranslateTrackID" id="0x66A5" type="binary" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackTranslate"/>
+  <element name="Video" id="0xE0" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="FlagInterlaced" id="0x9A" type="uinteger" range="0-2" default="0" minver="2" minOccurs="1" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="FieldOrder" id="0x9D" type="uinteger" range="0-14" default="2" minver="4" minOccurs="1" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="StereoMode" id="0x53B8" type="uinteger" default="0" minver="3" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="AlphaMode" id="0x53C0" type="uinteger" default="0" minver="3" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="OldStereoMode" id="0x53B9" type="uinteger" minver="1" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="PixelWidth" id="0xB0" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="PixelHeight" id="0xBA" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="PixelCropBottom" id="0x54AA" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="PixelCropTop" id="0x54BB" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="PixelCropLeft" id="0x54CC" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="PixelCropRight" id="0x54DD" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="DisplayWidth" id="0x54B0" type="uinteger" range="not 0" default="PixelWidth - PixelCropLeft - PixelCropRight" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="DisplayHeight" id="0x54BA" type="uinteger" range="not 0" default="PixelHeight - PixelCropTop - PixelCropBottom" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="DisplayUnit" id="0x54B2" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="AspectRatioType" id="0x54B3" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="ColourSpace" id="0x2EB524" type="binary" size="4" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="GammaValue" id="0x2FB523" type="float" range="&gt; 0x0p+0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="FrameRate" id="0x2383E3" type="float" range="&gt; 0x0p+0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="Colour" id="0x55B0" type="master" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Video"/>
+  <element name="MatrixCoefficients" id="0x55B1" type="uinteger" default="2" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="BitsPerChannel" id="0x55B2" type="uinteger" default="0" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="ChromaSubsamplingHorz" id="0x55B3" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="ChromaSubsamplingVert" id="0x55B4" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="CbSubsamplingHorz" id="0x55B5" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="CbSubsamplingVert" id="0x55B6" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="ChromaSitingHorz" id="0x55B7" type="uinteger" default="0" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="ChromaSitingVert" id="0x55B8" type="uinteger" default="0" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="Range" id="0x55B9" type="uinteger" default="0" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="TransferCharacteristics" id="0x55BA" type="uinteger" default="2" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="Primaries" id="0x55BB" type="uinteger" default="2" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="MaxCLL" id="0x55BC" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="MaxFALL" id="0x55BD" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="MasteringMetadata" id="0x55D0" type="master" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="Colour"/>
+  <element name="PrimaryRChromaticityX" id="0x55D1" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="PrimaryRChromaticityY" id="0x55D2" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="PrimaryGChromaticityX" id="0x55D3" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="PrimaryGChromaticityY" id="0x55D4" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="PrimaryBChromaticityX" id="0x55D5" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="PrimaryBChromaticityY" id="0x55D6" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="WhitePointChromaticityX" id="0x55D7" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="WhitePointChromaticityY" id="0x55D8" type="float" range="0-1" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="LuminanceMax" id="0x55D9" type="float" range="0-9999.99" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="LuminanceMin" id="0x55DA" type="float" range="0-999.9999" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="PrimaryRChromaticityX"/>
+  <element name="Audio" id="0xE1" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="SamplingFrequency" id="0xB5" type="float" range="&gt; 0x0p+0" default="0x1.f4p+12" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Audio"/>
+  <element name="OutputSamplingFrequency" id="0x78B5" type="float" range="&gt; 0x0p+0" default="SamplingFrequency" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Audio"/>
+  <element name="Channels" id="0x9F" type="uinteger" range="not 0" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Audio"/>
+  <element name="ChannelPositions" id="0x7D7B" type="binary" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="Audio"/>
+  <element name="BitDepth" id="0x6264" type="uinteger" range="not 0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Audio"/>
+  <element name="TrackOperation" id="0xE2" type="master" minver="3" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrackCombinePlanes" id="0xE3" type="master" minver="3" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackOperation"/>
+  <element name="TrackPlane" id="0xE4" type="master" minver="3" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="TrackCombinePlanes"/>
+  <element name="TrackPlaneUID" id="0xE5" type="uinteger" range="not 0" minver="3" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackPlane"/>
+  <element name="TrackPlaneType" id="0xE6" type="uinteger" minver="3" minOccurs="1" maxOccurs="1" recursive="false" parent="TrackPlane"/>
+  <element name="TrackJoinBlocks" id="0xE9" type="master" minver="3" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackOperation"/>
+  <element name="TrackJoinUID" id="0xED" type="uinteger" range="not 0" minver="3" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="TrackJoinBlocks"/>
+  <element name="TrickTrackUID" id="0xC0" type="uinteger" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrickTrackSegmentUID" id="0xC1" type="binary" size="16" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrickTrackFlag" id="0xC6" type="uinteger" default="0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrickMasterTrackUID" id="0xC7" type="uinteger" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="TrickMasterTrackSegmentUID" id="0xC4" type="binary" size="16" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="ContentEncodings" id="0x6D80" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="TrackEntry"/>
+  <element name="ContentEncoding" id="0x6240" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="ContentEncodings"/>
+  <element name="ContentEncodingOrder" id="0x5031" type="uinteger" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ContentEncoding"/>
+  <element name="ContentEncodingScope" id="0x5032" type="uinteger" range="not 0" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ContentEncoding"/>
+  <element name="ContentEncodingType" id="0x5033" type="uinteger" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ContentEncoding"/>
+  <element name="ContentCompression" id="0x5034" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncoding"/>
+  <element name="ContentCompAlgo" id="0x4254" type="uinteger" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ContentCompression"/>
+  <element name="ContentCompSettings" id="0x4255" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentCompression"/>
+  <element name="ContentEncryption" id="0x5035" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncoding"/>
+  <element name="ContentEncAlgo" id="0x47E1" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncryption"/>
+  <element name="ContentEncKeyID" id="0x47E2" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncryption"/>
+  <element name="ContentSignature" id="0x47E3" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncryption"/>
+  <element name="ContentSigKeyID" id="0x47E4" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncryption"/>
+  <element name="ContentSigAlgo" id="0x47E5" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncryption"/>
+  <element name="ContentSigHashAlgo" id="0x47E6" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ContentEncryption"/>
+  <element name="Cues" id="0x1C53BB6B" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Segment"/>
+  <element name="CuePoint" id="0xBB" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="Cues"/>
+  <element name="CueTime" id="0xB3" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="CuePoint"/>
+  <element name="CueTrackPositions" id="0xB7" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="CuePoint"/>
+  <element name="CueTrack" id="0xF7" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="CueTrackPositions"/>
+  <element name="CueClusterPosition" id="0xF1" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="CueTrackPositions"/>
+  <element name="CueRelativePosition" id="0xF0" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="CueTrackPositions"/>
+  <element name="CueDuration" id="0xB2" type="uinteger" minver="4" minOccurs="0" maxOccurs="1" recursive="false" parent="CueTrackPositions"/>
+  <element name="CueBlockNumber" id="0x5378" type="uinteger" range="not 0" default="1" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="CueTrackPositions"/>
+  <element name="CueCodecState" id="0xEA" type="uinteger" default="0" minver="2" minOccurs="0" maxOccurs="1" recursive="false" parent="CueTrackPositions"/>
+  <element name="CueReference" id="0xDB" type="master" minver="2" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="CueTrackPositions"/>
+  <element name="CueRefTime" id="0x96" type="uinteger" minver="2" minOccurs="1" maxOccurs="1" recursive="false" parent="CueReference"/>
+  <element name="CueRefCluster" id="0x97" type="uinteger" minver="0" maxver="0" minOccurs="1" maxOccurs="1" recursive="false" parent="CueReference"/>
+  <element name="CueRefNumber" id="0x535F" type="uinteger" range="not 0" default="1" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="CueReference"/>
+  <element name="CueRefCodecState" id="0xEB" type="uinteger" default="0" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="CueReference"/>
+  <element name="Attachments" id="0x1941A469" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Segment"/>
+  <element name="AttachedFile" id="0x61A7" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="Attachments"/>
+  <element name="FileDescription" id="0x467E" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="FileName" id="0x466E" type="utf-8" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="FileMimeType" id="0x4660" type="string" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="FileData" id="0x465C" type="binary" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="FileUID" id="0x46AE" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="FileReferral" id="0x4675" type="binary" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="FileUsedStartTime" id="0x4661" type="uinteger" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="FileUsedEndTime" id="0x4662" type="uinteger" minver="0" maxver="0" minOccurs="0" maxOccurs="1" recursive="false" parent="AttachedFile"/>
+  <element name="Chapters" id="0x1043A770" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Segment"/>
+  <element name="EditionEntry" id="0x45B9" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="Chapters"/>
+  <element name="EditionUID" id="0x45BC" type="uinteger" range="not 0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="EditionEntry"/>
+  <element name="EditionFlagHidden" id="0x45BD" type="uinteger" range="0-1" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EditionEntry"/>
+  <element name="EditionFlagDefault" id="0x45DB" type="uinteger" range="0-1" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="EditionEntry"/>
+  <element name="EditionFlagOrdered" id="0x45DD" type="uinteger" range="0-1" default="0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="EditionEntry"/>
+  <element name="ChapterAtom" id="0xB6" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="true" parent="EditionEntry"/>
+  <element name="ChapterUID" id="0x73C4" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterStringUID" id="0x5654" type="utf-8" minver="3" minOccurs="0" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterTimeStart" id="0x91" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterTimeEnd" id="0x92" type="uinteger" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterFlagHidden" id="0x98" type="uinteger" range="0-1" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterFlagEnabled" id="0x4598" type="uinteger" range="0-1" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterSegmentUID" id="0x6E67" type="binary" size="16" range="&gt;0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterSegmentEditionUID" id="0x6EBC" type="uinteger" range="not 0" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterPhysicalEquiv" id="0x63C3" type="uinteger" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterTrack" id="0x8F" type="master" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapterTrackNumber" id="0x89" type="uinteger" range="not 0" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="ChapterTrack"/>
+  <element name="ChapterDisplay" id="0x80" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapString" id="0x85" type="utf-8" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapterDisplay"/>
+  <element name="ChapLanguage" id="0x437C" type="string" default="eng" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="ChapterDisplay"/>
+  <element name="ChapCountry" id="0x437E" type="string" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="ChapterDisplay"/>
+  <element name="ChapProcess" id="0x6944" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="ChapterAtom"/>
+  <element name="ChapProcessCodecID" id="0x6955" type="uinteger" default="0" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapProcess"/>
+  <element name="ChapProcessPrivate" id="0x450D" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="ChapProcess"/>
+  <element name="ChapProcessCommand" id="0x6911" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="ChapProcess"/>
+  <element name="ChapProcessTime" id="0x6922" type="uinteger" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapProcessCommand"/>
+  <element name="ChapProcessData" id="0x6933" type="binary" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="ChapProcessCommand"/>
+  <element name="Tags" id="0x1254C367" type="master" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Segment"/>
+  <element name="Tag" id="0x7373" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="false" parent="Tags"/>
+  <element name="Targets" id="0x63C0" type="master" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="Tag"/>
+  <element name="TargetTypeValue" id="0x68CA" type="uinteger" default="50" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Targets"/>
+  <element name="TargetType" id="0x63CA" type="string" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="Targets"/>
+  <element name="TagTrackUID" id="0x63C5" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Targets"/>
+  <element name="TagEditionUID" id="0x63C9" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Targets"/>
+  <element name="TagChapterUID" id="0x63C4" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Targets"/>
+  <element name="TagAttachmentUID" id="0x63C6" type="uinteger" default="0" minver="1" minOccurs="0" maxOccurs="unbounded" recursive="false" parent="Targets"/>
+  <element name="SimpleTag" id="0x67C8" type="master" minver="1" minOccurs="1" maxOccurs="unbounded" recursive="true" parent="Tag"/>
+  <element name="TagName" id="0x45A3" type="utf-8" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="SimpleTag"/>
+  <element name="TagLanguage" id="0x447A" type="string" default="und" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="SimpleTag"/>
+  <element name="TagDefault" id="0x4484" type="uinteger" range="0-1" default="1" minver="1" minOccurs="1" maxOccurs="1" recursive="false" parent="SimpleTag"/>
+  <element name="TagString" id="0x4487" type="utf-8" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="SimpleTag"/>
+  <element name="TagBinary" id="0x4485" type="binary" minver="1" minOccurs="0" maxOccurs="1" recursive="false" parent="SimpleTag"/>
+</EBMLSchema4MediaConch>
