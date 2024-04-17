@@ -186,7 +186,7 @@
     <ClCompile Include="..\..\..\Source\Checker\Checker.cpp" />
     <ClCompile Include="..\..\..\Source\Checker\Path.cpp" />
     <ClCompile Include="..\..\..\Source\IMSC1\IMSC1Plugin.cpp" />
-    <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.c" />
+    <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
   </ItemGroup>
   <ItemGroup>

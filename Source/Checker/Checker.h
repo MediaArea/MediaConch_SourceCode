@@ -16,6 +16,9 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#ifndef TFSXML_NAMESPACE
+    #define TFSXML_NAMESPACE 1
+#endif // TFSXML_NAMESPACEs
 #include "ThirdParty/tfsxml/tfsxml.h"
 #include "Path.h"
 
@@ -124,9 +127,9 @@ private:
         size_t fail_count;
     };
 
-    RuleElement* parse_rule(tfsxml_string& tfsxml_priv);
-    PolicyElement* parse_policy(tfsxml_string& tfsxml_priv);
-    void parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, size_t level);
+    RuleElement* parse_rule(tfsxml::tfsxml_string& tfsxml_priv);
+    PolicyElement* parse_policy(tfsxml::tfsxml_string& tfsxml_priv);
+    void parse_node(tfsxml::tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, size_t level);
 
     std::vector<PolicyElement*> policies;
     std::vector<RuleElement*> rules;
