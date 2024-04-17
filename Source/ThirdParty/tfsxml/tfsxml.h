@@ -6,8 +6,14 @@
 #define TFSXML_H
 
 #ifdef __cplusplus
+#include <string>
+#ifdef TFSXML_NAMESPACE
+namespace tfsxml
+{
+#else
 extern "C"
 {
+#endif /* TFSXML_NAMESPACE */
 #endif /* __cplusplus */
 
 /** -------------------------------------------------------------------------
@@ -130,13 +136,11 @@ int tfsxml_strcmp_charp(tfsxml_string a, const char* b);
  */
 tfsxml_string tfsxml_strstr_charp(tfsxml_string a, const char* b);
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(TFSXML_NAMESPACE)
 }
-#endif /* __cplusplus */
+#endif /* defined(__cplusplus) && !defined(TFSXML_NAMESPACE) */
 
 #ifdef __cplusplus
-#include <string>
-
 static void tfsxml_decode_string(void* d, const char* buf, int len) { ((std::string*)d)->append(buf, len); }
 
 /** Convert encoded XML block (attribute or value) to real content (encoded in UTF-8)
@@ -154,6 +158,10 @@ static void tfsxml_decode(std::string& s, const tfsxml_string& b) { tfsxml_decod
 static std::string tfsxml_decode(const tfsxml_string& b) { std::string s; tfsxml_decode(&s, &b, tfsxml_decode_string); return s; }
 
 #endif /* __cplusplus */
+
+#if defined(__cplusplus) && defined(TFSXML_NAMESPACE)
+}
+#endif /* defined(__cplusplus) && defined(TFSXML_NAMESPACE) */
 
 #endif
 

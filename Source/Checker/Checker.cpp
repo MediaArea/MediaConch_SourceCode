@@ -20,6 +20,9 @@
 #include <cstring>
 #include <sstream>
 
+//---------------------------------------------------------------------------
+using namespace tfsxml;
+
 //TODO: mmt
 //TODO: reference_file
 

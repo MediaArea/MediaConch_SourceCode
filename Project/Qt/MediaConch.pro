@@ -94,7 +94,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Checker/Checker.cpp \
                     ../../Source/Checker/Path.cpp \
                     ../../Source/IMSC1/IMSC1Plugin.cpp \
-                    ../../Source/ThirdParty/tfsxml/tfsxml.c \
+                    ../../Source/ThirdParty/tfsxml/tfsxml.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/commonwebwindow.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \

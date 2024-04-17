@@ -16,6 +16,9 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#ifndef TFSXML_NAMESPACE
+    #define TFSXML_NAMESPACE 1
+#endif // TFSXML_NAMESPACE
 #include "ThirdParty/tfsxml/tfsxml.h"
 
 #include <string>
@@ -39,7 +42,7 @@ struct PathElement
 };
 
 std::vector<PathElement> parse_path(const std::string& xpath);
-bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurrence);
+bool path_is_matching(tfsxml::tfsxml_string& tfsxml_priv, tfsxml::tfsxml_string& node, PathElement path, size_t& occurrence);
 }
 
 #endif

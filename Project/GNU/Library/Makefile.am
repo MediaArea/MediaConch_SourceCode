@@ -43,7 +43,7 @@ lib@MediaConchLib_LibName@_la_SOURCES = \
     ../../../Source/Checker/Checker.cpp \
     ../../../Source/Checker/Path.cpp \
     ../../../Source/IMSC1/IMSC1Plugin.cpp \
-    ../../../Source/ThirdParty/tfsxml/tfsxml.c
+    ../../../Source/ThirdParty/tfsxml/tfsxml.cpp
 
 #lib@MediaConchLib_LibName@includedir = $(includedir)/MediaConch
 #lib@MediaConchLib_LibName@include_HEADERS = \

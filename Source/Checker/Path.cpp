@@ -18,6 +18,9 @@
 #include "Path.h"
 
 //---------------------------------------------------------------------------
+using namespace tfsxml;
+
+//---------------------------------------------------------------------------
 namespace MediaConch {
 
 std::vector<PathElement> parse_path(const std::string& xpath)

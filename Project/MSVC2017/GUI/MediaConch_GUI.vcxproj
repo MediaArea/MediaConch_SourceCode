@@ -229,7 +229,7 @@
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp" />
     <ClCompile Include="..\..\..\Source\GUI\Qt\workerfiles.cpp" />
-    <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.c" />
+    <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
     <ClCompile Include="_Automated\moc_commonwebwindow.cpp" />
     <ClCompile Include="_Automated\moc_helpwindow.cpp" />
