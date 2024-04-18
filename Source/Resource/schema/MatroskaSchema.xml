@@ -262,6 +262,21 @@
                 <element name="MaxBlockAdditionID" level="3" id="0x55EE" type="uinteger" minOccurs="1" minver="1" webm="0" default="0">
                     <documentation>The maximum value of <a href="http://www.matroska.org/technical/specs/index.html#BlockAddID">BlockAddID</a>. A value 0 means there is no <a href="http://www.matroska.org/technical/specs/index.html#BlockAdditions">BlockAdditions</a> for this track.</documentation>
                 </element>
+                <element name="BlockAdditionMapping" level="3" id="0x41E4" type="master" minver="4">
+                    <documentation>Contains elements that extend the track format, by adding content either to each frame, with BlockAddID, or to the track as a whole with BlockAddIDExtraData.</documentation>
+                    <element name="BlockAddIDValue" level="4" id="0x41F0" type="uinteger" minver="4" range="&gt;= 2" maxOccurs="1">
+                        <documentation>If the track format extension needs content beside frames, the value refers to the BlockAddID, value being described.</documentation>
+                    </element>
+                    <element name="BlockAddIDName" level="4" id="0x41A4" type="string" minver="4" maxOccurs="1">
+                        <documentation>A human-friendly name describing the type of BlockAdditional data, as defined by the associated Block Additional Mapping.</documentation>
+                    </element>
+                    <element name="BlockAddIDType" level="4" id="0x41E7" type="uinteger" minver="4" default="0" minOccurs="1" maxOccurs="1">
+                        <documentation>Stores the registered identifier of the Block Additional Mapping to define how the BlockAdditional data should be handled.</documentation>
+                    </element>
+                    <element name="BlockAddIDExtraData" level="4" id="0x41ED" type="binary" minver="4" maxOccurs="1">
+                        <documentation>Extra binary data that the BlockAddIDType can use to interpret the BlockAdditional data. The interpretation of the binary data depends on the BlockAddIDType value and the corresponding Block Additional Mapping.</documentation>
+                    </element>
+                </element>
                 <element name="Name" cppname="TrackName" level="3" id="0x536E" type="utf-8" minver="1">
                     <documentation>A human-readable track name.</documentation>
                 </element>
