@@ -1304,6 +1304,14 @@ XsltPolicyRule *DaemonClient::xslt_policy_rule_get(int user, int policy_id, int 
         rule->occurrence = res->rule.occurrence;
         rule->ope = rule->ope;
         rule->value = res->rule.value;
+        if (res->rule.source)
+        {
+            rule->source = new XsltPolicyRule::Source;
+            rule->source->track_type = res->rule.source->tracktype;
+            rule->source->field = res->rule.source->field;
+            rule->source->scope = res->rule.source->scope;
+            rule->source->occurrence = res->rule.source->occurrence;
+        }
     }
 
     delete res;
@@ -1327,7 +1335,16 @@ int DaemonClient::xslt_policy_rule_edit(int user, int policy_id, int rule_id, co
     req.rule.occurrence = rule->occurrence;
     req.rule.ope = rule->ope;
     req.rule.value = rule->value;
+    if (rule->source)
+    {
+        req.rule.source = new MediaConchLib::XSLT_Policy_Rule::Source;
+        req.rule.source->tracktype = rule->source->track_type;
+        req.rule.source->field = rule->source->field;
+        req.rule.source->scope = rule->source->scope;
+        req.rule.source->occurrence = rule->source->occurrence;
+    }
     req.user = user;
+
 
     COMMON_HTTP_REQ_RES(xslt_policy_rule_edit, -1)
 

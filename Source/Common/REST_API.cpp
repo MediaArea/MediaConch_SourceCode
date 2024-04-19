@@ -2597,6 +2597,42 @@ int RESTAPI::serialize_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule& rule, C
         val.obj["value"] = value;
     }
 
+    if (rule.source)
+    {
+        Container::Value source, src_tracktype, src_field, src_scope, src_occurrence;
+        source.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        if (rule.source->tracktype.size())
+        {
+            src_tracktype.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_tracktype.s = rule.source->tracktype;
+            source.obj["tracktype"] = src_tracktype;
+        }
+
+        if (rule.source->field.size())
+        {
+            src_field.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_field.s = rule.source->field;
+            source.obj["field"] = src_field;
+        }
+
+        if (rule.source->scope.size())
+        {
+            src_scope.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_scope.s = rule.source->scope;
+            source.obj["scope"] = src_scope;
+        }
+
+        if (rule.source->occurrence.size())
+        {
+            src_occurrence.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_occurrence.s = rule.source->occurrence;
+            source.obj["occurrence"] = src_occurrence;
+        }
+
+        val.obj["source"] = source;
+    }
+
     return 0;
 }
 
@@ -5363,6 +5399,31 @@ int RESTAPI::parse_xslt_policy_rule(Container::Value *val, MediaConchLib::XSLT_P
     Container::Value *value = model->get_value_by_key(*val, "value");
     if (value && value->type == Container::Value::CONTAINER_TYPE_STRING)
         rule->value = value->s;
+
+    Container::Value *source = model->get_value_by_key(*val, "source");
+    if (source && source->type == Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        if (rule->source)
+            delete rule->source;
+
+        rule->source = new MediaConchLib::XSLT_Policy_Rule::Source;
+
+        Container::Value *src_tracktype = model->get_value_by_key(*source, "tracktype");
+        if (src_tracktype && src_tracktype->type == Container::Value::CONTAINER_TYPE_STRING)
+            rule->source->tracktype = src_tracktype->s;
+
+        Container::Value *src_field = model->get_value_by_key(*source, "field");
+        if (src_field && src_field->type == Container::Value::CONTAINER_TYPE_STRING)
+            rule->source->field = src_field->s;
+
+        Container::Value *src_scope = model->get_value_by_key(*source, "scope");
+        if (src_scope && src_scope->type == Container::Value::CONTAINER_TYPE_STRING)
+            rule->source->scope = src_scope->s;
+
+        Container::Value *src_occurrence = model->get_value_by_key(*source, "occurrence");
+        if (src_occurrence && src_occurrence->type == Container::Value::CONTAINER_TYPE_STRING)
+            rule->source->occurrence = src_occurrence->s;
+    }
 
     return 0;
 }
@@ -9421,6 +9482,42 @@ void RESTAPI::serialize_a_xslt_policy_rule(MediaConchLib::XSLT_Policy_Rule* rule
         value.s = rule->value;
         ok_v.obj["value"] = value;
     }
+
+    if (rule->source)
+    {
+        Container::Value source, src_tracktype, src_field, src_scope, src_occurrence;
+        source.type = Container::Value::CONTAINER_TYPE_OBJECT;
+
+        if (rule->source->tracktype.size())
+        {
+            src_tracktype.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_tracktype.s = rule->source->tracktype;
+            source.obj["tracktype"] = src_tracktype;
+        }
+
+        if (rule->source->field.size())
+        {
+            src_field.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_field.s = rule->source->field;
+            source.obj["field"] = src_field;
+        }
+
+        if (rule->source->scope.size())
+        {
+            src_scope.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_scope.s = rule->source->scope;
+            source.obj["scope"] = src_scope;
+        }
+
+        if (rule->source->occurrence.size())
+        {
+            src_occurrence.type = Container::Value::CONTAINER_TYPE_STRING;
+            src_occurrence.s = rule->source->occurrence;
+            source.obj["occurrence"] = src_occurrence;
+        }
+
+        ok_v.obj["source"] = source;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -10187,6 +10284,28 @@ MediaConchLib::XSLT_Policy_Rule* RESTAPI::parse_a_xslt_policy_rule(Container::Va
     Container::Value *value = model->get_value_by_key(*rule, "value");
     if (value && value->type == Container::Value::CONTAINER_TYPE_STRING)
         ok->value = value->s;
+
+    Container::Value *source = model->get_value_by_key(*rule, "source");
+    if (source && source->type == Container::Value::CONTAINER_TYPE_OBJECT)
+    {
+        ok->source = new MediaConchLib::XSLT_Policy_Rule::Source;
+
+        Container::Value *src_tracktype = model->get_value_by_key(*source, "tracktype");
+        if (src_tracktype && src_tracktype->type == Container::Value::CONTAINER_TYPE_STRING)
+            ok->source->tracktype = src_tracktype->s;
+
+        Container::Value *src_field = model->get_value_by_key(*source, "field");
+        if (src_field && src_field->type == Container::Value::CONTAINER_TYPE_STRING)
+            ok->source->field = src_field->s;
+
+        Container::Value *src_scope = model->get_value_by_key(*source, "scope");
+        if (src_scope && src_scope->type == Container::Value::CONTAINER_TYPE_STRING)
+            ok->source->scope = src_scope->s;
+
+        Container::Value *src_occurrence = model->get_value_by_key(*source, "occurrence");
+        if (src_occurrence && src_occurrence->type == Container::Value::CONTAINER_TYPE_STRING)
+            ok->source->occurrence = src_occurrence->s;
+    }
 
     return ok;
 }

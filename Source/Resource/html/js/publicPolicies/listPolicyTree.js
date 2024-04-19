@@ -130,17 +130,33 @@ var policyTree = (function() {
             }
 
             if (undefined == node.data.occurrence || '' == node.data.occurrence || '*' == node.data.occurrence) {
-                data += '<li>Occurence: *</li>';
+                data += '<li>Occurrence: *</li>';
             }
             else {
-                data += '<li>Occurence: ' + node.data.occurrence + '</li>';
+                data += '<li>Occurrence: ' + node.data.occurrence + '</li>';
             }
 
             if (undefined != node.data.ope) {
                 data += '<li>Operator: ' + node.data.ope + '</li>';
             }
 
-            if (undefined != node.data.value) {
+            if (undefined != node.data.source) {
+                if (undefined != node.data.source.tracktype) {
+                    data += '<li>Source TrackType: ' + node.data.source.tracktype + '</li>';
+                }
+
+                if (undefined != node.data.source.field) {
+                    data += '<li>Source Field: ' + node.data.source.field + '</li>';
+                }
+
+                if (undefined == node.data.source.occurrence || '' == node.data.source.occurrence || '*' == node.data.source.occurrence) {
+                    data += '<li>Source Occurrence: *</li>';
+                }
+                else {
+                    data += '<li>Source Occurrence: ' + node.data.source.occurrence + '</li>';
+                }
+            }
+            else if (undefined != node.data.value) {
                 data += '<li>Value: ' + node.data.value + '</li>';
             }
             data += '</ul>';

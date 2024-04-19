@@ -30,6 +30,12 @@ function setSelect2Plugin() {
         minimumResultsForSearch: Infinity
     });
 
+    $('#xslPolicyRule_sourceTrackType').select2({
+        theme: 'bootstrap',
+        width: '100%',
+        minimumResultsForSearch: Infinity
+    });
+
     $('#xslPolicyRule_validator').select2({
         theme: 'bootstrap',
         width: '100%',
@@ -48,7 +54,19 @@ function setSelect2Plugin() {
         width: '100%'
     });
 
+    $('#xslPolicyRule_sourceField').select2({
+        tags: true,
+        theme: 'bootstrap',
+        width: '100%'
+    });
+
     $('#xslPolicyRule_occurrence').select2({
+        tags: true,
+        theme: 'bootstrap',
+        width: '100%'
+    });
+
+    $('#xslPolicyRule_sourceOccurrence').select2({
         tags: true,
         theme: 'bootstrap',
         width: '100%'
@@ -161,11 +179,23 @@ function formBindings() {
             var field = null;
         }
         else {
-            var field = $('#xslPolicyRule_field').val();
+            var field = $('#xslPolicyRule_field');
         }
 
         policyTreeRulesMI.loadFieldsList($('#xslPolicyRule_trackType').val(), field);
-        policyTreeRulesMI.displayOccurenceField($('#xslPolicyRule_trackType').val());
+        policyTreeRulesMI.displayOccurrenceField($('#xslPolicyRule_trackType').val(), $('#xslPolicyRule_occurrence'));
+    });
+
+    $('#xslPolicyRule_sourceTrackType').on('change', function() {
+        if ('undefined' === $('#xslPolicyRule_sourceField').val()) {
+            var field = null;
+        }
+        else {
+            var field = $('#xslPolicyRule_sourceField');
+        }
+
+        policyTreeRulesMI.loadFieldsList($('#xslPolicyRule_sourceTrackType').val(), field);
+        policyTreeRulesMI.displayOccurrenceField($('#xslPolicyRule_sourceTrackType').val(), $('#xslPolicyRule_sourceOccurrence'));
     });
 
     // Policy rule edit form field select list
@@ -402,12 +432,15 @@ function policyRuleHelp() {
 
     // trackType
     addHelp('trackType', 'Specifies which section of the file the rule should  target.', 'Track type');
+    addHelp('sourceTrackType', 'Specifies which section of the file the rule should  target.', 'Track type');
 
     // Field
     addHelp('field', 'Specifies the field (within the track) that the rule should target.', 'Field');
+    addHelp('sourceField', 'Specifies the field (within the track) that the rule should target.', 'Field');
 
     // Occurrence
     addHelp('occurrence', 'Optional field to specify which track should be tested. Leaving this field blank will test all tracks.', 'Occurrence');
+    addHelp('sourceOccurrence', 'Optional field to specify which track should be tested. Leaving this field blank will test all tracks.', 'Occurrence');
 
     // Validator
     addHelp('validator', 'Applies the appropriate operator to the rule.', 'Validator');

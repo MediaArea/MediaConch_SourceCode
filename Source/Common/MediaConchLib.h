@@ -175,7 +175,18 @@ public:
 
     struct XSLT_Policy_Rule
     {
-        XSLT_Policy_Rule() : id(-1) {}
+        XSLT_Policy_Rule() : id(-1), source(NULL) {}
+        ~XSLT_Policy_Rule() {
+            if (source)
+                delete source;
+        }
+
+        struct Source {
+            std::string  tracktype;
+            std::string  field;
+            std::string  scope;
+            std::string  occurrence;
+        };
 
         int          id;
         std::string  name;
@@ -186,6 +197,7 @@ public:
         std::string  occurrence;
         std::string  ope;
         std::string  value;
+        Source*      source;
         std::string  to_str() const;
     };
 

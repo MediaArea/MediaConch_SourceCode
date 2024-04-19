@@ -425,8 +425,8 @@
           <strong>Tracktype: </strong>  <xsl:value-of select="@tracktype"/>
           <br/>
         </xsl:if>
-        <xsl:if test="@occurence != ''">
-          <strong>Occurence: </strong>  <xsl:value-of select="@occurence"/>
+        <xsl:if test="@occurrence != ''">
+          <strong>Occurrence: </strong>  <xsl:value-of select="@occurrence"/>
           <br/>
         </xsl:if>
         <xsl:if test="@operator != ''">
@@ -451,8 +451,33 @@
         </xsl:if>
         <strong><xsl:text>Xpath:  </xsl:text></strong>
         <xsl:value-of select="@xpath"/>
+        <xsl:apply-templates select="mc:source"/>
+      </div>
       </div>
     </div>
-  </div>
+  </xsl:template>
+  <xsl:template match="mc:source">
+    <br/>
+    <input id="policy-arrow-{generate-id()}" class="arrow" type="checkbox"/>
+    <label for="policy-arrow-{generate-id()}"></label>
+    <xsl:text> </xsl:text>
+    <strong>
+      <span>Source</span>
+    </strong>
+    <xsl:text> </xsl:text>
+    <div class="extra">
+      <xsl:if test="@value != ''">
+        <strong>Value: </strong>  <xsl:value-of select="@value"/>
+        <br/>
+      </xsl:if>
+      <xsl:if test="@tracktype != ''">
+        <strong>Tracktype: </strong>  <xsl:value-of select="@tracktype"/>
+        <br/>
+      </xsl:if>
+      <xsl:if test="@occurrence != ''">
+        <strong>Occurrence: </strong>  <xsl:value-of select="@occurrence"/>
+        <br/>
+      </xsl:if>
+    </div>
   </xsl:template>
 </xsl:stylesheet>
