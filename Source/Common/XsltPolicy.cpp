@@ -68,11 +68,15 @@ size_t XsltPolicyRule::rule_id = 0;
 XsltPolicyRule::XsltPolicyRule() : XsltPolicyNode()
 {
     kind = XSLT_POLICY_RULE;
+    source = NULL;
+
 }
 
 //---------------------------------------------------------------------------
 XsltPolicyRule::~XsltPolicyRule()
 {
+    if (source)
+        delete source;
 }
 
 //---------------------------------------------------------------------------
@@ -89,6 +93,19 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule* r) : XsltPolicyNode(r)
     this->level      = r->level;
     this->occurrence = r->occurrence;
     this->value      = r->value;
+    if (r->source)
+    {
+        if (this->source)
+            delete this->source;
+
+        this->source = new Source;
+        this->source->track_type = r->source->track_type;
+        this->source->field      = r->source->field;
+        this->source->scope      = r->source->scope;
+        this->source->occurrence = r->source->occurrence;
+    }
+    else
+      this->source = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -105,6 +122,19 @@ XsltPolicyRule::XsltPolicyRule(const XsltPolicyRule& r) : XsltPolicyNode(r)
     this->level      = r.level;
     this->occurrence = r.occurrence;
     this->value      = r.value;
+    if (r.source)
+    {
+        if (this->source)
+            delete this->source;
+
+        this->source = new Source;
+        this->source->track_type = r.source->track_type;
+        this->source->field      = r.source->field;
+        this->source->scope      = r.source->scope;
+        this->source->occurrence = r.source->occurrence;
+    }
+    else
+      this->source = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -118,6 +148,19 @@ int XsltPolicyRule::edit_policy_rule(const XsltPolicyRule* rule, std::string&)
     this->level      = rule->level;
     this->occurrence = rule->occurrence;
     this->value      = rule->value;
+    if (rule->source)
+    {
+        if (this->source)
+            delete this->source;
+
+        this->source = new Source;
+        this->source->track_type = rule->source->track_type;
+        this->source->field      = rule->source->field;
+        this->source->scope      = rule->source->scope;
+        this->source->occurrence = rule->source->occurrence;
+    }
+    else
+      this->source = NULL;
 
     return 0;
 }
@@ -274,7 +317,7 @@ int XsltPolicy::run_over_siblings_nodes(xmlNodePtr node, bool is_root, XsltPolic
     {
         switch (node->type)
         {
-            case XML_TEXT_NODE: 
+            case XML_TEXT_NODE:
             case XML_COMMENT_NODE:
                 continue;
             default:;
@@ -482,13 +525,61 @@ int XsltPolicy::parse_policy_rule(xmlNodePtr node, bool is_root, XsltPolicy* cur
         xmlFree(occurrence);
     }
 
-    //Get value
-    xmlChar *value = xmlNodeGetContent(node);
-    if (value)
+    //Get source
+    for (xmlNodePtr child = node->children; child; child = child->next)
     {
-        r->value = std::string((const char*)value);
-        xmlFree(value);
+        if (child->type == XML_ELEMENT_NODE && child->name && std::string((const char*)child->name) == "source")
+        {
+           if (r->source)
+                delete r->source;
+
+            r->source = new XsltPolicyRule::Source;
+
+            //Get source trackType
+            xmlChar *track_type = xmlGetNoNsProp(child, (const unsigned char*)"tracktype");
+            if (track_type)
+            {
+                r->source->track_type = std::string((const char*)track_type);
+                xmlFree(track_type);
+            }
+
+            //Get source field
+            xmlChar *field = xmlGetNoNsProp(child, (const unsigned char*)"value");
+            if (field)
+            {
+                r->source->field = std::string((const char*)field);
+                xmlFree(field);
+            }
+
+            //Get source scope
+            xmlChar *scope = xmlGetNoNsProp(child, (const unsigned char*)"scope");
+            if (scope)
+            {
+                r->source->scope = std::string((const char*)scope);
+                xmlFree(scope);
+            }
+
+            //Get source occurrence
+            xmlChar *occurrence = xmlGetNoNsProp(child, (const unsigned char*)"occurrence");
+            if (occurrence)
+            {
+                r->source->occurrence = std::string((const char*)occurrence);
+                xmlFree(occurrence);
+            }
+            break;
+        }
     }
+
+    //Get value
+    if (!r->source)
+    {
+        xmlChar *value = xmlNodeGetContent(node);
+        if (value)
+        {
+            r->value = std::string((const char*)value);
+            xmlFree(value);
+        }
+     }
 
     return 0;
 }
@@ -615,8 +706,36 @@ int XsltPolicy::create_node_rule_child(xmlNodePtr& node, XsltPolicyRule *current
     if (current->level.size())
         xmlNewProp(node, (const xmlChar *)"level", (const xmlChar *)current->level.c_str());
 
-    //value
-    if (current->value.size())
+    //source or value
+    if (current->source)
+    {
+        xmlNodePtr child = xmlNewNode(NULL, (const xmlChar *)"source");
+        if (!child)
+        {
+            error = "Cannot create the source children";
+            return -1;
+        }
+
+        //field
+        if (current->source->field.size())
+            xmlNewProp(child, (const xmlChar *)"value", (const xmlChar *)current->source->field.c_str());
+
+        //track type
+        if (current->source->track_type.size())
+            xmlNewProp(child, (const xmlChar *)"tracktype", (const xmlChar *)current->source->track_type.c_str());
+
+
+        //scope
+        if (current->source->scope.size())
+            xmlNewProp(child, (const xmlChar *)"scope", (const xmlChar *)current->source->scope.c_str());
+
+        //occurrence
+        if (current->source->occurrence.size())
+            xmlNewProp(child, (const xmlChar *)"occurrence", (const xmlChar *)current->source->occurrence.c_str());
+
+        xmlAddChild(node, child);
+    }
+    else if (current->value.size())
         xmlNodeSetContent(node, (const xmlChar*)current->value.c_str());
 
     return 0;

@@ -220,8 +220,55 @@
               </select>
             </div>
             <div class="form-group">
+              <label class="control-label" for="xslPolicyRule_valueType">Compare to field</label>
+        <input type="checkbox" id="xslPolicyRule_valueType" name="xslPolicyRule[valueType]" style="float: right;" onclick="policyTreeRulesMI.displaySourceFields();" />
+            </div>
+            <div class="form-group">
               <label class="control-label required" for="xslPolicyRule_value">Content</label>
               <input type="text" id="xslPolicyRule_value" name="xslPolicyRule[value]" required="required" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="control-label required" for="xslPolicyRule_sourceTrackType">Track type to compare to</label>
+              <select id="xslPolicyRule_sourceTrackType" name="xslPolicyRule[sourceTrackType]" required="required" class="form-control">
+                <option value="" selected="selected">Choose a track type</option>
+                <option value="General">General</option>
+                <option value="Video">Video</option>
+                <option value="Audio">Audio</option>
+                <option value="Text">Text</option>
+                <option value="Other">Other</option>
+                <option value="Image">Image</option>
+                <option value="Menu">Menu</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label required" for="xslPolicyRule_sourceField">Field to compare to</label>
+              <select id="xslPolicyRule_sourceField" name="xslPolicyRule[sourceField]" required="required" class="form-control">
+                <option value="" selected="selected">Choose a field</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="xslPolicyRule_sourceOccurrence">Occurrence to compare to</label>
+              <select id="xslPolicyRule_sourceOccurrence" name="xslPolicyRule[sourceOccurrence]" class="form-control">
+                <option value="" selected="selected"></option>
+                <option value="any">Any</option>
+                <option value="all">All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+              </select>
             </div>
             <input type="hidden" id="xslPolicyRule_scope" name="xslPolicyRule[scope]" />
             <div class="form-group">

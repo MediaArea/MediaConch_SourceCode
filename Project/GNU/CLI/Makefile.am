@@ -60,7 +60,8 @@ TESTS = \
     test/simple.sh \
     test/filename.sh \
     test/test_mk.sh \
-    test/test_ffv1.sh
+    test/test_ffv1.sh \
+    test/test_policy.sh
 
 SAMPLES_DIR = test/SampleFiles
 

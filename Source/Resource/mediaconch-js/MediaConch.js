@@ -241,10 +241,6 @@
 
                     var toReturn = '';
                     var outcome = true;
-                    const policyXsltProc = new XSLTProcessor();
-                    policyXsltProc.setParameter(null, 'compare', '');
-                    policyXsltProc.setParameter(null, 'policy_verbosity', verbosity);
-                    policyXsltProc.importStylesheet(policyTransformXmlXsl);
 
                     const xmlSerializer = new XMLSerializer();
                     const parser = new DOMParser();
@@ -295,7 +291,7 @@
                         checker.add_policy(xmlSerializer.serializeToString(policy.xml));
                     });
 
-                    if(checker.full_parse()) {
+                    if(checker.is_policy_supported()) {
                         const temp = checker.analyze(xmlSerializer.serializeToString(mediainfoReport), verbosity);
                         var report = parser.parseFromString(temp, 'application/xml');
 
@@ -342,6 +338,10 @@
                                 toReturn += '\n\n';
                             }
 
+                            const policyXsltProc = new XSLTProcessor();
+                            policyXsltProc.setParameter(null, 'compare', '');
+                            policyXsltProc.setParameter(null, 'policy_verbosity', verbosity);
+                            policyXsltProc.importStylesheet(policyTransformXmlXsl);
                             let policyXsl = policyXsltProc.transformToDocument(policy.xml);
                             policyXsl = updatePrefixInPolicy(policyXsl);
 

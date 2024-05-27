@@ -1533,6 +1533,14 @@ namespace MediaConch
             res.rule.occurrence = rule->occurrence;
             res.rule.ope = rule->ope;
             res.rule.value = rule->value;
+            if (rule->source)
+            {
+                res.rule.source = new MediaConchLib::XSLT_Policy_Rule::Source;
+                res.rule.source->tracktype = rule->source->track_type;
+                res.rule.source->field = rule->source->field;
+                res.rule.source->scope = rule->source->scope;
+                res.rule.source->occurrence = rule->source->occurrence;
+            }
         }
 
         FUN_CMD_END(XSLT_Policy_Rule_Get)
@@ -1555,6 +1563,14 @@ namespace MediaConch
         rule.occurrence = req->rule.occurrence;
         rule.ope = req->rule.ope;
         rule.value = req->rule.value;
+        if (req->rule.source)
+        {
+            rule.source = new XsltPolicyRule::Source;
+            rule.source->track_type = req->rule.source->tracktype;
+            rule.source->field = req->rule.source->field;
+            rule.source->scope = req->rule.source->scope;
+            rule.source->occurrence = req->rule.source->occurrence;
+        }
 
         if (d->MCL->xslt_policy_rule_edit(req->user, req->policy_id, req->rule.id, &rule, err) < 0)
             FUN_CMD_NOK(res, err, -1)

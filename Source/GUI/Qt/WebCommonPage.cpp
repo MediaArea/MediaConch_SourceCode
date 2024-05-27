@@ -1088,6 +1088,53 @@ namespace MediaConch
         else
             rule_data += ",\"ope\":\"\"";
 
+        if (r->source)
+        {
+            rule_data += ",\"source\":{";
+
+            len = r->source->track_type.length();
+            if (len > 0)
+            {
+                QString source_tracktype = QString().fromUtf8(r->source->track_type.c_str(), r->source->track_type.length());
+                string_to_json(source_tracktype);
+                rule_data += QString("\"tracktype\":\"%1\"").arg(source_tracktype);
+            }
+            else
+                rule_data += "\"tracktype\":\"\"";
+
+            len = r->source->field.length();
+            if (len > 0)
+            {
+                QString source_field = QString().fromUtf8(r->source->field.c_str(), r->source->field.length());
+                string_to_json(source_field);
+                rule_data += QString(",\"field\":\"%1\"").arg(source_field);
+            }
+            else
+                rule_data += ",\"field\":\"\"";
+
+            len = r->source->occurrence.length();
+            if (len > 0)
+            {
+                QString source_occurrence = QString().fromUtf8(r->source->occurrence.c_str(), r->source->occurrence.length());
+                string_to_json(source_occurrence);
+                rule_data += QString(",\"occurrence\":\"%1\"").arg(source_occurrence);
+            }
+            else
+                rule_data += ",\"occurrence\":\"\"";
+
+            len = r->source->scope.length();
+            if (len > 0)
+            {
+                QString source_scope = QString().fromUtf8(r->source->scope.c_str(), r->source->scope.length());
+                string_to_json(source_scope);
+                rule_data += QString(",\"scope\":\"%1\"").arg(source_scope);
+            }
+            else
+                rule_data += ",\"scope\":\"\"";
+
+            rule_data += "}";
+        }
+
         len = r->value.length();
         if (len > 0)
         {
@@ -1521,7 +1568,9 @@ namespace MediaConch
         return json;
     }
 
-    QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type, const QString& field, const QString& occurrence, const QString& ope, const QString& value, const QString& scope, const QString& level)
+    QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString& title, const QString& type,
+                                                 const QString& field, const QString& occurrence, const QString& ope,
+                                                 const QString& value, const QString& scope, const QString& level)
     {
         QString err;
         QString json;
@@ -1535,6 +1584,54 @@ namespace MediaConch
         rule.value         = value.toUtf8().data();
         rule.scope         = scope.toUtf8().data();
         rule.level         = level.toUtf8().data();
+
+        int code;
+        if ((code = mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err)) < 0)
+        {
+            string_to_json(err);
+            json = QString("{\"error\":\"%1\"}").arg(err);
+            return json;
+        }
+
+        mainwindow->policy_save(policy_id, err);
+
+        XsltPolicyRule* r = mainwindow->xslt_policy_rule_get(policy_id, rule_id, err);
+        if (!r)
+        {
+            json = "{\"error\":\"Cannot get the policy rule edited\"}";
+            return json;
+        }
+
+        QString rule_data;
+        create_rule_tree(r, rule_data);
+        json = QString("{\"rule\":");
+        json += rule_data;
+        json += "}";
+        return json;
+    }
+
+    QString WebCommonPage::xslt_policy_rule_edit(int rule_id, int policy_id, const QString &title, const QString &type,
+                                                             const QString &field, const QString &occurrence, const QString &ope,
+                                                             const QJsonObject& source, const QString &scope, const QString &level)
+    {
+        QString err;
+        QString json;
+
+        XsltPolicyRule rule;
+        rule.source = new XsltPolicyRule::Source;
+
+        rule.node_name     = title.toUtf8().data();
+        rule.ope           = ope.toUtf8().data();
+        rule.track_type    = type.toUtf8().data();
+        rule.field         = field.toUtf8().data();
+        rule.occurrence    = occurrence.toUtf8().data();
+        rule.scope         = scope.toUtf8().data();
+        rule.level         = level.toUtf8().data();
+
+        rule.source->track_type = source.value("tracktype").toString().toUtf8().data();
+        rule.source->field      = source.value("field").toString().toUtf8().data();
+        rule.source->occurrence = source.value("occurrence").toString().toUtf8().data();
+        rule.source->scope      = source.value("scope").toString().toUtf8().data();
 
         int code;
         if ((code = mainwindow->xslt_policy_rule_edit(policy_id, rule_id, &rule, err)) < 0)

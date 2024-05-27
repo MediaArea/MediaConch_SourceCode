@@ -212,7 +212,7 @@ var policyTreeAjax = (function() {
          * @param int policyId policy ID of the policy that will contain the rule
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE,  "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURRENCE,  "ope":OPERATOR}}
          */
         webpage.xslt_policy_rule_create(policyNode.data.policyId, function(res){
             data = JSON.parse(res);
@@ -230,7 +230,7 @@ var policyTreeAjax = (function() {
          * @param int policyId policy ID of the policy that contain the rule
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURRENCE, "ope":OPERATOR}}
          */
 
         var scope = "";
@@ -241,6 +241,11 @@ var policyTreeAjax = (function() {
         var occurrence = "";
         var ope = "";
         var value = "";
+        var compare = false;
+        var src_tracktype = "";
+        var src_field = "";
+        var src_occurrence = "";
+        var src_scope = "";
 
         if ($(".ruleMediaTrace").hasClass("active"))
             scope = "mmt";
@@ -293,18 +298,55 @@ var policyTreeAjax = (function() {
             if (ope === null)
                 ope = "";
 
-            value = $("#xslPolicyRule_value").val();
-            if (value === null)
-                value = "";
+            compare = $("#xslPolicyRule_valueType").is(":checked");
+            if (compare)
+            {
+                src_tracktype = $("#xslPolicyRule_sourceTrackType").val();
+                if (src_tracktype === null)
+                    src_tracktype = "";
+
+                src_field = $("#xslPolicyRule_sourceField").val();
+                if (src_field === null)
+                    src_field = "";
+
+                src_occurrence = $("#xslPolicyRule_sourceOccurrence").val();
+                if (src_occurrence === null)
+                    src_occurrence = "";
+            }
+            else
+            {
+                value = $("#xslPolicyRule_value").val();
+                if (value === null)
+                    value = "";
+            }
         }
 
-        webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, value, scope, level, function(res){
-            data = JSON.parse(res);
-            if (!data.error)
-                policyTree.ruleEdit(data.rule, ruleNode);
-            else
-                mcoMessage.error(data.error);
+        if (compare)
+        {
+            var source = {
+                "tracktype": src_tracktype,
+                "field": src_field,
+                "scope": src_scope,
+                "occurrence": src_occurrence,
+            };
+            webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, source, scope, level, function(res){
+                data = JSON.parse(res);
+                if (!data.error)
+                    policyTree.ruleEdit(data.rule, ruleNode);
+                else
+                    mcoMessage.error(data.error);
         });
+        }
+        else
+        {
+            webpage.xslt_policy_rule_edit(ruleNode.data.ruleId, policyId, name, tracktype, field, occurrence, ope, value, scope, level, function(res){
+                data = JSON.parse(res);
+                if (!data.error)
+                    policyTree.ruleEdit(data.rule, ruleNode);
+                else
+                    mcoMessage.error(data.error);
+        });
+        }
     }
 
     var ruleDelete = function(policyId, ruleNode) {
@@ -333,7 +375,7 @@ var policyTreeAjax = (function() {
          * @param int dstPolicyId policy ID of the destination policy
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE,  "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURRENCE,  "ope":OPERATOR}}
          */
 
         webpage.xslt_policy_rule_duplicate(policyId, ruleNode.data.ruleId, dstNode.data.policyId, function(res){
@@ -353,7 +395,7 @@ var policyTreeAjax = (function() {
          * @param int dstPolicyId policy ID of the destination policy
          *
          * @return json
-         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURENCE, "ope":OPERATOR}}
+         * {"rule":{"tracktype":TRACKTYPE, "field":FIELD, "level" LEVEL, "id":RULE_ID, "name":NAME, "value":VALUE, "occurrence":OCCURRENCE, "ope":OPERATOR}}
          */
 
         webpage.xslt_policy_rule_move(policyId, ruleNode.data.ruleId, dstNode.data.policyId, function(res){
@@ -365,7 +407,7 @@ var policyTreeAjax = (function() {
         });
     }
 
-    var getFieldsList = function(trackType, field) {
+    var getFieldsList = function(trackType, field, value) {
         /**
          * Get list of fields for a trackType (POST : type and field)
          *
@@ -373,15 +415,17 @@ var policyTreeAjax = (function() {
          */
         if (trackType === null)
             trackType = "";
-        if (field === null)
-            field = "";
+        if (value === null)
+            value = "";
 
-        webpage.get_fields_list(trackType, field, function(res){
+        console.debug(value);
+
+        webpage.get_fields_list(trackType, value, function(res){
             data = JSON.parse(res);
             if (!data.error)
-                policyTreeRulesMI.fieldsListOk(data.fields, field)
+                policyTreeRulesMI.fieldsListOk(data.fields, field, value)
             else
-                policyTreeRulesMI.fieldsListError(field);
+                policyTreeRulesMI.fieldsListError(field, value);
         });
     }
 

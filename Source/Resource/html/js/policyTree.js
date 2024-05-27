@@ -531,6 +531,15 @@ var policyTree = (function() {
         selectedRule.data.value = (undefined == rule.value) ? '' : rule.value;
         selectedRule.data.scope = (undefined == rule.scope) ? '' : rule.scope;
         selectedRule.data.level = (undefined == rule.level) ? '' : rule.level;
+        if (undefined !== rule.source) {
+            selectedRule.data.source = {
+                tracktype: (undefined == rule.source.tracktype) ? '' : rule.source.tracktype,
+                field: (undefined == rule.source.field) ? '' : rule.source.field,
+                occurrence: (undefined == rule.source.occurrence) ? '' : rule.source.occurrence,
+                scope: (undefined == rule.source.scope) ? '' : rule.source.scope,
+            }
+        }
+
         mcoMessage.success('Rule successfuly edited');
     }
 
@@ -570,6 +579,12 @@ var policyTree = (function() {
                 value: (undefined == rule.value) ? '' : rule.value,
                 scope: (undefined == rule.scope) ? '' : rule.scope,
                 level: (undefined == rule.level) ? '' : rule.level,
+                source: (undefined == rule.source) ? undefined : {
+                    tracktype: (undefined == rule.source.tracktype) ? '' : rule.source.tracktype,
+                    field: (undefined == rule.source.field) ? '' : rule.source.field,
+                    occurrence: (undefined == rule.source.occurrence) ? '' : rule.source.occurrence,
+                    scope: (undefined == rule.source.scope) ? '' : rule.source.scope,
+                },
             }
         }
     }

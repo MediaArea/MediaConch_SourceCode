@@ -700,8 +700,18 @@ int JsTree::rule_to_js_tree(MediaConchLib::XSLT_Policy_Rule* rule, std::string& 
     ss << "\",\"level\":\"" << unified_json_value(rule->level);
     ss << "\",\"occurrence\":\"" << unified_json_value(rule->occurrence);
     ss << "\",\"ope\":\"" << unified_json_value(rule->ope);
-    ss << "\",\"value\":\"" << unified_json_value(rule->value);
-    ss <<"\"}}";
+    if (rule->source)
+    {
+        ss << "\",\"source\":{";
+        ss << "\"tracktype\":\"" << unified_json_value(rule->source->tracktype);
+        ss << "\",\"field\":\"" << unified_json_value(rule->source->field);
+        ss << "\",\"scope\":\"" << unified_json_value(rule->source->scope);
+        ss << "\",\"occurrence\":\"" << unified_json_value(rule->source->occurrence);
+        ss <<"\"}";
+    }
+    else
+        ss << "\",\"value\":\"" << unified_json_value(rule->value) << "\"";
+    ss <<"}}";
 
     json = ss.str();
     return 0;

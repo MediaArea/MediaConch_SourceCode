@@ -112,6 +112,7 @@ std::vector<PathElement> parse_path(const std::string& xpath)
 //---------------------------------------------------------------------------
 bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurrence)
 {
+    tfsxml_string tfsxml_priv_local = tfsxml_priv;
     tfsxml_string value;
 
     // compare names
@@ -125,10 +126,8 @@ bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathEleme
 
         tfsxml_string attribute_name;
         tfsxml_string attribute_value;
-        tfsxml_string tfsxml_priv_save=tfsxml_priv;
-        while (!tfsxml_attr(&tfsxml_priv, &attribute_name, &attribute_value))
+        while (!tfsxml_attr(&tfsxml_priv_local, &attribute_name, &attribute_value))
             attributes[std::string(attribute_name.buf, attribute_name.len)]=std::string(attribute_value.buf, attribute_value.len);
-        tfsxml_priv=tfsxml_priv_save;
 
         std::map<std::string, std::string>::iterator it=path.attributes.begin();
         while (it!=path.attributes.end())

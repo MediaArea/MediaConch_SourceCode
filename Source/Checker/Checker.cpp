@@ -84,6 +84,40 @@ int tfsxml_next_named(tfsxml_string* tfsxml_priv, tfsxml_string* result, const c
 }
 
 //---------------------------------------------------------------------------
+int tfsxml_hasvalue(tfsxml_string* priv)
+{
+    const char* buf = priv->buf;
+    unsigned len = priv->len;
+    while (len)
+    {
+        len--;
+        switch (*buf)
+        {
+            case '\n':
+            case '\t':
+            case '\r':
+            case ' ':
+                break;
+            case '<':
+                if (!len)
+                    return 1;
+                buf++;
+                switch (*buf)
+                {
+                    case '!':
+                    case '/':
+                        return 0;
+                    default:
+                        return -1;
+                }
+            default:
+                return 0;
+        }
+    }
+    return 1;
+}
+
+//---------------------------------------------------------------------------
 std::string tokenize(const std::string& scope, const std::string& list, const std::string& delimiter)
 {
     std::stringstream ss;
@@ -246,13 +280,15 @@ std::string PolicyChecker::PolicyElement::to_string(size_t level, bool verbose)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-PolicyChecker::RuleElement::RuleElement() : resolved(false), pass(false), tracks(0)
+PolicyChecker::RuleElement::RuleElement() : resolved(false), pass(false), tracks(0), source(NULL)
 {
 }
 
 //---------------------------------------------------------------------------
 PolicyChecker::RuleElement::~RuleElement()
 {
+    if (source)
+        delete source;
 }
 
 //---------------------------------------------------------------------------
@@ -262,71 +298,73 @@ void PolicyChecker::RuleElement::reset()
     pass=false;
     tracks=0;
     values.clear();
+    if (source)
+        source->values.clear();
 }
 
 //---------------------------------------------------------------------------
-bool  PolicyChecker::RuleElement::compare(const std::string& value)
+bool  PolicyChecker::RuleElement::compare(const std::string& v1, const std::string& v2)
 {
     bool to_return = false;
 
     char* val_end=NULL;
-    double val = strtod(value.c_str(), &val_end);
+    double val = strtod(v2.c_str(), &val_end);
     char* ref_end=NULL;
-    double ref = strtod(requested.c_str(), &ref_end);
+    double ref = strtod(v1.c_str(), &ref_end);
 
     if (operand=="starts with")
     {
-        to_return = value.rfind(requested, 0) == 0;
+        to_return = v2.rfind(v1, 0) == 0;
     }
     else if (operand=="must not start with")
     {
-        to_return = value.rfind(requested, 0) != 0;
+        to_return = v2.rfind(v1, 0) != 0;
     }
     else if (operand == "<")
     {
         if (!strlen(val_end) && !strlen(ref_end))
             to_return = val < ref;
         else
-            to_return = strcmp(value.c_str(), requested.c_str()) < 0;
+            to_return = strcmp(v2.c_str(), v1.c_str()) < 0;
     }
     else if (operand == "<=")
     {
         if (!strlen(val_end) && !strlen(ref_end))
             to_return = val <= ref;
         else
-            to_return = strcmp(value.c_str(), requested.c_str()) <= 0;
+            to_return = strcmp(v2.c_str(), v1.c_str()) <= 0;
     }
     else if (operand == "=")
     {
         if (!strlen(val_end) && !strlen(ref_end))
             to_return = val == ref;
         else
-            to_return = strcmp(value.c_str(), requested.c_str()) == 0;
+            to_return = strcmp(v2.c_str(), v1.c_str()) == 0;
     }
     else if (operand == "!=")
     {
         if (!strlen(val_end) && !strlen(ref_end))
             to_return = val != ref;
         else
-            to_return = strcmp(value.c_str(), requested.c_str()) != 0;
+            to_return = strcmp(v2.c_str(), v1.c_str()) != 0;
     }
     else if (operand == ">=")
     {
         if (!strlen(val_end) && !strlen(ref_end))
             to_return = val >= ref;
         else
-            to_return = strcmp(value.c_str(), requested.c_str()) >= 0;
+            to_return = strcmp(v2.c_str(), v1.c_str()) >= 0;
     }
     else if (operand == ">")
     {
         if (!strlen(val_end) && !strlen(ref_end))
             to_return = val > ref;
         else
-            to_return = strcmp(value.c_str(), requested.c_str()) > 0;
+            to_return = strcmp(v2.c_str(), v1.c_str()) > 0;
     }
 
     if (!to_return)
-        failing_values.push_back(value);
+        failing_values.push_back(v2);
 
     return to_return;
 }
@@ -363,12 +401,48 @@ void PolicyChecker::RuleElement::resolve()
     }
     else if (operand=="starts with" || operand=="must not start with" || operand=="<" || operand=="<=" || operand=="="  || operand=="!=" || operand==">=" || operand==">")
     {
-       if (values.empty())
-          pass = operand=="must not start with" ? true : false;
-       else if (occurrence=="all")
-           pass = std::all_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
-       else
-           pass = std::any_of(values.begin(), values.end(), std::bind(&PolicyChecker::RuleElement::compare, this, std::placeholders::_1));
+        std::vector<bool> results;
+
+        if (values.empty())
+           pass=operand=="must not start with" ? true : false;
+        else
+        {
+            for (std::pair<const char*, std::string> value : values)
+            {
+                if (source)
+                {
+                    std::vector<bool> r2;
+                    for (std::pair<const char*, std::string> v2 : source->values)
+                    {
+                        if ((occurrence.empty() || occurrence=="any" || occurrence=="*" ||
+                            source->occurrence.empty() || source->occurrence=="all" ||
+                            source->occurrence=="any" || source->occurrence=="*") &&
+                            v2.first==value.first)
+                            continue;
+
+                        r2.push_back(compare(v2.second, value.second));
+                    }
+
+                    if (r2.empty())
+                        continue;
+
+                    if (source->occurrence=="all")
+                        results.push_back(std::all_of(r2.begin(), r2.end(), [this](bool result) { return result; }));
+                    else
+                        results.push_back(std::any_of(r2.begin(), r2.end(), [this](bool result) { return result; }));
+                }
+                else
+                    results.push_back(compare(requested, value.second));
+            }
+
+            if (!results.empty())
+            {
+                if (occurrence=="all")
+                    pass=std::all_of(results.begin(), results.end(), [this](bool result) { return result; });
+                else
+                    pass=std::any_of(results.begin(), results.end(), [this](bool result) { return result; });
+            }
+        }
     }
 
     resolved=true;
@@ -414,18 +488,40 @@ std::string PolicyChecker::RuleElement::to_string(size_t level, bool verbose)
     if (result()>RESULT_PASS)
         value_str=failing_values.size() ? failing_values.front() : std::string();
     else if (verbose)
-        value_str=values.size() ? values.front() : std::string();
+        value_str=values.size() ? values.begin()->second : std::string();
 
     ss << indent(level) << "<rule name=\"" << xml_encode(name) << "\"";
     if (!scope.empty())
         ss << " scope=\"" << xml_encode(scope) << "\"";
-    ss << " value=\"" << xml_encode(field) << "\" tracktype=\"" << xml_encode(tracktype) << "\" occurrence=\"" << xml_encode(occurrence)
-       << "\" operator=\"" << xml_encode(operand) << "\" xpath=\"" << xpath << "\"";
+    ss << " value=\"" << xml_encode(field)
+       << "\" tracktype=\"" << xml_encode(tracktype)
+       << "\" occurrence=\"" << (occurrence.size() ? xml_encode(occurrence) : "*")
+       << "\" operator=\"" << xml_encode(operand)
+       << "\" xpath=\"" << xpath << "\"";
     if (!this->level.empty())
         ss << " level=\"" << xml_encode(this->level) << "\"";
     if (result()>RESULT_PASS || verbose)
-        ss << " requested=\"" << xml_encode(requested) << "\" actual=\"" << xml_encode(value_str) << "\"";
-    ss << " outcome=\"" << outcome_str << "\"/>" << std::endl;
+        ss << " requested=\""
+           << (source && source->values.size() ? xml_encode(source->values.begin()->second) : xml_encode(requested))
+           << "\" actual=\"" << xml_encode(value_str) << "\"";
+    ss << " outcome=\"" << outcome_str << "\"";
+
+    if (source)
+    {
+        ss << ">" << std::endl;
+
+        ss << indent(level +1) << "<source";
+        if (!source->scope.empty())
+            ss << " scope=\"" << xml_encode(source->scope) << "\"";
+        ss << " value=\"" << xml_encode(source->field)
+           << "\" tracktype=\"" << xml_encode(source->tracktype)
+           << "\" occurrence=\"" << (source->occurrence.size() ? xml_encode(source->occurrence) : "*")
+           << "\"/>" << std::endl;
+
+        ss << indent(level) << "</rule>" << std::endl;
+    }
+    else
+        ss << "/>" << std::endl;
 
     return ss.str();
 }
@@ -487,27 +583,74 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
             rule->operand=tfsxml_decode(attribute_value);
     }
 
-    std::string occurrence=rule->occurrence;
-    if (occurrence.empty() || occurrence=="all" || occurrence=="any")
-        occurrence="*";
+    if (!tfsxml_hasvalue(&tfsxml_priv))
+    {
+        tfsxml_string value;
+        if (!tfsxml_value(&tfsxml_priv, &value))
+            rule->requested = std::string(value.buf, value.len);
+    }
+    else
+    {
+        if (!tfsxml_enter(&tfsxml_priv))
+        {
+            tfsxml_string value;
+            while (!tfsxml_next(&tfsxml_priv, &value))
+            {
+                if (!tfsxml_strcmp_charp(value, "source"))
+                {
+                    if (rule->source)
+                        delete rule->source;
+                    rule->source = new RuleElement::Source();
+                    while (!tfsxml_attr(&tfsxml_priv, &attribute_name, &attribute_value))
+                    {
+                        if (!tfsxml_strcmp_charp(attribute_name, "scope"))
+                            rule->source->scope=tfsxml_decode(attribute_value);
+                        else if (!tfsxml_strcmp_charp(attribute_name, "value"))
+                            rule->source->field=tfsxml_decode(attribute_value);
+                        else if (!tfsxml_strcmp_charp(attribute_name, "tracktype"))
+                            rule->source->tracktype=tfsxml_decode(attribute_value);
+                        else if (!tfsxml_strcmp_charp(attribute_name, "occurrence"))
+                            rule->source->occurrence=tfsxml_decode(attribute_value);
+                    }
 
-    tfsxml_string value;
-    if (!tfsxml_value(&tfsxml_priv, &value))
-        rule->requested=std::string(value.buf, value.len);
+                    // Check for currently unsupported features
+                    if (rule->scope=="mmt")
+                        supported=false;
+
+                    if (rule->scope.empty() || rule->scope=="mi")
+                    {
+                        std::stringstream ss;
+                        ss << "mi:MediaInfo/mi:track[@type='"
+                           << rule->source->tracktype << "']["
+                           << ((rule->source->occurrence.empty() || rule->source->occurrence=="all" || rule->source->occurrence=="any") ? "*" : rule->source->occurrence)
+                           << "]"
+                           << tokenize(rule->source->scope, rule->source->field, "/");
+                        rule->source->path=parse_path(ss.str());
+                    }
+                    break;
+                }
+            }
+            tfsxml_leave(&tfsxml_priv);
+        }
+    }
 
     // Check for presence of _StringX or TimeCode* element in policy
     size_t index=rule->field.find_last_not_of("0123456789");
     if ((index!=std::string::npos && index>=6 && rule->field.substr(index-6, 7)=="_String") || rule->field.find("TimeCode")==0 || rule->field.rfind("_Total")==rule->field.size()-6)
         full=true;
 
-// Check for currently unsupported features
-    if (rule->scope=="mmt" || rule->requested=="compare")
+    // Check for currently unsupported features
+    if (rule->scope=="mmt" || rule->requested =="compare")
         supported=false;
 
     if (rule->scope.empty() || rule->scope=="mi")
     {
         std::stringstream ss;
-        ss << "mi:MediaInfo/mi:track[@type='" << rule->tracktype << "'][" << occurrence << "]" << tokenize(rule->scope, rule->field, "/");
+        ss << "mi:MediaInfo/mi:track[@type='"
+           << rule->tracktype
+           << "']["
+           << ((rule->occurrence.empty() || rule->occurrence=="all" || rule->occurrence=="any") ? "*" : rule->occurrence)
+           << "]" << tokenize(rule->scope, rule->field, "/");
         rule->xpath=ss.str();
         rule->path=parse_path(rule->xpath);
     }
@@ -569,7 +712,7 @@ void PolicyChecker::add_policy(const std::string& policy)
     tfsxml_string tfsxml_priv;
     tfsxml_string result;
 
-    tfsxml_init(&tfsxml_priv, (const void*)policy.c_str(), policy.size());
+    tfsxml_init(&tfsxml_priv, (const void*)policy.c_str(), policy.size(), 0);
     while (!tfsxml_next(&tfsxml_priv, &result))
     {
         if (!tfsxml_strcmp_charp(result, "policy"))
@@ -583,12 +726,11 @@ void PolicyChecker::add_policy(const std::string& policy)
 }
 
 //---------------------------------------------------------------------------
-void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, size_t level)
+void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, std::vector<RuleElement*> sources, size_t level)
 {
-    if (rules.empty())
+    if (rules.empty() && sources.empty())
         return;
 
-    tfsxml_string tfsxml_priv_save = tfsxml_priv;
     if (!tfsxml_enter(&tfsxml_priv))
     {
         std::map<PathElement*, size_t> occurrences;
@@ -596,9 +738,9 @@ void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleEleme
         tfsxml_string result;
         while (!tfsxml_next(&tfsxml_priv, &result))
         {
+            const char* id = result.buf;
             std::vector<RuleElement*> matching_rules;
-
-            std::string field = std::string(result.buf, result.len);
+            std::vector<RuleElement*> matching_sources;
             for (size_t pos = 0; pos < rules.size(); pos++)
             {
                 if (level < rules[pos]->path.size() && path_is_matching(tfsxml_priv, result, rules[pos]->path[level], occurrences[&rules[pos]->path[level]]))
@@ -606,23 +748,38 @@ void PolicyChecker::parse_node(tfsxml_string& tfsxml_priv, std::vector<RuleEleme
                     if (level == 1 && (rules[pos]->scope.empty() || rules[pos]->scope == "mi")) // at track level
                         rules[pos]->tracks++;
 
-                    tfsxml_string tfsxml_priv_copy = tfsxml_priv;
                     if (level == rules[pos]->path.size() - 1)
                     {
+                        tfsxml_string tfsxml_priv_copy = tfsxml_priv;
                         tfsxml_string value;
                         if (!tfsxml_value(&tfsxml_priv_copy, &value))
-                            rules[pos]->values.push_back(std::string(value.buf, value.len));
+                            rules[pos]->values[id] = std::string(value.buf, value.len);
                     }
                     else
                         matching_rules.push_back(rules[pos]);
                 }
             }
 
-            if (!matching_rules.empty())
-                parse_node(tfsxml_priv, matching_rules, level + 1);
+            for (size_t pos = 0; pos < sources.size(); pos++)
+            {
+                if (sources[pos]->source && level < sources[pos]->source->path.size() && path_is_matching(tfsxml_priv, result, sources[pos]->source->path[level], occurrences[&sources[pos]->source->path[level]]))
+                {
+                    if (level == sources[pos]->source->path.size() - 1)
+                    {
+                        tfsxml_string tfsxml_priv_copy = tfsxml_priv;
+                        tfsxml_string value;
+                        if (!tfsxml_value(&tfsxml_priv_copy, &value))
+                            sources[pos]->source->values[id] = std::string(value.buf, value.len);
+                    }
+                    else
+                        matching_sources.push_back(sources[pos]);
+                }
+            }
+
+            if (!matching_rules.empty() || !matching_sources.empty())
+                parse_node(tfsxml_priv, matching_rules, matching_sources, level + 1);
         }
     }
-    tfsxml_priv=tfsxml_priv_save;
 }
 
 //---------------------------------------------------------------------------
@@ -636,7 +793,7 @@ int PolicyChecker::analyze(const std::string& report, bool verbose, std::string&
     ss << indent(level  ) << "<creatingApplication version=\"" MEDIACONCH_VERSION "\" url=\"https://mediaarea.net/MediaConch\">MediaConch</creatingApplication>" << std::endl;
     tfsxml_string tfsxml_priv;
     tfsxml_string result;
-    tfsxml_init(&tfsxml_priv, (const void*)report.c_str(), report.size());
+    tfsxml_init(&tfsxml_priv, (const void*)report.c_str(), report.size(), 0);
     while (!tfsxml_next_named(&tfsxml_priv, &result, "MediaArea"))
     {
         if (!tfsxml_enter(&tfsxml_priv))
@@ -655,7 +812,7 @@ int PolicyChecker::analyze(const std::string& report, bool verbose, std::string&
                     }
 
                     ss << indent(level++) << "<media ref=\"" << media << "\">" << std::endl;
-                    parse_node(tfsxml_priv, rules, 0);
+                    parse_node(tfsxml_priv, rules, rules, 0);
                     for (size_t pos=0; pos<policies.size(); pos++)
                         ss << policies[pos]->to_string(level, verbose);
                     ss << indent(--level) << "</media>" << std::endl;

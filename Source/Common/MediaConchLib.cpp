@@ -690,7 +690,20 @@ std::string MediaConchLib::XSLT_Policy_Rule::to_str() const
         out << ",occurrence:\"" << occurrence << "\"";
     if (ope.size())
         out << ",\"ope\":\"" << ope << "\"";
-    if (value.size())
+    if (source)
+    {
+        out << ",source:{";
+        if (source->tracktype.size())
+            out << ",\"tracktype\":\"" << source->tracktype << "\"";
+        if (source->field.size())
+            out << ",\"field\":\"" << source->field << "\"";
+        if (source->scope.size())
+            out << ",\"scope\":\"" << source->scope << "\"";
+        if (source->occurrence.size())
+            out << ",occurrence:\"" << source->occurrence << "\"";
+        out << "}";
+    }
+    else if (value.size())
         out << ",\"value\":\"" << value << "\"";
     out << "}";
     return out.str();

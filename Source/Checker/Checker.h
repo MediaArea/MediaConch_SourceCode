@@ -18,12 +18,13 @@
 //---------------------------------------------------------------------------
 #ifndef TFSXML_NAMESPACE
     #define TFSXML_NAMESPACE 1
-#endif // TFSXML_NAMESPACEs
+#endif // TFSXML_NAMESPACE
 #include "ThirdParty/tfsxml/tfsxml.h"
 #include "Path.h"
 
 #include <string>
 #include <vector>
+#include <map>
 
 //---------------------------------------------------------------------------
 
@@ -73,11 +74,21 @@ private:
 
     class RuleElement : public Element {
     public:
+        struct Source
+        {
+            std::vector<PathElement> path;
+            std::map<const char*, std::string> values;
+            std::string scope;
+            std::string field;
+            std::string tracktype;
+            std::string occurrence;
+        };
+
         RuleElement();
         ~RuleElement();
 
         void reset();
-        bool compare(const std::string& value);
+        bool compare(const std::string& v1, const std::string& v2);
 
         virtual void resolve();
         virtual Result result();
@@ -93,8 +104,9 @@ private:
         std::string operand;
         std::string xpath;
         std::string requested;
-        std::vector<std::string> values;
+        std::map<const char*, std::string> values;
         std::vector<std::string> failing_values;
+        Source* source;
         size_t tracks;
 
     private:
@@ -129,7 +141,7 @@ private:
 
     RuleElement* parse_rule(tfsxml::tfsxml_string& tfsxml_priv);
     PolicyElement* parse_policy(tfsxml::tfsxml_string& tfsxml_priv);
-    void parse_node(tfsxml::tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, size_t level);
+    void parse_node(tfsxml::tfsxml_string& tfsxml_priv, std::vector<RuleElement*> rules, std::vector<RuleElement*> sources, size_t level);
 
     std::vector<PolicyElement*> policies;
     std::vector<RuleElement*> rules;

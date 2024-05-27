@@ -73,6 +73,13 @@ private:
 class XsltPolicyRule : public XsltPolicyNode
 {
 public:
+    struct Source {
+        std::string  track_type;
+        std::string  field;
+        std::string  scope;
+        std::string  occurrence;
+    };
+
     XsltPolicyRule();
     virtual ~XsltPolicyRule();
     XsltPolicyRule(const XsltPolicyRule*);
@@ -88,6 +95,7 @@ public:
     std::string   scope;
     std::string   level;
     std::string   occurrence;
+    Source*       source;
     std::string   value;
 
     static size_t rule_id;

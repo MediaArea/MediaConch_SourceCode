@@ -448,6 +448,14 @@ MediaConchLib::XSLT_Policy_Rule* Policies::xslt_policy_rule_to_mcl_policy(XsltPo
     r->occurrence = rule->occurrence;
     r->ope = rule->ope;
     r->value = rule->value;
+    if (rule->source)
+    {
+        r->source = new MediaConchLib::XSLT_Policy_Rule::Source;
+        r->source->tracktype = rule->source->track_type;
+        r->source->field = rule->source->field;
+        r->source->scope = rule->source->scope;
+        r->source->occurrence = rule->source->occurrence;
+    }
 
     return r;
 }
