@@ -448,15 +448,21 @@ namespace MediaConch
         return ret;
     }
 
-    void WebCommonPage::on_save_settings_selected(const QString& policy,
-                                            const QString& display,
-                                            const QString& verbosity,
-                                            const QString& parsespeed,
-                                            const QString& save_report_path, const QString& load_files_path,
-                                            const QString& save_policy_path, const QString& load_policy_path,
-                                            const QString& save_display_path, const QString& load_display_path)
+    void WebCommonPage::on_save_settings_selected(const QJsonObject& values)
     {
         UiSettings& settings = mainwindow->get_settings();
+
+        const QString policy = values.value("policy").toString();
+        const QString display = values.value("display").toString();
+        const QString verbosity = values.value("verbosity").toString();
+        const QString parsespeed = values.value("parsespeed").toString();
+        const QString displaycaptions = values.value("displaycaptions").toString();
+        const QString save_report_path = values.value("save_report_path").toString();
+        const QString load_files_path = values.value("load_files_path").toString();
+        const QString save_policy_path = values.value("save_policy_path").toString();
+        const QString load_policy_path = values.value("load_policy_path").toString();
+        const QString save_display_path = values.value("save_display_path").toString();
+        const QString load_display_path = values.value("load_display_path").toString();
 
         //policy
         if (policy == "-2")
@@ -487,6 +493,10 @@ namespace MediaConch
             settings.change_default_parsespeed("last");
         else
             settings.change_default_parsespeed(parsespeed.toStdString());
+
+        //displaycaptions
+        if (!displaycaptions.isEmpty())
+            settings.change_displaycaptions_option(displaycaptions.toStdString());
 
         //Save report path
         std::string r_s_path;

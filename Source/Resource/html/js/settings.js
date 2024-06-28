@@ -2,16 +2,22 @@ $(document).ready(function() {
     // Settings form
     $('#settings form').on('submit', function (e) {
         e.preventDefault();
-        webpage.on_save_settings_selected($('#settings_policy').val(),
-                                          $('#settings_display_selector').val(),
-                                          $('#settings_verbosity_selector').val(),
-                                          $('#settings_parsespeed_selector').val(),
-                                          $('input[name=settings_save_report_path]:checked').val(),
-                                          $('input[name=settings_load_files_path]:checked').val(),
-                                          $('input[name=settings_save_policy_path]:checked').val(),
-                                          $('input[name=settings_load_policy_path]:checked').val(),
-                                          $('input[name=settings_save_display_path]:checked').val(),
-                                          $('input[name=settings_load_display_path]:checked').val());
+
+        var values = {
+            "policy": $('#settings_policy').val(),
+            "display": $('#settings_display_selector').val(),
+            "verbosity": $('#settings_verbosity_selector').val(),
+            "parsespeed": $('#settings_parsespeed_selector').val(),
+            "displaycaptions": $('#settings_displaycaptions_selector').val(),
+            "save_report_path": $('input[name=settings_save_report_path]:checked').val(),
+            "load_files_path": $('input[name=settings_load_files_path]:checked').val(),
+            "save_policy_path": $('input[name=settings_save_policy_path]:checked').val(),
+            "load_policy_path": $('input[name=settings_load_policy_path]:checked').val(),
+            "save_display_path": $('input[name=settings_save_display_path]:checked').val(),
+            "load_display_path": $('input[name=settings_load_display_path]:checked').val(),
+        };
+
+        webpage.on_save_settings_selected(values);
     });
 });
 

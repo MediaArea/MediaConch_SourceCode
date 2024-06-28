@@ -105,6 +105,9 @@ public:
     virtual int ui_settings_save_last_save_display_path(const std::string&, int user_id = -1) = 0;
     virtual int ui_settings_get_last_save_display_path(std::string&, int user_id = -1) = 0;
 
+    virtual int ui_settings_save_displaycaptions_option(const std::string&, int user_id = -1) = 0;
+    virtual int ui_settings_get_displaycaptions_option(std::string&, int user_id = -1) = 0;
+
     virtual int ui_settings_save_mco_token(const std::string&, int user_id = -1) = 0;
     virtual int ui_settings_get_mco_token(std::string&, int user_id = -1) = 0;
 
@@ -127,6 +130,7 @@ protected:
     void        get_sql_query_for_update_ui_table_v12(std::string& q);
     void        get_sql_query_for_update_ui_settings_table_v13(std::string& q);
     void        get_sql_query_for_update_ui_table_v14(std::string& q);
+    void        get_sql_query_for_update_ui_settings_table_v15(std::string& q);
 
 private:
     DatabaseUi (const DatabaseUi&);

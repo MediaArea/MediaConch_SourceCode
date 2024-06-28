@@ -230,4 +230,12 @@ void DatabaseUi::get_sql_query_for_update_ui_table_v14(std::string& q)
     q = create.str();
 }
 
+//---------------------------------------------------------------------------
+void DatabaseUi::get_sql_query_for_update_ui_settings_table_v15(std::string& q)
+{
+    std::stringstream create;
+    create << "ALTER TABLE UI_SETTINGS"; // Table name
+    create << " ADD DISPLAYCAPTIONS_OPTION TEXT DEFAULT NULL;";
+    q = create.str();
+}
 }
