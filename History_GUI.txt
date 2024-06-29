@@ -7,6 +7,15 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 24.06, 2024-06-29
+-------------
+Update to MediaInfo library 24.06, see MediaInfo change log for the list of changes in the file formats support
+Add fields compare in policy checker
+Add 608/708 captions detection options
+Remove Matroska related errors with new Matroska block additions
+Supported platforms: minimum macOS version is now 10.13 (too much effort needed for building for older versions :( )
+Supported platforms: this is the last version compatible with RHEL/CentOS 7, Debian 10, Mageia 8
+
 Version 23.10, 2023-10-04
 -------------
 + Support of MPEG-H in MPEG-TS
