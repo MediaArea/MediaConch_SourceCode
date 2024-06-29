@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QDesktopServices>
+#include <QRegularExpression>
 
 namespace MediaConch
 {
@@ -82,7 +83,6 @@ namespace MediaConch
             return;
 
         QTextStream out(&file);
-        out.setCodec("UTF-8");
         out << report;
     }
 
@@ -795,34 +795,25 @@ namespace MediaConch
     //---------------------------------------------------------------------------
     bool WebCommonPage::report_is_html(const QString& report)
     {
-        QRegExp reg("^(<\\!DOCTYPE.*html|<html>.*</html>$)", Qt::CaseInsensitive);
+        QRegularExpression reg("^(<\\!DOCTYPE.*html|<html>.*</html>$)", QRegularExpression::CaseInsensitiveOption);
 
-        if (reg.indexIn(report.trimmed(), 0) != -1)
-            return true;
-
-        return false;
+        return reg.match(report.trimmed()).hasMatch();
     }
 
     //---------------------------------------------------------------------------
     bool WebCommonPage::report_is_xml(const QString& report)
     {
-        QRegExp reg("<\\?xml ", Qt::CaseInsensitive);
+        QRegularExpression reg("<\\?xml ", QRegularExpression::CaseInsensitiveOption);
 
-        if (reg.indexIn(report, 0) != -1)
-            return true;
-
-        return false;
+        return reg.match(report).hasMatch();
     }
 
     //---------------------------------------------------------------------------
     bool WebCommonPage::report_is_json(const QString& report)
     {
-        QRegExp reg("^\\{.*\\}$", Qt::CaseInsensitive);
+        QRegularExpression reg("^\\{.*\\}$", QRegularExpression::CaseInsensitiveOption);
 
-        if (reg.indexIn(report.trimmed(), 0) != -1)
-            return true;
-
-        return false;
+        return reg.match(report.trimmed()).hasMatch();
     }
 
     QString WebCommonPage::get_file_tool(const QString& file)

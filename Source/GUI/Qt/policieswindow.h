@@ -7,6 +7,7 @@
 #ifndef POLICIESWINDOW_H
 #define POLICIESWINDOW_H
 
+#include <QStringList>
 #include <QFileInfo>
 #include <QString>
 #include "commonwebwindow.h"
@@ -15,7 +16,6 @@ class QVBoxLayout;
 class QLabel;
 class QTreeWidgetItem;
 class QFile;
-class QStringList;
 class QFrame;
 
 namespace MediaConch {

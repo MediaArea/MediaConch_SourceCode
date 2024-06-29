@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QProgressBar>
+#include <QRegularExpression>
 #if QT_VERSION >= 0x050000
 #include <QStandardPaths>
 #else
@@ -79,11 +80,10 @@ void DatabaseWindow::create_html_base(QString& base, const QString& database)
 //---------------------------------------------------------------------------
 void DatabaseWindow::change_qt_scripts_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{ QT_SCRIPTS \\}\\}");
+    QRegularExpression reg("\\{\\{ QT_SCRIPTS \\}\\}", QRegularExpression::InvertedGreedinessOption);
     QString script;
     int     pos = 0;
 
-    reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
     script += "        <script type=\"text/javascript\" src=\"qrc:/database/database.js\"></script>\n"
               "        <script type=\"text/javascript\" src=\"qrc:/database/databaseWebKit.js\"></script>\n";
@@ -95,47 +95,40 @@ void DatabaseWindow::change_qt_scripts_in_template(QString& html)
 #endif
     script += "        <script type=\"text/javascript\" src=\"qrc:/utils/url.js\"></script>\n";
     script += "        <script type=\"text/javascript\" src=\"qrc:/menu.js\"></script>\n";
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), script);
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
+        html.replace(pos, match.capturedLength(), script);
 }
 
 //---------------------------------------------------------------------------
 void DatabaseWindow::set_webmachine_script_in_template(QString& html)
 {
-    QRegExp reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}");
+    QRegularExpression reg("\\{\\{[\\s]+webmachine[\\s]\\}\\}", QRegularExpression::InvertedGreedinessOption);
     QString machine;
     int     pos = 0;
 
-    reg.setMinimal(true);
 #if defined(WEB_MACHINE_KIT)
     machine = "WEB_MACHINE_KIT";
 #elif defined(WEB_MACHINE_ENGINE)
     machine = "WEB_MACHINE_ENGINE";
 #endif
-    if ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), machine);
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
+        html.replace(pos, match.capturedLength(), machine);
 }
 
 //---------------------------------------------------------------------------
 void DatabaseWindow::change_checker_in_template(QString& html, const QString& database)
 {
-    QRegExp reg("\\{% block checker %\\}\\{% endblock %\\}");
-    int pos = 0;
-
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), database);
+    QRegularExpression reg("\\{% block checker %\\}\\{% endblock %\\}", QRegularExpression::InvertedGreedinessOption);
+    html.replace(reg, database);
 }
 
 //---------------------------------------------------------------------------
 void DatabaseWindow::remove_result_in_template(QString& html)
 {
-    QRegExp reg("\\{% block result %\\}\\{% endblock %\\}");
-    int pos = 0;
-
-    reg.setMinimal(true);
-    while ((pos = reg.indexIn(html, pos)) != -1)
-        html.replace(pos, reg.matchedLength(), "");
+    QRegularExpression reg("\\{% block result %\\}\\{% endblock %\\}", QRegularExpression::InvertedGreedinessOption);
+    html.replace(reg, "");
 }
 
 }
