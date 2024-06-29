@@ -267,6 +267,14 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
     std::vector<std::string> opt_vec;
     for (int i = 0; i < options.size(); ++i)
         opt_vec.push_back(options[i].toUtf8().data());
+
+    std::string displaycaptions_option = uisettings.get_displaycaptions_option();
+    if (!displaycaptions_option.empty())
+    {
+        opt_vec.push_back("file_displaycaptions");
+        opt_vec.push_back(displaycaptions_option);
+    };
+
     if (workerfiles.add_file_to_list(filename, filepath, policy.toInt(), display_i, verbosity_i, fixer, force, create_policy, opt_vec, err) < 0)
         return -1;
     return 0;
@@ -290,6 +298,13 @@ int MainWindow::add_attachment_to_list(const QString& file, int policy, int disp
     std::vector<std::string> opt_vec;
     for (int i = 0; i < options.size(); ++i)
         opt_vec.push_back(options[i].toUtf8().data());
+
+    std::string displaycaptions_option = uisettings.get_displaycaptions_option();
+    if (!displaycaptions_option.empty())
+    {
+        opt_vec.push_back("file_displaycaptions");
+        opt_vec.push_back(displaycaptions_option);
+    };
 
     std::string filename = std::string(file.toUtf8().data(), file.toUtf8().length());
     if (workerfiles.add_attachment_to_list(filename, policy, display, verbosity, opt_vec, err) < 0)
@@ -331,7 +346,19 @@ int MainWindow::analyze_force_file_to_list(long id, std::string& err)
     if (db)
         db->ui_reset_file_for_reload(fr);
 
-    if (workerfiles.add_file_to_list(fr->filename, fr->filepath, fr->policy, fr->display, fr->verbosity, false, true, false, fr->options, err) < 0)
+    std::vector<std::string> options = fr->options;
+    std::vector<std::string>::iterator it = std::find(options.begin(), options.end(), "file_displaycaptions");
+    if (it != options.end() && it + 1 != options.end())
+        options.erase(it, it + 2);
+
+    std::string displaycaptions_option = uisettings.get_displaycaptions_option();
+    if (!displaycaptions_option.empty())
+    {
+        options.push_back("file_displaycaptions");
+        options.push_back(displaycaptions_option);
+    };
+
+    if (workerfiles.add_file_to_list(fr->filename, fr->filepath, fr->policy, fr->display, fr->verbosity, false, true, false, options, err) < 0)
         return -1;
 
     return 0;

@@ -35,7 +35,8 @@ private:
     void create_verbosity_options(QString& verbosity);
     void add_parsespeed_to_html_selection(QString& parsespeed, QString& html, const QString& selector);
     void create_parsespeed_options(QString& parsespeed);
-
+    void add_displaycaptions_to_html_selection(QString& displaycaptions, QString& html, const QString& selector);
+    void create_displaycaptions_options(QString& displaycaptions);
     void create_html_base(QString& base, const QString& settings);
     void change_qt_scripts_in_template(QString& html);
     void set_webmachine_script_in_template(QString& html);

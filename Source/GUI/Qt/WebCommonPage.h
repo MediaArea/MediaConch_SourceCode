@@ -78,10 +78,7 @@ public Q_SLOTS:
                                              const QString& verbosity, bool fixer, const QStringList&);
     QString      on_file_from_db_selected();
     QString      status_reports_multi(const QStringList& ids, const QStringList& policy_ids);
-    void         on_save_settings_selected(const QString& policy, const QString& display, const QString& verbosity, const QString& parsespeed,
-                                           const QString& save_report, const QString& load_files,
-                                           const QString& save_policy, const QString& load_policy,
-                                           const QString& save_display, const QString& load_display);
+    void         on_save_settings_selected(const QJsonObject& values);
 
     void         menu_link_checker(const QString& name);
     void         on_input_changed(const QString& inputName);

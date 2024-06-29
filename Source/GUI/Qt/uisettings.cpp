@@ -78,6 +78,8 @@ int UiSettings::init()
         return -1;
     if (database->ui_settings_get_last_load_display_path(last_load_display_path))
         return -1;
+    if (database->ui_settings_get_displaycaptions_option(displaycaptions_option))
+        return -1;
 
     if (database->ui_settings_get_mco_token(mco_token))
         return -1;
@@ -397,6 +399,24 @@ void UiSettings::change_last_save_display_path(const std::string& path)
         return;
 
     last_save_display_path = path;
+}
+
+//---------------------------------------------------------------------------
+std::string UiSettings::get_displaycaptions_option() const
+{
+    return displaycaptions_option;
+}
+
+//---------------------------------------------------------------------------
+void UiSettings::change_displaycaptions_option(const std::string& option)
+{
+    if (!database || displaycaptions_option == option)
+        return;
+
+    if (database->ui_settings_save_displaycaptions_option(option) < 0)
+        return;
+
+    displaycaptions_option = option;
 }
 
 //---------------------------------------------------------------------------

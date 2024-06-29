@@ -355,6 +355,18 @@ int NoDatabaseUi::ui_settings_get_last_save_display_path(std::string&, int)
 }
 
 //---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_save_displaycaptions_option(const std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int NoDatabaseUi::ui_settings_get_displaycaptions_option(std::string&, int)
+{
+    return 0;
+}
+
+//---------------------------------------------------------------------------
 int NoDatabaseUi::ui_settings_save_mco_token(const std::string&, int)
 {
     return 0;

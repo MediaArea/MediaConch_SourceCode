@@ -99,6 +99,10 @@ void SettingsWindow::fill_settings_html(QString& html)
     QString parsespeed;
     create_parsespeed_options(parsespeed);
     add_parsespeed_to_html_selection(parsespeed, html, "settings_parsespeed_selector");
+
+    QString displaycaptions;
+    create_displaycaptions_options(displaycaptions);
+    add_displaycaptions_to_html_selection(displaycaptions, html, "settings_displaycaptions_selector");
 }
 
 //---------------------------------------------------------------------------
@@ -267,6 +271,45 @@ void SettingsWindow::create_parsespeed_options(QString& parsespeed)
     if ("1" == selected_parsespeed)
         parsespeed += QString("selected=\"selected\" ");
     parsespeed += QString("value=\"1\">Full (1)</option>");
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::add_displaycaptions_to_html_selection(QString& displaycaptions, QString& html, const QString& selector)
+{
+    QRegExp reg("class=\"displaycaptionsList form-control\">");
+    int pos = html.indexOf(selector);
+
+    reg.setMinimal(true);
+
+    if (pos == -1)
+        return;
+
+    if ((pos = reg.indexIn(html, pos)) != -1)
+    {
+        pos += reg.matchedLength();
+        html.insert(pos, displaycaptions);
+    }
+}
+
+//---------------------------------------------------------------------------
+void SettingsWindow::create_displaycaptions_options(QString& displaycaptions)
+{
+    std::string selected_displaycaptions_option = main_window->get_settings().get_displaycaptions_option();
+
+    displaycaptions +=  QString("<option ");
+    if ("Content" == selected_displaycaptions_option)
+        displaycaptions += QString("selected=\"selected\" ");
+    displaycaptions += QString("value=\"Content\">When content is detected</option>");
+
+    displaycaptions +=  QString("<option ");
+    if ("" == selected_displaycaptions_option || "Command" == selected_displaycaptions_option)
+        displaycaptions += QString("selected=\"selected\" ");
+    displaycaptions += QString("value=\"Command\">When content or a command is detected</option>");
+
+    displaycaptions +=  QString("<option ");
+    if ("Stream" == selected_displaycaptions_option)
+        displaycaptions += QString("selected=\"selected\" ");
+    displaycaptions += QString("value=\"Stream\">Even when no content or command is detected</option>");
 }
 
 //---------------------------------------------------------------------------

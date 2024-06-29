@@ -28,7 +28,7 @@ namespace MediaConch {
 // SQLLiteUi
 //***************************************************************************
 
-int SQLLiteUi::ui_current_version          = 15;
+int SQLLiteUi::ui_current_version          = 16;
 
 //***************************************************************************
 // Constructor/Destructor
@@ -115,6 +115,7 @@ int SQLLiteUi::ui_update_table()
     UPDATE_UI_TABLE_FOR_VERSION(12);
     // UPDATE_UI_TABLE_FOR_VERSION(13); nothing to do
     UPDATE_UI_TABLE_FOR_VERSION(14);
+    // UPDATE_UI_TABLE_FOR_VERSION(15); nothing to do
 
 #undef UPDATE_UI_TABLE_FOR_VERSION
 
@@ -911,6 +912,7 @@ int SQLLiteUi::ui_settings_update_table()
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(12); nothing to do
     UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(13);
     // UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(14); nothing to do
+    UPDATE_UI_SETTINGS_TABLE_FOR_VERSION(15);
 #undef UPDATE_UI_SETTINGS_TABLE_FOR_VERSION
 
     return 0;
@@ -2117,6 +2119,63 @@ int SQLLiteUi::ui_settings_get_last_save_display_path(std::string& save_path, in
 
     if (reports[0].find("LAST_SAVE_DISPLAY_PATH") != reports[0].end())
         save_path = reports[0]["LAST_SAVE_DISPLAY_PATH"];
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_save_displaycaptions_option(const std::string& option, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    std::stringstream create;
+
+    reports.clear();
+    create << "UPDATE UI_SETTINGS ";
+    create << "SET   DISPLAYCAPTIONS_OPTION    = ? ";
+    create << "WHERE USER_ID        = ?;";
+
+    query = create.str();
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_blob(stmt, 1, option.c_str(), option.length(), SQLITE_STATIC);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 2, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    return execute();
+}
+
+//---------------------------------------------------------------------------
+int SQLLiteUi::ui_settings_get_displaycaptions_option(std::string& option, int user_id)
+{
+    if (ui_settings_check_user_id(user_id))
+        return -1;
+
+    reports.clear();
+    query = "SELECT DISPLAYCAPTIONS_OPTION FROM UI_SETTINGS WHERE USER_ID = ?;";
+
+    const char* end = NULL;
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length() + 1, &stmt, &end);
+    if (ret != SQLITE_OK || !stmt || (end && *end))
+        return -1;
+
+    ret = sqlite3_bind_int(stmt, 1, user_id);
+    if (ret != SQLITE_OK)
+        return -1;
+
+    if (execute() || reports.size() != 1)
+        return -1;
+
+    if (reports[0].find("DISPLAYCAPTIONS_OPTION") != reports[0].end())
+        option = reports[0]["DISPLAYCAPTIONS_OPTION"];
     return 0;
 }
 

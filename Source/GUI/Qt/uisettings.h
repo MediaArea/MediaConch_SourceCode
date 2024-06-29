@@ -71,6 +71,10 @@ public:
     std::string  get_last_save_display_path() const;
     void         change_last_save_display_path(const std::string& path);
 
+    // Options
+    std::string  get_displaycaptions_option() const;
+    void         change_displaycaptions_option(const std::string& option);
+
     // MCO Token
     std::string  get_mco_token() const;
     void         change_mco_token(const std::string& token);
@@ -99,6 +103,9 @@ private:
     std::string  last_save_report_path;
     std::string  last_save_policy_path;
     std::string  last_save_display_path;
+
+    //Options
+    std::string  displaycaptions_option;
 
     //MCO Token
     std::string  mco_token;
