@@ -12,6 +12,14 @@
 %global libzen_name libzen0
 %endif
 
+%if 0%{?mageia}
+%ifarch x86_64
+%global mageia_libname lib64
+%else
+%global mageia_libname lib
+%endif
+%endif
+
 # CentOS also set rhel macro
 %if ! 0%{?suse_version} || 0%{?suse_version} >= 1200
 %global build_server 1
@@ -55,9 +63,14 @@ BuildRequires:  autoconf
 BuildRequires:  zlib-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
-BuildRequires:  sqlite-devel
 BuildRequires:  libevent-devel
 BuildRequires:  libcurl-devel
+%if 0%{?mageia}
+BuildRequires: %{mageia_libname}sqlite3-devel
+%else
+BuildRequires:  sqlite-devel
+%endif
+
 
 %if 0%{?rhel} >= 8
 BuildRequires:  alternatives
@@ -76,11 +89,7 @@ BuildRequires:  jansson-devel
 %endif
 
 %if 0%{?mageia}
-%ifarch x86_64
-BuildRequires: lib64openssl-devel
-%else
-BuildRequires: libopenssl-devel
-%endif
+BuildRequires: %{mageia_libname}openssl-devel
 %endif
 
 # Lib dependencies
@@ -107,11 +116,7 @@ BuildRequires:  libQtWebKit-devel
 BuildRequires:  update-desktop-files
 %else
 %if 0%{?mageia}
-%ifarch x86_64
-BuildRequires:  lib64qtwebkit2.2-devel
-%else
-BuildRequires:  libqtwebkit2.2-devel
-%endif
+BuildRequires:  %{mageia_libname}qt5webengine-devel
 %endif
 %endif
 %endif
