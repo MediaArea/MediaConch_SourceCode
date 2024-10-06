@@ -62,7 +62,7 @@
     </xsl:for-each>
   </xsl:template>
   <xsl:template match="mc:policy|mc:rule">
-    <xsl:if test="@outcome!='pass' or descendant::*[@outcome!='pass']">
+    <xsl:if test="(name(..)!='policy' and @outcome!='pass') or (name(..)='policy' and ../@type='or' and ../@outcome!='pass' and @outcome=../@outcome) or (name(..)='policy' and ../@type!='or' and @outcome!='pass')">
       <xsl:text>&#xa;</xsl:text>
       <xsl:text> </xsl:text>
       <xsl:text>  --</xsl:text>
@@ -72,7 +72,7 @@
       <xsl:text>:</xsl:text>
       <xsl:value-of select="@name"/>
       <xsl:text>]</xsl:text>
-      <xsl:apply-templates select="mc:rule[@outcome!='pass']|mc:policy[@outcome!='pass']|descendant::*[@outcome!='pass']"/>
+      <xsl:apply-templates select="mc:policy|mc:rule"/>
     </xsl:if>
   </xsl:template>
 </xsl:stylesheet>
