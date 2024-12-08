@@ -21,8 +21,8 @@ rmdir MediaConch_CLI_Windows_x64 /S /Q
 mkdir MediaConch_CLI_Windows_x64
 
 rem --- Copying : Exe ---
-xcopy ..\Project\MSVC2019\x64\Release\MediaConch.exe MediaConch_CLI_Windows_x64\ /S
-xcopy ..\Project\MSVC2019\x64\Release\LIBCURL.DLL MediaConch_CLI_Windows_x64\ /S
+xcopy ..\Project\MSVC2022\x64\Release\MediaConch.exe MediaConch_CLI_Windows_x64\ /S
+xcopy ..\Project\MSVC2022\x64\Release\LIBCURL.DLL MediaConch_CLI_Windows_x64\ /S
 
 rem --- Copying : Information files ---
 copy ..\License.* MediaConch_CLI_Windows_x64\
