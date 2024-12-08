@@ -7,7 +7,10 @@
   <rule name="FFV1 is version 3.4 or later?" value="Format_Version" tracktype="Video" operator="&gt;=">3.4</rule>
   <rule name="FFV1 is encoded in GOP size of 1?" value="Format_Settings_GOP" tracktype="Video" operator="=">N=1</rule>
   <rule name="FFV1 uses slice crcs?" value="extra/ErrorDetectionType" tracktype="Video" operator="=">Per slice</rule>
-  <rule name="Display Aspect Ratio is 4/3?" value="DisplayAspectRatio" tracktype="Video" operator="=">1.333</rule>
+  <policy type="and" name="Display Aspect Ratio is 4/3ish?">
+    <rule name="Display Aspect Ratio is &gt;= 1.315?" value="DisplayAspectRatio" tracktype="Video" operator="&gt;=">1.315</rule>
+    <rule name="Display Aspect Ratio is &lt;= 1.351?" value="DisplayAspectRatio" tracktype="Video" operator="&lt;=">1.351</rule>
+  </policy>
   <policy type="or" name="Is this NTSC or PAL SD?">
     <description>A test to see if the files use NTSC or PAL frame rates and sizes.</description>
     <policy type="or" name="Is this NTSC SD or PAL SD?">
