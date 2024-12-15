@@ -111,6 +111,7 @@ namespace MediaConch
         bool                    list_watch_folders_mode;
         bool                    no_needs_files_mode;
         bool                    list_mode;
+        bool                    fixer;
     };
 
 }

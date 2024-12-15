@@ -8,6 +8,32 @@ var checker = (function() {
         bindings();
 
         //
+        var checkerUpload_parsespeed_val_save = $('#checkerUpload_parsespeed_selector').val()
+        $('#checkerUpload_fixer').on('click', function(e) {
+            if ($('#checkerUpload_fixer').is(':checked')) {
+                $('#checkerUpload_parsespeed_selector').prop( "disabled", true);
+                checkerUpload_parsespeed_val_save = $('#checkerUpload_parsespeed_selector').val()
+                $('#checkerUpload_parsespeed_selector').val('1');
+            }
+            else {
+                $('#checkerUpload_parsespeed_selector').prop( "disabled", false);
+                $('#checkerUpload_parsespeed_selector').val(checkerUpload_parsespeed_val_save);
+            }
+        })
+
+        var checkerRepository_parsespeed_val_save = $('#checkerRepository_parsespeed_selector').val()
+        $('#checkerRepository_fixer').on('click', function(e) {
+            if ($('#checkerRepository_fixer').is(':checked')) {
+                $('#checkerRepository_parsespeed_selector').prop( "disabled", true);
+                checkerRepository_parsespeed_val_save = $('#checkerRepository_parsespeed_selector').val()
+                $('#checkerRepository_parsespeed_selector').val('1');
+            }
+            else {
+                $('#checkerRepository_parsespeed_selector').prop( "disabled", false);
+                $('#checkerRepository_parsespeed_selector').val(checkerRepository_parsespeed_val_save);
+            }
+        })
+
         webpage.set_parse_speed($('.parsespeedList').val());
         $('.parsespeedList').change(function(){
             webpage.set_parse_speed($(this).val());

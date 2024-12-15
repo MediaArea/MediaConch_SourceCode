@@ -241,11 +241,14 @@ int MainWindow::add_file_to_list(const QString& file, const QString& path,
     uisettings.change_last_display(displays_list[display_i].toUtf8().data());
     uisettings.change_last_verbosity(verbosity_i);
 
-    int parsespeed_idx = options.lastIndexOf("file_parsespeed");
-    if (parsespeed_idx != -1 && parsespeed_idx < options.size())
-        uisettings.change_last_parsespeed(options[parsespeed_idx + 1].toStdString());
-    else
-        uisettings.change_last_parsespeed("");
+    if (!fixer)
+    {
+        int parsespeed_idx = options.lastIndexOf("file_parsespeed");
+        if (!fixer && parsespeed_idx != -1 && parsespeed_idx < options.size())
+            uisettings.change_last_parsespeed(options[parsespeed_idx + 1].toStdString());
+        else
+            uisettings.change_last_parsespeed("");
+    }
 
     std::string full_path = filepath;
 #ifdef WINDOWS
@@ -1414,12 +1417,13 @@ int MainWindow::analyze(const std::vector<std::string>& files, bool with_fixer, 
     if (with_fixer)
     {
         options.push_back(std::make_pair("File_TryToFix", "1"));
+        options.push_back(std::make_pair("file_parsespeed", "1"));
         force = true;
     }
 
     for (size_t i = 0; i + 1 < opt.size();)
     {
-        if (opt[i] != "File_TryToFix")
+        if (opt[i] != "File_TryToFix" && opt[i] != "file_parsespeed")
             options.push_back(std::make_pair(opt[i], opt[i + 1]));
         i += 2;
     }

@@ -17,6 +17,7 @@
 #include "Common/Reports.h"
 #include <Common/MediaConchLib.h>
 #include <ZenLib/ZtringList.h>
+#include <ZenLib/Ztring.h>
 #include <ZenLib/File.h>
 #include <ZenLib/Dir.h>
 
@@ -126,7 +127,7 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
                  force_analyze(false), mil_analyze(true),
                  watch_folder_recursive(true), create_policy_mode(false), file_information(false),
                  plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false),
-                 list_mode(false)
+                 list_mode(false), fixer(false)
     {
         format = MediaConchLib::format_Max;
     }
@@ -929,6 +930,23 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             if (report == "Option not known")
                 return CLI_RETURN_ERROR;
             return CLI_RETURN_FINISH;
+        }
+
+        ZenLib::Ztring str = ZenLib::Ztring().From_UTF8(key.c_str());
+        if (str.Compare(__T("File_TryToFix")))
+        {
+            fixer = true;
+            options.push_back(std::make_pair(key, value));
+            options.push_back(std::make_pair("file_parsespeed", "1"));
+        }
+        else if (fixer && (str.Compare(__T("File_ParseSpeed")) || str.Compare(__T("ParseSpeed"))))
+        {
+            ZenLib::Ztring str = ZenLib::Ztring().From_UTF8(value.c_str());
+            if (str != __T("1"))
+            {
+                STRINGOUT(ZenLib::Ztring().From_UTF8("ParseSpeed option must be set to 1 with File_TryToFix option."));
+                return CLI_RETURN_ERROR;
+            }
         }
 
         options.push_back(std::make_pair(key, value));
