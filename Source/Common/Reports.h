@@ -127,6 +127,7 @@ public:
                                      const std::map<std::string, std::string>& opts, std::string& result);
     int   transform_with_xslt_text_memory(const std::string& report, std::string& result);
     int   transform_with_xslt_html_memory(const std::string& report, std::string& result);
+    int   transform_with_xslt_json_memory(const std::string& report, std::string& result);
     int   transform_with_xslt_simple_memory(const std::string& report, std::string& result);
     int   transform_with_xslt_csv_memory(const std::string& report, std::string& result);
 

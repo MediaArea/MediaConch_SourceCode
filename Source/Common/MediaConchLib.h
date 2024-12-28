@@ -82,6 +82,7 @@ public:
         format_OrigXml,
         format_Simple,
         format_CSV,
+        format_Json,
         format_Max,
     };
 
@@ -286,6 +287,7 @@ public:
     static const std::string display_maxml_name;
     static const std::string display_text_name;
     static const std::string display_html_name;
+    static const std::string display_json_name;
     static const std::string display_jstree_name;
     static const std::string display_simple_name;
     static const std::string display_csv_name;

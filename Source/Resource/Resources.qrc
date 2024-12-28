@@ -79,6 +79,7 @@
     <qresource prefix="/displays">
         <file alias="MediaConchHtml.xsl">displays/MediaConchHtml.xsl</file>
         <file alias="MediaConchXml.xsl">displays/MediaConchXml.xsl</file>
+        <file alias="MediaConchJson.xsl">displays/MediaConchJson.xsl</file>
         <file alias="MediaConchText.xsl">displays/MediaConchText.xsl</file>
         <file alias="MediaConchTextUnicode.xsl">displays/MediaConchTextUnicode.xsl</file>
         <file alias="MediaConchSimple.xsl">displays/MediaConchSimple.xsl</file>

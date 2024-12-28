@@ -81,6 +81,8 @@ int Help()
     TEXTOUT("      (changed to -fa if there are more than 1 tool or more than 1 file)");
     TEXTOUT("  --Format=html, -fh");
     TEXTOUT("      Output MediaConch reports in HTML format");
+    TEXTOUT("  --Format=json, -fj");
+    TEXTOUT("      Output MediaConch reports in JSON format");
     TEXTOUT("  --Format=simple, -fs");
     TEXTOUT("      Output MediaConch reports in a shorten form");
     TEXTOUT("      (>1 line only if there are errors), default format");
@@ -102,6 +104,8 @@ int Help()
     TEXTOUT("      Output MediaConch reports in file in XML format");
     TEXTOUT("  Output-Html=file, -oh file");
     TEXTOUT("      Output MediaConch reports in file in HTML format");
+    TEXTOUT("  Output-Json=file, -oj file");
+    TEXTOUT("      Output MediaConch reports in file in JSON format");
     TEXTOUT("  Output-Simple=file, -os file");
     TEXTOUT("      Output MediaConch reports in file in a shorten form");
     TEXTOUT("      (>1 line only if there are errors), default format");

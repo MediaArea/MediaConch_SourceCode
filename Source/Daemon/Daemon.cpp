@@ -906,6 +906,8 @@ namespace MediaConch
             cr.format = MediaConchLib::format_MaXml;
         else if (req->display_name == MediaConchLib::display_html_name)
             cr.format = MediaConchLib::format_Html;
+        else if (req->display_name == MediaConchLib::display_json_name)
+            cr.format = MediaConchLib::format_Json;
         else if (req->display_name == MediaConchLib::display_jstree_name)
             cr.format = MediaConchLib::format_JsTree;
         else if (req->display_name == MediaConchLib::display_simple_name)

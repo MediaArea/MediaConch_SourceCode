@@ -134,7 +134,7 @@ static bool wait_for_another_argument(std::string& argument)
     }
     else if (argument=="-oj")
     {
-        Last_Argument = "--output-jstree=";
+        Last_Argument = "--output-json=";
         return true;
     }
     else if (argument=="-oh")
@@ -204,7 +204,7 @@ static void change_short_options_to_long(std::string& argument)
     if (argument=="-fa")
         argument = "--format=MAXML";
     if (argument=="-fj")
-        argument = "--format=JSTREE";
+        argument = "--format=JSON";
     if (argument=="-fh")
         argument = "--format=HTML";
     if (argument=="-fc")
@@ -289,7 +289,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--output-text",                                 Output)
     OPTION("--output-xml",                                  Output)
     OPTION("--output-maxml",                                Output)
-    OPTION("--output-jstree",                               Output)
+    OPTION("--output-json",                                 Output)
     OPTION("--output-html",                                 Output)
     OPTION("--output-csv",                                  Output)
     OPTION("--output-simple",                               Output)
