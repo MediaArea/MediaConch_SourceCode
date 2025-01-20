@@ -23,6 +23,7 @@
 #include "Common/generated/ImplementationReportVeraPDFXsl.h"
 #include "Common/generated/ImplementationReportDPFManagerXsl.h"
 #include "Common/generated/ImplementationReportDisplayHtmlXsl.h"
+#include "Common/generated/ImplementationReportDisplayJsonXsl.h"
 #include "Common/generated/ImplementationReportDisplayCSVXsl.h"
 #include "Common/generated/ImplementationReportDisplaySimpleXsl.h"
 #if defined(_WIN32) || defined(WIN32)
@@ -69,6 +70,8 @@ int Reports::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_Report
             transform_with_xslt_text_memory(result->report, result->report);
         else if (cr.format == MediaConchLib::format_Html)
             transform_with_xslt_html_memory(result->report, result->report);
+        else if (cr.format == MediaConchLib::format_Json)
+            transform_with_xslt_json_memory(result->report, result->report);
         else if (cr.format == MediaConchLib::format_Simple)
             transform_with_xslt_simple_memory(result->report, result->report);
         else if (cr.format == MediaConchLib::format_CSV)
@@ -93,6 +96,7 @@ int Reports::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_Report
             case MediaConchLib::format_Xml:
             case MediaConchLib::format_MaXml:
             case MediaConchLib::format_Html:
+            case MediaConchLib::format_Json:
             case MediaConchLib::format_OrigXml:
             case MediaConchLib::format_Simple:
             case MediaConchLib::format_CSV:
@@ -280,6 +284,8 @@ int Reports::get_reports_output(int user, const std::vector<long>& files,
             {
                 // No transformation for XML
             }
+            else if (f == MediaConchLib::format_Json)
+                transform_with_xslt_json_memory(tmp, tmp);
             else if (f == MediaConchLib::format_Simple)
                 transform_with_xslt_simple_memory(tmp, tmp);
             else if (f == MediaConchLib::format_CSV)
@@ -335,6 +341,8 @@ int Reports::get_reports_output(int user, const std::vector<long>& files,
                 {
                     if (f == MediaConchLib::format_Html)
                         transform_with_xslt_html_memory(transformed, transformed);
+                    else if (f == MediaConchLib::format_Json)
+                        transform_with_xslt_json_memory(transformed, transformed);
                     else if (f == MediaConchLib::format_Simple)
                         transform_with_xslt_simple_memory(transformed, transformed);
                     else if (f == MediaConchLib::format_CSV)
@@ -380,7 +388,9 @@ int Reports::get_reports_output(int user, const std::vector<long>& files,
                 {
                     if (f == MediaConchLib::format_Html)
                         transform_with_xslt_html_memory(transformed, transformed);
-                    if (f == MediaConchLib::format_Simple)
+                    else if (f == MediaConchLib::format_Json)
+                        transform_with_xslt_json_memory(transformed, transformed);
+                    else if (f == MediaConchLib::format_Simple)
                         transform_with_xslt_simple_memory(transformed, transformed);
                     else if (f == MediaConchLib::format_CSV)
                         transform_with_xslt_csv_memory(transformed, transformed);
@@ -416,7 +426,9 @@ int Reports::get_reports_output(int user, const std::vector<long>& files,
                 {
                     if (f == MediaConchLib::format_Html)
                         transform_with_xslt_html_memory(report, report);
-                    if (f == MediaConchLib::format_Simple)
+                    else if (f == MediaConchLib::format_Json)
+                        transform_with_xslt_json_memory(report, report);
+                    else if (f == MediaConchLib::format_Simple)
                         transform_with_xslt_simple_memory(report, report);
                     else if (f == MediaConchLib::format_CSV)
                         transform_with_xslt_csv_memory(report, report);
@@ -1312,6 +1324,14 @@ int Reports::transform_with_xslt_html_memory(const std::string& report, std::str
 {
     std::map<std::string, std::string> opts;
     std::string memory(implementation_report_display_html_xsl);
+    return transform_with_xslt_memory(report, memory, opts, result);
+}
+
+//---------------------------------------------------------------------------
+int Reports::transform_with_xslt_json_memory(const std::string& report, std::string& result)
+{
+    std::map<std::string, std::string> opts;
+    std::string memory(implementation_report_display_json_xsl);
     return transform_with_xslt_memory(report, memory, opts, result);
 }
 

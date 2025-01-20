@@ -677,6 +677,8 @@ int DaemonClient::checker_get_report(CheckerReport& cr, MediaConchLib::Checker_R
         req.display_name = MediaConchLib::display_text_name;
     else if (cr.format == MediaConchLib::format_Html)
         req.display_name = MediaConchLib::display_html_name;
+    else if (cr.format == MediaConchLib::format_Json)
+        req.display_name = MediaConchLib::display_json_name;
     else if (cr.format == MediaConchLib::format_JsTree)
         req.display_name = MediaConchLib::display_jstree_name;
     else if (cr.format == MediaConchLib::format_Simple)

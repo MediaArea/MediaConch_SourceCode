@@ -36,6 +36,7 @@ typedef enum MediaConch_format_t
     MediaConch_format_OrigXml,
     MediaConch_format_Simple,
     MediaConch_format_CSV,
+    MediaConch_format_Json,
     MediaConch_format_Max
 } MediaConch_format_c;
 

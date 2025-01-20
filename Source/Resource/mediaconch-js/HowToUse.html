@@ -94,6 +94,7 @@
                     <option value="">MediaConch XML</option>
                     <option value="CSV">MediaConch CSV</option>
                     <option value="Html">MediaConch HTML</option>
+                    <option value="Json">MediaConch JSON</option>
                     <option value="TextUnicode">MediaConch Text</option>
                     <option value="Simple">MediaConch Simple</option>
                     <option disabled>────────────</option>
@@ -348,7 +349,7 @@
                             const displayList = document.getElementById('display-list');
                             displayList.onchange = function() {
                                 const value = displayList.value;
-                                if (value === 'CSV' || value === 'Html' || value === 'TextUnicode' || value === 'Simple') {
+                                if (value === 'CSV' || value === 'Html' || value === "Json" || value === 'TextUnicode' || value === 'Simple') {
                                     // Need loading
                                     const xhr = new XMLHttpRequest();
                                     xhr.responseType = 'text';

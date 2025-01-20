@@ -38,6 +38,7 @@ const std::string MediaConchLib::display_xml_name = std::string("XML");
 const std::string MediaConchLib::display_maxml_name = std::string("MAXML");
 const std::string MediaConchLib::display_text_name = std::string("TEXT");
 const std::string MediaConchLib::display_html_name = std::string("HTML");
+const std::string MediaConchLib::display_json_name = std::string("JSON");
 const std::string MediaConchLib::display_jstree_name = std::string("JSTREE");
 const std::string MediaConchLib::display_simple_name = std::string("SIMPLE");
 const std::string MediaConchLib::display_csv_name = std::string("CSV");

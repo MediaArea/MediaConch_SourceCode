@@ -48,8 +48,9 @@ class Format:
         html:   HTML report.
         simple: Global outcome.
         csv:    CSV report.
+        json:   JSON report.
     """
-    text, xml, maxml, _, html, _, simple, csv, max = list(range(9))
+    text, xml, maxml, _, html, _, simple, csv, json, max = list(range(10))
 
 class Report:
     """Possibles reports types in MediaConch output.

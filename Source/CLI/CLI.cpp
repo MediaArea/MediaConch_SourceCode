@@ -240,6 +240,8 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
                         format = MediaConchLib::format_Html;
                     else if (filename.size() >= 4 && filename.rfind(".csv") == filename.size() - 4)
                         format = MediaConchLib::format_CSV;
+                    else if (filename.size() >= 5 && filename.rfind(".json") == filename.size() - 5)
+                        format = MediaConchLib::format_Json;
                     else
                         format = MediaConchLib::format_Simple;
 
@@ -659,6 +661,8 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             return set_format(MediaConchLib::format_Simple);
         else if (f == "CSV" || f == "csv")
             return set_format(MediaConchLib::format_CSV);
+        else if (f == "JSON" || f == "json")
+            return set_format(MediaConchLib::format_Json);
         else
             mi_inform = f;
 
@@ -908,6 +912,8 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             f = MediaConchLib::format_Html;
         else if (format == "csv")
             f = MediaConchLib::format_CSV;
+        else if (format == "json")
+            f = MediaConchLib::format_Json;
         else if (format == "simple")
             f = MediaConchLib::format_Simple;
         else
