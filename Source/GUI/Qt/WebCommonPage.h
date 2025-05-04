@@ -53,7 +53,7 @@ public:
 
 protected:
     void         clean_forms();
-    void         add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list);
+    void         add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list, bool hidden = false);
     void         charge_local_dir(const QString& directory, QStringList& tmp);
     QString      choose_file_settings();
     QString      choose_file_import_policy();
@@ -75,7 +75,7 @@ public Q_SLOTS:
     QString      on_file_online_selected(const QString& url, const QString& policy, const QString& display,
                                          const QString& verbosity, bool fixer, const QStringList&);
     QString      on_file_repository_selected(const QString& policy, const QString& display,
-                                             const QString& verbosity, bool fixer, const QStringList&);
+                                             const QString& verbosity, bool fixer, bool hidden, const QStringList&);
     QString      on_file_from_db_selected();
     QString      status_reports_multi(const QStringList& ids, const QStringList& policy_ids);
     void         on_save_settings_selected(const QJsonObject& values);

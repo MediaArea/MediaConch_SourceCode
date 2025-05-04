@@ -124,7 +124,7 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
 
     //--------------------------------------------------------------------------
     CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false),
-                 force_analyze(false), mil_analyze(true),
+                 force_analyze(false), full_report(false), include_hidden_files(false), mil_analyze(true),
                  watch_folder_recursive(true), create_policy_mode(false), file_information(false),
                  plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false),
                  list_mode(false), fixer(false)
@@ -798,6 +798,12 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
     }
 
     //--------------------------------------------------------------------------
+    void CLI::set_include_hidden(bool hidden)
+    {
+        include_hidden_files = hidden;
+    }
+
+    //--------------------------------------------------------------------------
     int CLI::add_plugin_to_use(const std::string& plugin)
     {
         plugins.push_back(plugin);
@@ -1067,10 +1073,11 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
             return;
         }
 
-        ZenLib::ZtringList list = ZenLib::Dir::GetAllFileNames(dirname,
-                                                               (ZenLib::Dir::dirlist_t)(ZenLib::Dir::Include_Files |
-                                                                                        ZenLib::Dir::Include_Hidden |
-                                                                                        ZenLib::Dir::Parse_SubDirs));
+        int flags = ZenLib::Dir::Include_Files | ZenLib::Dir::Parse_SubDirs;
+        if (include_hidden_files)
+            flags |= ZenLib::Dir::Include_Hidden;
+
+        ZenLib::ZtringList list = ZenLib::Dir::GetAllFileNames(dirname, (ZenLib::Dir::dirlist_t)flags);
 
         for (size_t i =0; i < list.size(); ++i)
             files.push_back(ZenLib::Ztring(list[i]).To_UTF8()); //Append the filename to the list of filenames to parse

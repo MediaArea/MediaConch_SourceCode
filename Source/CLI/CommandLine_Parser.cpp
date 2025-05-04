@@ -270,6 +270,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--compression",                                 Compression)
     OPTION("--force",                                       Force)
     OPTION("--full",                                        Full)
+    OPTION("--includehidden",                               IncludeHidden)
     OPTION("--nomilanalyze",                                NoMilAnalyze)
     OPTION("--async",                                       Asynchronous)
     OPTION("--pluginslist",                                 PluginsList)
@@ -527,6 +528,14 @@ CL_OPTION(Full)
 {
     (void)argument;
     cli->set_full_report(true);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(IncludeHidden)
+{
+    (void)argument;
+    cli->set_include_hidden(true);
     return CLI_RETURN_NONE;
 }
 
