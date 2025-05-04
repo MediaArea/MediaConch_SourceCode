@@ -13,7 +13,7 @@ jobs:
       PYTHONPATH: /usr/local/lib/python2.7:/usr/local/lib/python2.7/dist-packages:/usr/local/lib/python2.7/site-packages
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: Dependencies
@@ -26,17 +26,17 @@ jobs:
             pip --disable-pip-version-check install git+https://github.com/vi/mkvparse.git
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install libtool automake libxslt sqlite jansson libevent qt@5 sfk xmlstarlet ffmpeg
+            brew install libtool automake libxslt jansson qt@5 sfk xmlstarlet ffmpeg
             sudo pip --disable-pip-version-check install --prefix /usr/local git+https://github.com/vi/mkvparse.git
           fi
       - name: Get ZenLib info
         id: zenlib-info
         run: |
-          echo "::set-output name=hash::$(git ls-remote https://github.com/MediaArea/ZenLib.git HEAD | cut -f1)"
-          echo "::set-output name=path::$(dirname $PWD)/ZenLib"
+          echo "hash=$(git ls-remote https://github.com/MediaArea/ZenLib.git HEAD | cut -f1)" >> $GITHUB_OUTPUT
+          echo "path=$(dirname $PWD)/ZenLib" >> $GITHUB_OUTPUT
       - name: ZenLib cache
         id: zenlib-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.zenlib-info.outputs.path }}
           key: ${{ runner.os }}-ZenLib-${{ steps.zenlib-info.outputs.hash }}
@@ -52,11 +52,11 @@ jobs:
       - name: Get MediaInfoLib info
         id: mediainfolib-info
         run: |
-          echo "::set-output name=hash::$(git ls-remote https://github.com/MediaArea/MediaInfoLib.git HEAD | cut -f1)"
-          echo "::set-output name=path::$(dirname $PWD)/MediaInfoLib"
+          echo "hash=$(git ls-remote https://github.com/MediaArea/MediaInfoLib.git HEAD | cut -f1)" >> $GITHUB_OUTPUT
+          echo "path=$(dirname $PWD)/MediaInfoLib" >> $GITHUB_OUTPUT
       - name: MediaInfoLib cache
         id: mediainfolib-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.mediainfolib-info.outputs.path }}
           key: ${{ runner.os }}-MediaInfoLib-${{ steps.mediainfolib-info.outputs.hash }}
@@ -96,3 +96,155 @@ jobs:
           cd Project/Qt
           export PATH=/usr/local/opt/qt/bin:$PATH
           make
+  windows:
+    strategy:
+      matrix:
+        include:
+          - arch: Win32
+            qt_ver: 5.15
+            qt_arch: win32_msvc2019
+          - arch: x64
+            qt_ver: 5.15
+            qt_arch: win64_msvc2019_64
+      fail-fast: false
+    name: Windows (${{ matrix.arch }})
+    runs-on: windows-latest
+    steps:
+      - name: Set up Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_ver }}
+          arch: ${{ matrix.qt_arch }}
+          modules: qtwebengine
+      - name: Get zlib info
+        id: zlib-info
+        run: |
+          ('hash=' + ((git ls-remote https://github.com/MediaArea/zlib.git HEAD) -Split "`t")[0]) | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          ('path=' + (Get-Location) + '\zlib') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: zlib cache
+        id: zlib-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.zlib-info.outputs.path }}
+          key: windows-${{ matrix.arch }}-zlib-${{ steps.zlib-info.outputs.hash }}
+      - name: Checkout zlib
+        if: steps.zlib-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: MediaArea/zlib
+          path: zlib
+      - name: Get libxml2 info
+        id: libxml2-info
+        run: |
+          ('hash=' + ((git ls-remote https://github.com/MediaArea/libxml2.git HEAD) -Split "`t")[0]) | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          ('path=' + (Get-Location) + '\libxml2') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: libxml2 cache
+        id: libxml2-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.libxml2-info.outputs.path }}
+          key: windows-${{ matrix.arch }}-libxml2-${{ steps.libxml2-info.outputs.hash }}
+      - name: Checkout libxml2
+        if: steps.libxml2-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: MediaArea/libxml2
+          path: libxml2
+      - name: Get libxslt info
+        id: libxslt-info
+        run: |
+          ('hash=' + ((git ls-remote https://github.com/MediaArea/libxslt.git HEAD) -Split "`t")[0]) | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          ('path=' + (Get-Location) + '\libxslt') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: libxslt cache
+        id: libxslt-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.libxslt-info.outputs.path }}
+          key: windows-${{ matrix.arch }}-libxslt-${{ steps.libxslt-info.outputs.hash }}
+      - name: Checkout libxslt
+        if: steps.libxslt-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: MediaArea/libxslt
+          path: libxslt
+      - name: Get libevent info
+        id: libevent-info
+        run: |
+          ('hash=' + ((git ls-remote https://github.com/MediaArea/libevent.git HEAD) -Split "`t")[0]) | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          ('path=' + (Get-Location) + '\libevent') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: libevent cache
+        id: libevent-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.libevent-info.outputs.path }}
+          key: windows-${{ matrix.arch }}-libevent-${{ steps.libevent-info.outputs.hash }}
+      - name: Checkout libevent
+        if: steps.libevent-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: MediaArea/libevent
+          path: libevent
+      - name: Get jansson info
+        id: jansson-info
+        run: |
+          ('hash=' + ((git ls-remote https://github.com/MediaArea/jansson.git HEAD) -Split "`t")[0]) | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          ('path=' + (Get-Location) + '\jansson') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: jansson cache
+        id: jansson-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.jansson-info.outputs.path }}
+          key: windows-${{ matrix.arch }}-jansson-${{ steps.jansson-info.outputs.hash }}
+      - name: Checkout jansson
+        if: steps.jansson-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: MediaArea/jansson
+          path: jansson
+      - name: Get ZenLib info
+        id: zenlib-info
+        run: |
+          ('hash=' + ((git ls-remote https://github.com/MediaArea/ZenLib.git HEAD) -Split "`t")[0]) | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          ('path=' + (Get-Location) + '\ZenLib') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: ZenLib cache
+        id: zenlib-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.zenlib-info.outputs.path }}
+          key: windows-${{ matrix.arch }}-zenlib-${{ steps.zenlib-info.outputs.hash }}
+      - name: Checkout ZenLib
+        if: steps.zenlib-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: MediaArea/ZenLib
+          path: ZenLib
+      - name: Get MediaInfoLib info
+        id: mediainfolib-info
+        run: |
+          ('hash=' + ((git ls-remote https://github.com/MediaArea/MediaInfoLib.git HEAD) -Split "`t")[0]) | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          ('path=' + (Get-Location) + '\MediaInfoLib') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      - name: MediaInfoLib cache
+        id: mediainfolib-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.mediainfolib-info.outputs.path }}
+          key: windows-${{ matrix.arch }}-mediainfolib-${{ steps.mediainfolib-info.outputs.hash }}
+      - name: Checkout MediaInfoLib
+        if: steps.mediainfolib-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: MediaArea/MediaInfoLib
+          path: MediaInfoLib
+      - name: Checkout MediaConch
+        uses: actions/checkout@v4
+        with:
+          path: MediaConch
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+      - name: Build
+        run: |
+          $Env:IncludePath="$Env:QT_ROOT_DIR\include\QtGui;$Env:QT_ROOT_DIR\include\QtWidgets;$Env:QT_ROOT_DIR\include\QtCore;$Env:QT_ROOT_DIR\include\QtWebEngine;$Env:QT_ROOT_DIR\include\QtWebEngineWidgets;$Env:QT_ROOT_DIR\include\QtWebEngineCore;$Env:QT_ROOT_DIR\include\QtWebChannel;$Env:QT_ROOT_DIR\include;$Env:IncludePath"
+          $Env:LINK="/LIBPATH:$Env:QT_ROOT_DIR\lib"
+          MSBuild /Verbosity:Quiet /p:Configuration=Release`;Platform=${{ matrix.arch }} MediaConch\Project\MSVC2022\MediaConch.sln
