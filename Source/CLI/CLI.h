@@ -46,6 +46,7 @@ namespace MediaConch
         int  set_policy_reference_file(const std::string& file);
         void set_policy_verbosity(const std::string& verbosity);
         void set_full_report(bool full);
+        void set_include_hidden(bool hidden);
         int  add_plugin_to_use(const std::string& plugin);
         int  set_user_to_use(const std::string& user);
         int  set_compression_mode(const std::string& mode_str);
@@ -103,6 +104,7 @@ namespace MediaConch
         bool                    asynchronous;
         bool                    force_analyze;
         bool                    full_report;
+        bool                    include_hidden_files;
         bool                    mil_analyze;
         bool                    watch_folder_recursive;
         bool                    create_policy_mode;

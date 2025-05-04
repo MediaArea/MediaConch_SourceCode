@@ -144,6 +144,8 @@ int Help()
     TEXTOUT("File:");
     TEXTOUT("  --FileInformation, -fi");
     TEXTOUT("       Print files information and quit");
+    TEXTOUT("  --IncludeHidden");
+    TEXTOUT("       Include Hidden files when analysing a folder");
 
     return CLI_RETURN_FINISH;
 }

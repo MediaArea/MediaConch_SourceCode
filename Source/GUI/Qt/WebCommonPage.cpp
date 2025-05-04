@@ -365,7 +365,7 @@ namespace MediaConch
     }
 
     QString WebCommonPage::on_file_repository_selected(const QString& policy, const QString& display,
-                                                       const QString& verbosity, bool fixer,
+                                                       const QString& verbosity, bool fixer, bool hidden,
                                                        const QStringList& options)
     {
         QStringList dirname = file_selector.value("checkerRepository_directory", QStringList());
@@ -374,7 +374,7 @@ namespace MediaConch
 
         QDir dir(dirname.last());
         QFileInfoList list;
-        add_sub_directory_files_to_list(dir, list);
+        add_sub_directory_files_to_list(dir, list, hidden);
         if (!list.count())
             return QString("{\"error\": \"Folder selected is empty.\"}");
 
@@ -991,16 +991,20 @@ namespace MediaConch
         return json;
     }
 
-    void WebCommonPage::add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list)
+    void WebCommonPage::add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list, bool hidden)
     {
-        QFileInfoList tmp = dir.entryInfoList(QDir::Files);
+        int flags = QDir::Files;
+        if (hidden)
+            flags |= QDir::Hidden;
+
+        QFileInfoList tmp = dir.entryInfoList((QDir::Filter)flags);
         list << tmp;
 
         tmp = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (int i = 0; i < tmp.size(); ++i)
         {
             QDir tmp_dir(tmp[i].absoluteFilePath());
-            add_sub_directory_files_to_list(tmp_dir, list);
+            add_sub_directory_files_to_list(tmp_dir, list, hidden);
         }
     }
 

@@ -51,6 +51,7 @@ var checkerAjax = (function() {
                                                 $('.tab-content .active .displayList').val(),
                                                 $('.tab-content .active .verbosityList').val(),
                                                 $('#checkerRepository_fixer').is(':checked'),
+                                                $('#checkerRepository_hidden').is(':checked'),
                                                 options,
                                                 function (res)
                                                 {
