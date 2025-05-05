@@ -7,6 +7,15 @@ x Correction
 bug reports and feature request are here :
 https://github.com/MediaArea/MediaConch_SourceCode
 
+Version 25.04, 2025-05-05
+-------------
+Update to MediaInfo library 25.04, see MediaInfo change log for the list of changes in the file formats support
+Add JSON output for MediaConch reports
+Force ParseSpeed to 1 when fixer is used
+SimpleDisplay: Hide non-relevants errors for 'or' policies
+Exclude hidden files when adding a folder and option for including them
+More flexibility in 4/3 test
+
 Version 24.06, 2024-06-29
 -------------
 Update to MediaInfo library 24.06, see MediaInfo change log for the list of changes in the file formats support
