@@ -1,5 +1,5 @@
-%global mediaconch_version          24.06
-%global libmediainfo_version        24.06
+%global mediaconch_version          25.04
+%global libmediainfo_version        25.04
 %global libzen_version              0.4.41
 
 %if 0%{?fedora_version} || 0%{?rhel}
