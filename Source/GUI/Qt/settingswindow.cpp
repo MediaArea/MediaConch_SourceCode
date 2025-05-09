@@ -277,17 +277,16 @@ void SettingsWindow::create_parsespeed_options(QString& parsespeed)
 //---------------------------------------------------------------------------
 void SettingsWindow::add_displaycaptions_to_html_selection(QString& displaycaptions, QString& html, const QString& selector)
 {
-    QRegExp reg("class=\"displaycaptionsList form-control\">");
+    QRegularExpression reg("class=\"displaycaptionsList form-control\">", QRegularExpression::InvertedGreedinessOption);
     int pos = html.indexOf(selector);
-
-    reg.setMinimal(true);
 
     if (pos == -1)
         return;
 
-    if ((pos = reg.indexIn(html, pos)) != -1)
+    QRegularExpressionMatch match = reg.match(html, pos);
+    if ((pos = match.capturedStart()) != -1)
     {
-        pos += reg.matchedLength();
+        pos += match.capturedLength();
         html.insert(pos, displaycaptions);
     }
 }
