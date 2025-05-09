@@ -994,13 +994,17 @@ namespace MediaConch
     void WebCommonPage::add_sub_directory_files_to_list(const QDir dir, QFileInfoList& list, bool hidden)
     {
         int flags = QDir::Files;
+        int dirFlags = QDir::Dirs | QDir::NoDotAndDotDot;
         if (hidden)
+        {
             flags |= QDir::Hidden;
+            dirFlags |= QDir::Hidden;
+        }
 
         QFileInfoList tmp = dir.entryInfoList((QDir::Filter)flags);
         list << tmp;
 
-        tmp = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+        tmp = dir.entryInfoList((QDir::Filter)dirFlags);
         for (int i = 0; i < tmp.size(); ++i)
         {
             QDir tmp_dir(tmp[i].absoluteFilePath());
