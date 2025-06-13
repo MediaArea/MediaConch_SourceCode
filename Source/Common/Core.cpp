@@ -79,6 +79,7 @@ Core::Core() : policies(this), reports(this)
     watch_folders_manager = new WatchFoldersManager(this);
     policies.create_values_from_csv();
     compression_mode = MediaConchLib::compression_ZLib;
+    no_database = false;
 }
 
 Core::~Core()
@@ -154,18 +155,21 @@ void Core::load_plugins_configuration()
 void Core::load_database()
 {
 #ifdef HAVE_SQLITE
-    std::string db_path;
-    if (!config || config->get("SQLite_Path", db_path) < 0)
-        db_path = get_database_path();
-
-    db = new SQLLiteReport;
-
-    ((Database*)db)->set_database_directory(db_path);
-    db->set_database_filename(database_name);
-    if (db->init_report() < 0)
+    if (!no_database)
     {
-        delete db;
-        db = NULL;
+        std::string db_path;
+        if (!config || config->get("SQLite_Path", db_path) < 0)
+            db_path = get_database_path();
+
+        db = new SQLLiteReport;
+
+        ((Database*)db)->set_database_directory(db_path);
+        db->set_database_filename(database_name);
+        if (db->init_report() < 0)
+        {
+            delete db;
+            db = NULL;
+        }
     }
 #endif
     if (!db)
@@ -262,6 +266,18 @@ const std::string& Core::get_implementation_verbosity()
 void Core::set_compression_mode(MediaConchLib::compression compress)
 {
     compression_mode = compress;
+}
+
+//---------------------------------------------------------------------------
+void Core::set_no_database(bool ndb)
+{
+    no_database = ndb;
+    if (db)
+    {
+        delete db;
+        db = NULL;
+    }
+    load_database();
 }
 
 //---------------------------------------------------------------------------

@@ -829,6 +829,13 @@ void MediaConchLib::set_compression_mode(compression compress)
 }
 
 //---------------------------------------------------------------------------
+void MediaConchLib::set_no_database(bool no_database)
+{
+    if (core)
+        core->set_no_database(no_database);
+}
+
+//---------------------------------------------------------------------------
 int MediaConchLib::get_ui_poll_request() const
 {
     return core->get_ui_poll_request();

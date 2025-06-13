@@ -164,6 +164,7 @@ public:
     void               set_implementation_verbosity(const std::string& verbosity);
     const std::string& get_implementation_verbosity();
     void               set_compression_mode(MediaConchLib::compression compress);
+    void               set_no_database(bool no_database);
     int                get_ui_poll_request() const;
     int                get_ui_database_path(std::string& path) const;
     bool               is_using_daemon() const;
@@ -227,8 +228,9 @@ private:
     std::map<std::string, std::string> implementation_options;
     Scheduler                         *scheduler;
     PluginsManager                    *plugins_manager;
-    WatchFoldersManager                *watch_folders_manager;
+    WatchFoldersManager               *watch_folders_manager;
     MediaConchLib::compression         compression_mode;
+    bool                               no_database;
 
     bool has_outcome_fail(const std::string& report);
 
