@@ -163,10 +163,14 @@ static void change_short_options_to_long(std::string& argument)
         argument = "--help=Advanced";
     if (argument=="-v")
         argument = "--version";
+
+    // Main short options
     if (argument=="-f")
         argument = "--force";
     if (argument=="-nmil")
         argument = "--nomilanalyze";
+    if (argument=="-ndb")
+        argument = "--nodatabase";
 
     // Backward compatibility
     if (argument=="-tc")
@@ -272,6 +276,7 @@ int Parse(MediaConch::CLI* cli, std::string& argument)
     OPTION("--full",                                        Full)
     OPTION("--includehidden",                               IncludeHidden)
     OPTION("--nomilanalyze",                                NoMilAnalyze)
+    OPTION("--nodatabase",                                  NoDatabase)
     OPTION("--async",                                       Asynchronous)
     OPTION("--pluginslist",                                 PluginsList)
     OPTION("--useplugin",                                   UsePlugin)
@@ -544,6 +549,14 @@ CL_OPTION(NoMilAnalyze)
 {
     (void)argument;
     cli->set_mil_analyze(false);
+    return CLI_RETURN_NONE;
+}
+
+//---------------------------------------------------------------------------
+CL_OPTION(NoDatabase)
+{
+    (void)argument;
+    cli->set_no_database(true);
     return CLI_RETURN_NONE;
 }
 

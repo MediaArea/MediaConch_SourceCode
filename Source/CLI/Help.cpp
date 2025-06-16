@@ -193,6 +193,8 @@ int Help_Advanced()
     TEXTOUT("    Full MediaInfo report (needed by some policies)");
     TEXTOUT("--NoMilAnalyze, -nmil");
     TEXTOUT("    Do not analyze with MediaInfoLib");
+    TEXTOUT("--NoDatabase, -ndb");
+    TEXTOUT("    Do not read or write to the persistant database");
     TEXTOUT("--Async=yes, -as");
     TEXTOUT("    Analyze asynchronously the files,");
     TEXTOUT("    need to launch again the command to have the result");

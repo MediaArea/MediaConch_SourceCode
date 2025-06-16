@@ -51,6 +51,7 @@ CL_OPTION(Force);
 CL_OPTION(Full);
 CL_OPTION(IncludeHidden);
 CL_OPTION(NoMilAnalyze);
+CL_OPTION(NoDatabase);
 CL_OPTION(Asynchronous);
 CL_OPTION(UsePlugin);
 CL_OPTION(PluginsList);

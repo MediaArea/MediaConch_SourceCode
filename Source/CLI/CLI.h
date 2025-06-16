@@ -51,6 +51,7 @@ namespace MediaConch
         int  set_user_to_use(const std::string& user);
         int  set_compression_mode(const std::string& mode_str);
         void set_force_analyze(bool force);
+        void set_no_database(bool no_db);
         void set_mil_analyze(bool analyze);
         void set_asynchronous(bool async);
         void set_create_policy_mode();
@@ -103,6 +104,7 @@ namespace MediaConch
         bool                    use_daemon;
         bool                    asynchronous;
         bool                    force_analyze;
+        bool                    no_database;
         bool                    full_report;
         bool                    include_hidden_files;
         bool                    mil_analyze;
