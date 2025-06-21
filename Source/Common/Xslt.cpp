@@ -74,7 +74,6 @@ bool Xslt::register_schema_from_doc(void* data)
         return false;
 
     xsltSetGenericErrorFunc(this, &manage_generic_error);
-    xmlLoadExtDtdDefaultValue = 1;
 
     if (xslt_ctx)
     {
@@ -100,7 +99,6 @@ bool Xslt::register_schema_from_doc(void* data)
 //---------------------------------------------------------------------------
 bool Xslt::register_schema_from_memory(const std::string& schem)
 {
-    xmlLoadExtDtdDefaultValue = 1;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
 
     int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD;
@@ -135,10 +133,7 @@ int Xslt::validate_xml(const std::string& xml, bool)
     if (!xslt_ctx)
         return -1;
 
-    xmlSubstituteEntitiesDefault(1);
-    xmlLoadExtDtdDefaultValue = 1;
-
-    int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD;
+    int doc_flags = XML_PARSE_COMPACT | XML_PARSE_DTDLOAD | XML_PARSE_NOENT;
     xmlSetGenericErrorFunc(this, &manage_generic_error);
 
 #ifdef XML_PARSE_BIG_LINES

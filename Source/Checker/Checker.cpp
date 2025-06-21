@@ -118,7 +118,7 @@ int tfsxml_hasvalue(tfsxml_string* priv)
 }
 
 //---------------------------------------------------------------------------
-std::string tokenize(const std::string& scope, const std::string& list, const std::string& delimiter)
+std::string tokenize(const std::string& scope, const std::string& list, const char delimiter)
 {
     std::stringstream ss;
 
@@ -126,7 +126,7 @@ std::string tokenize(const std::string& scope, const std::string& list, const st
     if (scope.empty() || scope=="mi")
     {
         std::istringstream iss(list);
-        for (std::string token; std::getline(iss, token, '/');)
+        for (std::string token; std::getline(iss, token, delimiter);)
             ss << "/mi:" << token;
     }
 
@@ -280,7 +280,7 @@ std::string PolicyChecker::PolicyElement::to_string(size_t level, bool verbose)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-PolicyChecker::RuleElement::RuleElement() : resolved(false), pass(false), tracks(0), source(NULL)
+PolicyChecker::RuleElement::RuleElement() : source(NULL), tracks(0), resolved(false), pass(false)
 {
 }
 
@@ -624,7 +624,7 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
                            << rule->source->tracktype << "']["
                            << ((rule->source->occurrence.empty() || rule->source->occurrence=="all" || rule->source->occurrence=="any") ? "*" : rule->source->occurrence)
                            << "]"
-                           << tokenize(rule->source->scope, rule->source->field, "/");
+                           << tokenize(rule->source->scope, rule->source->field, '/');
                         rule->source->path=parse_path(ss.str());
                     }
                     break;
@@ -650,7 +650,7 @@ PolicyChecker::RuleElement* PolicyChecker::parse_rule(tfsxml_string& tfsxml_priv
            << rule->tracktype
            << "']["
            << ((rule->occurrence.empty() || rule->occurrence=="all" || rule->occurrence=="any") ? "*" : rule->occurrence)
-           << "]" << tokenize(rule->scope, rule->field, "/");
+           << "]" << tokenize(rule->scope, rule->field, '/');
         rule->xpath=ss.str();
         rule->path=parse_path(rule->xpath);
     }

@@ -47,14 +47,14 @@ private:
     class Element
     {
     public:
-        typedef enum Level {
+        enum Level {
             LEVEL_NONE = 0,
             LEVEL_INFO,
             LEVEL_WARN,
             LEVEL_FAIL,
         };
 
-        typedef enum Result {
+        enum Result {
             RESULT_PASS = 0,
             RESULT_INFO,
             RESULT_WARN,

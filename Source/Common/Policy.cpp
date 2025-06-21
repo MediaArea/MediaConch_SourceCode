@@ -95,7 +95,6 @@ int Policy::import_schema(const std::string& filename, const std::string& save_n
 
     int ret = import_schema_from_doc(doc, save_name);
     xmlFreeDoc(doc);
-    xmlCleanupCharEncodingHandlers();
     xmlSetGenericErrorFunc(NULL, NULL);
     return ret;
 }
