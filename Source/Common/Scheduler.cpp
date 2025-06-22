@@ -42,7 +42,7 @@ namespace MediaConch {
     //***************************************************************************
 
     //---------------------------------------------------------------------------
-    Scheduler::Scheduler(Core* c) : core(c), max_threads_modified(false), max_threads(1)
+    Scheduler::Scheduler(Core* c) : core(c), max_threads(1), max_threads_modified(false)
     {
         queue = new Queue(this);
     }

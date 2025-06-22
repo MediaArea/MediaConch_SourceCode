@@ -113,7 +113,6 @@ std::vector<PathElement> parse_path(const std::string& xpath)
 bool path_is_matching(tfsxml_string& tfsxml_priv, tfsxml_string& node, PathElement path, size_t& occurrence)
 {
     tfsxml_string tfsxml_priv_local = tfsxml_priv;
-    tfsxml_string value;
 
     // compare names
     if (tfsxml_strcmp_charp(node, path.name.c_str()))

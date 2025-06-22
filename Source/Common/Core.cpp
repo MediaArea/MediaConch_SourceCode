@@ -506,7 +506,7 @@ long Core::checker_analyze(int user, const std::string& filename, long src_id, s
 }
 
 //--------------------------------------------------------------------------
-int Core::checker_list_mediainfo_outputs(std::string& output, std::string& err)
+int Core::checker_list_mediainfo_outputs(std::string& output, std::string&)
 {
     output = Ztring(MI->Option(__T("Info_OutputFormats_JSON"))).To_UTF8();
 
@@ -980,7 +980,7 @@ int Core::transform_mixml_report(const std::string& mi_xml, const std::string& m
     }
 
     tmpMI->Open_Buffer_Init(BufferSize);
-    tmpMI->Open_Buffer_Continue((ZenLib::int8u*)mi_xml.data(), BufferSize);
+    tmpMI->Open_Buffer_Continue((const ZenLib::int8u*)mi_xml.data(), BufferSize);
     tmpMI->Open_Buffer_Finalize();
 
     report = Ztring(tmpMI->Inform()).To_UTF8();
@@ -1697,10 +1697,10 @@ unsigned long long Core::mil_version()
         build = strtol(version, &end, 10);
     }
 
-    return ((unsigned long long )major << 52) & 0xFFF0000000000000 |
-           ((unsigned long long )minor << 40) & 0x000FFF0000000000 |
-           ((unsigned long long )patch << 32) & 0x000000FF00000000 |
-           ((unsigned long long )build)       & 0x00000000FFFFFFFF;
+    return (((unsigned long long )major << 52) & 0xFFF0000000000000) |
+           (((unsigned long long )minor << 40) & 0x000FFF0000000000) |
+           (((unsigned long long )patch << 32) & 0x000000FF00000000) |
+           (((unsigned long long )build)       & 0x00000000FFFFFFFF);
 }
 
 //--------------------------------------------------------------------------

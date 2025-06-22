@@ -124,7 +124,7 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
 
     //--------------------------------------------------------------------------
     CLI::CLI() : watch_folder_user(NULL), use_as_user(-1), use_daemon(false), asynchronous(false),
-                 force_analyze(false), full_report(false), no_database(false), include_hidden_files(false), mil_analyze(true),
+                 force_analyze(false), no_database(false), full_report(false), include_hidden_files(false), mil_analyze(true),
                  watch_folder_recursive(true), create_policy_mode(false), file_information(false),
                  plugins_list_mode(false), list_watch_folders_mode(false), no_needs_files_mode(false),
                  list_mode(false), fixer(false)

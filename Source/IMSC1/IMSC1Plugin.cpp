@@ -81,7 +81,7 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    int IMSC1Plugin::create_report(std::string& report, const std::string& filename, bool result, const std::string& message, std::string& error)
+    int IMSC1Plugin::create_report(std::string& report, const std::string& filename, bool result, const std::string& message, std::string&)
     {
 
         xmlDocPtr doc = xmlNewDoc((const xmlChar *)"1.0");
@@ -348,7 +348,7 @@ namespace MediaConch {
     }
 
     //---------------------------------------------------------------------------
-    void IMSC1Plugin::xml_error_discard(void* user_data, const char* format, ...)
+    void IMSC1Plugin::xml_error_discard(void*, const char*, ...)
     {
     }
 }
