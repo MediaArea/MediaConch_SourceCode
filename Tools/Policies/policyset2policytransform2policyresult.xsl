@@ -110,7 +110,7 @@
               <aliasxsl:value-of select="$level"/>
             </aliasxsl:attribute>
           </aliasxsl:if>
-          <aliasxsl:if test="$policy_verbosity>0 or $outcome!='pass' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with'">
+          <aliasxsl:if test="$policy_verbosity>0 or $outcome!='pass' or string-length($compared_to)>0 or $operator='starts with' or $operator='must not start with' or $operator='contains' or $operator='must not contain'">
             <aliasxsl:if test="$requested">
               <aliasxsl:attribute name="requested">
                 <aliasxsl:value-of select="$requested"/>
@@ -298,16 +298,18 @@
         <xsl:when test="@operator='must not exist'">not(</xsl:when>
         <xsl:when test="@operator='starts with'">starts-with(</xsl:when>
         <xsl:when test="@operator='must not start with'">not(starts-with(</xsl:when>
+        <xsl:when test="@operator='contains'">contains(</xsl:when>
+        <xsl:when test="@operator='must not contain'">not(contains(</xsl:when>
       </xsl:choose>
       <xsl:value-of select="$equationbase"/>
       <xsl:choose>
         <xsl:when test="not(@operator) or @operator='exists'"></xsl:when>
         <xsl:when test="@operator='must not exist'">)</xsl:when>
-        <xsl:when test="@operator='starts with' or @operator='must not start with'">
+        <xsl:when test="@operator='starts with' or @operator='must not start with' or @operator='contains' or @operator='must not contain'">
           <xsl:text>,'</xsl:text>
           <xsl:value-of select="."/>
           <xsl:text>')</xsl:text>
-          <xsl:if test="@operator='must not start with'">)</xsl:if>
+          <xsl:if test="@operator='must not start with' or @operator='must not contain'">)</xsl:if>
         </xsl:when>
         <xsl:when test="@operator">
           <xsl:value-of select="@operator"/>

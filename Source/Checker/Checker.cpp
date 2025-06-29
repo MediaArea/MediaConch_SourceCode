@@ -320,6 +320,14 @@ bool  PolicyChecker::RuleElement::compare(const std::string& v1, const std::stri
     {
         to_return = v2.rfind(v1, 0) != 0;
     }
+    else if (operand=="contains")
+    {
+        to_return = v2.find(v1) != std::string::npos;
+    }
+    else if (operand=="must not contain")
+    {
+        to_return = v2.find(v1) == std::string::npos;
+    }
     else if (operand == "<")
     {
         if (!strlen(val_end) && !strlen(ref_end))
@@ -399,7 +407,7 @@ void PolicyChecker::RuleElement::resolve()
         else // keep old behavior for legacy "*" value
             pass=values.empty();
     }
-    else if (operand=="starts with" || operand=="must not start with" || operand=="<" || operand=="<=" || operand=="="  || operand=="!=" || operand==">=" || operand==">")
+    else if (operand=="starts with" || operand=="must not start with" || operand=="contains" || operand=="must not contain" || operand=="<" || operand=="<=" || operand=="="  || operand=="!=" || operand==">=" || operand==">")
     {
         std::vector<bool> results;
 
