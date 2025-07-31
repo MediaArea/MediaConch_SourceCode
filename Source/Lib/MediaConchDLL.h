@@ -49,7 +49,11 @@ typedef enum MediaConch_report_t
     report_Max,
 } MediaConch_report_c;
 
+#if defined(_MSC_VER)
+#define MEDIACONCH_EXPORT __declspec(dllexport)
+#else
 #define MEDIACONCH_EXPORT __attribute__ ((visibility("default")))
+#endif
 
 #ifdef __cplusplus
 extern "C"
