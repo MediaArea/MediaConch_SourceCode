@@ -19,6 +19,8 @@
 #include <ZenLib/File.h>
 #if !defined(WINDOWS)
     #include <unistd.h>
+#else
+    #include <windows.h>
 #endif //!defined(WINDOWS)
 #include <algorithm>
 
