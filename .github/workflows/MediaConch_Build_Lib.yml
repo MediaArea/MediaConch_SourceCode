@@ -11,23 +11,40 @@ jobs:
         include:
           - os: ubuntu-latest
             cmake_preset_name: conan-release
+            conan_home: "/home/runner/.conan2"
           - os: macos-latest
             cmake_preset_name: conan-release
+            conan_home: "/Users/runner/.conan2"
           - os: windows-latest
             cmake_preset_name: conan-default
+            conan_home: "C:/Users/runneradmin/.conan2"
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    env:
+      CONAN_HOME: ${{ matrix.conan_home }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           cache: 'pip' # caching pip dependencies
+      - name: "Cache Conan dependencies"
+        uses: actions/cache@v4
+        with:
+            path: "${{matrix.conan_home}}"
+            key: ${{ runner.os }}-conan-${{ hashFiles('.github/workflows/conanfile.txt') }}
+            restore-keys: |
+              ${{ runner.os }}-conan-
       - name: "install dependencies"  # use conan package manager to install c and c++ dependencies
+        # conanfile.txt is copied to the root because for some reason, conan doesn't seem to create the top
+        # CMakeUserPresets.json if you have the conanfile.txt in another directory than the path you call conan from.
+        #
+        # "cmake -E copy" is used to copy the file is because it has the same interface across all operating systems.
         run: |
           pip install --disable-pip-version-check uv
-          uvx conan profile detect
-          uvx conan install -of build --requires="zlib/1.3.1" --requires="libxslt/1.1.43" --requires="libxml2/2.13.8" --requires="libzen/0.4.38" --requires="libmediainfo/22.03" --build=missing -g CMakeDeps -g CMakeToolchain
+          uvx conan profile detect --exist-ok
+          cmake -E copy .github/workflows/conanfile.txt conanfile.txt
+          uvx conan install -of build --build=missing -g CMakeDeps -g CMakeToolchain conanfile.txt
       - name: Configure cmake
         run: |
           cmake --preset ${{ matrix.cmake_preset_name }} -D BUILD_SHARED_LIBS=${{ matrix.library_type == 'static' &&  'NO' || 'YES'}}
