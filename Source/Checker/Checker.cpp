@@ -307,10 +307,19 @@ bool  PolicyChecker::RuleElement::compare(const std::string& v1, const std::stri
 {
     bool to_return = false;
 
-    char* val_end=NULL;
-    double val = strtod(v2.c_str(), &val_end);
-    char* ref_end=NULL;
-    double ref = strtod(v1.c_str(), &ref_end);
+    char* val_end = NULL;
+    char* ref_end = NULL;
+    #ifdef _WIN32
+    _locale_t c_locale = _create_locale(LC_NUMERIC, "C");
+    double val = _strtod_l(v2.c_str(), &val_end, c_locale);
+    double ref = _strtod_l(v1.c_str(), &ref_end, c_locale);
+    _free_locale(c_locale);
+    #else
+    locale_t c_locale = newlocale(LC_NUMERIC_MASK, "C", NULL);
+    double val = strtod_l(v2.c_str(), &val_end, c_locale);
+    double ref = strtod_l(v1.c_str(), &ref_end, c_locale);
+    freelocale(c_locale);
+    #endif // _WIN32
 
     if (operand=="starts with")
     {
