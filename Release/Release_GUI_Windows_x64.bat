@@ -44,10 +44,10 @@ copy  ..\Project\MSVC2022\x64\Release\Qt5QuickWidgets.dll MediaConch_GUI_Windows
 copy  ..\Project\MSVC2022\x64\Release\Qt5Positioning.dll MediaConch_GUI_Windows_x64\
 copy  ..\Project\MSVC2022\x64\Release\Qt5Widgets.dll MediaConch_GUI_Windows_x64\
 copy  ..\Project\MSVC2022\x64\Release\QtWebEngineProcess.exe MediaConch_GUI_Windows_x64\
-copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\concrt140.dll" MediaConch_GUI_Windows_x64\
-copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\msvcp140.dll" MediaConch_GUI_Windows_x64\
-copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\vccorlib140.dll" MediaConch_GUI_Windows_x64\
-copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\vcruntime140.dll" MediaConch_GUI_Windows_x64\
+copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\concrt140.dll" MediaConch_GUI_Windows_x64\
+copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\msvcp140.dll" MediaConch_GUI_Windows_x64\
+copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\vccorlib140.dll" MediaConch_GUI_Windows_x64\
+copy "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\vcruntime140.dll" MediaConch_GUI_Windows_x64\
 mkdir MediaConch_GUI_Windows_x64\resources
 copy  ..\Project\MSVC2022\x64\Release\resources\icudtl.dat MediaConch_GUI_Windows_x64\resources\icudtl.dat
 copy  ..\Project\MSVC2022\x64\Release\resources\qtwebengine_resources.pak MediaConch_GUI_Windows_x64\resources\qtwebengine_resources.pak
