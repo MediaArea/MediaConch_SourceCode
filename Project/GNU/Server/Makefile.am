@@ -45,7 +45,7 @@ mediaconchd_SOURCES = \
     ../../../Source/Checker/Checker.cpp \
     ../../../Source/Checker/Path.cpp \
     ../../../Source/IMSC1/IMSC1Plugin.cpp \
-    ../../../Source/ThirdParty/tfsxml/tfsxml.cpp
+    ../../../Source/ThirdParty/tfsxml/tfsxml_wrapper.cpp
 
 #mediaconchd_LDFLAGS     = -no-undefined -version-info 0:0:0
 mediaconchd_CPPFLAGS = $(XML_CFLAGS)
