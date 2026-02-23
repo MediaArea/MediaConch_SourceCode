@@ -17,8 +17,6 @@ from ctypes import c_bool as _c_bool
 from ctypes import c_long as _c_long
 from ctypes import c_int as _c_int
 
-
-
 _module = _os.path.abspath(_os.path.dirname(__file__))
 _machine = _platform.machine().lower()
 _system = _platform.system().lower()
@@ -30,13 +28,18 @@ elif _machine in ["amd64"]:
 
 if _system == "darwin":
     _library = "libmediaconch.0.dylib"
+elif _system == "windows":
+    _library = "MediaConch.dll"
 else:
     _library = "libmediaconch.so.0"
 
 try:
     _MediaConchLib_Handler = _CDLL("{}/{}/{}/{}".format(_module, _system, _machine, _library))
 except:
-    _MediaConchLib_Handler = _CDLL(_library)
+    try:
+        _MediaConchLib_Handler = _CDLL("{}/{}".format(_module, _library))
+    except:
+        _MediaConchLib_Handler = _CDLL(_library)
 
 class Format:
     """Possibles MediaConch output formats.
