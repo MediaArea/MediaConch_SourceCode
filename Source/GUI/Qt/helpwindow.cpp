@@ -26,7 +26,7 @@ Help::Help(QWidget *parent) : QDialog(parent)
     QRect ScreenGeometry = QGuiApplication::primaryScreen()->geometry();
     move(ScreenGeometry.width()/5, y());
     resize(ScreenGeometry.width()-ScreenGeometry.width()/5*2, ScreenGeometry.height()*3/4);
-    setWindowFlags(windowFlags()&(0xFFFFFFFF-Qt::WindowContextHelpButtonHint));
+    setWindowFlags(windowFlags()&~Qt::WindowContextHelpButtonHint);
     setWindowTitle("MediaConch help");
 
     Close=new QPushButton("&Close");

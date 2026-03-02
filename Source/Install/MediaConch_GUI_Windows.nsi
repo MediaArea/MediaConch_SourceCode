@@ -32,6 +32,11 @@ SetCompressor /FINAL /SOLID lzma
 !define MUI_ABORTWARNING
 !define MUI_ICON "..\..\Source\Resource\Image\MediaConch.ico"
 
+; Uninstaller signing
+!ifdef EXPORT_UNINST
+  !uninstfinalize 'copy /Y "%1" "..\..\Release\${PRODUCT_NAME}_GUI_${PRODUCT_VERSION}_Windows-uninst.exe"'
+!endif
+
 ; Language Selection Dialog Settings
 !define MUI_LANGDLL_REGISTRY_ROOT "${PRODUCT_UNINST_ROOT_KEY}"
 !define MUI_LANGDLL_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
@@ -115,42 +120,42 @@ Section "SectionPrincipale" SEC01
   SetOutPath "$SMPROGRAMS"
   CreateShortCut "$SMPROGRAMS\MediaConch.lnk" "$INSTDIR\MediaConch.exe" "" "" "" "" "" "Convenient unified display of the most relevant technical and tag data for video and audio files"
   SetOutPath "$INSTDIR"
-  File "/oname=MediaConch.exe" "..\..\Project\MSVC2022\Win32\Release\MediaConch-GUI.exe"
+  File "..\..\Project\Qt\Win32\MediaConch.exe"
   File "/oname=History.txt" "..\..\History_GUI.txt"
   File "..\..\License.html"
   File "/oname=ReadMe.txt" "..\..\Release\ReadMe_GUI_Windows.txt"
-  File "..\..\Project\MSVC2022\Win32\Release\LIBCURL.DLL"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5Core.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5Gui.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5Network.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\libEGL.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\libGLESV2.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\d3dcompiler_47.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5Qml.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5Quick.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5WebChannel.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5WebEngineWidgets.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5WebEngineCore.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5PrintSupport.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5QuickWidgets.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5Positioning.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\Qt5Widgets.dll"
-  File "..\..\Project\MSVC2022\Win32\Release\QtWebEngineProcess.exe"
+  File "..\..\..\libcurl\Win32\Release\LIBCURL.DLL"
+  File "..\..\Project\Qt\Win32\Qt5Core.dll"
+  File "..\..\Project\Qt\Win32\Qt5Gui.dll"
+  File "..\..\Project\Qt\Win32\Qt5Network.dll"
+  File "..\..\Project\Qt\Win32\libEGL.dll"
+  File "..\..\Project\Qt\Win32\libGLESV2.dll"
+  File "..\..\Project\Qt\Win32\d3dcompiler_47.dll"
+  File "..\..\Project\Qt\Win32\Qt5Qml.dll"
+  File "..\..\Project\Qt\Win32\Qt5Quick.dll"
+  File "..\..\Project\Qt\Win32\Qt5WebChannel.dll"
+  File "..\..\Project\Qt\Win32\Qt5WebEngineWidgets.dll"
+  File "..\..\Project\Qt\Win32\Qt5WebEngineCore.dll"
+  File "..\..\Project\Qt\Win32\Qt5PrintSupport.dll"
+  File "..\..\Project\Qt\Win32\Qt5QuickWidgets.dll"
+  File "..\..\Project\Qt\Win32\Qt5Positioning.dll"
+  File "..\..\Project\Qt\Win32\Qt5Widgets.dll"
+  File "..\..\Project\Qt\Win32\QtWebEngineProcess.exe"
   File "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x86\Microsoft.VC143.CRT\concrt140.dll"
   File "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x86\Microsoft.VC143.CRT\msvcp140.dll"
   File "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x86\Microsoft.VC143.CRT\vccorlib140.dll"
   File "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Redist\MSVC\14.44.35112\x86\Microsoft.VC143.CRT\vcruntime140.dll"
   SetOutPath "$INSTDIR\resources"
-  File "..\..\Project\MSVC2022\Win32\Release\resources\icudtl.dat"
-  File "..\..\Project\MSVC2022\Win32\Release\resources\qtwebengine_resources.pak"
-  File "..\..\Project\MSVC2022\Win32\Release\resources\qtwebengine_resources_100p.pak"
-  File "..\..\Project\MSVC2022\Win32\Release\resources\qtwebengine_resources_200p.pak"
+  File "..\..\Project\Qt\Win32\resources\icudtl.dat"
+  File "..\..\Project\Qt\Win32\resources\qtwebengine_resources.pak"
+  File "..\..\Project\Qt\Win32\resources\qtwebengine_resources_100p.pak"
+  File "..\..\Project\Qt\Win32\resources\qtwebengine_resources_200p.pak"
   SetOutPath "$INSTDIR\platforms"
-  File "..\..\Project\MSVC2022\Win32\Release\platforms\qwindows.dll"
+  File "..\..\Project\Qt\Win32\platforms\qwindows.dll"
   SetOutPath "$INSTDIR\translations"
-  File "..\..\Project\MSVC2022\Win32\Release\translations\qt_en.qm"
+  File "..\..\Project\Qt\Win32\translations\qt_en.qm"
   SetOutPath "$INSTDIR\translations\qtwebengine_locales"
-  File "..\..\Project\MSVC2022\Win32\Release\translations\qtwebengine_locales\en-US.pak"
+  File "..\..\Project\Qt\Win32\translations\qtwebengine_locales\en-US.pak"
 
   # Create files
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
@@ -175,7 +180,11 @@ Section "SectionPrincipale" SEC01
 SectionEnd
 
 Section -Post
-  WriteUninstaller "$INSTDIR\uninst.exe"
+  !if /FileExists "..\..\Release\${PRODUCT_NAME}_GUI_${PRODUCT_VERSION}_Windows-uninst.exe"
+    File "/oname=$INSTDIR\uninst.exe" "..\..\Release\${PRODUCT_NAME}_GUI_${PRODUCT_VERSION}_Windows-uninst.exe"
+  !else
+    WriteUninstaller "$INSTDIR\uninst.exe"
+  !endif
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\MediaConch.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName"     "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher"       "${PRODUCT_PUBLISHER}"

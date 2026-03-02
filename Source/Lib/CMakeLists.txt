@@ -37,7 +37,7 @@ add_library(MediaConchLib
         ../IMSC1/IMSC1Plugin.cpp
         ../Checker/Checker.cpp
         ../Checker/Path.cpp
-        ../ThirdParty/tfsxml/tfsxml.cpp
+        ../ThirdParty/tfsxml/tfsxml_wrapper.cpp
         MediaConchDLL.cpp
         Lib.cpp
 )

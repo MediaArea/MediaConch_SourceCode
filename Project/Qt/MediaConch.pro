@@ -4,38 +4,15 @@
 #
 #-------------------------------------------------
 
-contains(QT_CONFIG, no-gui) {
-    error("qt module gui not found")
-}
+QT     += core gui widgets
 
-QT     += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4) {
-    !qtHaveModule(widgets) {
-        error("qt module widgets not found")
-    }
-    QT += widgets
-}
-
-WEB_MACHINE=
+WEB_MACHINE=webengine
 
 contains(USE_WEBKIT, yes|1) {
     WEB_MACHINE = webkit
 }
 contains(USE_WEBENGINE, yes|1) {
     WEB_MACHINE = webengine
-}
-
-isEmpty(WEB_MACHINE) {
-    WEB_MACHINE = webengine
-    lessThan(QT_MAJOR_VERSION, 5) {
-        WEB_MACHINE = webkit
-    }
-    equals(QT_MAJOR_VERSION, 5) {
-        lessThan(QT_MINOR_VERSION, 6) {
-            WEB_MACHINE = webkit
-        }
-    }
 }
 
 !defined(packagesExist, test) {
@@ -45,8 +22,8 @@ isEmpty(WEB_MACHINE) {
     }
 }
 
-!macx:TARGET = mediaconch-gui
-macx:TARGET = MediaConch
+unix:!macx:TARGET = mediaconch-gui
+else:TARGET = MediaConch
 TEMPLATE = app
 
 CONFIG += qt release c++11
@@ -94,7 +71,7 @@ SOURCES          += ../../Source/Common/MediaConchLib.cpp \
                     ../../Source/Checker/Checker.cpp \
                     ../../Source/Checker/Path.cpp \
                     ../../Source/IMSC1/IMSC1Plugin.cpp \
-                    ../../Source/ThirdParty/tfsxml/tfsxml.cpp \
+                    ../../Source/ThirdParty/tfsxml/tfsxml_wrapper.cpp \
                     ../../Source/GUI/Qt/main.cpp \
                     ../../Source/GUI/Qt/commonwebwindow.cpp \
                     ../../Source/GUI/Qt/helpwindow.cpp \
@@ -226,18 +203,6 @@ equals(WEB_MACHINE, webengine) {
                ../../Source/GUI/Qt/WebEngineView.h
     DEFINES += WEB_MACHINE_ENGINE
 } else {
-    greaterThan(QT_MAJOR_VERSION, 4) {
-        !qtHaveModule(webkit) {
-            error("qt module webkit not found")
-        }
-    } else {
-        # Ubuntu build QtWebKit from separate sources therefore QT_CONFIG contains
-        # neither webkit nor no-webkit, so we also check for pkg-config module
-        !contains(QT_CONFIG, webkit):!packagesExist(QtWebKit) {
-            error("qt module webkit not found")
-        }
-    }
-
     QT += webkit webkitwidgets
     SOURCES += ../../Source/GUI/Qt/WebKitPage.cpp \
                ../../Source/GUI/Qt/WebKitView.cpp
@@ -247,6 +212,13 @@ equals(WEB_MACHINE, webengine) {
 }
 
 INCLUDEPATH      += ../../Source
+
+win32 {
+    INCLUDEPATH                     += ../../../zlib
+    contains(QT_ARCH, i386): LIBS   += $${_PRO_FILE_PWD_}/../../../zlib/contrib/vstudio/vc17/x86/ZlibStatReleaseWithoutAsm/zlibstat.lib
+    contains(QT_ARCH, x86_64): LIBS += $${_PRO_FILE_PWD_}/../../../zlib/contrib/vstudio/vc17/x64/ZlibStatReleaseWithoutAsm/zlibstat.lib
+}
+
 
 unix:exists(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config) {
     INCLUDEPATH      += ../../../MediaInfoLib/Source
@@ -262,10 +234,14 @@ unix:exists(../../../MediaInfoLib/Project/GNU/Library/libmediainfo-config) {
         error("libmediainfo not found on system")
     }
     LIBS += $$system(pkg-config --libs libmediainfo)
+}else:win32 {
+    INCLUDEPATH                     += ../../../MediaInfoLib/Source
+    contains(QT_ARCH, i386): LIBS   += $${_PRO_FILE_PWD_}/../../../MediaInfoLib/Project/MSVC2022/Win32/Release/MediaInfo-Static.lib
+    contains(QT_ARCH, x86_64): LIBS += $${_PRO_FILE_PWD_}/../../../MediaInfoLib/Project/MSVC2022/x64/Release/MediaInfo-Static.lib
 }
 
 unix:exists(../../../ZenLib/Project/GNU/Library/libzen-config) {
-    INCLUDEPATH      += ../../../ZenLib/Source
+    INCLUDEPATH                    += ../../../ZenLib/Source
     contains(STATIC_LIBS, yes|1) {
         LIBS             += $$system(../../../ZenLib/Project/GNU/Library/libzen-config LIBS_Static)
         message("custom libzen       : yes (static)")
@@ -276,6 +252,10 @@ unix:exists(../../../ZenLib/Project/GNU/Library/libzen-config) {
 } else:unix {
     PKGCONFIG        += libzen
     message("libzen      : system")
+} else:win32 {
+    INCLUDEPATH                     += ../../../ZenLib/Source
+    contains(QT_ARCH, i386): LIBS   += $${_PRO_FILE_PWD_}/../../../MediaInfoLib/Project/MSVC2022/Win32/Release/ZenLib.lib
+    contains(QT_ARCH, x86_64): LIBS += $${_PRO_FILE_PWD_}/../../../MediaInfoLib/Project/MSVC2022/x64/Release/ZenLib.lib
 }
 
 unix:exists(../../../libxml2/.libs/libxml2.a) {
@@ -289,6 +269,11 @@ unix:exists(../../../libxml2/.libs/libxml2.a) {
         PKGCONFIG += libxml-2.0
     }
     message("libxml2     : system")
+} else:win32 {
+    DEFINES                        += LIBXML_STATIC
+    INCLUDEPATH                    += ../../../libxml2/include
+    contains(QT_ARCH, i386):LIBS   += $${_PRO_FILE_PWD_}/../../../libxml2/win32/VC17/Win32/Release/libxml2.lib
+    contains(QT_ARCH, x86_64):LIBS += $${_PRO_FILE_PWD_}/../../../libxml2/win32/VC17/x64/Release/libxml2.lib
 }
 
 unix:exists(../../../libxslt/libxslt/.libs/libxslt.a) {
@@ -299,6 +284,13 @@ unix:exists(../../../libxslt/libxslt/.libs/libxslt.a) {
 } else:unix {
     PKGCONFIG        += libxslt libexslt
     message("libxslt     : system")
+} else:win32 {
+    DEFINES                        += LIBXSLT_STATIC LIBEXSLT_STATIC
+    INCLUDEPATH                    += ../../../libxslt
+    contains(QT_ARCH, i386):LIBS   += $${_PRO_FILE_PWD_}/../../../libxslt/win32/VC17/libxslt/Win32/Release/libxslt.lib
+    contains(QT_ARCH, x86_64):LIBS += $${_PRO_FILE_PWD_}/../../../libxslt/win32/VC17/libxslt/x64/Release/libxslt.lib
+    contains(QT_ARCH, i386):LIBS   += $${_PRO_FILE_PWD_}/../../../libxslt/win32/VC17/libexslt/Win32/Release/libexslt.lib
+    contains(QT_ARCH, x86_64):LIBS += $${_PRO_FILE_PWD_}/../../../libxslt/win32/VC17/libexslt/x64/Release/libexslt.lib
 }
 
 
@@ -313,6 +305,11 @@ contains(NO_SQLITE, yes|1) {
     } else:unix {
         PKGCONFIG        += sqlite3
         message("libsqlite3  : system")
+    } else:win32 {
+        DEFINES     += HAVE_SQLITE
+        INCLUDEPATH += ../../Source/ThirdParty/sqlite
+        SOURCES     += ../../Source/ThirdParty/sqlite/sqlite3.c
+        HEADERS     += ../../Source/ThirdParty/sqlite/sqlite3.h
     }
 }
 
@@ -327,6 +324,11 @@ contains(NO_JANSSON, yes|1) {
     } else:unix {
         PKGCONFIG        += jansson
         message("libjansson  : system")
+    } else:win32 {
+        DEFINES                        += HAVE_JANSSON
+        INCLUDEPATH                    += ../../../jansson/Contrib/VC17/Jansson ../../../jansson/src
+        contains(QT_ARCH, i386):LIBS   += $${_PRO_FILE_PWD_}/../../../jansson/Contrib/VC17/Jansson/Win32/Release/Jansson.lib
+        contains(QT_ARCH, x86_64):LIBS += $${_PRO_FILE_PWD_}/../../../jansson/Contrib/VC17/Jansson/x64/Release/Jansson.lib
     }
 }
 
@@ -341,6 +343,11 @@ contains(NO_LIBEVENT, yes|1) {
     } else:unix {
         PKGCONFIG        += libevent
         message("libevent    : system")
+    } else:win32 {
+        DEFINES                        += HAVE_LIBEVENT
+        INCLUDEPATH                    += ../../../libevent/WIN32-Code/nmake ../../../libevent/include
+        contains(QT_ARCH, i386):LIBS   += $${_PRO_FILE_PWD_}/../../../libevent/Contrib/VC17/event/Win32/Release/event.lib
+        contains(QT_ARCH, x86_64):LIBS += $${_PRO_FILE_PWD_}/../../../libevent/Contrib/VC17/event/x64/Release/event.lib
     }
 }
 
@@ -356,8 +363,15 @@ macx:contains(MACSTORE, yes|1) {
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
 }
 
-LIBS             += -lz
-!macx:LIBS       += -ldl -lrt
+win32 {
+    RC_FILE = MediaConch.rc
+    LIBS += winmm.lib ws2_32.lib imm32.lib ole32.lib
+    contains(QT_ARCH, i386): DESTDIR = Win32
+    contains(QT_ARCH, x86_64): DESTDIR = x64
+}
+
+unix:LIBS        += -lz
+unix:!macx:LIBS  += -ldl -lrt
 
 RESOURCES        += ../../Source/Resource/Resources.qrc
 

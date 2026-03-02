@@ -19,152 +19,133 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2D3D1642-D55D-4EF6-AEC8-B8E1B8F8B226}</ProjectGuid>
+    <ProjectName>MediaConch-DLL</ProjectName>
+    <ProjectGuid>{574149DF-5BE6-47FD-9289-332AF77151FB}</ProjectGuid>
+    <RootNamespace>MediaConch</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>MediaConch_GUI</RootNamespace>
-    <ProjectName>MediaConch-GUI</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MediaConch</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MediaConch</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MediaConch</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MediaConch</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental />
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental />
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;HAVE_JANSSON;HAVE_LIBEVENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <MinimalRebuild>false</MinimalRebuild>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebChanneld.lib;Qt5WebEngined.lib;Qt5WebEngineWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>Pre-Build.bat Engine</Command>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>Post-Build.bat $(OutDir) $(Configuration)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;HAVE_JANSSON;HAVE_LIBEVENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5Widgetsd.lib;Qt5Networkd.lib;Qt5PrintSupportd.lib;Qt5WebChanneld.lib;Qt5WebEngined.lib;Qt5WebEngineWidgetsd.lib;qtmaind.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>Pre-Build.bat Engine</Command>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>Post-Build.bat $(OutDir) $(Configuration)</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;HAVE_JANSSON;HAVE_LIBEVENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DebugInformationFormat>None</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebChannel.lib;Qt5WebEngine.lib;Qt5WebEngineWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <SetChecksum>true</SetChecksum>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2022\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2022\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2022\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC17\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2022\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
     </Link>
-    <PreBuildEvent>
-      <Command>Pre-Build.bat Engine</Command>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>Post-Build.bat $(OutDir) $(Configuration)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <FunctionLevelLinking>
-      </FunctionLevelLinking>
-      <PreprocessorDefinitions>LIBXML_STATIC;LIBXSLT_STATIC;LIBEXSLT_STATIC;HAVE_SQLITE;HAVE_JANSSON;HAVE_LIBEVENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>
-      </SDLCheck>
-      <AdditionalIncludeDirectories>./_Automated;../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Source;../../../Source/ThirdParty/sqlite;../../../../libevent/WIN32-Code/nmake;../../../../libevent/include;../../../../jansson/src;../../../../jansson/Contrib/VC17/Jansson;../../../../zlib;../../../../libxslt;../../../../libxml2/include;../../../../MediaInfoLib/Source;../../../../ZenLib/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_JANSSON;HAVE_LIBEVENT;HAVE_SQLITE;LIBEXSLT_STATIC;LIBXSLT_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>None</DebugInformationFormat>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5Widgets.lib;Qt5Network.lib;Qt5PrintSupport.lib;Qt5WebChannel.lib;Qt5WebEngine.lib;Qt5WebEngineWidgets.lib;qtmain.lib;winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <SetChecksum>true</SetChecksum>
+      <AdditionalLibraryDirectories>..\..\..\Project\MSVC2022\$(Platform)\$(Configuration);..\..\..\..\MediaInfoLib\Project\MSVC2022\Library\$(Platform)\$(Configuration);..\..\..\..\ZenLib\Project\MSVC2022\Library\$(Platform)\$(Configuration);..\..\..\..\libxslt\win32\libxslt\$(Platform)\$(Configuration);..\..\..\..\libxml2\win32\VC17\$(Platform)\$(Configuration);..\..\..\..\zlib\projects\MSVC2022\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
     </Link>
-    <PreBuildEvent>
-      <Command>Pre-Build.bat Engine</Command>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>Post-Build.bat $(OutDir) $(Configuration)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ResourceCompile Include="MediaConch_GUI.rc" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\Lib\Lib.cpp" />
+    <ClCompile Include="..\..\..\Source\Lib\MediaConchDLL.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Configuration.cpp" />
     <ClCompile Include="..\..\..\Source\Common\Core.cpp" />
     <ClCompile Include="..\..\..\Source\Common\DaemonClient.cpp" />
@@ -203,53 +184,15 @@
     <ClCompile Include="..\..\..\Source\Checker\Checker.cpp" />
     <ClCompile Include="..\..\..\Source\Checker\Path.cpp" />
     <ClCompile Include="..\..\..\Source\IMSC1\IMSC1Plugin.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\checkerwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\commonwebwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\DatabaseUi.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\databasewindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\displaywindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\helpwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\main.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\mainwindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\settingswindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\NoDatabaseUi.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\policieswindow.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\progressbar.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\resulttable.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\SQLLiteUi.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\uisettings.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebCommonPage.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebEnginePage.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebEngineView.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitPage.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\WebKitView.cpp" />
-    <ClCompile Include="..\..\..\Source\GUI\Qt\workerfiles.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml_wrapper.cpp" />
     <ClCompile Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.c" />
-    <ClCompile Include="_Automated\moc_commonwebwindow.cpp" />
-    <ClCompile Include="_Automated\moc_helpwindow.cpp" />
-    <ClCompile Include="_Automated\moc_mainwindow.cpp" />
-    <ClCompile Include="_Automated\moc_progressbar.cpp" />
-    <ClCompile Include="_Automated\moc_WebCommonPage.cpp" />
-    <ClCompile Include="_Automated\moc_WebEnginePage.cpp" />
-    <ClCompile Include="_Automated\moc_WebEngineView.cpp" />
-    <ClCompile Include="_Automated\moc_WebKitPage.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_WebKitView.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="_Automated\moc_workerfiles.cpp" />
-    <ClCompile Include="_Automated\qrc_Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="MediaConch_DLL.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Source\Lib\Lib.h" />
+    <ClInclude Include="..\..\..\Source\Lib\MediaConchDLL.h" />
     <ClInclude Include="..\..\..\Source\Common\Configuration.h" />
     <ClInclude Include="..\..\..\Source\Common\Container.h" />
     <ClInclude Include="..\..\..\Source\Common\Core.h" />
@@ -331,39 +274,8 @@
     <ClInclude Include="..\..\..\Source\Checker\Checker.h" />
     <ClInclude Include="..\..\..\Source\Checker\Path.h" />
     <ClInclude Include="..\..\..\Source\IMSC1\IMSC1Plugin.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\checkerwindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\commonwebwindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\DatabaseUi.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\databasewindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\displaywindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\helpwindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\mainwindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\publicpolicieswindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\settingswindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\policieswindow.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\progressbar.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\resulttable.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\SQLLiteUi.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebChoose.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebCommonPage.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebEnginePage.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebEngineView.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebPage.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\WebView.h" />
-    <ClInclude Include="..\..\..\Source\GUI\Qt\workerfiles.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\tfsxml\tfsxml.h" />
     <ClInclude Include="..\..\..\Source\ThirdParty\sqlite\sqlite3.h" />
-    <ClInclude Include="_Automated\ui_groupofrules.h" />
-    <ClInclude Include="_Automated\ui_mainwindow.h" />
-    <ClInclude Include="_Automated\ui_policiesmenu.h" />
-    <ClInclude Include="_Automated\ui_policiestree.h" />
-    <ClInclude Include="_Automated\ui_policymenu.h" />
-    <ClInclude Include="_Automated\ui_progressbar.h" />
-    <ClInclude Include="_Automated\ui_ruleedit.h" />
-    <ClInclude Include="_Automated\ui_rulemenu.h" />
-    <ClInclude Include="_Automated\ui_unknownpolicymenu.h" />
-    <ClInclude Include="_Automated\ui_xsltpolicymenu.h" />
-    <ClInclude Include="_Automated\ui_xsltruleedit.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\jansson\Contrib\VC17\Jansson\Jansson.vcxproj">
@@ -390,23 +302,6 @@
     <ProjectReference Include="..\..\..\..\zlib\contrib\vstudio\vc17\zlibstat.vcxproj">
       <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="..\..\..\Source\GUI\Qt\mainwindow.ui">
-      <FileType>Document</FileType>
-    </Xml>
-    <Xml Include="..\..\..\Source\GUI\Qt\progressbar.ui">
-      <FileType>Document</FileType>
-    </Xml>
-    <Xml Include="..\..\..\Source\Resource\Resources.qrc">
-      <FileType>Document</FileType>
-    </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="..\..\..\License.html" />
-    <Xml Include="..\..\..\Source\Resource\html\Help\Data Format\Data Format.html" />
-    <Xml Include="..\..\..\Source\Resource\html\Help\FAQ\FAQ.html" />
-    <Xml Include="..\..\..\Source\Resource\html\Help\How To Use\How To Use.html" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
