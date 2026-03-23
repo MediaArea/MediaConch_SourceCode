@@ -1,5 +1,8 @@
+base: core24
+
 name: mediaconch-server
-version: 25.04
+title: MediaConch Server
+version: '25.04'
 summary: Implementation checker and policy checker for video and audio files (Server)
 description: |
   MediaConch is an implementation checker, policy checker, reporter,
@@ -8,21 +11,36 @@ description: |
   and FF Video Codec 1 (FFV1)).
 
   This project is maintained by MediaArea and funded by PREFORMA.
+license: BSD-2-Clause
+contact: info@mediaarea.net
+website: https://mediaarea.net/MediaConch
+source-code: https://github.com/MediaArea/MediaConch_SourceCode
+issues: https://github.com/MediaArea/MediaConch_SourceCode/issues
 confinement: strict
 grade: stable
 
+lint:
+  ignore:
+    - classic
+    - library:
+      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libmms.*
+      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libicu*
+
 apps:
   mediaconch-server:
-    command: mediaconchd
+    command: usr/bin/mediaconchd
     plugs:
       - home
       - network
-      - network-bind
+      - removable-media
+
 parts:
   mediaconch-server:
-    plugin: autotools-subdir
+    plugin: autotools
     source: MediaConch
-    make-directory: Project/GNU/Server
+    source-subdir: Project/GNU/Server
+    autotools-configure-parameters:
+      - --prefix=/usr
     build-packages:
       - zlib1g-dev
       - libxml2-dev
@@ -30,45 +48,56 @@ parts:
       - libevent-dev
       - libsqlite3-dev
       - libjansson-dev
-      - libcurl4-gnutls-dev
+      - libcurl4-openssl-dev
+    stage-packages:
+      - libcurl4t64
+      - libmms0
+      - libjansson4
+      - libxml2
+      - libxslt1.1
+    prime:
+      - usr/bin/mediaconchd
+      - usr/lib/*
     after:
       - libmediainfo
       - libzen
       - build-essential
 
   libmediainfo:
-    plugin: autotools-subdir
+    plugin: autotools
     source: MediaInfoLib
-    make-directory: Project/GNU/Library
-    configflags:
+    source-subdir: Project/GNU/Library
+    autotools-configure-parameters:
+      - --prefix=/usr
       - --enable-shared
       - --disable-static
       - --with-libcurl
       - --with-libmms
     build-packages:
-      - libcurl4-gnutls-dev
-      - libglib2.0-dev
+      - libcurl4-openssl-dev
       - libmms-dev
       - zlib1g-dev
     after:
       - libzen
       - build-essential
-    snap:
-      - lib/libmediainfo.*
+    prime:
+      - usr/lib/libmediainfo.*
 
   libzen:
-    plugin: autotools-subdir
+    plugin: autotools
     source: ZenLib
-    make-directory: Project/GNU/Library
-    configflags:
+    source-subdir: Project/GNU/Library
+    autotools-configure-parameters:
+      - --prefix=/usr
       - --enable-shared
       - --disable-static
-    snap:
-      - lib/libzen.*
     after:
       - build-essential
+    prime:
+      - usr/lib/libzen.*
 
   build-essential:
     plugin: nil
     build-packages:
       - build-essential
+      - pkgconf

@@ -1,5 +1,8 @@
+base: core24
+
 name: mediaconch-gui
-version: 25.04
+title: MediaConch
+version: '25.04'
 summary: Implementation checker and policy checker for video and audio files (GUI)
 description: |
   MediaConch is an implementation checker, policy checker, reporter,
@@ -8,74 +11,121 @@ description: |
   and FF Video Codec 1 (FFV1)).
 
   This project is maintained by MediaArea and funded by PREFORMA.
+license: BSD-2-Clause
+contact: info@mediaarea.net
+website: https://mediaarea.net/MediaConch
+source-code: https://github.com/MediaArea/MediaConch_SourceCode
+issues: https://github.com/MediaArea/MediaConch_SourceCode/issues
 confinement: strict
 grade: stable
 
+lint:
+  ignore:
+    - classic
+    - library:
+      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/lib*
+
+plugs:
+  shared-memory:
+    private: true
+
 apps:
   mediaconch-gui:
-    command: desktop-launch mediaconch-gui
+    extensions:
+      - kde-neon-6
+    environment:
+      QTWEBENGINE_DISABLE_SANDBOX: 1
+    command: usr/bin/mediaconch-gui
     plugs:
+      - x11
       - unity7
+      - wayland
+      - opengl
+      - desktop
+      - desktop-legacy
       - home
       - network
+      - gsettings
+      - removable-media
 
 parts:
   mediaconch-gui:
-    plugin: qmake-subdir
+    plugin: qmake
     source: MediaConch
-    make-directory: Project/Qt
-    qt-version: qt5
-    options:
-      - USE_WEBKIT=1
+    qmake-major-version: 6
+    qmake-project-file: Project/Qt/MediaConch.pro
+    build-environment:
+      - PATH: "/usr/lib/qt6/bin:$PATH"
     build-packages:
-      - qtbase5-dev
-      - libqt5webkit5-dev
       - zlib1g-dev
       - libxml2-dev
       - libxslt1-dev
       - libevent-dev
       - libsqlite3-dev
       - libjansson-dev
-      - libcurl4-gnutls-dev
+      - libcurl4-openssl-dev
+      - qt6-tools-dev-tools
+      - qt6-l10n-tools
+      - qt6-base-dev
+      - qt6-webengine-dev
+      - qmake6
+      - libglib2.0-bin
+    stage-packages:
+      - libcurl4t64
+      - libmms0
+      - libjansson4
+      - libxml2
+      - libxslt1.1
+      - libqt6widgets6t64
+      - libqt6xml6t64
+      - libqt6quickwidgets6
+      - libqt6printsupport6t64
+      - libqt6webenginecore6
+      - libqt6webenginewidgets6
+      - libgtk-3-common # needed by qt applications, but not pulled by kf6 part
+    override-prime: |
+      craftctl default
+      glib-compile-schemas $CRAFT_PRIME/usr/share/glib-2.0/schemas
     after:
-      - desktop-qt5
       - libmediainfo
       - libzen
       - build-essential
 
   libmediainfo:
-    plugin: autotools-subdir
+    plugin: autotools
     source: MediaInfoLib
-    make-directory: Project/GNU/Library
-    configflags:
+    source-subdir: Project/GNU/Library
+    autotools-configure-parameters:
+      - --prefix=/usr
       - --enable-shared
       - --disable-static
       - --with-libcurl
       - --with-libmms
     build-packages:
-      - libcurl4-gnutls-dev
-      - libglib2.0-dev
+      - libcurl4-openssl-dev
       - libmms-dev
       - zlib1g-dev
     after:
       - libzen
       - build-essential
-    snap:
-      - lib/libmediainfo.*
+    prime:
+      - usr/lib/libmediainfo.*
 
   libzen:
-    plugin: autotools-subdir
+    plugin: autotools
     source: ZenLib
-    make-directory: Project/GNU/Library
-    configflags:
+    source-subdir: Project/GNU/Library
+    autotools-configure-parameters:
+      - --prefix=/usr
       - --enable-shared
       - --disable-static
-    snap:
-      - lib/libzen.*
     after:
       - build-essential
+    prime:
+      - usr/lib/libzen.*
 
   build-essential:
     plugin: nil
     build-packages:
       - build-essential
+      - pkgconf
