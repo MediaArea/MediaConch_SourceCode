@@ -26,7 +26,7 @@ jobs:
             pip --disable-pip-version-check install git+https://github.com/vi/mkvparse.git
           fi
           if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install libtool automake libxslt jansson qt sfk xmlstarlet ffmpeg
+            brew install libtool automake libxslt libevent jansson qt sfk xmlstarlet ffmpeg
             sudo pip --disable-pip-version-check install --prefix /usr/local git+https://github.com/vi/mkvparse.git
           fi
       - name: Get ZenLib info
