@@ -42,6 +42,22 @@
     <xsl:text>&#xa;}&#xa;</xsl:text>
   </xsl:template>
 
+  <xsl:template name="escape-backslashes">
+    <xsl:param name="text"/>
+    <xsl:choose>
+      <xsl:when test="contains($text, '\')">
+        <xsl:value-of select="substring-before($text, '\')"/>
+        <xsl:text>\\</xsl:text>
+        <xsl:call-template name="escape-backslashes">
+          <xsl:with-param name="text" select="substring-after($text, '\')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="mc:media">
     <xsl:param name="level"/>
     <xsl:param name="attributes"/>
@@ -56,7 +72,9 @@
     <xsl:text>{</xsl:text>
     <xsl:value-of select="substring($indent, 1, 1 + 4 + $level * 2)"/>
     <xsl:text>"ref": "</xsl:text>
-    <xsl:value-of select="@ref"/>
+    <xsl:call-template name="escape-backslashes">
+      <xsl:with-param name="text" select="@ref"/>
+    </xsl:call-template>
     <xsl:text>"</xsl:text>
     <xsl:apply-templates select="mc:implementationChecks|mc:policyChecks">
       <xsl:with-param name="level" select="$level + 2"/>
