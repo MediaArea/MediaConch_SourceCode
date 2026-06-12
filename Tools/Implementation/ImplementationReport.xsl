@@ -143,7 +143,7 @@
                       <xsl:call-template name="size_is_not_unlimited">
                         <xsl:with-param name="icid">EBML-ELEM-UNKNOWN-SIZE</xsl:with-param>
                         <xsl:with-param name="version">1</xsl:with-param>
-                        <xsl:with-param name="element" select="mmt:MicroMediaTrace//mmt:b[not(ancestor::mmt:b[@n='FileData'])][@n!='Segment'][@n!='Cluster'][mmt:b[1][@n='Header']/mmt:d[@n='Name']][mmt:b[1][@n='Header']/mmt:d[@n='Size']='Unlimited']"/>
+                        <xsl:with-param name="element" select="mmt:MicroMediaTrace//mmt:b[not(ancestor::mmt:b[@n='FileData'])][@n!='Segment'][@n!='Cluster'][mmt:b[1][@n='Header']/mmt:d[@n='Name']][mmt:b[1][@n='Header']/mmt:d[@n='Size' and (.='Unlimited' or @*[starts-with(name(), 'i')]='Unlimited')]]"/>
                       </xsl:call-template>
                       <!-- /EBML-ELEM-UNKNOWN-SIZE -->
                       <!-- EBML-ELEMENT-NONMULTIPLES -->
@@ -1571,9 +1571,7 @@
           <xsl:variable name="ElementName">
             <xsl:value-of select="@n"/>
           </xsl:variable>
-          <xsl:variable name="element_size">
-            <xsl:value-of select="mmt:b[1][@n='Header']/mmt:d[@n='Size']"/>
-          </xsl:variable>
+          <xsl:variable name="element_size_is_unlimited" select="count(mmt:b[1][@n='Header']/mmt:d[@n='Size' and (.='Unlimited' or @*[starts-with(name(), 'i')]='Unlimited')]) &gt; 0"/>
           <xsl:variable name="values">
             <xsl:for-each select="parent::mmt:b">
               <xsl:call-template name="EBMLElementValue">
@@ -1582,7 +1580,7 @@
             </xsl:for-each>
           </xsl:variable>
           <xsl:choose>
-            <xsl:when test="$element_size != 'Unlimited'">
+            <xsl:when test="not($element_size_is_unlimited)">
               <test>
                 <xsl:attribute name="outcome">pass</xsl:attribute>
                 <xsl:attribute name="ya">
