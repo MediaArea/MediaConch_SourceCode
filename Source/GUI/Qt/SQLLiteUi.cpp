@@ -260,7 +260,7 @@ int SQLLiteUi::ui_create_files(const std::vector<FileRegistered*>& files)
     if (prepare_v2(query, err) < 0)
         return -1;
 
-    int nb_column = 12;
+    int nb_column = 14;
     int ret = SQLITE_OK;
     for (size_t i = 0; i < files.size(); ++i)
     {
@@ -458,7 +458,7 @@ int SQLLiteUi::ui_update_files(const std::vector<FileRegistered*>& files)
     if (ret != SQLITE_OK || !stmt || (end && *end))
         return -1;
 
-    int nb_column = 12;
+    int nb_column = 14;
     for (size_t i = 0; i < files.size(); ++i)
     {
         FileRegistered* file = files[i];
