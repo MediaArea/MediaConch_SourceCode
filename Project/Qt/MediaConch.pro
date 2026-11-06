@@ -365,7 +365,7 @@ macx:contains(MACSTORE, yes|1) {
 
 win32 {
     RC_FILE = MediaConch.rc
-    LIBS += winmm.lib ws2_32.lib imm32.lib ole32.lib
+    LIBS += winmm.lib ws2_32.lib imm32.lib ole32.lib user32.lib
     contains(QT_ARCH, i386): DESTDIR = Win32
     contains(QT_ARCH, x86_64): DESTDIR = x64
 }
