@@ -434,7 +434,9 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
 
             cr.display_content = &display_content;
 
-            MCL.checker_get_report(cr, &result, error);
+            if (MCL.checker_get_report(cr, &result, err) < 0)
+                return CLI_RETURN_ERROR;
+
             MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
             STRINGOUT(report_mi);
@@ -460,7 +462,9 @@ void __stdcall Event_CallBackFunction(unsigned char* Data_Content, size_t Data_S
 
                 cr.format = format;
 
-                MCL.checker_get_report(cr, &result, error);
+                if (MCL.checker_get_report(cr, &result, err) < 0)
+                    return CLI_RETURN_ERROR;
+
                 MediaInfoLib::String report_mi = ZenLib::Ztring().From_UTF8(result.report);
 
                 ZenLib::File F;

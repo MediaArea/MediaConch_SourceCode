@@ -1004,17 +1004,9 @@ int Policies::policy_get_policy_content(const std::string& policy, const std::ma
     ret = p->import_schema_from_memory(policy.c_str(), policy.length(), "");
     if (ret < 0)
     {
-        if (p)
-            delete p;
-
-        p = new UnknownPolicy(this, !core->accepts_https());
-        ret = p->import_schema_from_memory(policy.c_str(), policy.length(), "");
-        if (ret < 0)
-        {
-            err = p->get_error();
-            delete p;
-            return -1;
-        }
+        err = p->get_error();
+        delete p;
+        return -1;
     }
 
     ret = policy_get_policy_id(p, opts, xml_policies, xslt_policies, err);
