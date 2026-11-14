@@ -13,7 +13,7 @@ jobs:
       PYTHONPATH: /usr/local/lib/python2.7:/usr/local/lib/python2.7/dist-packages:/usr/local/lib/python2.7/site-packages
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
       - name: Dependencies
@@ -36,7 +36,7 @@ jobs:
           echo "path=$(dirname $PWD)/ZenLib" >> $GITHUB_OUTPUT
       - name: ZenLib cache
         id: zenlib-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.zenlib-info.outputs.path }}
           key: ${{ runner.os }}-ZenLib-${{ steps.zenlib-info.outputs.hash }}
@@ -56,7 +56,7 @@ jobs:
           echo "path=$(dirname $PWD)/MediaInfoLib" >> $GITHUB_OUTPUT
       - name: MediaInfoLib cache
         id: mediainfolib-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.mediainfolib-info.outputs.path }}
           key: ${{ runner.os }}-MediaInfoLib-${{ steps.mediainfolib-info.outputs.hash }}
@@ -123,13 +123,13 @@ jobs:
           ('path=' + (Get-Location) + '\zlib') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: zlib cache
         id: zlib-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.zlib-info.outputs.path }}
           key: windows-${{ matrix.arch }}-zlib-${{ steps.zlib-info.outputs.hash }}
       - name: Checkout zlib
         if: steps.zlib-cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MediaArea/zlib
           path: zlib
@@ -140,13 +140,13 @@ jobs:
           ('path=' + (Get-Location) + '\libxml2') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: libxml2 cache
         id: libxml2-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.libxml2-info.outputs.path }}
           key: windows-${{ matrix.arch }}-libxml2-${{ steps.libxml2-info.outputs.hash }}
       - name: Checkout libxml2
         if: steps.libxml2-cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MediaArea/libxml2
           path: libxml2
@@ -157,13 +157,13 @@ jobs:
           ('path=' + (Get-Location) + '\libxslt') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: libxslt cache
         id: libxslt-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.libxslt-info.outputs.path }}
           key: windows-${{ matrix.arch }}-libxslt-${{ steps.libxslt-info.outputs.hash }}
       - name: Checkout libxslt
         if: steps.libxslt-cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MediaArea/libxslt
           path: libxslt
@@ -174,13 +174,13 @@ jobs:
           ('path=' + (Get-Location) + '\libevent') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: libevent cache
         id: libevent-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.libevent-info.outputs.path }}
           key: windows-${{ matrix.arch }}-libevent-${{ steps.libevent-info.outputs.hash }}
       - name: Checkout libevent
         if: steps.libevent-cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MediaArea/libevent
           path: libevent
@@ -191,13 +191,13 @@ jobs:
           ('path=' + (Get-Location) + '\jansson') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: jansson cache
         id: jansson-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.jansson-info.outputs.path }}
           key: windows-${{ matrix.arch }}-jansson-${{ steps.jansson-info.outputs.hash }}
       - name: Checkout jansson
         if: steps.jansson-cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MediaArea/jansson
           path: jansson
@@ -208,13 +208,13 @@ jobs:
           ('path=' + (Get-Location) + '\ZenLib') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: ZenLib cache
         id: zenlib-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.zenlib-info.outputs.path }}
           key: windows-${{ matrix.arch }}-zenlib-${{ steps.zenlib-info.outputs.hash }}
       - name: Checkout ZenLib
         if: steps.zenlib-cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MediaArea/ZenLib
           path: ZenLib
@@ -225,22 +225,22 @@ jobs:
           ('path=' + (Get-Location) + '\MediaInfoLib') | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       - name: MediaInfoLib cache
         id: mediainfolib-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.mediainfolib-info.outputs.path }}
           key: windows-${{ matrix.arch }}-mediainfolib-${{ steps.mediainfolib-info.outputs.hash }}
       - name: Checkout MediaInfoLib
         if: steps.mediainfolib-cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MediaArea/MediaInfoLib
           path: MediaInfoLib
       - name: Checkout MediaConch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: MediaConch
       - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: x64
       - name: Build
