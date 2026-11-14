@@ -24,12 +24,12 @@ jobs:
       CONAN_HOME: ${{ matrix.conan_home }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+        uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
         with:
           cache: 'pip' # caching pip dependencies
       - name: "Cache Conan dependencies"
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
             path: "${{matrix.conan_home}}"
             key: ${{ runner.os }}-conan-${{ hashFiles('.github/workflows/conanfile.txt') }}
