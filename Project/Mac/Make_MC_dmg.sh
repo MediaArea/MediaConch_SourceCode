@@ -117,7 +117,7 @@ if [ "$KIND" = "GUI" ]; then
     echo Signing the application...
     echo
 
-    codesign --options=runtime --force --verbose --entitlements QtWebEngineProcess-ns.entitlements --sign "Developer ID Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
+    codesign --options=runtime --force --verbose --entitlements QtWebEngineProcess-ns.entitlements --sign "Developer ID Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app"
     codesign --deep --options=runtime --force --verbose --preserve-metadata=identifier,entitlements --sign "Developer ID Application: ${SIGNATURE}" "${FILES}/${APPNAME}.app"
 
     echo
