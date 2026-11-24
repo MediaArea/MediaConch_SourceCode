@@ -32,9 +32,9 @@ jobs:
         uses: actions/cache@v4
         with:
             path: "${{matrix.conan_home}}"
-            key: ${{ runner.os }}-conan-${{ hashFiles('.github/workflows/conanfile.txt') }}
+            key: ${{ runner.os }}-${{ runner.arch }}-conan-${{ hashFiles('.github/workflows/conanfile.txt') }}
             restore-keys: |
-              ${{ runner.os }}-conan-
+              ${{ runner.os }}-${{ runner.arch }}-conan-
       - name: "install dependencies"  # use conan package manager to install c and c++ dependencies
         # conanfile.txt is copied to the root because for some reason, conan doesn't seem to create the top
         # CMakeUserPresets.json if you have the conanfile.txt in another directory than the path you call conan from.
