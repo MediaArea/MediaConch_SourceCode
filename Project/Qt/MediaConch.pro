@@ -26,7 +26,7 @@ unix:!macx:TARGET = mediaconch-gui
 else:TARGET = MediaConch
 TEMPLATE = app
 
-CONFIG += qt release c++11
+CONFIG += qt release c++17
 CONFIG += no_keywords
 
 unix:CONFIG += link_pkgconfig
@@ -351,16 +351,20 @@ contains(NO_LIBEVENT, yes|1) {
     }
 }
 
+macx {
+    QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
+}
+
 macx:contains(MACSTORE, yes|1) {
     QMAKE_LFLAGS+=-Wl,-ld_classic
     QMAKE_CFLAGS += -gdwarf-2
     QMAKE_CXXFLAGS += -gdwarf-2
     QMAKE_INFO_PLIST = ../Mac/Info.plist
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
 } else:macx {
     QMAKE_LFLAGS+=-Wl,-ld_classic
     QMAKE_INFO_PLIST = ../Mac/Info-ns.plist
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
 }
 
 win32 {

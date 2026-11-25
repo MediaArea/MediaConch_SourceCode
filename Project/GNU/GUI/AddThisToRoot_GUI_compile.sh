@@ -31,30 +31,23 @@ Parallel_Make () {
 
 Home=`pwd`
 ZenLib_Options=""
-MacOptions="--with-macosx-version-min=10.10 --enable-arch-x86_64"
+MacOptions="--with-macosx-version-min=11.0 --enable-arch-x86_64 --enable-arch-arm64"
 
 OS=$(uname -s)
 # expr isn't available on mac
 if [ "$OS" = "Darwin" ]; then
     OS="mac"
     BINARY="MediaConch.app/Contents/MacOS/MediaConch"
-    if test -d ~/Qt/5.3/clang_64/bin; then
-        export PATH=$PATH:~/Qt/5.3/clang_64/bin
-    fi  
 # if the 5 first caracters of $OS equal "Linux"
 elif [ "$(expr substr $OS 1 5)" = "Linux" ]; then
     OS="linux"
     BINARY="mediaconch-gui"
-#elif [ "$(expr substr $OS 1 5)" = "SunOS" ]; then
-#    OS="solaris"
-#elif [ "$(expr substr $OS 1 7)" = "FreeBSD" ]; then
-#    OS="freebsd"
 fi
 
 if [ "$OS" = "mac" ] ; then
-    export CXXFLAGS="-mmacosx-version-min=10.10 -arch x86_64 $CXXFLAGS"
-    export CFLAGS="-mmacosx-version-min=10.10 -arch x86_64 $CFLAGS"
-    export LDFLAGS="-mmacosx-version-min=10.10 -arch x86_64 $LDFLAGS"
+    export CXXFLAGS="-mmacosx-version-min=11.0 -arch x86_64 -arch arm64 $CXXFLAGS"
+    export CFLAGS="-mmacosx-version-min=11.0 -arch x86_64 -arch arm64 $CFLAGS"
+    export LDFLAGS="-mmacosx-version-min=11.0 -arch x86_64 -arch arm64 $LDFLAGS"
 fi
 
 ##################################################################
@@ -183,20 +176,6 @@ if test -e ZenLib/Project/GNU/Library/configure; then
     fi
 else
     echo ZenLib directory is not found
-    exit
-fi
-cd $Home
-
-##################################################################
-# Compile zlib
-
-cd Shared/Source/zlib
-make clean
-Parallel_Make
-if test -e libz.a; then
-    echo zlib compiled
-else
-    echo Problem while compiling zlib
     exit
 fi
 cd $Home
